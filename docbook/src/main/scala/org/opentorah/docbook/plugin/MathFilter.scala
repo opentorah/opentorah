@@ -70,8 +70,8 @@ final class MathFilter(
     val isMathMLMath: Boolean = (uri == MathML.namespace.uri) && (localName == MathML.math)
     val attributes: Attributes = if (!isMathMLMath) atts else {
       val result: AttributesImpl = new AttributesImpl(atts)
-      val isInline: Option[Boolean] = displayAttribute.inNamespace(MathML.namespace).get(atts)
-      displayAttribute.inNamespace(MathML.namespace).withOptionalValue(checkInline(isInline)).set(result)
+      val isInline: Option[Boolean] = displayAttribute.optional.get(atts)
+      displayAttribute.optionalSetDefault.withValue(checkInline(isInline)).set(result)
       result
     }
 
@@ -137,7 +137,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    Input.attribute.inNamespace(MathML.namespace).withValue(input.withInline(isInline)).set(attributes)
+    Input.attribute.orDefault.withValue(input.withInline(isInline)).set(attributes)
 
     def mml(): Unit = {
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,

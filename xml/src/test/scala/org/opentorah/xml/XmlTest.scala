@@ -23,8 +23,11 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     parseOrError(
       new Element[Option[String]]("a") {
         override def contentType: ContentType = ContentType.Elements
-        override def parser: Parser[Option[String]] = Text().optional
-        override def antiparser: Antiparser[Option[String]] = ???
+
+        override def contentParsable: Parsable[Option[String]] = new Parsable[Option[String]] {
+          override def parser: Parser[Option[String]] = Text().optional()
+          override def antiparser: Antiparser[Option[String]] = ???
+        }
       }
         .parse(From.xml("test", <s>
           <a>asdjkh</a>
@@ -34,8 +37,11 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     Parser.parseDo(
       new Element[String]("a") {
         override def contentType: ContentType = ContentType.Characters
-        override def parser: Parser[String] = Text().required
-        override def antiparser: Antiparser[String] = ???
+
+        override def contentParsable: Parsable[String] = new Parsable[String] {
+          override def parser: Parser[String] = Text().required()
+          override def antiparser: Antiparser[String] = ???
+        }
       }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
@@ -51,21 +57,27 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
   private val nameParsable: Element[String] = new Element[String]("name") {
     override def contentType: ContentType = ContentType.Characters
-    override def parser: Parser[String] = Text().required
-    override def antiparser: Antiparser[String] = ???
+
+    override def contentParsable: Parsable[String] = new Parsable[String] {
+      override def parser: Parser[String] = Text().required()
+      override def antiparser: Antiparser[String] = ???
+    }
   }
 
-  private val file2parsable: Element[X] = new Element[X]("x") {
+  private val file2element: Element[X] = new Element[X]("x") {
     override def contentType: ContentType = ContentType.Elements
-    override def parser: Parser[X] = for {
-      urls <- Context.currentFromUrl
-      name <- nameParsable.required
-    } yield new X(
-      urls,
-      name
-    )
 
-    override def antiparser: Antiparser[X] = ???
+    override def contentParsable: Parsable[X] = new Parsable[X] {
+      override def parser: Parser[X] = for {
+        urls <- Context.currentFromUrl
+        name <- nameParsable.required()
+      } yield new X(
+        urls,
+        name
+      )
+
+      override def antiparser: Antiparser[X] = ???
+    }
   }
 
   "Redirect" should "work" in {
@@ -73,32 +85,32 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     val r1 = resource("1")
     def checkUrl(url: URL, name: String): Unit = url.toString.endsWith(s"/$name.xml") shouldBe true
 
-    val direct: X = Parser.parseDo(file2parsable.parse(resource("9")))
+    val direct: X = Parser.parseDo(file2element.parse(resource("9")))
     direct.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val followed: X = Parser.parseDo(file2parsable.followRedirects.parse(r1))
+    val followed: X = Parser.parseDo(file2element.followRedirects.parse(r1))
     followed.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val redirect = Parser.parseDo(file2parsable.orRedirect.parse(r1)).left.get
+    val redirect = Parser.parseDo(file2element.orRedirect.parse(r1)).left.get
     checkUrl(redirect.url, "2")
 
     val redirected: X = Parser.parseDo(redirect.followRedirects)
     redirected.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withTrue = Parser.parseDo(file2parsable.withRedirect(true).parse(r1)).right.get
+    val withTrue = Parser.parseDo(file2element.withRedirect(true).parse(r1)).right.get
     withTrue.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withFalse = Parser.parseDo(file2parsable.withRedirect(false).parse(r1)).left.get
+    val withFalse = Parser.parseDo(file2element.withRedirect(false).parse(r1)).left.get
     checkUrl(withFalse.url, "2")
   }
 
   "Attribute.get()" should "work" in {
-    Attribute("id").get(<x id="2"/>) shouldBe Some("2")
-    Attribute("id", Xml.namespace).get(<x xml:id="3"/>) shouldBe Some("3")
+    Attribute("id").optional.get(<x id="2"/>) shouldBe Some("2")
+    Attribute("id", Xml.namespace).optional.get(<x xml:id="3"/>) shouldBe Some("3")
     Dom.getAttributes(parseResource("namespace")) shouldBe Seq.empty
   }
 

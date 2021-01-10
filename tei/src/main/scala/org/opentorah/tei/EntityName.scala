@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Parsable, Parser, Xml}
 
 final case class EntityName(
   entityType: EntityType,
@@ -16,24 +16,28 @@ object EntityName extends EntityRelated[EntityName](
 
   override protected def contentType: ContentType = ContentType.Characters
 
-  val refAttribute: Attribute[String] = Attribute("ref")
+  private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
+  val refAttribute: Attribute.Optional[String] = Attribute("ref").optional
+  private val textParsable: Parsable[String] = org.opentorah.xml.Text().required
 
-  override protected def parser(entityType: EntityType): Parser[EntityName] = for {
-    id <- Xml.idAttribute.optional
-    ref <- refAttribute.optional
-    name <- org.opentorah.xml.Text().required
-  } yield EntityName(
-    entityType,
-    id,
-    ref,
-    name
-  )
+  override protected def parsable(entityType: EntityType): Parsable[EntityName] = new Parsable[EntityName] {
+    override protected def parser: Parser[EntityName] = for {
+      id <- idAttribute()
+      ref <- refAttribute()
+      name <- textParsable()
+    } yield EntityName(
+      entityType,
+      id,
+      ref,
+      name
+    )
 
-  override protected def antiparser(entityType: EntityType): Antiparser[EntityName] = Tei.concat(
-    Xml.idAttribute.toXmlOption(_.id),
-    refAttribute.toXmlOption(_.ref),
-    Antiparser.xml(value => Seq(Xml.mkText(value.name)))
-  )
+    override def antiparser: Antiparser[EntityName] = Tei.concat(
+      idAttribute(_.id),
+      refAttribute(_.ref),
+      textParsable(_.name)
+    )
+  }
 
   // TODO just the entity.entityName, like in the NamesObject?
   def forEntity(entity: Entity): EntityName = EntityName(

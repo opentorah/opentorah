@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
 import zio.ZIO
 
 abstract class Component(elementName: String) {
@@ -23,27 +23,29 @@ abstract class Component(elementName: String) {
   def classOfInline: Class[_]
 
   object parsable extends org.opentorah.xml.Element[Element](elementName) {
-    override def parser: Parser[Element] = for {
-      file <- Component.fileAttribute.optional
-      result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else  for {
-        className <- Attribute("type").optional
-        result <- className.flatMap(delegate)
-          .getOrElse(Component.this)
-          .inlineParser(className)
-          .map(_.asInstanceOf[Element])
+    override def contentParsable: Parsable[Element] = new Parsable[Element] {
+      override def parser: Parser[Element] = for {
+        file <- Component.fileAttribute.optional()
+        result <- if (file.isDefined) ZIO.succeed(FromFile(file.get)) else for {
+          className <- Attribute("type").optional()
+          result <- className.flatMap(delegate)
+            .getOrElse(Component.this)
+            .inlineParser(className)
+            .map(_.asInstanceOf[Element])
+        } yield result
       } yield result
-    } yield result
 
-    override def antiparser: Antiparser[Element] = Antiparser(
-      attributes = {
-        case FromFile(file) => Component.fileAttribute.toXml.attributes(file)
-        case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
-      },
-      content = {
-        case FromFile(_) => Seq.empty
-        case inline => inlineAntiparser.content(inline.asInstanceOf[Inline])
-      }
-    )
+      override def antiparser: Antiparser[Element] = Antiparser(
+        attributes = {
+          case FromFile(file) => Component.fileAttribute.required.antiparser.attributes(file)
+          case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
+        },
+        content = {
+          case FromFile(_) => Seq.empty
+          case inline => inlineAntiparser.content(inline.asInstanceOf[Inline])
+        }
+      )
+    }
   }
 
   private def delegate(className: String): Option[Component] = None
@@ -112,5 +114,5 @@ abstract class Component(elementName: String) {
 object Component {
   val fileAttribute: Attribute[String] = Attribute("file")
 
-  val typeAttribute: Attribute[String] = Attribute("type")
+  val typeAttribute: Attribute.Optional[String] = Attribute("type").optional
 }

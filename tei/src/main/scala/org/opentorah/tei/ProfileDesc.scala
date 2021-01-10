@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Choice, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Elements, Parsable, Parser}
 
 final case class ProfileDesc(
   documentAbstract: Option[Abstract.Value],
@@ -15,48 +15,7 @@ final case class ProfileDesc(
 
 object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
 
-  override val parser: Parser[ProfileDesc] = for {
-    values <- Choice(Seq(
-      Abstract.parsable,
-      Creation,
-      LangUsage,
-      TextClass.parsable,
-      CorrespDesc.parsable,
-      CalendarDesc.parsable,
-      HandNotes,
-      ListTranspose.parsable
-    ))
-    documentAbstract <- values.optional(Abstract.parsable)
-    creation <- values.optional(Creation)
-    langUsage <- values.optional(LangUsage)
-    textClass <- values.optional(TextClass.parsable)
-    correspDesc <- values.optional(CorrespDesc.parsable)
-    calendarDesc <- values.optional(CalendarDesc.parsable)
-    handNotes <- values.optional(HandNotes)
-    listTranspose <- values.optional(ListTranspose.parsable)
-  } yield new ProfileDesc(
-    documentAbstract,
-    creation,
-    langUsage,
-    textClass,
-    correspDesc,
-    calendarDesc,
-    handNotes,
-    listTranspose
-  )
-
-  override val antiparser: Antiparser[ProfileDesc] = Tei.concat(
-    Abstract.parsable.toXmlOption(_.documentAbstract),
-    Creation.toXmlOption(_.creation),
-    LangUsage.toXmlOption(_.langUsage),
-    TextClass.parsable.toXmlOption(_.textClass),
-    CorrespDesc.parsable.toXmlOption(_.correspDesc),
-    CalendarDesc.parsable.toXmlOption(_.calendarDesc),
-    HandNotes.toXmlOption(_.handNotes),
-    ListTranspose.parsable.toXmlOption(_.listTranspose)
-  )
-
-  def apply(): ProfileDesc = new ProfileDesc(
+  def empty: ProfileDesc = new ProfileDesc(
     documentAbstract = None,
     creation = None,
     langUsage = None,
@@ -66,4 +25,47 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
     handNotes = None,
     listTranspose = None
   )
+
+  override def contentParsable: Parsable[ProfileDesc] = new Parsable[ProfileDesc] {
+    override val parser: Parser[ProfileDesc] = for {
+      values <- Elements.choices(Seq(
+        Abstract.element,
+        Creation,
+        LangUsage,
+        TextClass.element,
+        CorrespDesc.element,
+        CalendarDesc.element,
+        HandNotes,
+        ListTranspose.element
+      ))
+      documentAbstract <- values.optional(Abstract.element)
+      creation <- values.optional(Creation)
+      langUsage <- values.optional(LangUsage)
+      textClass <- values.optional(TextClass.element)
+      correspDesc <- values.optional(CorrespDesc.element)
+      calendarDesc <- values.optional(CalendarDesc.element)
+      handNotes <- values.optional(HandNotes)
+      listTranspose <- values.optional(ListTranspose.element)
+    } yield new ProfileDesc(
+      documentAbstract,
+      creation,
+      langUsage,
+      textClass,
+      correspDesc,
+      calendarDesc,
+      handNotes,
+      listTranspose
+    )
+
+    override val antiparser: Antiparser[ProfileDesc] = Tei.concat(
+      Abstract.element.optional(_.documentAbstract),
+      Creation.optional(_.creation),
+      LangUsage.optional(_.langUsage),
+      TextClass.element.optional(_.textClass),
+      CorrespDesc.element.optional(_.correspDesc),
+      CalendarDesc.element.optional(_.calendarDesc),
+      HandNotes.optional(_.handNotes),
+      ListTranspose.element.optional(_.listTranspose)
+    )
+  }
 }

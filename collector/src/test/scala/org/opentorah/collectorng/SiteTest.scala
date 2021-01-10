@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers
 final class SiteTest extends AnyFlatSpec with Matchers {
 
   "Site" should "work" ignore {
+    //val old = new org.opentorah.collector.Site(new java.io.File("/home/dub/OpenTorah/alter-rebbe.org").toURI.toURL)
     val site: Site = Site.read("/home/dub/OpenTorah/alter-rebbe.org")
     site.writeLists()
     site.writeStaticFiles()

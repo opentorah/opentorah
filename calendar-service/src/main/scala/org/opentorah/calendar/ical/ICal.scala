@@ -50,7 +50,7 @@ object ICal {
       val mm = pad2digits(day.month.numberInYear)
       val dd = pad2digits(day.numberInMonth)
 
-      s"${yyyy}${mm}${dd}"
+      s"$yyyy$mm$dd"
     }
 
     Seq(

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser, Xml}
 
 final case class TitleStmt(
   titles: Seq[Title.Value],
@@ -13,19 +13,19 @@ final case class TitleStmt(
 ) {
   def references: Seq[EntityReference] = {
     val xml: Seq[Xml.Node] =
-      Title.parsable.toXmlSeq.content(titles) ++
-      Author.parsable.toXmlSeq.content(authors) ++
-      Sponsor.parsable.toXmlSeq.content(sponsors) ++
-      Funder.parsable.toXmlSeq.content(funders) ++
-      Principal.parsable.toXmlSeq.content(principals) ++
-      RespStmt.parsable.toXmlSeq.content(respStmts)
+      Title.element.seq.antiparser.content(titles) ++
+      Author.element.seq.antiparser.content(authors) ++
+      Sponsor.element.seq.antiparser.content(sponsors) ++
+      Funder.element.seq.antiparser.content(funders) ++
+      Principal.element.seq.antiparser.content(principals) ++
+      RespStmt.element.seq.antiparser.content(respStmts)
 
     EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
   }
 }
 
 object TitleStmt extends Element[TitleStmt]("titleStmt") {
-  def apply(): TitleStmt = new TitleStmt(
+  def empty: TitleStmt = new TitleStmt(
     titles = Seq.empty,
     authors = Seq.empty,
     editors = Seq.empty,
@@ -35,31 +35,33 @@ object TitleStmt extends Element[TitleStmt]("titleStmt") {
     respStmts = Seq.empty
   )
 
-  override val parser: Parser[TitleStmt] = for {
-    titles <- Title.parsable.all
-    authors <- Author.parsable.all
-    editors <- Editor.all
-    sponsors <- Sponsor.parsable.all
-    funders <- Funder.parsable.all
-    principals <- Principal.parsable.all
-    respStmts <- RespStmt.parsable.all
-  } yield new TitleStmt(
-    titles,
-    authors,
-    editors,
-    sponsors,
-    funders,
-    principals,
-    respStmts
-  )
+  override def contentParsable: Parsable[TitleStmt] = new Parsable[TitleStmt] {
+    override val parser: Parser[TitleStmt] = for {
+      titles <- Title.element.seq()
+      authors <- Author.element.seq()
+      editors <- Editor.seq()
+      sponsors <- Sponsor.element.seq()
+      funders <- Funder.element.seq()
+      principals <- Principal.element.seq()
+      respStmts <- RespStmt.element.seq()
+    } yield new TitleStmt(
+      titles,
+      authors,
+      editors,
+      sponsors,
+      funders,
+      principals,
+      respStmts
+    )
 
-  override val antiparser: Antiparser[TitleStmt] = Tei.concat(
-    Title.parsable.toXmlSeq(_.titles),
-    Author.parsable.toXmlSeq(_.authors),
-    Editor.toXmlSeq(_.editors),
-    Sponsor.parsable.toXmlSeq(_.sponsors),
-    Funder.parsable.toXmlSeq(_.funders),
-    Principal.parsable.toXmlSeq(_.principals),
-    RespStmt.parsable.toXmlSeq(_.respStmts)
-  )
+    override val antiparser: Antiparser[TitleStmt] = Tei.concat(
+      Title.element.seq(_.titles),
+      Author.element.seq(_.authors),
+      Editor.seq(_.editors),
+      Sponsor.element.seq(_.sponsors),
+      Funder.element.seq(_.funders),
+      Principal.element.seq(_.principals),
+      RespStmt.element.seq(_.respStmts)
+    )
+  }
 }

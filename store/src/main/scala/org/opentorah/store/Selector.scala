@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 final class Selector(val names: Names) {
   override def toString: String = names.toString
@@ -13,11 +13,11 @@ object Selector extends Element[Selector]("selector") {
 
   val predefinedSelectors: Seq[Selector] = Seq.empty
 
-  override val parser: Parser[Selector] = for {
-    names <- Names.withDefaultNameParser
-  } yield new Selector(names)
+  override def contentParsable: Parsable[Selector] = new Parsable[Selector] {
+    override val parser: Parser[Selector] = for {
+      names <- Names.withDefaultNameParsable()
+    } yield new Selector(names)
 
-  override val antiparser: Antiparser[Selector] = Antiparser(
-    content = value => Names.toXml(value.names)
-  )
+    override val antiparser: Antiparser[Selector] = Names.withDefaultNameParsable(_.names)
+  }
 }

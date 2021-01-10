@@ -1,6 +1,6 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Element, FromUrl, Parser}
+import org.opentorah.xml.{Antiparser, Element, FromUrl, Parsable, Parser}
 import java.net.URL
 
 final class ByNote(
@@ -21,18 +21,20 @@ final class ByNote(
 
 object ByNote extends Element[ByNote]("byNote") {
 
-  override def parser: Parser[ByNote] = for {
-    fromUrl <- currentFromUrl
-    selector <- By.selector
-    directory <- Directory.directory
-  } yield new ByNote(
-    fromUrl,
-    selector,
-    directory
-  )
+  override def contentParsable: Parsable[ByNote] = new Parsable[ByNote] {
+    override def parser: Parser[ByNote] = for {
+      fromUrl <- Element.currentFromUrl
+      selector <- By.selector
+      directory <- Directory.directoryAttribute()
+    } yield new ByNote(
+      fromUrl,
+      selector,
+      directory
+    )
 
-  override def antiparser: Antiparser[ByNote] = Antiparser.concat(
-    By.selectorToXml,
-    Directory.directoryToXml
-  )
+    override def antiparser: Antiparser[ByNote] = Antiparser.concat(
+      By.selectorToXml,
+      Directory.directoryAttribute(_.directory)
+    )
+  }
 }

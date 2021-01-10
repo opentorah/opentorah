@@ -76,7 +76,7 @@ object Dom extends Model {
     } yield Attribute(
       name = localName,
       namespace = Namespace(uri = uri, prefix = prefix)
-    ).withOptionalValue(Option(attribute.getValue))
+    ).optional.withValue(Option(attribute.getValue))
   }
 
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element = {

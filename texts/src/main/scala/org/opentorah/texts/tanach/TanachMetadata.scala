@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import Tanach.TanachBook
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Element, From, Parser}
+import org.opentorah.xml.{Antiparser, Element, From, Parsable, Parser}
 import zio.IO
 
 object TanachMetadata {
@@ -50,7 +50,7 @@ object TanachMetadata {
         val metadata: Map[TanachBook, TanachBookMetadata.Parsed] = Parser.parseDo(for {
           metadatas <- Metadata.load(
             from = From.resource(Tanach),
-            fromXml = Book.followRedirects
+            content = Book.followRedirects
           )
 
           metadata <- Metadata.bind(
@@ -69,18 +69,20 @@ object TanachMetadata {
   }
 
   private object Book extends Element[TanachBookMetadata.Parsed]("book") {
-    override def parser: Parser[TanachBookMetadata.Parsed] = for {
-      names <- Names.withDefaultNameParser
-      chapters <- Chapters.parser
-      book <- Metadata.find[TanachBook](Tanach.values, names)
-      result <- book match {
-        case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
-        case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
-        case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
-      }
-    } yield result
+    override def contentParsable: Parsable[TanachBookMetadata.Parsed] = new Parsable[TanachBookMetadata.Parsed] {
+      override def parser: Parser[TanachBookMetadata.Parsed] = for {
+        names <- Names.withDefaultNameParsable()
+        chapters <- Chapters.parser
+        book <- Metadata.find[TanachBook](Tanach.values, names)
+        result <- book match {
+          case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
+          case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
+          case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
+        }
+      } yield result
 
-    override def antiparser: Antiparser[TanachBookMetadata.Parsed] = ???
+      override def antiparser: Antiparser[TanachBookMetadata.Parsed] = ???
+    }
   }
 
   def forChumash(book: Tanach.ChumashBook): ChumashBookMetadata = forBook(book).asInstanceOf[ChumashBookMetadata]

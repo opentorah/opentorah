@@ -14,8 +14,11 @@ configureLibrary(['Scala', 'Jewish', 'TEI'])
 configureService()
 
 dependencies {
-  implementation project(':store')
+  api project(':metadata')
+  implementation project(':tei')
   implementation project(':util')
+
+  implementation project(':store') // TODO remove when new generation...
 
   implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
   implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
@@ -27,7 +30,7 @@ dependencies {
 
   // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
   // and since I am not at the point of using anything other than Caffeine,
-  // I'll use it directly.
+  // I'll use it directly - albeit not Scala-idiomatically ;)
   implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
 }
 

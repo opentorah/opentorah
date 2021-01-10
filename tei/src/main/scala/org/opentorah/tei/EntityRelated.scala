@@ -1,21 +1,18 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, ContentType, Element, Parser, ToXml, Xml}
+import org.opentorah.xml.{ContentType, Element, Elements, Parsable}
 
 abstract class EntityRelated[E](
   elementName: EntityType => String,
   entityType: E => EntityType
-) extends Element.Union[E] with ToXml[E] {
+) extends Elements.Union[E] {
   protected def contentType: ContentType
 
-  protected def parser(entityType: EntityType): Parser[E]
-
-  protected def antiparser(entityType: EntityType): Antiparser[E]
+  protected def parsable(entityType: EntityType): Parsable[E]
 
   sealed class ForEntityType(entityType: EntityType) extends Element[E](elementName(entityType)) {
-    override def contentType: ContentType    = EntityRelated.this.contentType
-    override def parser     : Parser     [E] = EntityRelated.this.parser     (entityType)
-    override def antiparser : Antiparser [E] = EntityRelated.this.antiparser (entityType)
+    override def contentType: ContentType = EntityRelated.this.contentType
+    override def contentParsable: Parsable[E] = EntityRelated.this.parsable(entityType)
   }
 
   final object Person       extends ForEntityType(EntityType.Person      )
@@ -24,9 +21,7 @@ abstract class EntityRelated[E](
 
   final override protected val elements: Seq[ForEntityType] = Seq(Person, Place, Organization)
 
-  // TODO extend Union from ToXml:
-  final override def toXmlElement(value: E): Xml.Element =
-    forEntityType(entityType(value)).toXmlElement(value)
+  final override protected def elementByValue(value: E): Element[_ <: E] = forEntityType(entityType(value))
 
   final def forEntityType(entityType: EntityType): Element[E] = entityType match {
     case EntityType.Person       => Person

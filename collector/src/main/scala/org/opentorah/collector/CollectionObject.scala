@@ -108,7 +108,7 @@ object CollectionObject {
     Table.Column("Расшифровка", "transcriber", { document: Document =>
       val transcribers: Seq[Xml.Node] = document.tei.titleStmt.editors
         .filter(_.role.contains("transcriber")).flatMap(_.persName)
-        .map(transcriber => EntityReference.toXmlElement(transcriber))
+        .map(transcriber => EntityReference.required.xml(transcriber))
       Xml.multi(transcribers)
     })
   )

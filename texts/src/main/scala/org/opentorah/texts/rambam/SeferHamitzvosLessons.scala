@@ -1,11 +1,11 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, ToXml, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Elements, Parsable, Parser}
 
 object SeferHamitzvosLessons {
 
-  private val nAttribute: Attribute.PositiveIntAttribute = new Attribute.PositiveIntAttribute("n")
+  private val nAttribute: Attribute.Required[Int] = new Attribute.PositiveIntAttribute("n").required
 
   final case class Lesson(
     number: Int,
@@ -13,33 +13,35 @@ object SeferHamitzvosLessons {
   )
 
   object Lesson extends Element[Lesson]("lesson") {
-    override def parser: Parser[Lesson] = for {
-      number <- nAttribute.required
-      parts <- Part.all
-    } yield Lesson(number, parts)
+    override def contentParsable: Parsable[Lesson] = new Parsable[Lesson] {
+      override def parser: Parser[Lesson] = for {
+        number <- nAttribute()
+        parts <- Part.seq()
+      } yield Lesson(number, parts)
 
-    override def antiparser: Antiparser[Lesson] = ???
+      override def antiparser: Antiparser[Lesson] = ???
+    }
   }
 
   sealed trait Part extends WithNames
 
-  // TODO extend Union from ToXml:
-  private object Part extends Element.Union[Part] with ToXml[Part] {
+  private object Part extends Elements.Union[Part] {
     override protected val elements: Seq[Element[_ <: Part]] = Seq(Positive, Negative, NamedPart)
 
-    override def toXmlElement(value: Part): Xml.Element = value match {
-      case value: Positive  => Positive .toXmlElement(value)
-      case value: Negative  => Negative .toXmlElement(value)
-      case value: NamedPart => NamedPart.toXmlElement(value)
+    override protected def elementByValue(value: Part): Element[_ <: Part] = value match {
+      case _: Positive  => Positive
+      case _: Negative  => Negative
+      case _: NamedPart => NamedPart
     }
   }
 
   final case class NamedPart(override val names: Names) extends Part
 
   object NamedPart extends Element[NamedPart]("named") {
-    override def parser: Parser[NamedPart] = Names.withoutDefaultNameParser.map(apply)
-
-    override def antiparser: Antiparser[NamedPart] = Names.antiparser(_.names)
+    override def contentParsable: Parsable[NamedPart] = new Parsable[NamedPart] {
+      override def parser: Parser[NamedPart] = Names.withoutDefaultNameParsable().map(NamedPart.apply)
+      override def antiparser: Antiparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
+    }
   }
 
   sealed abstract class Commandment(val number: Int) extends Part
@@ -55,9 +57,10 @@ object SeferHamitzvosLessons {
       Name("עשה", Language.Hebrew.toSpec)
     ))
 
-    override def parser: Parser[Positive] = nAttribute.required.map(apply)
-
-    override def antiparser: Antiparser[Positive] = nAttribute.toXml(_.number)
+    override def contentParsable: Parsable[Positive] = new Parsable[Positive] {
+      override def parser: Parser[Positive] = nAttribute().map(Positive.apply)
+      override def antiparser: Antiparser[Positive] = nAttribute(_.number)
+    }
   }
 
   final case class Negative(override val number: Int) extends Commandment(number) {
@@ -71,9 +74,10 @@ object SeferHamitzvosLessons {
       Name("לא תעשה", Language.Hebrew.toSpec)
     ))
 
-    override def parser: Parser[Negative] = nAttribute.required.map(apply)
-
-    override def antiparser: Antiparser[Negative] = nAttribute.toXml(_.number)
+    override def contentParsable: Parsable[Negative] = new Parsable[Negative] {
+      override def parser: Parser[Negative] = nAttribute().map(Negative.apply)
+      override def antiparser: Antiparser[Negative] = nAttribute(_.number)
+    }
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841

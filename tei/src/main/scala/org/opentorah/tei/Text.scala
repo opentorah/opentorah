@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, Xml}
 
 final case class Text(
   lang: Option[String],
@@ -9,16 +9,20 @@ final case class Text(
 
 object Text extends Element[Text]("text") {
 
-  override val parser: Parser[Text] = for {
-    lang <- Xml.langAttribute.optional
-    body <- Body.parsable.required
-  } yield new Text(
-    lang,
-    body
-  )
+  private val langAttribute: Attribute.Optional[String] = Xml.langAttribute.optional
 
-  override val antiparser: Antiparser[Text] = Tei.concat(
-    Xml.langAttribute.toXmlOption(_.lang),
-    Body.parsable.toXml(_.body)
-  )
+  override def contentParsable: Parsable[Text] = new Parsable[Text] {
+    override val parser: Parser[Text] = for {
+      lang <- langAttribute()
+      body <- Body.element.required()
+    } yield new Text(
+      lang,
+      body
+    )
+
+    override val antiparser: Antiparser[Text] = Tei.concat(
+      langAttribute(_.lang),
+      Body.element.required(_.body)
+    )
+  }
 }

@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
 import org.opentorah.tei.{Entity => TeiEntity}
-import org.opentorah.xml.{Antiparser, Element, FromUrl, Parser}
+import org.opentorah.xml.{Antiparser, Element, FromUrl, Parsable, Parser}
 import java.net.URL
 
 final class ByEntity(
@@ -21,18 +21,20 @@ final class ByEntity(
 
 object ByEntity extends Element[ByEntity]("byEntity") {
 
-  override def parser: Parser[ByEntity] = for {
-    fromUrl <- currentFromUrl
-    selector <- By.selector
-    directory <- Directory.directory
-  } yield new ByEntity(
-    fromUrl,
-    selector,
-    directory
-  )
+  override def contentParsable: Parsable[ByEntity] = new Parsable[ByEntity] {
+    override def parser: Parser[ByEntity] = for {
+      fromUrl <- Element.currentFromUrl
+      selector <- By.selector
+      directory <- Directory.directoryAttribute()
+    } yield new ByEntity(
+      fromUrl,
+      selector,
+      directory
+    )
 
-  override def antiparser: Antiparser[ByEntity] = Antiparser.concat(
-    By.selectorToXml,
-    Directory.directoryToXml
-  )
+    override def antiparser: Antiparser[ByEntity] = Antiparser.concat(
+      By.selectorToXml,
+      Directory.directoryAttribute(_.directory)
+    )
+  }
 }

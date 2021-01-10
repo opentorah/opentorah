@@ -1,24 +1,23 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Element, From, FromXml, Parser, Result}
+import org.opentorah.xml.{Element, Elements, From, Parsable, Parser, Result}
 
 final class Metadata[M](
   elementName: String,
-  fromXml: FromXml[M]
+  content: Elements[M]
 ) extends Element[Seq[M]](elementName) {
-  override def parser: Parser[Seq[M]] = fromXml.all
-  override def antiparser: Antiparser[Seq[M]] = ???
+  override def contentParsable: Parsable[Seq[M]] = content.seq
 }
 
 object Metadata {
 
   def load[K <: WithName, M](
     from: From,
-    fromXml: FromXml[M],
+    content: Elements[M],
     keys: Seq[K],
     hasName: (M, String) => Boolean
   ): Map[K, M] = Parser.parseDo(for {
-    metadatas <- load[M](from, fromXml)
+    metadatas <- load[M](from, content)
 
     result <- bind(
       keys,
@@ -30,18 +29,18 @@ object Metadata {
 
   def loadResource[M](
     obj: AnyRef,
-    fromXml: FromXml[M]
+    content: Elements[M]
   ): Seq[M] = Parser.parseDo(Metadata.load(
     from = From.resource(obj),
-    fromXml
+    content
   ))
 
   def load[M](
     from: From,
-    fromXml: FromXml[M]
+    content: Elements[M]
   ): Parser[Seq[M]] = new Metadata[M](
     elementName = from.name,
-    fromXml = fromXml
+    content = content
   ).parse(from)
 
   private def bind[K, M](

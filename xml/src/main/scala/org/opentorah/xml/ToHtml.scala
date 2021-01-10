@@ -92,7 +92,7 @@ trait ToHtml {
       attributes = attributes.map(transformXmlAttribute)
     ) else Xml.addAttributes(
       element = Xhtml.namespace.default.declare(newElement),
-      attributes = Xhtml.classAttribute.withValue(name) +: attributes.map(transformAttribute)
+      attributes = Xhtml.classAttribute.required.withValue(name) +: attributes.map(transformAttribute)
     )
   }
 
@@ -102,15 +102,15 @@ trait ToHtml {
     val result: Attribute.Value[String] = transformXmlAttribute(attribute)
     val name: String = result.attribute.name
     if (htmlAttributeNames.contains(name))
-      Attribute(addPrefix(name)).withOptionalValue(result.value)
+      Attribute(addPrefix(name)).optional.withValue(result.value)
     else
       result
   }
 
   private def transformXmlAttribute(attribute: Attribute.Value[String]): Attribute.Value[String] = {
     // TODO xml:base? xml:space?
-    if (attribute.attribute == Xml.idAttribute  ) Xhtml.idAttribute  .withOptionalValue(attribute.value) else
-    if (attribute.attribute == Xml.langAttribute) Xhtml.langAttribute.withOptionalValue(attribute.value) else
+    if (attribute.attribute == Xml.idAttribute  ) Xhtml.idAttribute  .optional.withValue(attribute.value) else
+    if (attribute.attribute == Xml.langAttribute) Xhtml.langAttribute.optional.withValue(attribute.value) else
       attribute
   }
 

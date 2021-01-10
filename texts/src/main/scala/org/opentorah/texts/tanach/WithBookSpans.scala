@@ -57,7 +57,7 @@ trait WithBookSpans[Book <: Tanach.TanachBook] {
   }
 
   val spanParser: Parser[BookSpanParsed] = for {
-    book <- Attribute("book").optional
+    book <- Attribute("book").optional()
     spanParsed <- SpanParsed.parser
   } yield new BookSpanParsed(book, spanParsed)
 

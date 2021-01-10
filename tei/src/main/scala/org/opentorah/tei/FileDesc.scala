@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parser}
+import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
 // but I made them optional so that they can be removed from the editable pre-TEI files
@@ -17,36 +17,38 @@ final case class FileDesc(
 
 object FileDesc extends Element[FileDesc]("fileDesc") {
 
-  override def parser: Parser[FileDesc] = for {
-    titleStmt <- TitleStmt.required
-    editionStmt <- EditionStmt.parsable.optional
-    extent <- Extent.parsable.optional
-    publicationStmt <- PublicationStmt.optional
-    seriesStmt <- SeriesStmt.parsable.optional
-    notesStmt <- NotesStmt.parsable.optional
-    sourceDesc <- SourceDesc.parsable.optional
-  } yield new FileDesc(
-    titleStmt,
-    editionStmt,
-    extent,
-    publicationStmt,
-    seriesStmt,
-    notesStmt,
-    sourceDesc
-  )
+  override def contentParsable: Parsable[FileDesc] = new Parsable[FileDesc] {
+    override def parser: Parser[FileDesc] = for {
+      titleStmt <- TitleStmt.required()
+      editionStmt <- EditionStmt.element.optional()
+      extent <- Extent.element.optional()
+      publicationStmt <- PublicationStmt.optional()
+      seriesStmt <- SeriesStmt.element.optional()
+      notesStmt <- NotesStmt.element.optional()
+      sourceDesc <- SourceDesc.element.optional()
+    } yield new FileDesc(
+      titleStmt,
+      editionStmt,
+      extent,
+      publicationStmt,
+      seriesStmt,
+      notesStmt,
+      sourceDesc
+    )
 
-  override val antiparser: Antiparser[FileDesc] = Tei.concat(
-    TitleStmt.toXml(_.titleStmt),
-    EditionStmt.parsable.toXmlOption(_.editionStmt),
-    Extent.parsable.toXmlOption(_.extent),
-    PublicationStmt.toXmlOption(_.publicationStmt),
-    SeriesStmt.parsable.toXmlOption(_.seriesStmt),
-    NotesStmt.parsable.toXmlOption(_.notesStmt),
-    SourceDesc.parsable.toXmlOption(_.sourceDesc)
-  )
+    override val antiparser: Antiparser[FileDesc] = Tei.concat(
+      TitleStmt.required(_.titleStmt),
+      EditionStmt.element.optional(_.editionStmt),
+      Extent.element.optional(_.extent),
+      PublicationStmt.optional(_.publicationStmt),
+      SeriesStmt.element.optional(_.seriesStmt),
+      NotesStmt.element.optional(_.notesStmt),
+      SourceDesc.element.optional(_.sourceDesc)
+    )
+  }
 
-  def apply(): FileDesc = new FileDesc(
-    titleStmt = TitleStmt(),
+  def empty: FileDesc = new FileDesc(
+    titleStmt = TitleStmt.empty,
     editionStmt =  None,
     extent = None,
     publicationStmt = None,

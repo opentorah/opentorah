@@ -14,13 +14,10 @@ object MathML extends Dialect {
 
   /**
     * Display mode: inline or block (display math).
+    *
+    * Note: this attribute is always used within its native MathML.namespace, so I set its namespace to Top.
     */
-  final class DisplayAttribute(namespace: Namespace, setDefault: Boolean)
-    extends Attribute[Boolean]("display", namespace, default = false, setDefault)
-  {
-    override def withNamespace(namespace: Namespace): DisplayAttribute =
-      new DisplayAttribute(namespace, setDefault)
-
+  final class DisplayAttribute extends Attribute[Boolean]("display", namespace = Namespace.No, default = false) {
     private val inline: String = "inline"
     private val block: String = "block"
     private val values: Set[String] = Set(inline, block)
@@ -34,8 +31,7 @@ object MathML extends Dialect {
   }
 
   @SerialVersionUID(1L)
-  // TODO this attribute is always used with inNamespace(MathML.namespace), so I might as well set its namespace to Top...
-  val displayAttribute: DisplayAttribute = new DisplayAttribute(namespace = MathML.namespace, setDefault = true)
+  val displayAttribute: DisplayAttribute = new DisplayAttribute
 
   val math: String = "math"
   val mrow: String = "mrow"

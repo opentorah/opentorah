@@ -2,7 +2,7 @@ package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, From, FromUrl, Parser, PrettyPrinter}
+import org.opentorah.xml.{Attribute, Element, From, FromUrl, Parsable, Parser, PrettyPrinter}
 import java.io.File
 import java.net.URL
 
@@ -32,7 +32,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry](
     val result: Seq[M] = files.map(name => entry(name, getFile(name)))
     Files.write(
       file,
-      PrettyPrinter.default.renderXml(directoryParsable.toXmlElement(result))
+      PrettyPrinter.default.renderXml(directoryParsable.required.xml(result))
     )
   }
 
@@ -48,8 +48,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry](
   private def listUrl: URL = Files.fileInDirectory(fromUrl.url, directory + "-list-generated-ng.xml")
 
   private val directoryParsable: Element[Seq[M]] = new Element[Seq[M]]("directory") {
-    final override def parser: Parser[Seq[M]] = entry.all
-    final override def antiparser: Antiparser[Seq[M]] = entry.toXmlSeq
+    override def contentParsable: Parsable[Seq[M]] = entry.seq
   }
 }
 
@@ -66,15 +65,7 @@ object Directory {
     def apply(name: String, content: T): M
   }
 
-  private val directoryAttribute: Attribute[String] = Attribute("directory")
+  val directoryAttribute: Attribute.Required[String] = Attribute("directory").required
 
-  val directory: Parser[String] = directoryAttribute.required
-
-  def directoryToXml[T <: Directory[_, _]]: Antiparser[T] = directoryAttribute.toXml(_.directory)
-
-  private val nameAttribute: Attribute[String] = Attribute("n")
-
-  def fileName: Parser[String] = nameAttribute.required
-
-  def fileNameToXml[T <: Entry]: Antiparser[T] = nameAttribute.toXml(_.name)
+  val fileNameAttribute: Attribute.Required[String] = Attribute("n").required
 }

@@ -34,7 +34,7 @@ object Hierarchy {
     pathLinks(path) ++
     <head xmlns={Tei.namespace.uri}>{storeTitle(path, store)}</head> ++
     store.storeAbstract.map(value => Seq(<ab xmlns={Tei.namespace.uri}>{value.xml}</ab>)).getOrElse(Seq.empty) ++
-    RawXml.getXml(store.body)
+    getXml(store.body)
 
   private def pathLinks(pathRaw: Path): Seq[Xml.Element] = {
     val path: Path = if (pathRaw.isEmpty) pathRaw else pathRaw.init
@@ -49,7 +49,7 @@ object Hierarchy {
   }
 
   private def storeTitle(path: Path, store: Store): Seq[Xml.Node] = {
-    val title: Seq[Xml.Node] = RawXml.getXml(store.title)
+    val title: Seq[Xml.Node] = getXml(store.title)
     val titlePrefix: Seq[Xml.Node] = if (path.isEmpty) Seq.empty else Xml.mkText(
       getName(path.last.selector.names) + " " + getName(store.names) + (if (title.isEmpty) "" else ": ")
     )
@@ -58,10 +58,12 @@ object Hierarchy {
   }
 
   def storeTitle(store: Store): Seq[Xml.Node] = {
-    val title: Seq[Xml.Node] = RawXml.getXml(store.title)
+    val title: Seq[Xml.Node] = getXml(store.title)
     val titlePrefix: Seq[Xml.Node] = if (title.isEmpty) Seq.empty else Seq(Xml.mkText(": "))
     titlePrefix ++ title
   }
+
+  private def getXml(value: Option[RawXml#Value]): Seq[Xml.Node] = value.map(_.xml).getOrElse(Seq.empty)
 
   // TODO eliminate
   def collectionXml(site: Site, collection: WithPath[Collection]): Xml.Element =

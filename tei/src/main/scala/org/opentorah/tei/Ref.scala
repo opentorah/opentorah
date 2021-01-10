@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Ref(
   target: String,
@@ -10,30 +10,32 @@ final case class Ref(
 
 object Ref extends Element[Ref]("ref") {
 
-  private val targetAttribute: Attribute[String] = Attribute("target")
+  private val targetAttribute: Attribute.Required[String] = Attribute("target").required
 
   override def contentType: ContentType = ContentType.Mixed
 
-  override val parser: Parser[Ref] = for {
-    target <- targetAttribute.required
-    text <- Element.allNodes
-  } yield new Ref(
-    target,
-    text
-  )
+  override def contentParsable: Parsable[Ref] = new Parsable[Ref] {
+    override val parser: Parser[Ref] = for {
+      target <- targetAttribute()
+      text <- Element.nodes()
+    } yield new Ref(
+      target,
+      text
+    )
 
-  override val antiparser: Antiparser[Ref] = Tei.concat(
-    targetAttribute.toXml(_.target),
-    Antiparser.xml(_.text)
-  )
+    override val antiparser: Antiparser[Ref] = Tei.concat(
+      targetAttribute(_.target),
+      Element.nodes(_.text)
+    )
+  }
 
   def toXml(
     target: Seq[String],
     text: String
-  ): Xml.Element = toXmlElement(new Ref(Files.mkUrl(target), Xml.mkText(text)))
+  ): Xml.Element = required.xml(new Ref(Files.mkUrl(target), Xml.mkText(text)))
 
   def toXml(
     target: Seq[String],
     text: Seq[Xml.Node]
-  ): Xml.Element = toXmlElement(new Ref(Files.mkUrl(target), text))
+  ): Xml.Element = required.xml(new Ref(Files.mkUrl(target), text))
 }

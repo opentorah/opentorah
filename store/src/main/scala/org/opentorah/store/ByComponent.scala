@@ -6,9 +6,9 @@ import zio.ZIO
 
 class ByComponent extends Component("by") {
 
-  private val selectorAttribute: Attribute[String] = Attribute("selector")
-  private val directoryAttribute: Attribute[String] = Attribute("directory")
-  private val listAttribute: Attribute[String] = Attribute("list")
+  private val selectorAttribute: Attribute.Required[String] = Attribute("selector").required
+  private val directoryAttribute: Attribute.Optional[String] = Attribute("directory").optional
+  private val listAttribute: Attribute.Optional[String] = Attribute("list").optional
 
   final case class InlineClass(
     selector: String,
@@ -23,10 +23,10 @@ class ByComponent extends Component("by") {
   override def classOfInline: Class[InlineClass] = classOf[InlineClass]
 
   override def inlineParser(className: Option[String]): Parser[Inline] = for {
-    selector <- selectorAttribute.required
-    directory <- directoryAttribute.optional
-    list <- listAttribute.optional
-    stores <- Store.parsable.all
+    selector <- selectorAttribute()
+    directory <- directoryAttribute()
+    list <- listAttribute()
+    stores <- Store.parsable.seq()
   } yield InlineClass(
     selector,
     directory,
@@ -36,11 +36,11 @@ class ByComponent extends Component("by") {
   )
 
   override protected def inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
-    selectorAttribute.toXml(_.selector),
-    directoryAttribute.toXmlOption(_.directory),
-    listAttribute.toXmlOption(_.list),
-    Component.typeAttribute.toXmlOption(_.className),
-    Store.parsable.toXmlSeq(_.stores)
+    selectorAttribute(_.selector),
+    directoryAttribute(_.directory),
+    listAttribute(_.list),
+    Component.typeAttribute(_.className),
+    Store.parsable.seq(_.stores)
   )
 
   abstract class FromElement[+S <: Store](

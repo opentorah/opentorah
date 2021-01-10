@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parser, Xml}
+import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, Xml}
 import org.opentorah.util.Collections
 import zio.ZIO
 
@@ -63,14 +63,10 @@ object Names {
 
   final val defaultNameAttribute: Attribute[String] = Attribute("n")
 
-  val withoutDefaultNameParser: Parser[Names] = parser(isDefaultNameAllowed = false)
-
-  val withDefaultNameParser: Parser[Names] = parser(isDefaultNameAllowed = true)
-
   def parser(isDefaultNameAllowed: Boolean): Parser[Names] = for {
-    n <- if (!isDefaultNameAllowed) ZIO.none else defaultNameAttribute.optional
+    n <- if (!isDefaultNameAllowed) ZIO.none else defaultNameAttribute.optional()
     defaultName = n.map(Name(_, LanguageSpec.empty))
-    nonDefaultNames <- Name.all
+    nonDefaultNames <- Name.seq()
     _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else
@@ -82,19 +78,20 @@ object Names {
     new Names(names)
   }
 
-  private val antiparser: Antiparser[Names] = Antiparser(
-    attributes = value => Seq(defaultNameAttribute.withOptionalValue(value.getDefaultName)),
-    content = value => if (value.getDefaultName.isDefined) Seq.empty else toXml(value)
-  )
+  val withDefaultNameParsable: Parsable[Names] = new Parsable[Names] {
+    override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = true)
+    override def antiparser: Antiparser[Names] = Antiparser(
+      attributes = value => Seq(defaultNameAttribute.optional.withValue(value.getDefaultName)),
+      content = value => if (value.getDefaultName.isDefined) Seq.empty else Name.seq[Names](_.names).content(value) // TODO ???
+    )
+  }
 
-  def antiparser[B](f: B => Names): Antiparser[B] = antiparser.compose(f)
-
-  // TODO remove (fold into the antiparser, of which there should be 2: with default name allowed and not...)
-  def toXml(value: Names): Seq[Xml.Node] =
-    Name.toXmlSeq[Names](_.names).content(value)
+  val withoutDefaultNameParsable: Parsable[Names] = new Parsable[Names] {
+    override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = false)
+    override def antiparser: Antiparser[Names] = Name.seq[Names](_.names)
+  }
 
   object NamesMetadata extends Element[Names]("names") {
-    override def parser: Parser[Names] = Names.withoutDefaultNameParser
-    override def antiparser: Antiparser[Names] = Names.antiparser
+    override def contentParsable: Parsable[Names] = withoutDefaultNameParsable
   }
 }

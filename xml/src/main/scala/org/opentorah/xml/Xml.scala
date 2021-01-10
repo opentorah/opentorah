@@ -118,7 +118,7 @@ object Xml extends Model {
       Attribute(
         name = attribute.key,
         namespace = namespace
-      ).withOptionalValue(Option(attribute.value).map(getAttributeValueText))
+      ).optional.withValue(Option(attribute.value).map(getAttributeValueText))
     }
 
   // TODO WTF?
@@ -127,7 +127,7 @@ object Xml extends Model {
 
   // TODO addAll() doesn't modify existing attributes; this should...
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
-    addAttributes(Seq(attribute.withValue(value)), element)
+    addAttributes(Seq(attribute.required.withValue(value)), element)
 
   override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element =
     element.copy(attributes = attributes.foldRight[MetaData](Null)(

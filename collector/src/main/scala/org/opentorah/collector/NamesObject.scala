@@ -21,7 +21,7 @@ final class NamesObject(site: Site) extends SimpleSiteObject(site) {
     def toXml(value: EntitiesList): Xml.Element =
       <list xmlns={Tei.namespace.uri} xml:id={value.id} role={value.role.orNull}>
         <head>{value.head}</head>
-        {for (entity <- value.entities) yield <l>{EntityName.toXmlElement(entity.entityName)}</l>}
+        {for (entity <- value.entities) yield <l>{EntityName.required.xml(entity.entityName)}</l>}
       </list>
         .copy(label = value.entityType.listElement)
 
