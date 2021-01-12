@@ -26,7 +26,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
         override def contentParsable: Parsable[Option[String]] = new Parsable[Option[String]] {
           override def parser: Parser[Option[String]] = Text().optional()
-          override def antiparser: Antiparser[Option[String]] = ???
+          override def unparser: Unparser[Option[String]] = ???
         }
       }
         .parse(From.xml("test", <s>
@@ -40,7 +40,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
         override def contentParsable: Parsable[String] = new Parsable[String] {
           override def parser: Parser[String] = Text().required()
-          override def antiparser: Antiparser[String] = ???
+          override def unparser: Unparser[String] = ???
         }
       }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
@@ -60,7 +60,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
     override def contentParsable: Parsable[String] = new Parsable[String] {
       override def parser: Parser[String] = Text().required()
-      override def antiparser: Antiparser[String] = ???
+      override def unparser: Unparser[String] = ???
     }
   }
 
@@ -76,7 +76,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
         name
       )
 
-      override def antiparser: Antiparser[X] = ???
+      override def unparser: Unparser[X] = ???
     }
   }
 

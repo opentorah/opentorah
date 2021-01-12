@@ -2,7 +2,7 @@ package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Antiparser, Element, FromUrl, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, FromUrl, Parsable, Parser}
 
 final class Hierarchy(
   override val fromUrl: FromUrl,
@@ -34,7 +34,7 @@ object Hierarchy extends Element[Hierarchy]("store") {
       by
     )
 
-    override def antiparser: Antiparser[Hierarchy] = Antiparser.concat(
+    override def unparser: Unparser[Hierarchy] = Unparser.concat(
       Names.withDefaultNameParsable(_.names),
       Title.element.optional(_.title),
       Abstract.element.optional(_.storeAbstract),

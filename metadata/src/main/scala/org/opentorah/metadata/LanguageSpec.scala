@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser}
 
 final case class LanguageSpec(
   language: Option[Language],
@@ -42,7 +42,7 @@ object LanguageSpec extends Parsable[LanguageSpec] {
     flavour = flavour
   )
 
-  override val antiparser: Antiparser[LanguageSpec] = Antiparser.concat(
+  override val unparser: Unparser[LanguageSpec] = Unparser.concat(
     langAttribute(_.language.map(_.name)),
     transliteratedAttribute(_.isTransliterated),
     flavourAttribute(_.flavour)

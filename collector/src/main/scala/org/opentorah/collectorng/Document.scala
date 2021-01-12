@@ -3,7 +3,7 @@ package org.opentorah.collectorng
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, Page, Pb, Tei}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Elements, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Elements, Parsable, Parser, Xml}
 
 final class Document(
   override val name: String,
@@ -135,7 +135,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
       pbs
     )
 
-    override def antiparser: Antiparser[Document] = Antiparser.concat(
+    override def unparser: Unparser[Document] = Unparser.concat(
       Directory.fileNameAttribute(_.name),
       langAttribute(_.lang),
       editorsElement(_.editors),

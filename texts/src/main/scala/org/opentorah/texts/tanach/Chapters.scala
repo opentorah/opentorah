@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
 final class Chapters(chapters: Seq[Int]) {
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -65,7 +65,7 @@ object Chapters {
 
     override def contentParsable: Parsable[WithNumber[Int]] = new Parsable[WithNumber[Int]] {
       override def parser: Parser[WithNumber[Int]] = WithNumber.parse(lengthAttribute())
-      override def antiparser: Antiparser[WithNumber[Int]] = ???
+      override def unparser: Unparser[WithNumber[Int]] = ???
     }
   }
 

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
 
 final case class Creation(
   date: Date,
@@ -18,7 +18,7 @@ object Creation extends Element[Creation]("creation") {
       xml
     )
 
-    override val antiparser: Antiparser[Creation] = Tei.concat(
+    override val unparser: Unparser[Creation] = Tei.concat(
       Date.required(_.date),
       Element.nodes(_.xml)
     )

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Pb(
   n: String,
@@ -40,7 +40,7 @@ object Pb extends Element[Pb]("pb") {
       isEmpty
     )
 
-    override val antiparser: Antiparser[Pb] = Tei.concat(
+    override val unparser: Unparser[Pb] = Tei.concat(
       nAttribute(_.n),
       idAttribute(_.id),
       facsAttribute(_.facs),

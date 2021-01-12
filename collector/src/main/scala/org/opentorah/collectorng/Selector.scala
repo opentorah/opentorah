@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
 import org.opentorah.metadata.{Metadata, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
 final class Selector(
   val names: Names,
@@ -23,7 +23,7 @@ object Selector extends Element[Selector]("selector") {
       title
     )
 
-    override val antiparser: Antiparser[Selector] = Antiparser.concat(
+    override val unparser: Unparser[Selector] = Unparser.concat(
       Names.withDefaultNameParsable(_.names),
       titleAttribute(_.title)
     )

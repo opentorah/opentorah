@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Ref(
   target: String,
@@ -23,7 +23,7 @@ object Ref extends Element[Ref]("ref") {
       text
     )
 
-    override val antiparser: Antiparser[Ref] = Tei.concat(
+    override val unparser: Unparser[Ref] = Tei.concat(
       targetAttribute(_.target),
       Element.nodes(_.text)
     )

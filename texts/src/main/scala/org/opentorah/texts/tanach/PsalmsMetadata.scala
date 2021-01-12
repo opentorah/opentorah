@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Names, WithNumber}
-import org.opentorah.xml.{Antiparser, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, ContentType, Element, Parsable, Parser}
 import zio.ZIO
 
 final class PsalmsMetadata(
@@ -46,7 +46,7 @@ object PsalmsMetadata {
 
     override def contentParsable: Parsable[WithNumber[SpanParsed]] = new Parsable[WithNumber[SpanParsed]] {
       override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
-      override def antiparser: Antiparser[WithNumber[SpanParsed]] = ???
+      override def unparser: Unparser[WithNumber[SpanParsed]] = ???
     }
   }
 }

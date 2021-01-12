@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parsable, Parser, PrettyPrinter, ToHtml, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parsable, Parser, PrettyPrinter, ToHtml, Xml}
 import zio.{URIO, ZIO}
 
 final case class Tei(
@@ -52,14 +52,14 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
       text
     )
 
-    override lazy val antiparser: Antiparser[Tei] = concat(
+    override lazy val unparser: Unparser[Tei] = concat(
       TeiHeader.required(_.teiHeader),
       Text.required(_.text)
     )
   }
 
-  def concat[A](antiparsers: Antiparser[A]*): Antiparser[A] =
-    Antiparser.concatInNamespace(Tei.namespace, antiparsers)
+  def concat[A](unparsers: Unparser[A]*): Unparser[A] =
+    Unparser.concatInNamespace(Tei.namespace, unparsers)
 
   def apply(body: Seq[Xml.Node]): Tei = new Tei(
     teiHeader = TeiHeader.empty,

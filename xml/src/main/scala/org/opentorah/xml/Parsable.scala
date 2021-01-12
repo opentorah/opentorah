@@ -5,11 +5,11 @@ trait Parsable[T] {
 
   final def apply(): Parser[T] = parser
 
-  def antiparser: Antiparser[T]
+  def unparser: Unparser[T]
 
-  final def apply[B](f: B => T): Antiparser[B] = Antiparser[B](
-    antiparser.attributes compose f,
-    antiparser.content compose f,
-    antiparser.namespace
+  final def apply[B](f: B => T): Unparser[B] = Unparser[B](
+    namespace  = unparser.namespace,
+    attributes = unparser.attributes compose f,
+    content    = unparser.content compose f
   )
 }

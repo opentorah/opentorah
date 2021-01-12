@@ -84,7 +84,7 @@ object Elements {
   final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[Xml.Element]] {
     override protected def parser: Parser[Option[A]] = elements.optionalParser
     override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.toXmlElement)
-    override def antiparser: Antiparser[Option[A]] = Antiparser[Option[A]](
+    override def unparser: Unparser[Option[A]] = Unparser[Option[A]](
       content = value => xml(value).toSeq
     )
   }
@@ -92,7 +92,7 @@ object Elements {
   final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element] {
     override protected def parser: Parser[A] = Parser.required(elements.optionalParser, elements)
     override def xml(value: A): Xml.Element = elements.toXmlElement(value)
-    override def antiparser: Antiparser[A] = Antiparser[A](
+    override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
     )
   }
@@ -106,7 +106,7 @@ object Elements {
         .getOrElse(ZIO.succeed(acc))
     } yield result
     override def xml(value: Seq[A]): Seq[Xml.Element] = value.map(elements.toXmlElement)
-    override def antiparser: Antiparser[Seq[A]] = Antiparser[Seq[A]](
+    override def unparser: Unparser[Seq[A]] = Unparser[Seq[A]](
       content = value => xml(value)
     )
   }

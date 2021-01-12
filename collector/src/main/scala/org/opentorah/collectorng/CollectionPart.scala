@@ -2,7 +2,7 @@ package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.Title
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
 final class CollectionPart(
   val names: Names,
@@ -63,7 +63,7 @@ object CollectionPart extends Element[CollectionPart]("store") {
       title
     )
 
-    override def antiparser: Antiparser[CollectionPart] = Antiparser.concat(
+    override def unparser: Unparser[CollectionPart] = Unparser.concat(
       Names.withDefaultNameParsable(_.names),
       fromAttribute(_.from),
       Title.element.required(_.title)

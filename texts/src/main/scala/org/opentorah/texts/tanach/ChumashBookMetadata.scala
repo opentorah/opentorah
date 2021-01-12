@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
@@ -89,7 +89,7 @@ object ChumashBookMetadata {
   {
     override def contentParsable: Parsable[ParshaMetadata.Parsed] = new Parsable[ParshaMetadata.Parsed] {
       override def parser: Parser[ParshaMetadata.Parsed] = ParshaMetadata.parser(book)
-      override def antiparser: Antiparser[ParshaMetadata.Parsed] = ???
+      override def unparser: Unparser[ParshaMetadata.Parsed] = ???
     }
   }
 }

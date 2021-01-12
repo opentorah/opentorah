@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, Xml}
 import org.opentorah.util.Collections
 import zio.ZIO
 
@@ -80,7 +80,7 @@ object Names {
 
   val withDefaultNameParsable: Parsable[Names] = new Parsable[Names] {
     override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = true)
-    override def antiparser: Antiparser[Names] = Antiparser(
+    override def unparser: Unparser[Names] = Unparser(
       attributes = value => Seq(defaultNameAttribute.optional.withValue(value.getDefaultName)),
       content = value => if (value.getDefaultName.isDefined) Seq.empty else Name.seq[Names](_.names).content(value) // TODO ???
     )
@@ -88,7 +88,7 @@ object Names {
 
   val withoutDefaultNameParsable: Parsable[Names] = new Parsable[Names] {
     override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = false)
-    override def antiparser: Antiparser[Names] = Name.seq[Names](_.names)
+    override def unparser: Unparser[Names] = Name.seq[Names](_.names)
   }
 
   object NamesMetadata extends Element[Names]("names") {

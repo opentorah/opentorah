@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -70,7 +70,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
         result <- parseAliyot(bookSpan, spans, number = None)
       } yield result
 
-      override def antiparser: Antiparser[Torah] = ???
+      override def unparser: Unparser[Torah] = ???
     }
   }
 
@@ -79,14 +79,14 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
       override def parser: Parser[WithNumber[SpanSemiResolved]] =
         WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
 
-      override def antiparser: Antiparser[Numbered] = ???
+      override def unparser: Unparser[Numbered] = ???
     }
   }
 
   object Maftir extends Element[BookSpan]("maftir") {
     override def contentParsable: Parsable[BookSpan] = new Parsable[BookSpan] {
       override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
-      override def antiparser: Antiparser[BookSpan] = ???
+      override def unparser: Unparser[BookSpan] = ???
     }
   }
 

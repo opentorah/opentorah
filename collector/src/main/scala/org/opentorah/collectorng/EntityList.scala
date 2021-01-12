@@ -2,7 +2,7 @@ package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, FromUrl, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, FromUrl, Parsable, Parser}
 
 final class EntityList(
   override val fromUrl: FromUrl,
@@ -36,7 +36,7 @@ object EntityList extends EntityRelated[EntityList](
       title
     )
 
-    override def antiparser: Antiparser[EntityList] = Antiparser.concat(
+    override def unparser: Unparser[EntityList] = Unparser.concat(
       Names.withDefaultNameParsable(_.names),
       roleAttribute(_.role),
       Title.element.required(_.title),

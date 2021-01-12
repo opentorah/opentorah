@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Text}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Text}
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -25,7 +25,7 @@ object Name extends Element[Name]("name") {
       languageSpec <- LanguageSpec()
     } yield new Name(name.get, languageSpec)
 
-    override val antiparser: Antiparser[Name] = Antiparser.concat(
+    override val unparser: Unparser[Name] = Unparser.concat(
       nAttribute.required(_.name),
       LanguageSpec(_.languageSpec)
     )

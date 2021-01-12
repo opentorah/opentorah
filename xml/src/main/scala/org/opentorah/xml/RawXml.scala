@@ -15,7 +15,7 @@ class RawXml(elementName: String, namespace: Option[Namespace] = None) {
     override def contentParsable: Parsable[Value] = new Parsable[Value] {
       override def parser: Parser[Value] = Element.nodes().map(new Value(_))
 
-      override def antiparser: Antiparser[Value] = Antiparser(
+      override def unparser: Unparser[Value] = Unparser(
         content = _.xml,
         namespace = namespace
       )

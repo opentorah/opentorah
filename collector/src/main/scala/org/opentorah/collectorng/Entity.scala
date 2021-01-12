@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
 import org.opentorah.tei.{EntityType, Entity => TeiEntity}
-import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser}
 
 final class Entity(
   override val name: String,
@@ -36,7 +36,7 @@ object Entity extends Directory.EntryMaker[TeiEntity, Entity]("entity") {
       mainName
     )
 
-    override def antiparser: Antiparser[Entity] = Antiparser.concat(
+    override def unparser: Unparser[Entity] = Unparser.concat(
       Directory.fileNameAttribute(_.name),
       entityTypeAttribute(_.entityType.element),
       roleAttribute(_.role),

@@ -1,6 +1,6 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
 
 // TODO:
 //  lazy val lists: Seq[EntitiesList] = element.lists.map(_.take(by.get.stores.map(_.entity)))
@@ -30,7 +30,7 @@ object ByEntityList extends Element[ByEntityList]("byEntityList") {
       lists
     )
 
-    override def antiparser: Antiparser[ByEntityList] = Antiparser.concat(
+    override def unparser: Unparser[ByEntityList] = Unparser.concat(
       By.selectorToXml,
       EntityList.seq(_.lists)
     )

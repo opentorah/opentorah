@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import java.net.URL
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parser}
 import zio.ZIO
 
 class ByComponent extends Component("by") {
@@ -35,7 +35,7 @@ class ByComponent extends Component("by") {
     className
   )
 
-  override protected def inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
+  override protected def inlineUnparser: Unparser[Inline] = Unparser.concat(
     selectorAttribute(_.selector),
     directoryAttribute(_.directory),
     listAttribute(_.list),

@@ -1,6 +1,6 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser, Xml}
 
 final class Note(
   override val name: String,
@@ -33,7 +33,7 @@ object Note extends Directory.EntryMaker[Markdown, Note]("note") {
       title
     )
 
-    override def antiparser: Antiparser[Note] = Antiparser.concat(
+    override def unparser: Unparser[Note] = Unparser.concat(
       Directory.fileNameAttribute(_.name),
       titleAttribute(_.title)
     )
