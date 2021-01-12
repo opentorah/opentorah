@@ -45,7 +45,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry](
   final protected def findByName(name: String, name2entry: Map[String, M]): Option[M] =
     Store.checkExtension(name, "html").flatMap(name2entry.get)
 
-  private def listUrl: URL = Files.fileInDirectory(fromUrl.url, directory + "-list-generated-ng.xml")
+  private def listUrl: URL = Files.fileInDirectory(fromUrl.url, directory + "-list-generated.xml")
 
   private val directoryParsable: Element[Seq[M]] = new Element[Seq[M]]("directory") {
     override def contentParsable: Parsable[Seq[M]] = entry.seq

@@ -9,7 +9,6 @@ final class NotesObject(site: Site) extends SiteObject(site) {
   private val (fileNames: Seq[String], fileInDirectory: (String => URL)) = FilesList.get(
     baseUrl = site.store.urls.baseUrl,
     directoryName = NotesObject.directoryName,
-    listName = None,
     extension = "md"
   )
 

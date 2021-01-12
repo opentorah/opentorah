@@ -66,7 +66,6 @@ class ByComponent extends Component("by") {
         val (fileNames: Seq[String], fileInDirectory: (String => URL)) = FilesList.get(
           baseUrl = urls.baseUrl,
           directoryName = element.directory.get,
-          listName = element.list,
           extension = "xml"
         )
 
