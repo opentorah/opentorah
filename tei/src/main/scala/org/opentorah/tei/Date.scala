@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Date(
   when: String,
@@ -26,7 +26,7 @@ object Date extends Element[Date]("date") {
       xml
     )
 
-    override val antiparser: Antiparser[Date] = Tei.concat(
+    override val unparser: Unparser[Date] = Tei.concat(
       whenAttribute(_.when),
       calendarAttribute(_.calendar),
       Element.nodes(_.xml)

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Parsable, Parser, Xml}
 
 final case class EntityName(
   entityType: EntityType,
@@ -32,7 +32,7 @@ object EntityName extends EntityRelated[EntityName](
       name
     )
 
-    override def antiparser: Antiparser[EntityName] = Tei.concat(
+    override def unparser: Unparser[EntityName] = Tei.concat(
       idAttribute(_.id),
       refAttribute(_.ref),
       textParsable(_.name)

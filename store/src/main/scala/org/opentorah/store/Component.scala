@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import java.net.URL
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser}
 import zio.ZIO
 
 abstract class Component(elementName: String) {
@@ -35,14 +35,14 @@ abstract class Component(elementName: String) {
         } yield result
       } yield result
 
-      override def antiparser: Antiparser[Element] = Antiparser(
+      override def unparser: Unparser[Element] = Unparser(
         attributes = {
-          case FromFile(file) => Component.fileAttribute.required.antiparser.attributes(file)
-          case inline => inlineAntiparser.attributes(inline.asInstanceOf[Inline])
+          case FromFile(file) => Component.fileAttribute.required.unparser.attributes(file)
+          case inline => inlineUnparser.attributes(inline.asInstanceOf[Inline])
         },
         content = {
           case FromFile(_) => Seq.empty
-          case inline => inlineAntiparser.content(inline.asInstanceOf[Inline])
+          case inline => inlineUnparser.content(inline.asInstanceOf[Inline])
         }
       )
     }
@@ -52,7 +52,7 @@ abstract class Component(elementName: String) {
 
   def inlineParser(className: Option[String]): Parser[Inline]
 
-  protected def inlineAntiparser: Antiparser[Inline]
+  protected def inlineUnparser: Unparser[Inline]
 
   final type Creator[+R] = (
     /* inheritedSelectors: */ Seq[Selector],

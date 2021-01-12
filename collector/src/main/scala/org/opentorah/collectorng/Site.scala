@@ -3,7 +3,7 @@ package org.opentorah.collectorng
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Page, SourceDesc, Tei, TeiRawXml, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Xhtml, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Xhtml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
@@ -280,7 +280,7 @@ object Site extends Element[Site]("site") {
       by
     )
 
-    override def antiparser: Antiparser[Site] = Antiparser.concat[Site](
+    override def unparser: Unparser[Site] = Unparser.concat[Site](
       Names.withDefaultNameParsable(_.names),
       Title.element.required(_.title),
       siteUrlAttribute(_.siteUrl),

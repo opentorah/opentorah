@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Metadata, Names, WithNumber}
 import org.opentorah.texts.tanach.Torah.Numbered
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
 
 final class ParshaMetadata(
   val parsha: Parsha,
@@ -108,7 +108,7 @@ object ParshaMetadata {
         isCombined <- new Attribute.BooleanAttribute("combined").optional().map(_.getOrElse(false))
       } yield DayParsed(span, custom, isCombined)
 
-      override def antiparser: Antiparser[DayParsed] = ???
+      override def unparser: Unparser[DayParsed] = ???
     }
   }
 
@@ -117,14 +117,14 @@ object ParshaMetadata {
 
     override def contentParsable: Parsable[Numbered] = new Parsable[Numbered] {
       override def parser: Parser[Numbered] = numberedParser
-      override def antiparser: Antiparser[Numbered] = ???
+      override def unparser: Unparser[Numbered] = ???
     }
   }
 
   object Maftir extends Element[SpanSemiResolved]("maftir") {
     override def contentParsable: Parsable[SpanSemiResolved] = new Parsable[SpanSemiResolved] {
       override def parser: Parser[SpanSemiResolved] = semiResolvedParser
-      override def antiparser: Antiparser[SpanSemiResolved] = ???
+      override def unparser: Unparser[SpanSemiResolved] = ???
     }
   }
 

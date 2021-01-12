@@ -1,6 +1,6 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Element, FromUrl, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, FromUrl, Parsable, Parser}
 import java.net.URL
 
 final class ByNote(
@@ -32,7 +32,7 @@ object ByNote extends Element[ByNote]("byNote") {
       directory
     )
 
-    override def antiparser: Antiparser[ByNote] = Antiparser.concat(
+    override def unparser: Unparser[ByNote] = Unparser.concat(
       By.selectorToXml,
       Directory.directoryAttribute(_.directory)
     )

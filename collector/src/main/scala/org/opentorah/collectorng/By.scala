@@ -1,7 +1,7 @@
 package org.opentorah.collectorng
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Antiparser, Attribute, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parser}
 
 trait By extends Store {
 
@@ -15,5 +15,5 @@ object By {
 
   val selector: Parser[Selector] = selectorAttribute().map(Selector.byName)
 
-  def selectorToXml[T <: By]: Antiparser[T] = selectorAttribute(_.selector.name)
+  def selectorToXml[T <: By]: Unparser[T] = selectorAttribute(_.selector.name)
 }

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 final case class TeiHeader(
   fileDesc: FileDesc,
@@ -27,7 +27,7 @@ object TeiHeader extends Element[TeiHeader]("teiHeader") {
       revisionDesc
     )
 
-    override val antiparser: Antiparser[TeiHeader] = Tei.concat(
+    override val unparser: Unparser[TeiHeader] = Tei.concat(
       FileDesc.required(_.fileDesc),
       EncodingDesc.element.optional(_.encodingDesc),
       ProfileDesc.optional(_.profileDesc),

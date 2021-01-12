@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
 
 final case class Language(
   ident: String,
@@ -27,7 +27,7 @@ object Language extends Element[Language]("language") {
       text
     )
 
-    override val antiparser: Antiparser[Language] = Tei.concat(
+    override val unparser: Unparser[Language] = Tei.concat(
       identAttribute(_.ident),
       usageAttribute(_.usage),
       textParsable(_.text)

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 // TODO remove
 final case class EntitiesList(
@@ -42,7 +42,7 @@ object EntitiesList extends EntityRelated[EntitiesList](
       Seq.empty
     )
 
-    override def antiparser: Antiparser[EntitiesList] = Antiparser.concat(
+    override def unparser: Unparser[EntitiesList] = Unparser.concat(
       idAttribute(_.id),
       roleAttribute(_.role),
       headElement(_.head)

@@ -49,7 +49,7 @@ object Attribute {
   }
 
   sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A] {
-    final override def antiparser: Antiparser[A] = Antiparser(
+    final override def unparser: Unparser[A] = Unparser(
       attributes = value => Seq(withValue(value))
     )
 

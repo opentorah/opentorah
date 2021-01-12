@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Attribute, Element, From, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, From, Parsable, Parser}
 import zio.ZIO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
@@ -31,7 +31,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
         result <- elementParser
       } yield (name, result)
 
-      override def antiparser: Antiparser[(String, Haftarah.Customs)] = ???
+      override def unparser: Unparser[(String, Haftarah.Customs)] = ???
     }
   }
 
@@ -45,7 +45,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
   def element(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
     override def contentParsable: Parsable[Customs] = new Parsable[Customs] {
       override def parser: Parser[Customs] = Haftarah.parser(full)
-      override def antiparser: Antiparser[Haftarah.Customs] = ???
+      override def unparser: Unparser[Haftarah.Customs] = ???
     }
   }
 
@@ -77,7 +77,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
         result <- if (parts.isEmpty) ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(parts)
       } yield Custom.parse(n) -> result
 
-      override def antiparser: Antiparser[(Set[Custom], Haftarah)] = ???
+      override def unparser: Unparser[(Set[Custom], Haftarah)] = ???
     }
   }
 
@@ -86,7 +86,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
       override def parser: Parser[WithNumber[BookSpan]] =
         WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
 
-      override def antiparser: Antiparser[WithNumber[BookSpan]] = ???
+      override def unparser: Unparser[WithNumber[BookSpan]] = ???
     }
   }
 

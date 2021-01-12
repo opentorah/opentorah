@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 final case class PublicationStmt(
   publisher: Option[Publisher.Value],
@@ -18,7 +18,7 @@ object PublicationStmt extends Element[PublicationStmt]("publicationStmt") {
       availability
     )
 
-    override val antiparser: Antiparser[PublicationStmt] = Tei.concat(
+    override val unparser: Unparser[PublicationStmt] = Tei.concat(
       Publisher.element.optional(_.publisher),
       Availability.optional(_.availability)
     )

@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import Tanach.TanachBook
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Antiparser, Element, From, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, From, Parsable, Parser}
 import zio.IO
 
 object TanachMetadata {
@@ -81,7 +81,7 @@ object TanachMetadata {
         }
       } yield result
 
-      override def antiparser: Antiparser[TanachBookMetadata.Parsed] = ???
+      override def unparser: Unparser[TanachBookMetadata.Parsed] = ???
     }
   }
 

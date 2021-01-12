@@ -18,9 +18,9 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
 
   override def toXmlElement(value: A): Xml.Element = Xml.construct(
     name = elementName,
-    namespace = contentParsable.antiparser.namespace,
-    attributes = contentParsable.antiparser.attributes(value),
-    children = contentParsable.antiparser.content(value)
+    namespace = contentParsable.unparser.namespace,
+    attributes = contentParsable.unparser.attributes(value),
+    children = contentParsable.unparser.content(value)
   )
 }
 
@@ -29,7 +29,7 @@ object Element {
 
   val nodes: Parsable[Seq[Xml.Node]] = new Parsable[Seq[Xml.Node]] {
     override protected def parser: Parser[Seq[Xml.Node]] = Context.allNodes
-    override def antiparser: Antiparser[Seq[Xml.Node]] = Antiparser[Seq[Xml.Node]](content = identity)
+    override def unparser: Unparser[Seq[Xml.Node]] = Unparser[Seq[Xml.Node]](content = identity)
   }
 
   def allAttributes: Parser[Seq[Attribute.Value[String]]] = Context.takeAllAttributes

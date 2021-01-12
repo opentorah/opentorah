@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Elements, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Elements, Parsable, Parser}
 
 final case class ProfileDesc(
   documentAbstract: Option[Abstract.Value],
@@ -57,7 +57,7 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
       listTranspose
     )
 
-    override val antiparser: Antiparser[ProfileDesc] = Tei.concat(
+    override val unparser: Unparser[ProfileDesc] = Tei.concat(
       Abstract.element.optional(_.documentAbstract),
       Creation.optional(_.creation),
       LangUsage.optional(_.langUsage),

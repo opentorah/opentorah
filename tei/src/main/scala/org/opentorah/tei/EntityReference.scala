@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, ContentType, Element, From, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, From, Parsable, Parser, Xml}
 
 final case class EntityReference(
   entityType: EntityType,
@@ -38,7 +38,7 @@ object EntityReference extends EntityRelated[EntityReference](
       ref
     )
 
-    override def antiparser: Antiparser[EntityReference] = Tei.concat(
+    override def unparser: Unparser[EntityReference] = Tei.concat(
       refAttribute(_.ref),
       idAttribute(_.id),
       roleAttribute(_.role),

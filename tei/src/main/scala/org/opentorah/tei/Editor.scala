@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
 final case class Editor(
   role: Option[String],
@@ -20,7 +20,7 @@ object Editor extends Element[Editor]("editor") {
       persName
     )
 
-    override val antiparser: Antiparser[Editor] = Tei.concat(
+    override val unparser: Unparser[Editor] = Tei.concat(
       roleAttribute(_.role),
       EntityReference.Person.optional(_.persName)
     )

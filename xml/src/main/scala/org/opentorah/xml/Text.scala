@@ -7,14 +7,14 @@ final class Text {
 
   def optional: Parsable[Option[String]] = new Parsable[Option[String]] {
     override protected def parser: Parser[Option[String]] = optionalParser
-    override def antiparser: Antiparser[Option[String]] = Antiparser(
+    override def unparser: Unparser[Option[String]] = Unparser(
       content = value => value.toSeq.map(Xml.mkText)
     )
   }
 
   def required: Parsable[String] = new Parsable[String] {
     override protected def parser: Parser[String] = Parser.required(optionalParser, this)
-    override def antiparser: Antiparser[String] = Antiparser(
+    override def unparser: Unparser[String] = Unparser(
       content = value => Seq(Xml.mkText(value))
     )
   }

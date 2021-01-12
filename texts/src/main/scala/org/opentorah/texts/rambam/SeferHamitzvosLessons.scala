@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, Elements, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Elements, Parsable, Parser}
 
 object SeferHamitzvosLessons {
 
@@ -19,7 +19,7 @@ object SeferHamitzvosLessons {
         parts <- Part.seq()
       } yield Lesson(number, parts)
 
-      override def antiparser: Antiparser[Lesson] = ???
+      override def unparser: Unparser[Lesson] = ???
     }
   }
 
@@ -40,7 +40,7 @@ object SeferHamitzvosLessons {
   object NamedPart extends Element[NamedPart]("named") {
     override def contentParsable: Parsable[NamedPart] = new Parsable[NamedPart] {
       override def parser: Parser[NamedPart] = Names.withoutDefaultNameParsable().map(NamedPart.apply)
-      override def antiparser: Antiparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
+      override def unparser: Unparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
     }
   }
 
@@ -59,7 +59,7 @@ object SeferHamitzvosLessons {
 
     override def contentParsable: Parsable[Positive] = new Parsable[Positive] {
       override def parser: Parser[Positive] = nAttribute().map(Positive.apply)
-      override def antiparser: Antiparser[Positive] = nAttribute(_.number)
+      override def unparser: Unparser[Positive] = nAttribute(_.number)
     }
   }
 
@@ -76,7 +76,7 @@ object SeferHamitzvosLessons {
 
     override def contentParsable: Parsable[Negative] = new Parsable[Negative] {
       override def parser: Parser[Negative] = nAttribute().map(Negative.apply)
-      override def antiparser: Antiparser[Negative] = nAttribute(_.number)
+      override def unparser: Unparser[Negative] = nAttribute(_.number)
     }
   }
 

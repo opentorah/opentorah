@@ -3,7 +3,7 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntitiesList, Entity}
-import org.opentorah.xml.{Antiparser, Attribute, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser}
 
 final class Entities(
   inheritedSelectors: Seq[Selector],
@@ -57,7 +57,7 @@ object Entities {
         lists
       )
 
-      override val antiparser: Antiparser[Element] = Antiparser.concat(
+      override val unparser: Unparser[Element] = Unparser.concat(
         selectorAttribute(_.selector),
         By.parsable.required(_.by),
         EntitiesList.seq(_.lists)

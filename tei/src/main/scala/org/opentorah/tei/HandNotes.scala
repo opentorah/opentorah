@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 final case class HandNotes(
   handNotes: Seq[HandNote.Value]
@@ -18,7 +18,7 @@ object HandNotes extends Element[HandNotes]("handNotes") {
       handNotes
     )
 
-    override val antiparser: Antiparser[HandNotes] = Tei.concat(
+    override val unparser: Unparser[HandNotes] = Tei.concat(
       HandNote.element.seq(_.handNotes)
     )
   }

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
 // but I made them optional so that they can be removed from the editable pre-TEI files
@@ -36,7 +36,7 @@ object FileDesc extends Element[FileDesc]("fileDesc") {
       sourceDesc
     )
 
-    override val antiparser: Antiparser[FileDesc] = Tei.concat(
+    override val unparser: Unparser[FileDesc] = Tei.concat(
       TitleStmt.required(_.titleStmt),
       EditionStmt.element.optional(_.editionStmt),
       Extent.element.optional(_.extent),

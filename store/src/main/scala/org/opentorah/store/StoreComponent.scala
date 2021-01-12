@@ -3,7 +3,7 @@ package org.opentorah.store
 import java.net.URL
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Antiparser, Attribute, Parser, PrettyPrinter}
+import org.opentorah.xml.{Unparser, Attribute, Parser, PrettyPrinter}
 
 class StoreComponent extends Component("store") {
 
@@ -46,7 +46,7 @@ class StoreComponent extends Component("store") {
     className
   )
 
-  override protected val inlineAntiparser: Antiparser[Inline] = Antiparser.concat(
+  override protected val inlineUnparser: Unparser[Inline] = Unparser.concat(
     Names.withDefaultNameParsable(_.names),
     fromAttribute(_.from),
     Component.typeAttribute(_.className),

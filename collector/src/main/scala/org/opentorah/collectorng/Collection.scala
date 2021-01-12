@@ -3,7 +3,7 @@ package org.opentorah.collectorng
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, EntityReference, Page, Tei, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Element, Elements, FromUrl, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Elements, FromUrl, Parsable, Parser, Xml}
 import java.net.URL
 
 final class Collection(
@@ -182,7 +182,7 @@ object Collection extends Element[Collection]("store") {
       byDocument.parts //parts
     )
 
-    override def antiparser: Antiparser[Collection] = Antiparser.concat(
+    override def unparser: Unparser[Collection] = Unparser.concat(
       namesParsable(_.names),
       titleElement(_.title),
       abstractElement(_.storeAbstract),
@@ -208,7 +208,7 @@ object Collection extends Element[Collection]("store") {
         parts
       )
 
-      override def antiparser: Antiparser[ByDocument] = ???
+      override def unparser: Unparser[ByDocument] = ???
     }
   }
 }

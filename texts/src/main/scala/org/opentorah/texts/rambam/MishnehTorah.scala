@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
 object MishnehTorah {
 
@@ -37,7 +37,7 @@ object MishnehTorah {
         }
       }
 
-      override def antiparser: Antiparser[Part] = ???
+      override def unparser: Unparser[Part] = ???
     }
   }
 
@@ -84,7 +84,7 @@ object MishnehTorah {
         names <- Names.withoutDefaultNameParsable()
       } yield new NamedChapter(names)
 
-      override def antiparser: Antiparser[NamedChapter] = Names.withoutDefaultNameParsable(_.names)
+      override def unparser: Unparser[NamedChapter] = Names.withoutDefaultNameParsable(_.names)
     }
   }
 
@@ -104,7 +104,7 @@ object MishnehTorah {
         result
       }
 
-      override def antiparser: Antiparser[Book] = ???
+      override def unparser: Unparser[Book] = ???
     }
   }
 

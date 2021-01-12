@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
 
 final case class TitleStmt(
   titles: Seq[Title.Value],
@@ -13,12 +13,12 @@ final case class TitleStmt(
 ) {
   def references: Seq[EntityReference] = {
     val xml: Seq[Xml.Node] =
-      Title.element.seq.antiparser.content(titles) ++
-      Author.element.seq.antiparser.content(authors) ++
-      Sponsor.element.seq.antiparser.content(sponsors) ++
-      Funder.element.seq.antiparser.content(funders) ++
-      Principal.element.seq.antiparser.content(principals) ++
-      RespStmt.element.seq.antiparser.content(respStmts)
+      Title.element.seq.unparser.content(titles) ++
+      Author.element.seq.unparser.content(authors) ++
+      Sponsor.element.seq.unparser.content(sponsors) ++
+      Funder.element.seq.unparser.content(funders) ++
+      Principal.element.seq.unparser.content(principals) ++
+      RespStmt.element.seq.unparser.content(respStmts)
 
     EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
   }
@@ -54,7 +54,7 @@ object TitleStmt extends Element[TitleStmt]("titleStmt") {
       respStmts
     )
 
-    override val antiparser: Antiparser[TitleStmt] = Tei.concat(
+    override val unparser: Unparser[TitleStmt] = Tei.concat(
       Title.element.seq(_.titles),
       Author.element.seq(_.authors),
       Editor.seq(_.editors),

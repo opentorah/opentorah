@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, Xml}
 
 final case class Availability(
   status: Option[String],
@@ -20,7 +20,7 @@ object Availability extends Element[Availability]("availability") {
       xml
     )
 
-    override val antiparser: Antiparser[Availability] = Tei.concat(
+    override val unparser: Unparser[Availability] = Tei.concat(
       statusAttribute(_.status),
       Element.nodes(_.xml)
     )

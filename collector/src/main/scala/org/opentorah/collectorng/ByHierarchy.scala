@@ -1,6 +1,6 @@
 package org.opentorah.collectorng
 
-import org.opentorah.xml.{Antiparser, Attribute, Element, FromUrl, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Element, FromUrl, Parsable, Parser, Xml}
 
 final class ByHierarchy(
   override val fromUrl: FromUrl,
@@ -38,7 +38,7 @@ object ByHierarchy extends Element[ByHierarchy]("by") {
       stores
     )
 
-    override def antiparser: Antiparser[ByHierarchy] = Antiparser.concat(
+    override def unparser: Unparser[ByHierarchy] = Unparser.concat(
       By.selectorToXml,
       storeParsable.seq(_.stores)
     )
@@ -59,7 +59,7 @@ object ByHierarchy extends Element[ByHierarchy]("by") {
         result <- if (typeOpt.isEmpty) Hierarchy.contentParsable() else Collection.contentParsable()
       } yield result
 
-      override def antiparser: Antiparser[Store] = ???
+      override def unparser: Unparser[Store] = ???
     }
 
     override protected def elementByValue(value: Store): Element[_] = value match {

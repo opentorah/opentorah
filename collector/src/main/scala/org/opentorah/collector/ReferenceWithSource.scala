@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.EntityReference
 import org.opentorah.util.Files
-import org.opentorah.xml.{Antiparser, Attribute, Element, Elements, Parsable, Parser}
+import org.opentorah.xml.{Unparser, Attribute, Element, Elements, Parsable, Parser}
 
 // TODO generalize to hold unclears...
 
@@ -36,7 +36,7 @@ object ReferenceWithSource extends Elements.Union[ReferenceWithSource] {
         entityName
       )
 
-      override def antiparser: Antiparser[FromEntity] = Antiparser.concat(
+      override def unparser: Unparser[FromEntity] = Unparser.concat(
         pathAttribute(unsplitPath),
         EntityReference.required(_.reference),
         entityIdAttribute(_.entityId),
@@ -79,7 +79,7 @@ object ReferenceWithSource extends Elements.Union[ReferenceWithSource] {
         documentName
       )
 
-      override def antiparser: Antiparser[FromDocument] = Antiparser.concat(
+      override def unparser: Unparser[FromDocument] = Unparser.concat(
         pathAttribute(unsplitPath),
         EntityReference.required(_.reference),
         collectionFileNameAttribute(_.collectionFileName),
@@ -104,7 +104,7 @@ object ReferenceWithSource extends Elements.Union[ReferenceWithSource] {
         reference
       )
 
-      override def antiparser: Antiparser[FromElement] = Antiparser.concat(
+      override def unparser: Unparser[FromElement] = Unparser.concat(
         pathAttribute(unsplitPath),
         EntityReference.required(_.reference)
       )
