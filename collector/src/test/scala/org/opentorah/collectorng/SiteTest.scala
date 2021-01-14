@@ -9,7 +9,8 @@ final class SiteTest extends AnyFlatSpec with Matchers {
     //val old = new org.opentorah.collector.Site(new java.io.File("/home/dub/OpenTorah/alter-rebbe.org").toURI.toURL)
     val site: Site = Site.read("/home/dub/OpenTorah/alter-rebbe.org")
     site.writeLists()
-    site.writeStaticFiles()
+    site.verify()
+    //site.writeStaticFiles()
 
 //    site.by.stores.head.names.name shouldBe "книги"
 //

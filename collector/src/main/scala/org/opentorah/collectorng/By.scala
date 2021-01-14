@@ -13,7 +13,7 @@ trait By extends Store {
 object By {
   private val selectorAttribute: Attribute.Required[String] = Attribute("selector").required
 
-  val selector: Parser[Selector] = selectorAttribute().map(Selector.byName)
+  val selectorParser: Parser[Selector] = selectorAttribute().map(Selector.byName)
 
-  def selectorToXml[T <: By]: Unparser[T] = selectorAttribute(_.selector.name)
+  def selectorUnparser[T <: By]: Unparser[T] = selectorAttribute(_.selector.name)
 }

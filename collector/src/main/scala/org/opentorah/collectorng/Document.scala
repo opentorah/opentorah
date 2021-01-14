@@ -34,7 +34,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
   {
     // TODO add owner etc.
     def content(site: Site): Xml.Element =
-      Tei.required.xml(collection.getFile(document.name))
+      Tei.required.xml(collection.getFile(document))
   }
 
   final class HtmlFacet(document: Document, collectionFacet: Collection.HtmlFacet)
@@ -49,7 +49,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
     // TODO add owner/calendar etc.
     // TODO add header summary and title to the text
     override def content(site: Site): Xml.Element =
-      Tei.required.xml(collection.getFile(document.name))
+      Tei.required.xml(collection.getFile(document))
   }
 
   final class FacsFacet(document: Document, collectionFacet: Collection.FacsFacet)

@@ -3,12 +3,15 @@ package org.opentorah.collectorng
 import org.opentorah.tei.{EntityType, Entity => TeiEntity}
 import org.opentorah.xml.{Unparser, Attribute, Parsable, Parser}
 
+// TODO use Union to record org/place/person...
 final class Entity(
   override val name: String,
   val entityType: EntityType,
   val role: Option[String],
   val mainName: String
-) extends Directory.Entry(name)
+) extends Directory.Entry(name) {
+  def id: String = name
+}
 
 object Entity extends Directory.EntryMaker[TeiEntity, Entity]("entity") {
 

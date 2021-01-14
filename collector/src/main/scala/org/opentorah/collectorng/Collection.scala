@@ -15,16 +15,18 @@ final class Collection(
   val body: Option[Body.Value],
   override val directory: String,
   val parts: Seq[CollectionPart]
-) extends Directory[Tei, Document](directory, "xml", Document) with Store with HtmlContent {
+) extends Directory[Tei, Document, Collection.Documents](
+  directory,
+  "xml",
+  Document,
+  new Collection.Documents(_, parts)
+) with Store with HtmlContent {
 
   def pageType: Page.Type = ??? // TODO
 
   override protected def loadFile(url: URL): Tei = Parser.parseDo(Tei.parse(url))
 
-  private def collectionDocuments: Collection.Documents = Cache.get[Collection.Documents](
-    directoryUrl,
-    _ /* url */ => new Collection.Documents(readDirectory, parts) // TODO use url?
-  )
+  private def collectionDocuments: Collection.Documents = getDirectory
 
   override def directoryEntries: Seq[Document] = documents
   def documents: Seq[Document] = collectionDocuments.directoryEntries
@@ -75,7 +77,7 @@ final class Collection(
 // TODO rename the element to "collection" when switched to the new generation
 object Collection extends Element[Collection]("store") {
 
-  private class Documents(
+  final class Documents(
     name2document: Map[String, Document],
     partsRaw: Seq[CollectionPart]
   ) {
@@ -108,7 +110,7 @@ object Collection extends Element[Collection]("store") {
   final class HtmlFacet(collection: Collection) extends Facet(collection) {
     override def selector: Selector = Selector.byName("document")
     override def extension: String = "html"
-    override protected def of(document: Document): Document.HtmlFacet = new Document.HtmlFacet(document, this)
+    override /*protected*/ def of(document: Document): Document.HtmlFacet = new Document.HtmlFacet(document, this)
   }
 
   final class FacsFacet(collection: Collection) extends Facet(collection) {
@@ -200,7 +202,7 @@ object Collection extends Element[Collection]("store") {
   object ByDocument extends Element[ByDocument]("by") {
     override def contentParsable: Parsable[ByDocument] = new Parsable[ByDocument] {
       override def parser: Parser[ByDocument] = for {
-        _ /*selector*/ <- By.selector
+        _ /*selector*/ <- By.selectorParser
         directory <- Directory.directoryAttribute()
         parts <- CollectionPart.seq()
       } yield new ByDocument(
