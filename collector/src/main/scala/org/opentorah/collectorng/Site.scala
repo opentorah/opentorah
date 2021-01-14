@@ -3,7 +3,8 @@ package org.opentorah.collectorng
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{EntityReference, Page, SourceDesc, Tei, TeiRawXml, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Unparser, Xhtml, Xml}
+import org.opentorah.xml.{Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Unparser, Xhtml,
+  Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
@@ -34,26 +35,18 @@ final class Site(
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private def collections(prefix: Store.Path, by: ByHierarchy): Seq[Store.Path] = by.stores.flatMap {
-    case collection: Collection => Seq(prefix ++ Seq(by, collection))
-    case hierarchy: Hierarchy => hierarchy.by.toSeq.flatMap(by1 => collections(prefix ++ Seq(by, hierarchy), by1))
-    case _ => Seq.empty
-  }
+  private val collections: Seq[Collection] = Site.getCollections(by)
 
-  val collection2path: Map[Collection, Store.Path] = collections(Seq.empty, by)
-    .map(path => path.last.asInstanceOf[Collection] -> path.init)
-    .toMap
-
-  val collections: Seq[Collection] = collection2path.keys.toSeq
-
-  private val collection2collectionAlias: Map[Collection, CollectionAlias] = collections
+  private val alias2collectionAlias: Map[String, CollectionAlias] =
+    collections
     .filter(_.alias.isDefined)
-    .map(collection => collection -> new CollectionAlias(collection))
+    .map(collection => collection.alias.get -> new CollectionAlias(collection))
     .toMap
 
-  private val alias2collectionAlias: Map[String, CollectionAlias] = collection2collectionAlias.values
-    .map(collectionAlias => collectionAlias.alias -> collectionAlias)
-    .toMap
+  override def findByName(name: String): Option[Store] =
+    alias2collectionAlias.get(name).orElse(Store.findByName(name, stores))
+
+  private val stores: Seq[Store] = Seq(byEntity, byEntityList, byNote, by)
 
   private val references: ListFile[EntityReference, References] = new ListFile[EntityReference, References](
     url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
@@ -61,11 +54,6 @@ final class Site(
     entry = EntityReference,
     wrapper = new References(_)
   )
-
-  override def findByName(name: String): Option[Store] =
-    alias2collectionAlias.get(name).orElse(Store.findByName(name, stores))
-
-  private val stores: Seq[Store] = Seq(byEntity, byEntityList, byNote, by)
 
   private lazy val navigationLinks: Seq[Html.NavigationLink] = pages.map { url =>
     val path: Store.Path = resolve(url).get
@@ -216,6 +204,12 @@ final class Site(
 }
 
 object Site extends Element[Site]("site") {
+
+  private def getCollections(by: ByHierarchy): Seq[Collection] = by.stores.flatMap {
+    case collection: Collection => Seq(collection)
+    case hierarchy: Hierarchy => hierarchy.by.toSeq.flatMap(getCollections)
+    case _ => Seq.empty
+  }
 
   def read(rootPath: String): Site =
     read(new File(rootPath).toURI.toURL)
