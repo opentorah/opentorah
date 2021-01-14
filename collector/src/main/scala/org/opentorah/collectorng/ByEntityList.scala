@@ -23,7 +23,7 @@ object ByEntityList extends Element[ByEntityList]("byEntityList") {
 
   override def contentParsable: Parsable[ByEntityList] = new Parsable[ByEntityList] {
     override def parser: Parser[ByEntityList] = for {
-      selector <- By.selector
+      selector <- By.selectorParser
       lists <- EntityList.seq()
     } yield new ByEntityList(
       selector,
@@ -31,7 +31,7 @@ object ByEntityList extends Element[ByEntityList]("byEntityList") {
     )
 
     override def unparser: Unparser[ByEntityList] = Unparser.concat(
-      By.selectorToXml,
+      By.selectorUnparser,
       EntityList.seq(_.lists)
     )
   }

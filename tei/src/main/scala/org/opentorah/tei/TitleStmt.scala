@@ -25,6 +25,7 @@ final case class TitleStmt(
 }
 
 object TitleStmt extends Element[TitleStmt]("titleStmt") {
+
   def empty: TitleStmt = new TitleStmt(
     titles = Seq.empty,
     authors = Seq.empty,

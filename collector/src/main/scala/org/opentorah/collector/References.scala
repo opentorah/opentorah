@@ -1,11 +1,10 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.store.{By, Entities, EntityHolder, Selector, Store}
+import org.opentorah.store.{By, Entities, Selector, Store}
 import org.opentorah.tei.{Entity, EntityReference}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Element, Parsable, Parser, PrettyPrinter, Xml}
-import java.net.URL
+import org.opentorah.xml.Xml
 
 final class References private(references: Seq[ReferenceWithSource]) {
   def noRef: Seq[ReferenceWithSource.FromDocument] =
@@ -19,7 +18,7 @@ final class References private(references: Seq[ReferenceWithSource]) {
   }
 }
 
-object References extends Element[Seq[ReferenceWithSource]]("references") {
+object References {
 
   def apply(store: Store): References = {
     val references: Seq[ReferenceWithSource] = getReferences(Seq.empty, store)
@@ -34,29 +33,18 @@ object References extends Element[Seq[ReferenceWithSource]]("references") {
 
   private def getReferences(path: Seq[String], store: Store): Seq[ReferenceWithSource] = {
     val entities: Entities = store.entities.get
-    val entitiesBy: By[EntityHolder] = entities.by.get
-    val referencesFile: URL = Files.fileInDirectory(entitiesBy.urls.baseUrl, "references-generated.xml")
 
-    if (!Files.isFileUrl(referencesFile)) Parser.parseDo(parse(referencesFile)) else {
-      val references: Seq[ReferenceWithSource] = entitiesBy.stores.flatMap { entityHolder =>
-        val entity: Entity = entityHolder.entity
-        val entityId: String = entity.id.get
-        EntityReference.from(entity.content).map(reference => ReferenceWithSource.FromEntity(
-          path = Files.addExtension(path :+ getName(entities.selector) :+ entityId, "html"),
-          reference,
-          entityId,
-          entity.name
-        ))
-      } ++
+    entities.by.get.stores.flatMap { entityHolder =>
+      val entity: Entity = entityHolder.entity
+      val entityId: String = entity.id.get
+      EntityReference.from(entity.content).map(reference => ReferenceWithSource.FromEntity(
+        path = Files.addExtension(path :+ getName(entities.selector) :+ entityId, "html"),
+        reference,
+        entityId,
+        entity.name
+      ))
+    } ++
       fromStore(path, store.asInstanceOf[Store.FromElement])
-
-      Files.write(
-        file = Files.url2file(referencesFile),
-        content = PrettyPrinter.default.renderXml(required.xml(references))
-      )
-
-      references
-    }
   }
 
   private def fromStore(path: Seq[String], store: Store.FromElement): Seq[ReferenceWithSource] = {
@@ -128,6 +116,4 @@ object References extends Element[Seq[ReferenceWithSource]]("references") {
   private def fromDocument(references: Seq[ReferenceWithSource]): Seq[ReferenceWithSource.FromDocument] = references
     .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
     .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
-
-  override def contentParsable: Parsable[Seq[ReferenceWithSource]] = ReferenceWithSource.seq
 }

@@ -8,13 +8,6 @@ final class ByHierarchy(
   val stores: Seq[Store]
 ) extends By with FromUrl.With with HtmlContent {
 
-  // TODO move into Site
-  def collections(prefix: Store.Path): Seq[Store.Path] = stores.flatMap {
-    case collection: Collection => Seq(prefix ++ Seq(this, collection))
-    case store: Hierarchy => store.by.toSeq.flatMap(_.collections(prefix ++ Seq(this, store)))
-    case _ => Seq.empty
-  }
-
   override def findByName(name: String): Option[Store] = Store.findByName(name, stores)
 
   override def viewer: Html.Viewer = Html.Viewer.default
@@ -30,7 +23,7 @@ object ByHierarchy extends Element[ByHierarchy]("by") {
   override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy] {
     override def parser: Parser[ByHierarchy] = for {
       fromUrl <- Element.currentFromUrl
-      selector <- By.selector
+      selector <- By.selectorParser
       stores <- storeParsable.followRedirects.seq()
     } yield new ByHierarchy(
       fromUrl,
@@ -39,7 +32,7 @@ object ByHierarchy extends Element[ByHierarchy]("by") {
     )
 
     override def unparser: Unparser[ByHierarchy] = Unparser.concat(
-      By.selectorToXml,
+      By.selectorUnparser,
       storeParsable.seq(_.stores)
     )
   }

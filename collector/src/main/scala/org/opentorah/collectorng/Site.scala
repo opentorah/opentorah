@@ -1,9 +1,9 @@
 package org.opentorah.collectorng
 
 import org.opentorah.metadata.{Language, Names}
-import org.opentorah.tei.{Page, SourceDesc, Tei, TeiRawXml, Title}
+import org.opentorah.tei.{EntityReference, Page, SourceDesc, Tei, TeiRawXml, Title}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Unparser, Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Xhtml, Xml}
+import org.opentorah.xml.{Attribute, Element, FromUrl, LinkResolver, Parsable, Parser, PrettyPrinter, Unparser, Xhtml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
@@ -34,12 +34,17 @@ final class Site(
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private val collection2path: Map[Collection, Store.Path] = by
-    .collections(Seq.empty)
+  private def collections(prefix: Store.Path, by: ByHierarchy): Seq[Store.Path] = by.stores.flatMap {
+    case collection: Collection => Seq(prefix ++ Seq(by, collection))
+    case hierarchy: Hierarchy => hierarchy.by.toSeq.flatMap(by1 => collections(prefix ++ Seq(by, hierarchy), by1))
+    case _ => Seq.empty
+  }
+
+  val collection2path: Map[Collection, Store.Path] = collections(Seq.empty, by)
     .map(path => path.last.asInstanceOf[Collection] -> path.init)
     .toMap
 
-  private val collections: Seq[Collection] = collection2path.keys.toSeq
+  val collections: Seq[Collection] = collection2path.keys.toSeq
 
   private val collection2collectionAlias: Map[Collection, CollectionAlias] = collections
     .filter(_.alias.isDefined)
@@ -49,6 +54,13 @@ final class Site(
   private val alias2collectionAlias: Map[String, CollectionAlias] = collection2collectionAlias.values
     .map(collectionAlias => collectionAlias.alias -> collectionAlias)
     .toMap
+
+  private val references: ListFile[EntityReference, References] = new ListFile[EntityReference, References](
+    url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
+    name = "references",
+    entry = EntityReference,
+    wrapper = new References(_)
+  )
 
   override def findByName(name: String): Option[Store] =
     alias2collectionAlias.get(name).orElse(Store.findByName(name, stores))
@@ -108,13 +120,16 @@ final class Site(
   def pageUrl(collection: Collection, document: Document, page: Page): Seq[String] = ???
 
   def writeLists(): Unit = {
-    // Write lists
-    if (Files.isFileUrl(fromUrl.url)) {
-      byEntity.writeDirectory()
-      byNote.writeDirectory()
+    byEntity.writeDirectory()
+    byNote.writeDirectory()
+    references.write(References.fromSite(this))
 
-      for (collection <- collections) collection.writeDirectory()
-    }
+    for (collection <- collections) collection.writeDirectory()
+  }
+
+  def verify(): Unit = {
+    val errors: Seq[String] = references.get.verify(this)
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
   }
 
   private val staticCollectionsRoot: String = "collections"

@@ -165,7 +165,8 @@ object Elements {
     override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[(Element[_], _)] =
       parser.map(result => element -> result)
 
-    override protected def elementByValue(value: (Element[_], _)): Element[_] = value._1
+    override protected def elementByValue(value: (Element[_], _)): Element[_] =
+      throw new UnsupportedOperationException("Not supposed to happen!")
   }
 
   def choices(elements: Seq[Element[_]]): Parser[Choices] = new Choice(elements)

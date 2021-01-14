@@ -12,7 +12,7 @@ final class Note(
   override def htmlTitle: Option[String] = title
   override def navigationLinks: Seq[Html.NavigationLink] = Seq.empty
   override def lang: Option[String] = None
-  override def content(site: Site): Xml.Element = site.byNote.getFile(name).html
+  override def content(site: Site): Xml.Element = site.byNote.getFile(this).html
 }
 
 object Note extends Directory.EntryMaker[Markdown, Note]("note") {
