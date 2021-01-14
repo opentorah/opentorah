@@ -6,7 +6,7 @@ import org.opentorah.numbers.BigRational
 
 object Gregorian extends Calendar {
 
-  abstract class GregorianYear(number: Int) extends YearBase(number) {
+  final class GregorianYear(number: Int) extends YearBase(number) {
     override def firstDayNumber: Int = Year.firstDay(number)
 
     override def lengthInDays: Int = Year.lengthInDays(number)
@@ -18,11 +18,14 @@ object Gregorian extends Calendar {
 
   final override type YearCharacter = Boolean
 
-  trait GregorianYearCompanion extends YearCompanion { this: YearCompanion =>
-    protected final override def characters: Seq[YearCharacter] =
+  final class GregorianYearCompanion extends YearCompanion {
+    override protected def newYear(number: Int): Year =
+      new GregorianYear(number)
+
+    override protected def characters: Seq[YearCharacter] =
       Seq(true, false)
 
-    protected final override def monthNamesAndLengths(isLeap: YearCharacter): Seq[MonthNameAndLength] = {
+    override protected def monthNamesAndLengths(isLeap: YearCharacter): Seq[MonthNameAndLength] = {
       Seq(
         new MonthNameAndLength(Month.Name.January  , 31),
         new MonthNameAndLength(Month.Name.February , if (isLeap) 29 else 28),
@@ -39,28 +42,28 @@ object Gregorian extends Calendar {
       )
     }
 
-    protected final override def areYearsPositive: Boolean = false
+    override protected def areYearsPositive: Boolean = false
 
-    final override def isLeap(yearNumber: Int): Boolean =
+    override def isLeap(yearNumber: Int): Boolean =
       (yearNumber % 4 == 0) && ((yearNumber % 100 != 0) || (yearNumber % 400 == 0))
 
-    final override def firstMonth(yearNumber: Int): Int =
+    override def firstMonth(yearNumber: Int): Int =
       monthsInYear*(yearNumber - 1) + 1
 
-    final override def lengthInMonths(yearNumber: Int): Int = monthsInYear
+    override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
-    final val monthsInYear: Int = 12
+    val monthsInYear: Int = 12
 
     private val daysInNonLeapYear: Int = 365
 
-    final def firstDay(yearNumber: Int): Int =
+    def firstDay(yearNumber: Int): Int =
       daysInNonLeapYear * (yearNumber - 1) + (yearNumber - 1)/4 - (yearNumber - 1)/100 +
         (yearNumber - 1)/400 + 1
 
-    final def lengthInDays(yearNumber: Int): Int =
+    def lengthInDays(yearNumber: Int): Int =
       if (Year.isLeap(yearNumber)) daysInNonLeapYear + 1 else daysInNonLeapYear
 
-    final lazy val yearLength: TimeVector = TimeVector.fromRational(
+    lazy val yearLength: TimeVector = TimeVector.fromRational(
       BigRational(365) +
       BigRational(1, 4) -
       BigRational(1, 100) +
@@ -69,22 +72,24 @@ object Gregorian extends Calendar {
     )
   }
 
-  final override lazy val Year = new GregorianYearCompanion {
-    protected override def newYear(number: Int): Year =
-      new GregorianYear(number) {
-      }
-  }
+  final override lazy val Year = new GregorianYearCompanion
 
   trait GregorianMonth extends MonthBase
 
   final override type Month = GregorianMonth
 
-  trait GregorianMonthCompanion extends MonthCompanion { this: MonthCompanion =>
-    final override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
+  final class GregorianMonthCompanion extends MonthCompanion {
+    override private[opentorah] def apply(yearOption: Option[Year], monthNumber: Int): Month =
+      new GregorianMonth {
+        override protected var yearOpt: Option[Year] = yearOption
+        override def number: Int = monthNumber
+      }
 
-    private[opentorah] final override def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
+    override val Name: GregorianMonthCompanion.type = GregorianMonthCompanion
 
-    private[opentorah] final override def numberInYear(monthNumber: Int): Int =
+    override private[opentorah] def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / Year.monthsInYear + 1
+
+    override private[opentorah] def numberInYear(monthNumber: Int): Int =
       monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
   }
 
@@ -112,24 +117,24 @@ object Gregorian extends Calendar {
     protected override def resourceName: String = "GregorianMonth"
   }
 
-  final override lazy val Month = new GregorianMonthCompanion {
-    private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new GregorianMonth {
-        override protected var yearOpt: Option[Year] = yearOption
-        override def number: Int = monthNumber
-      }
-  }
+  final override lazy val Month = new GregorianMonthCompanion
 
   trait GregorianDay extends DayBase
 
   final override type Day = GregorianDay
 
-  trait GregorianDayCompanion extends DayCompanion { this: DayCompanion =>
-    final override val Name: GregorianDayCompanion.type = GregorianDayCompanion
+  final class GregorianDayCompanion extends DayCompanion {
+    override private[opentorah] def apply(monthOption: Option[Month], dayNumber: Int): Day =
+      new GregorianDay {
+        override protected var monthOpt: Option[Month] = monthOption
+        override def number: Int = dayNumber
+      }
 
-    final override def names: Seq[Name] = GregorianDayCompanion.values
+    override val Name: GregorianDayCompanion.type = GregorianDayCompanion
 
-    final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian
+    override def names: Seq[Name] = GregorianDayCompanion.values
+
+    override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekGregorian
   }
 
   object GregorianDayCompanion extends NamedCompanion {
@@ -150,32 +155,23 @@ object Gregorian extends Calendar {
     protected override def resourceName: String = "GregorianDay"
   }
 
-  final override lazy val Day = new GregorianDayCompanion {
-    private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
-      new GregorianDay {
-        override protected var monthOpt: Option[Month] = monthOption
-        override def number: Int = dayNumber
-      }
-  }
+  final override lazy val Day = new GregorianDayCompanion
 
-  abstract class GregorianMoment(digits: Seq[Int]) extends MomentBase(digits) {
-    final def morningHours(value: Int): Moment = firstHalfHours(value)
+  final class GregorianMoment(digits: Seq[Int]) extends MomentBase(digits) {
+    override def companion: GregorianMomentCompanion = Point
 
-    final def afternoonHours(value: Int): Moment = secondHalfHours(value)
+    def morningHours(value: Int): Moment = firstHalfHours(value)
+
+    def afternoonHours(value: Int): Moment = secondHalfHours(value)
   }
 
   final override type Point = GregorianMoment
 
-  trait GregorianMomentCompanion extends MomentCompanion {
-    this: MomentCompanion =>
+  final class GregorianMomentCompanion extends MomentCompanion {
+    override protected def newNumber(digits: Seq[Int]): Point = new GregorianMoment(digits)
   }
 
-  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion {
-    protected override def newNumber(digits: Seq[Int]): Point =
-      new GregorianMoment(digits) {
-        final override def companion: GregorianMomentCompanion = Point
-      }
-  }
+  final override lazy val Point: GregorianMomentCompanion = new GregorianMomentCompanion
 
   final override def toString(number: Int)(implicit spec: LanguageSpec): String = number.toString
 }

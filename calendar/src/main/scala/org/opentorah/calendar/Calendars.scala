@@ -32,7 +32,7 @@ object Calendars {
 
   //  Jewish  :   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
   //  Georgian:  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
-  private final val dayStartHoursJewish = 18
+  private final val dayStartHoursJewish: Int = 18
 
   private final val dayStartHoursGregorian: Int = Times.hoursPerDay - dayStartHoursJewish
 

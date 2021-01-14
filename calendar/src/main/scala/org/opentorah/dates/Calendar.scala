@@ -11,7 +11,7 @@ trait Calendar extends Times {
    *
    * @param yearNumber  number of the Year
    */
-  abstract class YearBase(yearNumber: Int) extends  Numbered with LanguageString { this: Year =>
+  abstract class YearBase(yearNumber: Int) extends Numbered with LanguageString { this: Year =>
 
     type T = Year
 
@@ -292,9 +292,7 @@ trait Calendar extends Times {
 
   final type Moment = Point
 
-  abstract class MomentBase(digits: Digits)
-    extends TimePointBase(digits) with LanguageString
-  { this: Moment =>
+  abstract class MomentBase(digits: Digits) extends TimePointBase(digits) with LanguageString { this: Moment =>
 
     final def day: Day = Day(dayNumber)
 
@@ -330,11 +328,11 @@ trait Calendar extends Times {
   final override lazy val Vector: VectorCompanion = new VectorCompanion {
     protected override def newNumber(digits: Digits): Vector =
       new TimeVectorBase(digits) {
-        final override def companion: VectorCompanion = Vector
+        final override def companion: VectorCompanion = TimeVector
       }
   }
 
-  final val TimeVector = Vector
+  final val TimeVector: VectorCompanion = Vector
 
   def toString(number: Int)(implicit spec: LanguageSpec): String
 }

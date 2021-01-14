@@ -34,41 +34,41 @@ trait Angles extends PeriodicNumbers {
     def toDegrees: Double = toDouble
   }
 
-  trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N] { this: NumberCompanion[N] =>
+  trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N] {
     final def fromRadians(value: Double, length: Int): N = fromDegrees(math.toDegrees(value), length)
 
     final def fromDegrees(value: Double, length: Int): N = fromDouble(value, length)
   }
 
-  abstract class RotationAngle(digits: Digits) extends VectorNumber(digits) with Angle[RotationAngle]
+  final class RotationAngle(digits: Digits) extends VectorNumber(digits) with Angle[RotationAngle] {
+    override def companion: RotationCompanion = Vector
+  }
 
   final override type Vector = RotationAngle
 
   final type Rotation = Vector
 
-  abstract class VectorCompanionType extends VectorCompanion with AngleCompanion[Rotation]
-  final override lazy val Vector: VectorCompanionType = new VectorCompanionType {
-    protected override def newNumber(digits: Digits): Vector = new RotationAngle(digits) {
-      final override def companion: VectorCompanionType = Vector
-    }
+  final class RotationCompanion extends VectorCompanion with AngleCompanion[Rotation] {
+    override protected def newNumber(digits: Digits): Vector = new RotationAngle(digits)
   }
+
+  final override lazy val Vector: RotationCompanion = new RotationCompanion
 
   final val Rotation = Vector
 
-  abstract class PositionAngle(digits: Digits) extends PointNumber(digits) with Angle[PositionAngle]
+  final class PositionAngle(digits: Digits) extends PointNumber(digits) with Angle[PositionAngle] {
+    override def companion: PositionCompanion = Point
+  }
 
   final override type Point = PositionAngle
 
   final type Position = Point
 
-  abstract class PointCompanionType extends PointCompanion with AngleCompanion[Position]
+  final class PositionCompanion extends PointCompanion with AngleCompanion[Position] {
+    override protected def newNumber(digits: Digits): Point = new PositionAngle(digits)
+  }
 
-  final override lazy val Point: PointCompanionType = new PointCompanionType {
-      protected override def newNumber(digits: Digits): Point =
-        new PositionAngle(digits) {
-          final override def companion: PointCompanionType = Point
-        }
-    }
+  final override lazy val Point: PositionCompanion = new PositionCompanion
 
   final val Position = Point
 

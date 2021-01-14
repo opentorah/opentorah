@@ -34,16 +34,18 @@ object Jewish extends Calendar {
 
   final override type YearCharacter = (Boolean, Year.Kind)
 
-  trait JewishYearCompanion extends YearCompanion { this: YearCompanion =>
-    final type Kind = JewishYearCompanion.Kind
+  final class JewishYearCompanion extends YearCompanion {
+    type Kind = JewishYearCompanion.Kind
 
-    final val Kind: JewishYearCompanion.Kind.type = JewishYearCompanion.Kind
+    val Kind: JewishYearCompanion.Kind.type = JewishYearCompanion.Kind
 
-    protected final override def characters: Seq[YearCharacter] =
+    override protected def newYear(number: Int): Year = new JewishYear(number)
+
+    override protected def characters: Seq[YearCharacter] =
       for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
 
     // KH 8:5-6
-    protected final override def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
+    override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
       character match { case (isLeap: Boolean, kind: Kind) =>
         Seq(
           new MonthNameAndLength(Month.Name.Tishrei   , 30),
@@ -67,19 +69,19 @@ object Jewish extends Calendar {
       }
     }
 
-    protected final override def areYearsPositive: Boolean = true
+    override protected def areYearsPositive: Boolean = true
 
-    final override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
+    override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
 
-    final override def firstMonth(yearNumber: Int): Int = LeapYearsCycle.firstMonth(yearNumber)
+    override def firstMonth(yearNumber: Int): Int = LeapYearsCycle.firstMonth(yearNumber)
 
-    final override def lengthInMonths(yearNumber: Int): Int = LeapYearsCycle.yearLengthInMonths(yearNumber)
+    override def lengthInMonths(yearNumber: Int): Int = LeapYearsCycle.yearLengthInMonths(yearNumber)
 
     // KH 8:7-8
     val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
     val shortLeapYearLength: Int = yearLength((true, Kind.Short)) // 383
 
-    final def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
+    def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
       val daysOverShort: Int = lengthInDays - (if (isLeap) shortLeapYearLength else shortNonLeapYearLength)
 
       daysOverShort match {
@@ -104,9 +106,7 @@ object Jewish extends Calendar {
     }
   }
 
-  final override lazy val Year = new JewishYearCompanion {
-    protected override def newYear(number: Int): Year = new JewishYear(number)
-  }
+  final override lazy val Year = new JewishYearCompanion
 
   trait JewishMonth extends MonthBase {
     def newMoon: Moment = Moon.newMoon(number)
@@ -114,12 +114,18 @@ object Jewish extends Calendar {
 
   final override type Month = JewishMonth
 
-  trait JewishMonthCompanion extends MonthCompanion { this: MonthCompanion =>
-    final override val Name: JewishMonthCompanion.type = JewishMonthCompanion
+  final class JewishMonthCompanion extends MonthCompanion {
+    private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
+      new JewishMonth {
+        override protected var yearOpt: Option[Year] = yearOption
+        override def number: Int = monthNumber
+      }
 
-    private[opentorah] final override def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
+    override val Name: JewishMonthCompanion.type = JewishMonthCompanion
 
-    private[opentorah] final override def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
+    override private[opentorah] def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
+
+    override private[opentorah] def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
   }
 
   object JewishMonthCompanion extends NamedCompanion {
@@ -148,13 +154,7 @@ object Jewish extends Calendar {
     protected override def resourceName: String = "JewishMonth"
   }
 
-  final override lazy val Month = new JewishMonthCompanion {
-    private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new JewishMonth {
-        override protected var yearOpt: Option[Year] = yearOption
-        override def number: Int = monthNumber
-      }
-  }
+  final override lazy val Month: JewishMonthCompanion = new JewishMonthCompanion
 
   trait JewishDay extends DayBase {
     def isShabbos: Boolean = is(Day.Name.Shabbos)
@@ -175,12 +175,18 @@ object Jewish extends Calendar {
 
   final override type Day = JewishDay
 
-  trait JewishDayCompanion extends DayCompanion {
-    final override val Name: JewishDayCompanion.type = JewishDayCompanion
+  final class JewishDayCompanion extends DayCompanion {
+    private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
+      new JewishDay {
+        override protected var monthOpt: Option[Month] = monthOption
+        override def number: Int = dayNumber
+      }
 
-    final override def names: Seq[Name] = JewishDayCompanion.values
+    override val Name: JewishDayCompanion.type = JewishDayCompanion
 
-    final override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
+    override def names: Seq[Name] = JewishDayCompanion.values
+
+    override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
   }
 
   object JewishDayCompanion extends NamedCompanion {
@@ -201,31 +207,23 @@ object Jewish extends Calendar {
     protected override def resourceName: String = "JewishDay"
   }
 
-  final override lazy val Day = new JewishDayCompanion {
-    private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
-      new JewishDay {
-        override protected var monthOpt: Option[Month] = monthOption
-        override def number: Int = dayNumber
-      }
-  }
+  final override lazy val Day: JewishDayCompanion = new JewishDayCompanion
 
-  abstract class JewishMoment(digits: Seq[Int]) extends MomentBase(digits) {
-    final def nightHours(value: Int): Moment = firstHalfHours(value)
+  final class JewishMoment(digits: Seq[Int]) extends MomentBase(digits) {
+    override def companion: JewishMomentCompanion = Point
 
-    final def dayHours(value: Int): Moment = secondHalfHours(value)
+    def nightHours(value: Int): Moment = firstHalfHours(value)
+
+    def dayHours(value: Int): Moment = secondHalfHours(value)
   }
 
   final override type Point = JewishMoment
 
-  trait JewishMomentCompanion extends MomentCompanion { this: MomentCompanion =>
+  final class JewishMomentCompanion extends MomentCompanion {
+    override protected def newNumber(digits: Seq[Int]): Point = new JewishMoment(digits)
   }
 
-  final override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion {
-    protected override def newNumber(digits: Seq[Int]): Point =
-      new JewishMoment(digits) {
-        final override def companion: JewishMomentCompanion = Point
-      }
-  }
+  final override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion
 
   final override def toString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)
 }

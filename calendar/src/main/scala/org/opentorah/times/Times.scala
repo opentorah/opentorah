@@ -70,9 +70,7 @@ trait Times extends NonPeriodicNumbers {
 
   override type Point <: TimePointBase
 
-  abstract class TimeVectorBase(digits: Digits)
-    extends VectorNumber(digits) with Time[Vector]
-  { this: Vector =>
+  abstract class TimeVectorBase(digits: Digits) extends VectorNumber(digits) with Time[Vector] { this: Vector =>
   }
 
   override type Vector <: TimeVectorBase
