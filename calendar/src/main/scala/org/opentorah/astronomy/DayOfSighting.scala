@@ -14,7 +14,7 @@ object DayOfSighting {
   def dayOfSighting(month: Month): Day = {
     val from: Moment = (month.firstDay - 5).toMoment
     val to: Moment = (month.firstDay + 5).toMoment
-    val result: Moment = Math.findZero[Jewish, Rotation](
+    val result: Moment = Math.findZero[Rotation](Jewish)(
       elongation,
       from,
       to,

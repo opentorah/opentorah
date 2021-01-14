@@ -9,7 +9,6 @@ trait Zeroable[T] {
   def signum(value: T): Int
 }
 
-
 object Zeroable {
   def apply[T](implicit ev: Zeroable[T]): Zeroable[T] = ev
 
@@ -17,7 +16,7 @@ object Zeroable {
     def signum: Int = Zeroable[T].signum(value)
   }
 
-  implicit def numberZeroable[N <: Number[_, N]]: Zeroable[N] = new Zeroable[N] {
+  implicit def numberZeroable[N <: Numbers#Number[N]]: Zeroable[N] = new Zeroable[N] {
     override def signum(value: N): Int = value.signum
   }
 }

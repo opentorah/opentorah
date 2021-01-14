@@ -37,7 +37,7 @@ object AngularVelocities {
   def sunLongitudeMean(): Unit = {
     def m(n: Int): Rotation = (SunLongitudeMean.rambamValue * n).roundTo(Angles.Digit.SECONDS)
     for (n <- List(1, 10, 100, 1000, 10000, 354))
-      println(n + " " + m(n))
+      println(s"$n ${m(n)}")
 
     val v29 = Rotation(9, 51, 23)*3 - Rotation(0, 59, 8)
     println(v29)

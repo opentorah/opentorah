@@ -10,7 +10,7 @@ final class ICalGenerator private(os: OutputStream) {
 
   val out = new ICalWriter(os)
 
-  private def writeYear(year: Int) {
+  private def writeYear(year: Int): Unit = {
     out.print(beginCalendar(
       "-//Podval Group//NONSGML Jewish Calendar//EN",
       Some("Jewish Dates"),
@@ -49,7 +49,7 @@ object ICalGenerator {
   val iconUrl: String = baseUrl + "favicon.ico"
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     new ICalGenerator(new FileOutputStream("/tmp/jc.ics")).writeYear(2013)
   }
 }

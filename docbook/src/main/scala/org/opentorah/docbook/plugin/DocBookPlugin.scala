@@ -53,7 +53,7 @@ final class DocBookPlugin extends Plugin[Project] {
 
 object DocBookPlugin {
 
-  private class ListFopFontsTask extends DefaultTask {
+  /* not final so that Gradle could do its thing */ class ListFopFontsTask extends DefaultTask {
     setDescription("List FOP fonts")
 
     @TaskAction def execute(): Unit = {
@@ -63,7 +63,7 @@ object DocBookPlugin {
     }
   }
 
-  private class DeleteFopFontsCacheTask extends DefaultTask {
+  /* not final so that Gradle could do its thing */ class DeleteFopFontsCacheTask extends DefaultTask {
     setDescription("Delete FOP fonts cache")
 
     @TaskAction def execute(): Unit =

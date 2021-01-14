@@ -45,7 +45,7 @@ trait Time2Rotation {
       (if (lessThanHundred == 29) month else ten*tens + one*ones)
   }
 
-  final def calculate(vector: Jewish#Vector): Rotation = {
+  final def calculate(vector: Jewish.Vector): Rotation = {
     val rational = vector.toRational
     calculate(rational.whole) + Rotation.fromRational(rational.fraction*one.toRational, 6)
   }
@@ -54,7 +54,7 @@ trait Time2Rotation {
 
   final def calculateExact(days: Int): Rotation = rambamValue*days
 
-  final def calculateExact(vector: Jewish#Vector): Rotation =
+  final def calculateExact(vector: Jewish.Vector): Rotation =
     Rotation.fromRational(vector.toRational*one.toRational, 6)
 
   final def exactify: Interval = {

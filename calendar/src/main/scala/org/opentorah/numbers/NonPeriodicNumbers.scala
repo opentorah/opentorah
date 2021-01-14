@@ -1,5 +1,5 @@
 package org.opentorah.numbers
 
-trait NonPeriodicNumbers[S <: NonPeriodicNumbers[S]] extends Numbers[S] { this: S =>
+trait NonPeriodicNumbers extends Numbers {
   final override def headRangeOpt: Option[Int] = None
 }

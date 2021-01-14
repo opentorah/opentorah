@@ -42,7 +42,6 @@ object TanachMetadata {
   }
 
   private def ensureParsed(): Unit = {
-    checkNotProcessing()
     state match {
       case Parsed(_, _, _) =>
       case Resolved(_, _, _) =>
@@ -77,7 +76,7 @@ object TanachMetadata {
         result <- book match {
           case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
           case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
-          case book: Tanach.NachBook => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
+          case book: Tanach.NachBook    => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
         }
       } yield result
 
@@ -99,7 +98,6 @@ object TanachMetadata {
   }
 
   private def ensureResolved(): Unit = {
-    checkNotProcessing()
     ensureParsed()
     state match {
       case parsed@Parsed(_, _, _) => process(resolve(parsed))
@@ -116,11 +114,11 @@ object TanachMetadata {
 
   private var processing: Boolean = false
 
-  private def checkNotProcessing(): Unit = this.synchronized {
-    if (processing) throw new IllegalStateException()
-  }
-
+  // TODO I had to rework this for Scala 2.13 - it started breaking;
+  // this probably means the usual: I am not good with concurrency;
+  // it'd be best to redo this so that passes are cleanly delineated and concurrence is not used...
   private def process(f: => State): Unit = this.synchronized {
+    if (processing) throw new IllegalStateException()
     processing = true
     state = f
     processing = false

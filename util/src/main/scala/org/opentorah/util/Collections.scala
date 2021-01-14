@@ -4,6 +4,7 @@ object Collections {
   // Will this *ever* be in the standard library?
   // Or am I supposed to just use Cats - where, I am sure, it exists?
 
+  // TODO in Scala 2.13+ - use LazyList:
   //  def unfold[A, B](start: A)(f: A => Option[(A, B)]): Stream[B] =
   //    f(start).map { case (a, b) => b #:: unfold(a)(f) }.getOrElse(Stream.empty)
   //

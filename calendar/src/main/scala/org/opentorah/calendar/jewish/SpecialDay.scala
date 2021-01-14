@@ -59,7 +59,7 @@ object SpecialDay extends NamedCompanion {
   sealed trait Fast extends SpecialDay
 
   case object RoshHashanah1 extends LoadNames("Rosh Hashanah") with Festival {
-    override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(1)
+    override def date(year: Jewish.Year): Jewish.Day = year.month(Tishrei).day(1)
   }
 
   case object RoshHashanah2 extends Festival with NonFirstDayOf {
@@ -73,11 +73,11 @@ object SpecialDay extends NamedCompanion {
   }
 
   case object YomKippur extends LoadNames("Yom Kippur") with Festival {
-    override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(10)
+    override def date(year: Jewish.Year): Jewish.Day = year.month(Tishrei).day(10)
   }
 
   case object Succos1 extends LoadNames("Succos") with Festival with FirstDayOf {
-    override def date(year: JewishYear): JewishDay = year.month(Tishrei).day(15)
+    override def date(year: Jewish.Year): Jewish.Day = year.month(Tishrei).day(15)
   }
 
   case object Succos2 extends Festival with NonFirstDayOf {

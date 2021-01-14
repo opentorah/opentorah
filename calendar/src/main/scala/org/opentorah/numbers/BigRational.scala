@@ -55,7 +55,7 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def round: Int = whole + (if (fraction.abs <= BigRational.oneHalf) 0 else fraction.signum)
 
-  override def toString: String = numerator + "/" + denominator
+  override def toString: String = s"$numerator/$denominator"
 
   override def compare(that: BigRational): Int = (this - that).signum
 

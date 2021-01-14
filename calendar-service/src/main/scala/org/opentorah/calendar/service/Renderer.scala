@@ -3,7 +3,7 @@ package org.opentorah.calendar.service
 import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
-import org.opentorah.dates.{Calendar, DayBase, MonthBase, YearBase, YearsCycle}
+import org.opentorah.dates.{Calendar, YearsCycle}
 import org.opentorah.metadata.{Language, LanguageSpec, Numbered, WithNames}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
@@ -14,9 +14,7 @@ import org.opentorah.util.Collections
 import org.opentorah.xml.{PrettyPrinter, Xml}
 
 sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
-  protected type C <: Calendar[C]
-
-  protected val calendar: C
+  protected val calendar: Calendar
 
   private final def getName(other: Boolean = false): String = if (!other) name else otherName
 
@@ -24,47 +22,47 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
   protected def otherName: String
 
-  private final def getYear(yearStr: String): C#Year = calendar.Year(yearStr.toInt)
+  private final def getYear(yearStr: String): calendar.Year = calendar.Year(yearStr.toInt)
 
-  private final def getMonth(yearStr: String, monthStr: String): C#Month = {
+  private final def getMonth(yearStr: String, monthStr: String): calendar.Month = {
     val year = getYear(yearStr)
-    val monthName: Option[C#MonthName] = calendar.Month.Name.forName(monthStr)
+    val monthName: Option[calendar.MonthName] = calendar.Month.Name.forName(monthStr)
     if (monthName.isDefined) year.month(monthName.get)
     else year.month(monthStr.toInt)
   }
 
-  protected def jewish(day: DayBase[_]): Jewish.Day
+  protected def jewish(day: Calendar#DayBase): Jewish.Day
 
-  protected def gregorian(day: DayBase[_]): Gregorian.Day
+  protected def gregorian(day: Calendar#DayBase): Gregorian.Day
 
-  protected def first(day: DayBase[_]): DayBase[_]
+  protected def first(day: Calendar#DayBase): Calendar#DayBase
 
-  protected def second(day: DayBase[_]): DayBase[_]
+  protected def second(day: Calendar#DayBase): Calendar#DayBase
 
   //  private def toLanguageString(what: LanguageString): String = what.toLanguageString(spec)
 
-  private def yearUrl(year: YearBase[_], other: Boolean = false): String =
+  private def yearUrl(year: Calendar#YearBase, other: Boolean = false): String =
     s"/${getName(other)}/${year.number}"
 
-  private def monthUrl(month: MonthBase[_], other: Boolean = false): String =
+  private def monthUrl(month: Calendar#MonthBase, other: Boolean = false): String =
     s"/${getName(other)}/${month.year.number}/${month.numberInYear}"
 
-  private def monthNameUrl(month: MonthBase[_], other: Boolean = false): String =
+  private def monthNameUrl(month: Calendar#MonthBase, other: Boolean = false): String =
     s"/${getName(other)}/${month.year.number}/${month.name.toLanguageString(spec)}"
 
-  private def dayUrl(day: DayBase[_], other: Boolean = false): String =
+  private def dayUrl(day: Calendar#DayBase, other: Boolean = false): String =
     s"/${getName(other)}/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
 
-  private def yearLink(year: YearBase[_], other: Boolean = false, text: Option[String] = None): Xml.Element =
+  private def yearLink(year: Calendar#YearBase, other: Boolean = false, text: Option[String] = None): Xml.Element =
     navLink(yearUrl(year, other = other), text.getOrElse(year.toLanguageString(spec)))
 
-  private def monthLink(month: MonthBase[_]): Xml.Element =
+  private def monthLink(month: Calendar#MonthBase): Xml.Element =
     navLink(monthUrl(month), month.numberInYearToLanguageString(spec))
 
-  private def monthNameLink(month: MonthBase[_], other: Boolean = false, text: Option[String] = None): Xml.Element =
+  private def monthNameLink(month: Calendar#MonthBase, other: Boolean = false, text: Option[String] = None): Xml.Element =
     navLink(monthNameUrl(month, other = other), text.getOrElse(month.name.toLanguageString(spec)))
 
-  private def dayLink(day: DayBase[_], other: Boolean = false, text: Option[String] = None): Xml.Element =
+  private def dayLink(day: Calendar#DayBase, other: Boolean = false, text: Option[String] = None): Xml.Element =
     navLink(dayUrl(day, other = other), text.getOrElse(day.numberInMonthToLanguageString(spec)))
 
   private def navLink(url: String, text: String): Xml.Element =
@@ -72,7 +70,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
   private def suffix: String = Renderer.suffix(location, spec)
 
-  private def dayLinks(day: DayBase[_], other: Boolean): Xml.Element =
+  private def dayLinks(day: Calendar#DayBase, other: Boolean): Xml.Element =
     <span>
     {yearLink(day.year, other = other)}
     {monthNameLink(day.month, other = other)}
@@ -82,12 +80,12 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     </span>
 
   def renderLanding: String = {
-    val day: DayBase[_] = Calendars.now(calendar).day
+    val day: Calendar#DayBase = Calendars.now(calendar).day
     renderHtml(s"/$name", dayLinks(day, other = false))
   }
 
   def renderYear(yearStr: String): String = {
-    val year: YearBase[_] = getYear(yearStr)
+    val year: Calendar#YearBase = getYear(yearStr)
     renderHtml(
       yearUrl(year),
       <div>
@@ -96,7 +94,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
         {yearLink(year+1, text = Some(">"))}
         <table>
           <tbody>
-            {year.months.map { month: MonthBase[_] =>
+            {year.months.map { month: Calendar#MonthBase =>
             <tr>
               <td>{monthLink(month)}</td>
               <td>{monthNameLink(month)}</td>
@@ -109,10 +107,10 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     )
   }
 
-  protected def renderYearInformation(year: YearBase[_]): Seq[Xml.Element] = Seq.empty
+  protected def renderYearInformation(year: Calendar#YearBase): Seq[Xml.Element] = Seq.empty
 
   def renderMonth(yearStr: String, monthStr: String): String = {
-    val month: MonthBase[_] = getMonth(yearStr, monthStr)
+    val month: Calendar#MonthBase = getMonth(yearStr, monthStr)
     renderHtml(monthNameUrl(month),
       <div>
       {yearLink(month.year)}
@@ -121,7 +119,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       {monthNameLink(month+1, text = Some(">"))}
       <table>
         <tbody>
-        {month.days.map { day: DayBase[_] => <tr><td>{dayLink(day)}</td></tr>}}
+        {month.days.map { day: Calendar#DayBase => <tr><td>{dayLink(day)}</td></tr>}}
         </tbody>
       </table>
       </div>
@@ -129,10 +127,10 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   }
 
   def renderDay(yearStr: String, monthStr: String, dayStr: String): String = {
-    val day: DayBase[_] = getMonth(yearStr, monthStr).day(dayStr.toInt)
+    val day: Calendar#DayBase = getMonth(yearStr, monthStr).day(dayStr.toInt)
     val jewishDay: Jewish.Day = jewish(day)
-    val firstDay: DayBase[_] = first(day)
-    val secondDay: DayBase[_] = second(day)
+    val firstDay: Calendar#DayBase = first(day)
+    val secondDay: Calendar#DayBase = second(day)
 
     val daySchedule = Schedule.get(jewishDay, inHolyLand = location.inHolyLand)
 
@@ -319,17 +317,15 @@ object Renderer {
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
 
   private final class JewishRenderer(location: Location, spec: LanguageSpec) extends Renderer(location, spec) {
-    override protected type C = Jewish
-
-    override protected val calendar: C = Jewish
+    override protected val calendar: Calendar = Jewish
 
     override protected def name: String = jewishRendererName
 
     override protected def otherName: String = gregorianRenderername
 
-    override protected def jewish(day: DayBase[_]): Jewish.Day = day.asInstanceOf[Jewish.Day]
+    override protected def jewish(day: Calendar#DayBase): Jewish.Day = day.asInstanceOf[Jewish.Day]
 
-    override protected def gregorian(day: DayBase[_]): Gregorian.Day = {
+    override protected def gregorian(day: Calendar#DayBase): Gregorian.Day = {
       try {
         Calendars.fromJewish(jewish(day))
       } catch {
@@ -337,11 +333,11 @@ object Renderer {
       }
     }
 
-    override protected def first(day: DayBase[_]): DayBase[_] = jewish(day)
+    override protected def first(day: Calendar#DayBase): Calendar#DayBase = jewish(day)
 
-    override protected def second(day: DayBase[_]): DayBase[_] = gregorian(day)
+    override protected def second(day: Calendar#DayBase): Calendar#DayBase = gregorian(day)
 
-    override protected def renderYearInformation(yearRaw: YearBase[_]): Seq[Xml.Element] = {
+    override protected def renderYearInformation(yearRaw: Calendar#YearBase): Seq[Xml.Element] = {
       val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
       val delay = year.newYearDelay
 
@@ -417,21 +413,19 @@ object Renderer {
   }
 
   private final class GregorianRenderer(location: Location, spec: LanguageSpec) extends Renderer(location, spec) {
-    override protected type C = Gregorian
-
-    override protected val calendar: C = Gregorian
+    override protected val calendar: Calendar = Gregorian
 
     override protected def name: String = gregorianRenderername
 
     override protected def otherName: String = jewishRendererName
 
-    override protected def jewish(day: DayBase[_]): Jewish.Day = Calendars.toJewish(gregorian(day))
+    override protected def jewish(day: Calendar#DayBase): Jewish.Day = Calendars.toJewish(gregorian(day))
 
-    override protected def gregorian(day: DayBase[_]): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
+    override protected def gregorian(day: Calendar#DayBase): Gregorian.Day = day.asInstanceOf[Gregorian.Day]
 
-    override protected def first(day: DayBase[_]): DayBase[_] = gregorian(day)
+    override protected def first(day: Calendar#DayBase): Calendar#DayBase = gregorian(day)
 
-    override protected def second(day: DayBase[_]): DayBase[_] = jewish(day)
+    override protected def second(day: Calendar#DayBase): Calendar#DayBase = jewish(day)
   }
 
   def renderer(kindStr: String, location: Location, spec: LanguageSpec): Renderer = {

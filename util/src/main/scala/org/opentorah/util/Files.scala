@@ -91,7 +91,7 @@ object Files {
 
   def splitUrl(url: String): Seq[String] = {
     require(url.startsWith("/"))
-    url.substring(1).split("/")
+    url.substring(1).split("/").toIndexedSeq
   }
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")

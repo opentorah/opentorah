@@ -5,7 +5,7 @@ import org.opentorah.util.Files
 trait LinkResolver {
   final def resolve(target: String): Option[LinkResolver.Resolved] = if (!target.startsWith("/")) None else {
     val (url: String, part: Option[String]) = Files.urlAndPart(target)
-    resolve(url.substring(1).split("/"))
+    resolve(url.substring(1).split("/").toIndexedSeq)
       .map(resolved => resolved.copy(url = Files.addPart(resolved.url, part)))
   }
 
