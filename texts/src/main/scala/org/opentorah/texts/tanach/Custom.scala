@@ -147,7 +147,7 @@ object Custom extends NamedCompanion {
   val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 
   def parse(names: String): Set[Custom] = {
-    val result: Seq[Custom] = names.split(',').map(_.trim).map(getForName)
+    val result: Seq[Custom] = names.split(',').toIndexedSeq.map(_.trim).map(getForName)
     Collections.checkNoDuplicates(result, "customs")
     result.toSet
   }

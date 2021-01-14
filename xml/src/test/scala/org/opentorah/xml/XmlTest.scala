@@ -100,7 +100,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     redirected.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withTrue = Parser.parseDo(file2element.withRedirect(true).parse(r1)).right.get
+    val withTrue: X = Parser.parseDo(file2element.withRedirect(true).parse(r1)).right.get
     withTrue.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 

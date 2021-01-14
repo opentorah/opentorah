@@ -4,7 +4,7 @@ import java.io.File
 import com.eclipsesource.v8._
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.opentorah.node.{J2V8, Node}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
 // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;

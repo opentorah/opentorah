@@ -3,26 +3,26 @@ package org.opentorah.calendar
 import java.util.{GregorianCalendar, Calendar => Cal}
 import org.opentorah.calendar.gregorian.Gregorian
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.dates.{Calendar, MomentBase}
+import org.opentorah.dates.Calendar
 import org.opentorah.times.Times
 
 object Calendars {
 
-  def now(calendar: Calendar[_]): MomentBase[_] = calendar match {
-    case _: Jewish    => Calendars.nowJewish
-    case _: Gregorian => Calendars.nowGregorian
+  def now(calendar: Calendar): Calendar#MomentBase = calendar match {
+    case Jewish    => Calendars.nowJewish
+    case Gregorian => Calendars.nowGregorian
   }
 
-  final def nowJewish: Jewish#Moment = toJewish(now)
+  final def nowJewish: Jewish.Moment = toJewish(now)
 
-  final def nowGregorian: Gregorian#Moment = toGregorian(now)
+  final def nowGregorian: Gregorian.Moment = toGregorian(now)
 
   private def now: GregorianCalendar = new GregorianCalendar
 
-  final def toJewish(value: GregorianCalendar): Jewish#Moment =
+  final def toJewish(value: GregorianCalendar): Jewish.Moment =
     toJewish(toGregorian(value))
 
-  final def toGregorian(value: GregorianCalendar): Gregorian#Moment = Gregorian
+  final def toGregorian(value: GregorianCalendar): Gregorian.Moment = Gregorian
     .Year(value.get(Cal.YEAR))
     .month(value.get(Cal.MONTH)+1)
     .day(value.get(Cal.DAY_OF_MONTH)).toMoment

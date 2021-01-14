@@ -5,7 +5,7 @@ trait YearsCycle {
 
   final def yearsInCycle: Int = length
 
-  final def forYear(year: YearBase[_]): YearsCycle.In = forNumber(year.number)
+  final def forYear(year: Calendar#YearBase): YearsCycle.In = forNumber(year.number)
 
   def first: Int
 

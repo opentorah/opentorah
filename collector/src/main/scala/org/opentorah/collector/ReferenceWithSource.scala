@@ -111,7 +111,7 @@ object ReferenceWithSource extends Elements.Union[ReferenceWithSource] {
     }
   }
 
-  private def splitPath(path: String): Seq[String] = path.split("/")
+  private def splitPath(path: String): Seq[String] = path.split("/").toIndexedSeq
 
   private def unsplitPath(referenceWithSource: ReferenceWithSource): String = referenceWithSource.path.mkString("/")
 

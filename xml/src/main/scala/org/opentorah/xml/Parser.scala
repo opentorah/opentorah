@@ -12,7 +12,7 @@ object Parser {
   def collectAll[A](parsers: Seq[Parser[A]]): Parser[Seq[A]] = for {
     runs <- ZIO.foreach(parsers)(_.either)
     errors: Seq[Error] = runs.flatMap(_.left.toOption)
-    results: Seq[A] = runs.flatMap(_.right.toOption)
+    results: Seq[A] = runs.flatMap(_.toOption)
     results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
   } yield results
 

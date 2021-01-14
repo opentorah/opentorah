@@ -4,7 +4,7 @@ import java.lang.reflect.Field
 import com.eclipsesource.v8.V8
 import org.opentorah.util.Collections.mapValues
 import org.slf4j.{Logger, LoggerFactory}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 final class J2V8(libraryPath: String) {
 

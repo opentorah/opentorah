@@ -18,7 +18,7 @@ final class SeasonsAstronomical(calculator: Calculator) extends Season.ForYear {
     def f(moment: Moment): Rotation = sunLongitudeTrue(moment) - zodiac.start
     val left: Moment = year.month(Month.Name.Nisan).prev.firstDay.toMoment
     val right: Moment = year.month(Month.Name.Nisan).next.firstDay.toMoment
-    val result: Moment = Math.findZero[Jewish, Rotation](f, left, right, 0)
+    val result: Moment = Math.findZero[Rotation](Jewish)(f, left, right, 0)
     result
   }
 

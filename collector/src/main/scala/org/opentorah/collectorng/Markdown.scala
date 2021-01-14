@@ -7,7 +7,7 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataHolder, MutableDataSet}
 import org.opentorah.xml.{From, Xml}
 import zio.Runtime
-import scala.collection.JavaConverters.asJavaIterableConverter
+import scala.jdk.CollectionConverters.IterableHasAsJava
 import java.io.InputStreamReader
 import java.net.URL
 

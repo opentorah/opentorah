@@ -2,9 +2,9 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles
 import Angles.Rotation
-import org.opentorah.numbers.{BigRational, Number}
+import org.opentorah.numbers.BigRational
 
-abstract class InterpolatedTable[N <: Number[Angles, N]](implicit nOrdering: Ordering[N]) {
+abstract class InterpolatedTable[N <: Angles.Angle[N]](implicit nOrdering: Ordering[N]) {
 
   import nOrdering.mkOrderingOps
 
