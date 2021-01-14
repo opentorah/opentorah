@@ -78,12 +78,8 @@ object Service extends App {
   private def routes(siteUri: Uri): HttpRoutes[ServiceTask] = {
 //    val site: Site = new Site(toUrl(siteUri))
 
-    val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
-    import dsl._
-
     HttpRoutes.of[ServiceTask] {
-      //      case GET -> Root / "hello" =>
-      //        Ok("hello!")
+      // case GET -> Root / "hello" => Ok("hello!")
 
       case request@GET -> _ =>
         fromUrl(toUrl(siteUri.resolve(relativize(addIndex(request.uri)))), request)
@@ -130,13 +126,13 @@ object Service extends App {
     if (status.isInstanceOf[NotFound.type])
       warning(request, s"NOT $durationStr $urlStr")
     else
-      info(request, s"GOT $durationStr $urlStr")
+      info   (request, s"GOT $durationStr $urlStr")
   }
 
   private def formatDuration(duration: Duration): String = {
     val millis: Long = duration.toMillis
     if (millis < 1000) s"$millis ms" else {
-      val seconds = Math.round(millis.toFloat/100).toFloat/10
+      val seconds: Float = Math.round(millis.toFloat/100).toFloat/10
       s"$seconds s"
     }
   }
@@ -168,6 +164,32 @@ object Service extends App {
 }
 
 // TODO figure out why doesn't this compile when I unfold it into Service - and do it!
+// Cannot convert from String to an Entity, because no
+//   EntityEncoder[[+A]zio.ZIO[zio.Has[zio.clock.Clock.Service]
+//   with zio.Has[zio.console.Console.Service]
+//   with zio.Has[zio.system.System.Service]
+//   with zio.Has[zio.random.Random.Service]
+//   with zio.Has[zio.blocking.Blocking.Service],Throwable,A], String] instance could be found.
+//
+//  not enough arguments for method apply:
+//  (
+//    implicit F: cats.Applicative[
+//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable, A]
+//    ],
+//    implicit w: org.http4s.EntityEncoder[
+//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable, A],
+//      String
+//    ]
+//  )zio.ZIO[
+//    zio.Has[Clock+Console+System+Random+Blocking],
+//    Throwable,
+//    org.http4s.Response[
+//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable,A]
+//    ]
+//  ]
+//  in trait EntityResponseGenerator.
+//Unspecified value parameter w.
+//      .getOrElseF(NotFound(s"Not found: $url"))
 private object X {
   import Service.ServiceTask
   import Service.dsl._
