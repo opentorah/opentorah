@@ -77,10 +77,9 @@ object Hierarchy {
 
   def getName(names: Names): String = names.doFind(Language.Russian.toSpec).name
 
-  // TODO move into Store
   def fileName(store: Store): String =
     Files.nameAndExtension(Files.pathAndName(store.urls.fromUrl.get.getPath)._2)._1
 
   val pathOrdering: Ordering[Seq[String]] = (x: Seq[String], y: Seq[String]) =>
-    Ordering.Iterable[String]((x: String, y: String) => x.toLowerCase compare y.toLowerCase).compare(x, y)
+    Ordering.Implicits.seqOrdering[Seq, String]((x: String, y: String) => x.toLowerCase compare y.toLowerCase).compare(x, y)
 }
