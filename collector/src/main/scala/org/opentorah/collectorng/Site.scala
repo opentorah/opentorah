@@ -110,9 +110,10 @@ final class Site(
   def writeLists(): Unit = {
     byEntity.writeDirectory()
     byNote.writeDirectory()
-    references.write(References.fromSite(this))
-
     for (collection <- collections) collection.writeDirectory()
+
+    // Collection lists must exist by the time this runs:
+    references.write(References.fromSite(this))
   }
 
   def verify(): Unit = {

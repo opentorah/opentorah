@@ -10,7 +10,7 @@ final class SiteTest extends AnyFlatSpec with Matchers {
     val site: Site = Site.read("/home/dub/OpenTorah/alter-rebbe.org")
     site.writeLists()
     site.verify()
-    //site.writeStaticFiles()
+    site.writeStaticFiles()
 
 //    site.by.stores.head.names.name shouldBe "книги"
 //

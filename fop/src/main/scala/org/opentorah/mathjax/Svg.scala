@@ -38,6 +38,8 @@ object Svg extends Dialect {
   def forceXerces(): Unit = svgFactory
 
   def fromString(what: String): SVGDocument = {
+    // TODO use StringReader instead of the deprecated StringBufferInputStream;
+    // mark() call probably does nothing and should then be removed...
     val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(what))
     val length: Int = in.available
     in.mark(length + 1)
