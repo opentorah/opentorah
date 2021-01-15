@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{From, LinkResolver, Parser, Xml}
+import org.opentorah.xml.{From, Html, LinkResolver, Parser, Xml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -23,12 +23,13 @@ final class TeiTest extends AnyFlatSpec with Matchers {
   private def tei2html(element: Xml.Element): Xml.Element = {
     //    println(Xhtml.prettyPrinter.render(element))
     val resolver = new LinkResolver {
-      override def resolve(url: Seq[String]): Option[LinkResolver.Resolved] = None
-      override def findByRef(ref:  String): Option[LinkResolver.Resolved] = None
-      override def facs: LinkResolver.Resolved = LinkResolver.Resolved(
-        url = Seq("facsimiles"),
-        role = Some("facsViewer")
-      )
+      override def resolve(url: Seq[String]): Option[Html.a] = None
+      override def findByRef(ref:  String): Option[Html.a] = None
+      override def facs(pageId: String): Option[Html.a] = Some(Html.a(
+        path = Seq("facsimiles"),
+        part = Some(pageId),
+        target = Some("facsViewer")
+      ))
     }
 
     Tei.toHtml(resolver, element)
@@ -36,7 +37,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   "905" should "work" in {
     val tei: Tei = Parser.parseDo(Tei.parse(From.resource(Tei, "905")))
-    val html: Xml.Element = tei2html(Tei.required.xml(tei))
+    val html: Xml.Element = tei2html(Tei.xmlElement(tei))
     //println(Tei.prettyPrinter.render(html))
   }
 }

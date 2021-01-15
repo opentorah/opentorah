@@ -1,119 +1,96 @@
 package org.opentorah.collector
 
-import org.opentorah.metadata.Names
-import org.opentorah.store.{By, Entities, Selector, Store}
-import org.opentorah.tei.{Entity, EntityReference}
+import org.opentorah.tei.{Author, EntityReference, EntityType, Funder, Principal, RespStmt, Sponsor, Tei, Title, TitleStmt}
 import org.opentorah.util.Files
-import org.opentorah.xml.Xml
+import org.opentorah.xml.{From, Parser, RawXml, Xml}
 
-final class References private(references: Seq[ReferenceWithSource]) {
-  def noRef: Seq[ReferenceWithSource.FromDocument] =
-    References.fromDocument(references)
-      .filter(_.reference.ref.isEmpty)
-      .sortBy(_.reference.text.toLowerCase)
+final class References(references: Seq[EntityReference]) {
 
-  def toId(id: String): (Seq[ReferenceWithSource], Seq[ReferenceWithSource]) = {
-    val result: Seq[ReferenceWithSource] = references.filter(_.reference.ref.contains(id))
-    (References.fromEntity(result), References.fromDocument(result))
+  def verify(site: Site): Seq[String] = {
+    def checkReference(reference: EntityReference): Option[String] = {
+      val name: Seq[Xml.Node] = reference.name
+      reference.ref.fold[Option[String]](None) { ref =>
+        if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
+          site.entities.findByName(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
+            if (named.entityType == reference.entityType) None
+            else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
+          }
+        }
+      }
+    }
+
+    references.flatMap(reference => checkReference(reference))
   }
+
+  def noRef: Seq[EntityReference] = references.filter(_.ref.isEmpty).sortBy(_.text.toLowerCase)
+
+  def toId(id: String): Seq[EntityReference] = references.filter(_.ref.contains(id))
 }
 
 object References {
 
-  def apply(store: Store): References = {
-    val references: Seq[ReferenceWithSource] = getReferences(Seq.empty, store)
+  def fromSite(site: Site): Seq[EntityReference] = {
+    val fromEntities: Seq[Seq[EntityReference]] =
+      for (entity <- site.entities.entities)
+        yield addSource(entity.path(site), fromXml(site.entities.getFile(entity).content))
 
-    val errors: Seq[String] = references.flatMap(referenceWithSource =>
-        References.checkReference(referenceWithSource.reference, store.entities.get.findByRef))
+    val fromHierarchy: Seq[Seq[EntityReference]] =
+      for (hierarchy <- site.hierarchies)
+      yield addSource(hierarchy.path(site), fromHierarchical(hierarchy))
 
-    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+    val fromCollections: Seq[Seq[EntityReference]] =
+      for (collection <- site.collections)
+      yield addSource(collection.path(site), fromHierarchical(collection))
 
-    new References(references)
+    val fromDocuments: Seq[Seq[EntityReference]] =
+      for {
+        collection <- site.collections
+        document <- collection.documents
+      } yield addSource(collection.textFacet.of(document).path(site), fromTei(collection.getFile(document)))
+
+    (fromEntities ++ fromHierarchy ++ fromCollections ++ fromDocuments).flatten
   }
 
-  private def getReferences(path: Seq[String], store: Store): Seq[ReferenceWithSource] = {
-    val entities: Entities = store.entities.get
+  private def fromHierarchical(hierarchical: Hierarchical): Seq[EntityReference] =
+    fromValues(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body)
 
-    entities.by.get.stores.flatMap { entityHolder =>
-      val entity: Entity = entityHolder.entity
-      val entityId: String = entity.id.get
-      EntityReference.from(entity.content).map(reference => ReferenceWithSource.FromEntity(
-        path = Files.addExtension(path :+ getName(entities.selector) :+ entityId, "html"),
-        reference,
-        entityId,
-        entity.name
-      ))
-    } ++
-      fromStore(path, store.asInstanceOf[Store.FromElement])
-  }
+  private def fromTei(tei:Tei): Seq[EntityReference] = {
+    def references(titleStmt: TitleStmt): Seq[EntityReference] = {
+      val xml: Seq[Xml.Node] =
+        Title.element.seq.unparser.content(titleStmt.titles) ++
+        Author.element.seq.unparser.content(titleStmt.authors) ++
+        Sponsor.element.seq.unparser.content(titleStmt.sponsors) ++
+        Funder.element.seq.unparser.content(titleStmt.funders) ++
+        Principal.element.seq.unparser.content(titleStmt.principals) ++
+        RespStmt.element.seq.unparser.content(titleStmt.respStmts)
 
-  private def fromStore(path: Seq[String], store: Store.FromElement): Seq[ReferenceWithSource] = {
-    val fromElement: Seq[ReferenceWithSource.FromElement] = getReferences(store)
-      .map(reference => ReferenceWithSource.FromElement(
-        path,
-        reference
-      ))
-
-    val fromChildren = store match {
-      case collection: Collection =>
-        val collectionName: String = getName(collection.names)
-        val documentsBy: By.FromElement[Document] = collection.by.get
-        documentsBy.stores.flatMap { document =>
-          val documentPath: Seq[String] = path :+ getName(documentsBy.selector)
-          document.by.get.stores.flatMap { teiHolder =>
-            val teiHolderName: String = teiHolder.name
-            getReferences(teiHolder).map(reference => ReferenceWithSource.FromDocument(
-              documentPath :+ teiHolderName,
-              reference,
-              Hierarchy.fileName(collection),
-              collectionName,
-              teiHolderName
-            ))
-          }
-        }
-
-      case _ =>
-        store.by.toSeq.flatMap(by => by.stores.flatMap(store =>
-          fromStore(path ++ Seq(getName(by.selector), getName(store)), store.asInstanceOf[Store.FromElement])))
+      EntityReference.from(xml) ++ titleStmt.editors.flatMap(_.persName.toSeq)
     }
 
-    fromElement ++ fromChildren
+    // TODO unfold: convert the whole TEI document to XML and!
+    // ... and the same everywhere!
+
+    val fromTitleStmt: Seq[EntityReference] = references(tei.titleStmt)
+
+    val fromRest: Seq[EntityReference] = fromValues(
+      tei.teiHeader.profileDesc.flatMap(_.documentAbstract), tei.correspDesc, Some(tei.body))
+
+    fromTitleStmt ++ fromRest
   }
 
-  private def getReferences(store: Store): Seq[EntityReference] = EntityReference.from(
-    store.title.map(_.xml).getOrElse(Seq.empty) ++
-    store.storeAbstract.map(_.xml).getOrElse(Seq.empty) ++
-    store.body.map(_.xml).getOrElse(Seq.empty)
-  )
+  private def fromValues(values: Option[RawXml#Value]*): Seq[EntityReference] =
+    fromXml(values.flatten.flatMap(_.xml))
 
-  private def getReferences(teiHolder: TeiHolder): Seq[EntityReference] =
-    teiHolder.tei.titleStmt.references /* TODO unfold */ ++ EntityReference.from(
-    teiHolder.tei.getAbstractXml.getOrElse(Seq.empty) ++
-    teiHolder.tei.correspDesc.map(_.xml).getOrElse(Seq.empty) ++
-    teiHolder.tei.body.xml
-  )
+  private def fromXml(xml: Seq[Xml.Node]): Seq[EntityReference] = for {
+    entityType <- EntityType.values
+    node <- xml
+    descendant <- Xml.descendants(node, entityType.nameElement)
+  } yield
+    // TODO introduce and use here parser that doesn't allow sourceUrl
+    Parser.parseDo(EntityReference.parse(From.xml("descendants", descendant)))
 
-  private def getName(selector: Selector): String = getName(selector.names)
-  private def getName(store: Store): String = getName(store.names)
-  private def getName(names: Names): String = names.name
-
-  private def checkReference(reference: EntityReference,  findByRef: String => Option[Entity]): Option[String] = {
-    val name: Seq[Xml.Node] = reference.name
-    reference.ref.fold[Option[String]](None) { ref =>
-      if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
-        findByRef(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
-          if (named.entityType == reference.entityType) None
-          else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
-        }
-      }
-    }
+  private def addSource(path: Store.Path, references: Seq[EntityReference]): Seq[EntityReference] = {
+    val source: Option[String] = Some(Files.mkUrl(path.map(_.structureName)))
+    for (reference <- references) yield reference.copy(sourceUrl = source)
   }
-
-  private def fromEntity(references: Seq[ReferenceWithSource]): Seq[ReferenceWithSource.FromEntity] = references
-    .filter(_.isInstanceOf[ReferenceWithSource.FromEntity])
-    .map(_.asInstanceOf[ReferenceWithSource.FromEntity])
-
-  private def fromDocument(references: Seq[ReferenceWithSource]): Seq[ReferenceWithSource.FromDocument] = references
-    .filter(_.isInstanceOf[ReferenceWithSource.FromDocument])
-    .map(_.asInstanceOf[ReferenceWithSource.FromDocument])
 }

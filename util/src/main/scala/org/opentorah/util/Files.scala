@@ -1,8 +1,9 @@
 package org.opentorah.util
 
 import java.io.{BufferedWriter, File, FileWriter}
-import java.net.URL
+import java.net.{URL, URLDecoder}
 import org.slf4j.{Logger, LoggerFactory}
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import scala.io.Source
 
@@ -91,8 +92,12 @@ object Files {
 
   def splitUrl(url: String): Seq[String] = {
     require(url.startsWith("/"))
-    url.substring(1).split("/").toIndexedSeq
+    url.substring(1).split("/").toIndexedSeq.filterNot(_.isBlank)
   }
+
+  def splitAndDecodeUrl(url: String): Seq[String] = splitUrl(url).map(urlDecode)
+
+  def urlDecode(segment: String): String = URLDecoder.decode(segment, StandardCharsets.UTF_8)
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
 

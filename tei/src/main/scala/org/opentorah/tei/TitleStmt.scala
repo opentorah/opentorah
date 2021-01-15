@@ -10,19 +10,7 @@ final case class TitleStmt(
   funders: Seq[Funder.Value],
   principals: Seq[Principal.Value],
   respStmts: Seq[RespStmt.Value]
-) {
-  def references: Seq[EntityReference] = {
-    val xml: Seq[Xml.Node] =
-      Title.element.seq.unparser.content(titles) ++
-      Author.element.seq.unparser.content(authors) ++
-      Sponsor.element.seq.unparser.content(sponsors) ++
-      Funder.element.seq.unparser.content(funders) ++
-      Principal.element.seq.unparser.content(principals) ++
-      RespStmt.element.seq.unparser.content(respStmts)
-
-    EntityReference.from(xml) ++ editors.flatMap(_.persName.toSeq)
-  }
-}
+)
 
 object TitleStmt extends Element[TitleStmt]("titleStmt") {
 

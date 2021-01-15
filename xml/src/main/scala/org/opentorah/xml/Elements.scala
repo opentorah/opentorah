@@ -12,8 +12,8 @@ trait Elements[A] {
 
   protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A]
 
-  protected def toXmlElement(value: A): Xml.Element =
-    elementByValue(value).asInstanceOf[Element[A]].toXmlElement(value)
+  def xmlElement(value: A): Xml.Element =
+    elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
   private def nested(
     from: Option[From],
@@ -83,7 +83,7 @@ object Elements {
 
   final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[Xml.Element]] {
     override protected def parser: Parser[Option[A]] = elements.optionalParser
-    override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.toXmlElement)
+    override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Option[A]] = Unparser[Option[A]](
       content = value => xml(value).toSeq
     )
@@ -91,7 +91,7 @@ object Elements {
 
   final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element] {
     override protected def parser: Parser[A] = Parser.required(elements.optionalParser, elements)
-    override def xml(value: A): Xml.Element = elements.toXmlElement(value)
+    override def xml(value: A): Xml.Element = elements.xmlElement(value)
     override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
     )
@@ -105,7 +105,7 @@ object Elements {
         .map(next => all(acc :+ next))
         .getOrElse(ZIO.succeed(acc))
     } yield result
-    override def xml(value: Seq[A]): Seq[Xml.Element] = value.map(elements.toXmlElement)
+    override def xml(value: Seq[A]): Seq[Xml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Seq[A]] = Unparser[Seq[A]](
       content = value => xml(value)
     )

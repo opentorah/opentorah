@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2021-01-27
+My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:
+it was not general enough, and too inflexible to be used even in its original context.
+Code in the 'collector' module was re-written, and 'store' module emptied out.
+- Service class enhanced to serve dynamic content;
+- Main and Cutter moved into the alter-rebbe.org repository;
+- site XML files there adjusted to the new format;
+
 ## [0.1.62] - 2020-12-20
 - hybrid store/collector new generation;
 - selectors in metadata, not in the store file;

@@ -17,6 +17,8 @@ final case class Pb(
 
 object Pb extends Element[Pb]("pb") {
 
+  def pageId(n: String): String = s"p$n"
+
   val nAttribute: Attribute.Required[String] = Attribute("n").required
   private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
   private val missingAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("missing").orDefault

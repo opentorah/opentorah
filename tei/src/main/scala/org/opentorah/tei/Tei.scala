@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, Dialect, Element, From, LinkResolver, Namespace, Parsable, Parser, PrettyPrinter, ToHtml, Xml}
+import org.opentorah.xml.{Attribute, Dialect, Element, From, Html, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import zio.{URIO, ZIO}
 
 final case class Tei(
@@ -8,12 +8,6 @@ final case class Tei(
   text: Text
 ) {
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
-  def getAbstract: Option[Abstract.Value] = teiHeader.profileDesc.flatMap(_.documentAbstract)
-  def getAbstractXml: Option[Seq[Xml.Node]] = getAbstract.map(_.xml)
-  def creationDate: Option[Date] = teiHeader.profileDesc.flatMap(_.creation.map(_.date))
-  def languages: Seq[Language] = teiHeader.profileDesc.flatMap(_.langUsage).toSeq.flatMap(_.languages)
-  def editors: Seq[Editor] = titleStmt.editors
-  def authors: Seq[Author.Value] = titleStmt.authors
 
   def addressee: Option[EntityReference] =
     EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
@@ -24,18 +18,19 @@ final case class Tei(
       .map(descendant => Parser.parseDo(Pb.parse(From.xml("descendants", descendant))))
   )
 
-  // TODO not vals!
-  val correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
-  val body: Body.Value = text.body
+  def correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
+  def body: Body.Value = text.body
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
 }
 
-object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
+object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
   override val mimeType: String = "application/tei+xml"
+
+  def renderXml(tei: Tei): String = prettyPrinter.renderXml(Tei.xmlElement(tei))
 
   override val prettyPrinter: PrettyPrinter = new PrettyPrinter(
     doNotStackElements = Set("choice"),
@@ -61,54 +56,6 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
   def concat[A](unparsers: Unparser[A]*): Unparser[A] =
     Unparser.concatInNamespace(Tei.namespace, unparsers)
 
-  def apply(body: Seq[Xml.Node]): Tei = new Tei(
-    teiHeader = TeiHeader.empty,
-    text = new Text(
-      lang = None,
-      new Body.Value(body)
-    )
-  )
-
-  type Transformer = Tei => Tei
-
-  def addPublicationStatement(
-    publisher: Publisher.Value,
-    status: String,
-    licenseName: String,
-    licenseUrl: String
-  ): Tei.Transformer = tei =>
-    tei.copy(teiHeader = tei.teiHeader.copy(
-      fileDesc = tei.teiHeader.fileDesc.copy(
-        publicationStmt = Some(new PublicationStmt(
-          publisher = Some(publisher),
-          availability = Some(new Availability(
-            status = Some(status),
-            xml = <licence><ab><ref n="license" target={licenseUrl}>{licenseName}</ref></ab></licence>)))))))
-
-  def addSourceDesc(value: SourceDesc.Value): Tei.Transformer = tei =>
-    tei.copy(teiHeader = tei.teiHeader.copy(
-      fileDesc = tei.teiHeader.fileDesc.copy(
-        sourceDesc = Some(value))))
-
-  def addCalendarDesc(value: CalendarDesc.Value): Tei.Transformer = tei =>
-    tei.copy(teiHeader = tei.teiHeader.copy(
-      profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc.empty).copy(
-        calendarDesc = Some(value)))))
-
-  val addLanguage: Transformer = tei => {
-    val textLang: Option[String] = tei.text.lang
-    val langUsage: Option[LangUsage] = tei.teiHeader.profileDesc.flatMap(_.langUsage)
-    val add: Boolean = langUsage.isEmpty && textLang.isDefined
-    if (!add) tei else tei.copy(teiHeader = tei.teiHeader.copy(
-      profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc.empty).copy(langUsage =
-        Some(LangUsage(languages = Seq(Language(
-          ident = textLang.get,
-          usage = None,
-          text = None
-        ))))))
-    ))
-  }
-
   override protected def isEndNote(element: Xml.Element): Boolean =
     (element.label == "note") && placeAttribute.get(element).contains("end")
 
@@ -119,43 +66,34 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
 
   val facsimileSymbol: String = "⎙"
 
-  def toHtml(resolver: LinkResolver, tei: Tei): Xml.Element = toHtml(resolver, required.xml(tei))
-
-  // - add values of the cssClass attribute to class?
-  // - style/rend/rendition?
-  // - transform tagsDecl?
-  // - transform prefixDef?
-  override protected def elementTransform(element: Xml.Element): URIO[State, Xml.Element] = {
+  // Note: it is possible to add the tokens from the 'rendition' attribute to the value of the HTML class attribute
+  // by augmenting Html.To - but I do not see the need: CSS styling can be applied based on the 'rendition' itself.
+  // but I do not see the need
+  override protected def elementTransform(element: Xml.Element): URIO[Html.State, Xml.Element] = {
     val children: Seq[Xml.Node] = Xml.getChildren(element)
 
     element.label match {
       case label if EntityType.isName(label) =>
         require(!Xml.isEmpty(children), element)
-        link(EntityName.refAttribute.get(element), _.resolver.findByRef(_), children)
+        link(EntityName.refAttribute.get(element), _.findByRef(_)).map(_(children))
 
       case Ref.elementName =>
-        require(!Xml.isEmpty(children))
-        link(Some(targetAttribute.get(element)), _.resolver.resolve(_), children)
+        require(!Xml.isEmpty(children), element)
+        link(Some(targetAttribute.get(element)), _.resolve(_)).map(_(children))
 
       case "ptr" =>
-        require(Xml.isEmpty(children))
-        link(Some(targetAttribute.get(element)), _.resolver.resolve(_), Seq.empty)
+        require(Xml.isEmpty(children), element)
+        link(Some(targetAttribute.get(element)), _.resolve(_)).map(_(Seq.empty))
 
       // TODO feed pageId through State to obtain unique id
-      // TODO use - do not guess! - ids of the pbs in the facsimile viewer!
       case Pb.elementName =>
-        require(Xml.isEmpty(children))
-        val pageId: String = Page.pageId(Pb.nAttribute.get(element))
-        ZIO.access[State](_.resolver.facs).map(resolved => a(
-          id = Some(pageId),
-          href = Some(resolved.urlWithPartAsString(pageId)),
-          target = resolved.role,
-          Seq(Xml.mkText(facsimileSymbol))
-        ))
+        require(Xml.isEmpty(children), element)
+        val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
+        link(Some(pageId), _.facs(_), id = Some(pageId)).map(_(facsimileSymbol))
 
       case "graphic" =>
-        // Note: in TEI <graphic> can contain <desc>, but are treating it as empty.
-        require(Xml.isEmpty(children))
+        // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
+        require(Xml.isEmpty(children), element)
         ZIO.succeed(<img src={urlAttribute.get(element)}/>)
 
       case "table" =>
@@ -170,7 +108,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml {
         ZIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
 
       case _ if isEndNote(element) =>
-        ZIO.access[State](_.addEndNote(Xml.idAttribute.optional.get(element), children))
+        ZIO.access[Html.State](_.addEndNote(Xml.idAttribute.optional.get(element), children))
 
       case _ =>
         ZIO.succeed(element)

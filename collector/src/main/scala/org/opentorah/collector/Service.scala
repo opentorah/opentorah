@@ -1,23 +1,31 @@
 package org.opentorah.collector
 
-import cats.effect.{Blocker, ContextShift, ExitCode, Sync}
+import cats.data.OptionT
+import cats.effect.{Blocker, ExitCode, Sync}
+import org.opentorah.util.Files
 //import cats.implicits._
 //import fs2.io
-import java.net.URL
-import java.util.concurrent.Executors
+import fs2.Stream
 import net.logstash.logback.argument.StructuredArguments
-import org.http4s.{HttpRoutes, Request, Response, StaticFile, Status, Uri}
 import org.http4s.dsl.Http4sDsl
+import org.http4s.headers.{`Content-Length`, `Content-Type`}
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.util.CaseInsensitiveString
+import org.http4s._
 import org.slf4j.{Logger, LoggerFactory}
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-import zio.{App, RIO, URIO, ZEnv, ZIO}
 import zio.duration.Duration
 import zio.interop.catz._
+import zio.{App, RIO, URIO, ZEnv, ZIO}
+
+import java.net.URL
+import java.util.concurrent.Executors
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object Service extends App {
+  LoggerFactory.getILoggerFactory.asInstanceOf[ch.qos.logback.classic.LoggerContext]
+    .getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
+
   type ServiceEnvironment = ZEnv
 
   type ServiceTask[+A] = RIO[ServiceEnvironment, A]
@@ -32,11 +40,16 @@ object Service extends App {
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
   import dsl._
 
-  LoggerFactory.getILoggerFactory.asInstanceOf[ch.qos.logback.classic.LoggerContext]
-    .getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
-
   override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
-    val siteUri: String = if (args.nonEmpty) {
+    def getParameter(name: String, defaultValue: String): String = Option(System.getenv(name)).fold {
+      info(s"No value for '$name' in the environment; using default: '$defaultValue'")
+      defaultValue
+    }{ value =>
+      info(s"Value    for '$name' in the environment: $value")
+      value
+    }
+
+    val siteUrl: String = if (args.nonEmpty) {
       val result = args.head
       info(s"siteUri argument supplied: $result")
       result
@@ -56,7 +69,7 @@ object Service extends App {
         // must bind to all IPs, not just 127.0.0.1:
         .bindHttp(port, "0.0.0.0")
         .withWebSockets(false)
-        .withHttpApp(routes(Uri.unsafeFromString(siteUri)).orNotFound)
+        .withHttpApp(routes(siteUrl).orNotFound)
         .serve
         .compile[ServiceTask, ServiceTask, ExitCode]
         .drain
@@ -65,24 +78,89 @@ object Service extends App {
       .exitCode
   }
 
-  private def getParameter(name: String, defaultValue: String): String =Option(System.getenv(name)).fold {
-    info(s"No value for '$name' in the environment; using default: '$defaultValue'")
-    defaultValue
-  }{ value =>
-    info(s"Value    for '$name' in the environment: $value")
-    value
-  }
-
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
-  private def routes(siteUri: Uri): HttpRoutes[ServiceTask] = {
-//    val site: Site = new Site(toUrl(siteUri))
+  private def routes(siteUrl: String): HttpRoutes[ServiceTask] = {
+    val siteUri: Uri = Uri.unsafeFromString(siteUrl)
+
+    var site: Option[Site] = None
+
+    def getSite(request: Request[ServiceTask]): Site = site.getOrElse {
+      info(request, "initializing site")
+      val result = Site.read(toUrl(siteUri))
+      site = Some(result)
+      result
+    }
+
+    def fromSite(path: Seq[String], request: Request[ServiceTask]): Option[Response[ServiceTask]] = {
+      val site: Site = getSite(request)
+      val storePath: Option[Store.Path] = site.resolve(path)
+
+      val content: Option[(String, Boolean)] = try storePath.map(site.content) catch {
+        case _: NotImplementedError => None
+      }
+
+      val result: Option[Response[ServiceTask]] = content.map { case (content: String, isTei: Boolean) =>
+        val bytes: Array[Byte] = content.getBytes
+
+        Response(
+          headers = Headers(List(
+            `Content-Type`(if (isTei) MediaType.application.`tei+xml` else MediaType.text.html, Charset.`UTF-8`),
+            `Content-Length`.unsafeFromLong(bytes.length)
+            // TODO more headers!
+          )),
+          body = Stream.emits(bytes)
+        )
+      }
+
+      info(request, result.fold {
+        storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"??? $storePath")
+      }{ _ =>
+        s"YES ${storePath.get}"
+      })
+
+      result
+    }
+
+    def get(request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] = {
+      // TODO if I add a parameter list (implicit F: Sync[ServiceTask]) and use F.pure and F.suspend, I get
+      //   ambiguous implicit values:
+      //   both method taskConcurrentInstance in trait CatsEffectInstances1 of type
+      //     [R]cats.effect.Concurrent[[β$18$]zio.ZIO[R,Throwable,β$18$]]
+      //   and value F of type cats.effect.Sync[org.opentorah.collector.Service.ServiceTask]
+      //   match expected type cats.effect.Sync[org.opentorah.collector.Service.ServiceTask]
+      val F: Sync[ServiceTask] = taskConcurrentInstance
+
+      val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
+      val urlStr: String = Files.mkUrl(path)
+
+      val doNotResolve: Boolean = request.uri.authority.map(_.host.value).exists(_.startsWith("www."))
+
+      OptionT(
+        if (doNotResolve) F.pure(None)
+        else F.suspend(F.pure(fromSite(path, request)))
+      )
+      .orElse(StaticFile.fromURL[ServiceTask](
+        toUrl(siteUri.resolve(relativize(addIndex(request.uri)))),
+        Service.blocker,
+        Some(request)
+      ))
+      .getOrElseF(NotFound(s"Not found: $urlStr"))
+      .timed.mapEffect { case (duration: Duration, response: Response[ServiceTask]) =>
+        val durationStr: String = Service.formatDuration(duration)
+
+        if (response.status.isInstanceOf[NotFound.type])
+          Service.warning(request, s"NOT $durationStr $urlStr")
+        else
+          Service.info   (request, s"GOT $durationStr $urlStr")
+
+        response
+      }
+    }
 
     HttpRoutes.of[ServiceTask] {
       // case GET -> Root / "hello" => Ok("hello!")
-
-      case request@GET -> _ =>
-        fromUrl(toUrl(siteUri.resolve(relativize(addIndex(request.uri)))), request)
+      case request@GET -> _ => get(request)
     }
   }
 
@@ -93,41 +171,6 @@ object Service extends App {
     if (uri.path.startsWith("/")) uri.copy(path = uri.path.substring(1)) else uri
 
   private def toUrl(uri: Uri): URL = new URL(uri.toString)
-
-  def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
-    X.fromUrl(url, request)
-
-//  private val defaultBufferSize: Int = 10240
-
-//  def getUrl[F[_]](url: URL)(implicit F: Sync[F], cs: ContextShift[F]): F[Option[fs2.Stream[F, Byte]]] = {
-//    blocker
-//      .delay(url.openConnection.getInputStream)
-//      .redeem(
-//        recover = {
-//          case _: java.io.FileNotFoundException => None
-//          case other => throw other
-//        },
-//        f = { inputStream =>
-//          Some(io.readInputStream[F](F.pure(inputStream), defaultBufferSize, blocker))
-//        }
-//      )
-//  }
-
-  def log(
-    url: URL,
-    request: Request[ServiceTask],
-    duration: Duration,
-    status: Status
-  ): Unit = {
-    val durationStr: String = formatDuration(duration)
-
-    // TODO suppress URL encoding.
-    val urlStr: String = url.toString
-    if (status.isInstanceOf[NotFound.type])
-      warning(request, s"NOT $durationStr $urlStr")
-    else
-      info   (request, s"GOT $durationStr $urlStr")
-  }
 
   private def formatDuration(duration: Duration): String = {
     val millis: Long = duration.toMillis
@@ -161,46 +204,4 @@ object Service extends App {
       null
     )
   }
-}
-
-// TODO figure out why doesn't this compile when I unfold it into Service - and do it!
-// Cannot convert from String to an Entity, because no
-//   EntityEncoder[[+A]zio.ZIO[zio.Has[zio.clock.Clock.Service]
-//   with zio.Has[zio.console.Console.Service]
-//   with zio.Has[zio.system.System.Service]
-//   with zio.Has[zio.random.Random.Service]
-//   with zio.Has[zio.blocking.Blocking.Service],Throwable,A], String] instance could be found.
-//
-//  not enough arguments for method apply:
-//  (
-//    implicit F: cats.Applicative[
-//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable, A]
-//    ],
-//    implicit w: org.http4s.EntityEncoder[
-//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable, A],
-//      String
-//    ]
-//  )zio.ZIO[
-//    zio.Has[Clock+Console+System+Random+Blocking],
-//    Throwable,
-//    org.http4s.Response[
-//      [+A]zio.ZIO[zio.Has[Clock+Console+System+Random+Blocking], Throwable,A]
-//    ]
-//  ]
-//  in trait EntityResponseGenerator.
-//Unspecified value parameter w.
-//      .getOrElseF(NotFound(s"Not found: $url"))
-private object X {
-  import Service.ServiceTask
-  import Service.dsl._
-
-  def fromUrl(url: URL, request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] =
-    StaticFile
-      .fromURL[ServiceTask](url, Service.blocker, Some(request))
-      .getOrElseF(NotFound(s"Not found: $url"))
-      .timed.mapEffect {
-      case (duration: Duration, response: Response[ServiceTask]) =>
-        Service.log(url, request, duration, response.status)
-        response
-    }
 }

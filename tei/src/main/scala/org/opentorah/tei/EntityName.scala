@@ -38,16 +38,4 @@ object EntityName extends EntityRelated[EntityName](
       textParsable(_.name)
     )
   }
-
-  // TODO just the entity.entityName, like in the NamesObject?
-  def forEntity(entity: Entity): EntityName = EntityName(
-    entityType = entity.entityType,
-    ref = entity.id,
-    name = entity.id.getOrElse("")
-  )
-
-  def forReference(entityReference: EntityReference): EntityName = EntityName(
-    entityType = entityReference.entityType,
-    name = entityReference.text
-  )
 }

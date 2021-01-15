@@ -1,6 +1,5 @@
 package org.opentorah.tei
 
-import org.opentorah.util.Files
 import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class Ref(
@@ -28,14 +27,4 @@ object Ref extends Element[Ref]("ref") {
       Element.nodes(_.text)
     )
   }
-
-  def toXml(
-    target: Seq[String],
-    text: String
-  ): Xml.Element = required.xml(new Ref(Files.mkUrl(target), Xml.mkText(text)))
-
-  def toXml(
-    target: Seq[String],
-    text: Seq[Xml.Node]
-  ): Xml.Element = required.xml(new Ref(Files.mkUrl(target), text))
 }

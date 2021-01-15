@@ -16,7 +16,7 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
   final override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A] =
     parser.asInstanceOf[Parser[A]]
 
-  override def toXmlElement(value: A): Xml.Element = Xml.construct(
+  override def xmlElement(value: A): Xml.Element = Xml.construct(
     name = elementName,
     namespace = contentParsable.unparser.namespace,
     attributes = contentParsable.unparser.attributes(value),

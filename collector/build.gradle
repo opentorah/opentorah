@@ -18,8 +18,6 @@ dependencies {
   implementation project(':tei')
   implementation project(':util')
 
-  implementation project(':store') // TODO remove when new generation...
-
   implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
   implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
 //  implementation "com.vladsch.flexmark:flexmark-util-ast:$flexmarkVersion"

@@ -35,11 +35,7 @@ configureLibrary(['Scala', 'XML'])
 dependencies {
   implementation project(':util')
 
-  api ("org.scala-lang.modules:scala-xml_$scalaVersionMajor") {
-    version {
-      strictly "$scalaXmlVersion"
-    }
-  }
+  api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"  // TODO api?
   api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   implementation "xerces:xercesImpl:$xercesVersion"
