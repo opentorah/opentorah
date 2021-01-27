@@ -77,5 +77,6 @@ object FopFactoryFactory {
     override def isComplexScriptFeaturesEnabled: Boolean = delegate.isComplexScriptFeaturesEnabled
     override def getHyphenationPatternNames: java.util.Map[String, String] = delegate.getHyphenationPatternNames
     override def getFallbackResolver: org.apache.xmlgraphics.image.loader.impl.AbstractImageSessionContext.FallbackResolver = delegate.getFallbackResolver
+    override def isTableBorderOverpaint: Boolean = delegate.isTableBorderOverpaint
   }
 }
