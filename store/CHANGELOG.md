@@ -3,6 +3,13 @@
 Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-paper` and `typesetting-paper`.
 
 ## [Unreleased]
+
+## [0.2.0] - 2021-01-27
+My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:
+it was not general enough, and too inflexible to be used even in its original context.
+Code in the 'collector' module was re-written, and 'store' module emptied out.
+
+## [0.1.67] - 2021-01-15
 - Attribute.Parsable and ensuing cleanup;
 - everything is a Parsable now ;)
 

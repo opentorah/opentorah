@@ -438,7 +438,7 @@ object Renderer {
     url = "/",
     content =
       <div>
-        <div><a href={s"/$jewishRendererName"}>jewish"</a></div>,
+        <div><a href={s"/$jewishRendererName"}>jewish</a></div>,
         <div><a href={s"/$gregorianRenderername"}>gregorian</a></div>
       </div>,
     location = location,

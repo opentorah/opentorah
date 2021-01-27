@@ -19,11 +19,12 @@ plugins {
   id 'com.jfrog.bintray' apply false
 }
 
-allprojects {
-  repositories {
-    jcenter()
-    mavenCentral()
-    mavenLocal()
+idea {
+  module {
+    excludeDirs += [
+      file('.idea'),
+      file('gradle')
+    ]
   }
 }
 
@@ -34,19 +35,15 @@ subprojects {
   group = 'org.opentorah'
   version = projectVersion
 
+  repositories {
+    jcenter()
+    mavenCentral()
+  }
+
   apply from: '../scala.gradle'
   apply from: '../library.gradle'
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
-
-  // TODO there seem to be multiple versions of some dependencies; verify and force as needed:
-  // scala-xml, scala-library, slf4j-api, cats-kernel, cats-kernel-laws...
-  configurations.all {
-    resolutionStrategy {
-      // v1.3.04 doesn't have org.w3c.dom.ElementTraversal that Xerces uses:
-      force "xml-apis:xml-apis:$xmlApisVersion"
-    }
-  }
 
   task site
   site.description('Generate project website')
@@ -59,13 +56,4 @@ subprojects {
   task deploy
   deploy.description('Publish containers and re-deploy services')
   deploy.group('publishing')
-}
-
-idea {
-  module {
-    excludeDirs += [
-      file('.idea'),
-      file('gradle')
-    ]
-  }
 }

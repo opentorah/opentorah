@@ -45,10 +45,10 @@ object Xml extends Model {
   def descendants(xml: Node, name: String): Seq[Element] =
     xml.flatMap(_ \\ name).filter(isElement).map(asElement)
 
-  def multi(nodes: Nodes): Nodes = nodes match {
+  def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
-    case n :: ns if n.isInstanceOf[Element] => Seq(n, mkText(", ")) ++ multi(ns)
+    case n :: n1 :: ns if n.isInstanceOf[Element] && n1.isInstanceOf[Element] => Seq(n, mkText(separator)) ++ multi(n1 :: ns)
     case n :: ns => Seq(n) ++ multi(ns)
     case n => n
   }

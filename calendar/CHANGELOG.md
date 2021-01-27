@@ -3,6 +3,8 @@
 Modules covered: `calendar`, `calendar-service`, `schedule` and `calendar-paper`.
 
 ## [Unreleased]
+
+## [0.3.4] - 2021-01-15
 - preparing for the switch to Scala 2.13/3;
 - reworked family polymorphism to not use general type projections
   (they go away in Scala 3), so we are back to all family members being in one file :(
