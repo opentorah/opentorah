@@ -8,7 +8,7 @@ final class Note(
 ) extends Directory.Entry(name) with HtmlContent {
 
   override def htmlHeadTitle: Option[String] = title
-  override def htmlBodyTitle: Option[Seq[Xml.Node]] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def path(site: Site): Store.Path = Seq(site.notes, this)
   override def content(site: Site): Xml.Element = site.notes.getFile(this).html
 }

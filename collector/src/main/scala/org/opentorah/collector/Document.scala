@@ -20,10 +20,10 @@ final class Document(
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
   def getDate: Xml.Text = Xml.mkText(date.getOrElse(""))
-  def getDescription: Seq[Xml.Node] = description.toSeq.flatMap(_.xml)
-  def getAuthors: Seq[Xml.Node] = Xml.multi(authors.flatMap(_.xml))
+  def getDescription: Xml.Nodes = description.toSeq.flatMap(_.xml)
+  def getAuthors: Xml.Nodes = Xml.multi(authors.flatMap(_.xml))
   def getAddressee: Seq[Xml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
-  def getTranscribers: Seq[Xml.Node] = Xml.multi(editors
+  def getTranscribers: Xml.Nodes = Xml.multi(editors
     .filter(_.role.contains("transcriber"))
     .flatMap(_.persName)
     .map(EntityReference.xmlElement))
@@ -108,22 +108,22 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
     override def path(site: Site): Store.Path =
       collection.path(site) ++ Seq(collection.facsimileFacet, collection.facsimileFacet.of(document))
 
-    // TODO do pages of the file with the appropriate language!
     override def content(site: Site): Xml.Element =
       <div class={Viewer.Facsimile.name}>
         {document.headerSummary}
         <div class="facsimileScroller">{
-          val original: TextFacet = collection.textFacet.of(collection.original(document))
+          val text: TextFacet = collection.textFacet.of(document)
+          val facsimileUrl: String = collection.facsimileUrl(site)
 
           for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
             val pageId: String = Pb.pageId(n)
-            original.a(site, part = Some(pageId))(
+            text.a(site, part = Some(pageId))(
               <figure>
                 <img
                 id={pageId}
                 alt={s"facsimile for page $n"}
-                src={page.pb.facs.getOrElse(site.facsimileUrl(collection, n))}
+                src={page.pb.facs.getOrElse(s"$facsimileUrl$n.jpg")}
                 />
                 <figcaption>{n}</figcaption>
               </figure>
@@ -164,7 +164,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
   private val editorsElement: Elements.Sequence[Editor] = Editor.seq
   private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
   private val authorsElement: Elements.Sequence[Author.Value] = Author.element.seq
-  private val entityReferenceElement: Elements.Optional[EntityReference] = EntityReference.optional
+  private val addresseeElement: Elements.Optional[EntityReference] = EntityReference.optional
   private val pbsElement: Elements.Sequence[Pb] = Pb.seq
 
   override def contentParsable: Parsable[Document] = new Parsable[Document] {
@@ -176,7 +176,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
       description <- abstractElement()
       date <- dateAttribute()
       authors <- authorsElement()
-      addressee <- entityReferenceElement()
+      addressee <- addresseeElement()
       pbs <- pbsElement()
     } yield new Document(
       name,
@@ -198,7 +198,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
       abstractElement(_.description),
       dateAttribute(_.date),
       authorsElement(_.authors),
-      entityReferenceElement(_.addressee),
+      addresseeElement(_.addressee),
       pbsElement(_.pbs)
     )
   }

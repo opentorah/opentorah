@@ -16,7 +16,7 @@ object Common extends CommonSection {
     "img.src.path" -> (values.imagesDirectoryName + "/")
   )
 
-  override protected def customStylesheetBody: Seq[Xml.Node] = Seq(
+  override protected def customStylesheetBody: Xml.Nodes = Seq(
     <!-- This is needed (?) for template-tweaking customizations, like removal of "Chapter" in chapter title -->,
     <xsl:param name="local.l10n.xml" select="document('')"/>,
     <!-- Remove "Chapter" in chapter title -->,

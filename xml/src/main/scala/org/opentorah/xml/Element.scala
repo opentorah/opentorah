@@ -27,9 +27,9 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
 object Element {
   def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
 
-  val nodes: Parsable[Seq[Xml.Node]] = new Parsable[Seq[Xml.Node]] {
-    override protected def parser: Parser[Seq[Xml.Node]] = Context.allNodes
-    override def unparser: Unparser[Seq[Xml.Node]] = Unparser[Seq[Xml.Node]](content = identity)
+  val nodes: Parsable[Xml.Nodes] = new Parsable[Xml.Nodes] {
+    override protected def parser: Parser[Xml.Nodes] = Context.allNodes
+    override def unparser: Unparser[Xml.Nodes] = Unparser[Xml.Nodes](content = identity)
   }
 
   def allAttributes: Parser[Seq[Attribute.Value[String]]] = Context.takeAllAttributes

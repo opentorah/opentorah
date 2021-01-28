@@ -28,9 +28,9 @@ object Pdf extends DocBook2 {
 
   override def usesCss: Boolean = false
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] = Seq.empty
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes = Seq.empty
 
-  override protected def customStylesheetBody: Seq[Xml.Node] = Seq(
+  override protected def customStylesheetBody: Xml.Nodes = Seq(
     <!-- Break before each section -->,
     <xsl:attribute-set name="section.title.level1.properties">
       <xsl:attribute name="break-before">page</xsl:attribute>

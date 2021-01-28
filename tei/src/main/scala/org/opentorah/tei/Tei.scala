@@ -70,7 +70,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
   // by augmenting Html.To - but I do not see the need: CSS styling can be applied based on the 'rendition' itself.
   // but I do not see the need
   override protected def elementTransform(element: Xml.Element): URIO[Html.State, Xml.Element] = {
-    val children: Seq[Xml.Node] = Xml.getChildren(element)
+    val children: Xml.Nodes = Xml.getChildren(element)
 
     element.label match {
       case label if EntityType.isName(label) =>

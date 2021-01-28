@@ -53,7 +53,7 @@ trait DocBook2 extends Section {
       {mainStylesheetBody(values)}
     </xsl:stylesheet>
 
-  protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node]
+  protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes
 
   def paramsStylesheet(parameters: Seq[(String, Parameters)]): Xml.Element = {
     <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(usesDocBookXslt2)}>
@@ -100,7 +100,7 @@ object DocBook2 {
   def getNames(processors: List[DocBook2]): String =
     processors.map(docBook2 => "\"" + docBook2.name +"\"").mkString("[", ", ", "]")
 
-  private def parametersBySection(parameters: Seq[(String, Parameters)]): Seq[Xml.Node] = {
+  private def parametersBySection(parameters: Seq[(String, Parameters)]): Xml.Nodes = {
     val result = for {
       (sectionName: String, sectionParameters: Parameters) <- Collections.pruneSequenceOfMaps(parameters)
       if sectionParameters.nonEmpty

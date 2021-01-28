@@ -25,7 +25,7 @@ object Html extends DocBook2 {
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] =
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes =
     if (values.mathJaxConfiguration.isEmpty) Seq.empty else Seq(
       <!-- Add MathJax support -->,
       <xsl:template name="user.head.content">
@@ -36,5 +36,5 @@ object Html extends DocBook2 {
       </xsl:template>
     )
 
-  override protected def customStylesheetBody: Seq[Xml.Node] = Seq.empty
+  override protected def customStylesheetBody: Xml.Nodes = Seq.empty
 }

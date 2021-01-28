@@ -1,10 +1,9 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.{EntityReference, EntityType, Entity => TeiEntity}
+import org.opentorah.tei.{EntityType, Entity => TeiEntity}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Parsable, Parser, Unparser, Xml}
 
-// TODO use Union to record org/place/person.
 final class Entity(
   override val name: String,
   val entityType: EntityType,
@@ -29,13 +28,17 @@ final class Entity(
       for { source <- sources; if source.isInstanceOf[Entity] } yield source.asInstanceOf[Entity]
     )(_.id).sortBy(_.mainName)
 
-    val fromDocuments: Seq[Document.TextFacet] =
-      for { source <- sources; if source.isInstanceOf[Document.TextFacet] } yield source.asInstanceOf[Document.TextFacet]
+    val fromDocuments: Map[Collection, Seq[Document.TextFacet]] =
+      (for { source <- sources; if source.isInstanceOf[Document.TextFacet] } yield source.asInstanceOf[Document.TextFacet])
+    .groupBy(_.collection)
 
-    val byCollection: Map[Collection, Seq[Document.TextFacet]] =
-      Collections.mapValues(fromDocuments.groupBy(text => text.collection))(texts =>
-        Collections.removeConsecutiveDuplicatesWith(texts)(_.document.name).sortBy(_.document.name)
-      )
+    val byCollection: Seq[(Collection, Seq[Document.TextFacet])] =
+      for {
+        collection <- site.collections
+        texts = fromDocuments.get(collection)
+        if texts.isDefined
+      } yield collection -> Collections.removeConsecutiveDuplicatesWith(texts.get)(_.document.name)
+        .sortBy(_.document.name)
 
     val mentions: Xml.Element =
       <p class="mentions">
@@ -46,7 +49,7 @@ final class Entity(
           {Xml.multi(nodes = for (fromEntity <- fromEntities) yield fromEntity.a(site)(fromEntity.mainName))}
         </l>
         }
-        {for ((collection, texts) <- byCollection) yield // TODO sort in the site.collections order
+        {for ((collection, texts) <- byCollection) yield
         <l>{collection.pathHeaderHorizontal(site)}: {for (text <- texts) yield text.a(site)(text = text.document.baseName)}</l>}
       </p>
 
@@ -54,6 +57,7 @@ final class Entity(
   }
 }
 
+// TODO use EntityRelated - but first generalize EntryMaker?
 object Entity extends Directory.EntryMaker[TeiEntity, Entity]("entity") {
 
   override def apply(name: String, entity: TeiEntity): Entity = new Entity(

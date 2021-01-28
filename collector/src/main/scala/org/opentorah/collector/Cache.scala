@@ -16,6 +16,7 @@ object Cache {
     .build[URL, AnyRef]
 
   // TODO pass in parser from the file at the URL
+  // TODO support auto-refresh (if the file changed after it was cached )
   //   Look up and compute an entry if absent, or null if not computable
   //   graph = cache.get(key, (k: Nothing) => createExpensiveGraph(key))
   def get[T <: AnyRef](url: URL, load: URL => T): T =

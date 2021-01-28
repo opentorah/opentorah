@@ -13,7 +13,7 @@ object Reports extends By with HtmlContent {
 
   override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Seq[Xml.Node]] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def acceptsIndexHtml: Boolean = true
 
   override def path(site: Site): Store.Path = Seq(Reports)

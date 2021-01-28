@@ -53,6 +53,9 @@ object Xml extends Model {
     case n => n
   }
 
+  // TODO merge with Model.toString(Nodes)
+  def text(nodes: Nodes): String = nodes.map(_.text.trim).mkString(" ")
+
   override def toString(node: Node): String = Strings.squashWhitespace {
     node match {
       case elem: Element => (elem.child map (_.text)).mkString(" ")

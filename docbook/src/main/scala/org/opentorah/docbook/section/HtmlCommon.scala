@@ -18,5 +18,5 @@ object HtmlCommon extends CommonSection {
     "chunk.quietly" -> (if (values.isInfoEnabled) "0" else "1")
   )
 
-  override protected def customStylesheetBody: Seq[Xml.Node] = Seq.empty
+  override protected def customStylesheetBody: Xml.Nodes = Seq.empty
 }

@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Html, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
 import java.net.URL
 
 final class Collection(
@@ -11,6 +11,7 @@ final class Collection(
   override val names: Names,
   val pageType: Page.Type,
   val alias: Option[String],
+  val hierarchicalFacsimiles: Boolean,
   override val title: Title.Value,
   override val storeAbstract: Option[Abstract.Value],
   override val body: Option[Body.Value],
@@ -30,6 +31,13 @@ final class Collection(
   override def directoryEntries: Seq[Document] = documents
 
   private def collectionDocuments: Collection.Documents = getDirectory
+
+  def facsimileUrl(site: Site): String = {
+    val pathStr =
+      if (alias.isDefined && !hierarchicalFacsimiles) alias.get
+      else site.store2path(this).map(_.structureName).mkString("/")
+    site.facsimilesUrl + pathStr  + "/"
+  }
 
   def documents: Seq[Document] =
     collectionDocuments.documents
@@ -79,7 +87,7 @@ final class Collection(
     final case class Column(
       heading: String,
       cssClass: String,
-      value: Document => Seq[Xml.Node]
+      value: Document => Xml.Nodes
     )
 
     val columns: Seq[Column] = Seq[Column](
@@ -111,7 +119,7 @@ final class Collection(
       <table class="collection-index">
         {<tr>{for (column <- columns) yield <th class={column.cssClass}>{column.heading}</th>}</tr>}
         {collectionDocuments.parts.flatMap { part =>
-          part.title.fold[Seq[Xml.Node]](Seq.empty)(title =>
+          part.title.fold[Xml.Nodes](Seq.empty)(title =>
             <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
           ) ++
           part.documents.map(data =>
@@ -139,7 +147,7 @@ object Collection extends Element[Collection]("collection") {
     override def viewer: Viewer = collection.viewer
     override def isWide: Boolean = collection.isWide
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
-    override def htmlBodyTitle: Option[Seq[Xml.Node]] = collection.htmlBodyTitle
+    override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
     override def lang: Option[String] = collection.lang
     override def path           (site: Site): Store.Path       = collection.path           (site)
     override def navigationLinks(site: Site): Seq[Xml.Element] = collection.navigationLinks(site)
@@ -214,6 +222,8 @@ object Collection extends Element[Collection]("collection") {
     private val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
     private val pageTypeAttribute: Attribute.OrDefault[String] = Attribute("pageType", default = "manuscript").orDefault
     private val aliasAttribute: Attribute.Optional[String] = Attribute("alias").optional
+    private val hierarchicalFacsimilesAttribute: Attribute.OrDefault[Boolean] =
+      new Attribute.BooleanAttribute("hierarchicalFacsimiles").orDefault
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
 
     override def parser: Parser[Collection] = for {
@@ -224,6 +234,7 @@ object Collection extends Element[Collection]("collection") {
       storeAbstract <- abstractElement()
       body <- bodyElement()
       alias <- aliasAttribute()
+      hierarchicalFacsimiles <- hierarchicalFacsimilesAttribute()
       directory <- directoryAttribute()
       parts <- CollectionPart.seq()
     } yield new Collection(
@@ -231,6 +242,7 @@ object Collection extends Element[Collection]("collection") {
       names,
       Page.values.find(_.name == pageType).get,
       alias,
+      hierarchicalFacsimiles,
       title,
       storeAbstract,
       body,
@@ -245,6 +257,7 @@ object Collection extends Element[Collection]("collection") {
       abstractElement(_.storeAbstract),
       bodyElement(_.body),
       aliasAttribute(_.alias),
+      hierarchicalFacsimilesAttribute(_.hierarchicalFacsimiles),
       directoryAttribute(_.directory),
       CollectionPart.seq(_.parts)
     )

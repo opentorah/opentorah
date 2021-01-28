@@ -4,7 +4,7 @@ import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, Xml}
 
 final case class Availability(
   status: Option[String],
-  xml: Seq[Xml.Node]
+  xml: Xml.Nodes
 )
 
 object Availability extends Element[Availability]("availability") {

@@ -53,7 +53,7 @@ private[xml] object Context {
   val takeCharacters: Parser[Option[String]] =
     liftContentModifier(_.takeCharacters)
 
-  val allNodes: Parser[Seq[Xml.Node]] =
+  val allNodes: Parser[Xml.Nodes] =
     liftContentModifier(_.takeAllNodes)
 
   private def lift[A](f: Current => A): Parser[A] =

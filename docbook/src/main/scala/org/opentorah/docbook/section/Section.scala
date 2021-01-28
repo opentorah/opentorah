@@ -20,7 +20,7 @@ trait Section {
       {customStylesheetBody}
     </xsl:stylesheet>
 
-  protected def customStylesheetBody: Seq[Xml.Node]
+  protected def customStylesheetBody: Xml.Nodes
 
   def usesDocBookXslt2: Boolean = false
 }
