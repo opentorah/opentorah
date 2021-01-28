@@ -5,7 +5,7 @@ import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, P
 final case class Date(
   when: String,
   calendar: Option[String],
-  xml: Seq[Xml.Node]
+  xml: Xml.Nodes
 )
 
 object Date extends Element[Date]("date") {

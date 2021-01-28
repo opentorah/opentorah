@@ -3,6 +3,7 @@ package org.opentorah.collector
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+// TODO remove
 final class SiteTest extends AnyFlatSpec with Matchers {
 
   "Site" should "work" ignore {

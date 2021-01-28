@@ -7,7 +7,7 @@ trait HtmlContent {
   def isWide: Boolean = false
   def lang: Option[String] = None
   def htmlHeadTitle: Option[String]
-  def htmlBodyTitle: Option[Seq[Xml.Node]] = None
+  def htmlBodyTitle: Option[Xml.Nodes] = None
 
   final def a(site: Site, part: Option[String] = None): Html.a = site.a(path(site), part)
 

@@ -38,7 +38,7 @@ object Html extends Dialect with Doctype {
 
     def apply(xml: RawXml#Value): Xml.Element = apply(xml.xml)
 
-    def apply(children: Seq[Xml.Node]): Xml.Element = {
+    def apply(children: Xml.Nodes): Xml.Element = {
       val href: Option[String] =
         if (path.isEmpty) part.map(part => s"#$part")
         else Some(Files.mkUrl(Files.addPart(path, part)))
@@ -63,7 +63,7 @@ object Html extends Dialect with Doctype {
   private final class EndNote(
     number: Int,
     id: Option[String],
-    val content: Seq[Xml.Node]
+    val content: Xml.Nodes
   ) {
     private def contentId: String = s"_note_$number"
 
@@ -86,7 +86,7 @@ object Html extends Dialect with Doctype {
     private[Html] def getEndNotes: Seq[EndNote] = endNotes
 
     // TODO get two ids, one for the actual content at the end
-    def addEndNote(id: Option[String], content: Seq[Xml.Node]): Xml.Element = {
+    def addEndNote(id: Option[String], content: Xml.Nodes): Xml.Element = {
       val note: EndNote = new EndNote(
         number = endNotes.length + 1,
         id,

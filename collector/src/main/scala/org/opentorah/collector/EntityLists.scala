@@ -10,7 +10,7 @@ final class EntityLists(
 ) extends By with HtmlContent {
   override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Seq[Xml.Node]] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
   private var list2entities: Option[Map[EntityLists.EntityList, Seq[Entity]]] = None
 

@@ -8,7 +8,7 @@ final class References(references: Seq[EntityReference]) {
 
   def verify(site: Site): Seq[String] = {
     def checkReference(reference: EntityReference): Option[String] = {
-      val name: Seq[Xml.Node] = reference.name
+      val name: Xml.Nodes = reference.name
       reference.ref.fold[Option[String]](None) { ref =>
         if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
           site.entities.findByName(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
@@ -22,7 +22,9 @@ final class References(references: Seq[EntityReference]) {
     references.flatMap(reference => checkReference(reference))
   }
 
-  def noRef: Seq[EntityReference] = references.filter(_.ref.isEmpty).sortBy(_.text.toLowerCase)
+  def noRef: Seq[EntityReference] = references
+    .filter(_.ref.isEmpty)
+    .sortBy(reference => Xml.text(reference.name).toLowerCase)
 
   def toId(id: String): Seq[EntityReference] = references.filter(_.ref.contains(id))
 }
@@ -56,7 +58,7 @@ object References {
 
   private def fromTei(tei:Tei): Seq[EntityReference] = {
     def references(titleStmt: TitleStmt): Seq[EntityReference] = {
-      val xml: Seq[Xml.Node] =
+      val xml: Xml.Nodes =
         Title.element.seq.unparser.content(titleStmt.titles) ++
         Author.element.seq.unparser.content(titleStmt.authors) ++
         Sponsor.element.seq.unparser.content(titleStmt.sponsors) ++
@@ -69,6 +71,7 @@ object References {
 
     // TODO unfold: convert the whole TEI document to XML and!
     // ... and the same everywhere!
+    // ... and then unfold EntityReference.from()?
 
     val fromTitleStmt: Seq[EntityReference] = references(tei.titleStmt)
 
@@ -81,7 +84,7 @@ object References {
   private def fromValues(values: Option[RawXml#Value]*): Seq[EntityReference] =
     fromXml(values.flatten.flatMap(_.xml))
 
-  private def fromXml(xml: Seq[Xml.Node]): Seq[EntityReference] = for {
+  private def fromXml(xml: Xml.Nodes): Seq[EntityReference] = for {
     entityType <- EntityType.values
     node <- xml
     descendant <- Xml.descendants(node, entityType.nameElement)

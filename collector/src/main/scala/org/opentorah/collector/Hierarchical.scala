@@ -8,7 +8,7 @@ trait Hierarchical extends Store with HtmlContent {
 
   final def titleString: String = Xml.toString(title.xml)
 
-  def storeAbstract: Option[Abstract.Value] // TODO make required?
+  def storeAbstract: Option[Abstract.Value]
 
   final def storeAbstractXmlElement: Seq[Xml.Element] =
     storeAbstract.toSeq.map(storeAbstract => Abstract.element.xmlElement(storeAbstract))
@@ -44,11 +44,11 @@ trait Hierarchical extends Store with HtmlContent {
       )
 
     val path: Store.Path = site.store2path(this)
-    // TODO remove post-title here and style top-level TEI header that way...
+
     <div>
       <div class="store-header">
         {pathHeaderVertical(path.init.init, Seq.empty)}
-        <head xmlns={Tei.namespace.uri} rendition="post-title">{path.init.last.displayName} {displayName}: {title.xml}</head>
+        <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.xml}</head>
         {storeAbstractXmlElement}
         {body.toSeq.map(_.xml)}
       </div>

@@ -4,14 +4,12 @@ import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, From, Parsa
 
 final case class EntityReference(
   entityType: EntityType,
-  name: Seq[Xml.Node],
+  name: Xml.Nodes,
   id: Option[String],
   role: Option[String],
   ref: Option[String],
   sourceUrl: Option[String]
-) {
-  def text: String = name.map(_.text.trim).mkString(" ")
-}
+)
 
 object EntityReference extends EntityRelated[EntityReference](
   elementName = _.nameElement,
@@ -52,7 +50,7 @@ object EntityReference extends EntityRelated[EntityReference](
   }
 
   // TODO eliminate
-  final def from(xml: Seq[Xml.Node]): Seq[EntityReference] =
+  final def from(xml: Xml.Nodes): Seq[EntityReference] =
     EntityType.values.flatMap(entityType => xml.flatMap(node =>
       Xml.descendants(node, entityType.nameElement)
         .map(descendant => Parser.parseDo(parse(From.xml("descendants", descendant))))

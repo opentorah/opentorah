@@ -11,7 +11,7 @@ object HtmlTheme {
     lang: String,
     viewer: Viewer,
     headTitle: Option[String],
-    title: Option[Seq[Xml.Node]],
+    title: Option[Xml.Nodes],
     style: String,
     favicon: String,
     googleAnalyticsId: Option[String],
@@ -53,7 +53,7 @@ object HtmlTheme {
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
 
   def header(
-    title: Seq[Xml.Node],
+    title: Xml.Nodes,
     navigationLinks: Seq[Xml.Element] // normally, <a>s
   ): Xml.Element =
     <header class="site-header" role="banner">
@@ -84,7 +84,7 @@ object HtmlTheme {
     email: String,
     githubUsername: Option[String],
     twitterUsername: Option[String],
-    footerCol3: Seq[Xml.Node]
+    footerCol3: Xml.Nodes
   ): Xml.Element =
     <footer class="site-footer h-card">
       <data class="u-url" href="/"/>

@@ -2,9 +2,10 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
+// TODO Only the element name is used (in Tei.elementTransform); remove?
 final case class Ref(
   target: String,
-  text: Seq[Xml.Node]
+  text: Xml.Nodes
 )
 
 object Ref extends Element[Ref]("ref") {

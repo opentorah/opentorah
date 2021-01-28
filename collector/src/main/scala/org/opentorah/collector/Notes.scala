@@ -26,7 +26,7 @@ final class Notes(
   def notes: Seq[Note] = name2note.values.toSeq
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Seq[Xml.Node]] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def acceptsIndexHtml: Boolean = true
 
   override def path(site: Site): Store.Path = Seq(site.notes)

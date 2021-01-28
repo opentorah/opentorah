@@ -20,9 +20,9 @@ trait Epub extends DocBook2 {
 
   override def usesCss: Boolean = false
 
-  final override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] = Seq.empty
+  final override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes = Seq.empty
 
-  final override protected def customStylesheetBody: Seq[Xml.Node] = Seq.empty
+  final override protected def customStylesheetBody: Xml.Nodes = Seq.empty
 
   final override def postProcess(
     inputDirectory: File,

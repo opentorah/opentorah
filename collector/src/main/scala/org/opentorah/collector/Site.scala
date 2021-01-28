@@ -90,10 +90,6 @@ final class Site(
     a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
-  // TODO inline
-  def facsimileUrl(collection: Collection, page: String): String =
-    facsimilesUrl + collection.alias.get + "/" + page + ".jpg"
-
   def a(path: Store.Path, part: Option[String] = None): Html.a = Html.a(
     path = toStaticPath(path),
     part = part,

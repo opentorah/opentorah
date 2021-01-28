@@ -4,7 +4,7 @@ import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
 
 final case class Creation(
   date: Date,
-  xml: Seq[Xml.Node]
+  xml: Xml.Nodes
 )
 
 object Creation extends Element[Creation]("creation") {

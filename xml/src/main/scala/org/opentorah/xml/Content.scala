@@ -5,7 +5,7 @@ import zio.IO
 private[xml] sealed trait Content {
   def takeNextElement(p: Xml.Element => Boolean): Content.Next[Option[Xml.Element]]
 
-  def takeAllNodes: Content.Next[Seq[Xml.Node]]
+  def takeAllNodes: Content.Next[Xml.Nodes]
 
   def takeCharacters: Content.Next[Option[String]]
 
@@ -20,7 +20,7 @@ private[xml] object Content {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] =
       IO.fail(s"No element in $this")
 
-    override def takeAllNodes: Next[Seq[Xml.Node]] =
+    override def takeAllNodes: Next[Xml.Nodes] =
       IO.fail(s"No nodes in $this")
 
     override def takeCharacters: Next[Option[String]] =
@@ -33,7 +33,7 @@ private[xml] object Content {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] =
       IO.fail(s"No element in $this")
 
-    override def takeAllNodes: Next[Seq[Xml.Node]] =
+    override def takeAllNodes: Next[Xml.Nodes] =
       IO.fail(s"No nodes in $this")
 
     override def takeCharacters: Next[Option[String]] =
@@ -43,10 +43,10 @@ private[xml] object Content {
       characters.fold[Result](ok)(characters => IO.fail(s"Unparsed characters: $characters"))
   }
 
-  private abstract sealed class HasElements(nextElementNumber: Int, nodes: Seq[Xml.Node]) extends Content {
-    protected final def nextElement(p: Xml.Element => Boolean): (Int, Seq[Xml.Node], Option[Xml.Element]) = {
+  private abstract sealed class HasElements(nextElementNumber: Int, nodes: Xml.Nodes) extends Content {
+    protected final def nextElement(p: Xml.Element => Boolean): (Int, Xml.Nodes, Option[Xml.Element]) = {
       val noLeadingWhitespace = nodes.dropWhile(Xml.isWhitespace)
-      val (result, newNodes) = noLeadingWhitespace.headOption.fold[(Option[Xml.Element], Seq[Xml.Node])]((None, nodes)) {
+      val (result, newNodes) = noLeadingWhitespace.headOption.fold[(Option[Xml.Element], Xml.Nodes)]((None, nodes)) {
         case result: Xml.Element if p(result) => (Some(result), noLeadingWhitespace.tail)
         case _ => (None, nodes)
       }
@@ -57,25 +57,25 @@ private[xml] object Content {
       if (nodes.forall(Xml.isWhitespace)) ok else IO.fail(s"Unparsed nodes: $nodes")
   }
 
-  private final case class Elements(nextElementNumber: Int, nodes: Seq[Xml.Node]) extends HasElements(nextElementNumber, nodes) {
+  private final case class Elements(nextElementNumber: Int, nodes: Xml.Nodes) extends HasElements(nextElementNumber, nodes) {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] = IO.succeed {
-      val (newNextElementNumber: Int, newNodes: Seq[Xml.Node], result: Option[Xml.Element]) = nextElement(p)
+      val (newNextElementNumber: Int, newNodes: Xml.Nodes, result: Option[Xml.Element]) = nextElement(p)
       (copy(nextElementNumber = newNextElementNumber, nodes = newNodes), result)
     }
 
-    override def takeAllNodes: Next[Seq[Xml.Node]] = IO.succeed(copy(nodes = Seq.empty), nodes)
+    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed(copy(nodes = Seq.empty), nodes)
 
     override def takeCharacters: Next[Option[String]] =
       IO.fail(s"No characters in $this")
   }
 
-  private final case class Mixed(nextElementNumber: Int, nodes: Seq[Xml.Node]) extends HasElements(nextElementNumber, nodes) {
+  private final case class Mixed(nextElementNumber: Int, nodes: Xml.Nodes) extends HasElements(nextElementNumber, nodes) {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] = IO.succeed {
-      val (newNextElementNumber: Int, newNodes: Seq[Xml.Node], result: Option[Xml.Element]) = nextElement(p)
+      val (newNextElementNumber: Int, newNodes: Xml.Nodes, result: Option[Xml.Element]) = nextElement(p)
       (copy(nextElementNumber = newNextElementNumber, nodes = newNodes), result)
     }
 
-    override def takeAllNodes: Next[Seq[Xml.Node]] = IO.succeed(copy(nodes = Seq.empty), nodes)
+    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed(copy(nodes = Seq.empty), nodes)
 
     override def takeCharacters: Next[Option[String]] = {
       val (elements: Seq[Xml.Element], characters: Option[String]) = partition(nodes)
@@ -84,7 +84,7 @@ private[xml] object Content {
     }
   }
 
-  def open(nodes: Seq[Xml.Node], contentType: ContentType): IO[Error, Content] = {
+  def open(nodes: Xml.Nodes, contentType: ContentType): IO[Error, Content] = {
     val (elements: Seq[Xml.Element], characters: Option[String]) = partition(nodes)
 
     contentType match {
@@ -106,7 +106,7 @@ private[xml] object Content {
     }
   }
 
-  private def partition(nodes: Seq[Xml.Node]): (Seq[Xml.Element], Option[String]) = {
+  private def partition(nodes: Xml.Nodes): (Seq[Xml.Element], Option[String]) = {
     val (elems, nonElems) = nodes.partition(Xml.isElement)
     val characters = nonElems.map(_.text).mkString.trim
     (elems.map(Xml.asElement), if (characters.isEmpty) None else Some(characters))

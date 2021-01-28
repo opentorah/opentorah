@@ -24,9 +24,9 @@ object Html2 extends DocBook2 {
 
   override def usesCss: Boolean = true
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Seq[Xml.Node] = Seq.empty
+  override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes = Seq.empty
 
-  override protected def customStylesheetBody: Seq[Xml.Node] = Seq(
+  override protected def customStylesheetBody: Xml.Nodes = Seq(
     <xsl:param name="autolabel.elements">
       <db:appendix format="A"/>
       <db:chapter/>
