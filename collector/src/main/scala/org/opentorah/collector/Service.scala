@@ -134,9 +134,9 @@ object Service extends App {
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
       val urlStr: String = Files.mkUrl(path)
 
-      val host: Option[String] = request.uri.authority.map(_.host.value)
+      val host: Option[String] = request.headers.get(CaseInsensitiveString("Host")).map(_.value)
       val staticOnly: Boolean = host.exists(_.startsWith("www."))
-      if (!staticOnly) info(request, s"DYN host=$host; uri=${request.uri}")
+      if (!staticOnly) info(request, s"DYN host=$host")
 
       OptionT(
         if (staticOnly) F.pure(None)
