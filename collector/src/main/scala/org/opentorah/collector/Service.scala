@@ -86,7 +86,7 @@ object Service extends App {
     var site: Option[Site] = None
 
     def getSite(request: Request[ServiceTask]): Site = site.getOrElse {
-      info(request, "initializing site")
+      info(request, "INI")
       val result = Site.read(toUrl(siteUri))
       site = Some(result)
       result
@@ -161,8 +161,9 @@ object Service extends App {
     }
 
     HttpRoutes.of[ServiceTask] {
-      case GET -> Root / "reset-cached-site" =>
+      case request@GET -> Root / "reset-cached-site" =>
         site = None
+        info(request, "RST")
         Ok("Site reset!")
 
       case request@GET -> _ => get(request)
