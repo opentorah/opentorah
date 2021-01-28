@@ -134,10 +134,12 @@ object Service extends App {
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
       val urlStr: String = Files.mkUrl(path)
 
-      val doNotResolve: Boolean = request.uri.authority.map(_.host.value).exists(_.startsWith("www."))
+      val host: Option[String] = request.uri.authority.map(_.host.value)
+      val staticOnly: Boolean = host.exists(_.startsWith("www."))
+      if (!staticOnly) info(request, s"DYN host=$host; uri=${request.uri}")
 
       OptionT(
-        if (doNotResolve) F.pure(None)
+        if (staticOnly) F.pure(None)
         else F.suspend(F.pure(fromSite(path, request)))
       )
       .orElse(StaticFile.fromURL[ServiceTask](
@@ -159,7 +161,10 @@ object Service extends App {
     }
 
     HttpRoutes.of[ServiceTask] {
-      // case GET -> Root / "hello" => Ok("hello!")
+      case GET -> Root / "reset-cached-site" =>
+        site = None
+        Ok("Site reset!")
+
       case request@GET -> _ => get(request)
     }
   }
