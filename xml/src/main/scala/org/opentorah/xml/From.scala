@@ -75,10 +75,7 @@ object From {
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
   private def loadFromUrl(url: URL): IO[Error, Xml.Element] = {
-    if (!Files.isFileUrl(url) && !Files.isJarUrl(url)) {
-      // TODO log!
-      println(s"-- Loading $url")
-    }
+    //if (!Files.isFileUrl(url) && !Files.isJarUrl(url)) println(s"-- Loading $url") // TODO log!
     loadFromSource(new InputSource(url.openStream()))
   }
 

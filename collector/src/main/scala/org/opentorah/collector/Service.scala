@@ -86,7 +86,7 @@ object Service extends App {
     var site: Option[Site] = None
 
     def getSite(request: Request[ServiceTask]): Site = site.getOrElse {
-      info(request, "initializing site")
+      info(request, "INI")
       val result = Site.read(toUrl(siteUri))
       site = Some(result)
       result
@@ -134,10 +134,12 @@ object Service extends App {
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
       val urlStr: String = Files.mkUrl(path)
 
-      val doNotResolve: Boolean = request.uri.authority.map(_.host.value).exists(_.startsWith("www."))
+      val host: Option[String] = request.uri.authority.map(_.host.value)
+      val staticOnly: Boolean = host.exists(_.startsWith("www."))
+      if (!staticOnly) info(request, s"DYN host=$host; uri=${request.uri}")
 
       OptionT(
-        if (doNotResolve) F.pure(None)
+        if (staticOnly) F.pure(None)
         else F.suspend(F.pure(fromSite(path, request)))
       )
       .orElse(StaticFile.fromURL[ServiceTask](
@@ -159,7 +161,11 @@ object Service extends App {
     }
 
     HttpRoutes.of[ServiceTask] {
-      // case GET -> Root / "hello" => Ok("hello!")
+      case request@GET -> Root / "reset-cached-site" =>
+        site = None
+        info(request, "RST")
+        Ok("Site reset!")
+
       case request@GET -> _ => get(request)
     }
   }
