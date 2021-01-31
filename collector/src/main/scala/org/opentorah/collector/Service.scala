@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import cats.data.OptionT
 import cats.effect.{Blocker, ExitCode, Sync}
+import net.logstash.logback.argument.StructuredArgument
 import org.opentorah.util.Files
 //import cats.implicits._
 //import fs2.io
@@ -136,7 +137,7 @@ object Service extends App {
 
       val host: Option[String] = request.headers.get(CaseInsensitiveString("Host")).map(_.value)
       val staticOnly: Boolean = host.exists(_.startsWith("www."))
-      if (!staticOnly) info(request, s"DYN host=$host")
+      if (!staticOnly) info(request, s"DYN host=${host.get}")
 
       OptionT(
         if (staticOnly) F.pure(None)
@@ -196,18 +197,16 @@ object Service extends App {
   private val logger: Logger = LoggerFactory.getLogger("org.opentorah.collector.service.Service")
 
   private def log(request: Option[Request[ServiceTask]], message: String, severity: String): Unit = {
-    val trace: String = request
+    val trace: Option[String] = request
       .flatMap(_
         .headers.get(CaseInsensitiveString("X-Cloud-Trace-Context"))
         .map(_.value.split("/")(0))
       )
-      .getOrElse("no-trace")
 
-    logger.info(
-      message,
-      StructuredArguments.keyValue("severity", severity),
-      StructuredArguments.keyValue("logging.googleapis.com/trace", s"projects/$projectId/traces/$trace"),
-      null
-    )
+    val arguments: Seq[StructuredArgument] =
+      Seq(StructuredArguments.keyValue("severity", severity)) ++
+      trace.toSeq.map(trace => StructuredArguments.keyValue("logging.googleapis.com/trace", s"projects/$projectId/traces/$trace"))
+
+    logger.info(message, arguments: _*)
   }
 }

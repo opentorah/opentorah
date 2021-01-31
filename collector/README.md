@@ -1,7 +1,5 @@
 ## Static / Dynamic ##
 
-Code in the `collector` module pre-generates the static store.alter-rebbe.org site and syncs it into the Google Cloud Storage bucket.
-
 We are moving towards making the site dynamic, so that we can add:  
 - search functionality;
 - ability to modify the site.
@@ -26,6 +24,16 @@ To set Application Default Credentials that Cloud Code in the IDE needs:
   $ gcloud auth login --update-adc
 ```
 
+## Store ##
+
+On 2020-12-06: store data is now served from a Google Storage Bucket (and not from GitHub Pages):
+- created `store.alter-rebbe.org` bucket;
+- made it public;
+- pointed CNAME record at it
+
+Code in the `collector` module is called from the `alter-rebbe` project to pre-generate the static store.alter-rebbe.org
+site (which it then syncs into the Google Cloud Storage bucket).
+
 ## Facsimiles ##
 
 - created bucket `facsimiles.alter-rebbe.org` with:
@@ -41,18 +49,6 @@ Added `404.html` and set it as the error page in the website configuration of th
 
 Facsimiles displayed on the site come from that bucket;
 they can be retrieved by anyone who has the correct URL.
-
-To validate that facsimiles referenced from the site are in one-to-one correspondence with
-the files in the bucket, we probably need to use Google Cloud Storage client to retrieve
-(and cache) the list of them.
-
-To sync local copy of the bucket into it with `gsutil`:
-```
-  $ gsutil -m rsync -d -r <local copy> gs://facsimile.alter-rebbe.org
-```
-
-Note: Since `facsimiles.alter-rebbe.org` was then taken by the bucket in the previous incarnation of the project
-under dup@podval.org account, intermediate bucket was used to migrate the facsimiles into the new project's bucket.
 
 Note: Chrome [tightened the nuts on the mixed content](https://blog.chromium.org/2019/10/no-more-mixed-messages-about-https.html),
 so links to individual photograph in the facsimile page have to use HTTPS now.
@@ -88,14 +84,6 @@ To sync with the bucket:
   $ gsutil -m rsync -r -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
 ```
 
-## Store ##
-
-On 2020-12-06 started moving towards storing the store data in a Google Storage Bucket:
-- created `store.alter-rebbe.org` bucket;
-- made it public;
-- pointed CNAME record at it;
-
-
 ## JIB ##
 
 Everything is Dockerized nowadays. To make docker work locally,
@@ -121,6 +109,36 @@ build and push my Docker image:
 ```
 Image layers are in the `artifacts.alter-rebbe-2.appspot.com/containers/images` bucket that
 was auto-created (with fine-grained access control).
+
+### Running locally ###
+
+To run locally in the environment equivalent to Google Cloud Run, I need to install:
+- [minikube](https://minikube.sigs.k8s.io/docs/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [knative](https://knative.dev/docs/install/any-kubernetes-cluster/)
+- [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
+- [Istio](https://knative.dev/docs/install/installing-istio/)
+- [skaffold](https://skaffold.dev/) (probably)
+
+run as a service account: https://cloud.google.com/run/docs/configuring/service-accounts plugin in IntelliJ Idea
+does not make JIB builder available for my project in
+  `Cloud Code | Cloud Run | Run Locally` Run configuration, so I am running in plain local Docker,
+which is much simpler:
+
+Build the image to local Docker:
+```
+  $ ./gradlew jibDockerBuild
+```
+and run it:
+```
+  $ docker run --name collector --rm --cpus 1 --memory 512Mi --env PORT=8080 --publish 4000:8080 gcr.io/alter-rebbe-2/collector
+```
+
+To avoid duplication of the parameters between the Service YAML file and the task that runs the service in the local Docker,
+I enhanced my Cloud Run Gradle plugin to pre-configure such tasks.
+
+Turns out, for ZIO effects and unsafeRuns to work in the CPU-constrained environment,
+care needs to be taken witn the thread-pools.
 
 ## Cloud Run ##
 
@@ -182,27 +200,6 @@ I pointed `www.alter-rebbe.org` at the dynamic app, and configured it to proxy f
 
 I do not see the need to set up [Cloud Build](https://cloud.google.com/cloud-build),
 but if I do - it runs locally too!
-
-### Running in local Docker ###
-
-To run the container locally, build it to local Docker:
-```
-  $ ./gradlew jibDockerBuild
-```
-or, if pushed to a repository, pull it from there:
-```
-  $ docker pull <image name>
-```
-and then:
-```
-  $ docker run <image name>
-```
-
-
-To set entry point variables and environment variables:
-```
-  $ docker run -e "NAME=VALUE" <image name> <arg1> <arg2> <arg3>
-```
 
 ## Service Account ##
 
@@ -276,6 +273,20 @@ In October 2020, `--min-instances` option to gcloud run deploy became available 
 in November 2020, I switched to using it (I estimate under $10 a month for one kept-warm instance).
 If this works out, I won't need the CRON job anymore.
 
-Another advantage of configuring property name instead of the key itself is: in CI environment,
-the key is normally supplied (via an environment variable) only to the steps that need it;
-by retrieving the key only when it is needed, we avoid...
+
+## TODO ##
+- [ ] review Cloud Run [features](https://cloud.google.com/blog/products/serverless/looking-back-on-cloud-runs-first-year-since-ga) 
+- [ ] run as a service account: https://cloud.google.com/run/docs/configuring/service-accounts  
+- [ ] use [API Gateway](https://cloud.google.com/blog/products/serverless/google-cloud-api-gateway-is-now-available-in-public-beta)
+  to glue buckets and services together by URL mapping. etc.
+- [ ] Memorystore/Redis turned out to be too expensive (Google charges for *provisioned* capacity),
+  so the fact that Cloud Run probably can't talk to it even now (4/2020) isn't important :(
+- [ ] I may end up using [Cloud Firestore](__https://firebase.google.com/docs/firestore__) for caching generated
+  (and maybe even source) files.
+- [ ] does [Config Connector](https://cloud.google.com/config-connector/docs/reference/overview)
+  work with Cloud Run? Should I use it?
+- [ ] use [Tips](https://cloud.google.com/run/docs/tips/java) to configure memory size;
+  I see Cache evictions under memory pressure locally and do not see OOM even with 128MB;
+  lemme configur the thing in Cloud Run with 256 and see if it holds up...
+- [ ] update this write-up;  
+  

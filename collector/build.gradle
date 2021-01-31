@@ -32,9 +32,12 @@ dependencies {
   implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
 }
 
-// TODO IntelliJ Idea does not make JIB builder available for
-//   Cloud Code | Cloud Run | Run Locally Run configuration...
-
 jib.container.mainClass = 'org.opentorah.collector.Service'
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)
+
+cloudRunLocal.port = 4000
+cloudRunLocal.additionalOptions = [
+  '--mount', 'type=bind,source=/home/dub/OpenTorah/alter-rebbe.org/,target=/mnt/store/',
+  '--env'  , 'STORE=file:///mnt/store/'
+]

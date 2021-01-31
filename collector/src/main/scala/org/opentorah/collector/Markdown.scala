@@ -46,7 +46,7 @@ object Markdown {
 
   private def render(ast: Node): Xml.Element = {
     val html: String = renderer.render(ast)
-    Runtime.default.unsafeRun(From.string("flexmark", s"<div>$html</div>").load)
+    org.opentorah.xml.Parser.unsafeRun(From.string("flexmark", s"<div>$html</div>").load)
   }
 
   private lazy val options: DataHolder = {

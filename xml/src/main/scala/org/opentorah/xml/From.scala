@@ -3,6 +3,7 @@ package org.opentorah.xml
 import java.io.{File, StringReader}
 import java.net.URL
 import org.opentorah.util.{Files, Util}
+import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.InputSource
 import scala.xml.XML
 import zio.IO
@@ -17,6 +18,7 @@ sealed abstract class From(val name: String) {
 }
 
 object From {
+  private val log: Logger = LoggerFactory.getLogger(classOf[From])
 
   private final class FromXml(
     name: String,
@@ -75,7 +77,8 @@ object From {
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
   private def loadFromUrl(url: URL): IO[Error, Xml.Element] = {
-    //if (!Files.isFileUrl(url) && !Files.isJarUrl(url)) println(s"-- Loading $url") // TODO log!
+    //if (!Files.isFileUrl(url) && !Files.isJarUrl(url))
+      log.info(s"loadFromUrl($url)")
     loadFromSource(new InputSource(url.openStream()))
   }
 

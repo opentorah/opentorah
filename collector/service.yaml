@@ -8,9 +8,11 @@ spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/maxScale: "2"
         autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "2"
     spec:
+      containerConcurrency: 80
+      timeoutSeconds: 120
       containers:
       - image: "gcr.io/alter-rebbe-2/collector"
         ports:
@@ -18,6 +20,4 @@ spec:
         resources:
           limits:
             cpu: "1000m"
-            memory: "512Mi"
-      containerConcurrency: 80
-      timeoutSeconds: 60
+            memory: "256Mi"
