@@ -19,13 +19,16 @@ jobs:
         with:
           java-version: 11
 
-      - name: "Build and test"
-        run: ./gradlew --no-daemon --console=plain build
+#      - name: "Build and test"
+#        run: ./gradlew --no-daemon --console=plain build
 
-      - name: "Upload to Bintray"
-        env:
-          bintrayApiKey: ${{secrets.bintrayApiKey}}
-        run: ./gradlew --no-daemon --console=plain bintrayUpload
+      - name: "Assemble"
+        run: ./gradlew --no-daemon --console=plain assemble
+
+#      - name: "Upload to Bintray"
+#        env:
+#          bintrayApiKey: ${{secrets.bintrayApiKey}}
+#        run: ./gradlew --no-daemon --console=plain bintrayUpload
 
       - name: "Build and push container image to GCR and deploy Cloud Run service"
         env:

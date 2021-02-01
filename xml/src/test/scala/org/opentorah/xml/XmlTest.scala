@@ -10,7 +10,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   def parseOrError[A](parser: Parser[A]): Either[Error, A] =
     Parser.run(Parser.runnable(parser).either)
 
-  def loadResource(name: String): Xml.Element = Parser.load(From.resource(Parser, name))
+  def loadResource(name: String): Xml.Element = Parser.run(From.resource(Parser, name).load)
 
   def parseResource(name: String): org.w3c.dom.Element =
     Saxon.Saxon10.parse(new InputSource(Parser.getClass.getResourceAsStream(name + ".xml")))

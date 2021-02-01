@@ -39,7 +39,7 @@ object Xml extends Model {
       resultState <- ZIO.access[S](identity)
     } yield (resultElement, resultState)
 
-    Runtime.default.unsafeRun(result.provide(state))
+    Parser.unsafeRun(result.provide(state))
   }
 
   def descendants(xml: Node, name: String): Seq[Element] =

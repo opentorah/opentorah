@@ -1,6 +1,7 @@
 package org.opentorah.xml
 
 import zio.{IO, Runtime, ZIO}
+import zio.blocking.Blocking
 
 object Parser {
 
@@ -18,8 +19,6 @@ object Parser {
 
   def mapValues[A, B, C](map: Map[A, B])(f: B => Parser[C]): Parser[Map[A, C]] =
     collectAll(map.toSeq.map { case (a, b) => f(b).map(a -> _) }).map(_.toMap)
-
-  private[xml] def effect[A](f: => A): IO[Error, A] = IO(f).mapError(_.getMessage)
 
   def check(condition: Boolean, message: => String): Result =
     if (condition) ok else IO.fail(message)
@@ -39,7 +38,19 @@ object Parser {
 
   // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))
   private[xml] final def run[A](toRun: IO[Error, A]): A =
-    Runtime.default.unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
+    unsafeRun(toRun.mapError(error => throw new IllegalArgumentException(error)))
 
-  final def load(from: From): Xml.Element = Parser.run(from.load)
+  // Note: when running with 1 cpu (on Cloud Run or in local Docker),
+  // take care to avoid deadlocks:
+
+  // Note: using blockingRuntime to avoid deadlocks with nested unsafeRun() calls:
+  private val blockingRuntime: Runtime[_] = Runtime.default.withExecutor(Blocking.Service.live.blockingExecutor)
+  // TODO this is reused from Markdown - yuck...
+  def unsafeRun[E, A](zio: => IO[E, A]): A = {
+    blockingRuntime.unsafeRun[E, A](zio)
+  }
+
+  // Note: run effects on the blocking threadpool:
+  private[xml] def effect[A](f: => A): IO[Error, A] =
+    Blocking.Service.live.effectBlocking(f).mapError(_.getMessage)
 }
