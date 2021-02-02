@@ -11,7 +11,6 @@ final class Collection(
   override val names: Names,
   val pageType: Page.Type,
   val alias: Option[String],
-  val hierarchicalFacsimiles: Boolean,
   override val title: Title.Value,
   override val storeAbstract: Option[Abstract.Value],
   override val body: Option[Body.Value],
@@ -33,9 +32,7 @@ final class Collection(
   private def collectionDocuments: Collection.Documents = getDirectory
 
   def facsimileUrl(site: Site): String = {
-    val pathStr =
-      if (alias.isDefined && !hierarchicalFacsimiles) alias.get
-      else site.store2path(this).map(_.structureName).mkString("/")
+    val pathStr = site.store2path(this).map(_.structureName).mkString("/")
     site.facsimilesUrl + pathStr  + "/"
   }
 
@@ -84,35 +81,25 @@ final class Collection(
       else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
     }
 
-    final case class Column(
-      heading: String,
-      cssClass: String,
-      value: Document => Xml.Nodes
-    )
+    val columns: Seq[Collection.Column] = Seq[Collection.Column](
+      Collection.descriptionColumn,
+      Collection.dateColumn,
+      Collection.authorsColumn,
+      Collection.addresseeColumn,
+      languageColumn(site),
 
-    val columns: Seq[Column] = Seq[Column](
-      Column("Описание", "description", _.getDescription),
-      Column("Дата", "date", _.getDate),
-      Column("Кто", "author", _.getAuthors),
-      Column("Кому", "addressee", _.getAddressee),
-
-      Column("Язык", "language", { document: Document =>
-        Seq(Xml.mkText(document.lang)) ++ translations(document).flatMap(translation =>
-          Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang)))
-      }),
-
-      Column("Документ", "document", { document: Document =>
+      Collection.Column("Документ", "document", { document: Document =>
         textFacet.of(document).a(site)(text = document.baseName)
       }),
 
-      Column("Страницы", "pages", { document: Document =>
+      Collection.Column("Страницы", "pages", { document: Document =>
         val text: Document.TextFacet = textFacet.of(document)
         for (page <- document.pages(pageType)) yield page.pb.addAttributes(
           text.a(site, part = Some(Pb.pageId(page.pb.n)))(text = page.displayName)
         )
       }),
 
-      Column("Расшифровка", "transcriber", _.getTranscribers)
+      Collection.transcribersColumn
     )
 
     <div>
@@ -122,8 +109,8 @@ final class Collection(
           part.title.fold[Xml.Nodes](Seq.empty)(title =>
             <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
           ) ++
-          part.documents.map(data =>
-            <tr>{for (column <- columns) yield <td class={column.cssClass}>{column.value(data)}</td>}</tr>
+          part.documents.map(document =>
+            <tr>{for (column <- columns) yield <td class={column.cssClass}>{column.value(document)}</td>}</tr>
           )
         }}
       </table>
@@ -132,9 +119,45 @@ final class Collection(
       {listMissing("непустых", page => !page.pb.isEmpty)}
     </div>
   }
+
+  def documentHeader(document: Document): Xml.Element = {
+    val columns: Seq[Collection.Column] = Seq[Collection.Column](
+      Collection.descriptionColumn,
+      Collection.dateColumn,
+      Collection.authorsColumn,
+      Collection.addresseeColumn,
+      Collection.transcribersColumn
+    )
+
+    <table class="document-header">{
+      for (column <- columns) yield
+      <tr>
+        <td class="heading">{column.heading}</td>
+        <td class="value">{column.value(document)}</td>
+      </tr>
+    }</table>
+  }
+
+  private def languageColumn(site: Site): Collection.Column =
+    Collection.Column("Язык", "language", { document: Document =>
+      Seq(Xml.mkText(document.lang)) ++ translations(document).flatMap(translation =>
+        Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang)))
+    })
 }
 
 object Collection extends Element[Collection]("collection") {
+
+  final case class Column(
+    heading: String,
+    cssClass: String,
+    value: Document => Xml.Nodes
+  )
+
+  val descriptionColumn : Column = Column("Описание", "description", _.getDescription)
+  val dateColumn        : Column = Column("Дата", "date", _.getDate)
+  val authorsColumn     : Column = Column("Кто", "author", _.getAuthors)
+  val addresseeColumn   : Column = Column("Кому", "addressee", _.getAddressee)
+  val transcribersColumn: Column = Column("Расшифровка", "transcriber", _.getTranscribers)
 
   final class Alias(val collection: Collection) extends Store with HtmlContent {
 
@@ -222,8 +245,6 @@ object Collection extends Element[Collection]("collection") {
     private val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
     private val pageTypeAttribute: Attribute.OrDefault[String] = Attribute("pageType", default = "manuscript").orDefault
     private val aliasAttribute: Attribute.Optional[String] = Attribute("alias").optional
-    private val hierarchicalFacsimilesAttribute: Attribute.OrDefault[Boolean] =
-      new Attribute.BooleanAttribute("hierarchicalFacsimiles").orDefault
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
 
     override def parser: Parser[Collection] = for {
@@ -234,7 +255,6 @@ object Collection extends Element[Collection]("collection") {
       storeAbstract <- abstractElement()
       body <- bodyElement()
       alias <- aliasAttribute()
-      hierarchicalFacsimiles <- hierarchicalFacsimilesAttribute()
       directory <- directoryAttribute()
       parts <- CollectionPart.seq()
     } yield new Collection(
@@ -242,7 +262,6 @@ object Collection extends Element[Collection]("collection") {
       names,
       Page.values.find(_.name == pageType).get,
       alias,
-      hierarchicalFacsimiles,
       title,
       storeAbstract,
       body,
@@ -257,7 +276,6 @@ object Collection extends Element[Collection]("collection") {
       abstractElement(_.storeAbstract),
       bodyElement(_.body),
       aliasAttribute(_.alias),
-      hierarchicalFacsimilesAttribute(_.hierarchicalFacsimiles),
       directoryAttribute(_.directory),
       CollectionPart.seq(_.parts)
     )

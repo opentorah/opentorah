@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, Pb, Tei}
-import org.opentorah.xml.{Attribute, Elements, Html, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Elements, Parsable, Parser, Unparser, Xml}
 
 final class Document(
   override val name: String,
@@ -29,14 +29,6 @@ final class Document(
     .map(EntityReference.xmlElement))
 
   def pages(pageType: Page.Type): Seq[Page] = for (pb <- pbs) yield pageType(pb)
-
-  def headerSummary: Xml.Element =
-    <table xmlns={Html.namespace.uri} class="document-header">
-      <tr><td colspan="2">{getDescription}</td></tr>
-      <tr><td>Дата</td> <td>{getDate}</td></tr>
-      <tr><td>Кто </td> <td>{getAuthors}</td></tr>
-      <tr><td>Кому</td> <td>{getAddressee}</td></tr>
-    </table>
 }
 
 object Document extends Directory.EntryMaker[Tei, Document]("document") {
@@ -91,7 +83,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
 
     override def content(site: Site): Xml.Element =
       <div>
-        {document.headerSummary}
+        {collection.documentHeader(document)}
         {getTei.body.xml}
       </div>
   }
@@ -110,10 +102,11 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
 
     override def content(site: Site): Xml.Element =
       <div class={Viewer.Facsimile.name}>
-        {document.headerSummary}
+        {collection.documentHeader(document)}
         <div class="facsimileScroller">{
           val text: TextFacet = collection.textFacet.of(document)
           val facsimileUrl: String = collection.facsimileUrl(site)
+          // TODO verify that the file exists!
 
           for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
