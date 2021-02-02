@@ -1,5 +1,6 @@
 package org.opentorah.tei
 
+import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Dialect, Element, From, Html, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import zio.{URIO, ZIO}
 
@@ -75,21 +76,33 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
     element.label match {
       case label if EntityType.isName(label) =>
         require(!Xml.isEmpty(children), element)
-        link(EntityName.refAttribute.get(element), _.findByRef(_)).map(_(children))
+        val ref: Option[String] = EntityName.refAttribute.get(element)
 
-      case Ref.elementName =>
+        if (ref.isEmpty)
+          ZIO.succeed(Html.a()(children))
+        else
+          ZIO.access[Html.State](_.resolver.findByRef(ref.get)).map(_.
+            getOrElse(Html.a(path = ref.toSeq))
+            (children)
+          )
+
+      case "ref" =>
         require(!Xml.isEmpty(children), element)
-        link(Some(targetAttribute.get(element)), _.resolve(_)).map(_(children))
+        reference(element).map(_(children))
 
       case "ptr" =>
         require(Xml.isEmpty(children), element)
-        link(Some(targetAttribute.get(element)), _.resolve(_)).map(_(Seq.empty))
+        reference(element).map(_(Seq.empty))
 
       // TODO feed pageId through State to obtain unique id
       case Pb.elementName =>
         require(Xml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
-        link(Some(pageId), _.facs(_), id = Some(pageId)).map(_(facsimileSymbol))
+        ZIO.access[Html.State](_.resolver.facs(pageId)).map(_
+          .getOrElse(Html.a(path = Seq(pageId)))
+          .copy(id = Some(pageId))
+          (text = facsimileSymbol)
+        )
 
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
@@ -112,6 +125,20 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
 
       case _ =>
         ZIO.succeed(element)
+    }
+  }
+
+  private def reference(element: Xml.Element): URIO[Html.State, Html.a] = {
+    val href: String = targetAttribute.get(element)
+
+    // TODO maybe just call up regardless?
+    if (!href.startsWith("/")) ZIO.succeed(Html.a(path = Seq(href), pathIsAbsolute = true)) else {
+      val (url: String, part: Option[String]) = Files.urlAndPart(href)
+
+      ZIO.access[Html.State](_.resolver.resolve(Files.splitUrl(url))).map(_
+        .getOrElse(Html.a(path = Seq(href)))
+        .copy(part = part)
+      )
     }
   }
 }

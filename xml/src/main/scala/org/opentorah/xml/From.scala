@@ -78,7 +78,7 @@ object From {
 
   private def loadFromUrl(url: URL): IO[Error, Xml.Element] = {
     //if (!Files.isFileUrl(url) && !Files.isJarUrl(url))
-      log.info(s"loadFromUrl($url)")
+    //  log.info(s"loadFromUrl($url)")
     loadFromSource(new InputSource(url.openStream()))
   }
 

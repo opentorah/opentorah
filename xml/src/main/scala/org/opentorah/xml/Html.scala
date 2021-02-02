@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Files
-import zio.{URIO, ZIO}
+import zio.URIO
 
 object Html extends Dialect with Doctype {
 
@@ -20,8 +20,11 @@ object Html extends Dialect with Doctype {
   val reservedAttributes: Set[String] = Set("class", "target", "lang")
 
   // TODO use instead of the <a> throughout!
+  // TODO carry some kind of an URL instead of path, isPathAbsolute, part -
+  //   and remove Html.a(path = Seq(???)...
   final case class a(
     path: Seq[String] = Seq.empty,
+    pathIsAbsolute: Boolean = false,
     part: Option[String] = None,
     target: Option[String] = None,
     id: Option[String] = None,
@@ -41,7 +44,7 @@ object Html extends Dialect with Doctype {
     def apply(children: Xml.Nodes): Xml.Element = {
       val href: Option[String] =
         if (path.isEmpty) part.map(part => s"#$part")
-        else Some(Files.mkUrl(Files.addPart(path, part)))
+        else Some(Files.addPart(path, part).mkString(if (!pathIsAbsolute) "/" else "", "/", ""))
 
       val `class`: Option[String] =
         if (classes.isEmpty) None else Some(classes.mkString(" "))
@@ -103,20 +106,6 @@ object Html extends Dialect with Doctype {
     protected def elementTransform(element: Xml.Element): URIO[State, Xml.Element]
 
     protected def isEndNote(element: Xml.Element): Boolean
-
-    // TODO generalize so that the url path is already a Seq[String] here...
-    final protected def link(
-      ref: Option[String],
-      r: (LinkResolver, String) => Option[Html.a],
-      id: Option[String] = None
-    ): URIO[State, Html.a] = ref
-      .map(ref => ZIO.access[State](state => r(state.resolver, ref)))
-      .getOrElse(ZIO.none)
-      .map(a => Html.a(
-        path = if (a.isDefined && a.get.path.nonEmpty) a.get.path else ref.toSeq,
-        target = a.flatMap(_.target),
-        id = id
-      ))
 
     def toHtml(resolver: LinkResolver, element: Xml.Element): Xml.Element = {
       def runTransform(element: Xml.Element): (Xml.Element, State) = Xml.runTransform(

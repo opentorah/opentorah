@@ -32,7 +32,21 @@ dependencies {
   implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
 }
 
+jib.from.image = 'gcr.io/distroless/java:11'
 jib.container.mainClass = 'org.opentorah.collector.Service'
+
+//In service.yaml:
+//env:
+//- name: JAVA_TOOL_OPTIONS
+//value: <JVM flags>
+jib.container.jvmFlags = [
+//   '-XX:+PrintFlagsFinal'
+//    -XX:MinRAMPercentage
+//    -XX:MaxRAMPercentage
+//    -XX:InitialRAMPercentage
+]
+// result: MaxHeapSize, which seems to be 1/2, not 1/4 of the memory...
+
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)
 
