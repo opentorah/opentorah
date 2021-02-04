@@ -3,17 +3,17 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
-configureLibrary(['Scala', 'MathML', 'MathJax', 'JEuclid', 'FOP', 'Pdf'])
+configureLibrary()
 
 dependencies {
-  implementation project(':xml')
-  implementation project(':util')
+  implementation project(':opentorah-xml')
+  implementation project(':opentorah-util')
 
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"
   implementation "saxon:saxon:$saxon6Version"
@@ -30,8 +30,9 @@ dependencies {
     exclude group: 'com.sun.media', module: 'jai-codec'
   }
 
-  implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
-  implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
+  // TODO probably used by JEuclid; drop support for it and V8...
+//  implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
+//  implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
 
   // Hyphenation patterns
   implementation "net.sf.offo:fop-hyph:$fopHyphVersion"

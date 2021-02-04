@@ -9,7 +9,7 @@ configurePaper(
 )
 
 dependencies {
-  implementation project(':calendar')
+  implementation project(':opentorah-calendar')
   implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 }
 

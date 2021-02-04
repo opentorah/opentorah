@@ -1,6 +1,4 @@
 ext.configureScala = {
-  final boolean addSlf4jImplementationForTests = true
-  ->
   dependencies {
     // zinc
     //   first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
@@ -10,6 +8,7 @@ ext.configureScala = {
     //   just fine ;)
 
     implementation "org.scala-lang:scala-library:$scalaVersion"
+//    implementation "org.scala-lang:scala3-library_$scalaVersionMajor:$scalaVersion"
 
     compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
 
@@ -23,12 +22,7 @@ ext.configureScala = {
     testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
   }
 
-  if (addSlf4jImplementationForTests) {
-    dependencies {
-      testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
-    }
-  }
-
+  // TODO move into the main build file
   tasks.withType(ScalaCompile) {
     scalaCompileOptions.with {
       targetCompatibility = '1.8'

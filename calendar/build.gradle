@@ -3,17 +3,17 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
-configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
+configureLibrary()
 
 dependencies {
-  implementation project(':metadata')
-  implementation project(':util')
+  implementation project(':opentorah-metadata')
+  implementation project(':opentorah-util')
 
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
 }

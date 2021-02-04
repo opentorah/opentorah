@@ -3,16 +3,16 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Jewish Readings and Learning Schedules'
 
-configureLibrary(['Scala', 'Jewish', 'Calendar', 'Torah'])
+configureLibrary()
 
 dependencies {
-  api project(':calendar')
-  api project(':texts')
+  api project(':opentorah-calendar')
+  api project(':opentorah-texts')
 
-  implementation project(':util')
+  implementation project(':opentorah-util')
 }

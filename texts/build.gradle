@@ -3,15 +3,17 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Jewish Texts'
 
-configureLibrary(['Scala', 'Jewish', 'Torah', 'Rambam'])
+configureLibrary()
 
 dependencies {
-  api project(':store')
+  //api project(':opentorah-store')
+  api project(':opentorah-metadata')
+  api project(':opentorah-tei')
 
-  implementation project(':util')
+  implementation project(':opentorah-util')
 }

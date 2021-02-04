@@ -3,12 +3,12 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Open Torah Store'
 
-configureLibrary(['Scala', 'Jewish', 'TEI'])
+configureLibrary()
 
 dependencies {
   api project(':metadata')

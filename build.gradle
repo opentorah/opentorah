@@ -1,22 +1,7 @@
-// See http://dub.podval.org/2020/06/29/bintray-gradle-plugin.html for the reasons
-// this `buildscript` block is here and Bintray plugin is applied to the root project.
-// TODO see https://github.com/GoogleContainerTools/jib/blob/master/docs/faq.md#i-am-seeing-method-not-found-or-class-not-found-errors-when-building
-// - maybe that is a simpler solution? Update the blog then...
-buildscript {
-  dependencies {
-    classpath ("org.apache.httpcomponents:httpclient") {
-      version {
-        strictly '4.5.10'
-      }
-    }
-  }
-}
-
 plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
-  id 'com.jfrog.bintray' apply false
 }
 
 idea {
@@ -36,7 +21,6 @@ subprojects {
   version = projectVersion
 
   repositories {
-    jcenter()
     mavenCentral()
   }
 

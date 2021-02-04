@@ -2,10 +2,10 @@ package org.opentorah
 
 /** Number System.
   *
-  * Each number system `S` (derived from [[org.opentorah.numbers.Number]])
-  * supports two flavors of [[org.opentorah.numbers.Number]]:
-  * `S#Point` (derived from [[org.opentorah.numbers.PointNumber]] and
-  * `S#Vector` (derived from [[org.opentorah.numbers.VectorNumber]].
+  * Each number system `S` (derived from [[org.opentorah.numbers.Numbers#Number]])
+  * supports two flavors of [[org.opentorah.numbers.Numbers#Number]]:
+  * `S#Point` (derived from [[org.opentorah.numbers.Numbers#PointNumber]] and
+  * `S#Vector` (derived from [[org.opentorah.numbers.Numbers#VectorNumber]].
   *
   * This distinction allows definitions of operations to be constrained to the types where
   * a give operation makes sense:
