@@ -41,3 +41,15 @@ Since it is impossible to have a file in Git where only the last revision is kep
 but revision history is automatically discarded, and for the generated files
 (like HTML, PDF and EPUB of the papers) to be visible on the site they need to be checked in,
 I might end up pruning their history periodically using `$ git filter-repo`...
+
+## Module Dependencies ##
+```
+util         *used by all*
+xml          fop   docbook[xml]             (xml, but not metadata)
+metadata     tei[api metadata]
+calendar                                    (metadata, but no tei)
+             texts[api metadata, api tei]
+             collector[api metadata, tei]   (tei, but no texts or calendar(yet))  
+schedule[api calendar, api texts]
+calendar-service             
+```

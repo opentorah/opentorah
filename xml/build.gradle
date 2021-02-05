@@ -45,6 +45,5 @@ dependencies {
   compileOnly "saxon:saxon:$saxon6Version" // Saxon 6 (XSLT 1.0)
   compileOnly "net.sf.saxon:Saxon-HE:$saxon10Version" // Saxon 10 (XSLT 2.0)
 
-  testImplementation "net.sf.saxon:Saxon-HE:$saxon10Version"
-  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+  testRuntimeOnly "net.sf.saxon:Saxon-HE:$saxon10Version"
 }

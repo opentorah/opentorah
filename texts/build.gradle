@@ -16,6 +16,4 @@ dependencies {
   api project(':opentorah-tei')
 
   implementation project(':opentorah-util')
-
-  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }
