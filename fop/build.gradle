@@ -58,4 +58,6 @@ dependencies {
 
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
+
+  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }
