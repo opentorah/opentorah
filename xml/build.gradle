@@ -3,12 +3,12 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Open Torah XML'
 
-configureLibrary(['Scala', 'XML'])
+configureLibrary()
 
 // Note: I tried using Gradle 'variant':
 //java {
@@ -33,7 +33,7 @@ configureLibrary(['Scala', 'XML'])
 // - they need to be supplied as 'runtimeOnly' where needed.
 
 dependencies {
-  implementation project(':util')
+  implementation project(':opentorah-util')
 
   api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"  // TODO api?
   api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
@@ -46,4 +46,5 @@ dependencies {
   compileOnly "net.sf.saxon:Saxon-HE:$saxon10Version" // Saxon 10 (XSLT 2.0)
 
   testImplementation "net.sf.saxon:Saxon-HE:$saxon10Version"
+  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }

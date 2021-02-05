@@ -4,20 +4,19 @@ plugins {
   id 'com.github.maiflai.scalatest'
   id 'java-gradle-plugin'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
   id 'com.gradle.plugin-publish'
 }
 
 version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
-final List<String> projectTags = ['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid']
-configureLibrary(projectTags, false)
+configureLibrary(false)
 
 dependencies {
-  implementation project(':fop')
-  implementation project(':xml')
-  implementation project(':util')
+  implementation project(':opentorah-fop')
+  implementation project(':opentorah-xml')
+  implementation project(':opentorah-util')
 
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
 }
@@ -29,7 +28,7 @@ test {
 
 gradlePlugin {
   plugins {
-    docBookPlugin {
+    docBook {
       id = 'org.opentorah.docbook'
       implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
     }
@@ -41,10 +40,10 @@ pluginBundle {
   vcsUrl  = 'https://github.com/opentorah/opentorah/tree/master/docbook' //.git' ?
 
   plugins {
-    docBookPlugin {
+    docBook {
       displayName = project.description
       description = project.description
-      tags        = projectTags
+      tags        = ['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid']
     }
   }
 

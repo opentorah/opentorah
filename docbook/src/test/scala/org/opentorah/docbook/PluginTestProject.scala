@@ -54,7 +54,7 @@ class PluginTestProject private(
           |}
           |
           |repositories {
-          |  jcenter()
+          |  mavenCentral()
           |}
           |
           |docBook {

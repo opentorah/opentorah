@@ -123,7 +123,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id 'org.opentorah.docbook' version '0.7.49'
+  id 'org.opentorah.docbook' version '0.8.1'
 }
 ```
 
@@ -131,7 +131,7 @@ Plugin needs to be able to resolve DocBook XSLT stylesheets artifacts, so:
 
 ```groovy
 repositories {
-  jcenter()
+  mavenCentral()
 }
 ```
 

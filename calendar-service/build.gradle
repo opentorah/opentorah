@@ -16,6 +16,6 @@ configureService()
 //}
 
 dependencies {
-  implementation project(':schedule')
-  implementation project(':util')
+  implementation project(':opentorah-schedule')
+  implementation project(':opentorah-util')
 }

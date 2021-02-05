@@ -76,7 +76,7 @@ trait Numbers {
     /** Returns this number rounded to the `position`. */
     final def roundTo(length: Int): N = companion.fromDigits(Numbers.this.roundTo(digits, length))
 
-    /** Converts this number to [[BigRational]]. */
+    /** Converts this number to [[org.opentorah.numbers.BigRational]]. */
     final def toRational: BigRational = to[BigRational]
 
     /** Converts this number to `Double`. */
@@ -152,7 +152,8 @@ trait Numbers {
     /** Returns this Vector divided by the specified Int with up to length digits after the point. */
     final def /(n: Int, length: Int): Vector = this.*(BigRational(n).invert, length)
 
-    /** Returns this Vector multiplied by the specified [[BigRational]] with up to length digits after the point. */
+    /** Returns this Vector multiplied by the specified [[org.opentorah.numbers.BigRational]]
+      * with up to length digits after the point. */
     final def *(that: BigRational, length: Int): Vector =
       Vector.fromRational(this.toRational*that, math.max(this.length, length))
 

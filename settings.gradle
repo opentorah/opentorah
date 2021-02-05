@@ -1,35 +1,56 @@
 pluginManagement {
   repositories {
-    jcenter()
+    mavenCentral()
     gradlePluginPortal()
   }
 
   plugins {
     id 'com.github.ben-manes.versions' version '0.36.0'
     id 'com.github.maiflai.scalatest' version '0.30'
-    id 'com.jfrog.bintray' version '1.8.5'
     id 'com.google.cloud.tools.jib' version '2.7.1'
-    id 'org.podval.tools.cloudrun' version '0.1.4'
+    id 'org.podval.tools.cloudrun' version '0.1.5'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
   }
 }
 
 include ':util'
+project(":util").name = "opentorah-util"
+
 include ':xml'
+project(":xml").name = "opentorah-xml"
+
 include ':metadata'
+project(":metadata").name = "opentorah-metadata"
 
 include ':tei'
-include ':store'
+project(":tei").name = "opentorah-tei"
+
+// For now, there is nothing there...
+//include ':store'
+//project(":store").name = "opentorah-store"
+
 include ':texts'
+project(":texts").name = "opentorah-texts"
+
 
 include ':calendar'
+project(":calendar").name = "opentorah-calendar"
+
 include ':schedule'
+project(":schedule").name = "opentorah-schedule"
+
 include ':calendar-service'
+project(":calendar-service").name = "opentorah-calendar-service"
+
 include ':collector'
+project(":collector").name = "opentorah-collector"
 
 include ':fop'
+project(":fop").name = "opentorah-fop"
+
 include ':docbook'
+project(":docbook").name = "opentorah-docbook"
 
 include ':calendar-paper'
 include ':dream-paper'

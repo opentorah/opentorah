@@ -3,15 +3,17 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
 }
 
 description = 'Open Torah Metadata'
 
-configureLibrary(['Scala'])
+configureLibrary()
 
 dependencies {
-  api project(':xml')
+  api project(':opentorah-xml')
 
-  implementation project(':util')
+  implementation project(':opentorah-util')
+
+  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }

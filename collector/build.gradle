@@ -3,20 +3,20 @@ plugins {
   id 'scala'
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
-  id 'com.jfrog.bintray'
+  id 'signing'
   id 'com.google.cloud.tools.jib'
   id 'org.podval.tools.cloudrun'
 }
 
 description = 'Archive Collector'
 
-configureLibrary(['Scala', 'Jewish', 'TEI'])
+configureLibrary()
 configureService()
 
 dependencies {
-  api project(':metadata')
-  implementation project(':tei')
-  implementation project(':util')
+  api project(':opentorah-metadata')
+  implementation project(':opentorah-tei')
+  implementation project(':opentorah-util')
 
   implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
   implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
@@ -45,7 +45,7 @@ jib.container.jvmFlags = [
 //    -XX:MaxRAMPercentage
 //    -XX:InitialRAMPercentage
 ]
-// result: MaxHeapSize, which seems to be 1/2, not 1/4 of the memory...
+// result: MaxHeapSize is never less than 126Mb, so "ergonomic" 1/4 starts at 512Mi...
 
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)
