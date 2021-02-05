@@ -11,6 +11,7 @@ ext.configureScala = {
 //    implementation "org.scala-lang:scala3-library_$scalaVersionMajor:$scalaVersion"
 
     compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
+    testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 
     testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
     // for scalatest reports
@@ -20,14 +21,6 @@ ext.configureScala = {
     testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
     testImplementation "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"
     testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
-  }
-
-  // TODO move into the main build file
-  tasks.withType(ScalaCompile) {
-    scalaCompileOptions.with {
-      targetCompatibility = '1.8'
-      additionalParameters = ['-feature']
-    }
   }
 }
 

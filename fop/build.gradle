@@ -20,6 +20,7 @@ dependencies {
   implementation "net.sf.saxon:Saxon-HE:$saxon10Version"
 
   // FOP
+  // TODO probably used by JEuclid; drop support for it and V8...
   // FOP 2.4 uses JAI and JAI Codec from JBoss repository;
   // since at plugin application time it is too late to define the repository *or* to substitute JAI modules with the
   // ones from JCenter, and I do not want every project that uses the plugin to have to do either,
@@ -29,8 +30,6 @@ dependencies {
     exclude group: 'javax.media', module: 'jai-core'
     exclude group: 'com.sun.media', module: 'jai-codec'
   }
-
-  // TODO probably used by JEuclid; drop support for it and V8...
 //  implementation "javax.media.jai:com.springsource.javax.media.jai.core:$jaiVersion"
 //  implementation "javax.media.jai:com.springsource.javax.media.jai.codec:$jaiVersion"
 
@@ -58,6 +57,4 @@ dependencies {
 
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
-
-  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
 }

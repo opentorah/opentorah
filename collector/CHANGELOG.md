@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2021-02-02
+- serve using local Docker
+- facsimiles - hierarchically 
+
 ## [0.2.1] - 2021-01-31
 - use correct thread-pools to avoid ZIO dead-locks with nested `unsafeRun()` calls in CPU-constrained situation;
 - use latest Cloud Run Gradle plugin to run in the local Docker;

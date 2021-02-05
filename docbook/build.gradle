@@ -19,6 +19,12 @@ dependencies {
   implementation project(':opentorah-util')
 
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()
+  // it has its own slf4j implementation, so we exclude the default one
+  // that is added by the scala.gradle to avoid the warning
+  // "Class path contains multiple SLF4J bindings."
+  configurations.testRuntimeOnly {
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
+  }
 }
 
 // run tests sequentially

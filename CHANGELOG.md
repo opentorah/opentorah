@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2021-02-04
+- moved from JCenter/Bintray to Maven Central!
+- no tests in master CI
+- no artifact uploads from GitHub Actions
+
+## [0.2.1] - 2021-01-28
+- 'collector' re-written
+
+## [0.1.66] - 2021-01-14
+- Scala 2.13+
+- split-file family polymorphism encoding in 'calendar' removed :(
+
 ## [0.1.62] - 2020-12-20
 - calendar not using store;
 

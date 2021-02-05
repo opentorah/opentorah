@@ -29,6 +29,13 @@ subprojects {
   apply from: '../mdoc.gradle'
   apply from: '../paper.gradle'
 
+  tasks.withType(ScalaCompile) {
+    scalaCompileOptions.with {
+      targetCompatibility = '1.8'
+      additionalParameters = ['-feature']
+    }
+  }
+
   task site
   site.description('Generate project website')
   site.group('publishing')
