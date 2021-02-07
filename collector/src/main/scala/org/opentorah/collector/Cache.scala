@@ -28,7 +28,7 @@ object Cache {
     Option[AnyRef](cache.getIfPresent(url)).map(_.asInstanceOf[T]).getOrElse {
       val result = load(url)
       cache.put(url, result)
-      log.info(s"CACHED  $url of type ${result.getClass.getSimpleName}")
+      //log.info(s"CACHED  $url of type ${result.getClass.getSimpleName}")
       result
     }
 }

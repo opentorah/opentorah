@@ -36,23 +36,11 @@ dependencies {
 jib.from.image = 'gcr.io/distroless/java:11'
 jib.container.mainClass = 'org.opentorah.collector.Service'
 
-//In service.yaml:
-//env:
-//- name: JAVA_TOOL_OPTIONS
-//value: <JVM flags>
-jib.container.jvmFlags = [
-//   '-XX:+PrintFlagsFinal'
-//    -XX:MinRAMPercentage
-//    -XX:MaxRAMPercentage
-//    -XX:InitialRAMPercentage
-]
-// result: MaxHeapSize is never less than 126Mb, so "ergonomic" 1/4 starts at 512Mi...
-
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)
 
-cloudRunLocal.port = 4000
 cloudRunLocal.additionalOptions = [
+  // --volume?
   '--mount', 'type=bind,source=/home/dub/OpenTorah/alter-rebbe.org/,target=/mnt/store/',
   '--env'  , 'STORE=file:///mnt/store/'
 ]

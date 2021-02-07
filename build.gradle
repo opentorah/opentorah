@@ -20,10 +20,6 @@ subprojects {
   group = 'org.opentorah'
   version = projectVersion
 
-  repositories {
-    mavenCentral()
-  }
-
   apply from: '../scala.gradle'
   apply from: '../library.gradle'
   apply from: '../mdoc.gradle'

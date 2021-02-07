@@ -18,7 +18,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import zio.duration.Duration
 import zio.interop.catz._
 import zio.{App, RIO, URIO, ZEnv, ZIO}
-
 import java.net.URL
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
@@ -85,8 +84,9 @@ object Service extends App {
     val siteUri: Uri = Uri.unsafeFromString(siteUrl)
 
     var site: Option[Site] = None
+    getSite(None)
 
-    def getSite(request: Request[ServiceTask]): Site = site.getOrElse {
+    def getSite(request: Option[Request[ServiceTask]]): Site = site.getOrElse {
       info(request, "INI")
       val result = Site.read(toUrl(siteUri))
       site = Some(result)
@@ -94,7 +94,7 @@ object Service extends App {
     }
 
     def fromSite(path: Seq[String], request: Request[ServiceTask]): Option[Response[ServiceTask]] = {
-      val site: Site = getSite(request)
+      val site: Site = getSite(Some(request))
       val storePath: Option[Store.Path] = site.resolve(path)
 
       val content: Option[(String, Boolean)] = try storePath.map(site.content) catch {
@@ -164,6 +164,7 @@ object Service extends App {
     HttpRoutes.of[ServiceTask] {
       case request@GET -> Root / "reset-cached-site" =>
         site = None
+        getSite(Some(request))
         info(request, "RST")
         Ok("Site reset!")
 
@@ -187,6 +188,7 @@ object Service extends App {
     }
   }
 
+  private def info   (request: Option[Request[ServiceTask]], message: String): Unit = log(request, message, "INFO"   )
   private def info   (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "INFO"   )
   private def info   (                               message: String): Unit = log(None         , message, "INFO"   )
 //  private def notice (request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "NOTICE" )
