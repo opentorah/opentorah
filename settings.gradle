@@ -8,9 +8,15 @@ pluginManagement {
     id 'com.github.ben-manes.versions' version '0.36.0'
     id 'com.github.maiflai.scalatest' version '0.30'
     id 'com.google.cloud.tools.jib' version '2.7.1'
-    id 'org.podval.tools.cloudrun' version '0.1.5'
+    id 'org.podval.tools.cloudrun' version '0.2.0'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
   }
 }
 
@@ -56,4 +62,4 @@ include ':calendar-paper'
 include ':dream-paper'
 include ':typesetting-paper'
 
-// includeBuild '../../Projects/cloud-run'
+//includeBuild '../../Projects/cloud-run'

@@ -19,9 +19,9 @@ spec:
         - containerPort: 8080
         resources:
           limits:
-            cpu: "1000m"
+            cpu: "1"
 #           MaxHeapSize is never less than 126Mb, so "ergonomic" 1/4 starts at 512Mi:
             memory: "512Mi"
-        env:
-        - name: "JAVA_TOOL_OPTIONS"
-          value: "-XX:+PrintFlagsFinal"
+#        env:
+#        - name: "JAVA_TOOL_OPTIONS"
+#          value: "-XX:+PrintFlagsFinal"

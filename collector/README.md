@@ -110,30 +110,6 @@ build and push my Docker image:
 Image layers are in the `artifacts.alter-rebbe-2.appspot.com/containers/images` bucket that
 was auto-created (with fine-grained access control).
 
-### Running locally ###
-
-To run locally in the environment equivalent to Google Cloud Run, I need to install:
-- [minikube](https://minikube.sigs.k8s.io/docs/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- [knative](https://knative.dev/docs/install/any-kubernetes-cluster/)
-- [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
-- [Istio](https://knative.dev/docs/install/installing-istio/)
-- [skaffold](https://skaffold.dev/) (probably)
-
-run as a service account: https://cloud.google.com/run/docs/configuring/service-accounts plugin in IntelliJ Idea
-does not make JIB builder available for my project in
-  `Cloud Code | Cloud Run | Run Locally` Run configuration, so I am running in plain local Docker,
-which is much simpler:
-
-Build the image to local Docker:
-```
-  $ ./gradlew jibDockerBuild
-```
-and run it:
-```
-  $ docker run --name collector --rm --cpus 1 --memory 512Mi --env PORT=8080 --publish 4000:8080 gcr.io/alter-rebbe-2/collector
-```
-
 To avoid duplication of the parameters between the Service YAML file and the task that runs the service in the local Docker,
 I enhanced my Cloud Run Gradle plugin to pre-configure such tasks.
 
