@@ -45,3 +45,5 @@ cloudRunLocalFromLocalStore.additionalOptions = [
   '--mount', 'type=bind,source=/home/dub/OpenTorah/alter-rebbe.org/,target=/mnt/store/',
   '--env'  , 'STORE=file:///mnt/store/'
 ]
+
+task cloudRunLocalFromRemoteStore(type: org.podval.tools.cloudrun.CloudRunPlugin.RunLocalTask)
