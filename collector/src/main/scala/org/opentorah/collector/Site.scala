@@ -232,7 +232,7 @@ final class Site(
   }
 
   def prettyPrint(): Unit = {
-    for (entity <- entities.entities) entities.writeFile(
+    for (entity <- entities.directoryEntries) entities.writeFile(
       entity,
       content = Store.renderXml(TeiEntity.xmlElement(entities.getFile(entity)))
     )
@@ -244,7 +244,7 @@ final class Site(
 
     for {
       collection <- collections
-      document <- collection.documents
+      document <- collection.directoryEntries
     } collection.writeFile(
       document,
       content = Tei.renderXml(collection.getFile(document))
@@ -252,7 +252,7 @@ final class Site(
   }
 
   def verify(): Unit = {
-    val errors: Seq[String] = references.get.verify(this)
+    val errors: Seq[String] = getReferences.verify(this)
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
   }
 
@@ -277,7 +277,7 @@ final class Site(
 
     // Names
     deleteDirectory("names")
-    for (entity <- entities.entities) write(entity)
+    for (entity <- entities.directoryEntries) write(entity)
 
     // Notes
     deleteDirectory("notes")
@@ -298,7 +298,7 @@ final class Site(
     // Documents
     for {
       collection <- collections
-      document <- collection.documents
+      document <- collection.directoryEntries
     } {
       write(collection.textFacet     .of(document))
       write(collection.facsimileFacet.of(document))

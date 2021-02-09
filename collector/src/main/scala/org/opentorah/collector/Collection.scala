@@ -27,30 +27,16 @@ final class Collection(
 
   override protected def loadFile(url: URL): Tei = Parser.parseDo(Tei.parse(url))
 
-  override def directoryEntries: Seq[Document] = documents
-
-  private def collectionDocuments: Collection.Documents = getDirectory
-
   def facsimileUrl(site: Site): String = {
     val pathStr = site.store2path(this).map(_.structureName).mkString("/")
     site.facsimilesUrl + pathStr  + "/"
   }
 
-  def documents: Seq[Document] =
-    collectionDocuments.documents
-
   def siblings(document: Document): (Option[Document], Option[Document]) =
-    collectionDocuments.siblings(document.baseName)
+    getDirectory.siblings(document.baseName)
 
   def translations(document: Document): Seq[Document] =
-    collectionDocuments.translations.getOrElse(document.baseName, Seq.empty)
-
-  private def findDocument(name: String): Option[Document] =
-    collectionDocuments.name2document.get(name)
-
-  def original(document: Document): Document =
-    if (!document.isTranslation) document
-    else findDocument(document.baseName).get
+    getDirectory.translations.getOrElse(document.baseName, Seq.empty)
 
   val teiFacet      : Collection.TeiFacet       = new Collection.TeiFacet      (this)
   val textFacet     : Collection.TextFacet      = new Collection.TextFacet     (this)
@@ -73,7 +59,7 @@ final class Collection(
   )
 
   override protected def innerContent(site: Site): Xml.Element = {
-    val missingPages: Seq[Page] = documents.flatMap(_.pages(pageType)).filter(_.pb.isMissing)
+    val missingPages: Seq[Page] = directoryEntries.flatMap(_.pages(pageType)).filter(_.pb.isMissing)
 
     def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
       val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
@@ -105,7 +91,7 @@ final class Collection(
     <div>
       <table class="collection-index">
         {<tr>{for (column <- columns) yield <th class={column.cssClass}>{column.heading}</th>}</tr>}
-        {collectionDocuments.parts.flatMap { part =>
+        {getDirectory.parts.flatMap { part =>
           part.title.fold[Xml.Nodes](Seq.empty)(title =>
             <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
           ) ++
@@ -178,16 +164,15 @@ object Collection extends Element[Collection]("collection") {
   }
 
   final class Documents(
-    val name2document: Map[String, Document],
+    name2entry: Map[String, Document],
     partsRaw: Seq[CollectionPart]
-  ) {
-    lazy val documents: Seq[Document] = name2document.values.toSeq
+  ) extends Directory.Wrapper[Document](name2entry) {
 
-    lazy val originalDocuments: Seq[Document] = documents
+    lazy val originalDocuments: Seq[Document] = entries
       .filterNot(_.isTranslation)
       .sortBy(_.baseName)
 
-    lazy val translations: Map[String, Seq[Document]] = Collections.mapValues(documents
+    lazy val translations: Map[String, Seq[Document]] = Collections.mapValues(entries
       .filter(_.isTranslation)
       .map(document => (document.baseName, document))
       .groupBy(_._1))(_.map(_._2))
@@ -203,7 +188,7 @@ object Collection extends Element[Collection]("collection") {
   sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
     final override def findByName(name: String): Option[DF] =
       Store.checkExtension(name, extension, assumeAllowedExtension)
-      .flatMap(collection.findDocument)
+      .flatMap(collection.getDirectory.get)
       .map(of)
 
     def of(document: Document): DF

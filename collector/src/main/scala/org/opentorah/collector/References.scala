@@ -33,7 +33,7 @@ object References {
 
   def fromSite(site: Site): Seq[EntityReference] = {
     val fromEntities: Seq[Seq[EntityReference]] =
-      for (entity <- site.entities.entities)
+      for (entity <- site.entities.directoryEntries)
         yield addSource(entity.path(site), fromXml(site.entities.getFile(entity).content))
 
     val fromHierarchy: Seq[Seq[EntityReference]] =
@@ -47,7 +47,7 @@ object References {
     val fromDocuments: Seq[Seq[EntityReference]] =
       for {
         collection <- site.collections
-        document <- collection.documents
+        document <- collection.directoryEntries
       } yield addSource(collection.textFacet.of(document).path(site), fromTei(collection.getFile(document)))
 
     (fromEntities ++ fromHierarchy ++ fromCollections ++ fromDocuments).flatten
