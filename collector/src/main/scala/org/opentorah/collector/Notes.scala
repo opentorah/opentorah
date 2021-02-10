@@ -17,8 +17,7 @@ final class Notes(
   override protected def loadFile(url: URL): Markdown = Markdown.load(url)
 
   override def findByName(name: String): Option[Store] =
-    Store.checkExtension(name, "html")
-      .flatMap(getDirectory.findByName)
+    Store.findByName(name, "html", getDirectory.findByName)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)

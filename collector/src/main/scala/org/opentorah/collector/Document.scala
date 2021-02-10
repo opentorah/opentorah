@@ -36,9 +36,7 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
   sealed abstract class Facet[DF <: Facet[DF, F], F <: Collection.Facet[DF, F]](val document: Document, collectionFacet: F)
     extends Store
   {
-    final override def names: Names = Names(withExtension)
-    // TODO when dynamized - skip the extension
-    final def withExtension: String = document.name + "." + collectionFacet.extension
+    final override def names: Names = Names(document.name)
     final def collection: Collection = collectionFacet.collection
     final def getTei: Tei = collection.getFile(document)
   }
@@ -77,9 +75,8 @@ object Document extends Directory.EntryMaker[Tei, Document]("document") {
         yield collectionFacet.of(translation).a(site)(s"[${translation.lang}]")
       }
 
-    // TODO when dynamized - skip `collection.textFacet`:
     override def path(site: Site): Store.Path =
-      collection.path(site) ++ Seq(collection.textFacet, collection.textFacet.of(document))
+      collection.path(site) ++ Seq(collection.textFacet.of(document))
 
     override def content(site: Site): Xml.Element =
       <div>

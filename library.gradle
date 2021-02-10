@@ -97,7 +97,7 @@ ext.configureLibrary = {
   }
 
   signing {
-    useInMemoryPgpKeys(getProperty('gnupg.dub-opentorah-org.key'), getProperty('gnupg.dub-opentorah-org.password'))
+    useInMemoryPgpKeys(findProperty('gnupg.dub-opentorah-org.key'), findProperty('gnupg.dub-opentorah-org.password'))
     sign publishing.publications.library
   }
 

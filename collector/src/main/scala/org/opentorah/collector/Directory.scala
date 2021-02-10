@@ -56,8 +56,7 @@ object Directory {
   class Wrapper[M](name2entry: Map[String, M]) {
     final def entries: Seq[M] = name2entry.values.toSeq
 
-    final def findByName(name: String): Option[M] =
-      Store.checkExtension(name, "html").flatMap(get)
+    final def findByName(name: String): Option[M] = Store.findByName(name, "html", get)
 
     final def get(name: String): Option[M] = name2entry.get(name)
   }

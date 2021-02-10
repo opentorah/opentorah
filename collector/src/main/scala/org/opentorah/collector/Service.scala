@@ -23,8 +23,11 @@ import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object Service extends App {
-  LoggerFactory.getILoggerFactory.asInstanceOf[ch.qos.logback.classic.LoggerContext]
-    .getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
+  LoggerFactory.getILoggerFactory match {
+    case logback: ch.qos.logback.classic.LoggerContext =>
+      logback.getLogger (Logger.ROOT_LOGGER_NAME).setLevel (ch.qos.logback.classic.Level.INFO)
+    case _ =>
+  }
 
   type ServiceEnvironment = ZEnv
 
@@ -53,9 +56,9 @@ object Service extends App {
       val result = args.head
       info(s"siteUri argument supplied: $result")
       result
-    } else getParameter("STORE", s"http://$bucketName/")
+    } else getParameter("STORE", s"http://$bucketName/") // TODO switch to https
 
-    val port: Int = getParameter("PORT", "4000").toInt
+    val port: Int = getParameter("PORT", "8080").toInt
 
     val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
@@ -80,44 +83,38 @@ object Service extends App {
 
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
+  val staticPaths: Set[String] = Set("assets", "js", "sass", "alter-rebbe.jpg", "robots.txt")
+
   private def routes(siteUrl: String): HttpRoutes[ServiceTask] = {
     val siteUri: Uri = Uri.unsafeFromString(siteUrl)
 
-    var site: Option[Site] = None
-    getSite(None)
+    def readSite: Site = Site.read(toUrl(siteUri))
 
-    def getSite(request: Option[Request[ServiceTask]]): Site = site.getOrElse {
-      info(request, "INI")
-      val result = Site.read(toUrl(siteUri))
-      site = Some(result)
-      result
-    }
+    var site: Site = readSite
 
+    // TODO unfold a bit
     def fromSite(path: Seq[String], request: Request[ServiceTask]): Option[Response[ServiceTask]] = {
-      val site: Site = getSite(Some(request))
       val storePath: Option[Store.Path] = site.resolve(path)
 
-      val content: Option[(String, Boolean)] = try storePath.map(site.content) catch {
-        case _: NotImplementedError => None
-      }
+      val result: Option[Response[ServiceTask]] = storePath
+        .map(site.content)
+        .map { case (content: String, isTei: Boolean) =>
+          val bytes: Array[Byte] = content.getBytes
 
-      val result: Option[Response[ServiceTask]] = content.map { case (content: String, isTei: Boolean) =>
-        val bytes: Array[Byte] = content.getBytes
-
-        Response(
-          headers = Headers(List(
-            `Content-Type`(if (isTei) MediaType.application.`tei+xml` else MediaType.text.html, Charset.`UTF-8`),
-            `Content-Length`.unsafeFromLong(bytes.length)
-            // TODO more headers!
-          )),
-          body = Stream.emits(bytes)
-        )
-      }
+          Response(
+            headers = Headers(List(
+              `Content-Type`(if (isTei) MediaType.application.`tei+xml` else MediaType.text.html, Charset.`UTF-8`),
+              `Content-Length`.unsafeFromLong(bytes.length)
+              // TODO more headers!
+            )),
+            body = Stream.emits(bytes)
+          )
+        }
 
       info(request, result.fold {
-        storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"??? $storePath")
+        s"--- ${Files.mkUrl(path)}"
       }{ _ =>
-        s"YES ${storePath.get}"
+        s"YES ${storePath.get.mkString("")}"
       })
 
       result
@@ -135,12 +132,8 @@ object Service extends App {
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
       val urlStr: String = Files.mkUrl(path)
 
-      val host: Option[String] = request.headers.get(CaseInsensitiveString("Host")).map(_.value)
-      val staticOnly: Boolean = host.exists(_.startsWith("www."))
-      if (!staticOnly) info(request, s"DYN host=${host.get}")
-
       OptionT(
-        if (staticOnly) F.pure(None)
+        if (path.headOption.exists(staticPaths.contains)) F.pure(None)
         else F.suspend(F.pure(fromSite(path, request)))
       )
       .orElse(StaticFile.fromURL[ServiceTask](
@@ -163,9 +156,8 @@ object Service extends App {
 
     HttpRoutes.of[ServiceTask] {
       case request@GET -> Root / "reset-cached-site" =>
-        site = None
-        getSite(Some(request))
         info(request, "RST")
+        site = readSite
         Ok("Site reset!")
 
       case request@GET -> _ => get(request)

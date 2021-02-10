@@ -39,10 +39,21 @@ object Store {
     if (next.isEmpty) None else resolve(url.tail, next.get, next.get +: result)
   }
 
-  def checkExtension(fullName: String, allowedExtension: String, assumeAllowedExtension: Boolean = false): Option[String] = {
+  def findByName[M](
+    fullName: String,
+    allowedExtension: String,
+    findByName: String => Option[M],
+    assumeAllowedExtension: Boolean = false
+  ): Option[M] = {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(fullName)
-    if (extension.isDefined && !extension.contains(allowedExtension)) if (assumeAllowedExtension) Some(fullName) else None
-    else Some(fileName)
+
+    val name =
+      if (extension.isDefined && !extension.contains(allowedExtension))
+        if (assumeAllowedExtension) Some(fullName) else None
+      else
+        Some(fileName)
+
+    name.flatMap(findByName)
   }
 
   def findByName(name: String, stores: Seq[Store]): Option[Store] =

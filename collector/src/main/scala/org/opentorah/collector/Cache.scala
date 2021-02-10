@@ -7,6 +7,9 @@ import java.time.Duration
 
 object Cache {
 
+  var enabled: Boolean = true
+  var logEnabled: Boolean = true
+
   private val log: Logger = LoggerFactory.getLogger(classOf[Cache.type])
 
   private val cache: com.github.benmanes.caffeine.cache.Cache[URL, AnyRef] = Caffeine.newBuilder
@@ -16,10 +19,10 @@ object Cache {
     .build[URL, AnyRef]
 
   def get[T <: AnyRef](url: URL, load: URL => T): T =
-    Option[AnyRef](cache.getIfPresent(url)).map(_.asInstanceOf[T]).getOrElse {
-      val result = load(url)
+    if (!enabled) load(url) else Option[AnyRef](cache.getIfPresent(url)).map(_.asInstanceOf[T]).getOrElse {
+      val result: T = load(url)
       cache.put(url, result)
-      log.info(s"CACHED ${result.getClass.getSimpleName} $url")
+      if (logEnabled) log.info(s"CACHED ${result.getClass.getSimpleName} $url")
       result
     }
 }

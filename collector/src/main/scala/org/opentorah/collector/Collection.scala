@@ -186,21 +186,23 @@ object Collection extends Element[Collection]("collection") {
   }
 
   sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
-    final override def findByName(name: String): Option[DF] =
-      Store.checkExtension(name, extension, assumeAllowedExtension)
-      .flatMap(collection.getDirectory.get)
-      .map(of)
+    final override def findByName(name: String): Option[DF] = Store.findByName(
+      name,
+      extension,
+      name => collection.getDirectory.get(name).map(of),
+      // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
+      // assume the required extension is implied, and the one found is part of the document name.
+      assumeAllowedExtension = true
+    )
 
     def of(document: Document): DF
 
-    def extension: String
-
-    protected def assumeAllowedExtension: Boolean = false
+    protected def extension: String
   }
 
   final class TeiFacet(collection: Collection) extends Facet[Document.TeiFacet, TeiFacet](collection) {
     override def selector: Selector = Selector.byName("tei")
-    override def extension: String = "xml"
+    override protected def extension: String = "xml"
     override def of(document: Document): Document.TeiFacet = new Document.TeiFacet(document, this)
   }
 
@@ -209,17 +211,13 @@ object Collection extends Element[Collection]("collection") {
 
   final class TextFacet(collection: Collection) extends HtmlFacet[Document.TextFacet, TextFacet](collection) {
     override def selector: Selector = Selector.byName("document")
-    override def extension: String = "html"
+    override protected def extension: String = "html"
     override def of(document: Document): Document.TextFacet = new Document.TextFacet(document, this)
-
-    // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
-    // assume the required extension is implied, and the one found is part of the document name.
-    override protected def assumeAllowedExtension: Boolean = true
   }
 
   final class FacsimileFacet(collection: Collection) extends HtmlFacet[Document.FacsimileFacet, FacsimileFacet](collection) {
     override def selector: Selector = Selector.byName("facsimile")
-    override def extension: String = "html"
+    override protected def extension: String = "html"
     override def of(document: Document): Document.FacsimileFacet = new Document.FacsimileFacet(document, this)
   }
 

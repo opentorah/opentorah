@@ -20,43 +20,45 @@ dependencyResolutionManagement {
   }
 }
 
+rootProject.name = 'org.opentorah'
+
 include ':util'
-project(":util").name = "opentorah-util"
+project(':util'            ).name = 'opentorah-util'
 
 include ':xml'
-project(":xml").name = "opentorah-xml"
+project(':xml'             ).name = 'opentorah-xml'
 
 include ':metadata'
-project(":metadata").name = "opentorah-metadata"
+project(':metadata'        ).name = 'opentorah-metadata'
 
 include ':tei'
-project(":tei").name = "opentorah-tei"
+project(':tei'             ).name = 'opentorah-tei'
 
 // For now, there is nothing there...
 //include ':store'
-//project(":store").name = "opentorah-store"
+//project(':store').name = 'opentorah-store'
 
 include ':texts'
-project(":texts").name = "opentorah-texts"
+project(':texts'           ).name = 'opentorah-texts'
 
 
 include ':calendar'
-project(":calendar").name = "opentorah-calendar"
+project(':calendar'        ).name = 'opentorah-calendar'
 
 include ':schedule'
-project(":schedule").name = "opentorah-schedule"
+project(':schedule'        ).name = 'opentorah-schedule'
 
 include ':calendar-service'
-project(":calendar-service").name = "opentorah-calendar-service"
+project(':calendar-service').name = 'opentorah-calendar-service'
 
 include ':collector'
-project(":collector").name = "opentorah-collector"
+project(':collector'       ).name = 'opentorah-collector'
 
 include ':fop'
-project(":fop").name = "opentorah-fop"
+project(':fop'             ).name = 'opentorah-fop'
 
 include ':docbook'
-project(":docbook").name = "opentorah-docbook"
+project(":docbook"         ).name = 'opentorah-docbook'
 
 include ':calendar-paper'
 include ':dream-paper'
