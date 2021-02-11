@@ -49,10 +49,12 @@ object EntityReference extends EntityRelated[EntityReference](
     )
   }
 
-  // TODO eliminate
-  final def from(xml: Xml.Nodes): Seq[EntityReference] =
-    EntityType.values.flatMap(entityType => xml.flatMap(node =>
-      Xml.descendants(node, entityType.nameElement)
-        .map(descendant => Parser.parseDo(parse(From.xml("descendants", descendant))))
-    ))
+  // TODO eliminate?
+  def fromXml(xml: Xml.Nodes): Seq[EntityReference] = for {
+    entityType <- EntityType.values
+    node <- xml
+    descendant <- Xml.descendants(node, entityType.nameElement)
+  } yield
+    // TODO introduce and use here parser that doesn't allow sourceUrl
+    Parser.parseDo(EntityReference.parse(From.xml("descendants", descendant)))
 }

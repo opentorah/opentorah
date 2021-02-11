@@ -166,22 +166,22 @@ final class Site(
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
       textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
 
-    def toResolved(a: Option[Html.a], error: => String): Option[Html.a] = {
+    def resolved(a: Option[Html.a], error: => String): Option[Html.a] = {
       if (a.isEmpty) Site.logger.warn(error)
       a
     }
 
-    override def resolve(url: Seq[String]): Option[Html.a] = toResolved(
+    override def resolve(url: Seq[String]): Option[Html.a] = resolved(
       Site.this.resolve(url).map(path => a(path)),
       s"did not resolve: $url"
     )
 
-    override def findByRef(ref: String): Option[Html.a] = toResolved(
+    override def findByRef(ref: String): Option[Html.a] = resolved(
       entities.findByName(ref).map(entity => entity.a(Site.this)),
       s"did not find reference: $ref"
     )
 
-    override def facs(pageId: String): Option[Html.a] = toResolved(
+    override def facs(pageId: String): Option[Html.a] = resolved(
       facsUrl.map(facsUrl => a(facsUrl, part = Some(pageId))),
       "did not get facsimile: $pageId"
     )
@@ -194,8 +194,9 @@ final class Site(
     notes.writeDirectory()
     for (collection <- collections) collection.writeDirectory()
 
+    Site.logger.info("Writing references.")
     // Collection lists must exist by the time this runs:
-    references.write(References.fromSite(this))
+    references.write(allReferences)
 
     Site.logger.info("Verifying site.")
 
@@ -203,6 +204,7 @@ final class Site(
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     // detect and log unresolved references
+    // TODO do this as a part of references verification above?
     // TODO do the same for the hierarchy stores!
     for (note <- notes.directoryEntries) resolveHtmlContent(note)
     for (entity <- entities.directoryEntries) resolveHtmlContent(entity)
@@ -210,9 +212,43 @@ final class Site(
     for {
       collection <- collections
       document <- collection.directoryEntries
-    } resolveHtmlContent(collection.textFacet.of(document))
+      text = collection.textFacet.of(document)
+    } resolveHtmlContent(text)
 
     if (withPrettyPrint) prettyPrint()
+  }
+
+  private def allReferences: Seq[EntityReference] = {
+    // TODO from notes!
+
+    val fromEntities: Seq[Seq[EntityReference]] =
+      for (entity <- entities.directoryEntries) yield addSource(
+        entity,
+        entity.teiEntity(this).content
+      )
+
+    val fromHierarchicals: Seq[Seq[EntityReference]] =
+      for (hierarchical <- hierarchies ++ collections) yield addSource(
+        hierarchical,
+        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
+      )
+
+    val fromDocuments: Seq[Seq[EntityReference]] =
+      for {
+        collection <- collections
+        document <- collection.directoryEntries
+        text = collection.textFacet.of(document)
+      } yield addSource(
+        text,
+        Seq(Tei.xmlElement(text.getTei))
+      )
+
+    (fromEntities ++ fromHierarchicals ++ fromDocuments).flatten
+  }
+
+  private def addSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[EntityReference] = {
+    val source: Option[String] = Some(Files.mkUrl(htmlContent.path(this).map(_.structureName)))
+    for (reference <- EntityReference.fromXml(nodes)) yield reference.copy(sourceUrl = source)
   }
 
   private def prettyPrint(): Unit = {

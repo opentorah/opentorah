@@ -7,7 +7,7 @@ final case class Entity private(
   entityType: EntityType,
   role: Option[String],
   names: Seq[EntityName],
-  content: Xml.Nodes
+  content: Xml.Nodes // TODO rename body?
 ) {
   def name: String = names.head.name
 
