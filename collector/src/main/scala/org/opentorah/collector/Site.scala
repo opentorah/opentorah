@@ -131,17 +131,8 @@ final class Site(
     Tei.renderXml(result)
   }
 
-  private def getHtmlContent(htmlContent: HtmlContent): String = {
-    val content: Xml.Element = Tei.toHtml(
-      linkResolver(htmlContent match {
-        case htmlFacet: Document.TextFacet => Some(htmlFacet)
-        case _ => None
-      }),
-      htmlContent.content(this)
-    )
-    val navigationLinks: Seq[Xml.Element] = htmlContent.navigationLinks(this)
-
-    val html: Xml.Element = HtmlTheme.toHtml(
+  private def getHtmlContent(htmlContent: HtmlContent): String =
+    Site.htmlPrettyPrinter.render(doctype = Html, element = HtmlTheme.toHtml(
       lang = htmlContent.lang.getOrElse("ru"),
       viewer = htmlContent.viewer,
       headTitle = htmlContent.htmlHeadTitle,
@@ -149,10 +140,10 @@ final class Site(
       style = if (htmlContent.isWide) "wide" else "main",
       favicon,
       googleAnalyticsId,
-      content,
+      resolveHtmlContent(htmlContent),
       header = HtmlTheme.header(
         this.title.xml,
-        this.navigationLinks ++ navigationLinks
+        this.navigationLinks ++ htmlContent.navigationLinks(this)
       ),
       footer = HtmlTheme.footer(
         author = siteUrl,
@@ -161,10 +152,15 @@ final class Site(
         twitterUsername,
         footer.xml
       )
-    )
+    ))
 
-    Site.htmlPrettyPrinter.render(doctype = Html, element = html)
-  }
+  private def resolveHtmlContent(htmlContent: HtmlContent): Xml.Element = Tei.toHtml(
+    linkResolver(htmlContent match {
+      case htmlFacet: Document.TextFacet => Some(htmlFacet)
+      case _ => None
+    }),
+    htmlContent.content(this)
+  )
 
   private def linkResolver(textFacet: Option[Document.TextFacet]): LinkResolver = new LinkResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
@@ -205,6 +201,16 @@ final class Site(
 
     val errors: Seq[String] = getReferences.verify(this)
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+
+    // detect and log unresolved references
+    // TODO do the same for the hierarchy stores!
+    for (note <- notes.directoryEntries) resolveHtmlContent(note)
+    for (entity <- entities.directoryEntries) resolveHtmlContent(entity)
+    for (collection <- collections) resolveHtmlContent(collection)
+    for {
+      collection <- collections
+      document <- collection.directoryEntries
+    } resolveHtmlContent(collection.textFacet.of(document))
 
     if (withPrettyPrint) prettyPrint()
   }
