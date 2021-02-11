@@ -251,8 +251,7 @@ object Site extends Element[Site]("site") {
 
   def read(rootUrl: URL): Site = {
     logger.info(s"Reading site from $rootUrl")
-    val directory: URL = Files.subdirectory(rootUrl, "store")
-    Parser.parseDo(Site.parse(Files.fileInDirectory(directory, "site.xml")))
+    Parser.parseDo(Site.parse(Files.fileInDirectory(rootUrl, "site.xml")))
   }
 
   def main(args: Array[String]): Unit = {
