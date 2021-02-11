@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- site is now dynamic!
+
 ## [0.2.3] - 2021-02-02
 - serve using local Docker
 - facsimiles - hierarchically 

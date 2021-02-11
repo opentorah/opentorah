@@ -7,23 +7,17 @@ final class Notes(
   override val fromUrl: FromUrl,
   override val selector: Selector,
   override val directory: String
-) extends Directory[Markdown, Note, Map[String, Note]](
+) extends Directory[Markdown, Note, Notes.All](
   directory,
   "md",
   Note,
-  identity
+  new Notes.All(_),
 ) with By with HtmlContent {
 
   override protected def loadFile(url: URL): Markdown = Markdown.load(url)
 
-  private lazy val name2note: Map[String, Note] = getDirectory
-
   override def findByName(name: String): Option[Store] =
-    Store.checkExtension(name, "html")
-      .flatMap(name => findByName(name, name2note))
-
-  override def directoryEntries: Seq[Note] = notes
-  def notes: Seq[Note] = name2note.values.toSeq
+    Store.findByName(name, "html", getDirectory.findByName)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
@@ -32,10 +26,12 @@ final class Notes(
   override def path(site: Site): Store.Path = Seq(site.notes)
 
   override def content(site: Site): Xml.Element =
-    <div>{for (note <- notes) yield <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>}</div>
+    <div>{for (note <- directoryEntries) yield <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>}</div>
 }
 
 object Notes extends Element[Notes]("notes") {
+
+  final class All(name2entry: Map[String, Note]) extends Directory.Wrapper[Note](name2entry)
 
   override def contentParsable: Parsable[Notes] = new Parsable[Notes] {
     override def parser: Parser[Notes] = for {

@@ -8,20 +8,21 @@ final class Entities(
   override val fromUrl: FromUrl,
   override val selector: Selector,
   override val directory: String
-) extends Directory[TeiEntity, Entity, Map[String, Entity]](directory, "xml", Entity, identity) with By {
+) extends Directory[TeiEntity, Entity, Entities.All](
+  directory,
+  "xml",
+  Entity,
+  new Entities.All(_)
+) with By {
 
   override protected def loadFile(url: URL): TeiEntity = Parser.parseDo(TeiEntity.parse(url))
 
-  private lazy val name2entity: Map[String, Entity] = getDirectory
-
-  override def findByName(name: String): Option[Entity] = findByName(name, name2entity)
-
-  override def directoryEntries: Seq[Entity] = name2entity.values.toSeq
-
-  def entities: Seq[Entity] = directoryEntries
+  override def findByName(name: String): Option[Entity] = getDirectory.findByName(name)
 }
 
 object Entities extends Element[Entities]("entities") {
+
+  final class All(name2entry: Map[String, Entity]) extends Directory.Wrapper[Entity](name2entry)
 
   override def contentParsable: Parsable[Entities] = new Parsable[Entities] {
     override def parser: Parser[Entities] = for {

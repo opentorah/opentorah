@@ -11,7 +11,7 @@ import java.net.URL
   * @tparam T type of into which the file is parsed
   * @tparam M type of the files list entry
   */
-abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: AnyRef](
+abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapper[M]](
   val directory: String,
   fileExtension: String,
   entry: Directory.EntryMaker[T, M],
@@ -35,8 +35,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: AnyRef](
 
   final protected def getDirectory: W = listFile.get
 
-  // TODO it's always map.getValues()...
-  def directoryEntries: Seq[M]
+  final def directoryEntries: Seq[M] = getDirectory.entries
 
   final def getFile(entry: M): T = getFile(entry.name)
 
@@ -50,12 +49,17 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: AnyRef](
   )
 
   protected def loadFile(url: URL): T
-
-  final protected def findByName(name: String, name2entry: Map[String, M]): Option[M] =
-    Store.checkExtension(name, "html").flatMap(name2entry.get)
 }
 
 object Directory {
+
+  class Wrapper[M](name2entry: Map[String, M]) {
+    final def entries: Seq[M] = name2entry.values.toSeq
+
+    final def findByName(name: String): Option[M] = Store.findByName(name, "html", get)
+
+    final def get(name: String): Option[M] = name2entry.get(name)
+  }
 
   abstract class Entry(
     val name: String

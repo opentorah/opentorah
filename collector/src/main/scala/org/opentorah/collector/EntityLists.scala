@@ -15,7 +15,7 @@ final class EntityLists(
   private var list2entities: Option[Map[EntityLists.EntityList, Seq[Entity]]] = None
 
   private def setUp(site: Site): Unit = if (list2entities.isEmpty) list2entities = Some((for (list <- lists) yield {
-    val entities = site.entities.entities.filter(entity =>
+    val entities = site.entities.directoryEntries.filter(entity =>
       (entity.entityType == list.entityType) &&
       (entity.role       == list.role      )
     ).sortBy(_.name)

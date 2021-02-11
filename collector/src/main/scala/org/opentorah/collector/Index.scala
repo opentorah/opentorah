@@ -11,13 +11,13 @@ sealed abstract class Index(name: String, selectorName: String) extends Store wi
 }
 
 object Index {
-  object Tree extends Index("collections.html", "archive") {
+  object Tree extends Index("collections", "archive") {
     override def content(site: Site): Xml.Element =
       site.by.treeIndex(site)
   }
 
   // TODO private val unpublishedCollections: Set[String] = Set("niab5", "niab19", "rnb203")
-  object Flat extends Index("index.html", "case") {
+  object Flat extends Index("index", "case") {
     override def content(site: Site): Xml.Element =
       <ul>{for (collection <- site.collections) yield <li>{collection.flatIndexEntry(site)}</li>}</ul>
   }

@@ -38,7 +38,7 @@ object Report {
     "misnamed-entities",
     "Неправильно названные файлы с именами"
   ) {
-    override protected def lines(site: Site): Seq[Entity] = site.entities.entities
+    override protected def lines(site: Site): Seq[Entity] = site.entities.directoryEntries
       .filterNot(entity => entity.id == getExpectedId(entity))
       .sortBy(_.name)
 

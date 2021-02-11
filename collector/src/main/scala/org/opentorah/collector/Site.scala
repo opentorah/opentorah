@@ -35,8 +35,6 @@ final class Site(
   val by: ByHierarchy
 ) extends Store with FromUrl.With {
 
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
 
   private def getPaths(path: Store.Path, by: ByHierarchy): Seq[Store.Path] = by.stores.flatMap { store =>
@@ -77,13 +75,17 @@ final class Site(
 
   def resolve(url: String): Option[Store.Path] = resolve(Files.splitAndDecodeUrl(url))
 
-  def resolve(url: Seq[String]): Option[Store.Path] =
-    Store.resolve(fromStaticPath(url), this, Seq.empty)
+  def resolve(path: Seq[String]): Option[Store.Path] =
+    if (path.isEmpty) Some(Seq(Index.Flat))
+    else Store.resolve(path, this, Seq.empty)
 
-  override def findByName(name: String): Option[Store] =
-    alias2collectionAlias.get(name).orElse(Store.findByName(name, stores))
-
-  private val stores: Seq[Store] = Seq(Index.Flat, Index.Tree, entities, entityLists, notes, Reports, by)
+  override def findByName(name: String): Option[Store] = alias2collectionAlias.get(name)
+    .orElse(Store.findByName(name, Seq(entities, notes, Reports, by)))
+    .orElse(Store.findByName(
+      name,
+      "html",
+      name => Store.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
+    ))
 
   private lazy val navigationLinks: Seq[Xml.Element] = pages.map { url =>
     val path: Store.Path = resolve(url).get
@@ -91,46 +93,13 @@ final class Site(
   }
 
   def a(path: Store.Path, part: Option[String] = None): Html.a = Html.a(
-    path = toStaticPath(path),
+    path = path.map(_.structureName),
     part = part,
     target = Some((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
       case _ => Viewer.default
     }).name)
   )
-
-  private def toStaticPath(path: Seq[Store]): Seq[String] = path.last match {
-    case collectionAlias: Collection.Alias => Seq("collections", collectionAlias.alias, "index.html")
-    case htmlFacet: Document.TextFacet => Seq("collections", htmlFacet.collection.alias.get, "documents", htmlFacet.withExtension)
-    case facsFacet: Document.FacsimileFacet => Seq("collections", facsFacet.collection.alias.get, "facs", facsFacet.withExtension)
-    case _: EntityLists => Seq("names.html")
-    case entity: Entity => Seq("names", entity.name + ".html")
-    case _: Notes => Seq("notes", "index.html")
-    case note: Note => Seq("notes", note.name + ".html")
-    case Reports => Seq("reports", "index.html")
-    case report: Report[_] => Seq("reports", report.name + ".html")
-    case _ if path.head == by => "by" +: path.map(_.structureName) :+ "index.html"
-    case _ => path.map(_.structureName)
-  }
-
-  private def fromStaticPath(path: Seq[String]): Seq[String] = {
-    if (path.isEmpty) Seq("index.html")
-    else if (path.head == "by") path.tail
-    else path match {
-      case Seq("collections", alias, "index.html") => Seq(alias)
-      case Seq("collections", alias, "documents", document) => Seq(alias, "document" , document)
-      case Seq("collections", alias, "facs"     , document) => Seq(alias, "facsimile", document)
-      case Seq("names.html") => Seq(entityLists.names.name)
-      case Seq("names"  , entity) => Seq(entities.names.name, entity)
-      case Seq("notes") => Seq(notes.names.name)
-      case Seq("notes"  , "index.html") => Seq(notes.names.name)
-      case Seq("notes"  , note) => Seq(notes.names.name, note)
-      case Seq("reports") => Seq(Reports.names.name)
-      case Seq("reports", "index.html") => Seq(Reports.names.name)
-      case Seq("reports", report) => Seq(Reports.names.name, report)
-      case _ => path
-    }
-  }
 
   def content(path: Store.Path): (String, Boolean) = path.lastOption.getOrElse(this) match {
     case teiFacet: Document.TeiFacet => (getTeiContent(teiFacet.getTei), true)
@@ -202,7 +171,7 @@ final class Site(
       textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
 
     def toResolved(a: Option[Html.a], error: => String): Option[Html.a] = {
-      if (a.isEmpty) logger.warn(error)
+      if (a.isEmpty) Site.logger.warn(error)
       a
     }
 
@@ -222,17 +191,28 @@ final class Site(
     )
   }
 
-  def writeLists(): Unit = {
+  def build(withPrettyPrint: Boolean): Unit = {
+    Site.logger.info("Writing site lists.")
+
     entities.writeDirectory()
     notes.writeDirectory()
     for (collection <- collections) collection.writeDirectory()
 
     // Collection lists must exist by the time this runs:
     references.write(References.fromSite(this))
+
+    Site.logger.info("Verifying site.")
+
+    val errors: Seq[String] = getReferences.verify(this)
+    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
+
+    if (withPrettyPrint) prettyPrint()
   }
 
-  def prettyPrint(): Unit = {
-    for (entity <- entities.entities) entities.writeFile(
+  private def prettyPrint(): Unit = {
+    Site.logger.info("Pretty-printing site.")
+
+    for (entity <- entities.directoryEntries) entities.writeFile(
       entity,
       content = Store.renderXml(TeiEntity.xmlElement(entities.getFile(entity)))
     )
@@ -244,77 +224,17 @@ final class Site(
 
     for {
       collection <- collections
-      document <- collection.documents
+      document <- collection.directoryEntries
     } collection.writeFile(
       document,
       content = Tei.renderXml(collection.getFile(document))
     )
   }
-
-  def verify(): Unit = {
-    val errors: Seq[String] = references.get.verify(this)
-    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
-  }
-
-  def writeStaticFiles(): Unit = {
-    val directory: File = Files.url2file(Files.getParent(fromUrl.url))
-
-    def deleteDirectory(name: String): Unit = Files.deleteFiles(new File(directory, name))
-
-    def write(htmlContent: HtmlContent): Unit = Files.write(
-      Files.file(directory, toStaticPath(htmlContent.path(this))),
-      getHtmlContent(htmlContent)
-    )
-
-    // Index
-    write(Index.Flat)
-    write(Index.Tree)
-    write(entityLists)
-
-    // Hierarchy
-    deleteDirectory("by")
-    for (hierarchy <- hierarchies) write(hierarchy)
-
-    // Names
-    deleteDirectory("names")
-    for (entity <- entities.entities) write(entity)
-
-    // Notes
-    deleteDirectory("notes")
-    write(notes)
-    for (note <- notes.directoryEntries) write(note)
-
-    // Reports
-    deleteDirectory("reports")
-    write(Reports)
-    for (report <- Reports.reports) write(report)
-
-    // Documents, facsimile viewers and collection indices
-    deleteDirectory("collections")
-
-    // Collection indices
-    for (collection <- collections) write(collection)
-
-    // Documents
-    for {
-      collection <- collections
-      document <- collection.documents
-    } {
-      write(collection.textFacet     .of(document))
-      write(collection.facsimileFacet.of(document))
-    }
-  }
 }
 
 object Site extends Element[Site]("site") {
 
-  def read(rootPath: String): Site =
-    read(new File(rootPath).toURI.toURL)
-
-  def read(rootUrl: URL): Site = {
-    val directory: URL = Files.subdirectory(rootUrl, "store")
-    Parser.parseDo(Site.parse(Files.fileInDirectory(directory, "site.xml")))
-  }
+  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
@@ -325,6 +245,22 @@ object Site extends Element[Site]("site") {
     // and in general, it's weird to expand the elements that are always empty:
     keepEmptyElements = Set("br", "meta", "link", "img", "data")
   )
+
+  def read(rootPath: String): Site =
+    read(new File(rootPath).toURI.toURL)
+
+  def read(rootUrl: URL): Site = {
+    logger.info(s"Reading site from $rootUrl")
+    Parser.parseDo(Site.parse(Files.fileInDirectory(rootUrl, "site.xml")))
+  }
+
+  def main(args: Array[String]): Unit = {
+    org.opentorah.collector.Cache.logEnabled = false
+
+    Site
+      .read(new File(args(0)).toURI.toURL)
+      .build(args.length > 1 && (args(1) == "prettyPrint"))
+  }
 
   private val siteUrlAttribute: Attribute.Required[String] = Attribute("siteUrl").required
   private val facsimilesUrlAttribute: Attribute.Required[String] = Attribute("facsimilesUrl").required

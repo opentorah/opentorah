@@ -103,39 +103,13 @@ I store my Docker image (`gcr.io/alter-rebbe-2/collector`) in the GCP's Containe
 ```
 
 I use [jib](https://github.com/GoogleContainerTools/jib) Gradle Plugin to
-build and push my Docker image:
-```
-  $ ./gradlew :collector:jib
-```
+build and push my Docker image.
 Image layers are in the `artifacts.alter-rebbe-2.appspot.com/containers/images` bucket that
 was auto-created (with fine-grained access control).
 
-### Running locally ###
-
-To run locally in the environment equivalent to Google Cloud Run, I need to install:
-- [minikube](https://minikube.sigs.k8s.io/docs/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- [knative](https://knative.dev/docs/install/any-kubernetes-cluster/)
-- [istioctl](https://istio.io/latest/docs/setup/install/istioctl/)
-- [Istio](https://knative.dev/docs/install/installing-istio/)
-- [skaffold](https://skaffold.dev/) (probably)
-
-run as a service account: https://cloud.google.com/run/docs/configuring/service-accounts plugin in IntelliJ Idea
-does not make JIB builder available for my project in
-  `Cloud Code | Cloud Run | Run Locally` Run configuration, so I am running in plain local Docker,
-which is much simpler:
-
-Build the image to local Docker:
-```
-  $ ./gradlew jibDockerBuild
-```
-and run it:
-```
-  $ docker run --name collector --rm --cpus 1 --memory 512Mi --env PORT=8080 --publish 4000:8080 gcr.io/alter-rebbe-2/collector
-```
-
-To avoid duplication of the parameters between the Service YAML file and the task that runs the service in the local Docker,
-I enhanced my Cloud Run Gradle plugin to pre-configure such tasks.
+In December 2020 I wrote a [Cloud Run Plugin](https://github.com/dubinsky/cloud-run)
+and use it to deploy the service to Cloud Run or run it locally.
+Service configuration is in the `service.yaml` file.
 
 Turns out, for ZIO effects and unsafeRuns to work in the CPU-constrained environment,
 care needs to be taken witn the thread-pools.
@@ -151,37 +125,7 @@ I use [Cloud Run](https://cloud.google.com/run#key-features)
  $ gcloud config set run/region us-east4
 ```
 
-In December 2020 I wrote Cloud Run Gradle plugin and now use it to deploy the service.
-Service configuration is in the `service.yaml` file.
-
 Historically:
-To deploy on the Cloud Run for the first time (beta is required for the `--min-instances` option):
-```
-  $ gcloud beta run deploy collector \
-    --image gcr.io/alter-rebbe-2/collector \ 
-    --allow-unauthenticated \
-    --platform managed \
-    --region us-east4 \
-    --min-instances 1
-```
-
-To re-deploy inheriting parameters from the previous revision (image name is not inherited for some reason):
-```
-  $ gcloud run deploy collector --image gcr.io/alter-rebbe-2/collector 
-```
-
-To set entry point variables and environment variables:
-```
-  $ gcloud run services update collector
-    --command COMMAND
-    --args ARG1,ARG-N                  To reset this field to its default, pass an empty string.
-    --clear-env-vars                   Remove all environment variables.
-    --set-env-vars=[KEY=VALUE,...]     All existing environment variables will be removed first.
-    --remove-env-vars=[KEY,...]        List of environment variables to be removed.
-    --update-env-vars=[KEY=VALUE,...]  List of key-value pairs to set as environment variables.
-At most one of 'clear' and 'set' may be specified.
-If both 'remove' and 'update' are specified, 'remove' will be applied first.
-```
 
 To add a domain mapping:
 ```
