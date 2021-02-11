@@ -15,11 +15,11 @@ final class Entity(
   override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = Some(mainName)
 
+  def teiEntity(site: Site): TeiEntity = site.entities.getFile(this)
+
   override def path(site: Site): Store.Path = Seq(site.entities, this)
 
   override def content(site: Site): Xml.Element = {
-    val entity: TeiEntity = site.entities.getFile(this)
-
     val sources: Seq[Store] =
       for (reference <- site.getReferences.toId(id))
       yield site.resolve(reference.sourceUrl.get).get.last
@@ -53,6 +53,7 @@ final class Entity(
         <l>{collection.pathHeaderHorizontal(site)}: {for (text <- texts) yield text.a(site)(text = text.document.baseName)}</l>}
       </p>
 
+    val entity: TeiEntity = teiEntity(site)
     TeiEntity.xmlElement(entity.copy(content = entity.content :+ mentions))
   }
 }

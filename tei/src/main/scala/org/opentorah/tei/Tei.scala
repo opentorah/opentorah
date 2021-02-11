@@ -11,7 +11,7 @@ final case class Tei(
   def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
 
   def addressee: Option[EntityReference] =
-    EntityReference.from(correspDesc.map(_.xml).getOrElse(Seq.empty))
+    EntityReference.fromXml(correspDesc.map(_.xml).getOrElse(Seq.empty))
       .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
 
   def pbs: Seq[Pb] = body.xml.flatMap(node =>

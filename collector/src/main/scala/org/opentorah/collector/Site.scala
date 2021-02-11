@@ -131,17 +131,8 @@ final class Site(
     Tei.renderXml(result)
   }
 
-  private def getHtmlContent(htmlContent: HtmlContent): String = {
-    val content: Xml.Element = Tei.toHtml(
-      linkResolver(htmlContent match {
-        case htmlFacet: Document.TextFacet => Some(htmlFacet)
-        case _ => None
-      }),
-      htmlContent.content(this)
-    )
-    val navigationLinks: Seq[Xml.Element] = htmlContent.navigationLinks(this)
-
-    val html: Xml.Element = HtmlTheme.toHtml(
+  private def getHtmlContent(htmlContent: HtmlContent): String =
+    Site.htmlPrettyPrinter.render(doctype = Html, element = HtmlTheme.toHtml(
       lang = htmlContent.lang.getOrElse("ru"),
       viewer = htmlContent.viewer,
       headTitle = htmlContent.htmlHeadTitle,
@@ -149,10 +140,10 @@ final class Site(
       style = if (htmlContent.isWide) "wide" else "main",
       favicon,
       googleAnalyticsId,
-      content,
+      resolveHtmlContent(htmlContent),
       header = HtmlTheme.header(
         this.title.xml,
-        this.navigationLinks ++ navigationLinks
+        this.navigationLinks ++ htmlContent.navigationLinks(this)
       ),
       footer = HtmlTheme.footer(
         author = siteUrl,
@@ -161,31 +152,36 @@ final class Site(
         twitterUsername,
         footer.xml
       )
-    )
+    ))
 
-    Site.htmlPrettyPrinter.render(doctype = Html, element = html)
-  }
+  private def resolveHtmlContent(htmlContent: HtmlContent): Xml.Element = Tei.toHtml(
+    linkResolver(htmlContent match {
+      case htmlFacet: Document.TextFacet => Some(htmlFacet)
+      case _ => None
+    }),
+    htmlContent.content(this)
+  )
 
   private def linkResolver(textFacet: Option[Document.TextFacet]): LinkResolver = new LinkResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
       textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
 
-    def toResolved(a: Option[Html.a], error: => String): Option[Html.a] = {
+    def resolved(a: Option[Html.a], error: => String): Option[Html.a] = {
       if (a.isEmpty) Site.logger.warn(error)
       a
     }
 
-    override def resolve(url: Seq[String]): Option[Html.a] = toResolved(
+    override def resolve(url: Seq[String]): Option[Html.a] = resolved(
       Site.this.resolve(url).map(path => a(path)),
       s"did not resolve: $url"
     )
 
-    override def findByRef(ref: String): Option[Html.a] = toResolved(
+    override def findByRef(ref: String): Option[Html.a] = resolved(
       entities.findByName(ref).map(entity => entity.a(Site.this)),
       s"did not find reference: $ref"
     )
 
-    override def facs(pageId: String): Option[Html.a] = toResolved(
+    override def facs(pageId: String): Option[Html.a] = resolved(
       facsUrl.map(facsUrl => a(facsUrl, part = Some(pageId))),
       "did not get facsimile: $pageId"
     )
@@ -198,15 +194,61 @@ final class Site(
     notes.writeDirectory()
     for (collection <- collections) collection.writeDirectory()
 
+    Site.logger.info("Writing references.")
     // Collection lists must exist by the time this runs:
-    references.write(References.fromSite(this))
+    references.write(allReferences)
 
     Site.logger.info("Verifying site.")
 
     val errors: Seq[String] = getReferences.verify(this)
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
+    // detect and log unresolved references
+    // TODO do this as a part of references verification above?
+    // TODO do the same for the hierarchy stores!
+    for (note <- notes.directoryEntries) resolveHtmlContent(note)
+    for (entity <- entities.directoryEntries) resolveHtmlContent(entity)
+    for (collection <- collections) resolveHtmlContent(collection)
+    for {
+      collection <- collections
+      document <- collection.directoryEntries
+      text = collection.textFacet.of(document)
+    } resolveHtmlContent(text)
+
     if (withPrettyPrint) prettyPrint()
+  }
+
+  private def allReferences: Seq[EntityReference] = {
+    // TODO from notes!
+
+    val fromEntities: Seq[Seq[EntityReference]] =
+      for (entity <- entities.directoryEntries) yield addSource(
+        entity,
+        entity.teiEntity(this).content
+      )
+
+    val fromHierarchicals: Seq[Seq[EntityReference]] =
+      for (hierarchical <- hierarchies ++ collections) yield addSource(
+        hierarchical,
+        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
+      )
+
+    val fromDocuments: Seq[Seq[EntityReference]] =
+      for {
+        collection <- collections
+        document <- collection.directoryEntries
+        text = collection.textFacet.of(document)
+      } yield addSource(
+        text,
+        Seq(Tei.xmlElement(text.getTei))
+      )
+
+    (fromEntities ++ fromHierarchicals ++ fromDocuments).flatten
+  }
+
+  private def addSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[EntityReference] = {
+    val source: Option[String] = Some(Files.mkUrl(htmlContent.path(this).map(_.structureName)))
+    for (reference <- EntityReference.fromXml(nodes)) yield reference.copy(sourceUrl = source)
   }
 
   private def prettyPrint(): Unit = {
