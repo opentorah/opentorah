@@ -20,9 +20,7 @@ final class Entity(
   override def path(site: Site): Store.Path = Seq(site.entities, this)
 
   override def content(site: Site): Xml.Element = {
-    val sources: Seq[Store] =
-      for (reference <- site.getReferences.filter(_.value.ref.contains(id)))
-      yield site.resolve(reference.source).get.last
+    val sources: Seq[Store] = WithSource.resolve(site, site.getReferences.filter(_.value.ref.contains(id)))
 
     val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
       for { source <- sources; if source.isInstanceOf[Entity] } yield source.asInstanceOf[Entity]

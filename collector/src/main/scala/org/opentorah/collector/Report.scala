@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.tei.EntityReference
+import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Html, Xml}
 
@@ -33,6 +33,19 @@ object Report {
     override protected def lineToXml(reference: WithSource[EntityReference], site: Site): Xml.Element = {
       val source: String = reference.source
       <l>{Xml.text(reference.value.name)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
+    }
+  }
+
+  object Unclears extends Report[WithSource[Unclear.Value]](
+    "unclears",
+    "Неясности"
+  ) {
+    override protected def lines(site: Site): Seq[WithSource[Unclear.Value]] =
+      site.getUnclears.sortBy(_.source)
+
+    override protected def lineToXml(unclear: WithSource[Unclear.Value], site: Site): Xml.Element = {
+      val source: String = unclear.source
+      <l>{Xml.text(unclear.value.xml)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
     }
   }
 
