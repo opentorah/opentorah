@@ -273,7 +273,7 @@ object Site extends Element[Site]("site") {
   val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
     // Note: only the ones derived from TEI notes need to cling, but:
-    clingyElements = Set("a"),
+    // TODO: clingyElements = Set("a"), - but not the pages links!!! Shouldn't cling through whitespace...
     // Note: empty elements are mis-processed by the browser (next element gets inserted inside the empty one!),
     // so I make sure there are no empty elements in the HTML:
     allowEmptyElements = false,
