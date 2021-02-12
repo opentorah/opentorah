@@ -22,15 +22,17 @@ abstract class Report[T](val name: String, val title: String) extends Store with
 
 object Report {
 
-  object NoRefs extends Report[EntityReference](
+  object NoRefs extends Report[WithSource[EntityReference]](
     "no-refs",
     "Имена без атрибута /ref/"
   ) {
-    override protected def lines(site: Site): Seq[EntityReference] = site.getReferences.noRef
+    override protected def lines(site: Site): Seq[WithSource[EntityReference]] =  site.getReferences
+      .filter(_.value.ref.isEmpty)
+      .sortBy(reference => Xml.text(reference.value.name).toLowerCase)
 
-    override protected def lineToXml(reference: EntityReference, site: Site): Xml.Element = {
-      val source: String = reference.sourceUrl.get
-      <l>{Xml.text(reference.name)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
+    override protected def lineToXml(reference: WithSource[EntityReference], site: Site): Xml.Element = {
+      val source: String = reference.source
+      <l>{Xml.text(reference.value.name)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
     }
   }
 

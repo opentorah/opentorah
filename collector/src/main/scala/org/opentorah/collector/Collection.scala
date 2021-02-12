@@ -226,12 +226,11 @@ object Collection extends Element[Collection]("collection") {
     private val titleElement: Elements.Required[Title.Value] = Title.element.required
     private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
     private val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
-    private val pageTypeAttribute: Attribute.OrDefault[String] = Attribute("pageType", default = "manuscript").orDefault
     private val aliasAttribute: Attribute.Optional[String] = Attribute("alias").optional
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
 
     override def parser: Parser[Collection] = for {
-      pageType <- pageTypeAttribute()
+      pageType <- Page.typeAttribute()
       fromUrl <- Element.currentFromUrl
       names <- namesParsable()
       title <- titleElement()
@@ -243,7 +242,7 @@ object Collection extends Element[Collection]("collection") {
     } yield new Collection(
       fromUrl,
       names,
-      Page.values.find(_.name == pageType).get,
+      pageType,
       alias,
       title,
       storeAbstract,
@@ -253,7 +252,7 @@ object Collection extends Element[Collection]("collection") {
     )
 
     override def unparser: Unparser[Collection] = Unparser.concat(
-      pageTypeAttribute(_.pageType.name),
+      Page.typeAttribute(_.pageType),
       namesParsable(_.names),
       titleElement(_.title),
       abstractElement(_.storeAbstract),

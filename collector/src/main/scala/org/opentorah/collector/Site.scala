@@ -9,9 +9,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
 
-// TODO use enumerated Attributes!
 // TODO figure out how to read/write with materialized redirects,
-//   pre-generate hierarchy in one file and pretty-print hierarchy stores!
+//   pre-generate hierarchy in one file and pretty-print hierarchy stores.
+// TODO retrieve TEI(?) references from notes.
 final class Site(
   override val fromUrl: FromUrl,
   override val names: Names,
@@ -64,14 +64,15 @@ final class Site(
     .map(collection => collection.alias.get -> new Collection.Alias(collection))
     .toMap
 
-  private val references: ListFile[EntityReference, References] = new ListFile[EntityReference, References](
-    url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
-    name = "references",
-    entry = EntityReference,
-    wrapper = new References(_)
-  )
+  private val references: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] =
+    new ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]](
+      url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
+      name = "references",
+      entry = new WithSource.Of[EntityReference](EntityReference),
+      wrapper = identity
+    )
 
-  def getReferences: References = references.get
+  def getReferences: Seq[WithSource[EntityReference]] = references.get
 
   def resolve(url: String): Option[Store.Path] = resolve(Files.splitAndDecodeUrl(url))
 
@@ -102,12 +103,12 @@ final class Site(
   )
 
   def content(path: Store.Path): (String, Boolean) = path.lastOption.getOrElse(this) match {
-    case teiFacet: Document.TeiFacet => (getTeiContent(teiFacet.getTei), true)
-    case htmlContent: HtmlContent => (getHtmlContent(htmlContent), false)
+    case teiFacet: Document.TeiFacet => (renderTeiContent(teiFacet.getTei), true)
+    case htmlContent: HtmlContent => (renderHtmlContent(htmlContent), false)
   }
 
-  private def getTeiContent(tei: Tei): String = {
-    val result: Tei = tei.copy(teiHeader = tei.teiHeader.copy(
+  private def renderTeiContent(tei: Tei): String = Tei.renderXml(
+    tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(new PublicationStmt(
           publisher = Some(new Publisher.Value(<ptr target={siteUrl}/>)),
@@ -127,11 +128,9 @@ final class Site(
         calendarDesc = Some(calendarDesc)
       ))
     ))
+  )
 
-    Tei.renderXml(result)
-  }
-
-  private def getHtmlContent(htmlContent: HtmlContent): String =
+  private def renderHtmlContent(htmlContent: HtmlContent): String =
     Site.htmlPrettyPrinter.render(doctype = Html, element = HtmlTheme.toHtml(
       lang = htmlContent.lang.getOrElse("ru"),
       viewer = htmlContent.viewer,
@@ -140,7 +139,7 @@ final class Site(
       style = if (htmlContent.isWide) "wide" else "main",
       favicon,
       googleAnalyticsId,
-      resolveHtmlContent(htmlContent),
+      content = resolveHtmlContent(htmlContent),
       header = HtmlTheme.header(
         this.title.xml,
         this.navigationLinks ++ htmlContent.navigationLinks(this)
@@ -200,45 +199,54 @@ final class Site(
 
     Site.logger.info("Verifying site.")
 
-    val errors: Seq[String] = getReferences.verify(this)
+    val errors: Seq[String] = getReferences.flatMap { value =>
+      val reference: EntityReference = value.value
+      val name: Xml.Nodes = reference.name
+      reference.ref.fold[Option[String]](None) { ref =>
+        if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
+          entities.findByName(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
+            if (named.entityType == reference.entityType) None
+            else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
+          }
+        }
+      }
+    }
+
     if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
 
     // detect and log unresolved references
-    // TODO do this as a part of references verification above?
-    // TODO do the same for the hierarchy stores!
-    for (note <- notes.directoryEntries) resolveHtmlContent(note)
-    for (entity <- entities.directoryEntries) resolveHtmlContent(entity)
-    for (collection <- collections) resolveHtmlContent(collection)
+    for (htmlContent <- hierarchies ++ collections ++ notes.directoryEntries ++ entities.directoryEntries)
+      resolveHtmlContent(htmlContent)
+
     for {
       collection <- collections
       document <- collection.directoryEntries
       text = collection.textFacet.of(document)
     } resolveHtmlContent(text)
 
+    Site.logger.info("Pretty-printing site.")
     if (withPrettyPrint) prettyPrint()
   }
 
-  private def allReferences: Seq[EntityReference] = {
-    // TODO from notes!
-
-    val fromEntities: Seq[Seq[EntityReference]] =
-      for (entity <- entities.directoryEntries) yield addSource(
+  private def allReferences: Seq[WithSource[EntityReference]] = {
+    val fromEntities: Seq[Seq[WithSource[EntityReference]]] =
+      for (entity <- entities.directoryEntries) yield withSource(
         entity,
         entity.teiEntity(this).content
       )
 
-    val fromHierarchicals: Seq[Seq[EntityReference]] =
-      for (hierarchical <- hierarchies ++ collections) yield addSource(
+    val fromHierarchicals: Seq[Seq[WithSource[EntityReference]]] =
+      for (hierarchical <- hierarchies ++ collections) yield withSource(
         hierarchical,
         Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
       )
 
-    val fromDocuments: Seq[Seq[EntityReference]] =
+    val fromDocuments: Seq[Seq[WithSource[EntityReference]]] =
       for {
         collection <- collections
         document <- collection.directoryEntries
         text = collection.textFacet.of(document)
-      } yield addSource(
+      } yield withSource(
         text,
         Seq(Tei.xmlElement(text.getTei))
       )
@@ -246,14 +254,13 @@ final class Site(
     (fromEntities ++ fromHierarchicals ++ fromDocuments).flatten
   }
 
-  private def addSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[EntityReference] = {
-    val source: Option[String] = Some(Files.mkUrl(htmlContent.path(this).map(_.structureName)))
-    for (reference <- EntityReference.fromXml(nodes)) yield reference.copy(sourceUrl = source)
+  private def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[WithSource[EntityReference]] = {
+    val source: String = Files.mkUrl(htmlContent.path(this).map(_.structureName))
+    for (reference <- EntityReference.fromXml(nodes))
+    yield new WithSource[EntityReference](source, reference)
   }
 
   private def prettyPrint(): Unit = {
-    Site.logger.info("Pretty-printing site.")
-
     for (entity <- entities.directoryEntries) entities.writeFile(
       entity,
       content = Store.renderXml(TeiEntity.xmlElement(entities.getFile(entity)))

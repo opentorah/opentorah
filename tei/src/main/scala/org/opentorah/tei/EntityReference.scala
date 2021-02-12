@@ -7,8 +7,7 @@ final case class EntityReference(
   name: Xml.Nodes,
   id: Option[String],
   role: Option[String],
-  ref: Option[String],
-  sourceUrl: Option[String]
+  ref: Option[String]
 )
 
 object EntityReference extends EntityRelated[EntityReference](
@@ -21,11 +20,9 @@ object EntityReference extends EntityRelated[EntityReference](
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
   private val refAttribute: Attribute.Optional[String] = Attribute("ref").optional
   private val typeAttribute: Attribute.Optional[String] = Attribute("type").optional
-  private val sourceAttribute: Attribute.Optional[String] = Attribute("sourceUrl").optional
 
   override protected def parsable(entityType: EntityType): Parsable[EntityReference] = new Parsable[EntityReference] {
     override protected def parser: Parser[EntityReference] = for {
-      sourceUrl <- sourceAttribute()
       id <- idAttribute()
       role <- roleAttribute()
       ref <- refAttribute()
@@ -36,16 +33,14 @@ object EntityReference extends EntityRelated[EntityReference](
       name,
       id,
       role,
-      ref,
-      sourceUrl
+      ref
     )
 
     override def unparser: Unparser[EntityReference] = Tei.concat(
       refAttribute(_.ref),
       idAttribute(_.id),
       roleAttribute(_.role),
-      Element.nodes(_.name),
-      sourceAttribute(_.sourceUrl)
+      Element.nodes(_.name)
     )
   }
 
@@ -55,6 +50,5 @@ object EntityReference extends EntityRelated[EntityReference](
     node <- xml
     descendant <- Xml.descendants(node, entityType.nameElement)
   } yield
-    // TODO introduce and use here parser that doesn't allow sourceUrl
     Parser.parseDo(EntityReference.parse(From.xml("descendants", descendant)))
 }

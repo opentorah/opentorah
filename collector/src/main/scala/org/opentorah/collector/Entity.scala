@@ -1,14 +1,14 @@
 package org.opentorah.collector
 
-import org.opentorah.tei.{EntityType, Entity => TeiEntity}
+import org.opentorah.tei.{EntityRelated, EntityType, Entity => TeiEntity}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Unparser, Xml}
 
 final class Entity(
-  override val name: String,
   val entityType: EntityType,
   val role: Option[String],
-  val mainName: String
+  override val name: String,
+  val mainName: String  // Note: can mostly be reconstructed from the name...
 ) extends Directory.Entry(name) with HtmlContent {
   def id: String = name
 
@@ -21,8 +21,8 @@ final class Entity(
 
   override def content(site: Site): Xml.Element = {
     val sources: Seq[Store] =
-      for (reference <- site.getReferences.toId(id))
-      yield site.resolve(reference.sourceUrl.get).get.last
+      for (reference <- site.getReferences.filter(_.value.ref.contains(id)))
+      yield site.resolve(reference.source).get.last
 
     val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
       for { source <- sources; if source.isInstanceOf[Entity] } yield source.asInstanceOf[Entity]
@@ -58,37 +58,38 @@ final class Entity(
   }
 }
 
-// TODO use EntityRelated - but first generalize EntryMaker?
-object Entity extends Directory.EntryMaker[TeiEntity, Entity]("entity") {
+object Entity extends EntityRelated[Entity](
+  elementName = _.element,
+  entityType = _.entityType
+) with Directory.EntryMaker[TeiEntity, Entity] {
 
   override def apply(name: String, entity: TeiEntity): Entity = new Entity(
-    name,
     entity.entityType,
     entity.role,
+    name,
     entity.names.head.name
   )
 
-  private val entityTypeAttribute: Attribute.Required[String] = Attribute("type").required
+  override protected def contentType: ContentType = ContentType.Elements
+
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
   private val mainNameAttribute: Attribute.Required[String] = Attribute("name").required
 
-  override def contentParsable: Parsable[Entity] = new Parsable[Entity] {
+  override protected def parsable(entityType: EntityType): Parsable[Entity] = new Parsable[Entity] {
     override def parser: Parser[Entity] = for {
-      name <- Directory.fileNameAttribute()
-      entityType <- entityTypeAttribute().map(value => EntityType.values.find(_.element == value).get)
       role <- roleAttribute()
+      name <- Directory.fileNameAttribute()
       mainName <- mainNameAttribute()
     } yield new Entity(
-      name,
       entityType,
       role,
+      name,
       mainName
     )
 
     override def unparser: Unparser[Entity] = Unparser.concat(
-      Directory.fileNameAttribute(_.name),
-      entityTypeAttribute(_.entityType.element),
       roleAttribute(_.role),
+      Directory.fileNameAttribute(_.name),
       mainNameAttribute(_.mainName)
     )
   }
