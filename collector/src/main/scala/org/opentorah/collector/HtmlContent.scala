@@ -5,7 +5,6 @@ import org.opentorah.xml.{Html, Xml}
 trait HtmlContent {
   def viewer: Viewer = Viewer.default
   def isWide: Boolean = false
-  def lang: Option[String] = None
   def htmlHeadTitle: Option[String]
   def htmlBodyTitle: Option[Xml.Nodes] = None
 

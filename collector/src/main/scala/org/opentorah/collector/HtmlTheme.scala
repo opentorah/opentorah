@@ -4,10 +4,8 @@ import org.opentorah.xml.{Attribute, Html, XLink, Xml}
 
 object HtmlTheme {
 
-  // TODO set 'lang' deeper than on the html element.
   // TODO remove post-related stuff
   def toHtml(
-    lang: String,
     viewer: Viewer,
     headTitle: Option[String],
     title: Option[Xml.Nodes],
@@ -18,7 +16,7 @@ object HtmlTheme {
     header: Xml.Element,
     footer: Xml.Element
   ): Xml.Element =
-    <html lang={lang}>
+    <html>
       <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>

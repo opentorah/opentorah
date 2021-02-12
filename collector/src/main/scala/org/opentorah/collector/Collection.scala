@@ -157,7 +157,6 @@ object Collection extends Element[Collection]("collection") {
     override def isWide: Boolean = collection.isWide
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
-    override def lang: Option[String] = collection.lang
     override def path           (site: Site): Store.Path       = collection.path           (site)
     override def navigationLinks(site: Site): Seq[Xml.Element] = collection.navigationLinks(site)
     override def content        (site: Site): Xml.Element      = collection.content        (site)

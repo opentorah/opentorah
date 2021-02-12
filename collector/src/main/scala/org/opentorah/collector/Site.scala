@@ -136,7 +136,6 @@ final class Site(
 
   private def renderHtmlContent(htmlContent: HtmlContent): String =
     Site.htmlPrettyPrinter.render(doctype = Html, element = HtmlTheme.toHtml(
-      lang = htmlContent.lang.getOrElse("ru"),
       viewer = htmlContent.viewer,
       headTitle = htmlContent.htmlHeadTitle,
       title = htmlContent.htmlBodyTitle,
@@ -273,6 +272,8 @@ object Site extends Element[Site]("site") {
 
   val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
+    // Note: only the ones derived from TEI notes need to cling, but:
+    clingyElements = Set("a"),
     // Note: empty elements are mis-processed by the browser (next element gets inserted inside the empty one!),
     // so I make sure there are no empty elements in the HTML:
     allowEmptyElements = false,
