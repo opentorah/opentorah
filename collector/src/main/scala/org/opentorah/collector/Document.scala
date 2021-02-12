@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, Pb, Tei}
-import org.opentorah.xml.{Attribute, Elements, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
 
 final class Document(
   override val name: String,
@@ -31,7 +31,7 @@ final class Document(
   def pages(pageType: Page.Type): Seq[Page] = for (pb <- pbs) yield pageType(pb)
 }
 
-object Document extends Directory.EntryMaker[Tei, Document]("document") {
+object Document extends Element[Document]("document") with Directory.EntryMaker[Tei, Document] {
 
   sealed abstract class Facet[DF <: Facet[DF, F], F <: Collection.Facet[DF, F]](val document: Document, collectionFacet: F)
     extends Store

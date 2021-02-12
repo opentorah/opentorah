@@ -19,11 +19,8 @@ jobs:
         with:
           java-version: 11
 
-#      - name: "Build and test"
-#        run: ./gradlew --no-daemon --console=plain build
-
-      - name: "Assemble"
-        run: ./gradlew --no-daemon --console=plain assemble
+#      - name: "Assemble"
+#        run: ./gradlew --no-daemon --console=plain assemble
 
       - name: "Build and push container image to GCR and deploy Cloud Run service"
         env:

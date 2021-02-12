@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Pb
+import org.opentorah.xml.{Attribute, Namespace}
 
 sealed abstract class Page(val pb: Pb) {
   def base: String
@@ -57,8 +58,7 @@ object Page {
 
     override def apply(pb: Pb): Page = {
       val n = pb.n
-      if (n.dropWhile(_.isDigit).nonEmpty)
-        throw new IllegalArgumentException()
+      if (n.dropWhile(_.isDigit).nonEmpty) throw new IllegalArgumentException()
       new Book(pb)
     }
   }
@@ -71,4 +71,15 @@ object Page {
   }
 
   val values: Seq[Type] = Seq(Manuscript, Book)
+
+  val typeAttribute: Attribute.OrDefault[Type] = new Attribute[Type](
+    "pageType",
+    namespace = Namespace.No,
+    default = Manuscript)
+  {
+    override def toString(value: Type): String = value.name
+
+    override def fromString(value: String): Type =
+      values.find(_.name == value).getOrElse(throw new IllegalArgumentException(s"Unknown page type: $value"))
+  }.orDefault
 }

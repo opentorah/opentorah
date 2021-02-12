@@ -1,6 +1,6 @@
 package org.opentorah.mathjax
 
-import org.opentorah.xml.{Attribute, Namespace}
+import org.opentorah.xml.Attribute
 
 sealed trait Input {
   def name: String

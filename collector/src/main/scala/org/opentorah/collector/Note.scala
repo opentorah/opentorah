@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.xml.{Attribute, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class Note(
   override val name: String,
@@ -13,7 +13,7 @@ final class Note(
   override def content(site: Site): Xml.Element = site.notes.getFile(this).html
 }
 
-object Note extends Directory.EntryMaker[Markdown, Note]("note") {
+object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {
 
   override def apply(name: String, markdown: Markdown): Note = new Note(
     name,

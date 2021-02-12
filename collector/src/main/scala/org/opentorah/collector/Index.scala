@@ -16,7 +16,6 @@ object Index {
       site.by.treeIndex(site)
   }
 
-  // TODO private val unpublishedCollections: Set[String] = Set("niab5", "niab19", "rnb203")
   object Flat extends Index("index", "case") {
     override def content(site: Site): Xml.Element =
       <ul>{for (collection <- site.collections) yield <li>{collection.flatIndexEntry(site)}</li>}</ul>
