@@ -67,7 +67,6 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def viewer: Viewer = Viewer.Document
     override def htmlHeadTitle: Option[String] = None
-    override def lang: Option[String] = Some(document.lang)
 
     override protected def moreNavigationLinks(site: Site): Seq[Xml.Element] =
       Seq(collection.facsimileFacet.of(document).a(site)(text = Tei.facsimileSymbol)) ++ {
