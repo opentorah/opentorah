@@ -42,8 +42,9 @@ object Xml extends Model {
     Parser.unsafeRun(result.provide(state))
   }
 
-  def descendants(xml: Node, name: String): Seq[Element] =
-    xml.flatMap(_ \\ name).filter(isElement).map(asElement)
+  def descendants[T](node: Node, elementName: String, elements: Elements[T]): Seq[T] =
+    node.flatMap(_ \\ elementName).filter(isElement).map[Element](asElement)
+    .map(descendant => Parser.parseDo(elements.parse(From.xml("descendants", descendant))))
 
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
     case Nil => Nil

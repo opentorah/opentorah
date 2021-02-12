@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, From, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
 
 final case class EntityReference(
   entityType: EntityType,
@@ -43,12 +43,4 @@ object EntityReference extends EntityRelated[EntityReference](
       Element.nodes(_.name)
     )
   }
-
-  // TODO eliminate?
-  def fromXml(xml: Xml.Nodes): Seq[EntityReference] = for {
-    entityType <- EntityType.values
-    node <- xml
-    descendant <- Xml.descendants(node, entityType.nameElement)
-  } yield
-    Parser.parseDo(EntityReference.parse(From.xml("descendants", descendant)))
 }

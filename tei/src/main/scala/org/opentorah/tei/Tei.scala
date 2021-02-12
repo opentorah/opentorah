@@ -7,23 +7,7 @@ import zio.{URIO, ZIO}
 final case class Tei(
   teiHeader: TeiHeader,
   text: Text
-) {
-  def titleStmt: TitleStmt = teiHeader.fileDesc.titleStmt
-
-  def addressee: Option[EntityReference] =
-    EntityReference.fromXml(correspDesc.map(_.xml).getOrElse(Seq.empty))
-      .find(name => (name.entityType == EntityType.Person) && name.role.contains("addressee"))
-
-  def pbs: Seq[Pb] = body.xml.flatMap(node =>
-    Xml.descendants(node, Pb.elementName)
-      .map(descendant => Parser.parseDo(Pb.parse(From.xml("descendants", descendant))))
-  )
-
-  def correspDesc: Option[CorrespDesc.Value] = teiHeader.profileDesc.flatMap(_.correspDesc)
-  def body: Body.Value = text.body
-
-  /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
-}
+)
 
 object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
 
@@ -33,6 +17,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
 
   def renderXml(tei: Tei): String = prettyPrinter.renderXml(Tei.xmlElement(tei))
 
+  /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
   override val prettyPrinter: PrettyPrinter = new PrettyPrinter(
     doNotStackElements = Set("choice"),
     nestElements = Set("p", /*"abstract",*/ "head", "salute", "dateline"),

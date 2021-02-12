@@ -11,7 +11,7 @@ object Reports extends By with HtmlContent {
     name => Store.findByName(name, reports)
   )
 
-  val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities)
+  val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)
 
   override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = selector.title

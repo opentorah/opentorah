@@ -1,8 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, LangUsage, Language, ProfileDesc, PublicationStmt,
-  Publisher, SourceDesc, Tei, TeiRawXml, Title, Entity => TeiEntity}
+import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, ProfileDesc,
+  PublicationStmt, Publisher, SourceDesc, Tei, TeiRawXml, Title, Unclear, Entity => TeiEntity}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Element, FromUrl, Html, LinkResolver, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
@@ -64,15 +64,19 @@ final class Site(
     .map(collection => collection.alias.get -> new Collection.Alias(collection))
     .toMap
 
-  private val references: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] =
-    new ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]](
-      url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
-      name = "references",
-      entry = new WithSource.Of[EntityReference](EntityReference),
-      wrapper = identity
-    )
-
+  private val references = WithSource(
+    url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
+    name = "references",
+    value = EntityReference
+  )
   def getReferences: Seq[WithSource[EntityReference]] = references.get
+
+  private val unclears = WithSource(
+    url = Files.fileInDirectory(fromUrl.url, "unclears-generated.xml"),
+    name = "unclears",
+    value = Unclear.element
+  )
+  def getUnclears: Seq[WithSource[Unclear.Value]] = unclears.get
 
   def resolve(url: String): Option[Store.Path] = resolve(Files.splitAndDecodeUrl(url))
 
@@ -193,9 +197,23 @@ final class Site(
     notes.writeDirectory()
     for (collection <- collections) collection.writeDirectory()
 
-    Site.logger.info("Writing references.")
     // Collection lists must exist by the time this runs:
-    references.write(allReferences)
+
+    Site.logger.info("Writing references.")
+    references.write(WithSource.all[EntityReference](
+      this,
+      nodes => for {
+        entityType <- EntityType.values
+        node <- nodes
+        descendants <- Xml.descendants(node, entityType.nameElement, EntityReference)
+      } yield descendants
+    ))
+
+    Site.logger.info("Writing unclears.")
+    unclears.write(WithSource.all[Unclear.Value](
+      this,
+      nodes => (for (node <- nodes) yield Xml.descendants(node, Unclear.element.elementName, Unclear.element)).flatten
+    ))
 
     Site.logger.info("Verifying site.")
 
@@ -226,38 +244,6 @@ final class Site(
 
     Site.logger.info("Pretty-printing site.")
     if (withPrettyPrint) prettyPrint()
-  }
-
-  private def allReferences: Seq[WithSource[EntityReference]] = {
-    val fromEntities: Seq[Seq[WithSource[EntityReference]]] =
-      for (entity <- entities.directoryEntries) yield withSource(
-        entity,
-        entity.teiEntity(this).content
-      )
-
-    val fromHierarchicals: Seq[Seq[WithSource[EntityReference]]] =
-      for (hierarchical <- hierarchies ++ collections) yield withSource(
-        hierarchical,
-        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
-      )
-
-    val fromDocuments: Seq[Seq[WithSource[EntityReference]]] =
-      for {
-        collection <- collections
-        document <- collection.directoryEntries
-        text = collection.textFacet.of(document)
-      } yield withSource(
-        text,
-        Seq(Tei.xmlElement(text.getTei))
-      )
-
-    (fromEntities ++ fromHierarchicals ++ fromDocuments).flatten
-  }
-
-  private def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[WithSource[EntityReference]] = {
-    val source: String = Files.mkUrl(htmlContent.path(this).map(_.structureName))
-    for (reference <- EntityReference.fromXml(nodes))
-    yield new WithSource[EntityReference](source, reference)
   }
 
   private def prettyPrint(): Unit = {

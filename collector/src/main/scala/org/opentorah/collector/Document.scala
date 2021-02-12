@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, Pb, Tei}
+import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
 
 final class Document(
@@ -81,7 +81,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     override def content(site: Site): Xml.Element =
       <div>
         {collection.documentHeader(document)}
-        {getTei.body.xml}
+        {getTei.text.body.xml}
       </div>
   }
 
@@ -133,12 +133,18 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
       name,
       isTranslation = language.isDefined,
       lang = lang.get,
-      editors = tei.titleStmt.editors,
+      editors = tei.teiHeader.fileDesc.titleStmt.editors,
       description = tei.teiHeader.profileDesc.flatMap(_.documentAbstract),
       date = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date)).map(_.when),
-      authors = tei.titleStmt.authors,
-      addressee = tei.addressee,
-      pbs = tei.pbs
+      authors = tei.teiHeader.fileDesc.titleStmt.authors,
+      addressee = {
+        for {
+          node <- tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.xml).getOrElse(Seq.empty)
+          persName <- Xml.descendants(node, EntityType.Person.nameElement, EntityReference)
+          if persName.role.contains("addressee")
+        } yield persName
+      }.headOption,
+      pbs = tei.text.body.xml.flatMap(node => Xml.descendants(node, Pb.elementName, Pb))
     )
   }
 
