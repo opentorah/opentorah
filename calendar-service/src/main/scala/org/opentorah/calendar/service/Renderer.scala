@@ -11,7 +11,7 @@ import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.util.Collections
-import org.opentorah.xml.{PrettyPrinter, Xml}
+import org.opentorah.xml.{Html, PrettyPrinter, Xml}
 
 sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   protected val calendar: Calendar
@@ -41,17 +41,17 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
   //  private def toLanguageString(what: LanguageString): String = what.toLanguageString(spec)
 
-  private def yearUrl(year: Calendar#YearBase, other: Boolean = false): String =
-    s"/${getName(other)}/${year.number}"
+  private def yearUrl(year: Calendar#YearBase, other: Boolean = false): Seq[String] =
+    Seq(getName(other), year.number.toString)
 
-  private def monthUrl(month: Calendar#MonthBase, other: Boolean = false): String =
-    s"/${getName(other)}/${month.year.number}/${month.numberInYear}"
+  private def monthUrl(month: Calendar#MonthBase, other: Boolean = false): Seq[String] =
+    Seq(getName(other), month.year.number.toString, month.numberInYear.toString)
 
-  private def monthNameUrl(month: Calendar#MonthBase, other: Boolean = false): String =
-    s"/${getName(other)}/${month.year.number}/${month.name.toLanguageString(spec)}"
+  private def monthNameUrl(month: Calendar#MonthBase, other: Boolean = false): Seq[String] =
+    Seq(getName(other), month.year.number.toString, month.name.toLanguageString(spec))
 
-  private def dayUrl(day: Calendar#DayBase, other: Boolean = false): String =
-    s"/${getName(other)}/${day.year.number}/${day.month.numberInYear}/${day.numberInMonth}"
+  private def dayUrl(day: Calendar#DayBase, other: Boolean = false): Seq[String] =
+    Seq(getName(other), day.year.number.toString, day.month.numberInYear.toString, day.numberInMonth.toString)
 
   private def yearLink(year: Calendar#YearBase, other: Boolean = false, text: Option[String] = None): Xml.Element =
     navLink(yearUrl(year, other = other), text.getOrElse(year.toLanguageString(spec)))
@@ -65,8 +65,8 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
   private def dayLink(day: Calendar#DayBase, other: Boolean = false, text: Option[String] = None): Xml.Element =
     navLink(dayUrl(day, other = other), text.getOrElse(day.numberInMonthToLanguageString(spec)))
 
-  private def navLink(url: String, text: String): Xml.Element =
-    <a class="nav" href={s"$url$suffix"}>{text}</a>
+  private def navLink(url: Seq[String], text: String): Xml.Element =
+    Html.a(path = url, query = Some(suffix)).addClass("nav")(text)
 
   private def suffix: String = Renderer.suffix(location, spec)
 
@@ -81,7 +81,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
 
   def renderLanding: String = {
     val day: Calendar#DayBase = Calendars.now(calendar).day
-    renderHtml(s"/$name", dayLinks(day, other = false))
+    renderHtml(Seq(name), dayLinks(day, other = false))
   }
 
   def renderYear(yearStr: String): String = {
@@ -305,7 +305,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       </table>
     }
 
-  private def renderHtml(url: String, content: Xml.Element): String =
+  private def renderHtml(url: Seq[String], content: Xml.Element): String =
     Renderer.renderHtml(url, content, location, spec)
 }
 
@@ -435,18 +435,18 @@ object Renderer {
   }
 
   def renderRoot(location: Location, spec: LanguageSpec): String = renderHtml(
-    url = "/",
+    url = Seq.empty,
     content =
       <div>
-        <div><a href={s"/$jewishRendererName"}>jewish</a></div>,
-        <div><a href={s"/$gregorianRenderername"}>gregorian</a></div>
+        <div>{Html.a(path = Seq(jewishRendererName))(text = "jewish")}</div>,
+        <div>{Html.a(path = Seq(gregorianRenderername))(text = "gregorian")}</div>
       </div>,
     location = location,
     spec = spec
   )
 
   def renderHtml(
-    url: String,
+    url: Seq[String],
     content: Xml.Element,
     location: Location,
     spec: LanguageSpec
@@ -454,12 +454,12 @@ object Renderer {
     val languages: Seq[Xml.Element] = Language.values.map(_.toSpec) map { spec1 =>
       val languageName = spec1.languageName
       if (spec1.language == spec.language) <span class="picker">{languageName}</span>
-      else <a class="picker" href={s"$url${suffix(location, spec1)}"}>{languageName}</a>
+      else Html.a(path = url, query = Some(suffix(location, spec1))).addClass("picker")(text = languageName)
     }
 
     val locations: Seq[Xml.Element] = Seq(Location.HolyLand, Location.Diaspora).map { location1 =>
       if (location1 == location) <span class="picker">{location1.name}</span>
-      else <a class="picker" href={s"$url${suffix(location1, spec)}"}>{location1.name}</a>
+      else Html.a(path = url, query = Some(suffix(location1, spec))).addClass("picker")(text = location1.name)
     }
 
     //        title("Reading Schedule")?

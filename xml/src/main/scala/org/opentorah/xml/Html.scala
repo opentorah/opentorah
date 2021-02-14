@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import org.opentorah.util.Files
 import zio.URIO
+import java.net.URI
 
 object Html extends Dialect with Doctype {
 
@@ -19,13 +20,13 @@ object Html extends Dialect with Doctype {
 
   val reservedAttributes: Set[String] = Set("class", "target", "lang")
 
-  // TODO use instead of the <a> throughout!
-  // TODO carry some kind of an URL instead of path, isPathAbsolute, part -
+  // TODO carry some kind of an URL instead of path, isPathAbsolute, part, query(!) -
   //   and remove Html.a(path = Seq(???)...
   final case class a(
     path: Seq[String] = Seq.empty,
     pathIsAbsolute: Boolean = false,
     part: Option[String] = None,
+    query: Option[String] = None,
     target: Option[String] = None,
     id: Option[String] = None,
     classes: Seq[String] = Seq.empty,

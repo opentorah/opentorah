@@ -13,7 +13,6 @@ trait PreModel {
   def isNamespaceDeclared(namespace: Namespace, element:  PreElement): Boolean
   def declareNamespace(namespace: Namespace, element: Element): Element
 
-  // TODO return Attribute.Value?
   final def getAttribute[T](attribute: Attribute[T], element: PreElement): Option[T] =
     attribute.get(getAttributeValueString(attribute, element))
 
@@ -34,7 +33,10 @@ trait PreModel {
 
   protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element
 
-  def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element
+  def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = attributes match {
+    case Nil => element
+    case a::as => setAttributes(as, setAttribute(a.attribute, a.value, element))
+  }
 
   final def addAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = {
     val existing: Seq[Attribute.Value[_]] = getAttributes(element)

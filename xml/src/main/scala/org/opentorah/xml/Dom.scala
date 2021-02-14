@@ -92,9 +92,6 @@ object Dom extends Model {
     element
   }
 
-  // TODO implement
-  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ???
-
   override def getChildren(element: Element): Nodes = {
     val list: NodeList = element.getChildNodes
     for (index <- 0 until list.getLength) yield list.item(index)

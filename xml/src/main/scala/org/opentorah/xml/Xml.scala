@@ -49,8 +49,9 @@ object Xml extends Model {
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)
-    case n :: n1 :: ns if n.isInstanceOf[Element] && n1.isInstanceOf[Element] => Seq(n, mkText(separator)) ++ multi(n1 :: ns)
-    case n :: ns => Seq(n) ++ multi(ns)
+    case n :: n1 :: ns if n.isInstanceOf[Element] && n1.isInstanceOf[Element] =>
+      Seq(n, mkText(separator)) ++ multi(n1 :: ns, separator)
+    case n :: ns => Seq(n) ++ multi(ns, separator)
     case n => n
   }
 
@@ -122,7 +123,7 @@ object Xml extends Model {
       Attribute(
         name = attribute.key,
         namespace = namespace
-        // TODO Note: in Scala 2.13, Seq is in scala.collection.immutable, but Scala XML still returns scala.collection.Seq -
+        // Note: in Scala 2.13, Seq is in scala.collection.immutable, but Scala XML still returns scala.collection.Seq -
         // hence the `value =>...`
       ).optional.withValue(Option(attribute.value).map(value => getAttributeValueText(value)))
     }
