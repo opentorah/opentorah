@@ -48,7 +48,8 @@ final class Entity(
         </l>
         }
         {for ((collection, texts) <- byCollection) yield
-        <l>{collection.pathHeaderHorizontal(site)}: {for (text <- texts) yield text.a(site)(text = text.document.baseName)}</l>}
+        <l>{collection.pathHeaderHorizontal(site)}:
+          {Xml.multi(separator = " ", nodes = for (text <- texts) yield text.a(site)(text = text.document.baseName))}</l>}
       </p>
 
     val entity: TeiEntity = teiEntity(site)

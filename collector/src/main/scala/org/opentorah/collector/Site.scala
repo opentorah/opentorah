@@ -97,14 +97,12 @@ final class Site(
     a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
-  def a(path: Store.Path, part: Option[String] = None): Html.a = Html.a(
-    path = path.map(_.structureName),
-    part = part,
-    target = Some((path.last match {
+  def a(path: Store.Path): Html.a = Html.a
+    .path(path.map(_.structureName))
+    .setTarget((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
       case _ => Viewer.default
     }).name)
-  )
 
   def content(path: Store.Path): (String, Boolean) = path.lastOption.getOrElse(this) match {
     case teiFacet: Document.TeiFacet => (renderTeiContent(teiFacet.getTei), true)
@@ -115,7 +113,7 @@ final class Site(
     tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(new PublicationStmt(
-          publisher = Some(new Publisher.Value(<ptr target={siteUrl}/>)),
+          publisher = Some(new Publisher.Value(<ptr target={s"http://$siteUrl"}/>)),
           availability = Some(new Availability(
             status = Some("free"),
             xml = <licence><ab><ref n="license" target={licenseUrl}>{licenseName}</ref></ab></licence>
@@ -184,7 +182,7 @@ final class Site(
     )
 
     override def facs(pageId: String): Option[Html.a] = resolved(
-      facsUrl.map(facsUrl => a(facsUrl, part = Some(pageId))),
+      facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId)),
       "did not get facsimile: $pageId"
     )
   }

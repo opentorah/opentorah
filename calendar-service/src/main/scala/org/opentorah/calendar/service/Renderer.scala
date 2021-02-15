@@ -66,7 +66,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     navLink(dayUrl(day, other = other), text.getOrElse(day.numberInMonthToLanguageString(spec)))
 
   private def navLink(url: Seq[String], text: String): Xml.Element =
-    Html.a(path = url, query = Some(suffix)).addClass("nav")(text)
+    Html.a.path(url).setQuery(suffix).addClass("nav")(text)
 
   private def suffix: String = Renderer.suffix(location, spec)
 
@@ -438,8 +438,8 @@ object Renderer {
     url = Seq.empty,
     content =
       <div>
-        <div>{Html.a(path = Seq(jewishRendererName))(text = "jewish")}</div>,
-        <div>{Html.a(path = Seq(gregorianRenderername))(text = "gregorian")}</div>
+        <div>{Html.a.path(Seq(jewishRendererName))(text = "jewish")}</div>,
+        <div>{Html.a.path(Seq(gregorianRenderername))(text = "gregorian")}</div>
       </div>,
     location = location,
     spec = spec
@@ -454,12 +454,12 @@ object Renderer {
     val languages: Seq[Xml.Element] = Language.values.map(_.toSpec) map { spec1 =>
       val languageName = spec1.languageName
       if (spec1.language == spec.language) <span class="picker">{languageName}</span>
-      else Html.a(path = url, query = Some(suffix(location, spec1))).addClass("picker")(text = languageName)
+      else Html.a.path(url).setQuery(suffix(location, spec1)).addClass("picker")(text = languageName)
     }
 
     val locations: Seq[Xml.Element] = Seq(Location.HolyLand, Location.Diaspora).map { location1 =>
       if (location1 == location) <span class="picker">{location1.name}</span>
-      else Html.a(path = url, query = Some(suffix(location1, spec))).addClass("picker")(text = location1.name)
+      else Html.a.path(url).setQuery(suffix(location1, spec)).addClass("picker")(text = location1.name)
     }
 
     //        title("Reading Schedule")?
@@ -482,5 +482,5 @@ object Renderer {
     if (spec.language.contains(Language.Hebrew)) "rtl" else "ltr"
 
   private def suffix(location: Location, spec: LanguageSpec): String =
-    s"?inHolyLand=${location.inHolyLand}&lang=${spec.languageName}"
+    s"inHolyLand=${location.inHolyLand}&lang=${spec.languageName}"
 }

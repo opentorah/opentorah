@@ -33,7 +33,7 @@ final class EntityLists(
 
     <div>
       <p>
-        {for (list <- nonEmptyLists) yield <l>{a(site, part = Some(list.names.name))(xml = list.title)}</l>}
+        {for (list <- nonEmptyLists) yield <l>{a(site).setFragment(list.names.name)(xml = list.title)}</l>}
       </p>
       {for (list <- nonEmptyLists) yield
       <list id={list.names.name}>

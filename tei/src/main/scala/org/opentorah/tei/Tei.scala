@@ -1,8 +1,9 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Dialect, Element, From, Html, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Dialect, Element, Html, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import zio.{URIO, ZIO}
+import java.net.URI
 
 final case class Tei(
   teiHeader: TeiHeader,
@@ -67,7 +68,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
           ZIO.succeed(Html.a()(children))
         else
           ZIO.access[Html.State](_.resolver.findByRef(ref.get)).map(_.
-            getOrElse(Html.a(path = ref.toSeq))
+            getOrElse(Html.a.path(ref.toSeq))
             (children)
           )
 
@@ -84,7 +85,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
         require(Xml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
         ZIO.access[Html.State](_.resolver.facs(pageId)).map(_
-          .getOrElse(Html.a(path = Seq(pageId)))
+          .getOrElse(Html.a.path(Seq(pageId)))
           .copy(id = Some(pageId))
           (text = facsimileSymbol)
         )
@@ -114,15 +115,13 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
   }
 
   private def reference(element: Xml.Element): URIO[Html.State, Html.a] = {
-    val href: String = targetAttribute.get(element)
+    val uri: URI = new URI(targetAttribute.get(element))
 
     // TODO maybe just call up regardless?
-    if (!href.startsWith("/")) ZIO.succeed(Html.a(path = Seq(href), pathIsAbsolute = true)) else {
-      val (url: String, part: Option[String]) = Files.urlAndPart(href)
-
-      ZIO.access[Html.State](_.resolver.resolve(Files.splitUrl(url))).map(_
-        .getOrElse(Html.a(path = Seq(href)))
-        .copy(part = part)
+    if (uri.isAbsolute) ZIO.succeed(Html.a.uri(uri)) else {
+      ZIO.access[Html.State](_.resolver.resolve(Files.splitUrl(uri.getPath))).map(_
+        .map(a => Option(uri.getFragment).fold(a)(a.setFragment))
+        .getOrElse(Html.a.uri(uri))
       )
     }
   }

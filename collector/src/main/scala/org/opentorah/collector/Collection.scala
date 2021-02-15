@@ -82,7 +82,7 @@ final class Collection(
         val text: Document.TextFacet = textFacet.of(document)
         Xml.multi(separator = " ", nodes =
           for (page <- document.pages(pageType))
-            yield page.pb.addAttributes(text.a(site, part = Some(Pb.pageId(page.pb.n)))(text = page.displayName))
+            yield page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
         )
       }),
 

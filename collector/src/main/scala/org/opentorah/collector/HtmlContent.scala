@@ -8,7 +8,7 @@ trait HtmlContent {
   def htmlHeadTitle: Option[String]
   def htmlBodyTitle: Option[Xml.Nodes] = None
 
-  final def a(site: Site, part: Option[String] = None): Html.a = site.a(path(site), part)
+  final def a(site: Site): Html.a = site.a(path(site))
 
   def path           (site: Site): Store.Path
   def navigationLinks(site: Site): Seq[Xml.Element] = Seq.empty

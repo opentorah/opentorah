@@ -33,10 +33,7 @@ trait PreModel {
 
   protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element
 
-  def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = attributes match {
-    case Nil => element
-    case a::as => setAttributes(as, setAttribute(a.attribute, a.value, element))
-  }
+  def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element
 
   final def addAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = {
     val existing: Seq[Attribute.Value[_]] = getAttributes(element)
