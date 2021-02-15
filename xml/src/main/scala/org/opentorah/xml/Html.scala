@@ -69,9 +69,9 @@ object Html extends Dialect with Doctype {
 
     private val rootUri: URI = new URI(null, null, "/", null)
 
-    def path(value: Seq[String]): a = uri(new URI(null, null, Files.mkUrl(value), null))
+    def apply(path: Seq[String]): a = apply(new URI(null, null, Files.mkUrl(path), null))
 
-    def uri(value: URI): a = a(uri = Some(value))
+    def apply(uri: URI): a = a(uri = Some(uri))
   }
 
   // Converting other XML dialects (e.g., TEI) to HTML

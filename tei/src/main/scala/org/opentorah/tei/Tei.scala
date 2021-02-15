@@ -68,7 +68,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
           ZIO.succeed(Html.a()(children))
         else
           ZIO.access[Html.State](_.resolver.findByRef(ref.get)).map(_.
-            getOrElse(Html.a.path(ref.toSeq))
+            getOrElse(Html.a(ref.toSeq))
             (children)
           )
 
@@ -85,7 +85,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
         require(Xml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
         ZIO.access[Html.State](_.resolver.facs(pageId)).map(_
-          .getOrElse(Html.a.path(Seq(pageId)))
+          .getOrElse(Html.a(Seq(pageId)))
           .copy(id = Some(pageId))
           (text = facsimileSymbol)
         )
@@ -118,10 +118,10 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
     val uri: URI = new URI(targetAttribute.get(element))
 
     // TODO maybe just call up regardless?
-    if (uri.isAbsolute) ZIO.succeed(Html.a.uri(uri)) else {
+    if (uri.isAbsolute) ZIO.succeed(Html.a(uri)) else {
       ZIO.access[Html.State](_.resolver.resolve(Files.splitUrl(uri.getPath))).map(_
         .map(a => Option(uri.getFragment).fold(a)(a.setFragment))
-        .getOrElse(Html.a.uri(uri))
+        .getOrElse(Html.a(uri))
       )
     }
   }

@@ -25,7 +25,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
     val resolver = new LinkResolver {
       override def resolve(url: Seq[String]): Option[Html.a] = None
       override def findByRef(ref:  String): Option[Html.a] = None
-      override def facs(pageId: String): Option[Html.a] = Some(Html.a.path(Seq("facsimiles"))
+      override def facs(pageId: String): Option[Html.a] = Some(Html.a(Seq("facsimiles"))
         .setFragment(pageId)
         .setTarget("facsViewer")
       )

@@ -97,8 +97,8 @@ final class Site(
     a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
-  def a(path: Store.Path): Html.a = Html.a
-    .path(path.map(_.structureName))
+  def a(path: Store.Path): Html.a = Html
+    .a(path.map(_.structureName))
     .setTarget((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
       case _ => Viewer.default
