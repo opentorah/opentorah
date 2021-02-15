@@ -70,7 +70,8 @@ final case class PrettyPrinter(
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
           Doc.text(attributeValue.attribute.qName + "=") + Doc.lineOrEmpty +
-            Doc.text("\"" + attributeValue.valueToString.get + "\"")
+          // Note: maybe use single quotes if the value contains double quote?
+          Doc.text("\"" + attributeValue.valueToString.get + "\"")
         ))
 
       val nodes: model.Nodes = atomize(Seq.empty, model.getChildren(element))

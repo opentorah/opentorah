@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
-import zio.{Runtime, URIO, ZIO}
+import zio.{URIO, ZIO}
 import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
 object Xml extends Model {
@@ -55,9 +55,6 @@ object Xml extends Model {
     case n => n
   }
 
-  // TODO merge with Model.toString(Nodes)
-  def text(nodes: Nodes): String = nodes.map(_.text.trim).mkString(" ")
-
   override def toString(node: Node): String = Strings.squashWhitespace {
     node match {
       case elem: Element => (elem.child map (_.text)).mkString(" ")
@@ -85,6 +82,7 @@ object Xml extends Model {
     uri = element.getNamespace(element.prefix)
   )
 
+  // Note: maybe support re-definitions of the namespace bindings - like in  scala.xml.NamespaceBinding.shadowRedefined()?
   override def getNamespaces(element: Element): Seq[Namespace] = {
     @scala.annotation.tailrec
     def get(result: Seq[Namespace], namespaceBinding: NamespaceBinding): Seq[Namespace] =
@@ -123,14 +121,8 @@ object Xml extends Model {
       Attribute(
         name = attribute.key,
         namespace = namespace
-        // Note: in Scala 2.13, Seq is in scala.collection.immutable, but Scala XML still returns scala.collection.Seq -
-        // hence the `value =>...`
-      ).optional.withValue(Option(attribute.value).map(value => getAttributeValueText(value)))
+      ).optional.withValue(Option(attribute.value).map(_.text))
     }
-
-  // TODO WTF?
-  private def getAttributeValueText(value: Nodes): String =
-    Strings.sbToString(scala.xml.Utility.sequenceToXML(value, TopScope, _, stripComments = true))
 
   // TODO addAll() doesn't modify existing attributes; this should...
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
