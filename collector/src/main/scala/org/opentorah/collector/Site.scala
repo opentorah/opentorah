@@ -97,14 +97,12 @@ final class Site(
     a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
-  def a(path: Store.Path, part: Option[String] = None): Html.a = Html.a(
-    path = path.map(_.structureName),
-    part = part,
-    target = Some((path.last match {
+  def a(path: Store.Path): Html.a = Html
+    .a(path.map(_.structureName))
+    .setTarget((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
       case _ => Viewer.default
     }).name)
-  )
 
   def content(path: Store.Path): (String, Boolean) = path.lastOption.getOrElse(this) match {
     case teiFacet: Document.TeiFacet => (renderTeiContent(teiFacet.getTei), true)
@@ -115,7 +113,7 @@ final class Site(
     tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(new PublicationStmt(
-          publisher = Some(new Publisher.Value(<ptr target={siteUrl}/>)),
+          publisher = Some(new Publisher.Value(<ptr target={s"http://$siteUrl"}/>)),
           availability = Some(new Availability(
             status = Some("free"),
             xml = <licence><ab><ref n="license" target={licenseUrl}>{licenseName}</ref></ab></licence>
@@ -184,7 +182,7 @@ final class Site(
     )
 
     override def facs(pageId: String): Option[Html.a] = resolved(
-      facsUrl.map(facsUrl => a(facsUrl, part = Some(pageId))),
+      facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId)),
       "did not get facsimile: $pageId"
     )
   }
@@ -273,13 +271,12 @@ object Site extends Element[Site]("site") {
   val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
     // Note: only the ones derived from TEI notes need to cling, but:
-    clingyElements = Set("a"),
-    // Note: empty elements are mis-processed by the browser (next element gets inserted inside the empty one!),
-    // so I make sure there are no empty elements in the HTML:
+    clingyElements = Tei.prettyPrinter.clingyElements ++ Set("a"),
     allowEmptyElements = false,
     // ... except, some elements are mis-processed when they *are* non-empty (e.g., <br>),
     // and in general, it's weird to expand the elements that are always empty:
-    keepEmptyElements = Set("br", "meta", "link", "img", "data")
+    keepEmptyElements = Set("br", "meta", "link", "img", "data"),
+    preformattedElements = Set("pre")
   )
 
   def read(rootPath: String): Site =

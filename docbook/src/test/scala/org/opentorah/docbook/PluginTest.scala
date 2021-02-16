@@ -36,8 +36,11 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     PrettyPrinter.default.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // If the attribute value is enclosed in {}, making it dynamic, IntelliJ does not complain any longer -
-    // but Scala XML encodes the entity reference, so nothing works:
-    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&amp;version;"/>""" + "\n"
+    // but Scala XML encodes the entity reference, so nothing works...
+    // UPDATE 2021-02-15: things started working all of a sudden;
+    // tzorich iyun if this is connected to the recent changes in the PrettyPrinter (handling preformatted elements)
+    // or Markdown (double-escaping dangerous symbols), although I don't see how can it be...
+    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // In the tests below, I am thus forced to forego the {} - and suffer redness from IntelliJ...
   }

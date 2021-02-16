@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 - site is now dynamic!
+- moved Markdown code into a separate package;
+- double-escape XML tag start characters and such in Markdown code blocks;
+- PrettyPrinter supports preformatted elements;
+- and doesn't let Paiges to mis-indent them;
 
 ## [0.2.3] - 2021-02-02
 - serve using local Docker

@@ -79,14 +79,6 @@ object Files {
   def isFileUrl(url: URL): Boolean = url.getProtocol == "file"
   def isJarUrl(url: URL): Boolean = url.getProtocol == "jar"
 
-  def urlAndPart(what: String): (String, Option[String]) = Strings.split(what, '#')
-
-  def fileName(url: URL): String = Files.nameAndExtension(Files.pathAndName(url.getPath)._2)._1
-
-  def addPart(url: Seq[String], part: Option[String]): Seq[String] = part.fold(url)(addPart(url, _))
-  def addPart(url: Seq[String], part: String): Seq[String] = add(url, "#" + part)
-  def addExtension(url: Seq[String], extension: String): Seq[String] =  add(url, "." + extension)
-
   def add(url: Seq[String], what: String): Seq[String] =
     url.init :+ (url.last + what)
 

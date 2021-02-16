@@ -19,7 +19,7 @@ trait Model extends PreModel {
   final def isCharacters(node: Node): Boolean = isText(node) && getText(asText(node)).trim.nonEmpty
 
   def toString(node: Node): String
-  final def toString(nodes: Nodes): String = nodes.map(toString).mkString("")
+  final def toString(nodes: Nodes): String = nodes.map(toString).mkString(" ")
 
   def isElement(node: Node): Boolean
   def asElement(node: Node): Element

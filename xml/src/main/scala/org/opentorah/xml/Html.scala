@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import org.opentorah.util.Files
 import zio.URIO
+import java.net.URI
 
 object Html extends Dialect with Doctype {
 
@@ -19,21 +20,30 @@ object Html extends Dialect with Doctype {
 
   val reservedAttributes: Set[String] = Set("class", "target", "lang")
 
-  // TODO use instead of the <a> throughout!
-  // TODO carry some kind of an URL instead of path, isPathAbsolute, part -
-  //   and remove Html.a(path = Seq(???)...
   final case class a(
-    path: Seq[String] = Seq.empty,
-    pathIsAbsolute: Boolean = false,
-    part: Option[String] = None,
+    uri: Option[URI] = None,
     target: Option[String] = None,
     id: Option[String] = None,
     classes: Seq[String] = Seq.empty,
     declareNamespace: Boolean = false
   ) {
-    def withNamespace: a = copy(declareNamespace = true)
+    def setId(value: String): a = copy(id = Some(value))
+
+    def setTarget(value: String): a = copy(target = Some(value))
 
     def addClass(value: String): a = copy(classes = classes :+ value)
+
+    def withNamespace: a = copy(declareNamespace = true)
+
+    def setFragment(value: String): a = copy(uri = Some {
+      val newUri: URI = uri.getOrElse(a.rootUri)
+      new URI(newUri.getScheme, newUri.getUserInfo, newUri.getHost, newUri.getPort, newUri.getPath, newUri.getQuery, value)
+    })
+
+    def setQuery(value: String): a = copy(uri = Some {
+      val newUri: URI = uri.getOrElse(a.rootUri)
+      new URI(newUri.getScheme, newUri.getUserInfo, newUri.getHost, newUri.getPort, newUri.getPath, value, newUri.getFragment)
+    })
 
     def apply(text: String): Xml.Element = apply(Seq(Xml.mkText(text)))
 
@@ -42,23 +52,26 @@ object Html extends Dialect with Doctype {
     def apply(xml: RawXml#Value): Xml.Element = apply(xml.xml)
 
     def apply(children: Xml.Nodes): Xml.Element = {
-      val href: Option[String] =
-        if (path.isEmpty) part.map(part => s"#$part")
-        else Some(Files.addPart(path, part).mkString(if (!pathIsAbsolute) "/" else "", "/", ""))
-
-      val `class`: Option[String] =
-        if (classes.isEmpty) None else Some(classes.mkString(" "))
-
       val result: Xml.Element =
         <a
-          href={href.orNull}
+          href={uri.map(_.toString).orNull}
           target={target.orNull}
-          class={`class`.orNull}
+          class={if (classes.isEmpty) null else classes.mkString(" ")}
           id={id.orNull}
         >{children}</a>
 
       if (!declareNamespace) result else Html.namespace.default.declare(result)
     }
+  }
+
+  object a {
+    val empty: a = new a()
+
+    private val rootUri: URI = new URI(null, null, "/", null)
+
+    def apply(path: Seq[String]): a = apply(new URI(null, null, Files.mkUrl(path), null))
+
+    def apply(uri: URI): a = a(uri = Some(uri))
   }
 
   // Converting other XML dialects (e.g., TEI) to HTML
@@ -72,11 +85,11 @@ object Html extends Dialect with Doctype {
 
     private def srcId: String = id.getOrElse(s"src_note_$number")
 
-    def link: Xml.Element = a(part = Some(contentId), id = Some(srcId))(<sup>{number}</sup>)
+    def link: Xml.Element = a.empty.setFragment(contentId).setId(srcId)(element = <sup>{number}</sup>)
 
     def body: Xml.Element =
       <span xmlns={Html.namespace.uri} class="endnote" id={contentId}>
-        {a(part = Some(srcId)).addClass("endnote-backlink")(number.toString)}
+        {a.empty.setFragment(srcId).addClass("endnote-backlink")(number.toString)}
         {content}
       </span>
   }

@@ -13,7 +13,6 @@ trait PreModel {
   def isNamespaceDeclared(namespace: Namespace, element:  PreElement): Boolean
   def declareNamespace(namespace: Namespace, element: Element): Element
 
-  // TODO return Attribute.Value?
   final def getAttribute[T](attribute: Attribute[T], element: PreElement): Option[T] =
     attribute.get(getAttributeValueString(attribute, element))
 

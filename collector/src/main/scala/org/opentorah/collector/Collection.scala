@@ -80,8 +80,9 @@ final class Collection(
 
       Collection.Column("Страницы", "pages", { document: Document =>
         val text: Document.TextFacet = textFacet.of(document)
-        for (page <- document.pages(pageType)) yield page.pb.addAttributes(
-          text.a(site, part = Some(Pb.pageId(page.pb.n)))(text = page.displayName)
+        Xml.multi(separator = " ", nodes =
+          for (page <- document.pages(pageType))
+            yield page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
         )
       }),
 

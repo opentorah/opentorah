@@ -4,6 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Html, Xml}
+import java.net.URI
 
 abstract class Report[T](val name: String, val title: String) extends Store with HtmlContent {
   final override def names: Names = Names(name)
@@ -28,11 +29,11 @@ object Report {
   ) {
     override protected def lines(site: Site): Seq[WithSource[EntityReference]] =  site.getReferences
       .filter(_.value.ref.isEmpty)
-      .sortBy(reference => Xml.text(reference.value.name).toLowerCase)
+      .sortBy(reference => Xml.toString(reference.value.name).toLowerCase)
 
     override protected def lineToXml(reference: WithSource[EntityReference], site: Site): Xml.Element = {
       val source: String = reference.source
-      <l>{Xml.text(reference.value.name)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
+      <l>{Xml.toString(reference.value.name)} в {Html.a(new URI(source))(text = source)}</l>
     }
   }
 
@@ -45,7 +46,7 @@ object Report {
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], site: Site): Xml.Element = {
       val source: String = unclear.source
-      <l>{Xml.text(unclear.value.xml)} в {Html.a(path = Files.splitUrl(source))(text = source)}</l>
+      <l>{Xml.toString(unclear.value.xml)} в {Html.a(new URI(source))(text = source)}</l>
     }
   }
 
