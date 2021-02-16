@@ -271,11 +271,12 @@ object Site extends Element[Site]("site") {
   val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
     alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
     // Note: only the ones derived from TEI notes need to cling, but:
-    clingyElements = Set("a"),
+    clingyElements = Tei.prettyPrinter.clingyElements ++ Set("a"),
     allowEmptyElements = false,
     // ... except, some elements are mis-processed when they *are* non-empty (e.g., <br>),
     // and in general, it's weird to expand the elements that are always empty:
-    keepEmptyElements = Set("br", "meta", "link", "img", "data")
+    keepEmptyElements = Set("br", "meta", "link", "img", "data"),
+    preformattedElements = Set("pre")
   )
 
   def read(rootPath: String): Site =
