@@ -10,6 +10,7 @@ private[xml] final case class Current(
 ) {
   def takeAttribute(attribute: Attribute[_]): Current.Next[Option[String]] =
     IO.succeed((
+      // TODO maybe take namespace into account?
       copy(attributes = attributes.filterNot(candidate => attribute == candidate.attribute)),
       // TODO handle repeated attributes?
       attributes.find(candidate => attribute == candidate.attribute).flatMap(_.value)

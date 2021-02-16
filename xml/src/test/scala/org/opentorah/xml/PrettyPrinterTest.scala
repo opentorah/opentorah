@@ -109,6 +109,14 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
          |"2020-02-24"
          |/>blah</creation>""")
 
+    check(<p><l>line1</l>
+      <!-- comment --><l>line2</l></p>, 30, expected =
+      """|<p>
+         |  <l>line1</l>
+         |  <!-- comment -->
+         |  <l>line2</l>
+         |</p>""")
+
     check(
       <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(false)}
                       xmlns:db="http://docbook.org/ns/docbook"

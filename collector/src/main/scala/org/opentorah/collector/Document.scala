@@ -107,7 +107,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
           for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
             val n: String = page.pb.n
             val pageId: String = Pb.pageId(n)
-            text.a(site, part = Some(pageId))(
+            text.a(site).setFragment(pageId)(
               <figure>
                 <img
                 id={pageId}

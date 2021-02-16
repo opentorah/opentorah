@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.markdown.Markdown
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
 import java.net.URL
 
@@ -14,7 +15,7 @@ final class Notes(
   new Notes.All(_),
 ) with By with HtmlContent {
 
-  override protected def loadFile(url: URL): Markdown = Markdown.load(url)
+  override protected def loadFile(url: URL): Markdown = Markdown(url)
 
   override def findByName(name: String): Option[Store] =
     Store.findByName(name, "html", getDirectory.findByName)

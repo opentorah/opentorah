@@ -11,7 +11,8 @@ final case class PrettyPrinter(
   nestElements: Set[String] = Set.empty,
   clingyElements: Set[String] = Set.empty,
   allowEmptyElements: Boolean = true,
-  keepEmptyElements: Set[String] = Set.empty
+  keepEmptyElements: Set[String] = Set.empty,
+  preformattedElements: Set[String] = Set.empty
 ) {
   def renderXml(element: Xml.Element): String = renderXml(element, doctype = None)
   def renderXml(element: Xml.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
@@ -41,7 +42,9 @@ final case class PrettyPrinter(
       parent = None,
       canBreakLeft = true,
       canBreakRight = true
-    ).render(width)
+    )
+      .render(width)
+      .replace(PrettyPrinter.hiddenNewline, "\n")
 
     (if (!addXmlHeader) "" else Xml.header + "\n") +
     doctype.fold("")(doctype => doctype.doctype + "\n") +
@@ -52,25 +55,36 @@ final case class PrettyPrinter(
   // must come first, and thus can not be implicit; it is cleaner to scope them in a class with model a constructor parameter.
   private final class ForModel(val model: Model) {
 
+    private def fromPreformattedElement(element: model.Element, parent: Option[model.Element]): Seq[String] = {
+      val attributeValues: Seq[Attribute.Value[String]] = getAttributeValues(element, parent)
+      val attributes: String = if (attributeValues.isEmpty) "" else attributeValues
+        .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueToString.get + "\"")
+        .mkString(" ", ", ", "")
+
+      val children: Seq[String] =
+        model.getChildren(element).flatMap(node => fromPreformattedNode(node, Some(element)))
+
+      val name: String = getName(element)
+
+      if (children.isEmpty) Seq(s"<$name$attributes/>")
+      else if (children.length == 1) Seq(s"<$name$attributes>" + children.head + s"</$name>")
+      else Seq(s"<$name$attributes>" + children.head) ++ children.tail.init ++ Seq(children.last + s"</$name>")
+    }
+
     def fromElement(
       element: model.Element,
       parent: Option[model.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
-      val label: String = model.getName(element)
-      val name: String = model.getPrefix(element).fold("")(_ + ":") + label
-
-      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(model.getNamespaces)
-      val attributeValues: Seq[Attribute.Value[String]] =
-        model.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
-        model.getAttributes(element).filterNot(_.value.isEmpty)
+      val attributeValues: Seq[Attribute.Value[String]] = getAttributeValues(element, parent)
 
       val attributes: Doc =
         if (attributeValues.isEmpty) Doc.empty
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
           Doc.text(attributeValue.attribute.qName + "=") + Doc.lineOrEmpty +
-            Doc.text("\"" + attributeValue.valueToString.get + "\"")
+          // Note: maybe use single quotes if the value contains double quote?
+          Doc.text("\"" + attributeValue.valueToString.get + "\"")
         ))
 
       val nodes: model.Nodes = atomize(Seq.empty, model.getChildren(element))
@@ -94,6 +108,9 @@ final case class PrettyPrinter(
           fromChunk(chunks.last, Some(element), canBreakLeft = true, canBreakRight = canBreakRight1)
         }
       }
+
+      val label: String = model.getName(element)
+      val name: String = getName(element)
 
       if (children.isEmpty) {
         Doc.text(s"<$name") + attributes + Doc.lineOrEmpty +
@@ -124,6 +141,15 @@ final case class PrettyPrinter(
           end
         }
       }
+    }
+
+    private def getName(element: model.Element): String =
+      model.getPrefix(element).fold("")(_ + ":") + model.getName(element)
+
+    private def getAttributeValues(element: model.Element, parent: Option[model.Element]): Seq[Attribute.Value[String]] = {
+      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(model.getNamespaces)
+      model.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
+      model.getAttributes(element).filterNot(_.value.isEmpty)
     }
 
     @scala.annotation.tailrec
@@ -186,6 +212,11 @@ final case class PrettyPrinter(
       })
     }
 
+    private def fromPreformattedNode(node: model.Node, parent: Option[model.Element]): Seq[String] =
+      if (model.isElement(node)) fromPreformattedElement(model.asElement(node), parent)
+      else if (model.isText(node)) model.getText(model.asText(node)).split("\n").toSeq
+      else model.toString(node).split("\n").toSeq
+
     private def fromNode(
       node: model.Node,
       parent: Option[model.Element],
@@ -194,9 +225,13 @@ final case class PrettyPrinter(
     ): Doc =
       if (model.isElement(node)) {
         val element: model.Element = model.asElement(node)
-        val result = fromElement(element, parent, canBreakLeft, canBreakRight)
-        // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-        if (canBreakRight && model.getName(element) == "lb") result + Doc.hardLine else result
+        if (preformattedElements.contains(model.getName(element)))
+          Doc.text(fromPreformattedElement(element, parent).mkString(PrettyPrinter.hiddenNewline))
+        else {
+          val result: Doc = fromElement(element, parent, canBreakLeft, canBreakRight)
+          // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
+          if (canBreakRight && model.getName(element) == "lb") result + Doc.hardLine else result
+        }
       }
       else if (model.isText(node)) Doc.text(model.getText(model.asText(node)))
       else Doc.paragraph(model.toString(node))
@@ -204,5 +239,11 @@ final case class PrettyPrinter(
 }
 
 object PrettyPrinter {
+  // The only way I found to not let Paiges screw up indentation in the <pre><code>..</code></pre> blocks
+  // is to give it the whole block as one unbreakable text, and for that I need to hide newlines from it -
+  // and then restore them in render()...
+  // Also, elemet start and end tags must not be separated from the children by newlines...
+  val hiddenNewline: String = "\\n"
+
   val default: PrettyPrinter = new PrettyPrinter
 }

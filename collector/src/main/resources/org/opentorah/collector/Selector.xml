@@ -63,6 +63,7 @@
   <selector>
     <name n="facsimile" lang="en"/>
     <name n="факсимиле" lang="ru"/>
+    <name n="facs" lang="en"/>
   </selector>
   <selector>
     <name n="tei" lang="en"/>

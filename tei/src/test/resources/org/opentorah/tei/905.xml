@@ -5,7 +5,7 @@
     <fileDesc>
       <titleStmt><editor role="transcriber"><persName ref="ALD">Арье-Лейб Дубинский</persName></editor></titleStmt>
       <publicationStmt>
-        <publisher><ptr target="www.alter-rebbe.org"/></publisher>
+        <publisher><ptr target="http://www.alter-rebbe.org"/></publisher>
         <availability status="free"><licence><ab><ref n="license" target="http://creativecommons.org/licenses/by/4.0/">
           Creative Commons Attribution 4.0 International License</ref></ab></licence></availability>
       </publicationStmt>

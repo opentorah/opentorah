@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.markdown.Markdown
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class Note(
@@ -10,7 +11,7 @@ final class Note(
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def path(site: Site): Store.Path = Seq(site.notes, this)
-  override def content(site: Site): Xml.Element = site.notes.getFile(this).html
+  override def content(site: Site): Xml.Element = site.notes.getFile(this).content
 }
 
 object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {
