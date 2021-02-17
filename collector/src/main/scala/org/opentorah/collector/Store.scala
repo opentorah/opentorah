@@ -28,15 +28,18 @@ object Store {
    */
   @scala.annotation.tailrec
   def resolve(
-    url: Seq[String],
+    path: Seq[String],
     store: Store,
     result: Path
-  ): Option[Path] = if (url.isEmpty || store.acceptsIndexHtml && (url == Seq("index.html"))) {
-    if (result.isEmpty) None else Some(result.reverse)
-  } else {
-    val next: Option[Store] = store.findByName(url.head)
-    // Note: using fold() here breaks tail-recursion:
-    if (next.isEmpty) None else resolve(url.tail, next.get, next.get +: result)
+  ): Option[Path] = {
+    val theEnd: Boolean = path.isEmpty ||
+      store.acceptsIndexHtml && ((path == Seq("index.html")) || (path == Seq("index")))
+
+    if (theEnd) if (result.isEmpty) None else Some(result.reverse) else {
+      val next: Option[Store] = store.findByName(path.head)
+      // Note: using fold() here breaks tail-recursion:
+      if (next.isEmpty) None else resolve(path.tail, next.get, next.get +: result)
+    }
   }
 
   def findByName[M](

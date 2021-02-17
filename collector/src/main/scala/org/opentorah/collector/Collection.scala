@@ -152,6 +152,8 @@ object Collection extends Element[Collection]("collection") {
 
     override val names: Names = Names(alias)
 
+    override def acceptsIndexHtml: Boolean = collection.acceptsIndexHtml
+
     override def findByName(name: String): Option[Store] = collection.findByName(name)
 
     override def viewer: Viewer = collection.viewer
