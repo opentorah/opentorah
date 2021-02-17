@@ -96,29 +96,32 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     override def path(site: Site): Store.Path =
       collection.path(site) ++ Seq(collection.facsimileFacet, collection.facsimileFacet.of(document))
 
-    override def content(site: Site): Xml.Element =
-      <div class={Viewer.Facsimile.name}>
+    override def content(site: Site): Xml.Element = {
+      <div class="facsimileWrapper">
         {collection.documentHeader(document)}
-        <div class="facsimileScroller">{
-          val text: TextFacet = collection.textFacet.of(document)
-          val facsimileUrl: String = collection.facsimileUrl(site)
-          // TODO verify that the file exists!
+        <div class={Viewer.Facsimile.name}>
+          <div class="facsimileScroller">{
+            val text: TextFacet = collection.textFacet.of(document)
+            val facsimileUrl: String = collection.facsimileUrl(site)
+            // TODO verify that the file exists!
 
-          for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
-            val n: String = page.pb.n
-            val pageId: String = Pb.pageId(n)
-            text.a(site).setFragment(pageId)(
-              <figure>
-                <img
-                id={pageId}
-                alt={s"facsimile for page $n"}
-                src={page.pb.facs.getOrElse(s"$facsimileUrl$n.jpg")}
-                />
-                <figcaption>{n}</figcaption>
-              </figure>
-            )
-          }}</div>
+            for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
+              val n: String = page.pb.n
+              val pageId: String = Pb.pageId(n)
+              text.a(site).setFragment(pageId)(
+                <figure>
+                  <img
+                  id={pageId}
+                  alt={s"facsimile for page $n"}
+                  src={page.pb.facs.getOrElse(s"$facsimileUrl$n.jpg")}
+                  />
+                  <figcaption>{n}</figcaption>
+                </figure>
+              )
+            }}</div>
+        </div>
       </div>
+    }
   }
 
   override def apply(name: String, tei: Tei): Document = {
