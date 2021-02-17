@@ -35,15 +35,15 @@ object Html extends Dialect with Doctype {
 
     def withNamespace: a = copy(declareNamespace = true)
 
-    def setFragment(value: String): a = copy(uri = Some {
-      val newUri: URI = uri.getOrElse(a.rootUri)
-      new URI(newUri.getScheme, newUri.getUserInfo, newUri.getHost, newUri.getPort, newUri.getPath, newUri.getQuery, value)
-    })
+    def setFragment(value: String): a = copy(uri = Some(
+      uri.fold(new URI(null, null, null, null, value))
+      (uri => new URI(uri.getScheme, uri.getAuthority, uri.getPath, uri.getQuery, value))
+    ))
 
-    def setQuery(value: String): a = copy(uri = Some {
-      val newUri: URI = uri.getOrElse(a.rootUri)
-      new URI(newUri.getScheme, newUri.getUserInfo, newUri.getHost, newUri.getPort, newUri.getPath, value, newUri.getFragment)
-    })
+    def setQuery(value: String): a = copy(uri = Some(
+      uri.fold(new URI(null, null, null, "/", value))
+      (uri => new URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
+    ))
 
     def apply(text: String): Xml.Element = apply(Seq(Xml.mkText(text)))
 
@@ -65,10 +65,6 @@ object Html extends Dialect with Doctype {
   }
 
   object a {
-    val empty: a = new a()
-
-    private val rootUri: URI = new URI(null, null, "/", null)
-
     def apply(path: Seq[String]): a = apply(new URI(null, null, Files.mkUrl(path), null))
 
     def apply(uri: URI): a = a(uri = Some(uri))
@@ -85,11 +81,11 @@ object Html extends Dialect with Doctype {
 
     private def srcId: String = id.getOrElse(s"src_note_$number")
 
-    def link: Xml.Element = a.empty.setFragment(contentId).setId(srcId)(element = <sup>{number}</sup>)
+    def link: Xml.Element = a().setFragment(contentId).setId(srcId)(element = <sup>{number}</sup>)
 
     def body: Xml.Element =
       <span xmlns={Html.namespace.uri} class="endnote" id={contentId}>
-        {a.empty.setFragment(srcId).addClass("endnote-backlink")(number.toString)}
+        {a().setFragment(srcId).addClass("endnote-backlink")(number.toString)}
         {content}
       </span>
   }

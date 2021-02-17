@@ -64,14 +64,14 @@ final class Site(
     .map(collection => collection.alias.get -> new Collection.Alias(collection))
     .toMap
 
-  private val references = WithSource(
+  private val references: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
     name = "references",
     value = EntityReference
   )
   def getReferences: Seq[WithSource[EntityReference]] = references.get
 
-  private val unclears = WithSource(
+  private val unclears: ListFile[WithSource[Unclear.Value], Seq[WithSource[Unclear.Value]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "unclears-generated.xml"),
     name = "unclears",
     value = Unclear.element
