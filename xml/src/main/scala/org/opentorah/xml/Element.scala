@@ -16,12 +16,14 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
   final override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A] =
     parser.asInstanceOf[Parser[A]]
 
-  override def xmlElement(value: A): Xml.Element = Xml.construct(
-    name = elementName,
-    namespace = contentParsable.unparser.namespace,
-    attributes = contentParsable.unparser.attributes(value),
-    children = contentParsable.unparser.content(value)
-  )
+  override def xmlElement(value: A): Xml.Element =
+    Xml.setAttributes(
+      contentParsable.unparser.attributes(value),
+      contentParsable.unparser.namespace.fold(<elem/>)(_.default.declare(<elem/>))
+    ).copy(
+      label = elementName,
+      child = contentParsable.unparser.content(value)
+    )
 }
 
 object Element {

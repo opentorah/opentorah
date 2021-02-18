@@ -103,7 +103,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
           <div class="facsimileScroller">{
             val text: TextFacet = collection.textFacet.of(document)
             val facsimileUrl: String = collection.facsimileUrl(site)
-            // TODO verify that the file exists!
+            // TODO generate lists of images and check for missing ones and orphans
 
             for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
               val n: String = page.pb.n

@@ -117,26 +117,24 @@ object Html extends Dialect with Doctype {
     protected def isEndNote(element: Xml.Element): Boolean
 
     def toHtml(resolver: LinkResolver, element: Xml.Element): Xml.Element = {
-      def runTransform(element: Xml.Element): (Xml.Element, State) = Xml.runTransform(
-        transform = Xml.inNamespace[State](
-          namespace,
-          transform = (element: Xml.Element) => elementTransform(element).map(newElement => transformElement(element, newElement))
-        ),
-        state = new State(resolver),
-        element
+      def runTransform(element: Xml.Element): (Xml.Element, State) = Parser.unsafeRun(
+        new Xml.Transform[State](element => elementTransform(element).map(transformElement(element)))
+          .inNamespace(namespace)
+          .run(element)
+          .provide(new State(resolver))
       )
 
-      val (result, finalState) = runTransform(element)
+      val (result, endState) = runTransform(element)
       <div xmlns={Html.namespace.uri} class="html">
         {result}{runTransform(
         <div xmlns={Html.namespace.uri} class="endnotes">
-          {for (note <- finalState.getEndNotes) yield note.body}
+          {for (note <- endState.getEndNotes) yield note.body}
         </div>
       ) /* TODO do not ignore end-notes inside end-notes */ ._1}
       </div>
     }
 
-    private def transformElement(element: Xml.Element, newElement: Xml.Element): Xml.Element = {
+    private def transformElement(element: Xml.Element)(newElement: Xml.Element): Xml.Element = {
       val name: String = element.label
       val attributes: Seq[Attribute.Value[String]] = Xml.getAttributes(element)
       if (newElement eq element) Xml.setAttributes(
