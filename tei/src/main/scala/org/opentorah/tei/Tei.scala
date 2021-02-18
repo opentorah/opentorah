@@ -53,9 +53,10 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
 
   val facsimileSymbol: String = "⎙"
 
-  // Note: it is possible to add the tokens from the 'rendition' attribute to the value of the HTML class attribute
-  // by augmenting Html.To - but I do not see the need: CSS styling can be applied based on the 'rendition' itself.
-  // but I do not see the need
+  // Note: it is possible to add the tokens from the 'rendition' attribute to the value of the HTML
+  // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
+  // based on the 'rendition' itself.
+  // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
   override protected def elementTransform(element: Xml.Element): URIO[Html.State, Xml.Element] = {
     val children: Xml.Nodes = Xml.getChildren(element)
 

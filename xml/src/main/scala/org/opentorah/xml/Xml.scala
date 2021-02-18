@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
-import zio.{URIO, ZIO}
+import zio.URIO
 import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
 object Xml extends Model {
@@ -19,27 +19,22 @@ object Xml extends Model {
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
 
-  type Transform[S] = Element => URIO[S, Element]
+  final class Transform[S](transform: Element => URIO[S, Element]) {
+    def inNamespace(namespace: Namespace): Transform[S] = new Transform((element: Element) =>
+      if (Namespace.get(element) != namespace.default) URIO.succeed(element) else transform(element))
 
-  def inNamespace[S](namespace: Namespace, transform: Transform[S]): Transform[S] = (element: Element) =>
-    if (Namespace.get(element) != namespace.default) URIO.succeed(element) else transform(element)
+    private val depthFirst: Element => URIO[S, Element] = (element: Element) => for {
+      newElement <- transform(element)
+      children <- URIO.foreach(getChildren(newElement))(node =>
+        if (!isElement(node)) URIO.succeed(node)
+        else depthFirst(asElement(node))
+      )
+    } yield newElement.copy(child = children)
 
-  private def transformNode[S](transform: Transform[S])(node: Node): URIO[S, Node] =
-    if (!isElement(node)) ZIO.succeed(node) else transform(asElement(node))
-
-  // TODO can recursion here be simplified?
-  private def depthFirst[S](transform: Transform[S]): Transform[S] = (element: Element) => for {
-    newElement <- transform(element)
-    children <- ZIO.foreach(getChildren(newElement))(transformNode(depthFirst(transform)))
-  } yield newElement.copy(child = children)
-
-  def runTransform[S](transform: Transform[S], state: S, element: Element): (Element, S) = {
-    val result: URIO[S, (Element, S)] = for {
-      resultElement <- depthFirst(transform)(element)
-      resultState <- ZIO.access[S](identity)
-    } yield (resultElement, resultState)
-
-    Parser.unsafeRun(result.provide(state))
+    val run: Element => URIO[S, (Element, S)] = (element: Element) => for {
+      result <- depthFirst(element)
+      endState <- URIO.environment[S]
+    } yield (result, endState)
   }
 
   def descendants[T](node: Node, elementName: String, elements: Elements[T]): Seq[T] = node
@@ -145,17 +140,4 @@ object Xml extends Model {
   }
 
   override def getChildren(element: Element): Nodes = element.child
-
-  def construct(
-    name: String,
-    namespace: Option[Namespace],
-    attributes: Seq[Attribute.Value[_]],
-    children: Seq[Node]
-  ): Element = {
-    val base: Element = namespace.fold(<elem/>)(_.default.declare(<elem/>))
-    setAttributes(attributes, base).copy(
-      label = name,
-      child = children
-    )
-  }
 }
