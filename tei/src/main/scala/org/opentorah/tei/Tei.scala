@@ -1,8 +1,10 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Dialect, Element, Html, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
-import zio.{URIO, ZIO}
+import org.opentorah.html.{ToHtml, a}
+import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
+import zio.{Has, URIO, ZIO, ZLayer}
+
 import java.net.URI
 
 final case class Tei(
@@ -10,7 +12,7 @@ final case class Tei(
   text: Text
 )
 
-object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
+object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolver]] {
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
@@ -40,6 +42,9 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
     )
   }
 
+  def toHtml(linksResolver: LinksResolver, element: Xml.Element): Xml.Element =
+    Parser.unsafeRun(toHtml(element).provideLayer(ZLayer.succeed(linksResolver)))
+
   def concat[A](unparsers: Unparser[A]*): Unparser[A] =
     Unparser.concatInNamespace(Tei.namespace, unparsers)
 
@@ -57,7 +62,7 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
   // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
   // based on the 'rendition' itself.
   // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
-  override protected def elementTransform(element: Xml.Element): URIO[Html.State, Xml.Element] = {
+  override protected def elementTransform(element: Xml.Element): URIO[Has[LinksResolver], Xml.Element] = {
     val children: Xml.Nodes = Xml.getChildren(element)
 
     element.label match {
@@ -65,13 +70,10 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
         require(!Xml.isEmpty(children), element)
         val ref: Option[String] = EntityName.refAttribute.get(element)
 
-        if (ref.isEmpty)
-          ZIO.succeed(Html.a()(children))
-        else
-          ZIO.access[Html.State](_.resolver.findByRef(ref.get)).map(_.
-            getOrElse(Html.a(ref.toSeq))
-            (children)
-          )
+        if (ref.isEmpty) ZIO.succeed(a()(children)) else LinksResolver.findByRef(ref.get).map(_.
+          getOrElse(a(ref.toSeq))
+          (children)
+        )
 
       case "ref" =>
         require(!Xml.isEmpty(children), element)
@@ -85,8 +87,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
       case Pb.elementName =>
         require(Xml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
-        ZIO.access[Html.State](_.resolver.facs(pageId)).map(_
-          .getOrElse(Html.a(Seq(pageId)))
+        LinksResolver.facs(pageId).map(_
+          .getOrElse(a(Seq(pageId)))
           .copy(id = Some(pageId))
           (text = facsimileSymbol)
         )
@@ -107,23 +109,18 @@ object Tei extends Element[Tei]("TEI") with Dialect with Html.To {
       case "cell" =>
         ZIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
 
-      case _ if isEndNote(element) =>
-        ZIO.access[Html.State](_.addEndNote(Xml.idAttribute.optional.get(element), children))
-
       case _ =>
         ZIO.succeed(element)
     }
   }
 
-  private def reference(element: Xml.Element): URIO[Html.State, Html.a] = {
+  private def reference(element: Xml.Element): URIO[Has[LinksResolver], a] = {
     val uri: URI = new URI(targetAttribute.get(element))
 
     // TODO maybe just call up regardless?
-    if (uri.isAbsolute) ZIO.succeed(Html.a(uri)) else {
-      ZIO.access[Html.State](_.resolver.resolve(Files.splitUrl(uri.getPath))).map(_
+    if (uri.isAbsolute) ZIO.succeed(a(uri)) else LinksResolver.resolve(Files.splitUrl(uri.getPath)).map(_
         .map(a => Option(uri.getFragment).fold(a)(a.setFragment))
-        .getOrElse(Html.a(uri))
+        .getOrElse(a(uri))
       )
-    }
   }
 }

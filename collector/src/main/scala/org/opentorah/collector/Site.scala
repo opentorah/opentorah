@@ -1,10 +1,11 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, ProfileDesc,
-  PublicationStmt, Publisher, SourceDesc, Tei, TeiRawXml, Title, Unclear, Entity => TeiEntity}
+import org.opentorah.html
+import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
+  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, TeiRawXml, Title, Unclear, Entity => TeiEntity}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Element, FromUrl, Html, LinkResolver, Parsable, Parser, PrettyPrinter, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.net.URL
@@ -97,7 +98,7 @@ final class Site(
     a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
-  def a(path: Store.Path): Html.a = Html
+  def a(path: Store.Path): html.a = html
     .a(path.map(_.structureName))
     .setTarget((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
@@ -133,7 +134,7 @@ final class Site(
   )
 
   private def renderHtmlContent(htmlContent: HtmlContent): String =
-    Site.htmlPrettyPrinter.render(doctype = Html, element = HtmlTheme.toHtml(
+    Site.htmlPrettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
       viewer = htmlContent.viewer,
       headTitle = htmlContent.htmlHeadTitle,
       title = htmlContent.htmlBodyTitle,
@@ -162,26 +163,26 @@ final class Site(
     htmlContent.content(this)
   )
 
-  private def linkResolver(textFacet: Option[Document.TextFacet]): LinkResolver = new LinkResolver {
+  private def linkResolver(textFacet: Option[Document.TextFacet]): LinksResolver = new LinksResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
       textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
 
-    def resolved(a: Option[Html.a], error: => String): Option[Html.a] = {
+    def resolved(a: Option[html.a], error: => String): Option[html.a] = {
       if (a.isEmpty) Site.logger.warn(error)
       a
     }
 
-    override def resolve(url: Seq[String]): Option[Html.a] = resolved(
+    override def resolve(url: Seq[String]): Option[html.a] = resolved(
       Site.this.resolve(url).map(path => a(path)),
       s"did not resolve: $url"
     )
 
-    override def findByRef(ref: String): Option[Html.a] = resolved(
+    override def findByRef(ref: String): Option[html.a] = resolved(
       entities.findByName(ref).map(entity => entity.a(Site.this)),
       s"did not find reference: $ref"
     )
 
-    override def facs(pageId: String): Option[Html.a] = resolved(
+    override def facs(pageId: String): Option[html.a] = resolved(
       facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId)),
       "did not get facsimile: $pageId"
     )
