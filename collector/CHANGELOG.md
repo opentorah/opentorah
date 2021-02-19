@@ -7,6 +7,7 @@
 - double-escape XML tag start characters and such in Markdown code blocks;
 - PrettyPrinter supports preformatted elements;
 - and doesn't let Paiges to mis-indent them;
+- slight ZIOfication;
 
 ## [0.2.3] - 2021-02-02
 - serve using local Docker

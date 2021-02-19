@@ -6,11 +6,6 @@ import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
 object Xml extends Model {
 
-  override type Node = scala.xml.Node
-  override type Element = scala.xml.Elem
-  // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
-  override type Text = scala.xml.Atom[_]
-
   val namespace: Namespace = Namespace(uri = "http://www.w3.org/XML/1998/namespace", prefix = "xml")
 
   val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
@@ -19,45 +14,31 @@ object Xml extends Model {
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
 
-  final class Transform[S](transform: Element => URIO[S, Element]) {
-    def inNamespace(namespace: Namespace): Transform[S] = new Transform((element: Element) =>
-      if (Namespace.get(element) != namespace.default) URIO.succeed(element) else transform(element))
+  override type Node = scala.xml.Node
 
-    private val depthFirst: Element => URIO[S, Element] = (element: Element) => for {
+  override type Element = scala.xml.Elem
+
+  // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
+  override type Text = scala.xml.Atom[_]
+
+  final class Transform[R](transform: Element => URIO[R, Element]) {
+    val one: Element => URIO[R, Element] = element => for {
       newElement <- transform(element)
-      children <- URIO.foreach(getChildren(newElement))(node =>
-        if (!isElement(node)) URIO.succeed(node)
-        else depthFirst(asElement(node))
-      )
+      children <- URIO.foreach(getChildren(newElement)) {
+        node => if (!isElement(node)) URIO.succeed(node) else one(asElement(node))
+      }
     } yield newElement.copy(child = children)
 
-    val run: Element => URIO[S, (Element, S)] = (element: Element) => for {
-      result <- depthFirst(element)
-      endState <- URIO.environment[S]
-    } yield (result, endState)
+    val all: Seq[Element] => URIO[R, Seq[Element]] =
+      elements => URIO.collectAll(elements.map(one))
   }
 
-  def descendants[T](node: Node, elementName: String, elements: Elements[T]): Seq[T] = node
-    .flatMap(_ \\ elementName).filter(isElement).map[Element](asElement)
-    .map(descendant => Parser.parseDo(elements.parse(From.xml("descendants", descendant))))
-
-  def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: n1 :: ns if n.isInstanceOf[Element] && n1.isInstanceOf[Element] =>
-      Seq(n, mkText(separator)) ++ multi(n1 :: ns, separator)
-    case n :: ns => Seq(n) ++ multi(ns, separator)
-    case n => n
-  }
-
-  override def toString(node: Node): String = Strings.squashWhitespace {
-    node match {
-      case elem: Element => (elem.child map (_.text)).mkString(" ")
-      case text: Text => text.data.toString
-      case special: SpecialNode => Strings.sbToString(special.buildString)
-      case node: Node => node.text
-    }
-  }
+  override def toString(node: Node): String = Strings.squashWhitespace(node match {
+    case elem: Element => (elem.child map (_.text)).mkString(" ")
+    case text: Text => text.data.toString
+    case special: SpecialNode => Strings.sbToString(special.buildString)
+    case node: Node => node.text
+  })
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
@@ -134,10 +115,23 @@ object Xml extends Model {
     scala.xml.Attribute(
       pre = attribute.namespace.getPrefix.orNull,
       key = attribute.name,
-      value = value.map(attribute.toString).map(Xml.mkText).map(Seq(_)).orNull,
+      value = value.map(attribute.toString).map(mkText).map(Seq(_)).orNull,
       next = next
     )
   }
 
   override def getChildren(element: Element): Nodes = element.child
+
+  def descendants[T](node: Node, elementName: String, elements: Elements[T]): Seq[T] = node
+    .flatMap(_ \\ elementName).filter(isElement).map[Element](asElement)
+    .map(descendant => Parser.parseDo(elements.parse(From.xml("descendants", descendant))))
+
+  def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: n1 :: ns if n.isInstanceOf[Element] && n1.isInstanceOf[Element] =>
+      Seq(n, mkText(separator)) ++ multi(n1 :: ns, separator)
+    case n :: ns => Seq(n) ++ multi(ns, separator)
+    case n => n
+  }
 }

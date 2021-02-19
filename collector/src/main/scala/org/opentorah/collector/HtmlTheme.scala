@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
-import org.opentorah.xml.{Attribute, Html, XLink, Xml}
+import org.opentorah.html.Html
+import org.opentorah.xml.{Attribute, XLink, Xml}
 
 object HtmlTheme {
 

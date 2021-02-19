@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
+import org.opentorah.html
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Html, Xml}
+import org.opentorah.xml.Xml
 import java.net.URI
 
 abstract class Report[T](val name: String, val title: String) extends Store with HtmlContent {
@@ -33,7 +34,7 @@ object Report {
 
     override protected def lineToXml(reference: WithSource[EntityReference], site: Site): Xml.Element = {
       val source: String = reference.source
-      <l>{Xml.toString(reference.value.name)} в {Html.a(new URI(source))(text = source)}</l>
+      <l>{Xml.toString(reference.value.name)} в {html.a(new URI(source))(text = source)}</l>
     }
   }
 
@@ -46,7 +47,7 @@ object Report {
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], site: Site): Xml.Element = {
       val source: String = unclear.source
-      <l>{Xml.toString(unclear.value.xml)} в {Html.a(new URI(source))(text = source)}</l>
+      <l>{Xml.toString(unclear.value.xml)} в {html.a(new URI(source))(text = source)}</l>
     }
   }
 

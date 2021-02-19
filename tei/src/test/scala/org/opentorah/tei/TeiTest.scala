@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{From, Html, LinkResolver, Parser, Xml}
+import org.opentorah.html
+import org.opentorah.xml.{From, Parser, Xml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -22,10 +23,10 @@ final class TeiTest extends AnyFlatSpec with Matchers {
 
   private def tei2html(element: Xml.Element): Xml.Element = {
     //    println(Xhtml.prettyPrinter.render(element))
-    val resolver = new LinkResolver {
-      override def resolve(url: Seq[String]): Option[Html.a] = None
-      override def findByRef(ref:  String): Option[Html.a] = None
-      override def facs(pageId: String): Option[Html.a] = Some(Html.a(Seq("facsimiles"))
+    val resolver = new LinksResolver {
+      override def resolve(path: Seq[String]): Option[html.a] = None
+      override def findByRef(ref:  String): Option[html.a] = None
+      override def facs(pageId: String): Option[html.a] = Some(html.a(Seq("facsimiles"))
         .setFragment(pageId)
         .setTarget("facsViewer")
       )
