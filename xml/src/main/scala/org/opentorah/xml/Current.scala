@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import zio.IO
 
 private[xml] final case class Current(
@@ -22,13 +23,11 @@ private[xml] final case class Current(
       attributes
     ))
 
-  def checkNoLeftovers: Result = for {
-    _ <- Parser.check(attributes.isEmpty, s"Unparsed attributes: $attributes")
-    _ <- content.checkNoLeftovers
-  } yield ()
+  def checkNoLeftovers: IO[Effects.Error, Unit] =
+    Effects.check(attributes.isEmpty, s"Unparsed attributes: $attributes") *> content.checkNoLeftovers
 }
 
 private[xml] object Current {
 
-  type Next[A] = IO[Error, (Current, A)]
+  type Next[A] = IO[Effects.Error, (Current, A)]
 }

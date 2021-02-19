@@ -3,6 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 
 final class Hierarchy(
   override val fromUrl: FromUrl,
@@ -17,11 +18,11 @@ final class Hierarchy(
 
   override def acceptsIndexHtml: Boolean = true
 
-  override def findByName(name: String): Option[Store] = Store.findByName(name, Seq(by))
+  override def findByName(name: String): Parser[Option[Store]] = Store.findByName(name, Seq(by))
 
   override def path(site: Site): Store.Path = site.store2path(this)
 
-  override protected def innerContent(site: Site): Xml.Element = by.oneLevelIndex(site)
+  override protected def innerContent(site: Site): Parser[Xml.Element] = ZIO.succeed(by.oneLevelIndex(site))
 }
 
 object Hierarchy extends Element[Hierarchy]("store") {

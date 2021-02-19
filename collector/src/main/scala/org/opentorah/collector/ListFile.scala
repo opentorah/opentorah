@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Element, Elements, Parsable, Parser, PrettyPrinter}
+import org.opentorah.xml.{Element, Elements, Parsable, PrettyPrinter}
 import java.net.URL
 
 final class ListFile[M, W <: AnyRef](
@@ -15,9 +15,9 @@ final class ListFile[M, W <: AnyRef](
     content = PrettyPrinter.default.renderXml(list.xmlElement(entries))
   )
 
-  def get: W = Cache.get[W](
+  def get: Caching.Parser[W] = Caching.getCached[W](
     url,
-    load = (url: URL) => wrapper(Parser.parseDo(list.parse(url)))
+    load = (url: URL) => list.parse(url).map(wrapper)
   )
 
   private val list: Element[Seq[M]] = new Element[Seq[M]](name) {

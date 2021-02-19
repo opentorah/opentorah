@@ -1,7 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.Xml
+import org.opentorah.xml.{Parser, Xml}
+import zio.ZIO
 
 sealed abstract class Index(name: String, selectorName: String) extends Store with HtmlContent {
   final override def names: Names = Names(name)
@@ -12,12 +13,12 @@ sealed abstract class Index(name: String, selectorName: String) extends Store wi
 
 object Index {
   object Tree extends Index("collections", "archive") {
-    override def content(site: Site): Xml.Element =
-      site.by.treeIndex(site)
+    override def content(site: Site): Parser[Xml.Element] =
+      ZIO.succeed(site.by.treeIndex(site))
   }
 
   object Flat extends Index("index", "case") {
-    override def content(site: Site): Xml.Element =
-      <ul>{for (collection <- site.collections) yield <li>{collection.flatIndexEntry(site)}</li>}</ul>
+    override def content(site: Site): Parser[Xml.Element] =
+      ZIO.succeed(<ul>{site.collections.map(collection => <li>{collection.flatIndexEntry(site)}</li>)}</ul>)
   }
 }

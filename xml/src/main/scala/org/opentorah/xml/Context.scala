@@ -1,9 +1,10 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import java.net.URL
-import zio.ZIO
+import zio.{Has, ZIO}
 
-final private[xml] class Context {
+final /* TODO private[xml]? */ class Context {
 
   private var stack: List[Current] = List.empty
 
@@ -36,7 +37,7 @@ final private[xml] class Context {
 
 private[xml] object Context {
   val isEmpty: Parser[Boolean] =
-    ZIO.access[Context](_.isEmpty)
+    ZIO.access[Has[Context]](_.get.isEmpty)
 
   val elementName: Parser[String] =
     lift(_.name)
@@ -57,11 +58,11 @@ private[xml] object Context {
     liftContentModifier(_.takeAllNodes)
 
   private def lift[A](f: Current => A): Parser[A] =
-    ZIO.access[Context](liftCurrentToContext(f))
+    ZIO.access[Has[Context]](context => liftCurrentToContext(f)(context.get))
 
   private def liftCurrentModifier[A]: (Current => Current.Next[A]) => Parser[A] = (f: Current => Current.Next[A]) => for {
-    result <- ZIO.accessM[Context](liftCurrentToContext(f))
-    _ <- ZIO.access[Context](_.replaceCurrent(result._1))
+    result <- ZIO.accessM[Has[Context]](context => liftCurrentToContext(f)(context.get))
+    _ <- ZIO.access[Has[Context]](_.get.replaceCurrent(result._1))
   } yield result._2
 
   private def liftContentModifier[A]: (Content => Content.Next[A]) => Parser[A] =
@@ -75,10 +76,10 @@ private[xml] object Context {
       f(current.content).map { case (content, result) => (current.copy(content = content), result) }
 
   def currentBaseUrl: Parser[Option[URL]] =
-    ZIO.access[Context](_.currentBaseUrl)
+    ZIO.access[Has[Context]](_.get.currentBaseUrl)
 
   def currentFromUrl: Parser[FromUrl] =
-    ZIO.access[Context](_.currentFromUrl)
+    ZIO.access[Has[Context]](_.get.currentFromUrl)
 
   def nested[A](
     from: Option[From],
@@ -93,18 +94,18 @@ private[xml] object Context {
       attributes = Xml.getAttributes(nextElement),
       content
     )
-    result <- ZIO.access[Context](_.push(newCurrent)).bracket[Context, Error, A](
-      release = (_: Unit) => ZIO.access[Context](_.pop()),
+    result <- ZIO.access[Has[Context]](_.get.push(newCurrent)).bracket[Has[Context], Effects.Error, A](
+      release = (_: Unit) => ZIO.access[Has[Context]](_.get.pop()),
       use = (_: Unit) => addErrorTrace(for { result <- parser; _ <- checkNoLeftovers } yield result)
     )
   }  yield result
 
   private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError(error => for {
-    contextStr <- ZIO.access[Context](_.currentToString)
+    contextStr <- ZIO.access[Has[Context]](_.get.currentToString)
   } yield error + "\n" + contextStr)
 
   def checkNoLeftovers: Parser[Unit] = for {
-    isEmpty <- ZIO.access[Context](_.isEmpty)
-    _ <- if (isEmpty) ok else ZIO.accessM(liftCurrentToContext(_.checkNoLeftovers))
+    isEmpty <- ZIO.access[Has[Context]](_.get.isEmpty)
+    _ <- if (isEmpty) Effects.ok else ZIO.accessM[Has[Context]](context => liftCurrentToContext(_.checkNoLeftovers)(context.get))
   } yield ()
 }

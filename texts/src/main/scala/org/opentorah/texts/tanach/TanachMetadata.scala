@@ -4,7 +4,7 @@ import Tanach.TanachBook
 import org.opentorah.metadata.{Metadata, Names}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Unparser, Element, From, Parsable, Parser}
-import zio.IO
+import zio.ZIO
 
 object TanachMetadata {
 
@@ -46,7 +46,7 @@ object TanachMetadata {
       case Parsed(_, _, _) =>
       case Resolved(_, _, _) =>
       case Empty => process {
-        val metadata: Map[TanachBook, TanachBookMetadata.Parsed] = Parser.parseDo(for {
+        val metadata: Map[TanachBook, TanachBookMetadata.Parsed] = Parser.run(for {
           metadatas <- Metadata.load(
             from = From.resource(Tanach),
             content = Book.followRedirects
@@ -76,7 +76,7 @@ object TanachMetadata {
         result <- book match {
           case book: Tanach.ChumashBook => ChumashBookMetadata.parser(book, names, chapters)
           case book: Tanach.Psalms.type => PsalmsMetadata.parser(book, names, chapters)
-          case book: Tanach.NachBook    => IO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
+          case book: Tanach.NachBook    => ZIO.succeed(new NachBookMetadata.Parsed(book, names, chapters))
         }
       } yield result
 
@@ -109,7 +109,7 @@ object TanachMetadata {
   private def resolve(parsed: Parsed): Resolved = Resolved(
     names = parsed.names,
     chapters = parsed.chapters,
-    metadata = Collections.mapValues(parsed.metadata)(metadata => Parser.parseDo(metadata.resolve))
+    metadata = Collections.mapValues(parsed.metadata)(metadata => Parser.run(metadata.resolve))
   )
 
   private var processing: Boolean = false

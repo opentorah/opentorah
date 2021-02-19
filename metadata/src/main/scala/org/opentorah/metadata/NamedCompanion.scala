@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Util
-import org.opentorah.xml.From
+import org.opentorah.xml.{From, Parser}
 
 trait NamedCompanion {
   // TODO try pushing
@@ -17,12 +17,12 @@ trait NamedCompanion {
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
   // - not final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Metadata.load(
+  lazy val toNames: Map[Key, Names] = Parser.run(Metadata.load(
     from = From.resource(this, resourceName),
     content = Names.NamesMetadata,
     keys = values,
     hasName = (metadata: Names, name: String) => metadata.hasName(name)
-  )
+  ))
 
   protected def resourceName: String = what
 

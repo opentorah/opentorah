@@ -3,6 +3,7 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 import java.net.URL
 
 final class WithSource[T](val source: String, val value: T)
@@ -43,38 +44,28 @@ object WithSource {
 
   def all[T](
     site: Site,
-    finder: Xml.Nodes => Seq[T]
-  ): Seq[WithSource[T]] = {
-    def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Seq[WithSource[T]] = {
+    finder: Xml.Nodes => Parser[Seq[T]]
+  ): Caching.Parser[Seq[WithSource[T]]] = {
+
+    def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Parser[Seq[WithSource[T]]] = {
       val source: String = Files.mkUrl(htmlContent.path(site).map(_.structureName))
-      for (withoutSource <- finder(nodes)) yield new WithSource[T](source, withoutSource)
+      finder(nodes).map(_.map(new WithSource[T](source, _)))
     }
 
-    val fromEntities: Seq[Seq[WithSource[T]]] =
-      for (entity <- site.entities.directoryEntries) yield withSource(
-        entity,
-        entity.teiEntity(site).content
-      )
-
-    val fromHierarchicals: Seq[Seq[WithSource[T]]] =
-      for (hierarchical <- site.hierarchies ++ site.collections) yield withSource(
+    for {
+      entities <- site.entities.directoryEntries
+      fromEntities <- ZIO.foreach(entities)(entity =>
+          entity.teiEntity(site) >>= (teiEntity => withSource(entity, teiEntity.content)))
+      fromHierarchicals <- ZIO.foreach(site.hierarchies ++ site.collections) { hierarchical => withSource(
         hierarchical,
         Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
-      )
-
-    val fromDocuments: Seq[Seq[WithSource[T]]] =
-      for {
-        collection <- site.collections
-        document <- collection.directoryEntries
-        text = collection.textFacet.of(document)
-      } yield withSource(
-        text,
-        Seq(Tei.xmlElement(text.getTei))
-      )
-
-    (fromEntities ++ fromHierarchicals ++ fromDocuments).flatten
+      )}
+      fromDocuments <- ZIO.foreach(site.collections) { collection =>
+        collection.directoryEntries >>= (documents => ZIO.foreach(documents) { document =>
+          val text: Document.TextFacet = collection.textFacet.of(document)
+          text.getTei >>= (tei => withSource(text, Seq(Tei.xmlElement(tei))))
+        })
+      }
+    } yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten
   }
-
-  def resolve[T](site: Site, withSources: Seq[WithSource[T]]): Seq[Store] =
-    for (withSource <- withSources) yield site.resolve(withSource.source).get.last
 }

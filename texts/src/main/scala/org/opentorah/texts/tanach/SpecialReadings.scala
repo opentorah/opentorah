@@ -22,7 +22,7 @@ object SpecialReadings {
     parse(Haftarah.element(full), "Haftarah", element)
 
   private def parse[R](fromXml: Elements[R], what: String, element: Xml.Element): R =
-    Parser.parseDo(fromXml.parse(From.xml(what, element)))
+    Parser.run(fromXml.parse(From.xml(what, element)))
 
   private def fromDay(withNames: WithNames, torah: Torah): Torah = torah.fromWithNumbers(withNames)
 

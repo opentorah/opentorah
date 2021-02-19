@@ -1,11 +1,12 @@
 package org.opentorah.collector
 
-import org.opentorah.xml.Xml
+import org.opentorah.xml.{Parser, Xml}
+import zio.ZIO
 
 object Reports extends By with HtmlContent {
   override def selector: Selector = Selector.byName("report")
 
-  override def findByName(name: String): Option[Store] = Store.findByName(
+  override def findByName(name: String): Caching.Parser[Option[Store]] = Store.findByName(
     name,
     "html",
     name => Store.findByName(name, reports)
@@ -20,6 +21,6 @@ object Reports extends By with HtmlContent {
 
   override def path(site: Site): Store.Path = Seq(Reports)
 
-  override def content(site: Site): Xml.Element =
-    <div>{for (report <- reports) yield <l>{report.a(site)(text = report.title)}</l>}</div>
+  override def content(site: Site): Parser[Xml.Element] =
+    ZIO.succeed(<div>{reports.map(report => <l>{report.a(site)(text = report.title)}</l>)}</div>)
 }

@@ -1,5 +1,7 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
+
 final class Text {
   override def toString: String = s"element text"
 
@@ -13,7 +15,7 @@ final class Text {
   }
 
   def required: Parsable[String] = new Parsable[String] {
-    override protected def parser: Parser[String] = Parser.required(optionalParser, this)
+    override protected def parser: Parser[String] = Effects.required(optionalParser, this)
     override def unparser: Unparser[String] = Unparser(
       content = value => Seq(Xml.mkText(value))
     )
@@ -25,7 +27,7 @@ object Text {
   def apply(): Text = new Text
 
   final class TextElement(elementName: String) extends Element[String](elementName) {
-    override def toString: Error = s"text element $elementName"
+    override def toString: Effects.Error = s"text element $elementName"
     override def contentType: ContentType = ContentType.Characters
     override def contentParsable: Parsable[String] = Text().required
   }

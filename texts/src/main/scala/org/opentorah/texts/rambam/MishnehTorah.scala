@@ -1,7 +1,8 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.util.Effects
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 object MishnehTorah {
 
@@ -96,7 +97,7 @@ object MishnehTorah {
         number <- nAttribute()
         names <- Names.withoutDefaultNameParsable()
         parts <- Part.seq()
-        _ <- Parser.check(parts.map(_.number) == (1 to parts.length),
+        _ <- Effects.check(parts.map(_.number) == (1 to parts.length),
           s"Wrong part numbers: ${parts.map(_.number)} != ${1 until parts.length}")
       } yield {
         val result = new Book(number, names, parts)
@@ -110,7 +111,7 @@ object MishnehTorah {
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] = {
-    val result: Seq[Book] = Metadata.loadResource(this, Book)
+    val result: Seq[Book] = Parser.run(Metadata.loadResource(this, Book))
     require(result.map(_.number) == (0 to 14))
     result
   }

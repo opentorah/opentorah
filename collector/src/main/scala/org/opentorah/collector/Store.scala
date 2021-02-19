@@ -2,12 +2,13 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.{Language, WithNames}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Elements, PrettyPrinter, Xml}
+import org.opentorah.xml.{Elements, Parser, PrettyPrinter, Xml}
+import zio.ZIO
 
 trait Store extends WithNames {
   def acceptsIndexHtml: Boolean = false
 
-  def findByName(name: String): Option[Store] = None
+  def findByName(name: String): Caching.Parser[Option[Store]] = ZIO.none
 
   def displayName: String = names.doFind(Language.Russian.toSpec).name
 
@@ -26,41 +27,38 @@ object Store {
     Not all `Stores` are read from XML - some are constructed -
      so `Store` does *not* extend `FromUrl.With`.
    */
-  @scala.annotation.tailrec
   def resolve(
     path: Seq[String],
     store: Store,
-    result: Path
-  ): Option[Path] = {
+    acc: Path
+  ): Caching.Parser[Option[Path]] = {
     val theEnd: Boolean = path.isEmpty ||
       store.acceptsIndexHtml && ((path == Seq("index.html")) || (path == Seq("index")))
 
-    if (theEnd) if (result.isEmpty) None else Some(result.reverse) else {
-      val next: Option[Store] = store.findByName(path.head)
-      // Note: using fold() here breaks tail-recursion:
-      if (next.isEmpty) None else resolve(path.tail, next.get, next.get +: result)
-    }
+    if (theEnd) ZIO.succeed(if (acc.isEmpty) None else Some(acc.reverse))
+    else store.findByName(path.head) >>=
+      (_.fold[Caching.Parser[Option[Path]]](ZIO.none)(next => resolve(path.tail, next, next +: acc)))
   }
 
   def findByName[M](
     fullName: String,
     allowedExtension: String,
-    findByName: String => Option[M],
+    findByName: String => Caching.Parser[Option[M]],
     assumeAllowedExtension: Boolean = false
-  ): Option[M] = {
+  ): Caching.Parser[Option[M]] = {
     val (fileName: String, extension: Option[String]) = Files.nameAndExtension(fullName)
 
-    val name =
+    val name: Option[String] =
       if (extension.isDefined && !extension.contains(allowedExtension))
         if (assumeAllowedExtension) Some(fullName) else None
       else
         Some(fileName)
 
-    name.flatMap(findByName)
+    name.fold[Caching.Parser[Option[M]]](ZIO.none)(name => findByName(name))
   }
 
-  def findByName(name: String, stores: Seq[Store]): Option[Store] =
-    stores.find(_.names.hasName(name))
+  def findByName(name: String, stores: Seq[Store]): Parser[Option[Store]] =
+    ZIO.succeed(stores.find(_.names.hasName(name)))
 
   def renderXml[T <: Store](elements: Elements[T], value: T): String = renderXml(elements.xmlElement(value))
   def renderXml(xml: Xml.Element): String = prettyPrinter.renderXml(xml)

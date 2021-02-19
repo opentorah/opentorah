@@ -58,9 +58,7 @@ object HtmlTheme {
       <div class="wrapper">
         <a class="site-title" rel="author" target={Viewer.default.name} href="/">{title}</a>
         <nav class="site-nav">
-          <div class="trigger">{
-            for (link <- navigationLinks) yield pageLinkClass.set(link)
-          }</div>
+          <div class="trigger">{navigationLinks.map(pageLinkClass.set)}</div>
         </nav>
       </div>
     </header>

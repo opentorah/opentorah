@@ -4,9 +4,10 @@ import org.opentorah.metadata.Names
 import org.opentorah.html
 import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
   ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, TeiRawXml, Title, Unclear, Entity => TeiEntity}
-import org.opentorah.util.Files
+import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Attribute, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
+import zio.{App, ExitCode, Task, UIO, URIO, ZEnv, ZIO}
 import java.io.File
 import java.net.URL
 
@@ -36,6 +37,8 @@ final class Site(
   val by: ByHierarchy
 ) extends Store with FromUrl.With {
 
+  private val caching: Caching.Simple = new Caching.Simple
+
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
 
   private def getPaths(path: Store.Path, by: ByHierarchy): Seq[Store.Path] = by.stores.flatMap { store =>
@@ -46,7 +49,7 @@ final class Site(
     })
   }
 
-  val store2path: Map[Store, Store.Path] = (for (path <- paths) yield path.last -> path).toMap
+  val store2path: Map[Store, Store.Path] = paths.map(path => path.last -> path).toMap
 
   val collections: Seq[Collection] = for {
     path <- paths
@@ -70,48 +73,33 @@ final class Site(
     name = "references",
     value = EntityReference
   )
-  def getReferences: Seq[WithSource[EntityReference]] = references.get
+  def getReferences: Caching.Parser[Seq[WithSource[EntityReference]]] = references.get
 
   private val unclears: ListFile[WithSource[Unclear.Value], Seq[WithSource[Unclear.Value]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "unclears-generated.xml"),
     name = "unclears",
     value = Unclear.element
   )
-  def getUnclears: Seq[WithSource[Unclear.Value]] = unclears.get
+  def getUnclears: Caching.Parser[Seq[WithSource[Unclear.Value]]] = unclears.get
 
-  def resolve(url: String): Option[Store.Path] = resolve(Files.splitAndDecodeUrl(url))
+  def resolve(url: String): Caching.Parser[Option[Store.Path]] = resolve(Files.splitAndDecodeUrl(url))
 
-  def resolve(path: Seq[String]): Option[Store.Path] =
-    if (path.isEmpty) Some(Seq(Index.Flat))
+  def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] =
+    if (path.isEmpty) ZIO.some(Seq(Index.Flat))
     else Store.resolve(path, this, Seq.empty)
 
-  override def findByName(name: String): Option[Store] = alias2collectionAlias.get(name)
-    .orElse(Store.findByName(name, Seq(entities, notes, Reports, by)))
-    .orElse(Store.findByName(
-      name,
-      "html",
-      name => Store.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
-    ))
+  // TODO ZIOify logging!
+  //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
+  def resolveContent(path: Seq[String]): Task[Option[(String, Boolean)]] =
+    toTask(resolve(path) >>= (_.map(content(_).map(Some(_))).getOrElse(ZIO.none)))
 
-  private lazy val navigationLinks: Seq[Xml.Element] = pages.map { url =>
-    val path: Store.Path = resolve(url).get
-    a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
+  private def content(path: Store.Path): Caching.Parser[(String, Boolean)] = path.lastOption.getOrElse(this) match {
+    case teiFacet   : Document.TeiFacet => renderTeiContent (teiFacet   ).map((_, true ))
+    case htmlContent: HtmlContent       => renderHtmlContent(htmlContent).map((_, false))
   }
 
-  def a(path: Store.Path): html.a = html
-    .a(path.map(_.structureName))
-    .setTarget((path.last match {
-      case htmlContent: HtmlContent => htmlContent.viewer
-      case _ => Viewer.default
-    }).name)
-
-  def content(path: Store.Path): (String, Boolean) = path.lastOption.getOrElse(this) match {
-    case teiFacet: Document.TeiFacet => (renderTeiContent(teiFacet.getTei), true)
-    case htmlContent: HtmlContent => (renderHtmlContent(htmlContent), false)
-  }
-
-  private def renderTeiContent(tei: Tei): String = Tei.renderXml(
-    tei.copy(teiHeader = tei.teiHeader.copy(
+  private def renderTeiContent(teiFacet: Document.TeiFacet): Caching.Parser[String] = teiFacet.getTei.map(tei =>
+    Tei.renderXml(tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(new PublicationStmt(
           publisher = Some(new Publisher.Value(<ptr target={s"http://$siteUrl"}/>)),
@@ -130,142 +118,186 @@ final class Site(
         )))),
         calendarDesc = Some(calendarDesc)
       ))
-    ))
+    )))
   )
 
-  private def renderHtmlContent(htmlContent: HtmlContent): String =
-    Site.htmlPrettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
-      viewer = htmlContent.viewer,
-      headTitle = htmlContent.htmlHeadTitle,
-      title = htmlContent.htmlBodyTitle,
-      style = if (htmlContent.isWide) "wide" else "main",
-      favicon,
-      googleAnalyticsId,
-      content = resolveHtmlContent(htmlContent),
-      header = HtmlTheme.header(
-        this.title.xml,
-        this.navigationLinks ++ htmlContent.navigationLinks(this)
-      ),
-      footer = HtmlTheme.footer(
-        author = siteUrl,
-        email,
-        githubUsername,
-        twitterUsername,
-        footer.xml
-      )
-    ))
+  private def renderHtmlContent(htmlContent: HtmlContent): Caching.Parser[String] = for {
+    content <- resolveHtmlContent(htmlContent)
+    siteNavigationLinks <- getNavigationLinks
+    htmlContentNavigationLinks <- htmlContent.navigationLinks(this)
+  } yield Site.htmlPrettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
+    viewer = htmlContent.viewer,
+    headTitle = htmlContent.htmlHeadTitle,
+    title = htmlContent.htmlBodyTitle,
+    style = if (htmlContent.isWide) "wide" else "main",
+    favicon,
+    googleAnalyticsId,
+    content = content,
+    header = HtmlTheme.header(
+      title = this.title.xml,
+      navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks
+    ),
+    footer = HtmlTheme.footer(
+      author = siteUrl,
+      email,
+      githubUsername,
+      twitterUsername,
+      footer.xml
+    )
+  ))
 
-  private def resolveHtmlContent(htmlContent: HtmlContent): Xml.Element = Tei.toHtml(
-    linkResolver(htmlContent match {
-      case htmlFacet: Document.TextFacet => Some(htmlFacet)
-      case _ => None
-    }),
-    htmlContent.content(this)
-  )
+  private var navigationLinks: Option[Seq[Xml.Element]] = None
+
+  private def getNavigationLinks: Caching.Parser[Seq[Xml.Element]] =
+    if (navigationLinks.isDefined) ZIO.succeed(navigationLinks.get) else
+      ZIO.foreach(pages) { url => resolve(url).map { pathOpt =>
+        val path: Store.Path = pathOpt.get
+        a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
+      }}
+        .map { result =>
+          navigationLinks = Some(result)
+          result
+        }
+
+  def a(path: Store.Path): html.a = html
+    .a(path.map(_.structureName))
+    .setTarget((path.last match {
+      case htmlContent: HtmlContent => htmlContent.viewer
+      case _ => Viewer.default
+    }).name)
+
+  override def findByName(name: String): Caching.Parser[Option[Store]] =
+    ZIO.succeed(alias2collectionAlias.get(name)) >>= {
+      case Some(result) => ZIO.some(result)
+      case None =>
+        Store.findByName(name, Seq(entities, notes, Reports, by)) >>= {
+          case Some(result) => ZIO.some(result)
+          case None => Store.findByName(
+            name,
+            "html",
+            name => Store.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
+          )
+        }
+    }
+
+  private def resolveHtmlContent(htmlContent: HtmlContent): Caching.Parser[Xml.Element] =
+    htmlContent.content(this) >>= (content => Tei.toHtml(
+      linkResolver(htmlContent match {
+        case htmlFacet: Document.TextFacet => Some (htmlFacet)
+        case _ => None
+      }),
+      content
+    ))
 
   private def linkResolver(textFacet: Option[Document.TextFacet]): LinksResolver = new LinksResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
       textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
 
-    def resolved(a: Option[html.a], error: => String): Option[html.a] = {
-      if (a.isEmpty) Site.logger.warn(error)
-      a
-    }
+    def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
+      toTask(parser.map { a =>
+        if (a.isEmpty) Site.logger.warn(error)
+        a
+      }).orDie
 
-    override def resolve(url: Seq[String]): Option[html.a] = resolved(
-      Site.this.resolve(url).map(path => a(path)),
+    override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
+      Site.this.resolve(url).map(_.map(path => a(path))),
       s"did not resolve: $url"
     )
 
-    override def findByRef(ref: String): Option[html.a] = resolved(
-      entities.findByName(ref).map(entity => entity.a(Site.this)),
+    override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
+      entities.findByName(ref).map(_.map(entity => entity.a(Site.this))),
       s"did not find reference: $ref"
     )
 
-    override def facs(pageId: String): Option[html.a] = resolved(
-      facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId)),
+    override def facs(pageId: String): UIO[Option[html.a]] = toUIO(
+      ZIO.succeed(facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId))),
       "did not get facsimile: $pageId"
     )
   }
 
-  def build(withPrettyPrint: Boolean): Unit = {
-    Site.logger.info("Writing site lists.")
-
-    entities.writeDirectory()
-    notes.writeDirectory()
-    for (collection <- collections) collection.writeDirectory()
-
-    // Collection lists must exist by the time this runs:
-
-    Site.logger.info("Writing references.")
-    references.write(WithSource.all[EntityReference](
-      this,
-      nodes => for {
-        entityType <- EntityType.values
-        node <- nodes
-        descendants <- Xml.descendants(node, entityType.nameElement, EntityReference)
-      } yield descendants
-    ))
-
-    Site.logger.info("Writing unclears.")
-    unclears.write(WithSource.all[Unclear.Value](
-      this,
-      nodes => (for (node <- nodes) yield Xml.descendants(node, Unclear.element.elementName, Unclear.element)).flatten
-    ))
-
-    Site.logger.info("Verifying site.")
-
-    val errors: Seq[String] = getReferences.flatMap { value =>
-      val reference: EntityReference = value.value
-      val name: Xml.Nodes = reference.name
-      reference.ref.fold[Option[String]](None) { ref =>
-        if (ref.contains(" ")) Some(s"""Value of the ref attribute contains spaces: ref="$ref" """) else {
-          entities.findByName(ref).fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """)) { named =>
-            if (named.entityType == reference.entityType) None
-            else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
-          }
-        }
-      }
-    }
-
-    if (errors.nonEmpty) throw new IllegalArgumentException(errors.mkString("\n"))
-
-    // detect and log unresolved references
-    for (htmlContent <- hierarchies ++ collections ++ notes.directoryEntries ++ entities.directoryEntries)
-      resolveHtmlContent(htmlContent)
+  def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
+    caching.logEnabled = false
 
     for {
-      collection <- collections
-      document <- collection.directoryEntries
-      text = collection.textFacet.of(document)
-    } resolveHtmlContent(text)
+      _ <- Effects.effect(Site.logger.info("Writing site lists."))
+      _ <- entities.writeDirectory()
+      _ <- notes.writeDirectory()
+      // Collection lists must exist by the time we gather references and such:
+      _ <- ZIO.foreach_(collections)(_.writeDirectory())
 
-    Site.logger.info("Pretty-printing site.")
-    if (withPrettyPrint) prettyPrint()
+      _ <- Effects.effect(Site.logger.info("Writing references."))
+      allReferences <- WithSource.all[EntityReference](
+        this,
+        nodes => ZIO.foreach(EntityType.values)(entityType =>
+          Xml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
+      )
+      _ <- Effects.effect(references.write(allReferences))
+
+      _ <- Effects.effect(Site.logger.info("Writing unclears."))
+      allUnclears <- WithSource.all[Unclear.Value](
+        this,
+        nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
+      )
+      _ <- Effects.effect(unclears.write(allUnclears))
+
+      _ <- Effects.effect(Site.logger.info("Verifying site."))
+
+      errorOpts <- getReferences >>= (ZIO.foreach(_) { value =>
+        val reference: EntityReference = value.value
+        val name: Xml.Nodes = reference.name
+        reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
+          if (ref.contains(" ")) ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
+          else entities.findByName(ref).map(_
+            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """))(named =>
+              if (named.entityType == reference.entityType) None
+              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
+            )
+          )
+        )
+      })
+      errors = errorOpts.flatten
+      _ <- Effects.check(errors.isEmpty, errors.mkString("\n"))
+
+      // detect and log unresolved references
+      allNotes <- notes.directoryEntries
+      allEntities <- entities.directoryEntries
+      _ <- ZIO.foreach_(hierarchies ++ collections ++ allNotes ++ allEntities)(resolveHtmlContent)
+
+      _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries >>= (ZIO.foreach_(_)(document =>
+          resolveHtmlContent(collection.textFacet.of(document)))))
+
+      _ <- if (!withPrettyPrint) Effects.ok else prettyPrint()
+    } yield ()
   }
 
-  private def prettyPrint(): Unit = {
-    for (entity <- entities.directoryEntries) entities.writeFile(
-      entity,
-      content = Store.renderXml(TeiEntity.xmlElement(entities.getFile(entity)))
-    )
+  private def prettyPrint(): Caching.Parser[Unit] = for {
+    _ <- Effects.effect(Site.logger.info("Pretty-printing site."))
 
-    for (collection <- collections) Files.write(
+    _ <- entities.directoryEntries >>= (ZIO.foreach_(_)(entity => entities.getFile(entity).map(teiEntity =>
+      entities.writeFile(
+        entity,
+        content = Store.renderXml(TeiEntity.xmlElement(teiEntity))
+      )
+    )))
+
+    _ <- ZIO.foreach_(collections)(collection => ZIO.succeed(Files.write(
       file = Files.url2file(collection.fromUrl.url),
       content = Store.renderXml(Collection, collection)
-    )
+    )))
 
-    for {
-      collection <- collections
-      document <- collection.directoryEntries
-    } collection.writeFile(
-      document,
-      content = Tei.renderXml(collection.getFile(document))
+    _ <- ZIO.foreach_(collections)(collection =>
+      collection.directoryEntries >>= (ZIO.foreach_(_)(document => collection.getFile(document).map(text =>
+        collection.writeFile(
+        document,
+        content = Tei.renderXml(text)
+      ))))
     )
-  }
+  } yield ()
+
+  private def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
 }
 
-object Site extends Element[Site]("site") {
+object Site extends Element[Site]("site") with App {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
@@ -280,21 +312,15 @@ object Site extends Element[Site]("site") {
     preformattedElements = Set("pre")
   )
 
-  def read(rootPath: String): Site =
-    read(new File(rootPath).toURI.toURL)
-
-  def read(rootUrl: URL): Site = {
-    logger.info(s"Reading site from $rootUrl")
-    Parser.parseDo(Site.parse(Files.fileInDirectory(rootUrl, "site.xml")))
+  def read(rootUrl: URL): Task[Site] = Parser.toTask {
+    Effects.effect(logger.info(s"Reading site from $rootUrl")) *>
+    Site.parse(Files.fileInDirectory(rootUrl, "site.xml"))
   }
 
-  def main(args: Array[String]): Unit = {
-    org.opentorah.collector.Cache.logEnabled = false
-
-    Site
-      .read(new File(args(0)).toURI.toURL)
-      .build(args.length > 1 && (args(1) == "prettyPrint"))
-  }
+  override def run(args: List[String]): URIO[ZEnv, ExitCode] = {
+    val withPrettyPrint: Boolean = args.length > 1 && (args(1) == "prettyPrint")
+    Site.read(new File(args.head).toURI.toURL) >>= (_.build(withPrettyPrint))
+  }.exitCode
 
   private val siteUrlAttribute: Attribute.Required[String] = Attribute("siteUrl").required
   private val facsimilesUrlAttribute: Attribute.Required[String] = Attribute("facsimilesUrl").required

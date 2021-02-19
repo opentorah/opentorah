@@ -1,5 +1,6 @@
 # DocBook plugin for Gradle #
 
+[TOC]
 ## Motivation ##
 
 There is an excellent [DocBook](http://www.docbook.org/) plugin
@@ -444,3 +445,36 @@ Following features of the Maven Gradle plugin are not supported:
 - expressions in `<?eval?>`
 - access to the project and its properties in `<?eval?>`
 - multiple documents with different parameters
+
+## Unlikely Future ##
+
+Here are some issues and potential enhancements that probably won't happen:)
+
+- [ ] add DocBook code highlighting to the pipeline;
+
+### HTML2 ###
+- [ ] does "Chapter" suppression work for html2?
+- [ ] do MathJax configuration for html2 as for html.
+- [ ] how to control numbering with `db` in `autolabel.elements`?
+- [ ] how to get navigational links?
+- [ ] how to chunk glossary and bibliography?
+
+### JSON ###
+- [ ] print JSON prettier using Paiges... :)
+- [ ] try using it when printing MathJax configuration -
+  which is a value of an XSL parameter, so is formatted as a part of XML document...
+- [ ] quotes in JSON for the MathJaX configuration are quoted - 
+  can I avoid this double-quoting? Should I?
+
+### Oxygen ###
+- [ ] is there any combination of img.src.path, relative URLs, base etc. that makes images *visible*
+  in Oxygen while editing - without breaking the plugin?
+- [ ] Oxygen's PDF transform fails: doesn't recognize 'data:',
+  but in Author view works fine... resolver instead of the xmlresolver?
+- [ ] add note to README.md about FOP in Oxygen being obsolete - or not supporting JEuclid
+
+### EPUB ###
+- [ ] DocBook XSLT stylesheets for EPUB2 do not add the mimetype file with "application/epub+zip" in it; write it from the plugin itself?
+- [ ] codify EPUB customization along the lines of [ChunkingCustomization](http://www.sagehill.net/docbookxsl/ChunkingCustomization.html)
+  and epub3/README from the XSLT stlesheets distribution;
+- [ ] should CSS be configured for EPUB?

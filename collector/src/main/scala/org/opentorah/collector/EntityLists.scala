@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityRelated, EntityType, Tei, Title}
+import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, ContentType, Element, FromUrl, Parsable, Parser, Unparser, Xml}
 
 final class EntityLists(
@@ -13,35 +14,34 @@ final class EntityLists(
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
   private var list2entities: Option[Map[EntityLists.EntityList, Seq[Entity]]] = None
+  private var nonEmptyLists: Option[Seq[EntityLists.EntityList]] = None
 
-  private def setUp(site: Site): Unit = if (list2entities.isEmpty) list2entities = Some((for (list <- lists) yield {
-    val entities = site.entities.directoryEntries.filter(entity =>
-      (entity.entityType == list.entityType) &&
-      (entity.role       == list.role      )
-    ).sortBy(_.name)
-    list -> entities
-  }).toMap)
+  private def setUp(site: Site): Caching.Parser[Unit] = if (list2entities.nonEmpty) Effects.ok else
+    site.entities.directoryEntries.map { allEntities =>
+      val result: Map[EntityLists.EntityList, Seq[Entity]] = (for (list <- lists) yield {
+        val entities = allEntities.filter(entity =>
+          (entity.entityType == list.entityType) &&
+          (entity.role       == list.role      )
+        ).sortBy(_.name)
+        list -> entities
+      }).toMap
 
-  private def getEntities(list: EntityLists.EntityList): Seq[Entity] = list2entities.get(list)
+      list2entities = Some(result)
 
-  private lazy val nonEmptyLists: Seq[EntityLists.EntityList] = lists.filterNot(list => getEntities(list).isEmpty)
+      nonEmptyLists = Some(lists.filterNot(list => result(list).isEmpty))
+    }
 
   override def path(site: Site): Store.Path = Seq(site.entityLists)
 
-  override def content(site: Site): Xml.Element = {
-    setUp(site)
-
+  override def content(site: Site): Caching.Parser[Xml.Element] = for { _ <- setUp(site) } yield {
     <div>
-      <p>
-        {for (list <- nonEmptyLists) yield <l>{a(site).setFragment(list.names.name)(xml = list.title)}</l>}
-      </p>
-      {for (list <- nonEmptyLists) yield
+      <p>{nonEmptyLists.get.map(list => <l>{a(site).setFragment(list.names.name)(xml = list.title)}</l>)}</p>
+      {nonEmptyLists.get.map(list =>
       <list id={list.names.name}>
         <head xmlns={Tei.namespace.uri}>{list.title.xml}</head>
-        {for (entity <- getEntities(list)) yield <l>{entity.a(site)(text = entity.mainName)}</l>}
+        {list2entities.get(list).map(entity => <l>{entity.a(site)(text = entity.mainName)}</l>)}
       </list>
-      }
-    </div>
+    )}</div>
   }
 }
 
@@ -53,9 +53,7 @@ object EntityLists extends Element[EntityLists]("entityLists") {
     val entityType: EntityType,
     val role: Option[String],
     val title: Title.Value,
-  ) extends Store with FromUrl.With {
-    override def findByName(name: String): Option[Store] = None
-  }
+  ) extends Store with FromUrl.With
 
   object EntityList extends EntityRelated[EntityList](
     elementName = _.listElement,

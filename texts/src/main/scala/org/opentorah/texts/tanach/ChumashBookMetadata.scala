@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Metadata, Names}
-import org.opentorah.util.Collections
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
+import org.opentorah.util.{Collections, Effects}
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 final class ChumashBookMetadata(
   book: Tanach.ChumashBook,
@@ -41,7 +41,7 @@ object ChumashBookMetadata {
         f = combineDays(parsha2span, _)
       )
 
-      parsha2metadata <- Parser.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
+      parsha2metadata <- Effects.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
@@ -57,13 +57,14 @@ object ChumashBookMetadata {
           }
 
           val book = parsha.book
-          Some(Parser.parseDo(Torah.processDays(
+          Some(Parser.run(Torah.processDays(
             book,
             combined,
             book.chapters.merge(
               parsha2span(parsha),
               parsha2span(parshaNext)
-            ))))
+            )
+          )))
         }
 
         result +: combineDays(parsha2span, (parshaNext, daysNext) +: tail)
@@ -78,9 +79,9 @@ object ChumashBookMetadata {
 
   def parser(book: Tanach.ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for {
     weeks <- new WeekParsable(book).seq()
-    _ <- Parser.check(names.getDefaultName.isDefined,
+    _ <- Effects.check(names.getDefaultName.isDefined,
       "Only default name is allowed for a Chumash book")
-    _ <- Parser.check(weeks.head.names.hasName(names.getDefaultName.get),
+    _ <- Effects.check(weeks.head.names.hasName(names.getDefaultName.get),
       "Chumash book name must be a name of the book's first parsha")
   } yield new Parsed(book, names, chapters, weeks)
 

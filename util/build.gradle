@@ -11,6 +11,8 @@ description = 'Open Torah Utilities'
 configureLibrary()
 
 dependencies {
+  api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
 }

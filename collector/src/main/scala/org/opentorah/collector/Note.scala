@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 
 final class Note(
   override val name: String,
@@ -11,15 +12,15 @@ final class Note(
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def path(site: Site): Store.Path = Seq(site.notes, this)
-  override def content(site: Site): Xml.Element = site.notes.getFile(this).content
+  override def content(site: Site): Caching.Parser[Xml.Element] = site.notes.getFile(this).map(_.content)
 }
 
 object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {
 
-  override def apply(name: String, markdown: Markdown): Note = new Note(
+  override def apply(name: String, markdown: Markdown): Parser[Note] = ZIO.succeed(new Note(
     name,
     markdown.title
-  )
+  ))
 
   private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional
 
