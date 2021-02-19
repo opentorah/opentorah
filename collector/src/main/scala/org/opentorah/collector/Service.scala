@@ -1,13 +1,11 @@
 package org.opentorah.collector
 
 import cats.data.OptionT
-import cats.effect.{Blocker, ExitCode, Sync}
-import net.logstash.logback.argument.StructuredArgument
-import org.opentorah.util.Files
+import cats.effect.{Blocker, ExitCode}
 //import cats.implicits._
 //import fs2.io
 import fs2.Stream
-import net.logstash.logback.argument.StructuredArguments
+import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.{`Content-Length`, `Content-Type`}
 import org.http4s.implicits._
@@ -15,9 +13,10 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.util.CaseInsensitiveString
 import org.http4s._
 import org.slf4j.{Logger, LoggerFactory}
+import org.opentorah.util.{Effects, Files}
 import zio.duration.Duration
 import zio.interop.catz._
-import zio.{App, RIO, URIO, ZEnv, ZIO}
+import zio.{App, RIO, Task, URIO, ZEnv, ZIO}
 import java.net.URL
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
@@ -88,37 +87,13 @@ object Service extends App {
   private def routes(siteUrl: String): HttpRoutes[ServiceTask] = {
     val siteUri: Uri = Uri.unsafeFromString(siteUrl)
 
-    def readSite: Site = Site.read(toUrl(siteUri))
-
-    var site: Site = readSite
-
-    // TODO unfold a bit
-    def fromSite(path: Seq[String], request: Request[ServiceTask]): Option[Response[ServiceTask]] = {
-      val storePath: Option[Store.Path] = site.resolve(path)
-
-      val result: Option[Response[ServiceTask]] = storePath
-        .map(site.content)
-        .map { case (content: String, isTei: Boolean) =>
-          val bytes: Array[Byte] = content.getBytes
-
-          Response(
-            headers = Headers(List(
-              `Content-Type`(if (isTei) MediaType.application.`tei+xml` else MediaType.text.html, Charset.`UTF-8`),
-              `Content-Length`.unsafeFromLong(bytes.length)
-              // TODO more headers!
-            )),
-            body = Stream.emits(bytes)
-          )
-        }
-
-      info(request, result.fold {
-        s"--- ${Files.mkUrl(path)}"
-      }{ _ =>
-        s"YES ${storePath.get.mkString("")}"
-      })
-
+    var site: Option[Site] = None
+    def getSite: Task[Site] = site.map(Task.succeed(_)).getOrElse(Site.read(toUrl(siteUri)).map { result =>
+      site = Some(result)
       result
-    }
+    })
+
+    Effects.unsafeRun(getSite)
 
     def get(request: Request[ServiceTask]): ServiceTask[Response[ServiceTask]] = {
       // TODO if I add a parameter list (implicit F: Sync[ServiceTask]) and use F.pure and F.suspend, I get
@@ -127,14 +102,26 @@ object Service extends App {
       //     [R]cats.effect.Concurrent[[β$18$]zio.ZIO[R,Throwable,β$18$]]
       //   and value F of type cats.effect.Sync[org.opentorah.collector.Service.ServiceTask]
       //   match expected type cats.effect.Sync[org.opentorah.collector.Service.ServiceTask]
-      val F: Sync[ServiceTask] = taskConcurrentInstance
+      //val F: Sync[ServiceTask] = taskConcurrentInstance
 
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
       val urlStr: String = Files.mkUrl(path)
 
       OptionT(
-        if (path.headOption.exists(staticPaths.contains)) F.pure(None)
-        else F.suspend(F.pure(fromSite(path, request)))
+        if (path.headOption.exists(staticPaths.contains)) Task.none else
+          (getSite >>= (_.resolveContent(path))).map(_.map { case (content: String, isTei: Boolean) =>
+            val bytes: Array[Byte] = content.getBytes
+            Response[ServiceTask](
+              headers = Headers(List(
+                `Content-Type`(if (isTei) MediaType.application.`tei+xml` else MediaType.text.html, Charset.`UTF-8`),
+                `Content-Length`.unsafeFromLong(bytes.length)
+                // TODO more headers!
+              )),
+              body = Stream.emits(bytes)
+            )
+          })
+            // Note: without this ascription, incorrect type is inferred:
+            : ServiceTask[Option[Response[ServiceTask]]]
       )
       .orElse(StaticFile.fromURL[ServiceTask](
         toUrl(siteUri.resolve(relativize(addIndex(request.uri)))),
@@ -156,9 +143,10 @@ object Service extends App {
 
     HttpRoutes.of[ServiceTask] {
       case request@GET -> Root / "reset-cached-site" =>
-        info(request, "RST")
-        site = readSite
-        Ok("Site reset!")
+        Effects.effectTotal(info(request, "RST")) *>
+          Effects.effectTotal({site = None}) *>
+          getSite *>
+          Ok("Site reset!")
 
       case request@GET -> _ => get(request)
     }
@@ -191,11 +179,10 @@ object Service extends App {
   private val logger: Logger = LoggerFactory.getLogger("org.opentorah.collector.service.Service")
 
   private def log(request: Option[Request[ServiceTask]], message: String, severity: String): Unit = {
-    val trace: Option[String] = request
-      .flatMap(_
-        .headers.get(CaseInsensitiveString("X-Cloud-Trace-Context"))
-        .map(_.value.split("/")(0))
-      )
+    val trace: Option[String] = request.flatMap(_
+      .headers.get(CaseInsensitiveString("X-Cloud-Trace-Context"))
+      .map(_.value.split("/")(0))
+    )
 
     val arguments: Seq[StructuredArgument] =
       Seq(StructuredArguments.keyValue("severity", severity)) ++

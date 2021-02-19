@@ -1,6 +1,8 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Element, Elements, From, Parsable, Parser, Result}
+import org.opentorah.util.Effects
+import org.opentorah.xml.{Element, Elements, From, Parsable, Parser}
+import zio.IO
 
 final class Metadata[M](
   elementName: String,
@@ -16,7 +18,7 @@ object Metadata {
     content: Elements[M],
     keys: Seq[K],
     hasName: (M, String) => Boolean
-  ): Map[K, M] = Parser.parseDo(for {
+  ): Parser[Map[K, M]] = for {
     metadatas <- load[M](from, content)
 
     result <- bind(
@@ -25,15 +27,12 @@ object Metadata {
       metadatas,
       hasName
     )
-  } yield result.toMap)
+  } yield result.toMap
 
   def loadResource[M](
     obj: AnyRef,
     content: Elements[M]
-  ): Seq[M] = Parser.parseDo(Metadata.load(
-    from = From.resource(obj),
-    content
-  ))
+  ): Parser[Seq[M]] = Metadata.load(from = From.resource(obj), content)
 
   def load[M](
     from: From,
@@ -49,7 +48,7 @@ object Metadata {
     metadatas: Seq[M],
     hasName: (M, String) => Boolean
   ): Parser[Seq[(K, M)]] = for {
-    result <- Parser.collectAll(metadatas.map(metadata => find(keys, getName, metadata, hasName).map(_ -> metadata)))
+    result <- Effects.collectAll(metadatas.map(metadata => find(keys, getName, metadata, hasName).map(_ -> metadata)))
     _ <- checkNoUnmatchedKeys(keys.toSet -- result.map(_._1).toSet)
   } yield result
 
@@ -64,8 +63,8 @@ object Metadata {
     } yield result
   }
 
-  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): Result =
-    Parser.check(unmatchedKeys.isEmpty, s"Unmatched keys: $unmatchedKeys")
+  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): IO[Effects.Error, Unit] =
+    Effects.check(unmatchedKeys.isEmpty, s"Unmatched keys: $unmatchedKeys")
 
   def find[K <: WithName](
     keys: Seq[K],
@@ -85,8 +84,8 @@ object Metadata {
   ): Parser[K] = {
     val result: Seq[K] = keys.filter(key => hasName(metadata, getName(key)))
     for {
-      _ <- Parser.check(result.nonEmpty, s"Unmatched metadata: $metadata")
-      _ <- Parser.check(result.length == 1, s"Metadata matched multiple keys: $metadata")
+      _ <- Effects.check(result.nonEmpty, s"Unmatched metadata: $metadata")
+      _ <- Effects.check(result.length == 1, s"Metadata matched multiple keys: $metadata")
     } yield result.head
   }
 }

@@ -14,10 +14,10 @@ abstract class Report[T](val name: String, val title: String) extends Store with
 
   final override def path(site: Site): Store.Path = Seq(Reports, this)
 
-  final override def content(site: Site): Xml.Element =
-    <div>{lines(site).map(line => lineToXml(line, site))}</div>
+  final override def content(site: Site): Caching.Parser[Xml.Element] =
+    lines(site).map(lines => <div>{lines.map(line => lineToXml(line, site))}</div>)
 
-  protected def lines(site: Site): Seq[T]
+  protected def lines(site: Site): Caching.Parser[Seq[T]]
 
   protected def lineToXml(line: T, site: Site): Xml.Element
 }
@@ -28,9 +28,10 @@ object Report {
     "no-refs",
     "Имена без атрибута /ref/"
   ) {
-    override protected def lines(site: Site): Seq[WithSource[EntityReference]] =  site.getReferences
+    override protected def lines(site: Site): Caching.Parser[Seq[WithSource[EntityReference]]] = site.getReferences.map(_
       .filter(_.value.ref.isEmpty)
       .sortBy(reference => Xml.toString(reference.value.name).toLowerCase)
+    )
 
     override protected def lineToXml(reference: WithSource[EntityReference], site: Site): Xml.Element = {
       val source: String = reference.source
@@ -42,8 +43,8 @@ object Report {
     "unclears",
     "Неясности"
   ) {
-    override protected def lines(site: Site): Seq[WithSource[Unclear.Value]] =
-      site.getUnclears.sortBy(_.source)
+    override protected def lines(site: Site): Caching.Parser[Seq[WithSource[Unclear.Value]]] =
+      site.getUnclears.map(_.sortBy(_.source))
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], site: Site): Xml.Element = {
       val source: String = unclear.source
@@ -55,9 +56,10 @@ object Report {
     "misnamed-entities",
     "Неправильно названные файлы с именами"
   ) {
-    override protected def lines(site: Site): Seq[Entity] = site.entities.directoryEntries
+    override protected def lines(site: Site): Caching.Parser[Seq[Entity]] = site.entities.directoryEntries.map(_
       .filterNot(entity => entity.id == getExpectedId(entity))
       .sortBy(_.name)
+    )
 
     override protected def lineToXml(entity: Entity, site: Site): Xml.Element =
       <l>{entity.a(site)(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>

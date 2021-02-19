@@ -10,13 +10,13 @@ final class ByHierarchy(
 
   override def acceptsIndexHtml: Boolean = true
 
-  override def findByName(name: String): Option[Store] = Store.findByName(name, stores)
+  override def findByName(name: String): Parser[Option[Store]] = Store.findByName(name, stores)
 
   // TODO generate hierarchy root index and reference it from the summary.
   def oneLevelIndex(site: Site): Xml.Element =
     <p>
       <l>{displayName}:</l>
-      <ul>{for (store <- stores) yield <li>{store.a(site)(text = store.displayTitle)}</li>}</ul>
+      <ul>{stores.map(store => <li>{store.a(site)(text = store.displayTitle)}</li>)}</ul>
     </p>
 
   def treeIndex(site: Site): Xml.Element = {
@@ -24,13 +24,12 @@ final class ByHierarchy(
       <ul>
         <li><em>{displayName}</em></li>
         <li>
-          <ul>{
-          for (store <- stores) yield
+          <ul>{stores.map(store =>
             <li>
               {store.a(site)(text = store.displayTitle)}
               {store.getBy.toSeq.map(_.treeIndex(site))}
             </li>
-          }</ul>
+          )}</ul>
         </li>
       </ul>
     </div>

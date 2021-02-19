@@ -1,7 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{WithNames, WithNumber}
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
+import org.opentorah.util.Effects
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
 final case class Torah private(override val spans: Seq[Torah.BookSpan])
@@ -58,7 +59,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     for {
       _ <- WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
       spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(with1), span, chapters)
-      _ <- Parser.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
+      _ <- Effects.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
     } yield Torah(spans.map(inBook(bookSpan.book, _)))
   }
 
@@ -100,7 +101,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
 
-    val result: Parser[Custom.Sets[Torah]] = Parser.mapValues(days){ spans: Seq[Numbered] =>
+    val result: Parser[Custom.Sets[Torah]] = Effects.mapValues(days){ spans: Seq[Numbered] =>
       parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 

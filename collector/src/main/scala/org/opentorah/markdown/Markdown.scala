@@ -5,6 +5,7 @@ import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.options.{DataHolder, MutableDataSet}
+import org.opentorah.util.Effects
 import org.opentorah.xml.{From, Xml}
 import java.io.InputStreamReader
 import java.net.URL
@@ -39,7 +40,7 @@ object Markdown {
 
   private def parse(url: URL): Node = parser.parseReader(new InputStreamReader(url.openStream()))
 
-  private def render(ast: Node): Xml.Element = org.opentorah.xml.Parser.unsafeRun(
+  private def render(ast: Node): Xml.Element = Effects.unsafeRun(
     From.string("flexmark", s"<div>${renderer.render(ast)}</div>").load
   )
 

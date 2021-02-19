@@ -81,5 +81,5 @@ object SeferHamitzvosLessons {
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Metadata.loadResource(this, Lesson)
+  lazy val lessons: Seq[Lesson] = Parser.run(Metadata.loadResource(this, Lesson))
 }

@@ -2,6 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import zio.{UIO, ZIO}
 import java.net.URL
 
 final class Notes(
@@ -15,10 +16,13 @@ final class Notes(
   new Notes.All(_),
 ) with By with HtmlContent {
 
-  override protected def loadFile(url: URL): Markdown = Markdown(url)
+  override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
-  override def findByName(name: String): Option[Store] =
-    Store.findByName(name, "html", getDirectory.findByName)
+  override def findByName(name: String): Caching.Parser[Option[Store]] = Store.findByName(
+    name,
+    "html",
+    name => getDirectory >>= (_.findByName(name))
+  )
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
@@ -26,8 +30,8 @@ final class Notes(
 
   override def path(site: Site): Store.Path = Seq(site.notes)
 
-  override def content(site: Site): Xml.Element =
-    <div>{for (note <- directoryEntries) yield <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>}</div>
+  override def content(site: Site): Caching.Parser[Xml.Element] = directoryEntries.map(notes =>
+    <div>{notes.map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
 }
 
 object Notes extends Element[Notes]("notes") {

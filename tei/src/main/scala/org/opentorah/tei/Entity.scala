@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.util.Effects
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Unparser, Xml}
 
 final case class Entity private(
   id: Option[String],
@@ -32,7 +33,7 @@ object Entity extends EntityRelated[Entity](
       id <- idAttribute()
       role <- roleAttribute()
       names <- namesParsable()
-      _ <- Parser.check(names.nonEmpty, s"No names in $id")
+      _ <- Effects.check(names.nonEmpty, s"No names in $id")
       content <- Element.nodes()
     } yield new Entity(
       id,

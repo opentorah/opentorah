@@ -1,6 +1,7 @@
 package org.opentorah.xml
 
-import zio.ZIO
+import org.opentorah.util.Effects
+import zio.IO
 
 trait Conversion[A] {
   def toString(value: A): String = value.toString
@@ -10,9 +11,7 @@ trait Conversion[A] {
 
   def fromString(value: String): A
 
-  def parseFromString(value: String): Parser[A] = for {
-    result <- Parser.effect(fromString(value))
-  } yield result
+  def parseFromString(value: String): IO[Effects.Error, A] = Effects.effect(fromString(value)) // TODO ZIOify!
 }
 
 object Conversion {
@@ -20,7 +19,7 @@ object Conversion {
   trait StringConversion extends Conversion[String] {
     final override def fromString(value: String): String = value
 
-    final override def parseFromString(value: String): Parser[String] = ZIO.succeed(value)
+    final override def parseFromString(value: String): IO[Effects.Error, String] = IO.succeed(value)
   }
 
   trait BooleanConversion extends Conversion[Boolean] {

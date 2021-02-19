@@ -1,6 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Text}
+import org.opentorah.util.Effects
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Text, Unparser}
 
 final case class Name(name: String, languageSpec: LanguageSpec) {
   def satisfies(spec: LanguageSpec): Boolean = {
@@ -19,8 +20,8 @@ object Name extends Element[Name]("name") {
     override def parser: Parser[Name] = for {
       n <- nAttribute.optional()
       characters <- Text().optional()
-      _ <- Parser.check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")
-      _ <- Parser.check(n.isEmpty || characters.isEmpty, "Both 'n' attribute and text are present.")
+      _ <- Effects.check(n.nonEmpty || characters.nonEmpty, "Both 'n' attribute and text are absent.")
+      _ <- Effects.check(n.isEmpty  || characters.isEmpty, "Both 'n' attribute and text are present.")
       name = n.orElse(characters)
       languageSpec <- LanguageSpec()
     } yield new Name(name.get, languageSpec)

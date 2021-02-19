@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -10,7 +11,7 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
       width,
       indent = 2,
       clingyElements = Set("note")
-    ).render(Parser.run(from.load))
+    ).render(Effects.unsafeRun(from.loadTask))
 
   private def check(from: From, width: Int, expected: String): Unit = {
     val result = render(from, width)

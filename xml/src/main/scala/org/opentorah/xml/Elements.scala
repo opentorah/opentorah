@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-import org.opentorah.util.{Collections, Files}
+import org.opentorah.util.{Collections, Effects, Files}
 import zio.ZIO
 import java.net.URL
 
@@ -90,7 +90,7 @@ object Elements {
   }
 
   final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element] {
-    override protected def parser: Parser[A] = Parser.required(elements.optionalParser, elements)
+    override protected def parser: Parser[A] = Effects.required(elements.optionalParser, elements)
     override def xml(value: A): Xml.Element = elements.xmlElement(value)
     override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
@@ -126,7 +126,7 @@ object Elements {
       result <- url.fold(noRedirect(parser.asInstanceOf[Parser[A]])) { url: String =>
         for {
           currentBaseUrl <- Context.currentBaseUrl
-          from <- Parser.effect(Files.subUrl(currentBaseUrl, url))
+          from <- Effects.effect(Files.subUrl(currentBaseUrl, url))
           result <- redirected(from)
         } yield result
       }
@@ -153,7 +153,7 @@ object Elements {
     def optional[A](element: Element[A]): Parser[Option[A]] = {
       val results = all(element)
       for {
-        _ <- Parser.check(results.length <= 1, s"Too many values for $element")
+        _ <- Effects.check(results.length <= 1, s"Too many values for $element")
       } yield results.headOption
     }
   }

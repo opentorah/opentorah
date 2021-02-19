@@ -1,10 +1,9 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Files
-import org.opentorah.html.{ToHtml, a}
+import org.opentorah.html
 import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
-import zio.{Has, URIO, ZIO, ZLayer}
-
+import zio.{Has, URIO, ZLayer}
 import java.net.URI
 
 final case class Tei(
@@ -12,7 +11,7 @@ final case class Tei(
   text: Text
 )
 
-object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolver]] {
+object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksResolver]] {
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
@@ -42,8 +41,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolve
     )
   }
 
-  def toHtml(linksResolver: LinksResolver, element: Xml.Element): Xml.Element =
-    Parser.unsafeRun(toHtml(element).provideLayer(ZLayer.succeed(linksResolver)))
+  def toHtml(linksResolver: LinksResolver, element: Xml.Element): Parser[Xml.Element] =
+    toHtml(element).provideLayer(ZLayer.succeed(linksResolver))
 
   def concat[A](unparsers: Unparser[A]*): Unparser[A] =
     Unparser.concatInNamespace(Tei.namespace, unparsers)
@@ -70,8 +69,9 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolve
         require(!Xml.isEmpty(children), element)
         val ref: Option[String] = EntityName.refAttribute.get(element)
 
-        if (ref.isEmpty) ZIO.succeed(a()(children)) else LinksResolver.findByRef(ref.get).map(_.
-          getOrElse(a(ref.toSeq))
+        if (ref.isEmpty) URIO.succeed(html.a()(children))
+        else URIO.accessM[Has[LinksResolver]](_.get.findByRef(ref.get)).map(_.
+          getOrElse(html.a(ref.toSeq))
           (children)
         )
 
@@ -87,8 +87,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolve
       case Pb.elementName =>
         require(Xml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
-        LinksResolver.facs(pageId).map(_
-          .getOrElse(a(Seq(pageId)))
+        URIO.accessM[Has[LinksResolver]](_.get.facs(pageId)).map(_
+          .getOrElse(html.a(Seq(pageId)))
           .copy(id = Some(pageId))
           (text = facsimileSymbol)
         )
@@ -96,31 +96,32 @@ object Tei extends Element[Tei]("TEI") with Dialect with ToHtml[Has[LinksResolve
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
         require(Xml.isEmpty(children), element)
-        ZIO.succeed(<img src={urlAttribute.get(element)}/>)
+        URIO.succeed(<img src={urlAttribute.get(element)}/>)
 
       case "table" =>
-        ZIO.succeed(<table>{children}</table>)
+        URIO.succeed(<table>{children}</table>)
 
       // Note: before the first row there can be <head>HEAD</head>;
       // it should become <caption>transform(HEAD)</caption>.
       case "row" =>
-        ZIO.succeed(<tr>{children}</tr>)
+        URIO.succeed(<tr>{children}</tr>)
 
       case "cell" =>
-        ZIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
+        URIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
 
       case _ =>
-        ZIO.succeed(element)
+        URIO.succeed(element)
     }
   }
 
-  private def reference(element: Xml.Element): URIO[Has[LinksResolver], a] = {
+  private def reference(element: Xml.Element): URIO[Has[LinksResolver], html.a] = {
     val uri: URI = new URI(targetAttribute.get(element))
 
     // TODO maybe just call up regardless?
-    if (uri.isAbsolute) ZIO.succeed(a(uri)) else LinksResolver.resolve(Files.splitUrl(uri.getPath)).map(_
+    if (uri.isAbsolute) URIO.succeed(html.a(uri))
+    else URIO.accessM[Has[LinksResolver]](_.get.resolve(Files.splitUrl(uri.getPath))).map(_
         .map(a => Option(uri.getFragment).fold(a)(a.setFragment))
-        .getOrElse(a(uri))
+        .getOrElse(html.a(uri))
       )
   }
 }

@@ -3,6 +3,7 @@ package org.opentorah.collector
 import org.opentorah.tei.{EntityRelated, EntityType, Entity => TeiEntity}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 
 final class Entity(
   val entityType: EntityType,
@@ -15,20 +16,26 @@ final class Entity(
   override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = Some(mainName)
 
-  def teiEntity(site: Site): TeiEntity = site.entities.getFile(this)
+  def teiEntity(site: Site): Caching.Parser[TeiEntity] = site.entities.getFile(this)
 
   override def path(site: Site): Store.Path = Seq(site.entities, this)
 
-  override def content(site: Site): Xml.Element = {
-    val sources: Seq[Store] = WithSource.resolve(site, site.getReferences.filter(_.value.ref.contains(id)))
+  override def content(site: Site): Caching.Parser[Xml.Element] = for {
+    entity <- teiEntity(site)
+    references <- site.getReferences
+    sources <- ZIO.foreach(
+      references.filter(_.value.ref.contains(id))
+    )(withSource => site.resolve(withSource.source).map(_.get.last))
+  } yield {
 
     val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
-      for { source <- sources; if source.isInstanceOf[Entity] } yield source.asInstanceOf[Entity]
+      sources.filter(_.isInstanceOf[Entity]).map(_.asInstanceOf[Entity])
     )(_.id).sortBy(_.mainName)
 
-    val fromDocuments: Map[Collection, Seq[Document.TextFacet]] =
-      (for { source <- sources; if source.isInstanceOf[Document.TextFacet] } yield source.asInstanceOf[Document.TextFacet])
-    .groupBy(_.collection)
+    val fromDocuments: Map[Collection, Seq[Document.TextFacet]] = sources
+      .filter(_.isInstanceOf[Document.TextFacet])
+      .map(_.asInstanceOf[Document.TextFacet])
+      .groupBy(_.collection)
 
     val byCollection: Seq[(Collection, Seq[Document.TextFacet])] =
       for {
@@ -44,15 +51,14 @@ final class Entity(
         {if (fromEntities.isEmpty) Seq.empty else
         <l>
           <em>{site.entityLists.selector.title.get}:</em>
-          {Xml.multi(nodes = for (fromEntity <- fromEntities) yield fromEntity.a(site)(fromEntity.mainName))}
+          {Xml.multi(nodes = fromEntities.map(fromEntity => fromEntity.a(site)(fromEntity.mainName)))}
         </l>
         }
         {for ((collection, texts) <- byCollection) yield
         <l>{collection.pathHeaderHorizontal(site)}:
-          {Xml.multi(separator = " ", nodes = for (text <- texts) yield text.a(site)(text = text.document.baseName))}</l>}
+          {Xml.multi(separator = " ", nodes = texts.map(text => text.a(site)(text = text.document.baseName)))}</l>}
       </p>
 
-    val entity: TeiEntity = teiEntity(site)
     TeiEntity.xmlElement(entity.copy(content = entity.content :+ mentions))
   }
 }
@@ -62,12 +68,12 @@ object Entity extends EntityRelated[Entity](
   entityType = _.entityType
 ) with Directory.EntryMaker[TeiEntity, Entity] {
 
-  override def apply(name: String, entity: TeiEntity): Entity = new Entity(
+  override def apply(name: String, entity: TeiEntity): Parser[Entity] = ZIO.succeed(new Entity(
     entity.entityType,
     entity.role,
     name,
     entity.names.head.name
-  )
+  ))
 
   override protected def contentType: ContentType = ContentType.Elements
 

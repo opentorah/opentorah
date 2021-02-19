@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
-import org.opentorah.util.Collections
-import org.opentorah.xml.{Unparser, Attribute, Element, From, Parsable, Parser}
+import org.opentorah.util.{Collections, Effects}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
@@ -35,12 +35,12 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
     }
   }
 
-  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Metadata.load(
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.run(Metadata.load(
     from = From.resource(this),
     content = Week,
     keys = Parsha.values,
     hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
-  ))(_._2)
+  )))(_._2)
 
   def element(full: Boolean): Element[Customs] = new Element[Customs]("haftarah") {
     override def contentParsable: Parsable[Customs] = new Parsable[Customs] {
@@ -92,6 +92,6 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
 
   private def partsParser(parts: Seq[WithNumber[BookSpan]]): Parser[Haftarah] = for {
     _ <- WithNumber.checkConsecutive(parts, "part")
-    _ <- Parser.check(parts.length > 1, "too short")
+    _ <- Effects.check(parts.length > 1, "too short")
   } yield Haftarah(WithNumber.dropNumbers(parts))
 }

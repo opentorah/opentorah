@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import zio.ZIO
 
 // Type-safe XML attribute get/set - for use in DOM and SAX;
@@ -90,7 +91,7 @@ object Attribute {
   }
 
   final class Required[T](attribute: Attribute[T]) extends Parsable[T, T](attribute) {
-    override protected def parser: Parser[T] = Parser.required(optionalParser(attribute), attribute)
+    override protected def parser: Parser[T] = Effects.required(optionalParser(attribute), attribute)
     override def withValue(value: T): Attribute.Value[T] = new Attribute.Value[T](this, Option(value))
     override def effectiveValue(value: Option[T]): Option[T] = value.orElse(Some(attribute.default))
     override def get(element   : Xml.Element   ): T = Xml.doGetAttribute[T](attribute, element   )

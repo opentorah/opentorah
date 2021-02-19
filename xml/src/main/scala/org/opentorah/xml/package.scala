@@ -1,14 +1,9 @@
 package org.opentorah
 
-import zio.{IO, ZIO}
+import org.opentorah.util.Effects
+import zio.{Has, ZIO}
 
 package object xml {
 
-  type Error = String // TODO use more specific type
-
-  type Result = IO[Error, Unit]
-
-  val ok: Result = IO.succeed(())
-
-  type Parser[+A] = ZIO[Context, Error, A]
+  type Parser[+A] = ZIO[Has[Context], Effects.Error, A]
 }

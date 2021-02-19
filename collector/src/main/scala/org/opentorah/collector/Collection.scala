@@ -4,6 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 import java.net.URL
 
 final class Collection(
@@ -25,18 +26,18 @@ final class Collection(
 
   override def getBy: Option[ByHierarchy] = None
 
-  override protected def loadFile(url: URL): Tei = Parser.parseDo(Tei.parse(url))
+  override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
 
   def facsimileUrl(site: Site): String = {
     val pathStr = site.store2path(this).map(_.structureName).mkString("/")
     site.facsimilesUrl + pathStr  + "/"
   }
 
-  def siblings(document: Document): (Option[Document], Option[Document]) =
-    getDirectory.siblings(document.baseName)
+  def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =
+    getDirectory.map(_.siblings(document.baseName))
 
-  def translations(document: Document): Seq[Document] =
-    getDirectory.translations.getOrElse(document.baseName, Seq.empty)
+  def translations(document: Document): Caching.Parser[Seq[Document]] =
+    getDirectory.map(_.translations.getOrElse(document.baseName, Seq.empty))
 
   val teiFacet      : Collection.TeiFacet       = new Collection.TeiFacet      (this)
   val textFacet     : Collection.TextFacet      = new Collection.TextFacet     (this)
@@ -45,8 +46,10 @@ final class Collection(
   override def acceptsIndexHtml: Boolean = true
 
   // With no facet, "document" is assumed
-  override def findByName(name: String): Option[Store] = textFacet.findByName(name)
-    .orElse(Store.findByName(name, Seq(textFacet, facsimileFacet, teiFacet)))
+  override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name) >>= { // TODO ZIO.someOrElseM?
+    case Some(result) => ZIO.some(result)
+    case None => Store.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
+  }
 
   override def viewer: Viewer = Viewer.Collection
   override def isWide: Boolean = true
@@ -54,81 +57,86 @@ final class Collection(
   override def path(site: Site): Store.Path =
     alias.fold(site.store2path(this))(alias => Seq(site.alias2collectionAlias(alias)))
 
-  override def navigationLinks(site: Site): Seq[Xml.Element] = Seq(
+  override def navigationLinks(site: Site): Parser[Seq[Xml.Element]] = ZIO.succeed(Seq(
     a(site)(s"[${names.name}]")
-  )
+  ))
 
-  override protected def innerContent(site: Site): Xml.Element = {
-    val missingPages: Seq[Page] = directoryEntries.flatMap(_.pages(pageType)).filter(_.pb.isMissing)
+  override protected def innerContent(site: Site): Caching.Parser[Xml.Element] =
+    for {
+      directory <- getDirectory
+      columns = Seq[Collection.Column](
+        Collection.descriptionColumn,
+        Collection.dateColumn,
+        Collection.authorsColumn,
+        Collection.addresseeColumn,
+        languageColumn(site),
 
-    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
-      val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
-      if (missing.isEmpty) Seq.empty
-      else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
+        Collection.Column("Документ", "document", { document: Document =>
+          ZIO.succeed(textFacet.of(document).a(site)(text = document.baseName))
+        }),
+
+        Collection.Column("Страницы", "pages", { document: Document =>
+          val text: Document.TextFacet = textFacet.of(document)
+          ZIO.succeed(Xml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
+            page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
+          )))
+        }),
+
+        Collection.transcribersColumn
+      )
+      rows <- ZIO.foreach(directory.parts) { part =>
+        ZIO.foreach(part.documents) { document =>
+          ZIO.foreach(columns) { column =>
+            column.value(document).map(value => <td class={column.cssClass}>{value}</td>)
+          }.map(cells => <tr>{cells}</tr>)
+        }
+          .map(documentRows => part.title.fold[Xml.Nodes](Seq.empty)(title =>
+            <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
+          ) ++ documentRows)
+      }
+    } yield {
+      val missingPages: Seq[Page] = directory.entries.flatMap(_.pages(pageType)).filter(_.pb.isMissing)
+
+      def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
+        val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
+        if (missing.isEmpty) Seq.empty
+        else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
+      }
+
+      <div>
+        <table class="collection-index">
+          {<tr>{columns.map(column => <th class={column.cssClass}>{column.heading}</th>)}</tr>}
+          {rows.flatten}
+        </table>
+
+        {listMissing("пустых"  , page => page.pb.isEmpty)}
+        {listMissing("непустых", page => !page.pb.isEmpty)}
+      </div>
     }
 
-    val columns: Seq[Collection.Column] = Seq[Collection.Column](
-      Collection.descriptionColumn,
-      Collection.dateColumn,
-      Collection.authorsColumn,
-      Collection.addresseeColumn,
-      languageColumn(site),
+  private val documentHeaderColumns: Seq[Collection.Column] = Seq[Collection.Column](
+    Collection.descriptionColumn,
+    Collection.dateColumn,
+    Collection.authorsColumn,
+    Collection.addresseeColumn,
+    Collection.transcribersColumn
+  )
 
-      Collection.Column("Документ", "document", { document: Document =>
-        textFacet.of(document).a(site)(text = document.baseName)
-      }),
-
-      Collection.Column("Страницы", "pages", { document: Document =>
-        val text: Document.TextFacet = textFacet.of(document)
-        Xml.multi(separator = " ", nodes =
-          for (page <- document.pages(pageType))
-            yield page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
-        )
-      }),
-
-      Collection.transcribersColumn
-    )
-
-    <div>
-      <table class="collection-index">
-        {<tr>{for (column <- columns) yield <th class={column.cssClass}>{column.heading}</th>}</tr>}
-        {getDirectory.parts.flatMap { part =>
-          part.title.fold[Xml.Nodes](Seq.empty)(title =>
-            <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
-          ) ++
-          part.documents.map(document =>
-            <tr>{for (column <- columns) yield <td class={column.cssClass}>{column.value(document)}</td>}</tr>
-          )
-        }}
-      </table>
-
-      {listMissing("пустых"  , page => page.pb.isEmpty)}
-      {listMissing("непустых", page => !page.pb.isEmpty)}
-    </div>
-  }
-
-  def documentHeader(document: Document): Xml.Element = {
-    val columns: Seq[Collection.Column] = Seq[Collection.Column](
-      Collection.descriptionColumn,
-      Collection.dateColumn,
-      Collection.authorsColumn,
-      Collection.addresseeColumn,
-      Collection.transcribersColumn
-    )
-
-    <table class="document-header">{
-      for (column <- columns) yield
-      <tr>
-        <td class="heading">{column.heading}</td>
-        <td class="value">{column.value(document)}</td>
-      </tr>
-    }</table>
-  }
+  def documentHeader(document: Document): Caching.Parser[Xml.Element] =
+    ZIO.foreach(documentHeaderColumns) { column =>
+      column.value(document).map(value =>
+        <tr>
+          <td class="heading">{column.heading}</td>
+          <td class="value">{value}</td>
+        </tr>
+      )
+    }.map(rows => <table class="document-header">{rows}</table>)
 
   private def languageColumn(site: Site): Collection.Column =
     Collection.Column("Язык", "language", { document: Document =>
-      Seq(Xml.mkText(document.lang)) ++ translations(document).flatMap(translation =>
-        Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang)))
+      translations(document).map(documentTranslations =>
+        Seq(Xml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
+          Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))
     })
 }
 
@@ -137,14 +145,14 @@ object Collection extends Element[Collection]("collection") {
   final case class Column(
     heading: String,
     cssClass: String,
-    value: Document => Xml.Nodes
+    value: Document => Caching.Parser[Xml.Nodes]
   )
 
-  val descriptionColumn : Column = Column("Описание", "description", _.getDescription)
-  val dateColumn        : Column = Column("Дата", "date", _.getDate)
-  val authorsColumn     : Column = Column("Кто", "author", _.getAuthors)
-  val addresseeColumn   : Column = Column("Кому", "addressee", _.getAddressee)
-  val transcribersColumn: Column = Column("Расшифровка", "transcriber", _.getTranscribers)
+  val descriptionColumn : Column = Column("Описание"   , "description", document => ZIO.succeed(document.getDescription ))
+  val dateColumn        : Column = Column("Дата"       , "date"       , document => ZIO.succeed(document.getDate        ))
+  val authorsColumn     : Column = Column("Кто"        , "author"     , document => ZIO.succeed(document.getAuthors     ))
+  val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
+  val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
   final class Alias(val collection: Collection) extends Store with HtmlContent {
 
@@ -154,15 +162,15 @@ object Collection extends Element[Collection]("collection") {
 
     override def acceptsIndexHtml: Boolean = collection.acceptsIndexHtml
 
-    override def findByName(name: String): Option[Store] = collection.findByName(name)
+    override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
 
     override def viewer: Viewer = collection.viewer
     override def isWide: Boolean = collection.isWide
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
-    override def path           (site: Site): Store.Path       = collection.path           (site)
-    override def navigationLinks(site: Site): Seq[Xml.Element] = collection.navigationLinks(site)
-    override def content        (site: Site): Xml.Element      = collection.content        (site)
+    override def path           (site: Site): Store.Path = collection.path(site)
+    override def navigationLinks(site: Site): Parser[Seq[Xml.Element]] = collection.navigationLinks(site)
+    override def content        (site: Site): Caching.Parser[Xml.Element] = collection.content(site)
   }
 
   final class Documents(
@@ -188,10 +196,11 @@ object Collection extends Element[Collection]("collection") {
   }
 
   sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
-    final override def findByName(name: String): Option[DF] = Store.findByName(
+
+    final override def findByName(name: String): Caching.Parser[Option[DF]] = Store.findByName(
       name,
       extension,
-      name => collection.getDirectory.get(name).map(of),
+      name => (collection.getDirectory >>= (_.get(name))).map(_.map(of)),
       // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
       // assume the required extension is implied, and the one found is part of the document name.
       assumeAllowedExtension = true

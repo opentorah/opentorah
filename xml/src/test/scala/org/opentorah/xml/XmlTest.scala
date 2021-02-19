@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.xml.sax.InputSource
@@ -7,10 +8,11 @@ import java.net.URL
 
 final class XmlTest extends AnyFlatSpec with Matchers {
 
-  def parseOrError[A](parser: Parser[A]): Either[Error, A] =
-    Parser.run(Parser.runnable(parser).either)
+  def parseOrError[A](parser: Parser[A]): Either[Effects.Error, A] =
+    Parser.run(parser.either)
 
-  def loadResource(name: String): Xml.Element = Parser.run(From.resource(Parser, name).load)
+  def loadResource(name: String): Xml.Element =
+    Effects.unsafeRun(From.resource(Parser, name).loadTask)
 
   def parseResource(name: String): org.w3c.dom.Element =
     Saxon.Saxon10.parse(new InputSource(Parser.getClass.getResourceAsStream(name + ".xml")))
@@ -34,7 +36,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
         </s>))
     ).isLeft shouldBe true
 
-    Parser.parseDo(
+    Parser.run(
       new Element[String]("a") {
         override def contentType: ContentType = ContentType.Characters
 
@@ -85,26 +87,26 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     val r1 = resource("1")
     def checkUrl(url: URL, name: String): Unit = url.toString.endsWith(s"/$name.xml") shouldBe true
 
-    val direct: X = Parser.parseDo(file2element.parse(resource("9")))
+    val direct: X = Parser.run(file2element.parse(resource("9")))
     direct.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val followed: X = Parser.parseDo(file2element.followRedirects.parse(r1))
+    val followed: X = Parser.run(file2element.followRedirects.parse(r1))
     followed.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val redirect = Parser.parseDo(file2element.orRedirect.parse(r1)).swap.toOption.get
+    val redirect = Parser.run(file2element.orRedirect.parse(r1)).swap.toOption.get
     checkUrl(redirect.url, "2")
 
-    val redirected: X = Parser.parseDo(redirect.followRedirects)
+    val redirected: X = Parser.run(redirect.followRedirects)
     redirected.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withTrue: X = Parser.parseDo(file2element.withRedirect(true).parse(r1)).toOption.get
+    val withTrue: X = Parser.run(file2element.withRedirect(true).parse(r1)).toOption.get
     withTrue.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withFalse = Parser.parseDo(file2element.withRedirect(false).parse(r1)).swap.toOption.get
+    val withFalse = Parser.run(file2element.withRedirect(false).parse(r1)).swap.toOption.get
     checkUrl(withFalse.url, "2")
   }
 

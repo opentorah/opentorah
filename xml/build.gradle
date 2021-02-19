@@ -36,7 +36,6 @@ dependencies {
   implementation project(':opentorah-util')
 
   api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"  // TODO api?
-  api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
 
   implementation "xerces:xercesImpl:$xercesVersion"
   implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"

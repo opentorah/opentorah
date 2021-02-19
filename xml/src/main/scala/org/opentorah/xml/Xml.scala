@@ -1,7 +1,7 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
-import zio.URIO
+import zio.{URIO, ZIO}
 import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
 object Xml extends Model {
@@ -29,8 +29,7 @@ object Xml extends Model {
       }
     } yield newElement.copy(child = children)
 
-    val all: Seq[Element] => URIO[R, Seq[Element]] =
-      elements => URIO.collectAll(elements.map(one))
+    val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
   }
 
   override def toString(node: Node): String = Strings.squashWhitespace(node match {
@@ -122,9 +121,9 @@ object Xml extends Model {
 
   override def getChildren(element: Element): Nodes = element.child
 
-  def descendants[T](node: Node, elementName: String, elements: Elements[T]): Seq[T] = node
-    .flatMap(_ \\ elementName).filter(isElement).map[Element](asElement)
-    .map(descendant => Parser.parseDo(elements.parse(From.xml("descendants", descendant))))
+  def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
+    nodes.flatMap(node => node.flatMap(_ \\ elementName).filter(isElement).map[Element](asElement))
+  )(descendant => elements.parse(From.xml("descendants", descendant)))
 
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
     case Nil => Nil

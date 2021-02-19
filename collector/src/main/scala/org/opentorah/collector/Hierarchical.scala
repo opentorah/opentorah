@@ -32,7 +32,7 @@ trait Hierarchical extends Store with HtmlContent {
     pathHeaderHorizontal(site.store2path(this), Seq.empty).mkString(", ")
   }
 
-  final override def content(site: Site): Xml.Element = {
+  final override def content(site: Site): Caching.Parser[Xml.Element] = {
     @scala.annotation.tailrec
     def pathHeaderVertical(path: Store.Path, result: Seq[Xml.Element]): Seq[Xml.Element] =
       if (path.isEmpty) result else pathHeaderVertical(
@@ -45,18 +45,20 @@ trait Hierarchical extends Store with HtmlContent {
 
     val path: Store.Path = site.store2path(this)
 
-    <div>
-      <div class="store-header">
-        {pathHeaderVertical(path.init.init, Seq.empty)}
-        <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.xml}</head>
-        {storeAbstractXmlElement}
-        {body.toSeq.map(_.xml)}
+    innerContent(site).map(inner =>
+      <div>
+        <div class="store-header">
+          {pathHeaderVertical(path.init.init, Seq.empty)}
+          <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.xml}</head>
+          {storeAbstractXmlElement}
+          {body.toSeq.map(_.xml)}
+        </div>
+        {inner}
       </div>
-      {innerContent(site)}
-    </div>
+    )
   }
 
-  protected def innerContent(site: Site): Xml.Element
+  protected def innerContent(site: Site): Caching.Parser[Xml.Element]
 
   def flatIndexEntry(site: Site): Xml.Element =
     <div>

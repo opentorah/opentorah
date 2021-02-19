@@ -2,23 +2,23 @@ package org.opentorah.xml
 
 import java.io.{File, StringReader}
 import java.net.URL
-import org.opentorah.util.{Files, Util}
-import org.slf4j.{Logger, LoggerFactory}
+import org.opentorah.util.{Effects, Files, Util}
 import org.xml.sax.InputSource
 import scala.xml.XML
-import zio.IO
+import zio.{IO, Task}
 
 sealed abstract class From(val name: String) {
 
   def url: Option[URL]
 
-  def load: IO[Error, Xml.Element]
+  def load: IO[Effects.Error, Xml.Element]
+
+  final def loadTask: Task[Xml.Element] = Effects.error2throwable(load)
 
   def isRedirect: Boolean
 }
 
 object From {
-  private val log: Logger = LoggerFactory.getLogger(classOf[From])
 
   private final class FromXml(
     name: String,
@@ -27,7 +27,7 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
-    override def load: IO[Error, Xml.Element] = IO.succeed(elem)
+    override def load: IO[Effects.Error, Xml.Element] = IO.succeed(elem)
   }
 
   def xml(name: String, elem: Xml.Element): From = new FromXml(name, elem)
@@ -39,7 +39,7 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: IO[Error, Xml.Element] = loadFromSource(new InputSource(new StringReader(string)))
+    override def load: IO[Effects.Error, Xml.Element] = loadFromSource(new InputSource(new StringReader(string)))
   }
 
   def string(name: String, string: String): From = new FromString(name, string)
@@ -49,7 +49,7 @@ object From {
   {
     override def toString: String = s"From.url($fromUrl, isRedirect=$isRedirect)"
     override def url: Option[URL] = Some(fromUrl)
-    override def load: IO[Error, Xml.Element] = loadFromUrl(fromUrl)
+    override def load: IO[Effects.Error, Xml.Element] = loadFromUrl(fromUrl)
   }
 
   def url(url: URL): From = new FromUrl(url, false)
@@ -66,8 +66,8 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
-    override def load: IO[Error, Xml.Element] =
-      url.fold[IO[Error, Xml.Element]](IO.fail(s"Resource not found: $this"))(loadFromUrl)
+    override def load: IO[Effects.Error, Xml.Element] =
+      url.fold[IO[Effects.Error, Xml.Element]](IO.fail(s"Resource not found: $this"))(loadFromUrl)
   }
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)
@@ -76,14 +76,11 @@ object From {
 
   def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
 
-  private def loadFromUrl(url: URL): IO[Error, Xml.Element] = {
-    //if (!Files.isFileUrl(url) && !Files.isJarUrl(url))
-    //  log.info(s"loadFromUrl($url)")
+  private def loadFromUrl(url: URL): IO[Effects.Error, Xml.Element] =
     loadFromSource(new InputSource(url.openStream()))
-  }
 
   private val useXerces: Boolean = true
 
-  private def loadFromSource(source: InputSource): IO[Error, Xml.Element] =
-    Parser.effect(XML.loadXML(source, if (useXerces) Xerces.getParser else XML.parser))
+  private def loadFromSource(source: InputSource): IO[Effects.Error, Xml.Element] =
+    Effects.effect(XML.loadXML(source, if (useXerces) Xerces.getParser else XML.parser))
 }

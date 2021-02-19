@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, Xml}
-import org.opentorah.util.Collections
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.util.{Collections, Effects}
 import zio.ZIO
 
 final class Names(val names: Seq[Name]) extends LanguageString {
@@ -67,7 +67,7 @@ object Names {
     n <- if (!isDefaultNameAllowed) ZIO.none else defaultNameAttribute.optional()
     defaultName = n.map(Name(_, LanguageSpec.empty))
     nonDefaultNames <- Name.seq()
-    _ <- Parser.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
+    _ <- Effects.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   } yield {
     val names = if (nonDefaultNames.isEmpty) Seq(defaultName.get) else
       defaultName.fold(nonDefaultNames){ defaultName =>

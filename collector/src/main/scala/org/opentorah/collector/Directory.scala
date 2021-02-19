@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Elements, FromUrl}
+import org.opentorah.xml.{Attribute, Elements, FromUrl, Parser}
+import zio.ZIO
 import java.net.URL
 
 /**
@@ -27,19 +28,19 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
     wrapper = (entries: Seq[M]) => wrapper(entries.map(entry => entry.name -> entry).toMap)
   )
 
-  final def writeDirectory(): Unit = listFile.write(
-    Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension)
-      .sorted
-      .map(name => entryMaker(name, getFile(name)))
-  )
+  final def writeDirectory(): Caching.Parser[Unit] =
+    ZIO.foreach(
+      Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
+    )(name =>  getFile(name) >>= (file=> entryMaker(name, file)))
+      .map(listFile.write)
 
-  final protected def getDirectory: W = listFile.get
+  final protected def getDirectory: Caching.Parser[W] = listFile.get
 
-  final def directoryEntries: Seq[M] = getDirectory.entries
+  final def directoryEntries: Caching.Parser[Seq[M]] = getDirectory.map(_.entries)
 
-  final def getFile(entry: M): T = getFile(entry.name)
+  final def getFile(entry: M): Caching.Parser[T] = getFile(entry.name)
 
-  private def getFile(name: String): T = Cache.get[T](fileUrl(name), loadFile)
+  private def getFile(name: String): Caching.Parser[T] = Caching.getCached[T](fileUrl(name), loadFile)
 
   private def fileUrl(name: String): URL = Files.fileInDirectory(directoryUrl, name + "." + fileExtension)
 
@@ -48,7 +49,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
     content
   )
 
-  protected def loadFile(url: URL): T
+  protected def loadFile(url: URL): Parser[T]
 }
 
 object Directory {
@@ -56,9 +57,9 @@ object Directory {
   class Wrapper[M](name2entry: Map[String, M]) {
     final def entries: Seq[M] = name2entry.values.toSeq
 
-    final def findByName(name: String): Option[M] = Store.findByName(name, "html", get)
+    final def findByName(name: String): Caching.Parser[Option[M]] = Store.findByName(name, "html", get)
 
-    final def get(name: String): Option[M] = name2entry.get(name)
+    final def get(name: String): Parser[Option[M]] = ZIO.succeed(name2entry.get(name))
   }
 
   abstract class Entry(
@@ -68,7 +69,7 @@ object Directory {
   }
 
   trait EntryMaker[T, M <: Entry] extends Elements[M] {
-    def apply(name: String, content: T): M
+    def apply(name: String, content: T): Parser[M]
   }
 
   val directoryAttribute: Attribute.Required[String] = Attribute("directory").required

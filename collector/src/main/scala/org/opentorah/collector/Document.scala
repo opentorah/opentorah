@@ -2,7 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
+import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
+import zio.ZIO
 
 final class Document(
   override val name: String,
@@ -28,7 +30,7 @@ final class Document(
     .flatMap(_.persName)
     .map(EntityReference.xmlElement))
 
-  def pages(pageType: Page.Type): Seq[Page] = for (pb <- pbs) yield pageType(pb)
+  def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
 }
 
 object Document extends Element[Document]("document") with Directory.EntryMaker[Tei, Document] {
@@ -38,7 +40,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     final override def names: Names = Names(document.name)
     final def collection: Collection = collectionFacet.collection
-    final def getTei: Tei = collection.getFile(document)
+    final def getTei: Caching.Parser[Tei] = collection.getFile(document)
   }
 
   final class TeiFacet(document: Document, collectionFacet: Collection.TeiFacet)
@@ -49,17 +51,21 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
 
-    final override def navigationLinks(site: Site): Seq[Xml.Element] = {
-      val (prev: Option[Document], next: Option[Document]) = collection.siblings(document)
+    final override def navigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]] = for {
+      siblings <- collection.siblings(document)
+      collectionNavigationLinks <- collection.navigationLinks(site)
+      moreLinks <- moreNavigationLinks(site)
+    } yield {
+      val (prev: Option[Document], next: Option[Document]) = siblings
 
-      collection.navigationLinks(site) ++
+      collectionNavigationLinks ++
       prev.toSeq.map(prev => collectionFacet.of(prev    ).a(site)("⇦"          )) ++
       Seq(                   collectionFacet.of(document).a(site)(document.name)) ++
       next.toSeq.map(next => collectionFacet.of(next    ).a(site)("⇨"          )) ++
-      moreNavigationLinks(site)
+      moreLinks
     }
 
-    protected def moreNavigationLinks(site: Site): Seq[Xml.Element]
+    protected def moreNavigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]]
   }
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
@@ -68,19 +74,24 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     override def viewer: Viewer = Viewer.Document
     override def htmlHeadTitle: Option[String] = None
 
-    override protected def moreNavigationLinks(site: Site): Seq[Xml.Element] =
-      Seq(collection.facsimileFacet.of(document).a(site)(text = Tei.facsimileSymbol)) ++ {
-        for (translation <- if (document.isTranslation) Seq.empty else collection.translations(document))
-        yield collectionFacet.of(translation).a(site)(s"[${translation.lang}]")
+    override protected def moreNavigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]] =
+      collection.translations(document).map { translations =>
+        Seq(collection.facsimileFacet.of(document).a(site)(text = Tei.facsimileSymbol)) ++ {
+          for (translation <- if (document.isTranslation) Seq.empty else translations)
+            yield collectionFacet.of(translation).a(site)(s"[${translation.lang}]")
+        }
       }
 
     override def path(site: Site): Store.Path =
       collection.path(site) ++ Seq(collection.textFacet.of(document))
 
-    override def content(site: Site): Xml.Element =
+    override def content(site: Site): Caching.Parser[Xml.Element] = for {
+      tei <- getTei
+      header <- collection.documentHeader(document)
+    } yield
       <div>
-        {collection.documentHeader(document)}
-        {getTei.text.body.xml}
+        {header}
+        {tei.text.body.xml}
       </div>
   }
 
@@ -90,15 +101,15 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     override def viewer: Viewer = Viewer.Facsimile
     override def htmlHeadTitle: Option[String] = None
 
-    override protected def moreNavigationLinks(site: Site): Seq[Xml.Element] =
-      Seq(collection.textFacet.of(document).a(site)(text = "A"))
+    override protected def moreNavigationLinks(site: Site): Parser[Seq[Xml.Element]] =
+      ZIO.succeed(Seq(collection.textFacet.of(document).a(site)(text = "A")))
 
     override def path(site: Site): Store.Path =
       collection.path(site) ++ Seq(collection.facsimileFacet, collection.facsimileFacet.of(document))
 
-    override def content(site: Site): Xml.Element = {
+    override def content(site: Site): Caching.Parser[Xml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
-        {collection.documentHeader(document)}
+        {header}
         <div class={Viewer.Facsimile.name}>
           <div class="facsimileScroller">{
             val text: TextFacet = collection.textFacet.of(document)
@@ -121,34 +132,30 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
             }}</div>
         </div>
       </div>
-    }
-  }
-
-  override def apply(name: String, tei: Tei): Document = {
-    val lang: Option[String] = tei.text.lang
-
-    val language: Option[String] = splitLang(name)._2
-    if (language.isDefined && lang != language)
-      throw new IllegalArgumentException(s"Wrong language in $name: $lang != $language")
-
-    new Document(
-      name,
-      isTranslation = language.isDefined,
-      lang = lang.get,
-      editors = tei.teiHeader.fileDesc.titleStmt.editors,
-      description = tei.teiHeader.profileDesc.flatMap(_.documentAbstract),
-      date = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date)).map(_.when),
-      authors = tei.teiHeader.fileDesc.titleStmt.authors,
-      addressee = {
-        for {
-          node <- tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.xml).getOrElse(Seq.empty)
-          persName <- Xml.descendants(node, EntityType.Person.nameElement, EntityReference)
-          if persName.role.contains("addressee")
-        } yield persName
-      }.headOption,
-      pbs = tei.text.body.xml.flatMap(node => Xml.descendants(node, Pb.elementName, Pb))
     )
   }
+
+  override def apply(name: String, tei: Tei): Parser[Document] = for {
+    pbs <- Xml.descendants(tei.text.body.xml, Pb.elementName, Pb)
+    lang = tei.text.lang
+    language = splitLang(name)._2
+    _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
+    persNames <- Xml.descendants(
+      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.xml).getOrElse(Seq.empty),
+      elementName = EntityType.Person.nameElement,
+      elements = EntityReference
+    )
+  } yield new Document(
+    name,
+    isTranslation = language.isDefined,
+    lang = lang.get,
+    editors = tei.teiHeader.fileDesc.titleStmt.editors,
+    description = tei.teiHeader.profileDesc.flatMap(_.documentAbstract),
+    date = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date)).map(_.when),
+    authors = tei.teiHeader.fileDesc.titleStmt.authors,
+    addressee = persNames.find(_.role.contains("addressee")),
+    pbs = pbs
+  )
 
   private def splitLang(name: String): (String, Option[String]) = {
     val dash: Int = name.lastIndexOf('-')

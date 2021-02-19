@@ -1,5 +1,6 @@
 package org.opentorah.xml
 
+import org.opentorah.util.Effects
 import zio.IO
 
 private[xml] sealed trait Content {
@@ -9,12 +10,12 @@ private[xml] sealed trait Content {
 
   def takeCharacters: Content.Next[Option[String]]
 
-  def checkNoLeftovers: Result
+  def checkNoLeftovers: IO[Effects.Error, Unit]
 }
 
 private[xml] object Content {
 
-  type Next[A] = IO[Error, (Content, A)]
+  type Next[A] = IO[Effects.Error, (Content, A)]
 
   private final case object Empty extends Content {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] =
@@ -26,7 +27,7 @@ private[xml] object Content {
     override def takeCharacters: Next[Option[String]] =
       IO.fail(s"No characters in $this")
 
-    override def checkNoLeftovers: Result = ok
+    override def checkNoLeftovers: IO[Effects.Error, Unit] = Effects.ok
   }
 
   private final case class Characters(characters: Option[String]) extends Content {
@@ -39,8 +40,8 @@ private[xml] object Content {
     override def takeCharacters: Next[Option[String]] =
       IO.succeed((copy(characters = None), characters))
 
-    override def checkNoLeftovers: Result =
-      characters.fold[Result](ok)(characters => IO.fail(s"Unparsed characters: $characters"))
+    override def checkNoLeftovers: IO[Effects.Error, Unit] =
+      Effects.check(characters.isEmpty, s"Unparsed characters: ${characters.get}")
   }
 
   private abstract sealed class HasElements(nextElementNumber: Int, nodes: Xml.Nodes) extends Content {
@@ -53,8 +54,8 @@ private[xml] object Content {
       (nextElementNumber + (if (result.isEmpty) 0 else 1), newNodes, result)
     }
 
-    override def checkNoLeftovers: Result =
-      if (nodes.forall(Xml.isWhitespace)) ok else IO.fail(s"Unparsed nodes: $nodes")
+    override def checkNoLeftovers: IO[Effects.Error, Unit] =
+      Effects.check(nodes.forall(Xml.isWhitespace), s"Unparsed nodes: $nodes")
   }
 
   private final case class Elements(nextElementNumber: Int, nodes: Xml.Nodes) extends HasElements(nextElementNumber, nodes) {
@@ -84,7 +85,7 @@ private[xml] object Content {
     }
   }
 
-  def open(nodes: Xml.Nodes, contentType: ContentType): IO[Error, Content] = {
+  def open(nodes: Xml.Nodes, contentType: ContentType): IO[Effects.Error, Content] = {
     val (elements: Seq[Xml.Element], characters: Option[String]) = partition(nodes)
 
     contentType match {
