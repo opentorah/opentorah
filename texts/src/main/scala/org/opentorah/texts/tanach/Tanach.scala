@@ -1,113 +1,82 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Metadata, Named, NamedCompanion, Names}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
 
 object Tanach extends NamedCompanion {
 
-  override type Key = TanachBook
+  trait Book extends Named {
+    final def chapters: Chapters = {
+      if (book2chapters.isEmpty) loadMetadata()
+      book2chapters.get(this)
+    }
 
-  sealed trait TanachBook extends Named {
-    final def chapters: Chapters = TanachMetadata.getChapters(this)
+    def parser(names: Names, chapters: Chapters): Parser[Parsed]
+
+    def metadata: BookMetadata = forBook(this)
   }
 
-  override lazy val toNames: Map[TanachBook, Names] = TanachMetadata.getBook2names
+  class BookMetadata(
+    val book: Book
+  )
 
-  sealed abstract class ChumashBook(val parshiot: Seq[Parsha]) extends TanachBook with NamedCompanion {
-    final override type Key = Parsha
-
-    final override def values: Seq[Parsha] = parshiot
-
-    // Parsed names of the book are ignored - names of the first parsha are used instead.
-    final override def names: Names = parshiot.head.names
-
-    final def metadata: ChumashBookMetadata = TanachMetadata.forChumash(this)
+  abstract class Parsed(
+    val book: Book,
+    val names: Names,
+    val chapters: Chapters
+  ) {
+    def resolve: Parser[BookMetadata]
   }
 
-  case object Genesis extends ChumashBook(Parsha.genesis)
-  case object Exodus extends ChumashBook(Parsha.exodus)
-  case object Leviticus extends ChumashBook(Parsha.leviticus)
-  case object Numbers extends ChumashBook(Parsha.numbers)
-  case object Deuteronomy extends ChumashBook(Parsha.deuteronomy)
+  private object Parsed extends Element[Parsed]("book") {
+    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed] {
+      override def parser: Parser[Parsed] = for {
+        names <- Names.withDefaultNameParsable()
+        chapters <- Chapters.parser
+        book <- Metadata.find[Book](values, names)
+        result <- book.parser(names, chapters)
+      } yield result
 
-  val chumash: Seq[ChumashBook] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
-
-  def getChumashForName(name: String): ChumashBook = getForName(name).asInstanceOf[ChumashBook]
-
-  sealed trait NachBook extends TanachBook {
-    final override def names: Names = toNames(this)
+      override def unparser: Unparser[Parsed] = ???
+    }
   }
 
-  sealed trait ProphetsBook extends NachBook
+  override type Key = Book
 
-  sealed trait EarlyProphetsBook extends ProphetsBook
-
-  case object Joshua extends EarlyProphetsBook
-  case object Judges extends EarlyProphetsBook
-  case object SamuelI extends EarlyProphetsBook { override def name: String = "I Samuel" }
-  case object SamuelII extends EarlyProphetsBook { override def name: String = "II Samuel" }
-  case object KingsI extends EarlyProphetsBook { override def name: String = "I Kings" }
-  case object KingsII extends EarlyProphetsBook { override def name: String = "II Kings" }
-
-  val earlyProphets: Seq[ProphetsBook] = Seq(Joshua, Judges, SamuelI, SamuelII, KingsI, KingsII)
-
-  sealed trait LateProphetsBook extends ProphetsBook
-
-  case object Isaiah extends LateProphetsBook
-  case object Jeremiah extends LateProphetsBook
-  case object Ezekiel extends LateProphetsBook
-
-  <!-- תרי עשר -->
-  sealed trait TreiAsarBook extends LateProphetsBook
-
-  case object Hosea extends TreiAsarBook
-  case object Joel extends TreiAsarBook
-  case object Amos extends TreiAsarBook
-  case object Obadiah extends TreiAsarBook
-  case object Jonah extends TreiAsarBook
-  case object Micah extends TreiAsarBook
-  case object Nahum extends TreiAsarBook
-  case object Habakkuk extends TreiAsarBook
-  case object Zephaniah extends TreiAsarBook
-  case object Haggai extends TreiAsarBook
-  case object Zechariah extends TreiAsarBook
-  case object Malachi extends TreiAsarBook
-
-  val treiAsar: Seq[TreiAsarBook] = Seq(Hosea, Joel, Amos, Obadiah, Jonah, Micah,
-    Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi)
-
-  val lateProphets: Seq[ProphetsBook] = Seq(Isaiah, Jeremiah, Ezekiel) ++ treiAsar
-
-  val prophets: Seq[ProphetsBook] = earlyProphets ++ lateProphets
-
-  def getProhetForName(name: String): ProphetsBook = getForName(name).asInstanceOf[ProphetsBook]
-
-  sealed trait WritingsBook extends NachBook
-
-  case object Psalms extends WritingsBook {
-    def days: Seq[Span] = TanachMetadata.forPsalms.days
-
-    def weekDays: Seq[Span] = TanachMetadata.forPsalms.weekDays
-
-    def books: Seq[Span] = TanachMetadata.forPsalms.books
+  override lazy val toNames: Map[Book, Names] = {
+    if (book2names.isEmpty) loadMetadata()
+    book2names.get
   }
 
-  case object Proverbs extends WritingsBook
-  case object Job extends WritingsBook
-  case object SongOfSongs extends WritingsBook { override def name: String = "Song of Songs" }
-  case object Ruth extends WritingsBook
-  case object Lamentations extends WritingsBook
-  case object Ecclesiastes extends WritingsBook
-  case object Esther extends WritingsBook
-  case object Daniel extends WritingsBook
-  case object Ezra extends WritingsBook
-  case object Nehemiah extends WritingsBook
-  case object ChroniclesI extends WritingsBook { override def name: String = "I Chronicles" }
-  case object ChroniclesII extends WritingsBook { override def name: String = "II Chronicles" }
+  override val values: Seq[Book] = Chumash.all ++ Nach.all
 
-  val writings: Seq[WritingsBook] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
-    Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
+  private var book2names: Option[Map[Book, Names]] = None
 
-  val nach: Seq[TanachBook] = prophets ++ writings
+  private var book2chapters: Option[Map[Book, Chapters]] = None
 
-  override val values: Seq[TanachBook] = chumash ++ nach
+  private var book2metadata: Option[Map[Book, BookMetadata]] = None
+
+  def forBook(book: Book): BookMetadata = {
+    if (book2metadata.isEmpty) loadMetadata()
+    book2metadata.get(book)
+  }
+
+  private def loadMetadata(): Unit = {
+    val metadata: Map[Book, Parsed] = Parser.run(
+      Metadata.load(
+        from = From.resource(Tanach),
+        content = Parsed.followRedirects
+      ) >>= (Metadata.bind[Book, Parsed](
+        keys = values,
+        _,
+        getKey = _.book
+      ))
+    )
+
+    book2names = Some(Collections.mapValues(metadata)(_.names))
+    book2chapters = Some(Collections.mapValues(metadata)(_.chapters))
+
+    book2metadata = Some(Collections.mapValues(metadata)(metadata => Parser.run(metadata.resolve)))
+  }
 }

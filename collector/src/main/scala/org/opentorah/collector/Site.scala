@@ -11,8 +11,6 @@ import zio.{App, ExitCode, Task, UIO, URIO, ZEnv, ZIO}
 import java.io.File
 import java.net.URL
 
-// TODO figure out how to read/write with materialized redirects,
-//   pre-generate hierarchy in one file and pretty-print hierarchy stores.
 // TODO retrieve TEI(?) references from notes.
 final class Site(
   override val fromUrl: FromUrl,

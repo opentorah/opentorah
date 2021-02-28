@@ -1,40 +1,37 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Names, WithNumber}
-import org.opentorah.xml.{Unparser, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{ContentType, Element, Parsable, Parser, Unparser}
 import zio.ZIO
 
-final class PsalmsMetadata(
-  book: Tanach.Psalms.type,
-  val days: Seq[Span],
-  val weekDays: Seq[Span],
-  val books: Seq[Span]
-) extends TanachBookMetadata(book)
+case object Psalms extends Writings {
 
-object PsalmsMetadata {
+  final class BookMetadata(
+    val days: Seq[Span],
+    val weekDays: Seq[Span],
+    val books: Seq[Span]
+  ) extends Nach.BookMetadata(Psalms)
 
   final class Parsed(
-     book: Tanach.Psalms.type,
-     names: Names,
-     chapters: Chapters,
-     val days: Seq[Span],
-     val weekDays: Seq[Span],
-     val books: Seq[Span]
-  ) extends TanachBookMetadata.Parsed(book, names, chapters) {
+    names: Names,
+    chapters: Chapters,
+    val days: Seq[Span],
+    val weekDays: Seq[Span],
+    val books: Seq[Span]
+  ) extends Nach.Parsed(Psalms, names, chapters) {
 
-    override def resolve: Parser[PsalmsMetadata] = ZIO.succeed(new PsalmsMetadata(
-      book,
+    override def resolve: Parser[BookMetadata] = ZIO.succeed(new BookMetadata(
       days,
       weekDays,
       books
     ))
   }
 
-  def parser(book: Tanach.Psalms.type, names: Names, chapters: Chapters): Parser[Parsed] = for {
+  override def parser(names: Names, chapters: Chapters): Parser[Parsed] = for {
     days <- spansParser(chapters, "day", 30)
     weekDays <- spansParser(chapters, "weekDay", 7)
     books <- spansParser(chapters, "book", 5)
-  } yield new Parsed(book, names, chapters, days, weekDays, books)
+  } yield new Parsed(names, chapters, days, weekDays, books)
 
   private def spansParser(chapters: Chapters, name: String, number: Int): Parser[Seq[Span]] = for {
     numbered <- new SpanParsable(name).seq()
@@ -49,4 +46,12 @@ object PsalmsMetadata {
       override def unparser: Unparser[WithNumber[SpanParsed]] = ???
     }
   }
+
+  def days: Seq[Span] = metadata.days
+
+  def weekDays: Seq[Span] = metadata.weekDays
+
+  def books: Seq[Span] = metadata.books
+
+  override def metadata: BookMetadata = Tanach.forBook(Psalms).asInstanceOf[BookMetadata]
 }

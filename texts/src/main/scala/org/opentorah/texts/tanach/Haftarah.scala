@@ -8,7 +8,7 @@ import zio.ZIO
 final case class Haftarah private(override val spans: Seq[Haftarah.BookSpan])
   extends Haftarah.Spans(spans)
 
-object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
+object Haftarah extends WithBookSpans[Prophets] {
   override type Many = Haftarah
 
   override def apply(spans: Seq[BookSpan]): Haftarah = new Haftarah(spans)
@@ -20,7 +20,7 @@ object Haftarah extends WithBookSpans[Tanach.ProphetsBook] {
       }.mkString("; ")
   }
 
-  override protected def getBook(name: String): Tanach.ProphetsBook = Tanach.getProhetForName(name)
+  override protected def getBook(name: String): Prophets = Prophets.forName(name)
 
   object Week extends Element[(String, Customs)]("week") {
     private val elementParser = Haftarah.parser(full = true)

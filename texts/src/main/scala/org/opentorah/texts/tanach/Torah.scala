@@ -22,16 +22,14 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     Torah(drop(withDrop))
   }
 
-  def fromWithNumbers(source: WithNames): Torah =  {
-    val result = spans.zipWithIndex.map { case (aliyah, index) =>
+  def fromWithNumbers(source: WithNames): Torah =  Torah {
+    spans.zipWithIndex.map { case (aliyah, index) =>
       aliyah.from(new Source.AndNumber(withNames = source, number = index + 1))
     }
-
-    Torah(result)
   }
 }
 
-object Torah extends WithBookSpans[Tanach.ChumashBook] {
+object Torah extends WithBookSpans[Chumash] {
   protected override type Many = Torah
 
   override def apply(spans: Seq[BookSpan]): Torah = new Torah(spans)
@@ -42,7 +40,7 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
 
   type Maftir = BookSpan
 
-  override protected def getBook(name: String): Tanach.ChumashBook = Tanach.getChumashForName(name)
+  override protected def getBook(name: String): Chumash = Chumash.forName(name)
 
   def aliyot(spans: BookSpan*): Torah = Torah(spans)
 
@@ -91,10 +89,10 @@ object Torah extends WithBookSpans[Tanach.ChumashBook] {
     }
   }
 
-  def inBook(book: Tanach.ChumashBook, span: Span): BookSpan = BookSpan(book, span)
+  def inBook(book: Chumash, span: Span): BookSpan = BookSpan(book, span)
 
   def processDays(
-    book: Tanach.ChumashBook,
+    book: Chumash,
     days: Custom.Sets[Seq[Numbered]],
     span: Span
   ): Parser[Torah.Customs] = {

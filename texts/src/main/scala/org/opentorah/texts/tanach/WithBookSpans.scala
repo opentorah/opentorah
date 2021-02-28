@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{LanguageSpec, LanguageString, WithNames}
 import org.opentorah.xml.{Attribute, Parser}
 
-trait WithBookSpans[Book <: Tanach.TanachBook] {
+trait WithBookSpans[Book <: Tanach.Book] {
 
   class Spans(val spans: Seq[BookSpan]) {
     final def length: Int = spans.length
