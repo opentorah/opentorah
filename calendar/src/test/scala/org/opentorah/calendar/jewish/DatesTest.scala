@@ -138,6 +138,12 @@ final class DatesTest extends AnyFlatSpec with Matchers {
     }
   }
 
+//  "Purim" should "fall on Friday from time to time" in {
+//    years foreach { year =>
+//      if (Purim.date(year).name == Day.Name.Shishi) println(year)
+//    }
+//  }
+
   // Shulchan Aruch, Orach Chaim, 428:2
   "Roshei Chodoshim" should "fall on allowed days" in {
     val data = Table(

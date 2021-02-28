@@ -1,11 +1,13 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Metadata, Named, NamedCompanion, Names, WithNumber}
+import org.opentorah.util.Collections
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
 
 sealed trait Parsha extends Named {
-  def book: Tanach.ChumashBook
+  def book: Chumash
 
-  private def metadata: ParshaMetadata = book.metadata.forParsha(this)
+  private def metadata: Parsha.ParshaMetadata = book.metadata.forParsha(this)
 
   final override def names: Names = metadata.names
 
@@ -30,9 +32,144 @@ sealed trait Parsha extends Named {
 }
 
 object Parsha extends NamedCompanion {
+
+  final class ParshaMetadata(
+    val parsha: Parsha,
+    val names: Names,
+    val span: Span,
+    val days: Torah.Customs,
+    val daysCombined: Option[Torah.Customs],
+    val aliyot: Torah,
+    val maftir: Torah.Maftir
+  )
+
+  final class Parsed(
+    val parsha: Parsha,
+    val names: Names,
+    val span: SpanSemiResolved,
+    val days: Custom.Sets[Seq[Torah.Numbered]],
+    val daysCombined: Custom.Sets[Seq[Torah.Numbered]],
+    val aliyot: Seq[Torah.Numbered],
+    val maftir: SpanSemiResolved
+  ) {
+    def resolve(
+      parshaSpan: Span,
+      daysCombined: Option[Torah.Customs]
+    ): Parser[ParshaMetadata] = {
+      for {
+        days <- daysResolved(parshaSpan)
+        aliyot <- aliyotResolved(parshaSpan, days)
+        maftir = maftirResolved(parshaSpan)
+      } yield new ParshaMetadata(
+        parsha,
+        names,
+        parshaSpan,
+        days,
+        daysCombined,
+        aliyot,
+        maftir
+      )
+    }
+
+    private def daysResolved(parshaSpan: Span): Parser[Torah.Customs] =
+      Torah.processDays(parsha.book, days, parshaSpan)
+
+    private def aliyotResolved(parshaSpan: Span, days: Torah.Customs): Parser[Torah] = {
+      val bookSpan = Torah.inBook(parsha.book,
+        Span(
+          parshaSpan.from,
+          aliyot.last.what.to.getOrElse(days.common.spans.head.span.to)
+        )
+      )
+      Torah.parseAliyot(bookSpan, aliyot, number = Some(3))
+    }
+
+    private def maftirResolved(parshaSpan: Span): Torah.Maftir = {
+      val span = Span(maftir.from, maftir.to.getOrElse(parshaSpan.to))
+
+      Torah.inBook(parsha.book,
+        SpanSemiResolved.setImpliedTo(
+          Seq(maftir),
+          span,
+          parsha.book.chapters
+        ).head
+      )
+    }
+  }
+
+  final class WeekParsable(book: Chumash)
+    extends Element[Parsed]("week")
+  {
+    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed] {
+      override def parser: Parser[Parsed] = Parsha.parser(book)
+      override def unparser: Unparser[Parsed] = ???
+    }
+  }
+
+  private def parser(book: Chumash): Parser[Parsed] = for {
+    names <- Names.withoutDefaultNameParsable()
+    span <- semiResolvedParser
+    aliyot <- Aliyah.seq()
+    daysParsed <- DayParsed.seq()
+    maftir <- Maftir.required()
+    parsha <- Metadata.find[Parsha](book.parshiot, names)
+  } yield {
+    val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
+    new Parsed(
+      parsha,
+      names,
+      span,
+      days = byCustom(days),
+      daysCombined = byCustom(daysCombined),
+      aliyot,
+      maftir
+    )
+  }
+
+  private final case class DayParsed(
+    span: Torah.Numbered,
+    custom: Set[Custom],
+    isCombined: Boolean
+  )
+
+  private object DayParsed extends Element[DayParsed]("day") {
+    override def contentParsable: Parsable[DayParsed] = new Parsable[DayParsed] {
+      override def parser: Parser[DayParsed] = for {
+        span <- numberedParser
+        custom <- Attribute("custom").optional().map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
+        isCombined <- new Attribute.BooleanAttribute("combined").optional().map(_.getOrElse(false))
+      } yield DayParsed(span, custom, isCombined)
+
+      override def unparser: Unparser[DayParsed] = ???
+    }
+  }
+
+  private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
+    Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
+
+  object Aliyah extends Element[Torah.Numbered]("aliyah") {
+    override def contentType: ContentType = ContentType.Empty
+
+    override def contentParsable: Parsable[Torah.Numbered] = new Parsable[Torah.Numbered] {
+      override def parser: Parser[Torah.Numbered] = numberedParser
+      override def unparser: Unparser[Torah.Numbered] = ???
+    }
+  }
+
+  object Maftir extends Element[SpanSemiResolved]("maftir") {
+    override def contentParsable: Parsable[SpanSemiResolved] = new Parsable[SpanSemiResolved] {
+      override def parser: Parser[SpanSemiResolved] = semiResolvedParser
+      override def unparser: Unparser[SpanSemiResolved] = ???
+    }
+  }
+
+  private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)
+
+  private def semiResolvedParser: Parser[SpanSemiResolved] = SpanParsed.parser.map(_.semiResolve)
+
   override type Key = Parsha
 
-  trait GenesisParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Genesis }
+  trait GenesisParsha extends Parsha { final override def book: Chumash = Chumash.Genesis }
 
   case object Bereishis extends GenesisParsha
   case object Noach extends GenesisParsha
@@ -50,7 +187,7 @@ object Parsha extends NamedCompanion {
   val genesis: Seq[Parsha] = Seq(Bereishis, Noach, LechLecha, Vayeira, ChayeiSarah, Toldos,
     Vayeitzei, Vayishlach, Vayeishev, Mikeitz, Vayigash, Vayechi)
 
-  trait ExodusParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Exodus }
+  trait ExodusParsha extends Parsha { final override def book: Chumash = Chumash.Exodus }
 
   case object Shemos extends ExodusParsha
   case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
@@ -67,7 +204,7 @@ object Parsha extends NamedCompanion {
   val exodus: Seq[Parsha] = Seq(Shemos, Va_eira, Bo, Beshalach, Yisro, Mishpatim, Terumah,
     Tetzaveh, KiSisa, Vayakhel, Pekudei)
 
-  trait LeviticusParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Leviticus }
+  trait LeviticusParsha extends Parsha { final override def book: Chumash = Chumash.Leviticus }
 
   case object Vayikra extends LeviticusParsha
   case object Tzav extends LeviticusParsha
@@ -82,7 +219,7 @@ object Parsha extends NamedCompanion {
 
   val leviticus: Seq[Parsha] = Seq(Vayikra, Tzav, Shemini, Tazria, Metzora, Acharei, Kedoshim, Emor, Behar, Bechukosai)
 
-  trait NumbersParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Numbers }
+  trait NumbersParsha extends Parsha { final override def book: Chumash = Chumash.Numbers }
 
   case object Bemidbar extends NumbersParsha
   case object Nasso extends NumbersParsha
@@ -97,7 +234,7 @@ object Parsha extends NamedCompanion {
 
   val numbers: Seq[Parsha] = Seq(Bemidbar, Nasso, Beha_aloscha, Shelach, Korach, Chukas, Balak, Pinchas, Mattos, Masei)
 
-  trait DeutoronomyParsha extends Parsha { final override def book: Tanach.ChumashBook = Tanach.Deuteronomy }
+  trait DeutoronomyParsha extends Parsha { final override def book: Chumash = Chumash.Deuteronomy }
 
   case object Devarim extends DeutoronomyParsha
   case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }
