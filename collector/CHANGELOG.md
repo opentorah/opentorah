@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.5] - 2021-02-28
+
 - site is now dynamic!
 - double-escape XML tag start characters and such in Markdown code blocks;
 - PrettyPrinter supports preformatted elements;
