@@ -1,5 +1,6 @@
 package org.opentorah.schedule.tanach
 
+import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.metadata.WithNames
@@ -57,7 +58,7 @@ object Schedule {
     private val nextWeeklyReadings = new PairSlider[Day, WeeklyReading](weeklyReadingsList, _ > _)
 
     private val pesachOnChamishi = new Cache[Year, Boolean] {
-      override def calculate(year: Year): Boolean = SpecialDay.Pesach1.date(year).is(Day.Name.Chamishi)
+      override def calculate(year: Year): Boolean = SpecialDay.Pesach1.date(year).is(Week.Day.Chamishi)
     }
 
     private def forDay(day: Day, inHolyLand: Boolean): DaySchedule = {

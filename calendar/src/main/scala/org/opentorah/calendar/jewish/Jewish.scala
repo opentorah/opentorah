@@ -1,9 +1,18 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{LanguageSpec, Named, NamedCompanion, Names}
-import org.opentorah.dates.Calendar
+import org.opentorah.calendar.{Calendar, Week}
+import org.opentorah.metadata.{LanguageSpec, Named, Names}
 
 object Jewish extends Calendar {
+
+  override def epoch: Int = 0
+
+  override def epochHours: Int = 0
+
+  // first day of the Jewish calendar epoch -
+  // first day of the year 1 and the day of molad BaHaRaD -
+  // was a Monday:
+  def epochDayNumberInWeek: Int = 2
 
   final class JewishYear(number: Int) extends YearBase(number) {
     require(0 <= number)
@@ -15,8 +24,8 @@ object Jewish extends Calendar {
     private def newYearDelay(newMoon: Moment): NewYear.Delay = NewYear.delay(number, newMoon)
 
     override def firstDayNumber: Int = {
-      val nm = newMoon
-      nm.dayNumber + newYearDelay(nm).days
+      val newMoon: Moment = this.newMoon
+      newMoon.dayNumber + newYearDelay(newMoon).days
     }
 
     override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
@@ -25,14 +34,16 @@ object Jewish extends Calendar {
 
     def kind: Year.Kind = Year.kind(isLeap, lengthInDays)
 
-    def latestAdar: Month = month(if (isLeap) Month.Name.AdarII else Month.Name.Adar)
+    def latestAdar: Month = month(if (isLeap) Month.AdarII else Month.Adar)
 
     def isShemittah: Boolean = (number % 7) == 0
   }
 
-  final override type Year = JewishYear
+  override type Year = JewishYear
 
-  final override type YearCharacter = (Boolean, Year.Kind)
+  override type YearCharacter = (Boolean, Year.Kind)
+
+  override protected def areYearsPositive: Boolean = true
 
   final class JewishYearCompanion extends YearCompanion {
     type Kind = JewishYearCompanion.Kind
@@ -48,28 +59,26 @@ object Jewish extends Calendar {
     override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
       character match { case (isLeap: Boolean, kind: Kind) =>
         Seq(
-          new MonthNameAndLength(Month.Name.Tishrei   , 30),
-          new MonthNameAndLength(Month.Name.Marheshvan, if (kind == Kind.Full) 30 else 29),
-          new MonthNameAndLength(Month.Name.Kislev    , if (kind == Kind.Short) 29 else 30),
-          new MonthNameAndLength(Month.Name.Teves     , 29),
-          new MonthNameAndLength(Month.Name.Shvat     , 30)
+          new MonthNameAndLength(Month.Tishrei   , 30),
+          new MonthNameAndLength(Month.Marheshvan, if (kind == Kind.Full) 30 else 29),
+          new MonthNameAndLength(Month.Kislev    , if (kind == Kind.Short) 29 else 30),
+          new MonthNameAndLength(Month.Teves     , 29),
+          new MonthNameAndLength(Month.Shvat     , 30)
         ) ++
           (if (!isLeap)
-            Seq(new MonthNameAndLength(Month.Name.Adar, 29))
+            Seq(new MonthNameAndLength(Month.Adar, 29))
           else
-            Seq(new MonthNameAndLength(Month.Name.AdarI, 30), new MonthNameAndLength(Month.Name.AdarII, 29))) ++
+            Seq(new MonthNameAndLength(Month.AdarI, 30), new MonthNameAndLength(Month.AdarII, 29))) ++
           Seq(
-            new MonthNameAndLength(Month.Name.Nisan , 30),
-            new MonthNameAndLength(Month.Name.Iyar  , 29),
-            new MonthNameAndLength(Month.Name.Sivan , 30),
-            new MonthNameAndLength(Month.Name.Tammuz, 29),
-            new MonthNameAndLength(Month.Name.Av    , 30),
-            new MonthNameAndLength(Month.Name.Elul  , 29)
+            new MonthNameAndLength(Month.Nisan , 30),
+            new MonthNameAndLength(Month.Iyar  , 29),
+            new MonthNameAndLength(Month.Sivan , 30),
+            new MonthNameAndLength(Month.Tammuz, 29),
+            new MonthNameAndLength(Month.Av    , 30),
+            new MonthNameAndLength(Month.Elul  , 29)
           )
       }
     }
-
-    override protected def areYearsPositive: Boolean = true
 
     override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
 
@@ -106,13 +115,19 @@ object Jewish extends Calendar {
     }
   }
 
-  final override lazy val Year = new JewishYearCompanion
+  override lazy val Year = new JewishYearCompanion
 
   trait JewishMonth extends MonthBase {
     def newMoon: Moment = Moon.newMoon(number)
   }
 
   final override type Month = JewishMonth
+
+  sealed trait JewishMonthName extends Named {
+    final override def names: Names = Month.toNames(this)
+  }
+
+  override type MonthName = JewishMonthName
 
   final class JewishMonthCompanion extends MonthCompanion {
     private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
@@ -121,32 +136,24 @@ object Jewish extends Calendar {
         override def number: Int = monthNumber
       }
 
-    override val Name: JewishMonthCompanion.type = JewishMonthCompanion
-
     override private[opentorah] def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
 
     override private[opentorah] def numberInYear(monthNumber: Int): Int = LeapYearsCycle.monthNumberInYear(monthNumber)
-  }
 
-  object JewishMonthCompanion extends NamedCompanion {
-    sealed trait Key extends Named {
-      final override def names: Names = toNames(this)
-    }
-
-    case object Tishrei extends Key
-    case object Marheshvan extends Key
-    case object Kislev extends Key
-    case object Teves extends Key
-    case object Shvat extends Key
-    case object Adar extends Key
-    case object Nisan extends Key
-    case object Iyar extends Key
-    case object Sivan extends Key
-    case object Tammuz extends Key
-    case object Av extends Key
-    case object Elul extends Key
-    case object AdarI extends Key { override def name: String = "Adar I"}
-    case object AdarII extends Key { override def name: String = "Adar II"}
+    case object Tishrei    extends JewishMonthName
+    case object Marheshvan extends JewishMonthName
+    case object Kislev     extends JewishMonthName
+    case object Teves      extends JewishMonthName
+    case object Shvat      extends JewishMonthName
+    case object Adar       extends JewishMonthName
+    case object Nisan      extends JewishMonthName
+    case object Iyar       extends JewishMonthName
+    case object Sivan      extends JewishMonthName
+    case object Tammuz     extends JewishMonthName
+    case object Av         extends JewishMonthName
+    case object Elul       extends JewishMonthName
+    case object AdarI      extends JewishMonthName { override def name: String = "Adar I"}
+    case object AdarII     extends JewishMonthName { override def name: String = "Adar II"}
 
     override val values: Seq[Key] =
       Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
@@ -154,10 +161,10 @@ object Jewish extends Calendar {
     protected override def resourceName: String = "JewishMonth"
   }
 
-  final override lazy val Month: JewishMonthCompanion = new JewishMonthCompanion
+  override lazy val Month: JewishMonthCompanion = new JewishMonthCompanion
 
   trait JewishDay extends DayBase {
-    def isShabbos: Boolean = is(Day.Name.Shabbos)
+    def isShabbos: Boolean = is(Week.Day.Shabbos)
 
     def roshChodeshOf: Option[Month.Name] =
       if (numberInMonth == 1) Some(month.name) else
@@ -168,12 +175,12 @@ object Jewish extends Calendar {
 
     def isShabbosMevarchim: Boolean = isShabbos && (shabbosAfter.month != this.month)
 
-    def shabbosAfter: Day = next.next(Day.Name.Shabbos)
+    def shabbosAfter: Day = next.next(Week.Day.Shabbos)
 
-    def shabbosBefore: Day = prev.prev(Day.Name.Shabbos)
+    def shabbosBefore: Day = prev.prev(Week.Day.Shabbos)
   }
 
-  final override type Day = JewishDay
+  override type Day = JewishDay
 
   final class JewishDayCompanion extends DayCompanion {
     private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
@@ -181,33 +188,9 @@ object Jewish extends Calendar {
         override protected var monthOpt: Option[Month] = monthOption
         override def number: Int = dayNumber
       }
-
-    override val Name: JewishDayCompanion.type = JewishDayCompanion
-
-    override def names: Seq[Name] = JewishDayCompanion.values
-
-    override val firstDayNumberInWeek: Int = Calendar.firstDayNumberInWeekJewish
   }
 
-  object JewishDayCompanion extends NamedCompanion {
-    sealed trait Key extends Named {
-      final override def names: Names = toNames(this)
-    }
-
-    case object Rishon extends Key
-    case object Sheni extends Key
-    case object Shlishi extends Key
-    case object Rvii extends Key
-    case object Chamishi extends Key
-    case object Shishi extends Key
-    case object Shabbos extends Key
-
-    override val values: Seq[Key] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
-
-    protected override def resourceName: String = "JewishDay"
-  }
-
-  final override lazy val Day: JewishDayCompanion = new JewishDayCompanion
+  override lazy val Day: JewishDayCompanion = new JewishDayCompanion
 
   final class JewishMoment(digits: Seq[Int]) extends MomentBase(digits) {
     override def companion: JewishMomentCompanion = Point
@@ -217,13 +200,15 @@ object Jewish extends Calendar {
     def dayHours(value: Int): Moment = secondHalfHours(value)
   }
 
-  final override type Point = JewishMoment
+  override type Moment = JewishMoment
 
   final class JewishMomentCompanion extends MomentCompanion {
     override protected def newNumber(digits: Seq[Int]): Point = new JewishMoment(digits)
   }
 
-  final override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion
+  override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion
 
-  final override def toString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)
+  override def Moment: JewishMomentCompanion = Point
+
+  override def inToString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)
 }

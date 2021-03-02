@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.dates.YearsCycle
 import Jewish.TimeVector
+import org.opentorah.calendar.YearsCycle
 
 object LeapYearsCycle extends YearsCycle {
   final override val length: Int = 19

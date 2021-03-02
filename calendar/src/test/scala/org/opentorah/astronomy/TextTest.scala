@@ -1,8 +1,8 @@
 package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles
+import org.opentorah.calendar.{Week, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
-import org.opentorah.dates.YearsCycle
 import org.opentorah.numbers.BigRational
 import Angles.{Position, Rotation, headRange, range}
 import Jewish.{Day, Month, Year}
@@ -49,8 +49,8 @@ class TextTest extends AnyFunSpec with Matchers {
       it("epoch") {
         LeapYearsCycle.inCycle(260, 17) shouldBe 4938
         LeapYearsCycle.forNumber(4938) shouldBe YearsCycle.In(260, 17)
-        Epoch.Text.day shouldBe Year(4938).month(Month.Name.Nisan).day(3)
-        Epoch.Text.day.name shouldBe Day.Name.Chamishi
+        Epoch.Text.day shouldBe Year(4938).month(Month.Nisan).day(3)
+        Epoch.Text.day.name shouldBe Week.Day.Chamishi
       }
     }
   }
@@ -58,8 +58,8 @@ class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 12") {
     describe("Law 2") {
       it("mean Sun") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Tammuz).day(14))
-        result.day.name shouldBe Day.Name.Shabbos
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
+        result.day.name shouldBe Week.Day.Shabbos
         result.daysAfterEpoch shouldBe 100
         result.sunLongitudeMean shouldBe Position(105, 37, 25)
         result.sunLongitudeMean shouldBe Zodiac.Cancer.at(Rotation(15, 37, 25))
@@ -70,8 +70,8 @@ class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 13") {
     describe("Laws 9-10") {
       it("true Sun") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Tammuz).day(14))
-        result.day.name shouldBe Day.Name.Shabbos
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
+        result.day.name shouldBe Week.Day.Shabbos
         result.sunLongitudeMean shouldBe Position(105, 37, 25)
         result.sunApogee shouldBe Position(86, 45, 23)
         result.sunCourseRaw shouldBe Rotation(18, 52, 2)
@@ -85,10 +85,10 @@ class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 15") {
     describe("Laws 8-9") {
       it("true Moon") {
-        val month: Month = Year(4938).month(Month.Name.Iyar)
+        val month: Month = Year(4938).month(Month.Iyar)
         val day: Day = month.day(2)
         val result = Calculator.Text.calculate(day)
-        result.day.name shouldBe Day.Name.Shishi
+        result.day.name shouldBe Week.Day.Shishi
         result.daysAfterEpoch shouldBe 29
         result.sunLongitudeMean shouldBe Position(35, 38, 33)
         result.moonLongitudeMeanAtTimeOfSighting shouldBe Position(53, 36, 39)
@@ -109,8 +109,8 @@ class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 16") {
     describe("Laws 4-5") {
       it("Moon head") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
-        result.day.name shouldBe Day.Name.Shishi
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Iyar).day(2))
+        result.day.name shouldBe Week.Day.Shishi
         result.daysAfterEpoch shouldBe 29
         // KH 16:5
         result.moonHeadMeanReversed shouldBe Position(182, 29, 37)
@@ -135,8 +135,8 @@ class TextTest extends AnyFunSpec with Matchers {
 
     describe("Law 19") {
       it("Moon lattitude") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
-        result.day.name shouldBe Day.Name.Shishi
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Iyar).day(2))
+        result.day.name shouldBe Week.Day.Shishi
         result.moonLongitudeTrue shouldBe Zodiac.Taurus.at(Rotation(18, 36))
         result.moonHeadMean shouldBe Zodiac.Virgo.at(Rotation(27, 30))
         result.moonLatitudeCourseRaw.canonical shouldBe Rotation(231, 6)
@@ -148,8 +148,8 @@ class TextTest extends AnyFunSpec with Matchers {
   describe("Chapter 17") {
     describe("Laws 13-14") {
       it("arc of sighting") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
-        result.day.name shouldBe Day.Name.Shishi
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Iyar).day(2))
+        result.day.name shouldBe Week.Day.Shishi
         result.sunLongitudeTrue shouldBe Zodiac.Taurus.at(Rotation(7, 9))
         result.moonLongitudeTrue shouldBe Zodiac.Taurus.at(Rotation(18, 36))
         result.moonLatitude shouldBe Rotation(3, 53)
@@ -175,8 +175,8 @@ class TextTest extends AnyFunSpec with Matchers {
 
     describe("Law 22") {
       it("is sightable?") {
-        val result = Calculator.Text.calculate(Year(4938).month(Month.Name.Iyar).day(2))
-        result.day.name shouldBe Day.Name.Shishi
+        val result = Calculator.Text.calculate(Year(4938).month(Month.Iyar).day(2))
+        result.day.name shouldBe Week.Day.Shishi
         result.arcOfSighting shouldBe Rotation(11, 11)
         result.longitude1 shouldBe Rotation(11, 27)
         result.isMoonSightable shouldBe true

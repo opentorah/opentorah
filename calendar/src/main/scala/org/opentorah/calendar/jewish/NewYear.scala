@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import Jewish.{Day, Moment, TimeVector}
-import Day.Name._
+import org.opentorah.calendar.Week
 
 object NewYear {
 
@@ -9,42 +9,66 @@ object NewYear {
 
   object Delay {
     case object No extends Delay(0)
-    case object Adu extends Delay(1)
-    case object First extends Delay(1)
+
+    // KH 7:1
+    case object Adu extends Delay(1) {
+      val onDays: Set[Week.Day] = Set(Week.Day.Rishon, Week.Day.Rvii, Week.Day.Shishi)
+
+      def applies(day: Week.Day): Boolean = onDays.contains(day)
+    }
+
+    // KH 7:1-2 (molad zoken)
+    case object First extends Delay(1) {
+      val time: TimeVector = TimeVector().hours(18)
+
+      def applies(time: TimeVector): Boolean =
+        time >= this.time
+    }
+
+    // KH 7:3
     case object FirstAndAdu extends Delay(2)
-    case object Second extends Delay(2)
-    case object Third extends Delay(1)
+
+    // KH 7:4
+    case object Second extends Delay(2) {
+      val day: Week.Day = Week.Day.Shlishi
+      val time: TimeVector = TimeVector().hours(9).parts(204)
+
+      def applies(yearNumber: Int, day: Week.Day, time: TimeVector): Boolean =
+        (day == this.day) &&
+        (time >= this.time) &&
+        !LeapYearsCycle.isLeapYear(yearNumber)
+    }
+
+    // KH 7:5
+    case object Third extends Delay(1) {
+      val day: Week.Day = Week.Day.Sheni
+      val time: TimeVector = TimeVector().hours(15).parts(589)
+
+      def applies(yearNumber: Int, day: Week.Day, time: TimeVector): Boolean =
+        (day == this.day) &&
+        (time >= this.time) &&
+        // This is not defined for year 0 - and doesn't apply :)
+        LeapYearsCycle.isLeapYear(yearNumber-1)
+    }
   }
 
-  final def delay(yearNumber: Int, newMoon: Moment): Delay = {
-    import Delay._
-    val dayName: Day.Name = name(newMoon.dayNumber)
-    if (adu.contains(dayName)) Adu /* KH 7:1 */
-    else if (newMoon.time >= firstCorrection)
-      if (!adu.contains(name(newMoon.dayNumber+1))) First /* KH 7:2 */ else FirstAndAdu /* KH 7:3 */
-    else if (
-      (dayName == Shlishi) &&
-      (newMoon.time >= secondCorrection) &&
-      !LeapYearsCycle.isLeapYear(yearNumber)) Second  /* KH 7:4 */
-    else if (
-      (dayName == Sheni) &&
-      (newMoon.time >= thirdCorrection) &&
-      // This is not defined for year 0 - and doesn't apply :)
-      LeapYearsCycle.isLeapYear(yearNumber-1)) Third  /* KH 7:5 */
-    else No
+  val delaysEnabledFromYear: Int = 5
+
+  // Note: to have Friday of the creation of Adam and Eve be the first of Tishrei,
+  // I had to suppress New Year delays for a few first years.
+  final def delay(yearNumber: Int, newMoon: Moment): Delay = if (yearNumber < delaysEnabledFromYear) Delay.No else {
+    val dayNumber: Int = newMoon.dayNumber
+    val time: TimeVector = newMoon.time
+    val day: Week.Day = name(dayNumber)
+
+    if (Delay.Adu.applies(day)) Delay.Adu
+    else if (Delay.First.applies(time))
+      if (Delay.Adu.applies(name(dayNumber+1))) Delay.FirstAndAdu
+      else Delay.First
+    else if (Delay.Second.applies(yearNumber, day, time)) Delay.Second
+    else if (Delay.Third .applies(yearNumber, day, time)) Delay.Third
+    else Delay.No
   }
 
-  // KH 7:1
-  private val adu: Set[Day.Name] = Set(Rishon, Rvii, Shishi)
-
-  // KH 7:1-2 (molad zoken)
-  final val firstCorrection: TimeVector  = TimeVector().hours(18)
-
-  // KH 7:4
-  final val secondCorrection: TimeVector = TimeVector().hours(9).parts(204)
-
-  // KH 7:5
-  final val thirdCorrection: TimeVector  = TimeVector().hours(15).parts(589)
-
-  final def name(dayNumber: Int): Day.Name = Day.names(Day.numberInWeek(dayNumber) - 1)
+  final def name(dayNumber: Int): Week.Day = Week.Day.forNumber(Day.numberInWeek(dayNumber))
 }

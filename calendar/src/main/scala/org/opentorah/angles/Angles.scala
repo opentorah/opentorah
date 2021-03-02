@@ -88,4 +88,4 @@ trait Angles extends PeriodicNumbers {
   }
 }
 
-object Angles extends Angles
+object Angles extends Angles // TODO if I make Angles trait itself an object, RotationTest fails!!!

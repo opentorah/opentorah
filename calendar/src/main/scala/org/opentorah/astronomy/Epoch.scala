@@ -22,7 +22,7 @@ trait Epoch {
 
 object Epoch {
   object Text extends Epoch {
-    final override lazy val day: Day = Year(4938).month(Month.Name.Nisan).day(3)
+    final override lazy val day: Day = Year(4938).month(Month.Nisan).day(3)
 
     // KH 12:2
     final override def sunLongitudeMean: Position = Zodiac.Aries.at(Rotation(7, 3, 32))

@@ -1,7 +1,7 @@
 package org.opentorah.schedule.rambam
 
-import org.opentorah.calendar.Calendars
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
+import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 
 /**
@@ -36,7 +36,7 @@ object RambamSchedule {
   private val numberOfChapters: Int = chapters.length
   require(numberOfLessons*3 == numberOfChapters)
 
-  final val epoch: Day = Year(5744).month(Month.Name.Nisan).day(27)
+  final val epoch: Day = Year(5744).month(Month.Nisan).day(27)
 
   def forDay(day: Day): RambamSchedule = {
     val distance: Int = day - epoch
@@ -69,7 +69,7 @@ object RambamSchedule {
     def scheduleMonth(month: Month): Seq[String] = {
       val lessons = for {
         day <- month.days
-        gDay = Calendars.fromJewish(day)
+        gDay = Gregorian.Day.from(day)
       } yield formatter.formatLesson(
         day.numberInMonth,
         gDay.month.numberInYear,

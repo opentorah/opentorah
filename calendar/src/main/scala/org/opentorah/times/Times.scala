@@ -13,8 +13,6 @@ trait Times extends NonPeriodicNumbers {
 
     final def days(value: Int): N = set(Digit.DAYS, value)
 
-    final def day(number: Int): N = days(number-1)
-
     final def time: Vector = this - companion(days)
 
     final def hours: Int = get(Digit.HOURS)
@@ -84,8 +82,6 @@ trait Times extends NonPeriodicNumbers {
   }
 
   final override val Digit: DigitsDescriptor = Times.Digit
-
-  final lazy val week: Vector = Vector().days(7)
 }
 
 object Times {

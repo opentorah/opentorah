@@ -1,14 +1,15 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.jewish.Jewish.{Day, Year}
+import org.opentorah.calendar.Week
+import Jewish.Year
 
 final case class YearType
 (
   isLeap: Boolean,
   name: String,
-  roshHashanah: Day.Name,
+  roshHashanah: Week.Day,
   kind: Year.Kind,
-  pesach: Day.Name
+  pesach: Week.Day
 ) {
   override def toString: String = name
 }
@@ -36,12 +37,12 @@ object YearType {
   def apply(isLeap: Boolean, name: String): YearType = {
     require(name.length == 3)
 
-    def dayOfTheWeek(char: Char): Day.Name = char match {
-      case 'א' => Day.Name.Rishon
-      case 'ב' => Day.Name.Sheni
-      case 'ג' => Day.Name.Shlishi
-      case 'ה' => Day.Name.Chamishi
-      case 'ז' => Day.Name.Shabbos
+    def dayOfTheWeek(char: Char): Week.Day = char match {
+      case 'א' => Week.Day.Rishon
+      case 'ב' => Week.Day.Sheni
+      case 'ג' => Week.Day.Shlishi
+      case 'ה' => Week.Day.Chamishi
+      case 'ז' => Week.Day.Shabbos
     }
 
     new YearType(
@@ -61,8 +62,8 @@ object YearType {
     val (isLeap, kind) = year.character
     types.find { yearType =>
       (yearType.isLeap == isLeap) &&
-        (yearType.roshHashanah == year.firstDay.name) &&
-        (yearType.kind == kind)
+      (yearType.roshHashanah == year.firstDay.name) &&
+      (yearType.kind == kind)
     }.get
   }
 }

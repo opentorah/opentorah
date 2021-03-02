@@ -1,4 +1,4 @@
-package org.opentorah.dates
+package org.opentorah.calendar
 
 trait YearsCycle {
   def length: Int

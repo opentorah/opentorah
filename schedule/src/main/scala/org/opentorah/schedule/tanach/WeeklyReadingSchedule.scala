@@ -1,11 +1,11 @@
 package org.opentorah.schedule.tanach
 
+import org.opentorah.calendar.Week
+import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import org.opentorah.dates.Calendar
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
 import org.opentorah.util.Collections
-import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 
 /**
   * Determine weekly portion read on a given Shabbos.
@@ -129,7 +129,7 @@ object WeeklyReadingSchedule {
 
     // All Shabbos days that are not festivals from one Shabbos Bereshit until the next.
     val weeks: Seq[Day] =
-      Collections.unfoldSimple[Day](fromShabbosBereishis, _ + Calendar.daysPerWeek, _ < toShabbosBereishis)
+      Collections.unfoldSimple[Day](fromShabbosBereishis, _ + Week.length, _ < toShabbosBereishis)
         .filterNot(festivals.contains)
 
     val combine: Set[Parsha] = combined(year, weeks)
