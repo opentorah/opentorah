@@ -1,6 +1,7 @@
 package org.opentorah.schedule.tanach
 
-import org.opentorah.calendar.jewish.{Jewish, YearType}
+import org.opentorah.calendar.Week
+import org.opentorah.calendar.jewish.{Jewish, NewYear, YearType}
 import org.opentorah.calendar.jewish.SpecialDay._
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha._
@@ -13,7 +14,7 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
 
   "Torah readings" should "be assigned correctly" in {
     val start = System.currentTimeMillis()
-    (2 to 6000) foreach { number =>
+    (NewYear.delaysEnabledFromYear to 6000) foreach { number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
@@ -32,7 +33,7 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
     val readingsBeforePesach: WeeklyReading = findReadings(Pesach1.date(year).shabbosBefore)
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Day.Name.Chamishi)) Acharei else Metzora
+      if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Week.Day.Chamishi)) Acharei else Metzora
     }
 
     // Shavuot
@@ -46,7 +47,7 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
     // Rosh Ha Shanah
     val roshHaShanah: Day = RoshHashanah1.date(year+1)
     findReadings(roshHaShanah.shabbosBefore).parsha shouldBe Nitzavim
-    isCombined(Vayeilech) shouldBe !roshHaShanah.is(Day.Name.Sheni) && !roshHaShanah.is(Day.Name.Shlishi)
+    isCombined(Vayeilech) shouldBe !roshHaShanah.is(Week.Day.Sheni) && !roshHaShanah.is(Week.Day.Shlishi)
 
     val combined: Set[Parsha] = readings.values.toSet.filter(_.isCombined).map(_.parsha)
     val yearType = YearType.forYear(year)

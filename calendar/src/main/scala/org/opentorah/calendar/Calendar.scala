@@ -1,21 +1,24 @@
-package org.opentorah.dates
+package org.opentorah.calendar
 
-import org.opentorah.metadata.{LanguageSpec, LanguageString, NamedCompanion, Numbered}
+import org.opentorah.calendar.jewish.Jewish
+import org.opentorah.metadata.{LanguageSpec, LanguageString, Named, NamedCompanion, Numbered}
 import org.opentorah.numbers.Digits
 import org.opentorah.times.Times
 import org.opentorah.util.Cache
 
 trait Calendar extends Times {
 
-  /**
-   *
-   * @param yearNumber  number of the Year
-   */
-  abstract class YearBase(yearNumber: Int) extends Numbered with LanguageString { this: Year =>
+  // days before the start of the calendar
+  def epoch: Int
 
-    type T = Year
+  // hours offset; for example:
+  //  Jewish:   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
+  //  Roman :  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
+  def epochHours: Int
 
-    override def number: Int = yearNumber
+  abstract class YearBase(final override val number: Int) extends Numbered with LanguageString { this: Year =>
+
+    final override type T = Year
 
     def character: YearCharacter
 
@@ -52,10 +55,10 @@ trait Calendar extends Times {
     final def month(numberInYear: Int): Month =
       Month.withNumberInYear(this, numberInYear)
 
-    final def containsMonth(name: MonthName): Boolean =
+    final def containsMonth(name: Month.Name): Boolean =
       monthDescriptors.exists(_.name == name)
 
-    final def month(name: MonthName): Month =
+    final def month(name: Month.Name): Month =
       month(monthDescriptors.indexWhere(_.name == name) + 1)
 
     final def monthAndDay(when: MonthAndDay): Day =
@@ -69,12 +72,14 @@ trait Calendar extends Times {
     private[opentorah] final def monthDescriptors: Seq[MonthDescriptor] =
       Year.monthDescriptors(character)
 
-    final override def toLanguageString(implicit spec: LanguageSpec): String = Calendar.this.toString(number)
+    final override def toLanguageString(implicit spec: LanguageSpec): String = Calendar.this.inToString(number)
   }
 
   type Year <: YearBase
 
   type YearCharacter
+
+  protected def areYearsPositive: Boolean
 
   final val cacheYears: Boolean = true
 
@@ -90,16 +95,15 @@ trait Calendar extends Times {
 
     // lazy to make initialization work
     lazy val monthDescriptors: Map[YearCharacter, Seq[MonthDescriptor]] =
-      Map((for (character <- characters) yield character -> monthsGenerator(character)): _*)
+      Map(characters.map(character => character -> monthsGenerator(character)): _*)
 
     protected def characters: Seq[YearCharacter]
 
     private[this] def monthsGenerator(character: YearCharacter): Seq[MonthDescriptor] = {
-      val namesAndLengths = monthNamesAndLengths(character)
+      val namesAndLengths: Seq[MonthNameAndLength] = monthNamesAndLengths(character)
       val daysBeforeForMonth: Seq[Int] = namesAndLengths.map(_.length).scanLeft(0)(_ + _).init
       namesAndLengths zip daysBeforeForMonth map { case (nameAndLength, daysBefore) =>
-        // TODO get rid of the cast!
-        new MonthDescriptor(nameAndLength.name.asInstanceOf[Month.Name], nameAndLength.length, daysBefore)
+        new MonthDescriptor(nameAndLength.name, nameAndLength.length, daysBefore)
       }
     }
 
@@ -108,13 +112,6 @@ trait Calendar extends Times {
     protected final def yearLength(character: YearCharacter): Int = {
       val lastMonth: MonthDescriptor = monthDescriptors(character).last
       lastMonth.daysBefore + lastMonth.length
-    }
-
-    protected def areYearsPositive: Boolean
-
-    final def yearsForSureBefore(dayNumber: Int): Int =  {
-      val result: Int = (4 * dayNumber / (4 * 365 + 1)) - 1
-      if (areYearsPositive) scala.math.max(1, result) else result
     }
 
     def isLeap(yearNumber: Int): Boolean
@@ -128,7 +125,7 @@ trait Calendar extends Times {
 
   trait MonthBase extends Numbered { this: Month =>
 
-    type T = Month
+    final override type T = Month
 
     protected var yearOpt: Option[Year]
 
@@ -162,16 +159,18 @@ trait Calendar extends Times {
 
     final def day(numberInMonth: Int): Day = Day.witNumberInMonth(this, numberInMonth)
 
-    final def name: MonthName = descriptor.name
+    final def name: Month.Name = descriptor.name
 
     final def length: Int = descriptor.length
 
     private[this] def descriptor: MonthDescriptor = year.monthDescriptors(numberInYear - 1)
 
-    final def numberInYearToLanguageString(implicit spec: LanguageSpec): String = Calendar.this.toString(numberInYear)
+    final def numberInYearToLanguageString(implicit spec: LanguageSpec): String = Calendar.this.inToString(numberInYear)
   }
 
   type Month <: MonthBase
+
+  type MonthName <: Named
 
   final class MonthNameAndLength(val name: Month.Name, val length: Int)
 
@@ -179,13 +178,9 @@ trait Calendar extends Times {
 
   final class MonthAndDay(val monthName: Month.Name, val numberInMonth: Int)
 
-  // TODO remove?
-  final type MonthName = Month.Name
-
-  trait MonthCompanion {
-    val Name: NamedCompanion
-
-    final type Name = Name.Key
+  trait MonthCompanion extends NamedCompanion {
+    final override type Key = MonthName
+    final type Name = MonthName
 
     final def apply(number: Int): Month = apply(None, number)
 
@@ -205,19 +200,23 @@ trait Calendar extends Times {
 
   trait DayBase extends Numbered with LanguageString { this: Day =>
 
-    type T = Day
+    final override type T = Day
 
     protected var monthOpt: Option[Month]
 
     require(0 < number)
 
+    final def calendar: Calendar = Calendar.this
+
     final def month: Month = {
-      if (monthOpt.isEmpty) {
-        var year: Year = Year(Year.yearsForSureBefore(number))
+      if (monthOpt.isEmpty) monthOpt = Some {
+        // TODO remove magic constant
+        var year: Year = Year(scala.math.max(if (areYearsPositive) 1 else 0, (4 * number / (4 * 365 + 1)) - 1))
         require(year.firstDayNumber <= number)
+
         while (year.next.firstDayNumber <= number) year = year.next
 
-        monthOpt = Some(year.monthForDay(number - year.firstDayNumber + 1))
+        year.monthForDay(number - year.firstDayNumber + 1)
       }
 
       monthOpt.get
@@ -241,38 +240,34 @@ trait Calendar extends Times {
 
     final def numberInWeek: Int = Day.numberInWeek(number)
 
-    final def name: DayName = Day.names(numberInWeek - 1)
+    final def to(calendar: Calendar): calendar.Day =
+      if (this.calendar == calendar) this.asInstanceOf[calendar.Day]
+      else calendar.Day(number + epoch - calendar.epoch)
 
-    final def is(name: DayName): Boolean = this.name == name
+    final def name: Week.Day = Week.Day.forNumber(numberInWeek)
+
+    final def is(name: Week.Day): Boolean = this.name == name
 
     final def monthAndDay: MonthAndDay = new MonthAndDay(month.name, numberInMonth)
 
     @scala.annotation.tailrec
-    final def next(dayName: DayName): Day = if (is(dayName)) this else this.next.next(dayName)
+    final def next(dayName: Week.Day): Day = if (is(dayName)) this else this.next.next(dayName)
 
     @scala.annotation.tailrec
-    final def prev(dayName: DayName): Day = if (is(dayName)) this else this.prev.prev(dayName)
+    final def prev(dayName: Week.Day): Day = if (is(dayName)) this else this.prev.prev(dayName)
 
+    // Note: Day numbering starts at 1; that is why 1 is subtracted here and added MomentBase.dayNumber:
     final def toMoment: Moment = Moment().days(number - 1)
 
     final override def toLanguageString(implicit spec: LanguageSpec): String =
       year.toLanguageString + " " + month.name.toLanguageString + " " + numberInMonthToLanguageString
 
-    final def numberInMonthToLanguageString(implicit spec: LanguageSpec): String = Calendar.this.toString(numberInMonth)
+    final def numberInMonthToLanguageString(implicit spec: LanguageSpec): String = Calendar.this.inToString(numberInMonth)
   }
 
   type Day <: DayBase
 
-  // TODO remove?
-  final type DayName = Day.Name
-
   trait DayCompanion {
-    val Name: NamedCompanion
-
-    final type Name = Name.Key
-
-    def names: Seq[DayName]
-
     final def apply(number: Int): Day = apply(None, number)
 
     private[opentorah] final def witNumberInMonth(month: Month, numberInMonth: Int): Day = {
@@ -282,51 +277,69 @@ trait Calendar extends Times {
 
     private[opentorah] def apply(monthOpt: Option[Month], number: Int): Day
 
-    final def numberInWeek(dayNumber: Int): Int =
-      ((dayNumber + firstDayNumberInWeek - 1 - 1) % Calendar.daysPerWeek) + 1
+    final def from(day: Calendar#Day): Day = day.to(Calendar.this)
 
-    val firstDayNumberInWeek: Int
+    // Note: change of day because of the time offset is not taken into account,
+    // so careful with things like molad announcements...
+    final def numberInWeek(dayNumber: Int): Int =
+      ((dayNumber - 1) + (Jewish.epochDayNumberInWeek - 1) + epoch - Jewish.epoch) % Week.length + 1
   }
 
   val Day: DayCompanion
 
-  final type Moment = Point
-
   abstract class MomentBase(digits: Digits) extends TimePointBase(digits) with LanguageString { this: Moment =>
+    final def calendar: Calendar = Calendar.this
 
     final def day: Day = Day(dayNumber)
 
+    // Note: Day numbering starts at 1; that is why 1 is added here and subtracted in DayBase.toMoment:
     final def dayNumber: Int = days + 1
+
+    def to(calendar: Calendar): calendar.Moment = if (this.calendar == calendar) this.asInstanceOf[calendar.Moment] else {
+      // TODO this looks like Digits addition with carry, and should be implemented that way...
+      val toHours: Int = hours + epochHours - calendar.epochHours
+
+      val (newDay, newHours) =
+        if (hours < 0                ) (day.prev, toHours + Times.hoursPerDay) else
+        if (hours > Times.hoursPerDay) (day.next, toHours - Times.hoursPerDay) else
+                                       (day     , toHours                    )
+
+      newDay.to(calendar).toMoment.hours(newHours).parts(parts)
+    }
 
     final override def toLanguageString(implicit spec: LanguageSpec): String =
       day.toLanguageString +
-        " " + toString(time.hours) +
-        ":" + toString(time.minutes) +
-        "." + toString(time.partsWithoutMinutes) +
-        "." + toString(time.moments)
+        " " + inToString(time.hours) +
+        ":" + inToString(time.minutes) +
+        "." + inToString(time.partsWithoutMinutes) +
+        "." + inToString(time.moments)
 
     final def toSecondLanguageString(implicit spec: LanguageSpec): String =
       day.toLanguageString +
-        " " + toString(time.hours) +
-        ":" + toString(time.minutes) +
-        ":" + toString(time.seconds) +
-        "." + toString(time.milliseconds)
+        " " + inToString(time.hours) +
+        ":" + inToString(time.minutes) +
+        ":" + inToString(time.seconds) +
+        "." + inToString(time.milliseconds)
   }
 
-  override type Point <: MomentBase
+  type Moment <: MomentBase
 
-  trait MomentCompanion extends PointCompanion
+  final override type Point = Moment
+
+  trait MomentCompanion extends PointCompanion {
+    final def from(moment: Calendar#Moment): Moment = moment.to(Calendar.this)
+  }
 
   override val Point: MomentCompanion
 
-  final lazy val Moment: MomentCompanion = Point
+  def Moment: MomentCompanion
 
   final override type Vector = TimeVectorBase
 
   final type TimeVector = Vector
 
   final override lazy val Vector: VectorCompanion = new VectorCompanion {
-    protected override def newNumber(digits: Digits): Vector =
+    override protected def newNumber(digits: Digits): Vector =
       new TimeVectorBase(digits) {
         final override def companion: VectorCompanion = TimeVector
       }
@@ -334,19 +347,6 @@ trait Calendar extends Times {
 
   final val TimeVector: VectorCompanion = Vector
 
-  def toString(number: Int)(implicit spec: LanguageSpec): String
+  def inToString(number: Int)(implicit spec: LanguageSpec): String
 }
 
-
-object Calendar {
-  final val daysPerWeek: Int = 7
-
-  // It seems that first day of the first year was Sunday; molad - BaHaRad.
-  // Second year - Friday; molad - 8 in the morning.
-  final val firstDayNumberInWeekJewish: Int = 1
-
-  final val epoch: Int = 1373429
-
-  final val firstDayNumberInWeekGregorian: Int =
-    (((firstDayNumberInWeekJewish - 1) + epoch % daysPerWeek) % daysPerWeek) + 1
-}

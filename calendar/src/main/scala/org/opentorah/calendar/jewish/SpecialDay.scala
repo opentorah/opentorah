@@ -2,7 +2,7 @@ package org.opentorah.calendar.jewish
 
 import org.opentorah.metadata.{NamedCompanion, Names, WithName, WithNames}
 import Jewish.{Day, Year}
-import Jewish.Month.Name._
+import Jewish.Month._
 
 sealed trait SpecialDay extends WithNames {
   def date(year: Year): Day

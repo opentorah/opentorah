@@ -110,7 +110,7 @@ trait Numbers {
     private[numbers] final def subtract(that: Number[_]): Digits = zipWith(that, _ - _)
 
     private final def isComparable(that: N): Boolean =
-      /* TODO (this.numbers == that.numbers) && */ (this.companion == that.companion)
+      /* TODO (this.numbers == that.numbers) && */ this.companion == that.companion
 
     private final def zipWith(
       that: Number[_],

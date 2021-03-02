@@ -1,7 +1,8 @@
 package org.opentorah.schedule.tanach
 
+import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Month}
-import org.opentorah.calendar.jewish.Jewish.Month.Name._
+import org.opentorah.calendar.jewish.Jewish.Month._
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay._
 import org.opentorah.metadata.WithNames
@@ -33,7 +34,7 @@ object Readings {
       if (day.isRoshChodesh) 4 else
       if (specialDay.exists(_.isInstanceOf[RabbinicFestival])) 3 else
       if (specialDay.exists(_.isInstanceOf[Fast])) 3 else
-      if (day.is(Day.Name.Sheni) || day.is(Day.Name.Chamishi)) 3 else
+      if (day.is(Week.Day.Sheni) || day.is(Week.Day.Chamishi)) 3 else
         0
 
     result.fold(require(numAliyot == 0)) { _.torah.customs.values.foreach { torah => require(torah.length == numAliyot) }}
@@ -166,7 +167,7 @@ object Readings {
       reading.transform(weekly, day, roshChodeshDay)
   }
 
-  private final val sheniAndChamishi: Set[Day.Name] = Set(Day.Name.Sheni, Day.Name.Chamishi)
+  private final val sheniAndChamishi: Set[Week.Day] = Set(Week.Day.Sheni, Week.Day.Chamishi)
 
   private final def getWeekdayMorningReading(
     day: Day,

@@ -1,14 +1,12 @@
-package org.opentorah.calendar.jewish
+package org.opentorah.calendar
 
-import Jewish.{Day, Month, Year}
-import Jewish.TimeVector
-import Jewish.Day.Name._
-import Jewish.Month.Name._
-import org.opentorah.calendar.gregorian.Gregorian
-import Gregorian.Month.Name._
-import org.opentorah.calendar.Calendars
-import org.opentorah.calendar.jewish.SpecialDay.{Chanukah1, FastOfEster, FastOfTammuz, HoshanahRabbah, LagBaOmer,
-  Pesach1, Purim, RoshHashanah1, Shavuos1, SimchasTorah, TishaBeAv, YomKippur}
+import org.opentorah.calendar.jewish.{Jewish, NewYear, YearType}
+import org.opentorah.calendar.jewish.SpecialDay._
+import Jewish.{Day, Month, TimeVector, Year}
+import Jewish.Month._
+import org.opentorah.calendar.roman.Gregorian
+import Gregorian.Month._
+import Week.Day._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
@@ -63,26 +61,32 @@ final class DatesTest extends AnyFlatSpec with Matchers {
 
       (5773, Tishrei   , Rishon  ,  5772, Elul   , 29,  2012, September, 16,  1, 57,  8),
       (5773, Adar      , Rishon  ,  5773, Shvat  , 30,  2013, February , 10, 17, 37, 13),
-      (5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14)
+      (5773, Nisan     , Shlishi ,  5773, Nisan  ,  1,  2013, March    , 12,  6, 21, 14),
+
+      (5781, Nisan     , Sunday  ,  5781, Nisan  ,  1,  2021, March    , 13, 19,  3,  5), // chabad.org incorrectly lists Saturday?
     )
 
     forAll(data) {
       (
-        moladYear: Int, moladMonth: Jewish.MonthName, dayOfWeek: Jewish.DayName,
-        year: Int, month: Jewish.MonthName, day: Int,
-        yearG: Int, monthG: Gregorian.MonthName, dayG: Int,
+        moladYear: Int, moladMonth: Month.Name, dayOfWeek: Week.Day,
+        year: Int, month: Month.Name, day: Int,
+        yearG: Int, monthG: Gregorian.Month.Name, dayG: Int,
         hours: Int, minutes: Int, parts: Int
       ) =>
         val dayJ = Year(year).month(month).day(day)
-        val dateG = Gregorian.Year(yearG).month(monthG).day(dayG).toMoment.
-          hours(hours).minutes(minutes).partsWithoutMinutes(parts)
-        val molad = Jewish.Year(moladYear).month(moladMonth).newMoon
+
+        val molad = Year(moladYear).month(moladMonth).newMoon
 
         molad.day.name shouldBe dayOfWeek
-        molad.day shouldBe dayJ
+        molad.day      shouldBe dayJ
 
-        Calendars.toJewish(dateG).day shouldBe dayJ
-        Calendars.fromJewish(molad) shouldBe dateG
+        val dateG = Gregorian.Year(yearG).month(monthG).day(dayG).toMoment.
+          hours(hours).minutes(minutes).partsWithoutMinutes(parts)
+
+        Gregorian.Moment.from(molad) shouldBe dateG
+        molad.to(Gregorian)          shouldBe dateG
+
+        dateG.to(Jewish   ).day shouldBe dayJ
     }
   }
 
@@ -107,13 +111,15 @@ final class DatesTest extends AnyFlatSpec with Matchers {
 
   private val years = (1 to 6000) map (Year(_))
 
+  private val yearsWithDelaysEnabled = years.drop(NewYear.delaysEnabledFromYear-1)
+
   "Jewish year" should "be the year of the month retrieved from it" in {
     for (year <- years; month <- year.months) month.year shouldBe year
   }
 
   // Shulchan Aruch, Orach Chaim, 428:1
   "Festivals" should "not fall on the proscribed days" in {
-    val data = Table[Year => Day, Seq[Day.Name]](
+    val data = Table[Year => Day, Seq[Week.Day]](
       ("specialDay", "notOn"),
       (RoshHashanah1.date, Seq(Rishon, Rvii, Shishi)),
       (YomKippur.date, Seq(Shlishi, Rishon, Shishi)),
@@ -126,9 +132,9 @@ final class DatesTest extends AnyFlatSpec with Matchers {
       (FastOfTammuz.date, Seq(Sheni, Rvii, Shishi)),
       (TishaBeAv.date, Seq(Sheni, Rvii, Shishi))
     )
-    years foreach { year =>
+    yearsWithDelaysEnabled foreach { year =>
       forAll(data) {
-        (specialDay: Year => Day, days: Seq[Day.Name]) =>
+        (specialDay: Year => Day, days: Seq[Week.Day]) =>
         days contains specialDay(year).name shouldBe false
       }
 
@@ -165,9 +171,9 @@ final class DatesTest extends AnyFlatSpec with Matchers {
       (AdarI, Seq(Sheni, Rvii, Chamishi, Shabbos)), // => Parshas Shekalim never falls on Rosh Chodesh!
       (AdarII, Seq(Sheni, Rvii, Shishi, Shabbos))
     )
-    years foreach { year =>
+    yearsWithDelaysEnabled foreach { year =>
       forAll(data) {
-        (month: Month.Name, days: Seq[Day.Name]) =>
+        (month: Month.Name, days: Seq[Week.Day]) =>
           if (year.containsMonth(month)) {
             val roshChodesDay = year.month(month).firstDay
             days contains roshChodesDay.name shouldBe true
@@ -190,9 +196,10 @@ final class DatesTest extends AnyFlatSpec with Matchers {
   }
 
   "Jewish Year" should "have allowed type with Pesach on correct day of the week" in {
-    years foreach { year => Pesach1.date(year).name shouldBe YearType.forYear(year).pesach }
+    yearsWithDelaysEnabled foreach(year => Pesach1.date(year).name shouldBe YearType.forYear(year).pesach)
   }
 
+  // TODO suppress New Year delays for years up to this one!
   "Giving of the Torah" should "be off by the fixed calendar :)" in {
     // Revelation took place in year 2448, on Shabbos, Sivan 6th (or 7th according to Rabbi Jose).
     // Jews came to Mount Sinai on new moon, which was on Monday (or Sunday).
@@ -204,11 +211,11 @@ final class DatesTest extends AnyFlatSpec with Matchers {
   }
 
   "Pesach day of the week" should "calculate correctly" in {
-    val days: collection.mutable.Map[Jewish.Day.Name, Int] = new collection.mutable.HashMap[Jewish.Day.Name, Int]
-    years foreach { year =>
-      val day: Jewish.Day.Name = Pesach1.date(year).name
+    val days: collection.mutable.Map[Week.Day, Int] = new collection.mutable.HashMap[Week.Day, Int]
+    years.foreach { year =>
+      val day: Week.Day = Pesach1.date(year).name
       if (days.contains(day)) days.update(day, days(day) + 1) else days.update(day, 1)
     }
-    println(days)
+    //println(days)
   }
 }

@@ -15,7 +15,7 @@ by [ayvango](https://stackoverflow.com/users/837133/ayvango).
 
 Note: 
 - family polymorphism was introduced in the code in 2014;
-- implementation with family members in separate files was developedin2017-2018;
+- implementation with family members in separate files was developed in 2017-2018;
 - it stopped working in June 2019 with the release of Scala 2.13.0;
 - when the issue was not fixed by Scala 2.13.1 or 2.13.2, I filed a
   [bug](https://github.com/scala/bug/issues/11963) with the Scala team;

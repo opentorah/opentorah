@@ -23,7 +23,7 @@ object DayOfSighting {
   }
 
   def main(args: Array[String]): Unit = {
-    val from: Day = Year(4938).month(Month.Name.Iyar).firstDay - 5
+    val from: Day = Year(4938).month(Month.Iyar).firstDay - 5
     for (offset <- 0 to 10) {
       val day: Day = from + offset
       val e = elongation(day.toMoment)

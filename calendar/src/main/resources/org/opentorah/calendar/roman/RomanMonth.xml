@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GregorianMonth>
+<RomanMonth>
     <names>
         <name lang="en" n="January"/>
         <name lang="he" transliterated="yes" n="ינואר"/>
@@ -60,4 +60,4 @@
         <name lang="he" transliterated="yes" n="דצמבר"/>
         <name lang="ru" n="декабрь"/>
     </names>
-</GregorianMonth>
+</RomanMonth>

@@ -1,8 +1,7 @@
 package org.opentorah.calendar.ical
 
-import org.opentorah.calendar.gregorian.Gregorian.Day
+import org.opentorah.calendar.roman.Gregorian.Day
 import java.io.PrintStream
-
 
 object ICal {
   type Properties = Seq[(String, String)]

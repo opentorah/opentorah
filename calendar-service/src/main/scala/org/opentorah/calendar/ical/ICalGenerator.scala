@@ -1,8 +1,8 @@
 package org.opentorah.calendar.ical
 
+import org.opentorah.calendar.jewish.Jewish
+import org.opentorah.calendar.roman.Gregorian
 import java.io.{FileOutputStream, OutputStream}
-import org.opentorah.calendar.Calendars
-import org.opentorah.calendar.gregorian.Gregorian
 
 final class ICalGenerator private(os: OutputStream) {
   import ICal._
@@ -17,7 +17,7 @@ final class ICalGenerator private(os: OutputStream) {
       Some("Jewish Dates, Events and Schedules")
     ))
 
-    var dayG = Gregorian.Year(year).month(Gregorian.Month.Name.January).day(1)
+    var dayG = Gregorian.Year(year).month(Gregorian.Month.January).day(1)
     while (dayG.year.number == year) {
       out.print(day(dayG))
       dayG = dayG.next
@@ -27,7 +27,7 @@ final class ICalGenerator private(os: OutputStream) {
   }
 
   private def day(dayG: Gregorian.Day): Properties = {
-    val dayJ = Calendars.toJewish(dayG)
+    val dayJ = dayG.to(Jewish)
     val monthName: String = dayJ.month.name.name
     val dayNumber = dayJ.numberInMonth
     val summaryText = monthName + " " + dayNumber
