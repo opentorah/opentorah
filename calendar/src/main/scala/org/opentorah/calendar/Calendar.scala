@@ -3,7 +3,6 @@ package org.opentorah.calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.metadata.{LanguageSpec, LanguageString, Named, NamedCompanion, Numbered}
 import org.opentorah.numbers.Digits
-import org.opentorah.times.Times
 import org.opentorah.util.Cache
 
 trait Calendar extends Times {

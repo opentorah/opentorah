@@ -1,7 +1,6 @@
 package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.{Digit, Rotation}
-import Time2Rotation.Key
 import org.opentorah.numbers.Digit
 
 object SunApogee extends Time2Rotation {
@@ -15,8 +14,8 @@ object SunApogee extends Time2Rotation {
   final override val month      : Rotation = Rotation(0,  0,  4)
   final override val year       : Rotation = Rotation(0,  0, 53)
 
-  protected override def precision(key: Key): Digit =
-    if (key == Key.One) Digit.THIRDS else Digit.SECONDS
+  protected override def precision(days: Time2Rotation.Days): Digit =
+    if (days == 1 /* TODO 10?!*/) Digit.THIRDS else Digit.SECONDS
 
   final override val rambamValue = Rotation(0)
 

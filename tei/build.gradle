@@ -8,7 +8,7 @@ plugins {
 
 description = 'Open Torah TEI Support'
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 dependencies {
   api project(':opentorah-metadata')

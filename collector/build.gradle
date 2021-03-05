@@ -10,8 +10,9 @@ plugins {
 
 description = 'Archive Collector'
 
-configureLibrary()
-configureService()
+ext.isService = true
+
+apply from: '../configure.gradle'
 
 dependencies {
   api project(':opentorah-metadata')

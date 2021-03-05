@@ -11,7 +11,7 @@ plugins {
 version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-fop')

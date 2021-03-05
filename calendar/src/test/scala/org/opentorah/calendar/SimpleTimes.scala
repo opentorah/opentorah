@@ -1,4 +1,4 @@
-package org.opentorah.times
+package org.opentorah.calendar
 
 // For stand-alone testing of Times.
 object SimpleTimes extends Times {
