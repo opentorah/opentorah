@@ -31,7 +31,7 @@ final class Notes(
   override def path(site: Site): Store.Path = Seq(site.notes)
 
   override def content(site: Site): Caching.Parser[Xml.Element] = directoryEntries.map(notes =>
-    <div>{notes.map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
+    <div>{notes.sortBy(_.title).map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
 }
 
 object Notes extends Element[Notes]("notes") {

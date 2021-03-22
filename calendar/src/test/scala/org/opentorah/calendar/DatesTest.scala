@@ -199,15 +199,17 @@ final class DatesTest extends AnyFlatSpec with Matchers {
     yearsWithDelaysEnabled foreach(year => Pesach1.date(year).name shouldBe YearType.forYear(year).pesach)
   }
 
-  // TODO suppress New Year delays for years up to this one!
   "Giving of the Torah" should "be off by the fixed calendar :)" in {
     // Revelation took place in year 2448, on Shabbos, Sivan 6th (or 7th according to Rabbi Jose).
     // Jews came to Mount Sinai on new moon, which was on Monday (or Sunday).
-    // Fixed calendar gives the new moon of the month on Wednesday and the 6th on the following Wednesday,
+    // Fixed calendar gives the new moon of the month on Wednesday and the 6th on the following Wednesday
+    // (or Tuesday if New Year push-out are suppressed),
     // proving that the fixed calendar was not in use then ;)
     val day = Year(2448).month(Sivan).day(6)
-    day.name shouldBe Rvii
     day.month.newMoon.day.name shouldBe Rvii
+    day.name shouldBe Rvii
+
+    // TODO calculate based on the astronomical calendar!
   }
 
   "Pesach day of the week" should "calculate correctly" in {

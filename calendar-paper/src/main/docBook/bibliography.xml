@@ -39,6 +39,7 @@
           <surname>Kapach</surname>
         </personname>
       </editor>
+      <!-- TODO translation of his introduction: https://mhcny.org/pdf/Introduction%20to%20Mishneh%20Torah.pdf -->
     </biblioentry>
     <biblioentry xml:id="Frenkel" xreflabel="Frenkel">
       <author>
@@ -66,6 +67,22 @@
         </personname>
       </editor>
       <pubdate>2005</pubdate>
+    </biblioentry>
+    <biblioentry xml:id="Hazak" xreflabel="Hazak">
+      <author>
+        <personname>Rambam</personname>
+      </author>
+      <title>Mishne Torah</title>
+      <edition>HaSholem</edition>
+      <pubdate>2010</pubdate>
+      <!--
+      TODO see p.37-41 for their list of the versions of Rambam with misprints corrected,
+      and the reason they chose the Kapach version: it being based solely on the Yemenite
+      manuscripts that were not affected by the censorship unlike the Ashkenazic ones
+      and the Frenkel version being combination of various manuscripts and editions
+      (which is funny, since Kapach repeats Askenazic misprints in the Laws of the
+      Sanctification of the Moon)
+       -->
     </biblioentry>
     <biblioentry xml:id="Yale" xreflabel="Yale">
       <author>
@@ -465,6 +482,13 @@
         <personname><firstname>Sacha</firstname><surname>Stern</surname></personname>
       </author>
       <title>Calendar and Community: A History of the Jewish Calendar, 2nd Century BCE to 10th Century CE</title>
+    </biblioentry>
+    <biblioentry>
+      <title>A primitive rabbinic calendar text from the Cairo Genizah</title>
+      <author>
+        <personname><firstname>Sacha</firstname><surname>Stern</surname></personname>
+      </author>
+      <biblioid class="uri">https://www.jjs-online.net/archives/fulltext/3259</biblioid>
     </biblioentry>
     <biblioentry>
       <title> The Reality of Epicycles and Eccentrics Denied</title>

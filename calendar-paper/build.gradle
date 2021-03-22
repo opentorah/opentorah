@@ -3,10 +3,10 @@ plugins {
   id 'org.opentorah.docbook'
 }
 
-configurePaper(
-  'org.opentorah.calendar.paper.Tables',
-  true
-)
+ext.dataGeneratorClassName = 'org.opentorah.calendar.paper.Tables'
+ext.isMathJaxEnabled = true
+
+apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-calendar')
@@ -14,4 +14,4 @@ dependencies {
 }
 
 // To ensure calendar library is built before it is used:
-processDocBook.dependsOn(':calendar:assemble')
+processDocBook.dependsOn(':opentorah-calendar:assemble')

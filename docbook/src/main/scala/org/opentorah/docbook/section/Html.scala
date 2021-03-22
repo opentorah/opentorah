@@ -29,10 +29,9 @@ object Html extends DocBook2 {
     if (values.mathJaxConfiguration.isEmpty) Seq.empty else Seq(
       <!-- Add MathJax support -->,
       <xsl:template name="user.head.content">
-        <script type="text/javascript">
-          window.MathJax=<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>;
-        </script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script>MathJax = <xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>;</script>
+        <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       </xsl:template>
     )
 

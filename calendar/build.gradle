@@ -9,7 +9,7 @@ plugins {
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-metadata')

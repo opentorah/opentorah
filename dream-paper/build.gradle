@@ -3,7 +3,4 @@ plugins {
   id 'org.opentorah.docbook'
 }
 
-configurePaper(
-  '',
-  false
-)
+apply from: '../configure.gradle'

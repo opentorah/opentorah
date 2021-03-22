@@ -1,6 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xml:id="solar-theory" xmlns="http://docbook.org/ns/docbook" version="5.0">
+<chapter xml:id="solar-theory" xmlns="http://docbook.org/ns/docbook" version="5.0"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Solar Theory</title>
+
+  <para>In his "Laws of the Snctification of the Moon", Chapter 12, Law 1, Rambam states:</para>
+<!-- TODO quote/reference-->
+  <para>The mean rate of movement of the sun in one day (that is, twenty-four hours)
+    is fifty-nine minutes and eight seconds, in symbols - 59′8″.
+    It follows that its movement in ten days is nine degrees fifty-one minutes
+    and twenty-three seconds, in symbols - 9°51′23″.
+    It also follows that its movement in a hundred days is ninety-eight degrees
+    thirty-three minutes and fifty-three seconds, in symbols - 98°33′53″.
+    It also follows that remainder of its movement in a thousand days, after you
+    subtract all [multiples of] 360° (as was explained) is two hundred sixty-five
+    degrees thirty-eight minutes and fifty seconds, in symbols - 265°38′50″.
+    It also follows that the remainder of its movement in ten thousand days is
+    one hundred thirty-six degrees twenty-eight minutes and twenty seconds,
+    in symbols - 136°28′20″.</para>
+
+  <para>And in this way you can multiply and calculate its movement for any number
+    [of days] that you want.
+    Similarly, if you want to make known to you values of its movement for two
+    days, three, four and so on to ten - do it.
+    Similarly, if you want for to have known and ready values of its movement
+    for twenty days, thirty, forty and so on to a hundred - do it.
+    This is clear and known once you know its movement in 1 day.</para>
+
+  <para>And you should have ready and known to you mean movement of the Sun for
+    twenty-nine days and for three hundred and fifty-four (which is the number of
+    days in the lunar year when its months are "regular" (TODO link), and it is
+    called "regular year"). The reason is: if you have those movement values ready,
+    these calculations of the visibility of the moon will be easy, because there
+    are twenty-nine complete days from the night of observation to the night of
+    observation of the following month, and so it is every month: no less than
+    twenty-nine days and no more.
+    Since our sole desire in all those calculations is exclusively to determine
+    visibility [of the moon].
+    And between the night of sighting of this month and night of sighting of the
+    same month next year there is either a regular year or a year and 1 day;
+    and the same every year.
+    Mean movement of the Sun in twenty-nine days is twenty-eight degrees
+    thirty-five minutes and one second, in symbols - 28°35′1″.
+    Its movement in a regular year is three hundred forty-eight degrees,
+    fifty-five minutes and fifteen seconds, in symbols - 348°55′15″.</para>
+
+  <para>In table format:</para>
+  <xi:include href="data:slm-printed.xml"/>
+
+  <para>Now let's see if the printed values can be recovered by multiplying the value for
+    one day by the number of days (and discarding full circles as appropriate):</para>
+  <xi:include href="data:slm-reconstructed-1.xml"/>
+  <xi:include href="data:slm-reconstructed-10.xml"/>
+  <xi:include href="data:slm-reconstructed-100.xml"/>
+  <xi:include href="data:slm-reconstructed-1000.xml"/>
 
   <section xml:id="solar-model">
     <title>Model (TODO)</title>

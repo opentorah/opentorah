@@ -95,7 +95,7 @@ final class Collection(
           ) ++ documentRows)
       }
     } yield {
-      val missingPages: Seq[Page] = directory.entries.flatMap(_.pages(pageType)).filter(_.pb.isMissing)
+      val missingPages: Seq[Page] = directory.entries.sortBy(_.name).flatMap(_.pages(pageType)).filter(_.pb.isMissing)
 
       def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
         val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)

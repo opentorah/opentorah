@@ -8,7 +8,7 @@ plugins {
 
 description = 'Open Torah XML'
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 // Note: I tried using Gradle 'variant':
 //java {

@@ -9,7 +9,7 @@ plugins {
 version = docBookProjectVersion
 description = 'FOP MathJax plugin'
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-xml')

@@ -3,6 +3,7 @@
 Modules covered: `docbook` and `fop`.
 
 ## [Unreleased]
+- MathJax 3
 
 ## [0.7.53] - 2020-08-23
 - use XML literals instead of strings

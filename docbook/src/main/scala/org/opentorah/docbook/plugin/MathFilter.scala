@@ -129,6 +129,8 @@ final class MathFilter(
   private def unescape(chars: String): String =
     if (!configuration.processEscapes) chars else chars.replace("\\$", "$")
 
+  // TODO should I use DocBook's <markup role="mathjax"> element or something instead of the MathML one?
+
   private def flush(closedByDelimiter: Boolean = false): Unit = if (delimiters.isDefined) {
     if (!closedByDelimiter) warning(s"Math '$math' not closed")
 

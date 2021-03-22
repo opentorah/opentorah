@@ -1,0 +1,267 @@
+// the following properties of the project determine how will it be configured:
+// if project.name.endsWith('-service'), is is configured as a service and not as a library;
+// if project.isService is true, it is configured as a service and as a library;
+// if project.name.endsWith('-paper'), it is configured as a paper (and not as a library nor a service), and:
+//   project.dataGeneratorClassName, if present, is used to configure the data generator (bye default it is not configured)
+//   isMathJaxEnabled, if present, determines if MathJax support is enabled (by default it is not);
+// otherwise, it is configured as a library.
+
+final boolean isPaper   = project.name.endsWith('-paper'  )
+final boolean isService = project.name.endsWith('-service')
+
+final String projectBaseName =
+  isPaper   ? project.name.substring(0, project.name.length() - '-paper'.length  ()) :
+  isService ? project.name.substring(0, project.name.length() - '-service'.length()) :
+  project.name
+
+// everything is in Scala
+
+dependencies {
+  // zinc
+  //   first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
+  //   previous version - 1.3.5 - doesn't work with Scala 2.13...
+  //   on the other hand, build works without any
+  //     zinc "org.scala-sbt:zinc_$scalaVersionMajor:$zincVersion"
+  //   just fine ;)
+
+  implementation "$scalaLibrary:$scalaVersion"
+
+  compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
+  testRuntimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+
+  testImplementation "org.scalatest:scalatest_$scalaVersionMajor:$scalatestVersion"
+  // for scalatest reports
+  testRuntimeOnly "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+
+  testImplementation "org.scalacheck:scalacheck_$scalaVersionMajor:$scalacheckVersion"
+  testImplementation "org.typelevel:discipline-scalatest_$scalaVersionMajor:$disciplineScalatestVersion"
+  testImplementation "org.typelevel:algebra-laws_$scalaVersionMajor:$algebraLawsVersion"
+}
+
+// service
+if (isService || (project.hasProperty('isService') ? project.isService : false)) {
+  dependencies {
+    implementation "dev.zio:zio-interop-cats_$scalaVersionMajor:$zioInteropCatsVersion"
+    implementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+    implementation "org.typelevel:cats-effect_$scalaVersionMajor:$catsEffectVersion"
+
+    implementation "org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion"
+    implementation "org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion"
+    implementation "org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion"
+
+    runtimeOnly    "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+  }
+}
+
+tasks.withType(ScalaCompile) {
+  scalaCompileOptions.with {
+    targetCompatibility = '1.8'
+    additionalParameters = ['-feature']
+  }
+}
+
+// mdoc
+final String inputDirectory = "$projectDir/src/docs"
+
+if (file(inputDirectory).exists()) {
+  final String outputDirectory = "$buildDir/docs/mdoc"
+  final String publishDirectory = "$rootDir/docs/$projectBaseName/" + (isPaper ? 'paper-docs' : 'docs')
+
+  task mdoc
+  mdoc.description = 'Process and publish mdoc documentation'
+  mdoc.group = 'publishing'
+  mdoc.dependsOn classes
+  site.dependsOn mdoc
+
+  mdoc.doLast {
+    // clean
+    project.delete(outputDirectory)
+
+    // process
+    final String[] args = [
+      '--in' , inputDirectory ,
+      '--out', outputDirectory,
+      '--classpath', sourceSets.main.runtimeClasspath.asPath
+    ]
+    mdocRunner.main(args)
+
+    // publish
+    project.sync {
+      from outputDirectory
+      into publishDirectory
+    }
+  }
+}
+
+// paper
+if (isPaper) {
+  final String dataGeneratorClassName = project.hasProperty('dataGeneratorClassName') ? project.dataGeneratorClassName : ''
+  final boolean isMathJaxEnabled = project.hasProperty('isMathJaxEnabled') ? project.isMathJaxEnabled : false
+
+  final String projectVersion = project.version
+  final String documentName = projectBaseName
+
+  docBook {
+    document = documentName
+
+    dataGeneratorClass = dataGeneratorClassName
+
+//    outputFormats = ["html", "pdf", "epub2"]
+    outputFormats = ["html"]
+
+    substitutions = [
+      "project.version": projectVersion
+    ]
+
+    parameters.common = [
+      "part.autolabel"       : "0",       // was only in calendar paper
+      "chapter.autolabel"    : "0",       // was only in calendar paper
+      "section.autolabel.max.depth": "6"  // was only in the non-calendar papers
+//      "punct.honorific": "" // Remove trailing period after honorific
+    ]
+
+    parameters.htmlCommon = [
+      // Include page number in cross-references
+      "insert.xref.page.number": "yes"  // was only in the non-calendar papers
+    ]
+
+    parameters.pdf = [
+      "title.font.family"    : "DejaVu Sans",
+      "body.font.family"     : "DejaVu Sans",
+      "sans.font.family"     : "DejaVu Sans",
+      "monospace.font.family": "DejaVu Sans Mono",
+      "symbol.font.family"   : "DejaVu Sans",
+      "body.font.master"     : "12",
+      "footnote.font.size"   : "10",  // was only in the non-calendar papers
+
+      // Suppress content indent
+      "body.start.indent"    : "0pt",  // was only in the non-calendar papers
+
+      // Some space for the list labels
+      "orderedlist.label.width": "2em"  // was only in the non-calendar papers
+    ]
+
+    mathJax {
+      isEnabled = isMathJaxEnabled
+    }
+  }
+
+  site.dependsOn processDocBook
+  site.doLast {
+    project.sync {
+      from processDocBook.outputDirectory
+      into "$rootDir/docs/$documentName/paper"
+    }
+  }
+}
+
+// library
+if (!isService && !isPaper) {
+  final String gitHubRepository = "opentorah/opentorah"
+  final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+  final String orgName = 'Open Torah Project'
+  final String orgUrl = 'http://www.opentorah.org'
+
+  jar {
+    // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
+    //   Since this library is included as a jar in our jib projects, we want the jar to built reproducibly.
+    preserveFileTimestamps false
+    reproducibleFileOrder true
+
+    // Because why not?
+    manifest {
+      attributes(
+        'Implementation-Title'  : project.description,
+        'Implementation-Version': project.version
+      )
+    }
+  }
+
+  task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+  }
+
+  task scaladocJar(type: Jar) {
+    from scaladoc.destinationDir
+    archiveClassifier.set('scaladoc')
+  }
+  scaladocJar.dependsOn(scaladoc)
+
+  // there is no Java in the project, but Maven Central requires javadoc JAR...
+  task javadocJar(type: Jar) {
+    from javadoc.destinationDir
+    archiveClassifier.set('javadoc')
+  }
+  javadocJar.dependsOn(javadoc)
+
+  publishing {
+    repositories {
+      maven {
+        name = 'mavenCentral'
+        url = version.endsWith('SNAPSHOT') ?
+                'https://oss.sonatype.org/content/repositories/snapshots' :
+                'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+
+        // Note: this will use mavenCentralUsername and mavenCentralPassword properties - if they are available
+        credentials(PasswordCredentials)
+      }
+
+      publications {
+        library(MavenPublication) {
+          from components.java
+          artifact sourcesJar
+          artifact scaladocJar
+          artifact javadocJar
+
+          pom {
+            name = project.name
+            description = project.description
+            url = "$gitHubRepositoryUrl/tree/master/$project.name"
+            scm {
+              url = "$gitHubRepositoryUrl"
+              connection = "scm:git:git://github.com/${gitHubRepository}.git"
+              developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+            }
+            licenses {
+              license {
+                name = 'The Apache Software License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'repo'
+                comments = 'A business-friendly OSS license'
+              }
+            }
+            organization {
+              name = orgName
+              url = orgUrl
+            }
+            developers {
+              developer {
+                id = 'dub'
+                name = 'Leonid Dubinsky'
+                email = 'dub@opentorah.org'
+                organization = orgName
+                organizationUrl = orgUrl
+                timezone = '-5'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  signing {
+    useInMemoryPgpKeys(findProperty('gnupg.dub-opentorah-org.key'), findProperty('gnupg.dub-opentorah-org.password'))
+    sign publishing.publications.library
+  }
+
+  task uploadLibrary
+  uploadLibrary.description('Upload artifacts')
+  uploadLibrary.group('publishing')
+  uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
+
+  upload.dependsOn(uploadLibrary)
+}

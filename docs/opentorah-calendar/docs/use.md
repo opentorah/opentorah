@@ -9,9 +9,9 @@ Create some angles:
 
 ```scala
 val fullCircle = Rotation(360)
-// fullCircle: Angles#Vector = 360°
+// fullCircle: Angles.Vector = 360°
 val zero = Position(360)
-// zero: Angles#Point = 0°
+// zero: Angles.Point = 0°
 ```
 
 Look at them - inside and out:

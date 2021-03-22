@@ -8,7 +8,7 @@ plugins {
 
 description = 'Open Torah Store'
 
-configureLibrary()
+apply from: '../configure.gradle'
 
 dependencies {
   api project(':metadata')

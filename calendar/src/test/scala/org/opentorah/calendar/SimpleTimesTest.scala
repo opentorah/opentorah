@@ -1,11 +1,11 @@
-package org.opentorah.times
+package org.opentorah.calendar
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import SimpleTimes.{Point, Vector}
 import Times.Digit
 import org.opentorah.numbers.BigRational
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 

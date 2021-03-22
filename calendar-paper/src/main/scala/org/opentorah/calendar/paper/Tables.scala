@@ -1,27 +1,43 @@
 package org.opentorah.calendar.paper
 
 import java.io.File
+import org.opentorah.angles.Angles.Rotation
 import org.opentorah.astronomy.{SunLongitudeMean, Time2Rotation}
-import Time2Rotation.Key
 
 object Tables {
+
+  def printed(time2Rotation: Time2Rotation)(rows: Time2Rotation.Days*): Table = Table(rows: _*)(
+    Table.Column("days" , days => days),
+    Table.Column("printed", days => time2Rotation.value(days))
+  )
+
+  def reconstructed(time2Rotation: Time2Rotation)(rows: Time2Rotation.Days*): Table = {
+    val from: Int = rows.head
+    def reconstructed(days: Int): Rotation = (time2Rotation.value(from)*(days/from)).canonical
+    def difference   (days: Int): Rotation = time2Rotation.value(days) - reconstructed(days)
+    def blank(days: Int, value: Rotation): String = if (days == from) "" else value.toString
+
+    Table(rows: _*)(
+      Table.Column("days"         , days => days),
+      Table.Column("printed"      , days => time2Rotation.value(days)),
+      Table.Column("reconstructed", days => blank(days, reconstructed(days))),
+      Table.Column("difference"   , days => blank(days, difference   (days)))
+    )
+  }
 
   def main(args: Array[String]): Unit = {
     val directory = new File(if (!args.isEmpty) args(0) else "/tmp/xxx/tables/")
     directory.mkdirs
 
-    velocityOriginal(SunLongitudeMean).write(directory, "slm-original",
-      Seq(Key.One, Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand))
+    Tables.printed(SunLongitudeMean)(1, 10, 100, 1000, 10000, 29, 354).writeDocbook(directory, "slm-printed")
+    Tables.reconstructed(SunLongitudeMean)(1, 10, 29, 100, 354, 1000, 10000).writeDocbook(directory, "slm-reconstructed-1")
+    Tables.reconstructed(SunLongitudeMean)(10, 100, 1000, 10000).writeDocbook(directory, "slm-reconstructed-10")
+    Tables.reconstructed(SunLongitudeMean)(100, 1000, 10000).writeDocbook(directory, "slm-reconstructed-100")
+    Tables.reconstructed(SunLongitudeMean)(1000, 10000).writeDocbook(directory, "slm-reconstructed-1000")
+
+//      Seq(Key.One, Key.Ten, Key.Hundred, Key.Thousand, Key.TenThousand))
   }
 
-  private def velocityOriginal(data: Time2Rotation): Table[Key] = {
-    val days = Column[Key]("days", "n", _.number)
-    val value = Column[Key]("value", "v(n)", data.value)
-    val calculated = Column[Key]("calculated", "v(1)*n",
-      (key: Key) => (data.one*key.number).canonical)
-
-    new Table(days, value, calculated)
-  }
 
 //  private def mvaTables(data: Map[Angle, Angle]) = {
 //      def e(a: Angle, v: Angle) = {
