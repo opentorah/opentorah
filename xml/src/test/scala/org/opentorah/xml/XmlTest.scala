@@ -3,7 +3,6 @@ package org.opentorah.xml
 import org.opentorah.util.Effects
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.xml.sax.InputSource
 import java.net.URL
 
 final class XmlTest extends AnyFlatSpec with Matchers {
@@ -11,12 +10,8 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   def parseOrError[A](parser: Parser[A]): Either[Effects.Error, A] =
     Parser.run(parser.either)
 
-  def loadResource(name: String): Xml.Element =
-    Effects.unsafeRun(From.resource(Parser, name).loadTask)
-
-  def parseResource(name: String): org.w3c.dom.Element =
-    Saxon.Saxon10.parse(new InputSource(Parser.getClass.getResourceAsStream(name + ".xml")))
-      .asInstanceOf[org.w3c.dom.Document].getDocumentElement
+  def loadResource(model: Model, name: String): model.Element =
+    model.loadFromUrl(Parser.getClass.getResource(name + ".xml"))
 
   def firstElement(element: Xml.Element): Xml.Element =
     Xml.getChildren(element).filter(Xml.isElement).map(Xml.asElement).head
@@ -49,7 +44,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   "From.resource()" should "work" in {
-    loadResource("1")
+    loadResource(Xml, "1")
   }
 
   private final class X(
@@ -113,7 +108,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   "Attribute.get()" should "work" in {
     Attribute("id").optional.get(<x id="2"/>) shouldBe Some("2")
     Attribute("id", Xml.namespace).optional.get(<x xml:id="3"/>) shouldBe Some("3")
-    Dom.getAttributes(parseResource("namespace")) shouldBe Seq.empty
+    Dom.getAttributes(loadResource(Dom, "namespace")) shouldBe Seq.empty
   }
 
   private val teiNamespace: Namespace = Namespace(prefix = "tei", uri = "http://www.tei-c.org/ns/1.0")
@@ -126,9 +121,11 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     Namespace.get(teiNamespace.default.declare(<TEI/>)) shouldBe teiNamespace.default
     Namespace.get(<TEI xmlns={teiNamespace.uri}/>) shouldBe teiNamespace.default
 
-    Namespace.get(loadResource("namespace")) shouldBe teiNamespace.default
-    Namespace.get(firstElement(loadResource("namespace"))) shouldBe teiNamespace.default
+    Namespace.get(<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/></TEI>) shouldBe teiNamespace.default
 
-    Namespace.get(parseResource("namespace")) shouldBe teiNamespace.default
+    Namespace.get(loadResource(Xml, "namespace")) shouldBe teiNamespace.default
+    Namespace.get(firstElement(loadResource(Xml, "namespace"))) shouldBe teiNamespace.default
+
+    Namespace.get(loadResource(Dom, "namespace")) shouldBe teiNamespace.default
   }
 }

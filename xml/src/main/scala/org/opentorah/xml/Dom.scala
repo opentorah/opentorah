@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-import org.w3c.dom.{Attr, NamedNodeMap, NodeList}
+import org.xml.sax.{InputSource, XMLFilter}
 
 // Note: declareNamespace() and setAttribute[s]() modify in-place.
 object Dom extends Model {
@@ -8,6 +8,24 @@ object Dom extends Model {
   override type Node = org.w3c.dom.Node
   override type Element = org.w3c.dom.Element
   override type Text = org.w3c.dom.CharacterData
+
+  override protected def loadFromSource(
+    inputSource: InputSource,
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ): Element = {
+    val result: javax.xml.transform.dom.DOMResult = new javax.xml.transform.dom.DOMResult
+
+    Saxon.Saxon10.transform(
+      filters = filters,
+      resolver = resolver,
+      stylesheetFile = None,
+      inputSource = inputSource,
+      result
+    )
+
+    result.getNode.asInstanceOf[org.w3c.dom.Document].getDocumentElement
+  }
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text =    node.asInstanceOf[Text]
@@ -26,10 +44,10 @@ object Dom extends Model {
   )
 
   override def getNamespaces(element: Element): Seq[Namespace] = {
-    val list: NamedNodeMap = element.getAttributes
+    val list: org.w3c.dom.NamedNodeMap = element.getAttributes
     for {
       index <- 0 until list.getLength
-      attribute = list.item(index).asInstanceOf[Attr]
+      attribute = list.item(index).asInstanceOf[org.w3c.dom.Attr]
       if attribute.getNamespaceURI == Namespace.Xmlns.uri
       localName = attribute.getLocalName
       prefix = attribute.getPrefix
@@ -65,10 +83,10 @@ object Dom extends Model {
   }
 
   override def getAttributes(element: Element): Seq[Attribute.Value[String]] = {
-    val list: NamedNodeMap = element.getAttributes
+    val list: org.w3c.dom.NamedNodeMap = element.getAttributes
     for {
       index <- 0 until list.getLength
-      attribute = list.item(index).asInstanceOf[Attr]
+      attribute = list.item(index).asInstanceOf[org.w3c.dom.Attr]
       uri = attribute.getNamespaceURI
       if uri != Namespace.Xmlns.uri
       localName = attribute.getLocalName
@@ -95,7 +113,7 @@ object Dom extends Model {
   override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ??? // TODO implement
 
   override def getChildren(element: Element): Nodes = {
-    val list: NodeList = element.getChildNodes
+    val list: org.w3c.dom.NodeList = element.getChildNodes
     for (index <- 0 until list.getLength) yield list.item(index)
   }
 }

@@ -1,11 +1,16 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Strings
-import org.xml.sax.Attributes
+import org.opentorah.util.{Files, Strings}
+import org.xml.sax.{Attributes, InputSource}
 import org.xml.sax.helpers.AttributesImpl
+import java.io.File
+import java.net.URL
 
 // Note: declareNamespace() and setAttribute() modify in-place.
 object Sax extends PreModel {
+
+  def file2inputSource(file: File): InputSource = url2inputSource(Files.file2url(file))
+  def url2inputSource(url: URL): InputSource = new InputSource(url.toString)
 
   override type PreElement = Attributes
   override type Element = AttributesImpl

@@ -1,5 +1,9 @@
 package org.opentorah.xml
 
+import org.xml.sax.{InputSource, XMLFilter}
+import java.io.StringReader
+import java.net.URL
+
 // This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
 trait Model extends PreModel {
   type Node
@@ -7,6 +11,14 @@ trait Model extends PreModel {
   override type Element <: Node
   final override type PreElement = Element
   type Text <: Node
+
+  final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
+    loadFromSource(new InputSource(new StringReader(string)), filters, resolver)
+
+  final def loadFromUrl(url: URL, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
+    loadFromSource(Sax.url2inputSource(url), filters, resolver)
+
+  protected def loadFromSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
 
   def isText(node: Node): Boolean
   def asText(node: Node): Text

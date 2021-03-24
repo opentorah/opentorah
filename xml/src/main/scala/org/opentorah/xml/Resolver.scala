@@ -2,14 +2,11 @@ package org.opentorah.xml
 
 import java.io.File
 import javax.xml.transform.{Source, URIResolver}
-import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{EntityResolver, InputSource}
 
 final class Resolver(catalogFile: File) extends URIResolver with EntityResolver {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[Resolver])
-
-  logger.info(s"Resolver(catalogFile = $catalogFile)")
+  xmlLogger.info(s"Resolver(catalogFile = $catalogFile)")
 
   private val parentResolver: org.xmlresolver.Resolver = {
     val properties: java.util.Properties = new java.util.Properties
@@ -39,9 +36,9 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
     val result = Option(call(parentResolver))
 
     result.fold {
-      logger.error(s"$parameters\n  unresolved")
+      xmlLogger.error(s"$parameters\n  unresolved")
     } { result =>
-      logger.debug(s"$parameters\n  resolved to: ${id(result)}")
+      xmlLogger.debug(s"$parameters\n  resolved to: ${id(result)}")
     }
 
     result.getOrElse(null.asInstanceOf[R])
