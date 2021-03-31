@@ -317,7 +317,7 @@ object Site extends Element[Site]("site") with App {
 
   override def run(args: List[String]): URIO[ZEnv, ExitCode] = {
     val withPrettyPrint: Boolean = args.length > 1 && (args(1) == "prettyPrint")
-    Site.read(new File(args.head).toURI.toURL) >>= (_.build(withPrettyPrint))
+    Site.read(Files.file2url(new File(args.head))) >>= (_.build(withPrettyPrint))
   }.exitCode
 
   private val siteUrlAttribute: Attribute.Required[String] = Attribute("siteUrl").required

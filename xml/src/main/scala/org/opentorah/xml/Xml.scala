@@ -1,8 +1,8 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Strings
+import org.xml.sax.{InputSource, XMLFilter, XMLReader}
 import zio.{URIO, ZIO}
-import scala.xml.{MetaData, NamespaceBinding, Null, SpecialNode, TopScope}
 
 object Xml extends Model {
 
@@ -35,9 +35,35 @@ object Xml extends Model {
   override def toString(node: Node): String = Strings.squashWhitespace(node match {
     case elem: Element => (elem.child map (_.text)).mkString(" ")
     case text: Text => text.data.toString
-    case special: SpecialNode => Strings.sbToString(special.buildString)
+    case special: scala.xml.SpecialNode => Strings.sbToString(special.buildString)
     case node: Node => node.text
   })
+
+  override protected def loadFromSource(
+    inputSource: InputSource,
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ): Element = {
+
+    val adapter: scala.xml.parsing.FactoryAdapter = new scala.xml.parsing.NoBindingFactoryAdapter()
+
+    adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
+
+    // Note: scala.xml.parsing.FactoryAdapter looks for namespace declarations
+    // in the attributes passed into .startElement(), and does not override
+    // startPrefixMapping(), so it does not work with a namespace-aware parser...
+    val xmlReader: XMLReader = Xerces.getXMLReader(filters, resolver, xincludeAware = false)
+
+    xmlReader.setContentHandler(adapter)
+
+    xmlReader.setDTDHandler(adapter)
+
+    xmlReader.parse(inputSource)
+
+    adapter.scopeStack = adapter.scopeStack.tail
+
+    adapter.rootElem.asInstanceOf[Element]
+  }
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
@@ -60,8 +86,8 @@ object Xml extends Model {
   // Note: maybe support re-definitions of the namespace bindings - like in  scala.xml.NamespaceBinding.shadowRedefined()?
   override def getNamespaces(element: Element): Seq[Namespace] = {
     @scala.annotation.tailrec
-    def get(result: Seq[Namespace], namespaceBinding: NamespaceBinding): Seq[Namespace] =
-      if (namespaceBinding == TopScope) result else {
+    def get(result: Seq[Namespace], namespaceBinding: scala.xml.NamespaceBinding): Seq[Namespace] =
+      if (namespaceBinding == scala.xml.TopScope) result else {
         val namespace: Namespace = Namespace(
           prefix = namespaceBinding.prefix,
           uri = namespaceBinding.uri
@@ -76,7 +102,7 @@ object Xml extends Model {
   override def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean = ???
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
-    element.copy(scope = NamespaceBinding(namespace.getPrefix.orNull, namespace.getUri.get, element.scope))
+    element.copy(scope = scala.xml.NamespaceBinding(namespace.getPrefix.orNull, namespace.getUri.get, element.scope))
 
   override protected def getAttributeValueString(attribute: Attribute[_], element: Element): Option[String] = {
     val name: String = attribute.name
@@ -104,11 +130,11 @@ object Xml extends Model {
     addAttributes(Seq(attribute.required.withValue(value)), element)
 
   override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element =
-    element.copy(attributes = attributes.foldRight[MetaData](Null)(
+    element.copy(attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null)(
       (attributeValue, next) => toMetaData(attributeValue, next))
     )
 
-  private def toMetaData[T](attributeValue: Attribute.Value[T], next: MetaData): MetaData = {
+  private def toMetaData[T](attributeValue: Attribute.Value[T], next: scala.xml.MetaData): scala.xml.MetaData = {
     val attribute: Attribute[T] = attributeValue.attribute
     val value: Option[T] = attributeValue.effectiveValue
     scala.xml.Attribute(

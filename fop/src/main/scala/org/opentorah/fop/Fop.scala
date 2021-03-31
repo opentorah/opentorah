@@ -4,7 +4,7 @@ import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
 import org.opentorah.mathjax.Svg
 import org.opentorah.util.Util
-import org.opentorah.xml.{Saxon, Xml}
+import org.opentorah.xml.{Sax, Saxon, Xerces, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 
 object Fop {
@@ -107,8 +107,11 @@ object Fop {
 
     try {
       saxon.transform(
-        inputFile = inputFile,
-        defaultHandler = fop.getDefaultHandler
+        filters = Seq.empty,
+        resolver = None,
+        stylesheetFile = None,
+        inputSource = Sax.file2inputSource(inputFile),
+        result = new javax.xml.transform.sax.SAXResult(fop.getDefaultHandler)
       )
     } finally {
       outputStream.close()

@@ -1,12 +1,12 @@
 package org.opentorah.docbook.plugin
 
-import java.io.File
+import java.io.{File, FileWriter}
 import org.gradle.api.Project
 import org.opentorah.docbook.section.DocBook2
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin}
 import org.opentorah.mathjax.MathJax
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.xml.{Resolver, Saxon, Xerces}
+import org.opentorah.xml.{Resolver, Sax, Saxon, Xerces}
 import org.slf4j.{Logger, LoggerFactory}
 
 final class ProcessDocBook(
@@ -36,9 +36,6 @@ final class ProcessDocBook(
 
     saxonOutputDirectory.mkdirs
 
-    val mathFilter: Option[MathFilter] =
-      if (mathJax.isDefined && isPdf) Some(new MathFilter(mathJax.get.configuration)) else None
-
     // Run Saxon.
     // Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
     // ("Don't know how to chunk with Saxonica").
@@ -51,20 +48,28 @@ final class ProcessDocBook(
     // I am not sure what I can do to set up DocBook XSLT 1 processing with Saxon 10
     // (it didn't work out of the box for me), but I'd love to get rid of the Saxon 6, since it:
     // - produces unmodifiable DOM (see Saxon) - unlike Saxon 10,
-    // - carries within it obsolete org.w3c.dom classes (Leve 2), which cause IDE to highlight
+    // - carries within it obsolete org.w3c.dom classes (Level 2), which cause IDE to highlight
     //   as errors uses of the (Level 3) method org.w3c.dom.Node.getTextContent()...
     val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
+
+    // do not output the 'main' file when chunking in XSLT 1.0
+    val result: javax.xml.transform.stream.StreamResult = new javax.xml.transform.stream.StreamResult
+    if (docBook2.usesRootFile) {
+      result.setSystemId(saxonOutputFile)
+      result.setWriter(new FileWriter(saxonOutputFile))
+    } else {
+      result.setSystemId("dev-null")
+      result.setOutputStream((_: Int) => {})
+    }
+
     saxon.transform(
-      resolver,
-      inputFile,
-      stylesheetFile,
-      xmlReader = Xerces.getFilteredXMLReader(
-        Seq(new EvalFilter(substitutions)) ++
-        mathFilter.toSeq
-        // ++ Seq(new TracingFilter)
-      ),
-      // do not output the 'main' file when chunking in XSLT 1.0
-      outputFile = if (docBook2.usesRootFile) Some(saxonOutputFile) else None
+      filters = Seq(new EvalFilter(substitutions)) ++
+      (if (mathJax.isDefined && isPdf) Seq(new MathFilter(mathJax.get.configuration)) else Seq.empty),
+      // ++ Seq(new TracingFilter),
+      resolver = Some(resolver),
+      stylesheetFile = Some(stylesheetFile),
+      inputSource = Sax.file2inputSource(inputFile),
+      result = result
     )
 
     copyImagesAndCss(docBook2, saxonOutputDirectory)

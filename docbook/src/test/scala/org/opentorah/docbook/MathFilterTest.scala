@@ -1,13 +1,10 @@
 package org.opentorah.docbook
 
-import java.io.StringReader
 import org.opentorah.docbook.plugin.MathFilter
 import org.opentorah.mathjax.{Configuration, MathJax, MathML}
-import org.opentorah.xml.{Saxon, XInclude, Xml}
+import org.opentorah.xml.{Dom, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import org.w3c.dom.{Document, Node}
-import org.xml.sax.InputSource
 
 class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
@@ -109,14 +106,12 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
   }
 
   private def parse(string: String): String = {
-    val node: Node = Saxon.Saxon10.parse(
-      inputSource = new InputSource(new StringReader(string)),
-      filters = Seq(
+    val element: Dom.Element = Dom.loadFromString(string, filters = Seq(
         new MathFilter(Configuration())
 //        , new org.opentorah.xml.TracingFilter
       )
     )
-    val result = DocBook.prettyPrinter.renderXml(node.asInstanceOf[Document].getDocumentElement)
+    val result: String = DocBook.prettyPrinter.renderXml(element)
 //    println(result)
     result
   }

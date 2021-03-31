@@ -11,7 +11,7 @@ description = 'Open Torah TEI Support'
 apply from: '../configure.gradle'
 
 dependencies {
-  api project(':opentorah-metadata')
+  api project(':opentorah-xml')
 
   implementation project(':opentorah-util')
 }

@@ -409,6 +409,7 @@
     <biblioentry>
       <title>Zmanim</title>
       <biblioid class="uri">http://www.myzmanim.com/search.aspx</biblioid>
+<!-- TODO also     https://kosherjava.com/zmanim-project/how-to-use-the-zmanim-api/-->
     </biblioentry>
     <biblioentry>
       <title>MikvahCalendar</title>
