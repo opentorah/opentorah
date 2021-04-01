@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-sealed abstract class Viewer(val name: String)
+import org.opentorah.site.Viewer
 
 object Viewer {
   case object Collection extends Viewer("collectionViewer")

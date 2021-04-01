@@ -97,7 +97,7 @@ if (file(inputDirectory).exists()) {
 }
 
 // paper
-if (isPaper) {
+if (isPaper || (project.hasProperty('isPaper') ? project.isPaper : false)) {
   final String dataGeneratorClassName = project.hasProperty('dataGeneratorClassName') ? project.dataGeneratorClassName : ''
   final boolean isMathJaxEnabled = project.hasProperty('isMathJaxEnabled') ? project.isMathJaxEnabled : false
 

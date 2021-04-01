@@ -2,6 +2,7 @@ package org.opentorah.docbook.plugin
 
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.{DefaultTask, Plugin, Project}
+import org.opentorah.docbook.Layout
 import org.opentorah.fop.FopFonts
 import org.opentorah.util.Gradle
 
@@ -24,6 +25,7 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.outputFormats.set(extension.outputFormats)
     processDocBookTask.dataGeneratorClass.set(extension.dataGeneratorClass)
     processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
+    processDocBookTask.siteFile.set(extension.siteFile)
     processDocBookTask.isMathJaxEnabled.set(extension.mathJax.isEnabled)
     processDocBookTask.nodeVersion.set(extension.mathJax.nodeVersion)
     processDocBookTask.useJ2V8.set(extension.mathJax.useJ2V8)
@@ -57,7 +59,7 @@ object DocBookPlugin {
     setDescription("List FOP fonts")
 
     @TaskAction def execute(): Unit = {
-      val result = FopFonts.list(configurationFile = Layout.forProject(getProject).fopConfigurationFile)
+      val result = FopFonts.list(configurationFile = layoutForProject(getProject).fopConfigurationFile)
       System.out.print(result)
       System.out.flush()
     }
@@ -67,6 +69,12 @@ object DocBookPlugin {
     setDescription("Delete FOP fonts cache")
 
     @TaskAction def execute(): Unit =
-      FopFonts.deleteCache(Layout.forProject(getProject).fopConfigurationFile)
+      FopFonts.deleteCache(layoutForProject(getProject).fopConfigurationFile)
   }
+
+  def layoutForProject(project: Project): Layout = new Layout(
+    frameworksDir = project.getGradle.getGradleUserHomeDir,
+    projectDir = project.getProjectDir,
+    buildDir = project.getBuildDir
+  )
 }

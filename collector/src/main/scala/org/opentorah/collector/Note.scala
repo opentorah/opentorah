@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
+import org.opentorah.site.Caching
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 

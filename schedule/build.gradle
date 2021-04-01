@@ -14,5 +14,5 @@ dependencies {
   api project(':opentorah-calendar')
   api project(':opentorah-texts')
 
-  implementation project(':opentorah-util')
+  implementation project(':opentorah-base')
 }

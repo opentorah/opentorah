@@ -11,6 +11,7 @@ plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
+  id 'io.miret.etienne.sass'
 }
 
 ext.mdocRunner = mdoc.Main
@@ -43,3 +44,11 @@ subprojects {
   deploy.description = 'Publish containers and re-deploy services'
   deploy.group = 'publishing'
 }
+
+compileSass {
+  group = 'publishing'
+
+  sourceDir = project.file ("$rootDir/docs/sass")
+  outputDir = project.file ("$rootDir/docs/css")
+}
+

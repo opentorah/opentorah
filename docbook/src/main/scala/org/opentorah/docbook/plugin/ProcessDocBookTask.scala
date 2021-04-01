@@ -1,29 +1,26 @@
 package org.opentorah.docbook.plugin
 
 import java.io.File
-import java.net.URI
 import org.gradle.api.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
-import org.gradle.api.tasks.{Input, Internal, SourceSet, TaskAction}
-import org.opentorah.docbook.DocBook
-import org.opentorah.docbook.section.{CommonSection, DocBook2, NonOverridableParameters, Section, Sections, Variant}
-import org.opentorah.fop.{Fop, FopFonts}
-import org.opentorah.mathjax
-import org.opentorah.mathjax.MathJax
+import org.gradle.api.tasks.{Input, Internal, TaskAction}
+import org.opentorah.docbook.{Layout, ProcessDocBookDirect, Operations, Stylesheets}
+import org.opentorah.docbook.section.{DocBook2, Section, Sections, Variant}
+import org.opentorah.fop.{FopFonts, MathJax}
+import org.opentorah.mathjax.MathJaxConfiguration
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
-import org.opentorah.xml.{Catalog, Doctype, PrettyPrinter, Resolver, XInclude, Xml}
+import org.opentorah.xml.Resolver
 import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
-import scala.xml.Comment
 
 // Note: Task class can not be final for Gradle to be able to decorate it.
 class ProcessDocBookTask extends DefaultTask {
   setDescription(s"Process DocBook")
   setGroup("publishing")
 
-  private val layout: Layout = Layout.forProject(getProject)
+  private val layout: Layout = DocBookPlugin.layoutForProject(getProject)
   private val logger: Logger = getProject.getLogger
   private def info(message: String): Unit = logger.info(message, null, null, null)
 
@@ -36,7 +33,7 @@ class ProcessDocBookTask extends DefaultTask {
     layout.fopConfigurationDirectory,
     layout.stylesheetDirectory
   ) ++ Set(
-    layout.imagesDirectory,
+    layout.imagesDirectory
   ).filter(_.exists)
 
   // Register inputs
@@ -108,6 +105,9 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
+  @Input @BeanProperty val siteFile: Property[File] =
+    getProject.getObjects.property(classOf[File])
+
   @Input @BeanProperty val xslt1version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
@@ -131,6 +131,9 @@ class ProcessDocBookTask extends DefaultTask {
 
   @TaskAction
   def processDocBook(): Unit = {
+    def getDocumentName(string: String): Option[String] =
+      if (string.isEmpty) None else Some(Files.dropAllowedExtension(string, "xml"))
+
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
@@ -145,11 +148,10 @@ class ProcessDocBookTask extends DefaultTask {
       documentName.toList.map(name => name -> false) ++
       documentNames.map(name => name -> true)
 
-    val processors: List[DocBook2] =
-      Option(getProject.findProperty("docBook.outputFormats"))
-        .map(_.toString.split(",").map(_.trim).toList.filter(_.nonEmpty))
-        .getOrElse(outputFormats.get.asScala.toList)
-        .map(DocBook2.forName)
+    val processors: List[DocBook2] = Option(getProject.findProperty("docBook.outputFormats"))
+      .map(_.toString.split(",").map(_.trim).toList.filter(_.nonEmpty))
+      .getOrElse(outputFormats.get.asScala.toList)
+      .map(DocBook2.forName)
 
     info(s"Output formats: ${DocBook2.getNames(processors)}")
 
@@ -161,157 +163,79 @@ class ProcessDocBookTask extends DefaultTask {
     if (unusedSections.nonEmpty)
       info(s"Unused parameter sections: ${unusedSections.map(_.name).mkString(", ")}")
 
+    // Generate data
+    val mainClass: String = dataGeneratorClass.get
+    if (mainClass.isEmpty) info("Skipping DocBook data generation: 'dataGenerationClass' is not set")
+    else GradleOperations.generateData(getProject, mainClass, layout.dataDirectory)
+
+    // Unpack DocBook stylesheets
+    val xslt1: File = GradleOperations.unpackStylesheets(getProject, Stylesheets.xslt1, xslt1version.get, layout.docBookXslDirectory)
+    val xslt2: File = GradleOperations.unpackStylesheets(getProject, Stylesheets.xslt2, xslt2version.get, layout.docBookXslDirectory)
+
+    // MathJax
     require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
 
-    val mathJaxConfiguration: mathjax.Configuration = getMathJaxConfiguration
-
-    val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
-
-    // FOP configuration
-    ProcessDocBookTask.write(
-      file = layout.fopConfigurationFile,
-      replace = false,
-      elem = Fop.defaultConfigurationFile
+    val mathJaxConfiguration: MathJaxConfiguration = MathJaxConfiguration(
+      font = mathJaxFont.get,
+      extensions = mathJaxExtensions.get.asScala.toList,
+      texDelimiters = MathJaxConfiguration.delimiters(texDelimiter.get),
+      texInlineDelimiters = MathJaxConfiguration.delimiters(texInlineDelimiter.get),
+      asciiMathDelimiters = MathJaxConfiguration.delimiters(asciiMathDelimiter.get),
+      processEscapes = processMathJaxEscapes.get
     )
-
-    // Substitutions DTD
-    Files.write(
-      file = layout.xmlFile(layout.substitutionsDtdFileName),
-      replace = true,
-      content = ProcessDocBookTask.substitutionsDtd(substitutionsMap)
-    )
-
-    // XML catalog
-    ProcessDocBookTask.write(
-      file = layout.catalogFile,
-      replace = true,
-      doctype = Some(Catalog),
-      elem = ProcessDocBookTask.xmlCatalog(
-        xslt1 = Stylesheets.xslt1.unpack(xslt1version.get, getProject, layout.docBookXslDirectory),
-        xslt2 = Stylesheets.xslt2.unpack(xslt2version.get, getProject, layout.docBookXslDirectory),
-        catalogGroupBase = layout.catalogGroupBase,
-        substitutionsDtdFileName = layout.substitutionsDtdFileName,
-        catalogCustomFileName = layout.catalogCustomFileName,
-        data = layout.dataDirectoryRelative
-      )
-    )
-
-    // Custom XML catalog
-    ProcessDocBookTask.write(
-      file = layout.xmlFile(layout.catalogCustomFileName),
-      replace = false,
-      doctype = Some(Catalog),
-      elem = ProcessDocBookTask.catalogCustomization
-    )
-
-    val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
-
-    // CSS file
-    Files.write(
-      file = layout.cssFile(cssFileName),
-      replace = false,
-      content = ProcessDocBookTask.defaultCssFile
-    )
-
-    // Input documents
-    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) ProcessDocBookTask.write(
-      file = layout.inputFile(name),
-      replace = false,
-      doctype = Some(DocBook),
-      elem = ProcessDocBookTask.defaultInputFile
-    )
-
-    val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
-    val epubEmbeddedFontsUris: List[URI] = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
-    val epubEmbeddedFontsString: String = epubEmbeddedFontsUris.map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
-    info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
 
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
 
-    // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) ProcessDocBookTask.write(
-      file = layout.stylesheetFile(layout.customStylesheet(section)),
-      replace = false,
-      elem = section.customStylesheet
-    )
-    for (variant: Variant <- sections.allVariants) ProcessDocBookTask.write(
-      file = layout.stylesheetFile(layout.customStylesheet(variant)),
-      replace = false,
-      elem = variant.docBook2.customStylesheet
-    )
-
-    // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) ProcessDocBookTask.write(
-      file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
-      replace = true,
-      elem = variant.docBook2.paramsStylesheet(sections.parameters(variant))
-    )
-
-    // Main stylesheet
-    for {
-      variant: Variant <- sections.allVariants
-      (documentName: String, prefixed: Boolean) <- inputDocuments
-    } {
-      val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
-
-      // xsl:param has the last value assigned to it, so customization must come last;
-      // since it is imported (so as not to be overwritten), and import elements must come first,
-      // a separate "-param" file is written with the "default" values for the parameters :)
-      ProcessDocBookTask.write(
-        file = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
-        replace = true,
-        elem = variant.docBook2.mainStylesheet(
-          paramsStylesheetName = layout.paramsStylesheet(variant),
-          stylesheetUriBase = (if (variant.docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1).uri,
-          customStylesheets =
-            variant.docBook2.commonSections.map(layout.customStylesheet) ++
-            (variant.baseVariant.toSeq :+ variant).map(layout.customStylesheet),
-          values = new NonOverridableParameters(
-            isInfoEnabled = logger.isInfoEnabled,
-            embeddedFonts = epubEmbeddedFontsString,
-            cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
-            imagesDirectoryName = layout.imagesDirectoryName,
-            mathJaxConfiguration = if(!enableMathJax) None else Some(mathJaxConfiguration),
-            documentName = documentName,
-            saxonOutputDirectory = forDocument.saxonOutputDirectory(variant)
-          )
-        )
-      )
-    }
-
-    // Data generation
-    val mainClass: String = dataGeneratorClass.get
-    if (mainClass.isEmpty) info("Skipping DocBook data generation: dataGenerationClass is not set")
-    else generateData(mainClass)
-
-    // MathJax
-    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None
-    else Some(MathJax.get(
+    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None else Some(GradleOperations.getMathJax(
       getProject,
       nodeRoot = layout.nodeRoot,
       nodeVersion = nodeVersion.get,
       overwriteNode = false,
       overwriteMathJax = false,
       j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
-      configuration = mathJaxConfiguration))
+      configuration = mathJaxConfiguration)
+    )
 
+    val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
+
+    // FOP configuration
+    Operations.writeFopConfigurationFile(layout)
+
+    // Catalog
+    val resolver: Resolver = Operations.writeCatalog(
+      layout,
+      Some(xslt1),
+      Some(xslt2),
+      substitutionsMap
+    )
+
+    // CSS file
+    val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
+    Operations.writeCssFile(layout, cssFileName)
+
+    // Input documents
+    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) Operations.writeInputFile(layout, name)
+
+    val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
+    val epubEmbeddedFontsString: String = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
+      .map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
+    info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
+
+    Operations.writeStylesheets(
+      layout = layout,
+      sections = sections,
+      inputDocuments = inputDocuments,
+      isInfoEnabled = logger.isInfoEnabled,
+      embeddedFonts = epubEmbeddedFontsString,
+      cssFileName = cssFileName,
+      mathJaxConfiguration = mathJaxConfiguration,
+      enableMathJax = enableMathJax
+    )
 
     val variants: Seq[Variant] = sections.runVariants(processors)
     logger.lifecycle("Output variants: " + variants.map(_.fullName).mkString("[", ", ", "]"))
 
-    val processDocBook: ProcessDocBook = new ProcessDocBook(
-      project = getProject,
-      // In processing instructions and CSS, substitute xslParameters also - because why not?
-      substitutions = sections.substitutions ++ substitutionsMap,
-      resolver = new Resolver(layout.catalogFile),
-      isJEuclidEnabled = isJEuclidEnabled.get,
-      mathJax,
-      fopConfigurationFile = layout.fopConfigurationFile,
-      imagesDirectory = layout.imagesDirectory,
-      imagesDirectoryName = layout.imagesDirectoryName,
-      cssDirectory = layout.cssDirectory,
-      cssDirectoryName = layout.cssDirectoryName
-    )
+    val allSubstitutions: Map[String, String] = sections.substitutions ++ substitutionsMap
 
     // Process DocBook :)
     for {
@@ -319,128 +243,68 @@ class ProcessDocBookTask extends DefaultTask {
       (documentName: String, prefixed: Boolean) <- inputDocuments
     } {
       logger.lifecycle(s"DocBook: processing '$documentName' to ${variant.fullName}.")
-
+      val docBook2: DocBook2 = variant.docBook2
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
+      val saxonOutputDirectory: File = forDocument.saxonOutputDirectory(variant)
+      val saxonOutputFile: File = forDocument.saxonOutputFile(variant)
 
-      processDocBook.run(
-        docBook2 = variant.docBook2,
+      saxonOutputDirectory.mkdirs
+
+      Operations.runSaxon(
+        docBook2 = docBook2,
         inputFile = layout.inputFile(documentName),
+        // In processing instructions and CSS, substitute xslParameters also - because why not?
+        substitutions = allSubstitutions,
+        mathJax = mathJax,
+        resolver = resolver,
         stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
-        saxonOutputDirectory = forDocument.saxonOutputDirectory(variant),
-        saxonOutputFile = forDocument.saxonOutputFile(variant),
-        outputDirectory = forDocument.outputDirectory(variant),
-        outputFile = forDocument.outputFile(variant)
+        saxonOutputFile = saxonOutputFile
       )
-    }
-  }
 
-  private def getDocumentName(string: String): Option[String] =
-    if (string.isEmpty) None else Some(Files.dropAllowedExtension(string, "xml"))
+      val into: File = Files.prefixedDirectory(saxonOutputDirectory, docBook2.copyDestinationDirectoryName)
 
-  private def generateData(mainClass: String): Unit = {
-    val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(getProject)
-    if (mainSourceSet.isEmpty) logger.warn(
-      s"Skipping DocBook data generation: no Java plugin in the project")
-    else {
-      val dataDirectory: File = layout.dataDirectory
-      info(s"Running DocBook data generator $mainClass into $dataDirectory")
-      Gradle.javaexec(
+      info(s"Copying images")
+      Gradle.copyDirectory(
         getProject,
-        mainClass,
-        mainSourceSet.get.getRuntimeClasspath,
-        dataDirectory.toString
-       )
+        into,
+        from = layout.imagesDirectory.getParentFile,
+        directoryName = layout.imagesDirectoryName,
+        substitutions = Map.empty
+      )
+
+      if (docBook2.usesCss) {
+        info(s"Copying CSS")
+        Gradle.copyDirectory(
+          getProject,
+          into,
+          from = layout.cssDirectory.getParentFile,
+          directoryName = layout.cssDirectoryName,
+          substitutions = allSubstitutions
+        )
+      }
+
+      if (docBook2.usesIntermediate) {
+        info(s"Post-processing ${docBook2.name}")
+        forDocument.outputDirectory(variant).mkdirs
+
+        Operations.postProcess(
+          layout = layout,
+          docBook2 = docBook2,
+          outputFile = forDocument.outputFile(variant),
+          saxonOutputDirectory = saxonOutputDirectory,
+          saxonOutputFile = saxonOutputFile,
+          substitutions = allSubstitutions,
+          isJEuclidEnabled = isJEuclidEnabled.get,
+          mathJax = mathJax
+        )
+      }
     }
-  }
 
-  private def getMathJaxConfiguration: mathjax.Configuration = {
-    def delimiters(property: Property[String]): Seq[mathjax.Configuration.Delimiters] =
-      Seq(new mathjax.Configuration.Delimiters(property.get, property.get))
-
-    mathjax.Configuration(
-      font = mathJaxFont.get,
-      extensions = mathJaxExtensions.get.asScala.toList,
-      texDelimiters = delimiters(texDelimiter),
-      texInlineDelimiters = delimiters(texInlineDelimiter),
-      asciiMathDelimiters = delimiters(asciiMathDelimiter),
-      processEscapes = processMathJaxEscapes.get
+    if (siteFile.get != Extension.dummySiteFile) ProcessDocBookDirect.run(
+      layout = layout,
+      siteFile = siteFile.get,
+      inputDocuments = inputDocuments,
+      resolver = resolver
     )
   }
-}
-
-private object ProcessDocBookTask {
-
-  def write(
-    file: File,
-    replace: Boolean,
-    doctype: Option[Doctype] = None,
-    elem: Xml.Element
-  ): Unit = Files.write(
-    file,
-    replace,
-    content = PrettyPrinter.default.renderXml(element = elem, doctype)
-  )
-
-  def xmlCatalog(
-    xslt1: File,
-    xslt2: File,
-    catalogGroupBase: String,
-    substitutionsDtdFileName: String,
-    catalogCustomFileName: String,
-    data: String
-  ): Xml.Element =
-    <catalog xmlns={Catalog.namespace.uri} prefer="public">
-      {Comment(s" DO NOT EDIT! Generated by the DocBook plugin. Customizations go into $catalogCustomFileName. ")}
-      <group xml:base={catalogGroupBase}>
-        <!--
-          There seems to be some confusion with the rewriteURI form:
-          Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
-          but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
-        -->
-
-        <!-- DocBook XSLT 1.0 stylesheets  -->
-        <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl-ns/current/"
-                    rewritePrefix={s"$xslt1/"}/>
-
-        <!-- DocBook XSLT 2.0 stylesheets  -->
-        <rewriteURI uriStartString="https://cdn.docbook.org/release/latest/xslt/"
-                    rewritePrefix={s"$xslt2/"}/>
-
-        <!-- generated data -->
-        <rewriteSystem systemIdStartString="data:/"
-                       rewritePrefix={data}/>
-        <rewriteSystem systemIdStartString="data:"
-                       rewritePrefix={data}/>
-        <rewriteSystem systemIdStartString="urn:docbook:data:/"
-                       rewritePrefix={data}/>
-        <rewriteSystem systemIdStartString="urn:docbook:data:"
-                       rewritePrefix={data}/>
-        <rewriteSystem systemIdStartString="urn:docbook:data/"
-                       rewritePrefix={data}/>
-        <rewriteSystem systemIdStartString="http://opentorah.org/docbook/data/"
-                       rewritePrefix={data}/>
-      </group>
-
-      <!-- substitutions DTD -->
-      <public publicId={DocBook.dtdId} uri={substitutionsDtdFileName}/>
-
-      <nextCatalog catalog={catalogCustomFileName}/>
-    </catalog>
-
-  val catalogCustomization: Xml.Element =
-    <catalog xmlns={Catalog.namespace.uri} prefer="public">
-      <!-- Customizations go here. -->
-      <nextCatalog catalog="/etc/xml/catalog"/>
-    </catalog>
-
-  def substitutionsDtd(substitutions: Map[String, String]): String = substitutions.toSeq.map {
-    case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
-  }.mkString
-
-  val defaultInputFile: Xml.Element =
-    <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xi={XInclude.namespace.uri}/>
-
-  val defaultCssFile: String =
-    s"""@namespace xml "${Xml.namespace.uri}";
-        |""".stripMargin
 }

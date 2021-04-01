@@ -1,0 +1,117 @@
+//@namespace xml "http://www.w3.org/XML/1998/namespace";
+//
+//body {
+//  font-family: sans-serif;
+//}
+//
+//div.dedication {
+//  display:block;
+//  background-color: #FFEEEE;
+//  color:inherit;
+//  margin:1em 1em;
+//  padding:0.2em;
+//  border: 1px solid #FFAAAA;
+//}
+//
+//div.colophon {
+//  display:block;
+//  background-color: #EFEFEF;
+//  color:inherit;
+//  margin:1em 1em;
+//  border: 1px solid #DDDDDD;
+//}
+//
+//em.glossterm {
+//  display:inline;
+//  font-style:italic;
+//}
+//
+//span.italic {
+//  text-decoration:inherit;
+//  font-style:italic;
+//  font-weight:inherit;
+//}
+
+book {
+  display: block;
+}
+
+info {
+  display: block;
+}
+
+author {
+  display: block;
+}
+
+title, para {
+  @extend %vertical-rhythm;
+}
+
+para {
+  display: block;
+  margin-top: 1em;
+  //text-align: justify;
+}
+
+book > title {
+  font-size: 200%;
+  display: block;
+}
+preface > title {
+  font-size: 170%;
+  display: block;
+}
+section > title {
+  font-size: 170%;
+  text-indent: -0.5em;
+}
+section > section > title {
+  display: block;
+  font-size: 155%;
+}
+section > section > section > title {
+  font-size: 140%;
+  display: block;
+}
+section > section > section > section > title {
+  font-size: 130%;
+  display: block;
+}
+section > section > section > section > section > title {
+  font-size: 120%;
+  display: block;
+}
+section > section > section > section > section > section title {
+  font-size: 110%;
+  display: block;
+}
+
+biblioentry {
+  display: block;
+  @extend %vertical-rhythm;
+}
+biblioentry > author {
+  display: inline;
+}
+biblioentry > authorgroup > author {
+   display: inline;
+}
+biblioentry > title {
+  display: inline;
+  font-style: italic;
+}
+
+itemizedlist {
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+}
+
+listitem {
+  display: list-item;
+  text-align: -webkit-match-parent;
+}

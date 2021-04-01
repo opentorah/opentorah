@@ -2,7 +2,6 @@ package org.opentorah.docbook
 
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
-import org.opentorah.docbook.plugin.Layout
 import org.opentorah.util.Files
 
 class PluginTestProject private(

@@ -15,26 +15,16 @@ ext.isService = true
 apply from: '../configure.gradle'
 
 dependencies {
-  api project(':opentorah-metadata')
   implementation project(':opentorah-tei')
-  implementation project(':opentorah-util')
-
-  implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-  implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
-//  implementation "com.vladsch.flexmark:flexmark-util-ast:$flexmarkVersion"
-//  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
+  implementation project(':opentorah-site')
+  implementation project(':opentorah-base')
 
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
-
-  // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
-  // and since I am not at the point of using anything other than Caffeine,
-  // I'll use it directly - albeit not Scala-idiomatically ;)
-  implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
 }
 
-jib.from.image = 'gcr.io/distroless/java:11'
+jib.from.image = 'gcr.io/adoptopenjdk/java:11'
 jib.container.mainClass = 'org.opentorah.collector.Service'
 
 cloudRun.region = 'us-east4'

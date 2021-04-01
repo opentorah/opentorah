@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.6] - 2021-0
+
+- consolidated util, xml and metadata modules into base;
+- consolidated calendar-paper into calendar;
+- consolidated fop into docbook;
+- added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;
+- added theme files to the project's site;
+- added SASS -> CSS compilation to the project's site;
+- collector and DocBook plugin use the 'site' module;
+- support to MathJax3;
+- code highlighting using `highlightjs`;
+- 'calendar' paper uses ProcessDocBookDirect directly (without plugin);
+- dependency updates;
+
 ## [0.2.4] - 2021-02-04
 - moved from JCenter/Bintray to Maven Central (see http://dub.podval.org/2021/02/04/bintray-is-dead.html)!
 - no tests in master CI
