@@ -1,7 +1,7 @@
 package org.opentorah.docbook
 
-import org.opentorah.docbook.plugin.MathFilter
-import org.opentorah.mathjax.{Configuration, MathJax, MathML}
+import org.opentorah.fop.MathJax
+import org.opentorah.mathjax.{MathJaxConfiguration, MathML}
 import org.opentorah.xml.{Dom, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
@@ -107,7 +107,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 
   private def parse(string: String): String = {
     val element: Dom.Element = Dom.loadFromString(string, filters = Seq(
-        new MathFilter(Configuration())
+        new MathFilter(MathJaxConfiguration())
 //        , new org.opentorah.xml.TracingFilter
       )
     )

@@ -1,0 +1,50 @@
+plugins {
+  id 'java-library'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'maven-publish'
+  id 'signing'
+}
+
+description = 'Open Torah Base'
+
+apply from: '../configure.gradle'
+
+// Note: I tried using Gradle 'variant':
+//java {
+//  registerFeature('saxon') {
+//    usingSourceSet(sourceSets.main)
+//  }
+//}
+// and got this from 'bintrayUpload':
+//   Maven publication 'bintrayMavenPublication' pom metadata warnings (silence with 'suppressPomMetadataWarningsFor(variant)'):
+//   - Variant saxonApiElements:
+//     - Declares capability org.opentorah:xml-saxon:0.1.49 which cannot be mapped to Maven
+//   - Variant saxonRuntimeElements:
+//     - Declares capability org.opentorah:xml-saxon:0.1.49 which cannot be mapped to Maven
+//   These issues indicate information that is lost in the published 'pom' metadata file, which may be an issue if
+//   the published library is consumed by an old Gradle version or Apache Maven.
+//   The 'module' metadata file, which is used by Gradle 6+ is not affected.
+//
+// Also, capabilities get artifact ids that start with the main component name,
+// so I'll get 'xml-saxon' instead of 'opentorah-xml-saxon'...
+// Staying with the approach where:
+// - optional dependencies are declared here as 'compileOnly';
+// - they need to be supplied as 'runtimeOnly' where needed.
+
+dependencies {
+  api "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"  // TODO api?
+  api "dev.zio:zio_$scalaVersionMajor:$zioVersion"
+
+  implementation "xerces:xercesImpl:$xercesVersion"
+  implementation "org.typelevel:paiges-core_$scalaVersionMajor:$paigesVersion"
+
+  compileOnly "org.xmlresolver:xmlresolver:$xmlresolverVersion"
+  compileOnly "saxon:saxon:$saxon6Version" // Saxon 6 (XSLT 1.0)
+  compileOnly "net.sf.saxon:Saxon-HE:$saxon10Version" // Saxon 10 (XSLT 2.0)
+
+  // Needed to compile classes using Gradle, but does not become a dependency:
+  compileOnly gradleApi()
+
+  testRuntimeOnly "net.sf.saxon:Saxon-HE:$saxon10Version"
+}

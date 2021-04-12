@@ -1,8 +1,26 @@
 # Changelog
 
-Modules covered: `store`, `metadata`, `xml`, `tei`, `util`, `texts`, `dream-paper` and `typesetting-paper`.
+Modules covered: `base`, `store`, `site`, `tei`, `texts`, `dream-paper` and `typesetting-paper`.
 
 ## [Unreleased]
+
+## [0.2.6] - 2021-0
+
+- added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;
+- added theme files to the project's site;
+- added SASS -> CSS compilation to the project's site;
+- collector and DocBook plugin use the 'site' module;
+- HtmlTheme supports MathJax;
+- support to MathJax3;
+- code highlighting using `highlightjs`;
+- introduced ProcessDocBookDirect: direct (no XSLT) transformation from DocBook to HTML;
+- transforming DocBook -> HTML in DocBook.scala;
+- DocBook plugin calls ProcessDocBookDirect;
+- 'calendar' paper uses ProcessDocBookDirect directly (without plugin);
+- working on the DocBook stylesheet and element transform;
+- PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
+- `DoubleEscapeHtmlNodeExtension` removed;
+- dependency updates;
 
 ## [0.2.0] - 2021-01-27
 My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:
@@ -144,7 +162,6 @@ Code in the 'collector' module was re-written, and 'store' module emptied out.
 - Jersey webapp
 - selectors
 - text structure/metadata
-
 
 ## [] - 2010-08-06
 - initial check-in

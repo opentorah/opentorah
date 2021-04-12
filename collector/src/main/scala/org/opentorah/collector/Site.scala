@@ -2,8 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.html
+import org.opentorah.site.{Caching, ListFile, Site => HtmlSite}
 import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
-  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, TeiRawXml, Title, Unclear, Entity => TeiEntity}
+  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, Unclear, Entity => TeiEntity}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Attribute, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
@@ -15,27 +16,55 @@ import java.net.URL
 final class Site(
   override val fromUrl: FromUrl,
   override val names: Names,
-  val title: Title.Value,
-  val siteUrl: String,
+  title: HtmlSite.Title.Value,
+  siteUrl: String,
   val facsimilesUrl: String,
-  val favicon: String,
+  favicon: String,
   val sourceDesc: SourceDesc.Value,
   val calendarDesc: CalendarDesc.Value,
-  val pages: Seq[String],
-  val licenseName: String,
-  val licenseUrl: String,
-  val googleAnalyticsId: Option[String],
-  val email: String,
-  val githubUsername: Option[String],
-  val twitterUsername: Option[String],
-  val footer: Site.Footer.Value,
+  pages: Seq[String],
+  licenseName: String,
+  licenseUrl: String,
+  googleAnalyticsId: Option[String],
+  email: String,
+  githubUsername: Option[String],
+  twitterUsername: Option[String],
+  footer: HtmlSite.Footer.Value,
   val entities: Entities,
   val entityLists: EntityLists,
   val notes: Notes,
   val by: ByHierarchy
-) extends Store with FromUrl.With {
+) extends HtmlSite[Site](
+  title,
+  siteUrl,
+  favicon,
+  pages,
+  licenseName,
+  licenseUrl,
+  googleAnalyticsId,
+  isMathJaxEnabled = false,
+  email,
+  githubUsername,
+  twitterUsername,
+  footer,
+  Viewer.default
+) with Store with FromUrl.With {
 
-  private val caching: Caching.Simple = new Caching.Simple
+  override protected def resolveNavigationalLink(url: String): Caching.Parser[Xml.Element] = resolve(url).map { pathOpt =>
+    val path: Store.Path = pathOpt.get
+    a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
+  }
+
+  override protected def resolveHtmlContent(htmlContent: org.opentorah.site.HtmlContent[Site]): Caching.Parser[Xml.Element] =
+    htmlContent.content(this) >>= (content => Tei.toHtml(
+      linkResolver(htmlContent match {
+        case htmlFacet: Document.TextFacet => Some (htmlFacet)
+        case _ => None
+      }),
+      content
+    ))
+
+  override protected def htmlPrettyPrinter: PrettyPrinter = Site.htmlPrettyPrinter
 
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
 
@@ -119,43 +148,7 @@ final class Site(
     )))
   )
 
-  private def renderHtmlContent(htmlContent: HtmlContent): Caching.Parser[String] = for {
-    content <- resolveHtmlContent(htmlContent)
-    siteNavigationLinks <- getNavigationLinks
-    htmlContentNavigationLinks <- htmlContent.navigationLinks(this)
-  } yield Site.htmlPrettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
-    viewer = htmlContent.viewer,
-    headTitle = htmlContent.htmlHeadTitle,
-    title = htmlContent.htmlBodyTitle,
-    style = if (htmlContent.isWide) "wide" else "main",
-    favicon,
-    googleAnalyticsId,
-    content = content,
-    header = HtmlTheme.header(
-      title = this.title.xml,
-      navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks
-    ),
-    footer = HtmlTheme.footer(
-      author = siteUrl,
-      email,
-      githubUsername,
-      twitterUsername,
-      footer.xml
-    )
-  ))
-
-  private var navigationLinks: Option[Seq[Xml.Element]] = None
-
-  private def getNavigationLinks: Caching.Parser[Seq[Xml.Element]] =
-    if (navigationLinks.isDefined) ZIO.succeed(navigationLinks.get) else
-      ZIO.foreach(pages) { url => resolve(url).map { pathOpt =>
-        val path: Store.Path = pathOpt.get
-        a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
-      }}
-        .map { result =>
-          navigationLinks = Some(result)
-          result
-        }
+  def a(htmlContent: HtmlContent): html.a = a(htmlContent.path(this))
 
   def a(path: Store.Path): html.a = html
     .a(path.map(_.structureName))
@@ -177,15 +170,6 @@ final class Site(
           )
         }
     }
-
-  private def resolveHtmlContent(htmlContent: HtmlContent): Caching.Parser[Xml.Element] =
-    htmlContent.content(this) >>= (content => Tei.toHtml(
-      linkResolver(htmlContent match {
-        case htmlFacet: Document.TextFacet => Some (htmlFacet)
-        case _ => None
-      }),
-      content
-    ))
 
   private def linkResolver(textFacet: Option[Document.TextFacet]): LinksResolver = new LinksResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
@@ -320,41 +304,26 @@ object Site extends Element[Site]("site") with App {
     Site.read(Files.file2url(new File(args.head))) >>= (_.build(withPrettyPrint))
   }.exitCode
 
-  private val siteUrlAttribute: Attribute.Required[String] = Attribute("siteUrl").required
   private val facsimilesUrlAttribute: Attribute.Required[String] = Attribute("facsimilesUrl").required
-  private val faviconAttribute: Attribute.Required[String] = Attribute("favicon").required
-  private val licenseNameAttribute: Attribute.Required[String] = Attribute("licenseName").required
-  private val licenseUrlAttribute: Attribute.Required[String] = Attribute("licenseUrl").required
-  private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
-  private val emailAttribute: Attribute.Required[String] = Attribute("email").required
-  private val githubUsernameAttribute: Attribute.Optional[String] = Attribute("githubUsername").optional
-  private val twitterUsernameAttribute: Attribute.Optional[String] = Attribute("twitterUsername").optional
-
-  object Page extends Element[String]("page") {
-    private val urlAttribute: Attribute.Required[String] = Attribute("url").required
-    override def contentParsable: Parsable[String] = urlAttribute
-  }
-
-  object Footer extends TeiRawXml("footer")
 
   override def contentParsable: Parsable[Site] = new Parsable[Site] {
     override def parser: Parser[Site] = for {
       fromUrl <- Element.currentFromUrl
       names <- Names.withDefaultNameParsable()
-      title <- Title.element.required()
-      siteUrl <- siteUrlAttribute()
+      title <- HtmlSite.Title.element.required()
+      siteUrl <- HtmlSite.siteUrlAttribute()
       facsimilesUrl <- facsimilesUrlAttribute()
-      favicon <- faviconAttribute()
+      favicon <- HtmlSite.faviconAttribute()
       sourceDesc <- SourceDesc.element.required()
       calendarDesc <- CalendarDesc.element.required()
-      navigationLinks <- Page.seq()
-      licenseName <- licenseNameAttribute()
-      licenseUrl <- licenseUrlAttribute()
-      googleAnalyticsId <- googleAnalyticsIdAttribute()
-      email <- emailAttribute()
-      githubUsername <- githubUsernameAttribute()
-      twitterUsername <- twitterUsernameAttribute()
-      footer <- Footer.element.required()
+      pages <- HtmlSite.Page.seq()
+      licenseName <- HtmlSite.licenseNameAttribute()
+      licenseUrl <- HtmlSite.licenseUrlAttribute()
+      googleAnalyticsId <- HtmlSite.googleAnalyticsIdAttribute()
+      email <- HtmlSite.emailAttribute()
+      githubUsername <- HtmlSite.githubUsernameAttribute()
+      twitterUsername <- HtmlSite.twitterUsernameAttribute()
+      footer <- HtmlSite.Footer.element.required()
       entities <- Entities.required()
       entityLists <- EntityLists.required()
       notes <- Notes.required()
@@ -368,7 +337,7 @@ object Site extends Element[Site]("site") with App {
       favicon,
       sourceDesc,
       calendarDesc,
-      navigationLinks,
+      pages,
       licenseName,
       licenseUrl,
       googleAnalyticsId,
@@ -384,20 +353,20 @@ object Site extends Element[Site]("site") with App {
 
     override def unparser: Unparser[Site] = Unparser.concat[Site](
       Names.withDefaultNameParsable(_.names),
-      Title.element.required(_.title),
-      siteUrlAttribute(_.siteUrl),
+      HtmlSite.Title.element.required(_.title),
+      HtmlSite.siteUrlAttribute(_.siteUrl),
       facsimilesUrlAttribute(_.facsimilesUrl),
-      faviconAttribute(_.favicon),
+      HtmlSite.faviconAttribute(_.favicon),
       SourceDesc.element.required(_.sourceDesc),
       CalendarDesc.element.required(_.calendarDesc),
-      Page.seq(_.pages),
-      licenseNameAttribute(_.licenseName),
-      licenseUrlAttribute(_.licenseUrl),
-      googleAnalyticsIdAttribute(_.googleAnalyticsId),
-      emailAttribute(_.email),
-      githubUsernameAttribute(_.githubUsername),
-      twitterUsernameAttribute(_.twitterUsername),
-      Footer.element.required(_.footer),
+      HtmlSite.Page.seq(_.pages),
+      HtmlSite.licenseNameAttribute(_.licenseName),
+      HtmlSite.licenseUrlAttribute(_.licenseUrl),
+      HtmlSite.googleAnalyticsIdAttribute(_.googleAnalyticsId),
+      HtmlSite.emailAttribute(_.email),
+      HtmlSite.githubUsernameAttribute(_.githubUsername),
+      HtmlSite.twitterUsernameAttribute(_.twitterUsername),
+      HtmlSite.Footer.element.required(_.footer),
       Entities.required(_.entities),
       EntityLists.required(_.entityLists),
       Notes.required(_.notes),

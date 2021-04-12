@@ -7,10 +7,11 @@ pluginManagement {
   plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'com.github.maiflai.scalatest' version '0.30'
-    id 'com.google.cloud.tools.jib' version '2.8.0'
+    id 'com.google.cloud.tools.jib' version '3.0.0'
     id 'org.podval.tools.cloudrun' version '0.2.0'
     id 'com.gradle.plugin-publish' version '0.14.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
+    id 'io.miret.etienne.sass' version '1.1.1'
   }
 }
 
@@ -22,14 +23,11 @@ dependencyResolutionManagement {
 
 rootProject.name = 'org.opentorah'
 
-include ':util'
-project(':util'            ).name = 'opentorah-util'
+include ':base'
+project(':base'             ).name = 'opentorah-base'
 
-include ':xml'
-project(':xml'             ).name = 'opentorah-xml'
-
-include ':metadata'
-project(':metadata'        ).name = 'opentorah-metadata'
+include ':site'
+project(':site'            ).name = 'opentorah-site'
 
 include ':tei'
 project(':tei'             ).name = 'opentorah-tei'
@@ -40,7 +38,6 @@ project(':tei'             ).name = 'opentorah-tei'
 
 include ':texts'
 project(':texts'           ).name = 'opentorah-texts'
-
 
 include ':calendar'
 project(':calendar'        ).name = 'opentorah-calendar'
@@ -54,13 +51,9 @@ project(':calendar-service').name = 'opentorah-calendar-service'
 include ':collector'
 project(':collector'       ).name = 'opentorah-collector'
 
-include ':fop'
-project(':fop'             ).name = 'opentorah-fop'
-
 include ':docbook'
 project(":docbook"         ).name = 'opentorah-docbook'
 
-include ':calendar-paper'
 include ':dream-paper'
 include ':typesetting-paper'
 

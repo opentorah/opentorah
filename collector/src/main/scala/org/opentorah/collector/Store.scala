@@ -1,10 +1,12 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.{Language, WithNames}
+import org.opentorah.site.Caching
 import org.opentorah.util.Files
 import org.opentorah.xml.{Elements, Parser, PrettyPrinter, Xml}
 import zio.ZIO
 
+// TODO move into the site (or base?) module
 trait Store extends WithNames {
   def acceptsIndexHtml: Boolean = false
 

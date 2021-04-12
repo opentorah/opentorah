@@ -13,8 +13,6 @@ motivation and chosen approach can be found in a
 
 Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/).
 To make this possible, integration with [Node.js](https://nodejs.org/en/) was developed.
-Code of the FOP MathJax plugin is shipped as a separate artifact
-`org.opentorah:opentorah-fop` to facilitate its re-use with markup other than DocBook. 
 
 ## Summary ##
 
@@ -445,6 +443,16 @@ Following features of the Maven Gradle plugin are not supported:
 - expressions in `<?eval?>`
 - access to the project and its properties in `<?eval?>`
 - multiple documents with different parameters
+
+## Future ##
+
+I should look into alternative ways of integrating with Node:
+[GraalVM](https://www.graalvm.org/) and
+[Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme).
+
+Dyno?
+
+Support for J2V8 should probably be dropped...
 
 ## Unlikely Future ##
 

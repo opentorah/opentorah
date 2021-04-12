@@ -3,7 +3,8 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.html
 import org.opentorah.tei.{EntityReference, Unclear}
-import org.opentorah.util.Files
+import org.opentorah.site.Caching
+import org.opentorah.util.Strings
 import org.opentorah.xml.Xml
 import java.net.URI
 
@@ -64,6 +65,6 @@ object Report {
     override protected def lineToXml(entity: Entity, site: Site): Xml.Element =
       <l>{entity.a(site)(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
 
-    private def getExpectedId(entity: Entity): String = Files.spacesToUnderscores(entity.mainName)
+    private def getExpectedId(entity: Entity): String = Strings.spacesToUnderscores(entity.mainName)
   }
 }

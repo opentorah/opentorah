@@ -4,16 +4,45 @@ plugins {
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'signing'
+// using direct transformation:  id 'org.opentorah.docbook'
 }
 
 description = 'Jewish Calendar Dates'
 version = calendarProjectVersion
 
+// using direct transformation:  ext.isPaper = true
+ext.dataGeneratorClassName = 'org.opentorah.calendar.paper.Tables'
+// using direct transformation:  ext.isMathJaxEnabled = true
+
 apply from: '../configure.gradle'
 
 dependencies {
-  implementation project(':opentorah-metadata')
-  implementation project(':opentorah-util')
+  implementation project(':opentorah-base')
+
+  // using direct transformation:
+  implementation project(':opentorah-docbook')
+
+  implementation "org.scala-lang.modules:scala-xml_$scalaVersionMajor:$scalaXmlVersion"
 
   testImplementation "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion"
+}
+
+// using direct transformation:
+task processDocBookDirect(type: JavaExec) {
+  group = 'publishing'
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'org.opentorah.docbook.ProcessDocBookDirect'
+  args = [
+    projectDir,
+    "$rootDir/docs/site.xml",
+    'calendar',
+    dataGeneratorClassName
+  ]
+}
+site.dependsOn processDocBookDirect
+site.doLast {
+  project.sync {
+    from "$buildDir/docBookDirect"
+    into "$rootDir/docs/calendar/paperDirect"
+  }
 }

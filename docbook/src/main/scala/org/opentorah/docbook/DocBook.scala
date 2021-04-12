@@ -1,8 +1,11 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Dialect, Doctype, Namespace, PrettyPrinter}
+import org.opentorah.html
+import org.opentorah.xml.{Attribute, Dialect, Doctype, Namespace, Parser, PrettyPrinter, Xml}
+import zio.{Has, URIO, ZLayer}
+import java.net.URI
 
-object DocBook extends Dialect with Doctype {
+object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
 
   override val namespace: Namespace = Namespace(uri = "http://docbook.org/ns/docbook", prefix="db")
 
@@ -17,6 +20,54 @@ object DocBook extends Dialect with Doctype {
   val version: String = "5.0"
 
   override val prettyPrinter: PrettyPrinter = PrettyPrinter(
-    alwaysStackElements = Set("article", "para", "equation", "informalequation", "inlineequation", "math", "mrow", "mi")
+    alwaysStackElements = Set("article", "para", "equation", "informalequation", "inlineequation", "math", "mrow", "mi"),
+    clingyElements = Set("footnote")
   )
+
+  def toHtml0(element: Xml.Element): Parser[Xml.Element] =
+    toHtml(element).provideLayer(ZLayer.succeed(()))
+
+  // TODO put endnotes below the component that has them
+  override protected def isEndNote(element: Xml.Element): Boolean = element.label == "footnote"
+
+  private val urlAttribute: Attribute.Required[String] = Attribute("url").required
+  private val linkendAttribute: Attribute.Required[String] = Attribute("linkend").required
+
+  override protected def elementTransform(element: Xml.Element): URIO[Has[Unit], Xml.Element] = {
+    val children: Xml.Nodes = Xml.getChildren(element)
+
+    element.label match {
+      // TODO link, olink, xref, anchor
+
+      case "ulink" =>
+        require(!Xml.isEmpty(children), element)
+        URIO.succeed(html.a(new URI(urlAttribute.get(element)))(children))
+
+      // TODO look up the reference in the bibliography entry itself
+      // TODO add chunk name for chunked mode
+      case "biblioref" =>
+        require(Xml.isEmpty(children), element)
+        val linkend: String = linkendAttribute.get(element)
+        URIO.succeed(html.a().setFragment(linkend)(linkend))
+
+      //      case "graphic" =>
+      //        // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
+      //        require(Xml.isEmpty(children), element)
+      //        URIO.succeed(<img src={urlAttribute.get(element)}/>)
+
+      // TODO tgroups etc.; colspan analogue?
+      case "informaltable" =>
+        URIO.succeed(<table>{children}</table>)
+
+      case "row" =>
+        URIO.succeed(<tr>{children}</tr>)
+
+      case "entry" =>
+        //URIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
+        URIO.succeed(<td>{children}</td>)
+
+      case _ =>
+        URIO.succeed(element)
+    }
+  }
 }

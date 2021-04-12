@@ -6,6 +6,8 @@ import org.scalatest.matchers.should.Matchers
 
 class PluginTest extends AnyFlatSpecLike with Matchers {
 
+  private val prettyPrinter: PrettyPrinter = PrettyPrinter.default.copy(encodeXmlSpecials = false)
+
   private def test(
     name: String,
     substitutions: Map[String, String],
@@ -16,7 +18,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     val project = PluginTestProject(
       prefix = "pluginTestProjects",
       name,
-      document = PrettyPrinter.default.renderXml(document, doctype),
+      document = prettyPrinter.renderXml(document, doctype),
       substitutions,
       isPdfEnabled = true
     )
@@ -33,14 +35,17 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     // Entity reference in the attribute value trips up IntelliJ's Scala XML parser:
     // it reports "No closing tag" and underlines XML literal around the entity reference in red.
     // In reality, everything works as intended:
-    PrettyPrinter.default.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
+    prettyPrinter.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // If the attribute value is enclosed in {}, making it dynamic, IntelliJ does not complain any longer -
     // but Scala XML encodes the entity reference, so nothing works...
     // UPDATE 2021-02-15: things started working all of a sudden;
     // tzorich iyun if this is connected to the recent changes in the PrettyPrinter (handling preformatted elements)
     // or Markdown (double-escaping dangerous symbols), although I don't see how can it be...
-    PrettyPrinter.default.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&version;"/>""" + "\n"
+    prettyPrinter.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&version;"/>""" + "\n"
+
+    // UPDATE 2021-04: PrettyPrinter now escapes '&' (and '<') by default,
+    // so to keep the expectations I had to disable this encoding...
 
     // In the tests below, I am thus forced to forego the {} - and suffer redness from IntelliJ...
   }
@@ -100,7 +105,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
       prefix = "pluginTestProjects",
       name = "substitutions-without-DTD-entity-substitutions",
       substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
-      document = PrettyPrinter.default.renderXml(
+      document = prettyPrinter.renderXml(
         <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
           <para>Processing instruction: <?eval version ?>.</para>
           <para>Entity: &version;.</para>

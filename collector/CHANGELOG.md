@@ -2,8 +2,14 @@
 
 ## [Unreleased]
 
-## [0.2.5] - 2021-02-28
+## [0.2.6] - 2021-0
 
+- use the 'site' module;
+- code highlighting using `highlightjs`;
+- PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
+- `DoubleEscapeHtmlNodeExtension` removed;
+
+## [0.2.5] - 2021-02-28
 - site is now dynamic!
 - double-escape XML tag start characters and such in Markdown code blocks;
 - PrettyPrinter supports preformatted elements;

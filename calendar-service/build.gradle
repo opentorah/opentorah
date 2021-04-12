@@ -17,5 +17,5 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-schedule')
-  implementation project(':opentorah-util')
+  implementation project(':opentorah-base')
 }

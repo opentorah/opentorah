@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.site.{Caching, ListFile}
 import org.opentorah.tei.Tei
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}

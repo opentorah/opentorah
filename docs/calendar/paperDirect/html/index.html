@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/css/main.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity=
+    "sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
+    <link rel="icon" type="image/jpeg" href="/alter-rebbe.jpg"/>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>MathJax = { "tex":{ "processEscapes":true, "inlineMath":[["$", "$"]], "displayMath":[["$$", "$$"]] }
+    };</script>
+    <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="wrapper">
+        <a class="site-title" rel="author" target="defaultViewer" href="/">the Open Torah Project</a>
+        <nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger"></input>
+          <label for="nav-trigger"><span class="menu-icon"><svg viewBox="0 0 18 15" width="18px" height="15px"><path d=
+          "M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"
+          ></path></svg></span></label>
+          <div class="trigger"></div>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+          <div class="post-content">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="html">
+              <book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
+                <info>
+                  <title>Rambam on Calendar</title>
+                  <author><personname>Leonid Dubinsky</personname></author>
+                </info>
+                <preface version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/introduction.xml" id="introduction">
+                  <title>Introduction</title>
+                  <para>Latest version of this paper and the code used to produce it are available from
+                  http://www.opentorah.org/.</para>
+                  <para>In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two
+                  calendars: fixed ("arithmetic") and observational ("astronomical"). Both calendars are described in a
+                  form ready to be implemented, but the reasons for the calculation steps - especially for the
+                  astronomical calendar - are not always given: what are the models - and the formulae resulting from
+                  them - that reproduce the numbers? Sometimes Rambam describes the models, so only the formulae need to
+                  be reconstructed; sometimes the models are not described, so both the models and the formulae need to
+                  be reconstructed.</para>
+                  <para>Goals of this paper are: <itemizedlist>
+                    <listitem><para>reconstruct models that Rambam uses from the Rambam's text</para></listitem>
+                    <listitem><para>describe the models with diagrams and formulae</para></listitem>
+                    <listitem><para>reconstruct actual parameters of the models from the numbers given by Rambam</para>
+                    </listitem>
+                    <listitem><para>identify misprints in the traditional editions</para></listitem>
+                    <listitem><para>analyze correspondence with the fixed calendar</para></listitem>
+                    <listitem><para>verify Rambam's tables and rounding decisions against his models</para></listitem>
+                    <listitem><para>analyze impact of various misprints on the sighting calculations</para></listitem>
+                    <listitem><para>Verify consistency of Rambam's numbers.</para></listitem>
+                    <listitem><para>Translate relevant chapters of Rambam into English. The translation does not have to
+                    be literal; literal translations are already available (<a xmlns="http://www.w3.org/1999/xhtml"
+                    href="#Yale" class="biblioref" linkend="Yale">Yale</a>, <a xmlns="http://www.w3.org/1999/xhtml"
+                    href="#Touger" class="biblioref" linkend="Touger">Touger</a>). The goal of our translation is to
+                    make the text complete and accessible for collaboration by people not proficient enough in
+                    Hebrew.</para></listitem>
+                    <listitem><para>see how Rambam's calculations of the moon visibility compare to the current
+                    models</para></listitem>
+                  </itemizedlist></para>
+                  <para>Approximate timeline of the project: <itemizedlist>
+                    <listitem><para>In 1984, The Rebbe instructed Jews to learn Rambam every day. As a result, in 1991 I
+                    encountered calendar chapters of Rambam, decided to reconstruct the models behind the calculations
+                    described in them, and discovered mistakes in the text of one of the laws (15:6). The results were
+                    published in "Notices of Temimim and Anash", a weekly of the central Lubavicher Yeshiva 770. Some of
+                    the readers were appalled that someone dares to correct the text of Rambam! My point was that the
+                    text as published contains mistakes that need to be corrected. Indeed, Frenkel edition [<a xmlns=
+                    "http://www.w3.org/1999/xhtml" href="#Frenkel" class="biblioref" linkend="Frenkel">Frenkel</a>],
+                    that was already published at the time, corrects all of the mistakes I did. In fact, they were
+                    already corrected by Hazon Ish in his commentary on Rambam [<a xmlns="http://www.w3.org/1999/xhtml"
+                    href="#HazonIsh" class="biblioref" linkend="HazonIsh">HazonIsh</a>] - but I did not know it
+                    then.</para></listitem>
+                    <listitem><para>2008: I acquired a pile of books on the subject and started looking into it; I also
+                    experimented with various ways of publishing the work on the web.</para></listitem>
+                    <listitem><para>2009: coded some of the algorithms to look into the rumors the dates of <a xmlns=
+                    "http://www.w3.org/1999/xhtml" href=
+                    "http://dub.podval.org/2019/07/18/sanctification-of-the-sun.html" class="ulink" url=
+                    "http://dub.podval.org/2019/07/18/sanctification-of-the-sun.html">Birkhat HaHamah</a> that were
+                    circulating then.</para></listitem>
+                    <listitem><para>2013: code converted to Scala.</para></listitem>
+                    <listitem><para>2017-2018: split-file encoding of the family polymorphism and current representation
+                    of the dates and angles were implemented in the supporting code.</para></listitem>
+                    <listitem><para>2018-2019: generation of reading and learning schedules was added to the
+                    code.</para></listitem>
+                  </itemizedlist></para>
+                  <para>I want to acknowledge people who contributed to the content of this work - and to the fact of
+                  its existence ;) If your name should be on this list but isn't, please forgive me: the omission is not
+                  intentional. <itemizedlist>
+                    <listitem><para><personname>
+                      <firstname>Mordechai</firstname>
+                      <surname>Goldin</surname>
+                    </personname> - for providing office space and computer equipment when I, as a Yeshiva student, had
+                    neither;</para></listitem>
+                    <listitem><para><personname>
+                      <firstname>Ilia</firstname>
+                      <surname>Pomansky</surname>
+                    </personname> - for encouraging this work at the early stages, in 1991;</para></listitem>
+                    <listitem><para>my wife Nina - for listening to my wild ideas, for her patience, and for help with
+                    math;</para></listitem>
+                    <listitem><para>my daughter Menucha Rochel - for assistance with the translation;</para></listitem>
+                    <listitem><para>Rabbi Michael Koretz - for stimulating discussions during our visit to Israel in
+                    2005, encouragement, and extensive research into customs of Torah/Haftarah reading;</para>
+                    </listitem>
+                    <listitem><para>Dr. Michael Partensky - for encouragement and advise;</para></listitem>
+                    <listitem><para>Dr. Peter Ofman - for asking questions that prodded me to revive this project in
+                    2011, after years of hiatus;</para></listitem>
+                    <listitem><para>Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan
+                    5772;</para></listitem>
+                    <listitem><para>Rabbi Chaim Prus - for causing me to investigate which number does the year of
+                    Creation has - 0 or 1;</para></listitem>
+                  </itemizedlist></para>
+                </preface>
+                <part id="remarks">
+                  <title>Part I: Some Remarks</title>
+                  <chapter version="5.0" xml:base=
+                  "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/new-year-corrections.xml" id=
+                  "new-year-corrections">
+                    <title>New Year corrections</title>
+                    <itemizedlist>
+                      <listitem><para>are there meaningful names for the corrections?</para></listitem>
+                      <listitem><para>are corrections explained by the desire to not have Yom Kippur on Sunday
+                      etc.?</para></listitem>
+                      <listitem><para>calculate third correction from the maximum length of a year and the first
+                      correction</para></listitem>
+                      <listitem><para>KH 7:8 says that postponement of RoshHaShonoh is done to align the calendar better
+                      with the true molad; analyze the statistics of distances between mean and true molad and
+                      RoshHashono.</para></listitem>
+                    </itemizedlist>
+                    <para>There is an <a xmlns="http://www.w3.org/1999/xhtml" href=
+                    "https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8"
+                    class="ulink" url=
+                    "https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8"
+                    >argument</a> concerning some of the Rosh Hashono delays involving r. Saadia Gaon: Спор о размерах
+                    "старого молада", когда он отодвигает Рош ашана на следующий день. По нашей шите от Расага и дальше
+                    - 18 часов По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа</para>
+                    <para>make possible calculating the calendar according to the other opinion and compare the
+                    results.</para>
+                    <para>Молад года творения человека выходит в пятницу. Это и было Рош а-Шана второго года, ведь тогда
+                    принцип ли аду Рош не применялся. Тогда понятней спор Рамбама и Райвада о причине сдвига Рош а-Шана
+                    ло аду. Рамбама настаивает, что оно нужно для подсчёта по кибуц эмцаи, а Райвад на него из Талмуда
+                    возмущается. Теоретически можно сделать календарь на время до установления календаря без сдвига Рош
+                    а-Шана.</para>
+                    <para>Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable? Analyze the
+                    difference in historic periods...</para>
+                  </chapter>
+                  <chapter version="5.0" xml:base=
+                  "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/solar-theory.xml" id="solar-theory">
+                  <title>Solar Theory</title> <para>In his "Laws of the Snctification of the Moon", Chapter 12, Law 1,
+                  Rambam states:</para> TODO quote/reference <para>The mean rate of movement of the sun in one day (that
+                  is, twenty-four hours) is fifty-nine minutes and eight seconds, in symbols - 59′8″. It follows that
+                  its movement in ten days is nine degrees fifty-one minutes and twenty-three seconds, in symbols -
+                  9°51′23″. It also follows that its movement in a hundred days is ninety-eight degrees thirty-three
+                  minutes and fifty-three seconds, in symbols - 98°33′53″. It also follows that remainder of its
+                  movement in a thousand days, after you subtract all [multiples of] 360° (as was explained) is two
+                  hundred sixty-five degrees thirty-eight minutes and fifty seconds, in symbols - 265°38′50″. It also
+                  follows that the remainder of its movement in ten thousand days is one hundred thirty-six degrees
+                  twenty-eight minutes and twenty seconds, in symbols - 136°28′20″.</para> <para>And in this way you can
+                  multiply and calculate its movement for any number [of days] that you want. Similarly, if you want to
+                  make known to you values of its movement for two days, three, four and so on to ten - do it.
+                  Similarly, if you want for to have known and ready values of its movement for twenty days, thirty,
+                  forty and so on to a hundred - do it. This is clear and known once you know its movement in 1
+                  day.</para> <para>And you should have ready and known to you mean movement of the Sun for twenty-nine
+                  days and for three hundred and fifty-four (which is the number of days in the lunar year when its
+                  months are "regular" (TODO link), and it is called "regular year"). The reason is: if you have those
+                  movement values ready, these calculations of the visibility of the moon will be easy, because there
+                  are twenty-nine complete days from the night of observation to the night of observation of the
+                  following month, and so it is every month: no less than twenty-nine days and no more. Since our sole
+                  desire in all those calculations is exclusively to determine visibility [of the moon]. And between the
+                  night of sighting of this month and night of sighting of the same month next year there is either a
+                  regular year or a year and 1 day; and the same every year. Mean movement of the Sun in twenty-nine
+                  days is twenty-eight degrees thirty-five minutes and one second, in symbols - 28°35′1″. Its movement
+                  in a regular year is three hundred forty-eight degrees, fifty-five minutes and fifteen seconds, in
+                  symbols - 348°55′15″.</para> <para>In table format:</para> <table xmlns="http://www.w3.org/1999/xhtml"
+                  class="informaltable" frame="all" version="5.0" xml:base=
+                  "///home/dub/OpenTorah/opentorah.org/calendar/build/data/slm-printed.xml" id="slm-printed"><tgroup
+                  xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="2">
+                    <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                      <td class="entry">days</td>
+                      <td class="entry">printed</td>
+                    </tr></thead>
+                    <tbody>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1</td>
+                        <td class="entry">0°59′8″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10</td>
+                        <td class="entry">9°51′23″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">100</td>
+                        <td class="entry">98°33′53″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1000</td>
+                        <td class="entry">265°38′50″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10000</td>
+                        <td class="entry">136°28′20″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">29</td>
+                        <td class="entry">28°35′1″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">354</td>
+                        <td class="entry">348°55′15″</td>
+                      </tr>
+                    </tbody>
+                  </tgroup></table> <para>Now let's see if the printed values can be recovered by multiplying the value
+                  for one day by the number of days (and discarding full circles as appropriate):</para> <table xmlns=
+                  "http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" xml:base=
+                  "///home/dub/OpenTorah/opentorah.org/calendar/build/data/slm-reconstructed-1.xml" id=
+                  "slm-reconstructed-1"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
+                  "http://www.w3.org/2001/XInclude" cols="4">
+                    <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                      <td class="entry">days</td>
+                      <td class="entry">printed</td>
+                      <td class="entry">reconstructed</td>
+                      <td class="entry">difference</td>
+                    </tr></thead>
+                    <tbody>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1</td>
+                        <td class="entry">0°59′8″</td>
+                        <td class="entry"></td>
+                        <td class="entry"></td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10</td>
+                        <td class="entry">9°51′23″</td>
+                        <td class="entry">9°51′20″</td>
+                        <td class="entry">0°0′3″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">29</td>
+                        <td class="entry">28°35′1″</td>
+                        <td class="entry">28°34′52″</td>
+                        <td class="entry">0°0′9″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">100</td>
+                        <td class="entry">98°33′53″</td>
+                        <td class="entry">98°33′20″</td>
+                        <td class="entry">0°0′33″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">354</td>
+                        <td class="entry">348°55′15″</td>
+                        <td class="entry">348°53′12″</td>
+                        <td class="entry">0°2′3″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1000</td>
+                        <td class="entry">265°38′50″</td>
+                        <td class="entry">265°33′20″</td>
+                        <td class="entry">0°5′30″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10000</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">135°33′20″</td>
+                        <td class="entry">0°55′</td>
+                      </tr>
+                    </tbody>
+                  </tgroup></table> <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"
+                  version="5.0" xml:base=
+                  "///home/dub/OpenTorah/opentorah.org/calendar/build/data/slm-reconstructed-10.xml" id=
+                  "slm-reconstructed-10"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
+                  "http://www.w3.org/2001/XInclude" cols="4">
+                    <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                      <td class="entry">days</td>
+                      <td class="entry">printed</td>
+                      <td class="entry">reconstructed</td>
+                      <td class="entry">difference</td>
+                    </tr></thead>
+                    <tbody>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10</td>
+                        <td class="entry">9°51′23″</td>
+                        <td class="entry"></td>
+                        <td class="entry"></td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">100</td>
+                        <td class="entry">98°33′53″</td>
+                        <td class="entry">98°33′50″</td>
+                        <td class="entry">0°0′3″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1000</td>
+                        <td class="entry">265°38′50″</td>
+                        <td class="entry">265°38′20″</td>
+                        <td class="entry">0°0′30″</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10000</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">136°23′20″</td>
+                        <td class="entry">0°5′</td>
+                      </tr>
+                    </tbody>
+                  </tgroup></table> <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"
+                  version="5.0" xml:base=
+                  "///home/dub/OpenTorah/opentorah.org/calendar/build/data/slm-reconstructed-100.xml" id=
+                  "slm-reconstructed-100"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
+                  "http://www.w3.org/2001/XInclude" cols="4">
+                    <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                      <td class="entry">days</td>
+                      <td class="entry">printed</td>
+                      <td class="entry">reconstructed</td>
+                      <td class="entry">difference</td>
+                    </tr></thead>
+                    <tbody>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">100</td>
+                        <td class="entry">98°33′53″</td>
+                        <td class="entry"></td>
+                        <td class="entry"></td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1000</td>
+                        <td class="entry">265°38′50″</td>
+                        <td class="entry">265°38′50″</td>
+                        <td class="entry">0°</td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10000</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">0°</td>
+                      </tr>
+                    </tbody>
+                  </tgroup></table> <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"
+                  version="5.0" xml:base=
+                  "///home/dub/OpenTorah/opentorah.org/calendar/build/data/slm-reconstructed-1000.xml" id=
+                  "slm-reconstructed-1000"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
+                  "http://www.w3.org/2001/XInclude" cols="4">
+                    <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                      <td class="entry">days</td>
+                      <td class="entry">printed</td>
+                      <td class="entry">reconstructed</td>
+                      <td class="entry">difference</td>
+                    </tr></thead>
+                    <tbody>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">1000</td>
+                        <td class="entry">265°38′50″</td>
+                        <td class="entry"></td>
+                        <td class="entry"></td>
+                      </tr>
+                      <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">10000</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">136°28′20″</td>
+                        <td class="entry">0°</td>
+                      </tr>
+                    </tbody>
+                  </tgroup></table> <section id="solar-model">
+                    <title>Model (TODO)</title>
+                    <para>Figure out from the text directions of Sun's movements and what are the position angles from
+                    (look at the parallax correction stuff: subtract mean apogee from the mean Sun...).</para>
+                    <para>TODO diagrams for the correction in Moznaim's Rambam.</para>
+                  </section> <section id="exactification">
+                    <title>Exactification (TODO)</title>
+                    <para>It is not clear how Rambam arrived at the values he gives. When value of the movement in one
+                    day given by Rambam is multiplied by 29, 100 etc., the result is smaller than that of Rambam. The
+                    following table compares printed and calculated values: TODO</para>
+                    <para>Although the value of the movement of the mean solar longitude in one day given by <a xmlns=
+                    "http://www.w3.org/1999/xhtml" href="#Almagest" class="biblioref" linkend="Almagest">Almagest</a>
+                    III 1 (H209) (which, rounded to seconds, becomes Rambam's value) is bigger, it is not big enough,
+                    and Rambam's numbers (for more than 10 days) can not be explained by performing calculations with
+                    the long value from Almagest and then rounding the results to the precision of the Rambam's
+                    values.</para>
+                    <para><a xmlns="http://www.w3.org/1999/xhtml" href="#Tzikuni" class="biblioref" linkend="Tzikuni"
+                    >Tzikuni</a> (TODO p. XXX) gives the algorithm of such reconstruction: add to the remainder as many
+                    times 360 as there were full rotations in given time period, and then divide. It also gives a value
+                    reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees,
+                    and the current "scientific" value of 0.9856473 degrees. It seems that origins of the Rambam's value
+                    were questioned by his commentators, including "Pirush". Value that can be derived from the
+                    tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348.</para>
+                    <para>This algorithm can be modified to produce an interval of possible values, taking into account
+                    precision of the numbers.</para>
+                    <para>From the printed values it is possible to reconstruct the value of the movement in mean solar
+                    longitude in one day that Rambam used to calculate each of them:</para>
+                    <para>Use it to calculate intervals for Rambam's values of the angular velocities.</para>
+                    <para><a xmlns="http://www.w3.org/1999/xhtml" href="#Tzikuni" class="biblioref" linkend="Tzikuni"
+                    >Tzikuni</a> quotes Rambam's value for 354 days as 348°55′15″, but calculated value as 348°55′9″,
+                    and notes that this "requires a little thought".</para>
+                    <para>TODO About apogee, Rambam says "the same way", but doesn't give value for 1 day...
+                    Exactification requires extra attention, since there is no value for 1 day. SunApogee rambamValue
+                    and almagestValue.</para>
+                  </section> <section id="solar-movement-29">
+                    <title>Angular movement for 29 days (TODO)</title>
+                    <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not
+                    2*v(10)+9*v(1), nor 29*vexact(1)? For any tables other than SunLongitudeMean?</para>
+                    <para>Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give
+                    the "official" Rambam's value. Values calculated from the value reconstructed from the printed 10000
+                    days movement, if rounded, produce the values Rambam published - except for 29 days, 354 days, and
+                    10000 days which we use to calculate the exact value that Rambam used! TODO!</para>
+                  </section> <section id="zeros">
+                    <title>Zeros (TODO)</title>
+                    <para>Math.findZero(): Finish and test the code; use two separate lengths (precisions)?</para>
+                  </section> <section id="sun-precise">
+                    <title>Sun for a precise time (TODO)</title>
+                    <para>make possible calculations for a Moment, not just a Day (at least for the sun);</para>
+                  </section> <section id="sun-creation">
+                    <title>Sun at Creation (TODO)</title>
+                    <para>Where and when was the Sun created? (Birchat Hachamo is on a different opinion.) Does it let
+                    us get more precise values of Sun's angular velocities?</para>
+                  </section> <section id="true-seasons">
+                    <title>True seasons (TODO)</title>
+                    <para>calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is
+                    approximately two days before the mean one; add a test.</para>
+                    <para>SeasonsAstronomical.seasonForYear: should this always be Nisan?</para>
+                  </section> <section id="year-lengths">
+                    <title>Year lengths (TODO)</title>
+                    <para>Convert each year length mentioned in the fixed calendar to angular speed.</para>
+                    <para>What year length does value for mean anomaly velocity given by Moznaim correspond?</para>
+                  </section> <section id="interesting">
+                    <title>Interesting</title>
+                    <para>TODO От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции
+                    Рамбама в астрономии - https://www.yeshiva.org.il/midrash/11088</para>
+                  </section> <section id="interesting2">
+                    <title>Check statements of Nove Kadosh / Ibn Ezra</title>
+                    <para>TODO От Корица: ודבר זה הלכה למשה מסיני הוא, שבזמן שיש סנהדרין קובעין על הראייה ובזמן שאין שם
+                    סנהדרין קובעין על חשבון זה שאנו מחשבין בו היום ואין נזקקין לראייה, אלא פעמים שיהיה יום שקובעין בו
+                    בחשבון זה הוא יום הראייה או קודם לו ביום או אחריו ביום, וזה שיהיה אחר הראייה ביום פלא הוא ובארצות
+                    שהן למערב ארץ ישראל. נאוה קודש הלכות קידוש החודש פרק ה הלכה ב כבר נתבאר לעיל בפרק ראשון הלכה ג' ע"פ
+                    ציור באיזה אופן שאפשר להיות קיבוץ האמתי קודם להאמצעי או שיהיה אחר האמצעי, ולפעמים יהיו קיבוץ האמתי
+                    והאמצעי ברגע אחד, והקדימה או האחירה של קיבוץ האמתי מהאמצעי לכל היותר הוא קרוב לי"ד שעות וכן דעת הר'
+                    אברהם אבן עזרא בפרשת בא דהיינו י"ג שעות ושלשה רביעיות שעה, ודוקא בתשרי אשר הוא במאזנים אזי אפשר
+                    שיקדים האמתי להאמצעי שיעור הנזכר אבל האיחור של קיבוץ האמתי מהאמצעי בתשרי לא יהיה כי אם קרוב לשש שעות
+                    ולא יותר ובחדש ניסן אשר הוא בטלה יהיה הדין בהפוך ר"ל לכל היותר לא תהיה הקדימה הנזכר כי אם קרוב לשש
+                    שעות, והאיחור יכול להיות קרוב לי"ד שעות, כל זה יתבאר בע"ה לקמן בדרך מופת, ומבואר שכל דברי רבינו של
+                    הלכה זו הולך וסובב על חדש תשרי אשר בו שייך כל הדחיות המבוארים לקמן בפרק ז' עיין שם, Не знаю, кто
+                    это; не верю, что средневековцы могли доказать теорему о максимальной дистанции; но чтобы проверить
+                    эти утверждения, чьи бы они ни были, надо считать не только через 15 минут после захода, а в любой
+                    момент :) ביוגרפיה - נאוה קדש רבי שמעון וואלטש היה מדרי העיר ברונשוויג שבאשכנז, את חכמת התכונה למד
+                    ממי שנחשב בדורו (שנות הת"ק) כאחד המומחים הגדולים בחכמה זו, הכונה לרבי ישכר בעריש בנו של הגאון הגדול
+                    רבי אריה ליב (בן הפנ"י) רבה הנודע של הנובר, אשר הסכים בהתלהבות לפרסום ספר "נאוה קודש", בפרט לאחר
+                    שכבר ניתנה הסכמתו של רבה הגדול של ברלין רבי צבי הירש לוין. ספר "נאוה קודש" הודפס בברלין בשנת תקמ"ו
+                    (1786). 53 דף. הספר הודפס שנית במהדורת צילום (בתוך ספר פועל ה' ח"ב) בשנת תשכ"ט (1969), ושוב בבני ברק
+                    בשנת תשנ"ח (1998) (בתוך ספר פועל ה' ח"ג). החידושים על הרמב"ם הוכנסו ממהדורת פרידברג ירושלים
+                    תשס"ו.</para>
+                  </section></chapter>
+                  <chapter version="5.0" xml:base=
+                  "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/lunar-theory.xml" id="lunar-theory">
+                    <title>Lunar Theory</title>
+                    <para>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second,
+                    giving "true"? Why is the second "mean"? Because of the effects of the sun?</para>
+                    <para>Note: From what and in which direction are the angles measured?</para>
+                    <para>Anomaly (and head?): opposite direction!</para>
+                    <para>TODO MoonHeadMean rambamValue and almagestValue</para>
+                    <para>Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says "'ordered' year"; it
+                    was rendered as 254 in accordance with Law 12:1.</para>
+                    <para>Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1. Also,
+                    this value is actually given in Law 4.</para>
+                    <para>14: 5,6 TODO: Compare with 11:9, about Dli... Something is off!</para>
+                    <para>15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)). Rambam does not describe the model
+                    behind this correction. Because the models Rambam did describe until now are the same as Almagest's
+                    models (including numerical parameters), and because this correction is determined by the (doubled)
+                    sun-moon elongation, just like Almagest's "improved" model of the moon ("the crank"), I assume that
+                    that model was used to calculate this correction. TODO: describe the model!</para>
+                    <para>TODO: Derive the formula! Make the diagram! TODO: How come the fact that sun and moon move in
+                    different plains does not affect this calculation?</para>
+                    <para>It seems that Rambam treats "the crank" as just a calculation device - otherwise, table giving
+                    visible anomaly from the corrected anomaly should take into account changes in the earth-moon
+                    distance depending on the elongation - and it does not! Maybe that is why he does not describe the
+                    model behind this correction. And maybe this is why Rambam reiterates - in Law 2 - that only the
+                    observability of the new moon needs to be calculated correctly. TODO: How does Almagest calculate
+                    visible anomaly?</para>
+                    <para>Law 4,5,6: True Lunar Longitude. Formulae: $$ \tan ^{-1} \left({\sin \alpha \over \cos \alpha
+                    + \epsilon} \right) $$ $R$ - radius of the big circle; $r$ - radius of the small circle; $\epsilon =
+                    R/r$. A little trigonometry, and we get: visible anomaly = arctg(sin(corrected
+                    anomaly)/(cos(corrected anomaly) + e)) and: e = ctg(visible anomaly)*sin(corrected anomaly) -
+                    cos(corrected anomaly)</para>
+                    <para>TODO: Make the diagram! Here?</para>
+                    <para>It is clear that values for 150° and 170° are misprinted: they are bigger than the one before
+                    them when they should be smaller. Value for 120° is also misprinted, but it is less obvious.</para>
+                    <para>Calculations show that for the precision up to a minute, it is sufficient to know e to up to
+                    the second digit after the dot. Below, a column giving the value of e was added to the table. Look
+                    at the value of e, and the misprints become obvious: value of e for them is way out of range it is
+                    in for the rest of them.</para>
+                    <para>TODO Range of e - graph. Range of possible values for each based on the range of e. This is
+                    transcription error: one letter; extra word... Probable correct values.</para>
+                    <para>This is how different sources treat the often misprinted values:</para>
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                    "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
+                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">Edition</td>
+                        <td class="entry">120°</td>
+                        <td class="entry">150°</td>
+                        <td class="entry">170°</td>
+                      </tr></thead>
+                      <tbody>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Vilno" class="biblioref" linkend="Vilno">Vilno</a></td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Eshkol" class="biblioref" linkend="Eshkol">Eshkol</a></td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#LaAm" class="biblioref" linkend="LaAm">LaAm</a></td>
+                          <td class="entry">corrected in the notes</td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Kapach" class="biblioref" linkend="Kapach">Kapach</a><a href=
+                          "#_note_1" id="src_note_1" class="footnote"><sup>1</sup></a></td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">corrected in the notes</td>
+                          <td class="entry">corrected in the notes</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Bluming" class="biblioref" linkend="Bluming">Bluming</a></td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">corrected in the notes</td>
+                          <td class="entry">corrected in the notes</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Frenkel" class="biblioref" linkend="Frenkel">Frenkel</a></td>
+                          <td class="entry">correct and noted</td>
+                          <td class="entry">correct and noted</td>
+                          <td class="entry">correct and noted</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Keller" class="biblioref" linkend="Keller">Keller</a></td>
+                          <td class="entry">not given</td>
+                          <td class="entry">not given</td>
+                          <td class="entry">not given</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry"><a href="#Losh" class="biblioref" linkend="Losh">Losh</a><a href="#_note_2"
+                          id="src_note_2" class="footnote"><sup>2</sup></a></td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                          <td class="entry">incorrect</td>
+                        </tr>
+                      </tbody>
+                    </tgroup></table>
+                    <section id="moon-questions">
+                      <title>Questions</title>
+                      <section>
+                        <title>Moznaim Rambam, KH 13:2f4</title>
+                        <para>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</para>
+                      </section>
+                      <section>
+                        <title>Moon's mean period from astronomical models</title>
+                        <para>Angular speed of the moon = 360 / (1/tropical month + 1/solar year). Moon.meanLunarPeriod
+                        - what is it called? Tropical?</para>
+                      </section>
+                      <section><title>14:5 Moon Longitude Adjustment for Time of Seeing</title> See notes in Moznaim
+                      Rambam Sun longitude: mean or true? In 3rd and 7th lines, most editions incorrectly have
+                      15.</section>
+                      <section>
+                        <title>TODO Moznaim Rambam, KH 15:1f2</title>
+                        <para>double elongation = distance between moon's mean and apogee Moon longitude adjustment for
+                        double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits; encode the
+                        limits</para>
+                      </section>
+                      <section><title>MoonSightable.forSightingLimits</title> is that what Rambam is saying?</section>
+                      <section>
+                        <title>Distance between mean and true new moon</title>
+                        <para>KH 5:1-2 says that the distance is no more than a day. Calculate this difference for all
+                        months; Rambam's epoch - two days after molad?! (Petya Ofman).</para>
+                        <para>How to find the day of sighting given a month?</para>
+                      </section>
+                      <section>
+                        <title>Differences between arithmetic and observational calendars</title>
+                        <para>
+                          <itemizedlist>
+                            <listitem><para>основан не на среднем движении солнца и луны, поэтому к молад надо делать
+                            поправку, но не путем отодвигания Рош а-шана, а методами последних глав Кидуш а-ходеш</para>
+                            </listitem>
+                            <listitem><para>другой порядок високосных и простых лет</para></listitem>
+                            <listitem><para>другой порядок полных и неполных месяцев</para></listitem>
+                            <listitem><para>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и
+                            сравнить с завиксированныму в традиции датами и днями недели?</para></listitem>
+                            <listitem><para>Пример: выход из Египта - 15 день от освящения месяца, четверг</para>
+                            </listitem>
+                            <listitem><para>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год
+                            был високосным.</para></listitem>
+                          </itemizedlist>
+                        </para>
+                      </section>
+                      <section>
+                        <title>TimeToRotation.calculate()</title>
+                        <para>without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH
+                        15:8-9 (see test); see if variations in this algorithms are logical: e.g., for 600, add for 1000
+                        and subtract 4*for 100? see if the end result is stable when Rambam's "real" value is used with
+                        straight multiplication and rounding (abstract away the calculation mechaninsm).</para>
+                      </section>
+                      <section><title>TODO Example in 15:8-9</title> moonAnomalyTrue - printing error in standard
+                      editions, 180 instead of 108; still 108°21′46″, which doesn't round to 108°21...
+                      moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.</section>
+                      <section><title>TODO Example 17:13-14</title> "this longitude is in Taurus" - but longitude3
+                      isn't, so I get 1/6 instead of 1/5...</section>
+                      <section><title>TODO crescent calculations: KH 18-19!</title></section>
+                    </section>
+                  </chapter>
+                  <chapter version="5.0" xml:base=
+                  "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/leap-years-cycle.xml" id=
+                  "leap-years-cycle">
+                    <title>Meton's cycle</title>
+                    <para>Show why 19-years cycle is the best. Calculate optimal distribution of the leap years.</para>
+                    <para>- 1:2 Solar year is ~11 days longer than the lunar (see chapter 6); when discrepancy
+                    accumulates to ~30 days, year is made leap. - 4:1-2 Leap year - additional Adar; Pesach (15th of
+                    Nisan) must be not before the vernal equinox (Sun enters Aries, see 9:3) and before the next summer
+                    solstice.</para>
+                    <para>Moznaim: Based on Sanhedrin 13a-b, the Ramah (cited in Kessef Mishneh on law 15): "Succos must
+                    be after the autumnal equinox"; Rambam doesn't mention this. With vernal equinox on Nissan 15th,
+                    autumnal could be on Tishrei 21st, 6 days into Succos. Ohr Sameach: Rambam did say this, printers
+                    missed it. Aruch HaShulchan: Rambam holds that that Sanhedrin isn't law; we only care about vernal
+                    equinox.</para>
+                    <para>QUESTION: what are the properties of the fixed calendar in this respect (need true
+                    seasons)?</para>
+                    <para>- 6:3 Lunar month (between conjunctions) = 29d12h793p. - 6:4 Lunar year (12 lunar months) =
+                    354d8h876p = 354d8h48m40s; Leap lunar year (13 lunar months) = 383d21h589p; Solar year = 365d6h (see
+                    also 9:1, 10:6); longer than the lunar year by 10d21h204p. - 6:10 19 year cycle (12+7 leap); because
+                    the difference between 19 solar years and the cycle is less than a day: 1h485p. (see 10:1 - with a
+                    different year length, the difference is 0)</para>
+                    <para>QUESTION: what other lengths of the cycle have this property?</para>
+                    <para>- 6:11 Leap years: 3,6,8,11,14,17,19.</para>
+                    <para>QUESTION: in what sense is this an optimal correspondence? and for different cycle lengths? It
+                    is possible that true Sun calculations are needed to answer those questions...</para>
+                  </chapter>
+                  <chapter version="5.0" xml:base=
+                  "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/rambam-summary.xml" id=
+                  "rambam-summary">
+                    <title>Rambam: Summary</title>
+                    <section id="rambam-summary-general">
+                      <title>General</title>
+                      <section id="rambam-summary-chapter-1">
+                        <title>Chapter 1: Introduction.</title>
+                        <simplelist>
+                          <member>Law 1: Month is lunar; year is solar.</member>
+                          <member>Law 2: Solar year is ~11 days longer than the lunar; when discrepancy accumulates to
+                          ~30 days, year is made leap.</member>
+                          <member>Law 3: Moon is not seen for ~1 day before and after the conjunction; first night when
+                          the Moon is sighted - Rosh Chodesh; next Rosh Chodesh: if it is sighted on the night of the
+                          30th day - 30th; if not - 31st.</member>
+                          <member>Law 4: Short/full month.</member>
+                          <member>Laws 5-8: Court calculates in a manner <emphasis role="bold">resembling</emphasis> the
+                          calculations of the astronomers.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-2">
+                        <title>Chapter 2: Court procedure.</title>
+                        <simplelist><member>Laws 1-10: Court procedure.</member></simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-3">
+                        <title>Chapter 3: Court procedure.</title>
+                        <simplelist><member>Laws 1-19: Court procedure; messengers.</member></simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-4">
+                        <title>Chapter 4: Leap Year.</title>
+                        <simplelist>
+                          <member>Laws 1-2: Leap year - additional Adar; Pesach (15th of Nisan) must in the spring: not
+                          before the day of vernal equinox (Sun enters Aries, see 9:3) and before the next summer
+                          solstice.</member>
+                          <member>Laws 3-8: Other reasons for leaping the year; (Succos after the autumnal equinox - not
+                          mentioned in Rambam.)</member>
+                          <member>Laws 9-17: Court procedure.</member>
+                        </simplelist>
+                      </section>
+                    </section>
+                    <section id="rambam-summary-arithmetic">
+                      <title>Arithmetic calendar.</title>
+                      <section id="rambam-summary-chapter-5">
+                        <title>Chapter 5: Introduction.</title>
+                        <simplelist>
+                          <member>Laws 1-2: Introduction; discrepancy with observations: -1…+1 day (+1 - very
+                          rare).</member>
+                          <member>Law 2: Fixed Rosh Hodesh: sighting of the Moon can be +/- 1 day; +2 - extremely
+                          rare.</member>
+                          <member>Law 3: When started.</member>
+                          <member>Laws 4-12: Second day of festivals.</member>
+                          <member>Law 13: Conclusion.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-6">
+                        <title>Chapter 6: Conjunction. Lunar month and year. Leap year cycle.</title>
+                        <simplelist>
+                          <member>Law 1: "Molad" - approximate conjunction (Sun. Moon and Earth on the same
+                          line).</member>
+                          <member>Law 2: day = 24 hours; 1 hour = 1080 parts.</member>
+                          <member>Law 3: Lunar month (between conjunctions) = 29d12h793p.</member>
+                          <member>Law 4: Lunar year (12 lunar months) = 354d8h876p = 354d8h48m40s; Leap lunar year (13
+                          lunar months) = 383d21h589p; Solar year = 365d6h (see also 9:1, 10:6); longer than the lunar
+                          year by 10d21h204p.</member>
+                          <member>Law 5: Lunar month % 7 = 1d12h793p; lunar year % 7 = 4d8h876p; leap year % 7 =
+                          5d21h589p.</member>
+                          <member>Law 7: if molad Nisan - Sunday, 5h107p after sunrise, next month - Iyar: Tuesday
+                          night, 5h900p.</member>
+                          <member>Law 8: First conjunction - Tishrei, year #1: Monday, 5h204p (just subtract % from the
+                          next one :)) Conjunction of Rosh Hashono of Adam's creation (year #2, see Shmita and Yovel
+                          10:2): Friday, 6h.</member>
+                          <member>Law 9: We do not need the number of days, just the remainders.</member>
+                          <member>Law 10: 19 year cycle (12+7 leap); because the difference between 19 solar years and
+                          the cycle is less than a day: 1h485p.</member>
+                          <member>Law 11: Leap years: 3,6,8,11,14,17,19.</member>
+                          <member>Law 12: cycle % 7 = 2d16h595p.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-7">
+                        <title>Chapter 7: New Year corrections.</title>
+                        <simplelist>
+                          <member>Law 1: Rosh Hashono gets pushed off from Sunday, Wednesday, Friday.</member>
+                          <member>Law 2: Gets pushed off if molad is after noon (Molad Zoken).</member>
+                          <member>Law 3: ADU applies after noon push-off also.</member>
+                          <member>Law 4: Non-leap year, if molad is at night of the 3rd day after 9h204p: push off to
+                          Thursday (or the year will be too long).</member>
+                          <member>Law 5: Year after leap one, Monday, after 5h589p: push to Tuesday.</member>
+                          <member>Law 7: ADU - why?</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-8">
+                        <title>Chapter 8: TODO</title>
+                        <simplelist>
+                          <member>Law 1: -> 6.3</member>
+                          <member>Law 2: Month - 29 or 30 days.</member>
+                          <member>Laws 5-6: Same?</member>
+                          <member>Law 7: TODO</member>
+                          <member>Law 8: TODO</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-9">
+                        <title>Chapter 9: Seasons.</title>
+                        <simplelist>
+                          <member>Law 2: 1/4 of the year between seasons (91d 7.5h).</member>
+                          <member>Law 3: Nisan (Spring) - Aries; Tammuz - Cancer; Tishrei - Libra; Teves - Cap.? Vernal
+                          equinox of year #1 = 7d9h642p before conjunction of Nisan. Notes 5,7 in Moznaim edition. Every
+                          year seasons move 30h; in 28 years - in the same place.</member>
+                          <member>Law 5: Vernal equinox, year 4930: midnight, 5th day, 8th of Nisan.</member>
+                          <member>Laws 6-8: Simplified procedure.</member>
+                          <member>Law 7: Real seasons - 2 days before average ones. Note 5: 1st hour of the 4th day of
+                          creation; 1st vernal equinox. Autumnal: Wednesday, 3 hours after daybreak, 1d23h before
+                          conjunction of Tishrei.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-10">
+                        <title>Chapter 10: More precise length of the year. Seasons.</title>
+                        <simplelist>
+                          <member>Law 1: More precise length of a solar year. Moments.</member>
+                          <member>Law 2: Seasons for this year length.</member>
+                          <member>Law 3: Vernal equinox of year #1 - 9h642p before conjunction of Nisan. (Differenbt
+                          from 9:3: Rav Ada follows Rabbi Yehoshua - world created in Nisan; Shmuel (9:3) follows Rabbi
+                          Eliezer - world created in Tishrei.) Every first year of the 19-year cycle.</member>
+                          <member>Law 4: 1/4 of the year between seasons (91d7h519p31m).</member>
+                          <member>Law 5: Simplified procedure.</member>
+                          <member>Law 6: This more precise calculation of seasons was used by Sanhedrin to leap the year
+                          because of the spring equinox.</member>
+                          <member>Law 7: Real vernal equinox approximately 2 days before either of these
+                          calculations.</member>
+                        </simplelist>
+                      </section>
+                    </section>
+                    <section id="rambam-summary-astronomical">
+                      <title>Atronomical Calculations.</title>
+                      <section id="rambam-summary-chapter-11">
+                        <title>Chapter 11. Approximation. Angles. Mean and true motions. Epoch and location.</title>
+                        <simplelist>
+                          <member>Laws 1-4: Visibility calculations are deep. Fixed calendar can be appreciated even by
+                          school children in 3 or 4 days.</member>
+                          <member>Laws 5-6: Calculations are simplified/approximated to not fluster the inexprerienced;
+                          result - visibility of the moon - is not affected.</member>
+                          <member>Laws 7-9: 360 degrees; 60 minutes, seconds...; order of the 12
+                          constellations.</member>
+                          <member>Laws 10-12: adding/subtracting angles.</member>
+                          <member>Laws 13-14: Velocities are constant. Earth encircled by all the spheres but isn't in
+                          the center. Notes 14,15 in Moznaim.</member>
+                          <member>Law 15: Mean and true motion.</member>
+                          <member>Law 16: Epoch.</member>
+                          <member>Law 17: Location: Jerusalem; see Chapter 17.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-12">
+                        <title>Chapter 12: Sun and its apogee.</title>
+                        <simplelist>
+                          <member>Law 1: Movement of the Sun. Moznaim Note 6: calculations may be accurate only on the
+                          first day of the month; Note 7. 59′8.33″ Yale, p.99; Neugeb., p. 388ff</member>
+                          <member>Law 2: Movement of the Sun's apogee. Moznaim Note 10: over 800 years, apogee moved ~12
+                          degrees and is in constellation of Cancer. Note 11: position - at 6PM.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-13">
+                        <title>Chapter 13: True position of the sun. True seasons.</title>
+                        <simplelist>
+                          <member>Laws 1-3: Tue position of the Sun.</member>
+                          <member>Law 4: Course correction table.</member>
+                          <member>Laws 5-10: Examples.</member>
+                          <member>Law 11: True seasons.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-14">
+                        <title>Chapter 14</title>
+                        <simplelist>
+                          <member>Law 1: Moon: epicycle and deferent; movement as seen from Earth. See Moznaim
+                          notes!</member>
+                          <member>Law 2: Deferrent table.</member>
+                          <member>Law 3: Epicycle table.</member>
+                          <member>Law 4: Epoch.</member>
+                          <member>Law 5: Time of sighting correction table: ~20 minutes after sunset.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-15">
+                        <title>Chapter 15</title>
+                        <simplelist>
+                          <member>Laws 1-2: Double elongation and its limits. See Moznaim notes!</member>
+                          <member>Laws 3-5: Course correction table.</member>
+                          <member>Laws 4-7: Parallax correction rules and table.</member>
+                          <member>Laws 8-9: Examples.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-16">
+                        <title>Chapter 16</title>
+                        <simplelist>
+                          <member>Laws 1-4: Head movement, table and rules.</member>
+                          <member>Law 5: Example.</member>
+                          <member>Laws 6-18: Moon latitude.</member>
+                          <member>Law 19: Example.</member>
+                        </simplelist>
+                      </section>
+                      <section id="rambam-summary-chapter-17"><title>Chapter 17 (TODO)</title></section>
+                      <section id="rambam-summary-chapter-18"><title>Chapter 18 (TODO)</title></section>
+                      <section id="rambam-summary-chapter-19"><title>Chapter 19 (TODO)</title></section>
+                    </section>
+                  </chapter>
+                </part>
+                <part id="rambam"><title>Part II: The Text</title> <partintro>
+                  <para>Laws of the Sanctification of the Moon</para>
+                  <para>There is one positive commandment: to calculate, to know, and to establish on which day each
+                  month of the year begins. Explanation of this commandment is in these chapters.</para>
+                </partintro> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter1.xml" id="KH1">
+                  <title>Chapter 1</title>
+                  <section role="NotInToc" id="KH1-1">
+                    <title>Law 1</title>
+                    <para>The months of the year are lunar months, as it is said: "[...] the burnt offering of the month
+                    in its month"<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_3" id="src_note_3" class=
+                    "footnote"><sup>3</sup></a> and it is said: "This month shall be for you the head of the months"<a
+                    xmlns="http://www.w3.org/1999/xhtml" href="#_note_4" id="src_note_4" class="footnote"><sup
+                    >4</sup></a>. This is what the sages said: "The Holy One, blessed be He, showed to Moshe, in a
+                    prophetic vision, the image of the Moon, and said to him: '[When] you see [the Moon] like this -
+                    sanctify [it].'"<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_5" id="src_note_5" class=
+                    "footnote"><sup>5</sup></a></para>
+                    <para>But the years that we reckon are solar years, as it is said: "Keep the month of aviv
+                    [spring]".<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_6" id="src_note_6" class="footnote"
+                    ><sup>6</sup></a></para>
+                  </section>
+                  <section role="NotInToc" id="KH1-2">
+                    <title>Law 2</title>
+                    <para>By how much is the solar year longer than the lunar year? By approximately 11 days. Therefore,
+                    when this excess accumulates to around 30 days, or a little less, or a little more, a month is added
+                    and the year is made to have 13 months - which is called a "pregnant" year. [This is done] because
+                    it is impossible to have a year of 12 months and some days, as it is said: "for the months of the
+                    year" - you count the months of the year, but not the days of the year.<a xmlns=
+                    "http://www.w3.org/1999/xhtml" href="#_note_7" id="src_note_7" class="footnote"><sup>7</sup></a>
+                    </para>
+                  </section>
+                  <section role="NotInToc" id="KH1-3">
+                    <title>Law 3</title>
+                    <para>Each month, the moon becomes hidden for about two days, or a little less or more: about one
+                    day before its conjunction with the sun at the end of the month, and about one day after its
+                    conjunction with the sun, and in the evening it is sightet in the west. The night when it is sighted
+                    in the west after being hidden is the beginning of the month. We count 29 days from that day; if the
+                    moon is sighted on the 30th night, the 30th day is the first day of the [next] month. If it is not
+                    sighted, first day of the [next] month is the 31st day, and the 30th day belongs to the previous
+                    month. On the 31st night, we do not depend on the moon, regardless if it is visible or not, since
+                    lunar month is never longer than 30 days.</para>
+                  </section>
+                  <section role="NotInToc" id="KH1-4">
+                    <title>Law 4</title>
+                    <para>Month of 29 days, [when] the moon was sighted on the 30th night, is called "lacking". If the
+                    moon was not sighted, and the previous month has 30 days, it is called "pregnant" month, or "full"
+                    month. The moon sighted on the 30th night is called "moon sighted on time". If it is sighted on the
+                    31st night, but not on the 30th night, it is called "moon sighted on the night of pregnancy".</para>
+                  </section>
+                  <section role="NotInToc" id="KH1-5">
+                    <title>Law 5</title>
+                    <para>Sighting of the moon is not up to an individual, unlike determination of the Shabbos, where
+                    one counts 6 days and observes Shabbos on the 7th, but is given to the court. Only when the court
+                    sanctifies and establishes the day as the beginning of the [new] month does it become the beginning
+                    of the [new] month. As it is said: "this month shall be for you" - this testimony is entrusted to
+                    you.</para>
+                  </section>
+                  <section role="NotInToc" id="KH1-6">
+                    <title>Law 6</title>
+                    <para>The court calculates, like the astronomers who know positions of the planets and their
+                    movements, and look into it until they know if it is possible for the moon to be sighted on time -
+                    that is, on the 30th night - or not. If they determined that it is possible for it to be sighted,
+                    they sit and wait for withnesses all day - that is, the 30th day. If the witnesses did come and were
+                    examined in accordance with the law, and their words were accepted - they sanctify it. If the moon
+                    was not sighted and the witnesses did not come, they complete the 30 days and the month will be
+                    "pregnant". If they found out from calculations that it is impossible to sight the moon, they do not
+                    sit during the 30th day and do not await the witnesses. And if the witnesses did come, it is certain
+                    that they are false witnesses or that they saw a likeness of the moon in the clouds and not the real
+                    moon.</para>
+                  </section>
+                  <section role="NotInToc" id="KH1-7">
+                    <title>Law 7</title>
+                    <para>It is a positive commandment of the Torah for the court to calculate and to know whether the
+                    moon can be sighted or not, and to examine the witnesses before the month is sanctified, and to send
+                    [messengers] to notify the rest of the people which day is the beginning of the month, so that they
+                    know on which day are the festivals. As it is said: "which you will call the holy convocations" and
+                    as it is said : "keep this statute in its time".</para>
+                  </section>
+                  <section role="NotInToc" id="KH1-8">
+                    <title>Law 8</title>
+                    <para>Calculation and establishment of the months and declaration of "pregnant" years is done only
+                    in the Land of Israel, as it is said: "For out of Zion will come forth Torah, and the word of G-d -
+                    from Yerushalaim". But, if there was a man great in wisdom, and ordained in the Land of Israel, who
+                    came out of the Land, and there remains no one equal to him in the Land of Israel, he can calculate
+                    and establish month, and declares "pregnant" years outside of the Land. If he becomes aware that in
+                    the Land of Israel there appeared a man as great as him - or, needless to say, greater than him - he
+                    is prohibited to establish and to proclaim outside of the Land, and if he transgressed and did
+                    establish or did proclaim, it is as if he didn't do a thing.</para>
+                  </section>
+                </chapter> &lt;xi:include href="translation/chapter2.xml"/> &lt;xi:include
+                href="translation/chapter3.xml"/> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter4.xml" id="KH4">
+                  <title>Chapter 4</title>
+                  <section role="NotInToc" id="KH4-1">
+                    <title>Law 1</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH4-2">
+                    <title>Law 2</title>
+                    <para>TODO</para>
+                  </section>
+                </chapter> &lt;xi:include href="translation/chapter5.xml"/> &lt;xi:include
+                href="translation/chapter6.xml"/> &lt;xi:include href="translation/chapter7.xml"/> &lt;xi:include
+                href="translation/chapter8.xml"/> &lt;xi:include href="translation/chapter9.xml"/> &lt;xi:include
+                href="translation/chapter10.xml"/> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter11.xml" id="KH11">
+                  <title>Chapter 11</title>
+                  <section role="NotInToc" id="KH11-1">
+                    <title>Law 1</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-2">
+                    <title>Law 2</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-3">
+                    <title>Law 3</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-4">
+                    <title>Law 4</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-5">
+                    <title>Law 5</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-6">
+                    <title>Law 6</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-7">
+                    <title>Law 7</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-8">
+                    <title>Law 8</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-9">
+                    <title>Law 9</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-10">
+                    <title>Law 10</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-11">
+                    <title>Law 11</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-12">
+                    <title>Law 12</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-13">
+                    <title>Law 13</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-14">
+                    <title>Law 14</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-15">
+                    <title>Law 15</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-16">
+                    <title>Law 16</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH11-17">
+                    <title>Law 17</title>
+                    <para>TODO</para>
+                  </section>
+                </chapter> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter12.xml" id="KH12">
+                  <title>Chapter 12</title>
+                  <section role="NotInToc" id="KH12-1">
+                    <title>Law 1</title>
+                    <para>The mean rate of movement of the sun in one day (that is, twenty-four hours) is fifty-nine
+                    minutes and eight seconds, in symbols - 59′8″. It follows that its movement in ten days is nine
+                    degrees fifty-one minutes and twenty-three seconds, in symbols - 9°51′23″. It also follows that its
+                    movement in a hundred days is ninety-eight degrees thirty-three minutes and fifty-three seconds, in
+                    symbols - 98°33′53″. It also follows that remainder of its movement in a thousand days, after you
+                    subtract all [multiples of] 360° (as was explained) is two hundred sixty-five degrees thirty-eight
+                    minutes and fifty seconds, in symbols - 265°38′50″. It also follows that the remainder of its
+                    movement in ten thousand days is one hundred thirty-six degrees twenty-eight minutes and twenty
+                    seconds, in symbols - 136°28′20″.</para>
+                    <para>And in this way you can multiply and calculate its movement for any number [of days] that you
+                    want. Similarly, if you want to make known to you values of its movement for two days, three, four
+                    and so on to ten - do it. Similarly, if you want for to have known and ready values of its movement
+                    for twenty days, thirty, forty and so on to a hundred - do it. This is clear and known once you know
+                    its movement in 1 day.</para>
+                    <para>And you should have ready and known to you mean movement of the Sun for twenty-nine days and
+                    for three hundred and fifty-four (which is the number of days in the lunar year when its months are
+                    "regular" (TODO link), and it is called "regular year"). The reason is: if you have those movement
+                    values ready, these calculations of the visibility of the moon will be easy, because there are
+                    twenty-nine complete days from the night of observation to the night of observation of the following
+                    month, and so it is every month: no less than twenty-nine days and no more. Since our sole desire in
+                    all those calculations is exclusively to determine visibility [of the moon]. And between the night
+                    of sighting of this month and night of sighting of the same month next year there is either a
+                    regular year or a year and 1 day; and the same every year. Mean movement of the Sun in twenty-nine
+                    days is twenty-eight degrees thirty-five minutes and one second, in symbols - 28°35′1″. Its movement
+                    in a regular year is three hundred forty-eight degrees, fifty-five minutes and fifteen seconds, in
+                    symbols - 348°55′15″.</para>
+                  </section>
+                  <section role="NotInToc" id="KH12-2">
+                    <title>Law 2</title>
+                    <para>There is a point on the Sun's orbit (and on orbits of the other seven planets) such that when
+                    the planet is there it is highest above Earth. This point of the Sun's orbit (and so for other
+                    planets, except for the moon) rotates with constant speed. Its movement every seventy years is
+                    approximately one degree. This point is called <glossterm linkend="gva-hashemesh">Sun's
+                    apogee</glossterm>. Its movement in ten days is one and a half seconds, half a second being thirty
+                    thirds. It follows that its movement in a hundred days is fifteen seconds. Its movement in a
+                    thousand days is two minutes and thirty seconds. Its movement in ten thousand days is twenty five
+                    minutes. It also follows that its movement in twenty nine days is a bit more (TODO!) than four
+                    seconds; and its movement in a regular year is fifty three seconds.</para>
+                    <para>We already said that the epoch that our calculations start from is beginning of the night of
+                    the fifth day that is 3rd of Nisan of the year four thousand nine hundred thirty eight from the
+                    Creation. Position of the Sun in its mean movement at the epoch was seven degrees three minutes and
+                    thirty two seconds in the constellation of Ram (Tele), in symbols - 7°3′32″. Position of the Sun's
+                    apogee at the epoch was twenty six degrees fourty five minutes and eight seconds in the
+                    constellation of Twins, in symbols - 26°45′8″.</para>
+                    <para>When you want to know position of the Sun in its mean movement at any time you want, take the
+                    number of days from the epoch to the day that you want, and find out its mean movement during those
+                    days from the values we mentioned, add all of it to the epoch, adding each kind [of unit] with its
+                    kind, and the result is the position of the Sun in its mean movement on that day.</para>
+                    <para>For example, if we wanted to know Sun's mean position at the beginning of the night of Shabbat
+                    whose day is the fourteenth of Tammuz of this year, which is the year of the epoch - we find the
+                    number of days from the day of the epoch to the beginning of the day that we want to find Sun's
+                    position on to be a hundred days. We take its mean movement over a hundred days - which is 98°33′53″
+                    - and add it to the epoch - which is 7°3′32″. Result of this calculation: one hundred and five
+                    degrees thrity seven minutes and twenty five seconds. In symbols - 105°37′25″. So its position in
+                    its mean movement at the beginning of this night is in the constellation of Cancer, at fifteen
+                    degrees in it, and thirty seven minutes of the sixteenth degree.</para>
+                    <para>Mean position thus calculated is sometimes exactly at the beginning of the night, sometimes an
+                    hour before sunset, and sometimes - an hour after sunset. This fact is not important for the Sun in
+                    the calculations of the observation [of the new Moon] since we compensate for this approximation
+                    when calculating mean Moon.</para>
+                    <para>Do it the same way for whatever time you want whatsoever, even after a thousand years: when
+                    you add up all the reminders and add to the epoch, result you get is the the mean position. And the
+                    same you do for the mean Moon and mean of every planet: once you know what is the movement in one
+                    day and what is the epoch that we start from, and you sum up its movement in the years and days that
+                    you want, and add it to the epoch - you get its position in mean movement.</para>
+                    <para>Do the same for the Sun's apogee: add its movement in those days or years to the epoch, and
+                    you get position of the Sun's apogee for the day that you want.</para>
+                    <para>Also, if you want to make a different epoch from which to start, other that the epoch that we
+                    start from (which is this year), so that epoch is at the beginning of the year of a known cycle or
+                    at the beginning of a hundred-year period - you can do it. And if yuo want the epoch from which you
+                    start to be in the years that already passed before this epoch or many years after it - the way is
+                    known.</para>
+                    <para>What is this way? You already know movement of the Sun in an regular year, and its movement in
+                    twenty nine days, and its movement in one day. And it is known that year whose months are full is
+                    longer than the regular year by one day, and the year whose months are lacking is shorter than the
+                    regular year by one day. And the leap year: if its months are regular, it will be longer than the
+                    regular year by thirty days, and if its months are full, it will be longer than the regular one by
+                    thirty one day, and if its months are lacking, it will be longer than the regular one by twenty nine
+                    days. Once you know all those facts, calculate Sun's mean movement for the years and days that you
+                    want, and add to the epoch that we made, and you'll get its mean position for the day that you want
+                    from the coming years - and that you make into an epoch. Or subtract mean [movement] that you
+                    calculated form the epoch that we made, and you get an epoch for the day that you want from the
+                    years that passed, and make that mean [position] an epoch. And the same you shall do for the mean
+                    Moon and the rest of the planets if [their movements] will be known to you. And it should be clear
+                    to you from the idea of our words that the same way you can find out mean Sun for any day you want
+                    from the coming days, you can calculate its mean for any day you want from the days that
+                    passed.</para>
+                  </section>
+                </chapter> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter13.xml" id="KH13">
+                  <title>Chapter 13</title>
+                  <section role="NotInToc" id="KH13-1">
+                    <title>Law 1</title>
+                    <para>If you want to find out true position of the Sun for any day that you want, first calculate
+                    its mean position for that day the way we explained, and calculate position of the Sun's apogee.
+                    Subtract position of the Sun's apogee from the Sun's mean position; what is left is called
+                    <glossterm>maslul of the Sun</glossterm>.</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-2">
+                    <title>Law 2</title>
+                    <para>See how many degrees is the maslul of the Sun; if maslul was less than one hundred and eighty
+                    degrees, subtract parallax correction from the position of the mean Sun; if maslul was more than one
+                    hundred and eighty degrees up to three hundred and sixty, add parallax correction to the position of
+                    the mean Sun; that what it is after you add to it or subtract from it is the true position.</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-3">
+                    <title>Law 3</title>
+                    <para>Know that if maslul is exactly one hundred and eighty or exactly three hundred and sixty, it
+                    doesn't have parallax correction; rather, the mean position is the true position</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-4">
+                    <title>Law 4</title>
+                    <para>And what is the value of the parallax correction? If maslul will be ten degrees, its parallax
+                    correction will be twenty seconds; and if it will be twenty degrees, its parallax correction will be
+                    fourty minutes; and if it will be thirty degrees, its parallax correction will be fifty eight
+                    minutes; and if it will be fourty degrees, its parallax correction will be one degree and fifteen
+                    minutes; and if it will be fifty degrees, its parallax correction will be one degree and twenty nine
+                    minutes; and if it will be sixty degrees, its parallax correction will be one degree and fourty one
+                    minutes; and if it will be seventy degrees, its parallax correction will be one degree and fifty one
+                    minutes; and if it will be eighty degrees, its parallax correction will be one degree and fifty
+                    seven minutes; and if it will be ninety degrees, its parallax correction will be one degree and
+                    fifty nine minutes; and if it will be one hundred degrees, its parallax correction will be one
+                    degree and fifty eight minutes; and if it will be one hundred and ten degrees, its parallax
+                    correction will be one degree and fifty three minutes; and if it will be one hundred and twenty
+                    degrees, its parallax correction will be one degree and fourty five minutes; and if it will be one
+                    hundred and thirty degrees, its parallax correction will be one degree and thirty three minutes; and
+                    if it will be one hundred and forty degrees, its parallax correction will be one degree and nineteen
+                    minutes; and if it will be one hundred and fifty degrees, its parallax correction will be one degree
+                    and one minute; and if it will be one hundred and sizty degrees, its parallax correction will be
+                    fourty two minutes; and if it will be one hundred and seventy degrees, its parallax correction will
+                    be twenty one minutes; and if it will be one hundred and eighty degrees exactly, it doesn't have
+                    parallax correction, as we explained, rather Sun's mean position is its true position.</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-5">
+                    <title>Law 5</title>
+                    <para>If maslul was more that one hundred and eighty degrees, subtract it from three hundred and
+                    sixty degrees and find out its parallax correction. For example, if maslul was two hundred degrees,
+                    subtract it from three hundred and suxty, and one hundred and sixty degrees will be left. And we
+                    already made known that parallax correction for one hundred and sixty degrees is fourty two minutes,
+                    and so is the parallax correction for two hundred - fourty two minutes.</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-6">
+                    <title>Law 6</title>
+                    <para>Also, if the maslul was three hindred degrees, subtract it from three hundred and sixty - and
+                    sixty will remain. And you already know that parallax correction for sixty degrees [is] one degree
+                    and fouty one minutes, and so is the parallax correction for three hundred degrees. And the same way
+                    - for every number.</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-7">
+                    <title>Law 7</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-8">
+                    <title>Law 8</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-9">
+                    <title>Law 9</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-10">
+                    <title>Law 10</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH13-11">
+                    <title>Law 11</title>
+                    <para>TODO</para>
+                  </section>
+                </chapter> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter14.xml" id="KH14">
+                  <title>Chapter 14</title>
+                  <section role="NotInToc" id="KH14-1">
+                    <title>Law 1</title>
+                    <para>The moon has two mean movements. The moon itself rotates on a small circle that does not
+                    surround all of the Earth. Moon's movement on that small circle is called <glossterm linkend=
+                    "mla-term">mean lunar anomaly</glossterm> (אמצע המסלול). The small circle (epicycle TODO link to
+                    Wikipedia) itself rotates on a big circle (deferent TODO link to Wikipedia) that encircles the
+                    Earth. The mean movement of the small circle on the big circle that encircles the Earth is called
+                    movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח).</para>
+                  </section>
+                  <section role="NotInToc" id="KH14-2">
+                    <title>Law 2</title>
+                    <para>Movement in mean lunar longitude in one day is 13°10′35″<a xmlns=
+                    "http://www.w3.org/1999/xhtml" href="#_note_8" id="src_note_8" class="footnote"><sup
+                    >8</sup></a>.</para>
+                    <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
+                    <para>And in this way you can calculate it for any number of days and years that you want.</para>
+                  </section>
+                  <section role="NotInToc" id="KH14-3">
+                    <title>Law 3</title>
+                    <para>Movement in mean lunar anomaly in one day is 13°3′54″.</para>
+                    <para>For longer periods, (remainder) of the movement in mean lunar anomaly is:</para>
+                  </section>
+                  <section role="NotInToc" id="KH14-4">
+                    <title>Law 4</title>
+                    <para>In the beginning of the night to Thursday that is the epoch (TODO measured from what? Chapter
+                    11?) [TODO: link to definition] for these calculations, mean lunar longitude was 1°14′43″ into the
+                    constellation of Ram. And mean lunar anomaly on the epoch was 84°28′42″. Now that you know rate of
+                    movement in the mean lunar longitude and its value on the epoch to which you add, you'll calculate
+                    mean lunar longitude on any day that you want the same way as you did for the mean solar longitude.
+                    TODO: reference</para>
+                  </section>
+                  <section role="NotInToc" id="KH14-5">
+                    <title>Law 5</title>
+                    <para>After you calculate mean lunar longitude at the beginning of the night that you want,
+                    contemplate the sun (TODO: longitude?) and figure out which constellation (zodiac) is it in<a xmlns=
+                    "http://www.w3.org/1999/xhtml" href="#_note_9" id="src_note_9" class="footnote"><sup>9</sup></a>.
+                    [This is the correction of the mean lunar longitude depending on the mean solar longitude:]</para>
+                  </section>
+                  <section role="NotInToc" id="KH14-6">
+                    <title>Law 6</title>
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                    "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
+                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">Solar Longitude on the Zodiac</td>
+                        <td class="entry">from</td>
+                        <td class="entry">to, not including<a href="#_note_10" id="src_note_10" class="footnote"><sup
+                        >10</sup></a></td>
+                        <td class="entry">Lunar longitude correction</td>
+                      </tr></thead>
+                      <tbody>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">middle of Pisces-middle of Taurus<a href="#_note_11" id="src_note_11" class=
+                          "footnote"><sup>11</sup></a></td>
+                          <td class="entry">315°</td>
+                          <td class="entry">15°</td>
+                          <td class="entry">0°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">middle of Taurus-beginning of Gemini</td>
+                          <td class="entry">15°</td>
+                          <td class="entry">30°</td>
+                          <td class="entry">0°15′</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">beginning of Gemini-beginning of Leo</td>
+                          <td class="entry">30°</td>
+                          <td class="entry">90°</td>
+                          <td class="entry">0°15′</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">beginning of Leo-middle of Virgo</td>
+                          <td class="entry">90°</td>
+                          <td class="entry">135°</td>
+                          <td class="entry">0°15′</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">middle of Virgo-middle of Libra</td>
+                          <td class="entry">135°</td>
+                          <td class="entry">165°</td>
+                          <td class="entry">0°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">middle of Libra-beginning of Sagittarius</td>
+                          <td class="entry">165°</td>
+                          <td class="entry">210°</td>
+                          <td class="entry">-0°15′</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">beginning of Sagittarius-beginning of Aquarius</td>
+                          <td class="entry">210°</td>
+                          <td class="entry">270°</td>
+                          <td class="entry">-0°30′</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">beginning of Aquarius-middle of Pisces</td>
+                          <td class="entry">270°</td>
+                          <td class="entry">315°</td>
+                          <td class="entry">-0°15′</td>
+                        </tr>
+                      </tbody>
+                    </tgroup></table>
+                    <para>The value of mean [lunar longitude] after you add to it or subtract from it or leave it as it
+                    is - that is mean lunar longitude approximately a third of an hour after sunset on the date you are
+                    calculating it for. And this is what is called <glossterm>mean lunar longitude at observation
+                    time</glossterm>.</para>
+                  </section>
+                </chapter> <chapter version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/translation/chapter15.xml" id="KH15">
+                  <title>Chapter 15</title>
+                  <section role="NotInToc" id="KH15-1">
+                    <title>Law 1</title>
+                    <para>To find <glossterm linkend="tll-term">true lunar longitude</glossterm> on a specific day:
+                    First, calculate mean lunar longitude during observation time of the desired night. Also, calculate
+                    mean lunar anomaly and mean solar longitude for the same time. Then, subtract mean solar longitude
+                    from the mean lunar longitude and double the result. This value is called <glossterm linkend=
+                    "dd-term">doubled distance</glossterm> .</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-2">
+                    <title>Law 2</title>
+                    <para>We already stipulated that all the calculations in these chapters are for one purpose only: to
+                    know if the moon is visible. And it is not possible for this double distance during the night of
+                    observation when the moon is indeed visible to be outside of the interval from 5° to 62°. It cannot
+                    be more - nor less.</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-3">
+                    <title>Law 3</title>
+                    <para>A correction that depends on the doubled distance is added to the mean lunar anomaly, giving
+                    <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון):</para>
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                    "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="2">
+                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                        <td class="entry">doubled distance</td>
+                        <td class="entry">correction of the mean anomaly</td>
+                      </tr></thead>
+                      <tbody>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">~5°</td>
+                          <td class="entry">0°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">6°-11°</td>
+                          <td class="entry">1°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">12°-18°</td>
+                          <td class="entry">2°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">19°-24°</td>
+                          <td class="entry">3°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">25°-31°</td>
+                          <td class="entry">4°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">32°-38°</td>
+                          <td class="entry">5°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">39°-45°</td>
+                          <td class="entry">6°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">46°-51°</td>
+                          <td class="entry">7°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">52°-59°</td>
+                          <td class="entry">8°</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">60°-63°</td>
+                          <td class="entry">9°</td>
+                        </tr>
+                      </tbody>
+                    </tgroup></table>
+                  </section>
+                  <section role="NotInToc" id="KH15-4">
+                    <title>Law 4</title>
+                    <para id="l15-4">Then, see how many degrees is corrected lunar anomaly. If it is less than 180°,
+                    subtract visible anomaly of this corrected anomaly from the mean lunar longitude the observation
+                    time. And if corrected lunar anomaly is more than 180° but less than 360°, add visible anomaly of
+                    this corrected anomaly to the mean lunar longitude the observation time. And mean lunar longitude
+                    after you add to it or subtract from it is the <glossterm>true lunar longitude at the observation
+                    time</glossterm>.</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-5">
+                    <title>Law 5</title>
+                    <para>If the corrected anomaly is 180° or 360°, there is no visible anomaly, so mean lunar longitude
+                    at observation time is also true longitude.<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_12"
+                    id="src_note_12" class="footnote"><sup>12</sup></a></para>
+                  </section>
+                  <section role="NotInToc" id="KH15-6">
+                    <title>Law 6</title>
+                    <para>What is the value of the visible anomaly for a given value of the corrected anomaly?</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-7">
+                    <title>Law 7</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-8">
+                    <title>Law 8</title>
+                    <para>TODO</para>
+                  </section>
+                  <section role="NotInToc" id="KH15-9">
+                    <title>Law 9</title>
+                    <para>TODO</para>
+                  </section>
+                </chapter> &lt;xi:include href="translation/chapter16.xml"/> &lt;xi:include
+                href="translation/chapter17.xml"/> &lt;xi:include href="translation/chapter18.xml"/> &lt;xi:include
+                href="translation/chapter19.xml"/></part>
+                <glossary version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/glossary.xml" id="glossary">
+                  <title>Glossary</title>
+                  <glossdiv>
+                    <title>Astronomical terms</title>
+                    <glossentry id="gva-hashemesh">
+                      <glossterm>Sun's apogee</glossterm>
+                      <glossdef><para>Point on the orbit of the Sun where it is highest above the Earth.</para>
+                      </glossdef>
+                    </glossentry>
+                    <glossentry id="mla-term">
+                      <glossterm>mean lunar anomaly (אמצע המסלול)</glossterm>
+                      <acronym>mla</acronym>
+                      <glossdef><para>Mean angular coordinate of the Moon on its epicycle.</para></glossdef>
+                    </glossentry>
+                    <glossentry id="tll-term">
+                      <glossterm>true lunar longitude (הירח האמיתי)</glossterm>
+                      <glossdef><para>???</para></glossdef>
+                    </glossentry>
+                    <glossentry id="dd-term">
+                      <glossterm>doubled distance (מרחק הכפול)</glossterm>
+                      <glossdef><para>???</para></glossdef>
+                    </glossentry>
+                  </glossdiv>
+                </glossary>
+                <bibliography version="5.0" xml:base=
+                "file:/home/dub/OpenTorah/opentorah.org/calendar/src/main/docBook/bibliography.xml" id="bibliography">
+                  <bibliodiv>
+                    <title>Laws of Sanctification of the Moon by Rambam</title>
+                    <biblioentry id="Vilno" xreflabel="Vilno">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <publisher><publishername>Widow and Brothers Romm</publishername></publisher>
+                    </biblioentry>
+                    <biblioentry id="LaAm" xreflabel="Rambam LaAm">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <edition>Rambam LaAm</edition>
+                    </biblioentry>
+                    <biblioentry id="Eshkol" xreflabel="Eshkol">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <publisher><publishername>Eshkol</publishername></publisher>
+                      <pubdate>1987</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Kapach" xreflabel="Kapach"><author><personname>Rambam</personname></author> <title
+                    >Mishne Torah</title> <editor><personname>
+                      <honorific>Rabbi</honorific>
+                      <surname>Kapach</surname>
+                    </personname></editor> TODO translation of his introduction:
+                    https://mhcny.org/pdf/Introduction%20to%20Mishneh%20Torah.pdf</biblioentry>
+                    <biblioentry id="Frenkel" xreflabel="Frenkel">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <editor><personname>
+                        <honorific>Rabbi</honorific>
+                        <surname>Frenkel</surname>
+                      </personname></editor>
+                    </biblioentry>
+                    <biblioentry id="Bluming" xreflabel="Bluming">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <edition>Rambam HaAruch</edition>
+                      <editor><personname>
+                        <honorific>Rabbi</honorific>
+                        <firstname>Y</firstname>
+                        <surname>Bluming</surname>
+                      </personname></editor>
+                      <pubdate>2005</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Hazak" xreflabel="Hazak"><author><personname>Rambam</personname></author> <title
+                    >Mishne Torah</title> <edition>HaSholem</edition> <pubdate>2010</pubdate> TODO see p.37-41 for their
+                    list of the versions of Rambam with misprints corrected, and the reason they chose the Kapach
+                    version: it being based solely on the Yemenite manuscripts that were not affected by the censorship
+                    unlike the Ashkenazic ones and the Frenkel version being combination of various manuscripts and
+                    editions (which is funny, since Kapach repeats Askenazic misprints in the Laws of the Sanctification
+                    of the Moon)</biblioentry>
+                    <biblioentry id="Yale" xreflabel="Yale">
+                      <author><personname>Rambam</personname></author>
+                      <editor role="translator"><personname>
+                        <firstname>Solomon</firstname>
+                        <surname>Gandz</surname>
+                      </personname></editor>
+                      <editor role="introduction"><personname>
+                        <firstname>Julian</firstname>
+                        <surname>Obermann</surname>
+                      </personname></editor>
+                      <title>Mishne Torah</title>
+                      <title>Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica
+                      Series, Vol. 11)</title>
+                      <publisher><publishername>Yale</publishername></publisher>
+                      <pubdate>1967</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Touger" xreflabel="Touger">
+                      <author><personname>Rambam</personname></author>
+                      <title>Mishne Torah</title>
+                      <editor><personname>
+                        <honorific>Rabbi</honorific>
+                        <surname>Touger</surname>
+                      </personname></editor>
+                    </biblioentry>
+                    <biblioentry id="HazonIsh"><author><personname>Hazon Ish</personname></author></biblioentry>
+                  </bibliodiv>
+                  <bibliodiv>
+                    <title>Jewish Writings on Calendar</title>
+                    <biblioentry id="Losh" xreflabel="Losh">
+                      <title>Sefer HaTchunah LeMatchil</title>
+                      <author><personname>
+                        <firstname>Yosef Yitzchok</firstname>
+                        <surname>Losh</surname>
+                      </personname></author>
+                      <pubdate>1988</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Keller" xreflabel="Keller">
+                      <title>Tchunat HaShamaim</title>
+                      <author><personname>
+                        <firstname>Yosef Yitzchok</firstname>
+                        <surname>Keller</surname>
+                      </personname></author>
+                      <pubdate>1988</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Glitzenshtein" xreflabel="Glitzenshtein">
+                      <title>Kidush HaChodesh LeHaRambam</title>
+                      <author><personname>
+                        <firstname>Menachem Mendel</firstname>
+                        <surname>Glitzenshtein</surname>
+                      </personname></author>
+                      <pubdate>1993</pubdate>
+                    </biblioentry>
+                    <biblioentry id="Tzikuni" xreflabel="Tzikuni">
+                      <title>הזון שמים (Hazon Shamaim)</title>
+                      <author><personname>
+                        <firstname>Eitan</firstname>
+                        <surname>Tzikuni</surname>
+                      </personname></author>
+                      <pubdate>2001</pubdate>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Hazon Ish and the sine tables</title>
+                      <biblioid class="uri">http://www.biu.ac.il/JH/Parasha/pekudey/lev.html</biblioid>
+                    </biblioentry>
+                  </bibliodiv>
+                  <bibliodiv>
+                    <title>Greeks on Astronomy</title>
+                    <biblioentry id="Neugebauer" xreflabel="Neugebauer">
+                      <title>The Exact Sciences in Antiquity</title>
+                      <author><personname>
+                        <firstname>Otto</firstname>
+                        <surname>Neugebauer</surname>
+                      </personname></author>
+                      <edition>2nd</edition>
+                      <publisher><publishername>Dover Publications</publishername></publisher>
+                      <pubdate>1969</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Astronomy and History Selected Essays</title>
+                      <author><personname>
+                        <firstname>Otto</firstname>
+                        <surname>Neugebauer</surname>
+                      </personname></author>
+                      <publisher><publishername>Springer</publishername></publisher>
+                      <pubdate>August 8, 1983</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0387908447</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Crowe" xreflabel="Crowe">
+                      <title>Theories of the World from Antiquity to the Copernican Revolution</title>
+                      <author><personname>
+                        <firstname>Michael</firstname>
+                        <othername>J.</othername>
+                        <surname>Crowe</surname>
+                      </personname></author>
+                      <edition>2nd</edition>
+                      <publisher><publishername>Dover Publications</publishername></publisher>
+                      <pubdate>2001</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Evans" xreflabel="Evans">
+                      <title>The History &amp; Practice of Ancient Astronomy</title>
+                      <author><personname>
+                        <firstname>James</firstname>
+                        <surname>Evans</surname>
+                      </personname></author>
+                      <publisher><publishername>Oxford University Press</publishername></publisher>
+                      <pubdate>1998</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Thurston" xreflabel="Thurston">
+                      <title>Early Astronomy</title>
+                      <author><personname>
+                        <firstname>Hugh</firstname>
+                        <surname>Thurston</surname>
+                      </personname></author>
+                      <publisher><publishername>Springer Verlag</publishername></publisher>
+                      <pubdate>1996</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Almagest" xreflabel="Almagest">
+                      <title>Ptolemy's Almagest</title>
+                      <author role="translator"><personname>
+                        <firstname>G. J.</firstname>
+                        <surname>Toomer</surname>
+                      </personname></author>
+                      <publisher><publishername>Princeton University Press</publishername></publisher>
+                      <pubdate>1998</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Campanus" xreflabel="Campanus">
+                      <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
+                      <authorgroup>
+                        <author><personname>
+                          <firstname>G. J.</firstname>
+                          <surname>Toomer</surname>
+                          <lineage>Jr</lineage>
+                        </personname></author>
+                        <author><personname>
+                          <firstname>Francis</firstname>
+                          <othername>S.</othername>
+                          <surname>Benjamin</surname>
+                        </personname></author>
+                      </authorgroup>
+                      <publisher><publishername>University of Wisconsin Press</publishername></publisher>
+                      <pubdate>1972</pubdate>
+                      <biblioid class="uri">http://isbn.nu/029905960X</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Ancient Planetary Model Animations</title>
+                      <biblioid class="uri">http://people.sc.fsu.edu/~dduke/models</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>A Modern Almagest: An updated version of Ptolemy's Almagest</title>
+                      <biblioid class="uri">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Summary of Ptolemaic Astronomy</title>
+                      <biblioid class="uri"
+                      >http://www.clas.ufl.edu/users/ufhatch/HIS-SCI-STUDY-GUIDE/0034_summaryPtolemiacAstron.html</biblioid>
+                    </biblioentry>
+                  </bibliodiv>
+                  <bibliodiv>
+                    <title>Contemporary Models</title>
+                    <biblioentry id="Meeus" xreflabel="Meeus">
+                      <title>Astronomical Algorithms</title>
+                      <author><personname>
+                        <firstname>Jean</firstname>
+                        <surname>Meeus</surname>
+                      </personname></author>
+                      <edition>2nd</edition>
+                      <publisher><publishername>Willmann-Bell</publishername></publisher>
+                      <pubdate>1998</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Montenbruck" xreflabel="Montenbruck">
+                      <title>Astronomy on the Personal Computer</title>
+                      <authorgroup>
+                        <author><personname>
+                          <firstname>Oliver</firstname>
+                          <surname>Montenbruck</surname>
+                        </personname></author>
+                        <author><personname>
+                          <firstname>Thomas</firstname>
+                          <surname>Pfleger</surname>
+                        </personname></author>
+                      </authorgroup>
+                      <edition>4th</edition>
+                      <publisher><publishername>Springer Verlag</publishername></publisher>
+                      <pubdate>2000</pubdate>
+                      <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Dershowitz" xreflabel="Dershowitz">
+                      <title>Calendrical Calculations</title>
+                      <authorgroup>
+                        <author><personname>
+                          <firstname>Nachum</firstname>
+                          <surname>Dershowitz</surname>
+                        </personname></author>
+                        <author><personname>
+                          <firstname>Edward</firstname>
+                          <othername>M.</othername>
+                          <surname>Reingold</surname>
+                        </personname></author>
+                      </authorgroup>
+                      <edition>3rd</edition>
+                      <publisher><publishername>Cambridge University Press</publishername></publisher>
+                      <pubdate>2008</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0521702386</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Dermott" xreflabel="Dermott">
+                      <title>Solar System Dynamics</title>
+                      <authorgroup>
+                        <author><personname>
+                          <firstname>S.</firstname>
+                          <othername>F.</othername>
+                          <surname>Dermott</surname>
+                        </personname></author>
+                        <author><personname>
+                          <firstname>Carl</firstname>
+                          <othername>D.</othername>
+                          <surname>Murray</surname>
+                        </personname></author>
+                      </authorgroup>
+                      <publisher><publishername>Cambridge University Press</publishername></publisher>
+                      <pubdate>2000</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>How to compute planetary positions</title>
+                      <biblioid class="uri">http://stjarnhimlen.se/comp/ppcomp.html</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Sky View</title>
+                      <biblioid class="uri">http://www.sky-view.co.il/</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Israeli New Moon Society</title>
+                      <biblioid class="uri">https://sites.google.com/site/moonsoc/</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>EarthTools</title>
+                      <biblioid class="uri">http://www.earthtools.org/webservices.htm#usage</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>NOAA Solar Calculator</title>
+                      <biblioid class="uri">http://www.esrl.noaa.gov/gmd/grad/solcalc/</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>Naval Oceanography Portal</title>
+                      <biblioid class="uri">http://aa.usno.navy.mil/data/index.php</biblioid>
+                    </biblioentry>
+                    <biblioentry><title>Zmanim</title> <biblioid class="uri"
+                    >http://www.myzmanim.com/search.aspx</biblioid> TODO also
+                    https://kosherjava.com/zmanim-project/how-to-use-the-zmanim-api/</biblioentry>
+                    <biblioentry>
+                      <title>MikvahCalendar</title>
+                      <biblioid class="uri">https://www.mikvahcalendar.com/</biblioid>
+                    </biblioentry>
+                  </bibliodiv>
+                  <bibliodiv>
+                    <title>On Jewish Calendar</title>
+                    <biblioentry>
+                      <title>Understanding the Jewish Calendar</title>
+                      <author><personname>
+                        <firstname>Nathan</firstname>
+                        <surname>Bushwick</surname>
+                      </personname></author>
+                      <publisher><publishername>Moznaim</publishername></publisher>
+                      <pubdate>February 1, 1989</pubdate>
+                      <biblioid class="uri">http://isbn.nu/0940118173</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>The Hebrew Calendar</title>
+                      <author><personname>
+                        <honorific>Dr</honorific>
+                        <firstname>Irv</firstname>
+                        <surname>Bromberg</surname>
+                      </personname></author>
+                      <publisher><publishername>University of Toronto, Canada</publishername></publisher>
+                      <biblioid class="uri">http://www.sym454.org/hebrew</biblioid>
+                    </biblioentry>
+                    <biblioentry id="Feldman" xreflabel="Feldman">
+                      <author><personname>
+                        <firstname>W. M.</firstname>
+                        <surname>Feldman</surname>
+                      </personname></author>
+                      <title>Rabbinical Mathematics and Astronomy</title>
+                      <seriesvolnums>Judaic Studies Library; No. Shp4</seriesvolnums>
+                      <publisher><publishername>Intellectbooks</publishername></publisher>
+                      <pubdate>January 1, 1931</pubdate>
+                      <edition>3</edition>
+                      <biblioid class="uri">http://isbn.nu/0872030261</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <author><personname>Belenkiy</personname></author>
+                      <biblioid class="uri">http://u.cs.biu.ac.il/~belenka/calendar.html</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <author><personname>Bromberg</personname></author>
+                      <biblioid class="uri">http://individual.utoronto.ca/kalendis/</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <author><personname>
+                        <firstname>Remy</firstname>
+                        <surname>Landau</surname>
+                      </personname></author>
+                      <title>Hebrew Calendar Science and Myths</title>
+                      <biblioid class="uri">http://hebrewcalendar.tripod.com/</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <author><personname>
+                        <firstname>Sacha</firstname>
+                        <surname>Stern</surname>
+                      </personname></author>
+                      <title>Calendar and Community: A History of the Jewish Calendar, 2nd Century BCE to 10th Century
+                      CE</title>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>A primitive rabbinic calendar text from the Cairo Genizah</title>
+                      <author><personname>
+                        <firstname>Sacha</firstname>
+                        <surname>Stern</surname>
+                      </personname></author>
+                      <biblioid class="uri">https://www.jjs-online.net/archives/fulltext/3259</biblioid>
+                    </biblioentry>
+                    <biblioentry>
+                      <title>The Reality of Epicycles and Eccentrics Denied</title>
+                      <biblioid class="uri">http://homepages.wmich.edu/~mcgrew/maimonides.htm</biblioid>
+                    </biblioentry>
+                  </bibliodiv>
+                </bibliography>
+              </book>
+              <div class="endnotes">
+                <span class="endnote" id="_note_1">
+                  <a href="#src_note_1" class="endnote-backlink">1</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">It is not clear
+                  how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic editions.</para>
+                </span>
+                <span class="endnote" id="_note_2">
+                  <a href="#src_note_2" class="endnote-backlink">2</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Reprints the
+                  text and does not correct any of the misprints - surpising for a textbook on the subject (even
+                  introductory). TODO: Link to the scans of the appropriate pages - with the stuff highlighted.</para>
+                </span>
+                <span class="endnote" id="_note_3">
+                  <a href="#src_note_3" class="endnote-backlink">3</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Bamidbar
+                  28:14</para>
+                </span>
+                <span class="endnote" id="_note_4">
+                  <a href="#src_note_4" class="endnote-backlink">4</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Shemos
+                  12:2</para>
+                </span>
+                <span class="endnote" id="_note_5">
+                  <a href="#src_note_5" class="endnote-backlink">5</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Rosh Hashanah
+                  20b; Menachot 29a</para>
+                </span>
+                <span class="endnote" id="_note_6">
+                  <a href="#src_note_6" class="endnote-backlink">6</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Dvarim
+                  16</para>
+                </span>
+                <span class="endnote" id="_note_7">
+                  <a href="#src_note_7" class="endnote-backlink">7</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Megilla 5a;
+                  Nazir 7a</para>
+                </span>
+                <span class="endnote" id="_note_8">
+                  <a href="#src_note_8" class="endnote-backlink">8</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is part of
+                  Law 1.</para>
+                </span>
+                <span class="endnote" id="_note_9">
+                  <a href="#src_note_9" class="endnote-backlink">9</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is part of
+                  Law 4.</para>
+                </span>
+                <span class="endnote" id="_note_10">
+                  <a href="#src_note_10" class="endnote-backlink">10</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">My
+                  understanding of the word usage in the original.</para>
+                </span>
+                <span class="endnote" id="_note_11">
+                  <a href="#src_note_11" class="endnote-backlink">11</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">See Chapter 11,
+                  Law 7 on the start of Jewish Zodiac. (TODO reference)</para>
+                </span>
+                <span class="endnote" id="_note_12">
+                  <a href="#src_note_12" class="endnote-backlink">12</a>
+                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is Law
+                  5.</para>
+                </span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </main>
+    <footer class="site-footer h-card">
+      <data class="u-url" href="/"/>
+      <div class="wrapper">
+        <div class="footer-col-wrapper">
+          <div class="footer-col footer-col-1">
+            <ul class="contact-list">
+              <li class="p-name">www.opentorah.org</li>
+              <li><a class="u-email" href="mailto:dub@opentorah.org">dub@opentorah.org</a></li>
+            </ul>
+          </div>
+          <div class="footer-col footer-col-2">
+            <ul class="social-media-list">
+              <li><a href="https://github.com/opentorah">
+                <svg class="svg-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href=
+                "/assets/icons.svg#github"></use></svg>
+                <span class="username">opentorah</span>
+              </a></li>
+              <li><a href="https://www.twitter.com/theopentorah">
+                <svg class="svg-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href=
+                "/assets/icons.svg#twitter"></use></svg>
+                <span class="username">theopentorah</span>
+              </a></li>
+            </ul>
+          </div>
+          <div class="footer-col footer-col-3">documents related to early Chabad history<br/> 🄯 <a href=
+          "http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a> <a href=
+          "http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a></div>
+        </div>
+      </div>
+    </footer>
+  </body>
+  <script type="module">import loadWindow from '/js/window.js'; loadWindow('defaultViewer', null);</script>
+</html>
