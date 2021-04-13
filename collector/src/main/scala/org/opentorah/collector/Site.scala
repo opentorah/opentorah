@@ -2,9 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.html
-import org.opentorah.site.{Caching, ListFile, Site => HtmlSite}
+import org.opentorah.site.{Caching, ListFile, Store, Site => HtmlSite, WithSource}
 import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
-  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, Unclear, Entity => TeiEntity}
+  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Attribute, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
@@ -43,6 +43,7 @@ final class Site(
   licenseUrl,
   googleAnalyticsId,
   isMathJaxEnabled = false,
+  useMathJax3 = true,
   email,
   githubUsername,
   twitterUsername,
@@ -58,12 +59,13 @@ final class Site(
   override protected def resolveHtmlContent(htmlContent: org.opentorah.site.HtmlContent[Site]): Caching.Parser[Xml.Element] =
     htmlContent.content(this) >>= (content => Tei.toHtml(
       linkResolver(htmlContent match {
-        case htmlFacet: Document.TextFacet => Some (htmlFacet)
+        case htmlFacet: Document.TextFacet => Some(htmlFacet)
         case _ => None
       }),
       content
     ))
 
+  // TODO move to site
   override protected def htmlPrettyPrinter: PrettyPrinter = Site.htmlPrettyPrinter
 
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
@@ -109,12 +111,11 @@ final class Site(
   )
   def getUnclears: Caching.Parser[Seq[WithSource[Unclear.Value]]] = unclears.get
 
-  def resolve(url: String): Caching.Parser[Option[Store.Path]] = resolve(Files.splitAndDecodeUrl(url))
-
-  def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] =
+  override def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] =
     if (path.isEmpty) ZIO.some(Seq(Index.Flat))
     else Store.resolve(path, this, Seq.empty)
 
+  // TODO generalize and move to site
   // TODO ZIOify logging!
   //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
   def resolveContent(path: Seq[String]): Task[Option[(String, Boolean)]] =
@@ -148,9 +149,8 @@ final class Site(
     )))
   )
 
-  def a(htmlContent: HtmlContent): html.a = a(htmlContent.path(this))
-
-  def a(path: Store.Path): html.a = html
+  // TODO move to site?
+  override def a(path: Store.Path): html.a = html
     .a(path.map(_.structureName))
     .setTarget((path.last match {
       case htmlContent: HtmlContent => htmlContent.viewer
@@ -208,16 +208,14 @@ final class Site(
       _ <- ZIO.foreach_(collections)(_.writeDirectory())
 
       _ <- Effects.effect(Site.logger.info("Writing references."))
-      allReferences <- WithSource.all[EntityReference](
-        this,
+      allReferences <- allWithSource[EntityReference](
         nodes => ZIO.foreach(EntityType.values)(entityType =>
           Xml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
       )
       _ <- Effects.effect(references.write(allReferences))
 
       _ <- Effects.effect(Site.logger.info("Writing unclears."))
-      allUnclears <- WithSource.all[Unclear.Value](
-        this,
+      allUnclears <- allWithSource[Unclear.Value](
         nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
       _ <- Effects.effect(unclears.write(allUnclears))
@@ -248,33 +246,45 @@ final class Site(
       _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries >>= (ZIO.foreach_(_)(document =>
           resolveHtmlContent(collection.textFacet.of(document)))))
 
-      _ <- if (!withPrettyPrint) Effects.ok else prettyPrint()
+      _ <- if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint())
     } yield ()
   }
 
-  private def prettyPrint(): Caching.Parser[Unit] = for {
-    _ <- Effects.effect(Site.logger.info("Pretty-printing site."))
+  def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
 
-    _ <- entities.directoryEntries >>= (ZIO.foreach_(_)(entity => entities.getFile(entity).map(teiEntity =>
-      entities.writeFile(
-        entity,
-        content = Store.renderXml(TeiEntity.xmlElement(teiEntity))
-      )
-    )))
+    def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Parser[Seq[WithSource[T]]] = {
+      val source: String = Files.mkUrl(htmlContent.path(this).map(_.structureName))
+      finder(nodes).map(_.map(new WithSource[T](source, _)))
+    }
 
-    _ <- ZIO.foreach_(collections)(collection => ZIO.succeed(Files.write(
-      file = Files.url2file(collection.fromUrl.url),
-      content = Store.renderXml(Collection, collection)
-    )))
+    for {
+      entities <- entities.directoryEntries
+      fromEntities <- ZIO.foreach(entities)(entity =>
+        entity.teiEntity(this) >>= (teiEntity => withSource(entity, teiEntity.content)))
+      fromHierarchicals <- ZIO.foreach(hierarchies ++ collections) { hierarchical => withSource(
+        hierarchical,
+        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
+      )}
+      fromDocuments <- ZIO.foreach(collections) { collection =>
+        collection.directoryEntries >>= (documents => ZIO.foreach(documents) { document =>
+          val text: Document.TextFacet = collection.textFacet.of(document)
+          text.getTei >>= (tei => withSource(text, Seq(Tei.xmlElement(tei))))
+        })
+      }
+    } yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten
+  }
 
-    _ <- ZIO.foreach_(collections)(collection =>
-      collection.directoryEntries >>= (ZIO.foreach_(_)(document => collection.getFile(document).map(text =>
-        collection.writeFile(
-        document,
-        content = Tei.renderXml(text)
-      ))))
+  private def prettyPrint(): Unit = {
+    Site.logger.info("Pretty-printing site.")
+    HtmlSite.prettyPrint(
+      List(
+//        Files.url2file(fromUrl.url),  // leave the site.xml file alone :)
+        Files.url2file(entities.directoryUrl),
+        Files.url2file(Files.subdirectory(fromUrl.url, "archive")) // TODO do not assume the directory name!
+      ),
+      xml => if (xml.label == "TEI") (Tei.prettyPrinter, None) else (Store.prettyPrinter, None)
     )
-  } yield ()
+  }
 
   private def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
 }

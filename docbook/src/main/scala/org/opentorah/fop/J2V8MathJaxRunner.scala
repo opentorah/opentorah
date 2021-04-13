@@ -2,7 +2,7 @@ package org.opentorah.fop
 
 import com.eclipsesource.v8._
 import com.eclipsesource.v8.utils.V8ObjectUtils
-import org.opentorah.mathjax.MathJaxConfiguration
+import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
 import java.io.File
 import scala.jdk.CollectionConverters._
 
@@ -18,73 +18,62 @@ import scala.jdk.CollectionConverters._
 // Some tests fail if their order is reversed when mathJax instance is re-used;
 // this doesn't look like a threading issue - or maybe whatever I "solved" by using fresh MathJax instance
 // for each typesetting wasn't (just) a threading issue either?
-final class J2V8MathJax(
+final class J2V8MathJaxRunner(
   node: Node,
+  mathJax: MathJax,
   configuration: MathJaxConfiguration
-) extends MathJax(configuration) {
+) extends MathJaxRunner(
+  mathJax,
+  configuration
+) {
 
   override def typeset(
     options: Map[String, Any],
     outputName: String
   ): String = {
-    val worker: J2V8MathJaxWorker = new J2V8MathJaxWorker(node.nodeModules)
+    val nodeJS: NodeJS = NodeJS.createNodeJS
+    def v8: V8 = nodeJS.getRuntime
+    val mathJaxNode: V8Object = nodeJS.require(new File(node.nodeModules, mathJax.packageName))
 
-    worker.configure(configuration.toMap)
-    val result = worker.typeset(options, outputName)
-    worker.close()
-    result
-  }
-}
+    val configurationArgs: V8Array =
+      V8ObjectUtils.toV8Array(v8, List(J2V8.map2java(mathJax.nodeConfiguration(configuration))).asJava)
+    mathJaxNode.executeVoidFunction(mathJax.configurationFunction, configurationArgs)
+    configurationArgs.release()
 
-private final class J2V8MathJaxWorker(nodeModules: File) {
-  val nodeJS: NodeJS = NodeJS.createNodeJS
-
-  def v8: V8 = nodeJS.getRuntime
-
-  val mathJaxNode: V8Object =
-    nodeJS.require(new File(nodeModules, MathJax.packageName))
-
-  def configure(configuration: Map[String, Any]): Unit = {
-    val args: V8Array = V8ObjectUtils.toV8Array(v8, List(J2V8.map2java(configuration)).asJava)
-    mathJaxNode.executeVoidFunction("config", args)
-    args.release()
-  }
-
-  // This is done automatically when typeset is first called.
-  //  private def start(): Unit = {
-  //    val args = new V8Array(v8)
-  //    mathJaxNode.executeVoidFunction("start", args)
-  //    args.release()
-  //  }
-
-  def typeset(optionsMap: Map[String, Any], outputName: String): String = {
     var data: V8Object = null
 
     val callback: V8Function = new V8Function(v8, (_ /*receiver*/: V8Object, parameters: V8Array) => {
       data = parameters.getObject(0)
-      val errors: V8Array = data.getArray("errors")
+      val errors: V8Array = data.getArray(mathJax.errorsArray)
       if (!errors.isUndefined)
         throw new IllegalArgumentException(V8ObjectUtils.toList(errors).asScala.map(_.asInstanceOf[String]).mkString("\n"))
       errors.release()
       null
     })
 
-    val args: V8Array = V8ObjectUtils.toV8Array(v8, J2V8.list2java(List(optionsMap, callback)))
-    val callResult: V8Object = mathJaxNode.executeObjectFunction("typeset", args)
+    val typesetArgs: V8Array = V8ObjectUtils.toV8Array(v8, J2V8.list2java(List(options, callback)))
+
+    // This is done automatically when typeset is first called.
+    //  private def start(): Unit = {
+    //    val args = new V8Array(v8)
+    //    mathJaxNode.executeVoidFunction("start", args)
+    //    args.release()
+    //  }
+    val callResult: V8Object = mathJaxNode.executeObjectFunction(mathJax.typesetFunction, typesetArgs)
 
     while (nodeJS.isRunning) nodeJS.handleMessage()
 
     callback.release()
-    args.release()
+    typesetArgs.release()
     callResult.release()
 
     val result: String = data.getString(outputName)
     data.release()
-    result
-  }
 
-  def close(): Unit = {
     mathJaxNode.release()
     nodeJS.release()
+
+    result
   }
 }
+

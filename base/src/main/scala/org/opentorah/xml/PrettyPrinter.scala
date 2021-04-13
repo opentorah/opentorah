@@ -3,6 +3,7 @@ package org.opentorah.xml
 import org.opentorah.util.Strings
 import org.typelevel.paiges.Doc
 
+// TODO keep empty lines!
 final case class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,

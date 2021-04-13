@@ -14,7 +14,7 @@ description = 'Gradle DocBook Plugin'
 apply from: '../configure.gradle'
 
 dependencies {
-  implementation project(':opentorah-site')
+  implementation project(':opentorah-site')  // TODO exclude flexmark...
   implementation project(':opentorah-base')
 
   implementation "org.xmlresolver:xmlresolver:$xmlresolverVersion"

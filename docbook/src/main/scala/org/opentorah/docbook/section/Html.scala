@@ -1,7 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import org.opentorah.util.Json
+import org.opentorah.mathjax.MathJax
 import org.opentorah.xml.Xml
 
 object Html extends DocBook2 {
@@ -17,23 +17,27 @@ object Html extends DocBook2 {
   override def nonOverridableParameters(values: NonOverridableParameters): Parameters = Map(
     "root.filename" -> rootFilename(values.documentName),
     "html.stylesheet" -> values.cssFile
-  ) ++ values.mathJaxConfiguration.fold[Parameters](Map.empty)(mathJaxConfiguration => Map(
-     mathJaxConfigurationParameterName -> Json.fromMap(mathJaxConfiguration.toHtmlMap)
-  ))
+  ) ++ values.mathJaxConfiguration.fold[Parameters](Map.empty){ mathJaxConfiguration =>
+    val mathJax: MathJax = MathJax.get(values.useMathJax3)
+    Map(
+      mathJaxConfigurationParameterName -> mathJax.htmlConfigurationString(mathJaxConfiguration)
+    )
+  }
 
   override def usesCss: Boolean = true
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
   override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes =
-    if (values.mathJaxConfiguration.isEmpty) Seq.empty else Seq(
-      <!-- Add MathJax support -->,
-      <xsl:template name="user.head.content">
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script>MathJax = <xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>;</script>
-        <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-      </xsl:template>
-    )
+    if (values.mathJaxConfiguration.isEmpty) Seq.empty else {
+      val mathJax: MathJax = MathJax.get(values.useMathJax3)
+      Seq(
+        <!-- Add MathJax support -->,
+        <xsl:template name="user.head.content">
+          {mathJax.head(<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>)}
+        </xsl:template>
+      )
+    }
 
   override protected def customStylesheetBody: Xml.Nodes = Seq.empty
 }

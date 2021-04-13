@@ -8,8 +8,7 @@ import org.opentorah.metadata.{Language, LanguageSpec, Numbered, WithNames}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
-import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
-import org.opentorah.texts.tanach.Psalms
+import org.opentorah.texts.tanach.{Custom, Haftarah, Psalms, Reading, Span, Torah}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{PrettyPrinter, Xml}
 

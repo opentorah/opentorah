@@ -8,11 +8,24 @@ plugins {
 
 description = 'Jewish Readings and Learning Schedules'
 
+ext.isService = true
+
 apply from: '../configure.gradle'
+
+//jib {
+//  to { image = 'gcr.io/calendar/calendar' }
+//  container { mainClass = 'org.opentorah.calendar.service.CalendarService' }
+//}
 
 dependencies {
   api project(':opentorah-calendar')
   api project(':opentorah-texts')
 
   implementation project(':opentorah-base')
+
+  // looks like Gradle API (which I do not see among the dependencies) drags in
+  // its implementation, causing "Class path contains multiple SLF4J bindings." warning; so:
+  configurations.testRuntimeOnly {
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
+  }
 }

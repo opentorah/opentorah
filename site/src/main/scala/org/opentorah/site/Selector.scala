@@ -1,4 +1,4 @@
-package org.opentorah.collector
+package org.opentorah.site
 
 import org.opentorah.metadata.{Metadata, Names, WithNames}
 import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}

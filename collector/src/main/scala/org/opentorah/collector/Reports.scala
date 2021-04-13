@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.site.{Caching, Viewer}
+import org.opentorah.site.{By, Caching, Selector, Store, Viewer}
 import org.opentorah.xml.{Parser, Xml}
 import zio.ZIO
 

@@ -27,6 +27,7 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
     processDocBookTask.siteFile.set(extension.siteFile)
     processDocBookTask.isMathJaxEnabled.set(extension.mathJax.isEnabled)
+    processDocBookTask.useMathJax3.set(extension.mathJax.useMathJax3)
     processDocBookTask.nodeVersion.set(extension.mathJax.nodeVersion)
     processDocBookTask.useJ2V8.set(extension.mathJax.useJ2V8)
     processDocBookTask.mathJaxFont.set(extension.mathJax.font)

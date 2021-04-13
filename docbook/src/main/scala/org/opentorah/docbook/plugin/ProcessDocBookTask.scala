@@ -5,10 +5,10 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
-import org.opentorah.docbook.{Layout, ProcessDocBookDirect, Operations, Stylesheets}
+import org.opentorah.docbook.{Layout, Operations, ProcessDocBookDirect, Stylesheets}
 import org.opentorah.docbook.section.{DocBook2, Section, Sections, Variant}
-import org.opentorah.fop.{FopFonts, MathJax}
-import org.opentorah.mathjax.MathJaxConfiguration
+import org.opentorah.fop.{FopFonts, MathJaxRunner}
+import org.opentorah.mathjax.{Delimiters, MathJax, MathJaxConfiguration}
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.Resolver
@@ -82,6 +82,9 @@ class ProcessDocBookTask extends DefaultTask {
     getProject.getObjects.listProperty(classOf[String])
 
   @Input @BeanProperty val isMathJaxEnabled: Property[Boolean] =
+    getProject.getObjects.property(classOf[Boolean])
+
+  @Input @BeanProperty val useMathJax3: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
   @Input @BeanProperty val useJ2V8: Property[Boolean] =
@@ -178,23 +181,25 @@ class ProcessDocBookTask extends DefaultTask {
     val mathJaxConfiguration: MathJaxConfiguration = MathJaxConfiguration(
       font = mathJaxFont.get,
       extensions = mathJaxExtensions.get.asScala.toList,
-      texDelimiters = MathJaxConfiguration.delimiters(texDelimiter.get),
-      texInlineDelimiters = MathJaxConfiguration.delimiters(texInlineDelimiter.get),
-      asciiMathDelimiters = MathJaxConfiguration.delimiters(asciiMathDelimiter.get),
+      texDelimiters = Delimiters(texDelimiter.get),
+      texInlineDelimiters = Delimiters(texInlineDelimiter.get),
+      asciiMathDelimiters = Delimiters(asciiMathDelimiter.get),
       processEscapes = processMathJaxEscapes.get
     )
 
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
 
-    val mathJax: Option[MathJax] = if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None else Some(GradleOperations.getMathJax(
-      getProject,
-      nodeRoot = layout.nodeRoot,
-      nodeVersion = nodeVersion.get,
-      overwriteNode = false,
-      overwriteMathJax = false,
-      j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
-      configuration = mathJaxConfiguration)
-    )
+    val mathJaxRunner: Option[MathJaxRunner] =
+      if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None else Some(GradleOperations.getMathJaxRunner(
+        getProject,
+        nodeRoot = layout.nodeRoot,
+        nodeVersion = nodeVersion.get,
+        overwriteNode = false,
+        overwriteMathJax = false,
+        j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
+        mathJax = MathJax.get(useMathJax3 = useMathJax3.get),
+        configuration = mathJaxConfiguration
+      ))
 
     val substitutionsMap: Map[String, String] = substitutions.get.asScala.toMap
 
@@ -228,6 +233,7 @@ class ProcessDocBookTask extends DefaultTask {
       isInfoEnabled = logger.isInfoEnabled,
       embeddedFonts = epubEmbeddedFontsString,
       cssFileName = cssFileName,
+      useMathJax3 = useMathJax3.get,
       mathJaxConfiguration = mathJaxConfiguration,
       enableMathJax = enableMathJax
     )
@@ -255,7 +261,7 @@ class ProcessDocBookTask extends DefaultTask {
         inputFile = layout.inputFile(documentName),
         // In processing instructions and CSS, substitute xslParameters also - because why not?
         substitutions = allSubstitutions,
-        mathJax = mathJax,
+        mathJaxRunner = mathJaxRunner,
         resolver = resolver,
         stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
         saxonOutputFile = saxonOutputFile
@@ -295,7 +301,7 @@ class ProcessDocBookTask extends DefaultTask {
           saxonOutputFile = saxonOutputFile,
           substitutions = allSubstitutions,
           isJEuclidEnabled = isJEuclidEnabled.get,
-          mathJax = mathJax
+          mathJaxRunner = mathJaxRunner
         )
       }
     }

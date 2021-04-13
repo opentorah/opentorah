@@ -7,7 +7,7 @@ import org.opentorah.xml.Sax
 import org.xml.sax.{Attributes, Locator}
 import java.awt.geom.Point2D
 
-final class MathMLObj(parent: FONode, mathJax: MathJax) extends MathMLObj.Obj(parent) {
+final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.Obj(parent) {
 
   private var fontSize: Option[Float] = None
 

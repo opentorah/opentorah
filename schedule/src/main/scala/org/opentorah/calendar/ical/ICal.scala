@@ -1,6 +1,7 @@
 package org.opentorah.calendar.ical
 
 import org.opentorah.calendar.roman.Gregorian.Day
+
 import java.io.PrintStream
 
 object ICal {
@@ -12,14 +13,14 @@ object ICal {
 
   def beginCalendar(prodId: String, name: Option[String], description: Option[String]): Properties = {
     Seq(
-      "BEGIN"    -> "VCALENDAR",
-      "PRODID"   -> prodId,
-      "VERSION"  -> "2.0",
+      "BEGIN" -> "VCALENDAR",
+      "PRODID" -> prodId,
+      "VERSION" -> "2.0",
       "CALSCALE" -> "GREGORIAN",
-      "METHOD"   -> "PUBLISH"
+      "METHOD" -> "PUBLISH"
     ) ++
-    name       .map("X-WR-CALNAME" -> _) ++
-    description.map("X-WR-CALDESC" -> _)
+      name.map("X-WR-CALNAME" -> _) ++
+      description.map("X-WR-CALDESC" -> _)
   }
 
   val endCalendar: Properties = Seq("END" -> "VCALENDAR")
@@ -30,8 +31,8 @@ object ICal {
     // "DTSTAMP"       -> "2061121T044202Z",
     // "UID"           -> "asdhjgd-wjks=-f",
 
-    "BEGIN"  -> "VEVENT",
-    "CLASS"  -> "PUBLIC",
+    "BEGIN" -> "VEVENT",
+    "CLASS" -> "PUBLIC",
     "STATUS" -> "CONFIRMED",
     "TRANSP" -> (if (transparent) "TRANSPARENT" else "OPAQUE")
   )
@@ -62,16 +63,16 @@ object ICal {
   def summary(text: String): Properties = Seq("SUMMARY" -> text)
 
   def googleContent(
-    title: String,
-    icon: String,
-    url: String,
-    width: Int,
-    height: Int) : Properties = Seq(
-    "X-GOOGLE-CALENDAR-CONTENT-TITLE"  -> title,
-    "X-GOOGLE-CALENDAR-CONTENT-ICON"   -> icon,
-    "X-GOOGLE-CALENDAR-CONTENT-URL"    -> url,
-    "X-GOOGLE-CALENDAR-CONTENT-TYPE"   -> "text/html", // can be image/*
-    "X-GOOGLE-CALENDAR-CONTENT-WIDTH"  -> width.toString,
+                     title: String,
+                     icon: String,
+                     url: String,
+                     width: Int,
+                     height: Int): Properties = Seq(
+    "X-GOOGLE-CALENDAR-CONTENT-TITLE" -> title,
+    "X-GOOGLE-CALENDAR-CONTENT-ICON" -> icon,
+    "X-GOOGLE-CALENDAR-CONTENT-URL" -> url,
+    "X-GOOGLE-CALENDAR-CONTENT-TYPE" -> "text/html", // can be image/*
+    "X-GOOGLE-CALENDAR-CONTENT-WIDTH" -> width.toString,
     "X-GOOGLE-CALENDAR-CONTENT-HEIGHT" -> height.toString
   )
 }

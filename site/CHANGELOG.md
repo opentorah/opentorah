@@ -1,6 +1,6 @@
 # Changelog
 
-Modules covered: `base`, `store`, `site`, `tei`, `texts`, `dream-paper` and `typesetting-paper`.
+Modules covered: `base`, `site`, `tei`, `texts`, `dream-paper` and `typesetting-paper`.
 
 ## [Unreleased]
 
@@ -20,7 +20,8 @@ Modules covered: `base`, `store`, `site`, `tei`, `texts`, `dream-paper` and `typ
 - working on the DocBook stylesheet and element transform;
 - PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
 - `DoubleEscapeHtmlNodeExtension` removed;
-- dependency updates;
+- moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the 'site' module;
+- pretty-printing in Site;
 
 ## [0.2.0] - 2021-01-27
 My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:

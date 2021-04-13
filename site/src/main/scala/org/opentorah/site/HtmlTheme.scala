@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.html.Html
-import org.opentorah.util.Json
+import org.opentorah.mathjax.MathJax
 import org.opentorah.xml.{Attribute, XLink, Xml}
 
 object HtmlTheme {
@@ -27,9 +27,8 @@ object HtmlTheme {
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>
         {if (!site.isMathJaxEnabled) Seq.empty else {
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script>MathJax = {Json.fromMap(site.mathJaxConfiguration.toHtmlMap3)};</script>
-        <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>}}
+           val mathJax: MathJax = MathJax.get(site.useMathJax3)
+           mathJax.head(Xml.mkText(mathJax.htmlConfigurationString(site.mathJaxConfiguration)))}}
       </head>
       <body>
         <header class="site-header" role="banner">

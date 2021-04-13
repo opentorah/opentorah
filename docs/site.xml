@@ -3,6 +3,7 @@
   siteUrl="www.opentorah.org"
   favicon="alter-rebbe"
   isMathJaxEnabled="true"
+  useMathJax3="true"
   licenseName="Creative Commons Attribution 4.0 International License"
   licenseUrl="http://creativecommons.org/licenses/by/4.0/"
   email="dub@opentorah.org"

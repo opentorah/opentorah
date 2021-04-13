@@ -24,7 +24,7 @@ dependencies {
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
 }
 
-jib.from.image = 'gcr.io/adoptopenjdk/java:11'
+jib.from.image = 'adoptopenjdk:11'
 jib.container.mainClass = 'org.opentorah.collector.Service'
 
 cloudRun.region = 'us-east4'

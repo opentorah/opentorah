@@ -1,7 +1,7 @@
 package org.opentorah.docbook
 
 import org.opentorah.docbook.section.{CommonSection, DocBook2, NonOverridableParameters, Sections, Variant}
-import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJax, MathJaxFopPlugin}
+import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxRunner, MathJaxFopPlugin}
 import org.opentorah.mathjax.MathJaxConfiguration
 import org.opentorah.util.Files
 import org.opentorah.xml.{Catalog, Doctype, EvalFilter, PrettyPrinter, Resolver, Sax, Saxon, XInclude, Xml}
@@ -98,10 +98,10 @@ object Operations {
             but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
             -->
 
-            {xslt1.toSeq.map(xslt1 => <!-- DocBook XSLT 1.0 stylesheets  -->)}
+            {xslt1.toSeq.map(_     => <!-- DocBook XSLT 1.0 stylesheets  -->)}
             {xslt1.toSeq.map(xslt1 => <rewriteURI uriStartString={Stylesheets.xslt1.uri} rewritePrefix={s"$xslt1/"}/>)}
 
-            {xslt2.toSeq.map(xslt2 => <!-- DocBook XSLT 2.0 stylesheets  -->)}
+            {xslt2.toSeq.map(_     => <!-- DocBook XSLT 2.0 stylesheets  -->)}
             {xslt2.toSeq.map(xslt2 => <rewriteURI uriStartString={Stylesheets.xslt2.uri} rewritePrefix={s"$xslt2/"}/>)}
 
             <!-- generated data -->
@@ -130,6 +130,7 @@ object Operations {
     isInfoEnabled: Boolean,
     embeddedFonts: String,
     cssFileName: String,
+    useMathJax3: Boolean,
     mathJaxConfiguration: MathJaxConfiguration,
     enableMathJax: Boolean
   ): Unit = {
@@ -164,6 +165,7 @@ object Operations {
       isInfoEnabled = isInfoEnabled,
       embeddedFonts = embeddedFonts,
       cssFileName = cssFileName,
+      useMathJax3 = useMathJax3,
       mathJaxConfiguration = mathJaxConfiguration,
       enableMathJax = enableMathJax
     )
@@ -177,6 +179,7 @@ object Operations {
     isInfoEnabled: Boolean,
     embeddedFonts: String,
     cssFileName: String,
+    useMathJax3: Boolean,
     mathJaxConfiguration: MathJaxConfiguration,
     enableMathJax: Boolean
   ): Unit = {
@@ -199,6 +202,7 @@ object Operations {
           embeddedFonts = embeddedFonts,
           cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
           imagesDirectoryName = layout.imagesDirectoryName,
+          useMathJax3 = useMathJax3,
           mathJaxConfiguration = if(!enableMathJax) None else Some(mathJaxConfiguration),
           documentName = documentName,
           saxonOutputDirectory = forDocument.saxonOutputDirectory(variant)
@@ -211,7 +215,7 @@ object Operations {
     docBook2: DocBook2,
     inputFile: File,
     substitutions: Map[String, String],
-    mathJax: Option[MathJax],
+    mathJaxRunner: Option[MathJaxRunner],
     resolver: Resolver,
     stylesheetFile: File,
     saxonOutputFile: File
@@ -244,7 +248,7 @@ object Operations {
 
     saxon.transform(
       filters = Seq(new EvalFilter(substitutions)) ++
-        (if (mathJax.isDefined && docBook2.isPdf) Seq(new MathFilter(mathJax.get.configuration)) else Seq.empty),
+        (if (mathJaxRunner.isDefined && docBook2.isPdf) Seq(new MathFilter(mathJaxRunner.get.configuration)) else Seq.empty),
       // ++ Seq(new TracingFilter),
       resolver = Some(resolver),
       stylesheetFile = Some(stylesheetFile),
@@ -261,12 +265,12 @@ object Operations {
     saxonOutputFile: File,
     substitutions: Map[String, String],
     isJEuclidEnabled: Boolean,
-    mathJax: Option[MathJax]
+    mathJaxRunner: Option[MathJaxRunner]
   ): Unit = {
     if (docBook2.isPdf) {
       val fopPlugin: Option[FopPlugin] =
         if (isJEuclidEnabled) Some(new JEuclidFopPlugin)
-        else mathJax.map(new MathJaxFopPlugin(_))
+        else mathJaxRunner.map(new MathJaxFopPlugin(_))
 
       Fop.run(
         saxon = Saxon.Saxon10,

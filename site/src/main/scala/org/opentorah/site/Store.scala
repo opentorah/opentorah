@@ -1,12 +1,10 @@
-package org.opentorah.collector
+package org.opentorah.site
 
 import org.opentorah.metadata.{Language, WithNames}
-import org.opentorah.site.Caching
 import org.opentorah.util.Files
 import org.opentorah.xml.{Elements, Parser, PrettyPrinter, Xml}
 import zio.ZIO
 
-// TODO move into the site (or base?) module
 trait Store extends WithNames {
   def acceptsIndexHtml: Boolean = false
 
@@ -65,8 +63,8 @@ object Store {
   def renderXml[T <: Store](elements: Elements[T], value: T): String = renderXml(elements.xmlElement(value))
   def renderXml(xml: Xml.Element): String = prettyPrinter.renderXml(xml)
 
-  private val prettyPrinter: PrettyPrinter = new PrettyPrinter(
-    nestElements = Set("p"),
+  val prettyPrinter: PrettyPrinter = new PrettyPrinter(
+    nestElements = Set("p"), // TODO remnants of TEI?
     alwaysStackElements = Set("store", "by")
   )
 }

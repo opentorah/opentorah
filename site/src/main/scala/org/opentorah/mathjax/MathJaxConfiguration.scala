@@ -1,8 +1,5 @@
 package org.opentorah.mathjax
 
-import org.opentorah.mathjax.MathJaxConfiguration.{Delimiters, DelimitersAndInput}
-import org.opentorah.util.Strings
-
 final case class MathJaxConfiguration(
   displayMessages: Boolean = false, // determines whether Message.Set() calls are logged
   displayErrors: Boolean = true, // determines whether error messages are shown on the console
@@ -29,71 +26,6 @@ final case class MathJaxConfiguration(
     if (starts.toSet.size != starts.size) throw new IllegalArgumentException(s"Duplicate start delimiters")
   }
 
-  // Configuring mathjax-node
-  def toMap: Map[String, Any] = Map(
-    "displayMessages"     -> displayMessages,
-    "displayErrors"       -> displayErrors,
-    "undefinedCharError"  -> undefinedCharError,
-    "extensions"          -> extensions.mkString(","),
-    "fontURL"             -> fontURL,
-    // standard MathJax configuration options; see https://docs.mathjax.org for more detail
-    "MathJax" -> Map(
-      "jax" -> (MathJaxConfiguration.inputs ++ List("output/SVG")),
-      "TeX" -> Map("extensions" -> MathJaxConfiguration.texExtensions),
-      "SVG" -> Map("font" -> font)
-    )
-  )
-
-  // Configuring MathJax in HTML
-  def toHtmlMap: Map[String, Any] = Map(
-    "jax" -> (MathJaxConfiguration.inputs ++ List("output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG")),
-    "extensions" -> List("tex2jax.js", "mml2jax.js", "asciimath2jax.js", "MathMenu.js", "MathZoom.js"),
-    "tex2jax" -> Map(
-      "processEscapes" -> processEscapes,
-      "inlineMath" -> json(texInlineDelimiters),
-      "displayMath" -> json(texDelimiters)
-    ),
-    "mml2jax" -> Map(),
-    "asciimath2jax" -> Map("delimiters" -> json(asciiMathDelimiters)),
-    "TeX" -> Map("extensions" -> MathJaxConfiguration.texExtensions),
-    "MathML" -> Map(),
-    "AsciiMath" -> Map(),
-    "CommonHTML" -> Map(),
-    "HTML-CSS" -> Map(),
-    "NativeMML" -> Map(),
-    "SVG" -> Map("font" -> font),
-    "PreviewHTML" -> Map(),
-    "PlainSource" -> Map()
-  )
-
-  // MathJax3
-  // TODO https://docs.mathjax.org/en/latest/options/input/tex.html
-  def toHtmlMap3: Map[String, Any] = Map(
-//    "jax" -> (MathJaxConfiguration.inputs ++ List("output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG")),
-//    "extensions" -> List("tex2jax.js", "mml2jax.js", "asciimath2jax.js", "MathMenu.js", "MathZoom.js"),
-    "tex" -> Map(
-      "processEscapes" -> processEscapes,
-      "inlineMath" -> json(texInlineDelimiters),
-      "displayMath" -> json(texDelimiters)
-    ),
-//    "mml2jax" -> Map(),
-//    "asciimath2jax" -> Map("delimiters" -> json(asciiMathDelimiters)),
-//    "TeX" -> Map("extensions" -> MathJaxConfiguration.texExtensions),
-//    "MathML" -> Map(),
-//    "AsciiMath" -> Map(),
-//    "CommonHTML" -> Map(),
-//    "HTML-CSS" -> Map(),
-//    "NativeMML" -> Map(),
-//    "SVG" -> Map("font" -> font),
-//    "PreviewHTML" -> Map(),
-//    "PlainSource" -> Map()
-  )
-
-  private def json(delimiterss: Seq[Delimiters]): List[Any] = delimiterss.toList.map(delimiters => List(
-    Strings.escape(delimiters.start),
-    Strings.escape(delimiters.end)
-  ))
-
   def allDelimiters: Seq[DelimitersAndInput] = {
     def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
       for (delimiters <- values) yield new DelimitersAndInput(delimiters, input)
@@ -108,16 +40,7 @@ final case class MathJaxConfiguration(
 }
 
 object MathJaxConfiguration {
-  final class Delimiters(val start: String, val end: String)
 
-  def delimiters(delimiter: String): Seq[Delimiters] = Seq(new Delimiters(start = delimiter, end = delimiter))
-
-  final class DelimitersAndInput(val delimiters: Delimiters, val input: Input) {
-    def start: String = delimiters.start
-    def end: String = delimiters.end
-  }
-
-  // TODO introduce MathJax versions
   val fontURL: String = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/fonts/HTML-CSS"
 
   val fonts: Set[String] = Set("TeX", "STIX", "STIX-Web", "Asana-Math", "Neo-Euler", "Gyre-Pagella", "Gyre-Termes", "Latin-Modern")

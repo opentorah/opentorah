@@ -1,11 +1,10 @@
 package org.opentorah.docbook
 
 import org.opentorah.html
-import org.opentorah.site.{Caching, Viewer, Site => HtmlSite}
+import org.opentorah.site.{Caching, Store, Viewer, Site => HtmlSite}
 import org.opentorah.util.Files
 import org.opentorah.xml._
 import zio.ZIO
-
 import java.io.File
 
 // TODO document eventually
@@ -18,6 +17,7 @@ final class Site(
   licenseUrl: String,
   googleAnalyticsId: Option[String],
   isMathJaxEnabled: Boolean,
+  useMathJax3: Boolean,
   email: String,
   githubUsername: Option[String],
   twitterUsername: Option[String],
@@ -31,11 +31,12 @@ final class Site(
   licenseUrl,
   googleAnalyticsId,
   isMathJaxEnabled,
+  useMathJax3,
   email,
   githubUsername,
   twitterUsername,
   footer,
-  Site.defaultViewer
+  Site.defaultViewer // TODO turn into method and override?
 ) {
   override protected def resolveNavigationalLink(url: String): Caching.Parser[Xml.Element] =
     ZIO.succeed(html.a(Seq(url))(text = url)) // TODO
@@ -44,6 +45,10 @@ final class Site(
     htmlContent.content(this) >>= (content => DocBook.toHtml0(content))
 
   override protected def htmlPrettyPrinter: PrettyPrinter = Site.htmlPrettyPrinter
+
+  override def a(path: Store.Path): html.a = ???
+
+  override def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] = ???
 }
 
 object Site extends Element[Site]("site") {
@@ -73,6 +78,7 @@ object Site extends Element[Site]("site") {
       licenseUrl <- HtmlSite.licenseUrlAttribute()
       googleAnalyticsId <- HtmlSite.googleAnalyticsIdAttribute()
       isMathJaxEnabled <- HtmlSite.isMathJaxEnabledAttribute()
+      useMathJax3 <- HtmlSite.useMathJax3Attribute()
       email <- HtmlSite.emailAttribute()
       githubUsername <- HtmlSite.githubUsernameAttribute()
       twitterUsername <- HtmlSite.twitterUsernameAttribute()
@@ -86,6 +92,7 @@ object Site extends Element[Site]("site") {
       licenseUrl,
       googleAnalyticsId,
       isMathJaxEnabled,
+      useMathJax3,
       email,
       githubUsername,
       twitterUsername,
@@ -101,6 +108,7 @@ object Site extends Element[Site]("site") {
       HtmlSite.licenseUrlAttribute(_.licenseUrl),
       HtmlSite.googleAnalyticsIdAttribute(_.googleAnalyticsId),
       HtmlSite.isMathJaxEnabledAttribute(_.isMathJaxEnabled),
+      HtmlSite.useMathJax3Attribute(_.useMathJax3),
       HtmlSite.emailAttribute(_.email),
       HtmlSite.githubUsernameAttribute(_.githubUsername),
       HtmlSite.twitterUsernameAttribute(_.twitterUsername),

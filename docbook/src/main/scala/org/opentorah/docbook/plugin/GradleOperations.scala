@@ -3,8 +3,8 @@ package org.opentorah.docbook.plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import org.opentorah.docbook.Stylesheets
-import org.opentorah.fop.{J2V8, J2V8Distribution, MathJax, Node, NodeDistribution}
-import org.opentorah.mathjax.MathJaxConfiguration
+import org.opentorah.fop.{J2V8, J2V8Distribution, MathJaxRunner, Node, NodeDistribution}
+import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
 import org.opentorah.util.{Files, Gradle}
 import java.io.File
 
@@ -41,15 +41,16 @@ object GradleOperations {
     directory
   }
 
-  def getMathJax(
+  def getMathJaxRunner(
     project: Project,
     nodeRoot: File,
     nodeVersion: String,
     overwriteNode: Boolean,
     overwriteMathJax: Boolean,
     j2v8Parent: Option[File],
+    mathJax: MathJax,
     configuration: MathJaxConfiguration
-  ): MathJax = MathJax.get(
+  ): MathJaxRunner = MathJaxRunner.get(
     node = installNode(
       project,
       new NodeDistribution(nodeVersion),
@@ -62,6 +63,7 @@ object GradleOperations {
       new J2V8Distribution,
       into = j2v8Parent
     )),
+    mathJax,
     configuration
   )
 
