@@ -13,7 +13,6 @@ object ProcessDocBookDirect {
     val site: Site = Site.read(siteFile)
 
     for ((documentName: String, prefixed: Boolean) <- inputDocuments) {
-      val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
       val inputFile: File = layout.inputFile(documentName)
       val outputDirectory: File = new File(layout.directOutputRoot, "html")
       val outputFile: File = new File(outputDirectory, "index.html")

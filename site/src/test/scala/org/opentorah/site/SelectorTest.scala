@@ -1,4 +1,4 @@
-package org.opentorah.collector
+package org.opentorah.site
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

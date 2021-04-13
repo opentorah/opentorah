@@ -1,19 +1,17 @@
-package org.opentorah.collector
+package org.opentorah.site
 
 import org.opentorah.metadata.Names
-import org.opentorah.site.{Caching, ListFile}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Elements, FromUrl, Parser}
 import zio.ZIO
 import java.net.URL
 
-// TODO move into the site module
 /**
-  * Directory of files.
-  *
-  * @tparam T type of into which the file is parsed
-  * @tparam M type of the files list entry
-  */
+ * Directory of files.
+ *
+ * @tparam T type of into which the file is parsed
+ * @tparam M type of the files list entry
+ */
 abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapper[M]](
   val directory: String,
   fileExtension: String,
@@ -21,7 +19,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
   wrapper: Map[String, M] => W
 ) extends FromUrl.With {
 
-  final protected def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
+  final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
   private val listFile: ListFile[M, W] = new ListFile[M, W](
     url = Files.fileInDirectory(fromUrl.url, directory + "-list-generated.xml"),

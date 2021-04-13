@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
-import org.opentorah.site.{Caching, Viewer}
+import org.opentorah.site.{Caching, Directory, Store, Viewer}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
 import zio.ZIO

@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
-import org.opentorah.site.Caching
+import org.opentorah.site.{Caching, Store}
 import org.opentorah.xml.{Element, Elements, Xml}
 
 trait Hierarchical extends Store with HtmlContent {

@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
-import org.opentorah.site.Caching
+import org.opentorah.site.{By, Caching, Directory, Selector, Store}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.UIO
 import java.net.URL

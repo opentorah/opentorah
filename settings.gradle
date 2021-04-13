@@ -32,10 +32,6 @@ project(':site'            ).name = 'opentorah-site'
 include ':tei'
 project(':tei'             ).name = 'opentorah-tei'
 
-// For now, there is nothing there...
-//include ':store'
-//project(':store').name = 'opentorah-store'
-
 include ':texts'
 project(':texts'           ).name = 'opentorah-texts'
 
@@ -44,9 +40,6 @@ project(':calendar'        ).name = 'opentorah-calendar'
 
 include ':schedule'
 project(':schedule'        ).name = 'opentorah-schedule'
-
-include ':calendar-service'
-project(':calendar-service').name = 'opentorah-calendar-service'
 
 include ':collector'
 project(':collector'       ).name = 'opentorah-collector'

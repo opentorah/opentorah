@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
+import org.opentorah.site.Store
 import org.opentorah.tei.{Abstract, Body, Title}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.ZIO

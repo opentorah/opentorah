@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.fop.{MathJax, Svg}
+import org.opentorah.fop.{MathJaxRunner, Svg}
 import org.opentorah.xml.XLink
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
@@ -27,8 +27,8 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
       )
 
       val log: String = project.run(logInfo = true)
-      substring(log, MathJax.logStart, MathJax.logSep) shouldBe tex
-      substring(log, MathJax.logSep, MathJax.logEnd) shouldBe svgExpected
+      substring(log, MathJaxRunner.logStart, MathJaxRunner.logSep) shouldBe tex
+      substring(log, MathJaxRunner.logSep, MathJaxRunner.logEnd) shouldBe svgExpected
     }
 
 ///    test(useJ2V8 = true)

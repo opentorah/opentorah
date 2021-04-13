@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.site.{Caching, Viewer}
+import org.opentorah.site.{By, Caching, Directory, Selector, Store, Viewer}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
@@ -53,7 +53,7 @@ final class Collection(
   }
 
   override def viewer: Viewer = Viewer.Collection
-  override def isWide: Boolean = true
+  override def style: String = "/css/wide"
 
   override def path(site: Site): Store.Path =
     alias.fold(site.store2path(this))(alias => Seq(site.alias2collectionAlias(alias)))
@@ -166,7 +166,7 @@ object Collection extends Element[Collection]("collection") {
     override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
 
     override def viewer: Viewer = collection.viewer
-    override def isWide: Boolean = collection.isWide
+    override def style: String = collection.style
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
     override def path           (site: Site): Store.Path = collection.path(site)

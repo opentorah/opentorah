@@ -13,7 +13,7 @@ import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
 //  Inspired by the JEuclid FOP plugin.
-final class MathJaxFopPlugin(mathJax: MathJax) extends FopPlugin {
+final class MathJaxFopPlugin(mathJax: MathJaxRunner) extends FopPlugin {
 
   override protected def elementMapping: ElementMapping = new ElementMapping {
     namespaceURI = MathML.namespace.uri

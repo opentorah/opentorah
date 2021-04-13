@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
+import org.opentorah.site.{Selector, Store}
 import org.opentorah.xml.{Parser, Xml}
 import zio.ZIO
 

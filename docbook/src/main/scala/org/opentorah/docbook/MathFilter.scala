@@ -1,14 +1,13 @@
 package org.opentorah.docbook
 
-import org.opentorah.fop.MathJax
-import org.opentorah.mathjax.MathJaxConfiguration.DelimitersAndInput
+import org.opentorah.mathjax.{DelimitersAndInput, Input, MathJaxConfiguration, MathML}
 import org.opentorah.mathjax.MathML.displayAttribute
-import org.opentorah.mathjax.{MathJaxConfiguration, MathML}
-import org.opentorah.xml.{Namespace, WarningFilter}
+import org.opentorah.xml.{Attribute, Namespace, WarningFilter}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+// TODO move into site module (docbook package); move bits into Input.
 final class MathFilter(
   configuration: MathJaxConfiguration
 ) extends WarningFilter {
@@ -139,7 +138,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    MathJax.inputAttribute.withValue(input.withInline(isInline)).set(attributes)
+    MathFilter.inputAttribute.withValue(input.withInline(isInline)).set(attributes)
 
     def mml(): Unit = {
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
@@ -148,7 +147,7 @@ final class MathFilter(
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
       prefixMapping(MathML.namespace.default) {
-        prefixMapping(MathJax.namespace) {
+        prefixMapping(MathFilter.namespace) {
           element(MathML.namespace.default, MathML.math, atts = attributes) {
             element(MathML.namespace.default, MathML.mrow) {
               element(MathML.namespace.default, MathML.mi) {
@@ -211,6 +210,24 @@ object MathFilter {
     else if (chars.charAt(index-1) == '\\') None
     else Some(index)
   }
+
+  val namespace: Namespace = Namespace(
+    uri = "http://opentorah.org/mathjax/ns/ext",
+    prefix = "mathjax"
+  )
+
+  /**
+   * Type of the input: TeX, MathML, AsciiMath.
+   */
+  final class InputAttribute extends Attribute[Input]("input", namespace = namespace, default = Input.MathML) {
+    override def toString(value: Input): String = value.name
+
+    override def fromString(value: String): Input =
+      Input.values.find(_.name == value).getOrElse(throw new IllegalArgumentException(s"Unknown input type: $value"))
+  }
+
+  @SerialVersionUID(1L)
+  val inputAttribute: Attribute.OrDefault[Input] = (new InputAttribute).orDefault
 
   def unwrap(mathML: org.w3c.dom.Element): String = mathML
     .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[org.w3c.dom.Element]
