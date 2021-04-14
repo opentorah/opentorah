@@ -3,6 +3,11 @@ package org.opentorah.xml
 import org.opentorah.util.Effects
 import zio.IO
 
+/* TODO all the issues with Scala XML push me towards generalizing parsing
+   (and transforms) to work with Dom...
+   I should take a look at the following classes:
+     Content, Context, Element, Elements, From (and possibly Catalog).
+ */
 private[xml] sealed trait Content {
   def takeNextElement(p: Xml.Element => Boolean): Content.Next[Option[Xml.Element]]
 

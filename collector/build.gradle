@@ -19,6 +19,9 @@ dependencies {
   implementation project(':opentorah-site')
   implementation project(':opentorah-base')
 
+  // pretty-printing now uses Dom to retain comments...
+  implementation "net.sf.saxon:Saxon-HE:$saxon10Version"
+
   implementation "ch.qos.logback:logback-classic:$logbackVersion"
 
   testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"

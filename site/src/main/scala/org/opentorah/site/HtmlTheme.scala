@@ -8,6 +8,8 @@ object HtmlTheme {
 
   // TODO remove post-related stuff
   // TODO conditionalize syntax highlighting (https://highlightjs.org/)
+  // TODO consolidate css, js etc. under 'asset'
+  // TODO do not force the favicon to be jpeg
   def toHtml[S <: Site[S]](
     htmlContent: HtmlContent[S],
     navigationLinks: Seq[Xml.Element], // normally, <a>s
@@ -20,9 +22,9 @@ object HtmlTheme {
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         {htmlContent.htmlHeadTitle.toSeq.map(title => <title>{title}</title>)}
-        <link rel="stylesheet" href={s"${htmlContent.style}.css"}/>
+        <link rel="stylesheet" href={s"/css/${site.style(htmlContent)}.css"}/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
-        <link rel="icon" type="image/jpeg" href={s"/${site.favicon}.jpg"}/>
+        <link rel="icon" href={s"/${site.favicon}"}/>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css"/>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>
@@ -80,7 +82,7 @@ object HtmlTheme {
       </body>
       <script type='module'>
         import loadWindow from '/js/window.js';
-        loadWindow('{htmlContent.viewer.name}', {optionToJs(site.googleAnalyticsId)});</script>
+        loadWindow('{site.viewer(htmlContent).name}', {optionToJs(site.googleAnalyticsId)});</script>
     </html>
 
   private def optionToJs(value: Option[String]): String =

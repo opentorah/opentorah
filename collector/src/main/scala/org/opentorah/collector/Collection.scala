@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.site.{By, Caching, Directory, Selector, Store, Viewer}
+import org.opentorah.site.{By, Caching, Directory, HtmlContent, Selector, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
@@ -51,16 +51,6 @@ final class Collection(
     case Some(result) => ZIO.some(result)
     case None => Store.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
   }
-
-  override def viewer: Viewer = Viewer.Collection
-  override def style: String = "/css/wide"
-
-  override def path(site: Site): Store.Path =
-    alias.fold(site.store2path(this))(alias => Seq(site.alias2collectionAlias(alias)))
-
-  override def navigationLinks(site: Site): Parser[Seq[Xml.Element]] = ZIO.succeed(Seq(
-    a(site)(s"[${names.name}]")
-  ))
 
   override protected def innerContent(site: Site): Caching.Parser[Xml.Element] =
     for {
@@ -155,7 +145,7 @@ object Collection extends Element[Collection]("collection") {
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store with HtmlContent {
+  final class Alias(val collection: Collection) extends Store with HtmlContent[Site] {
 
     def alias: String = collection.alias.get
 
@@ -164,14 +154,9 @@ object Collection extends Element[Collection]("collection") {
     override def acceptsIndexHtml: Boolean = collection.acceptsIndexHtml
 
     override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
-
-    override def viewer: Viewer = collection.viewer
-    override def style: String = collection.style
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
-    override def path           (site: Site): Store.Path = collection.path(site)
-    override def navigationLinks(site: Site): Parser[Seq[Xml.Element]] = collection.navigationLinks(site)
-    override def content        (site: Site): Caching.Parser[Xml.Element] = collection.content(site)
+    override def content(site: Site): Caching.Parser[Xml.Element] = collection.content(site)
   }
 
   final class Documents(

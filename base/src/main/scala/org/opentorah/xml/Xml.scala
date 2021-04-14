@@ -33,8 +33,8 @@ object Xml extends Model {
     val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
   }
 
-  override def toString(node: Node): String = Strings.squashWhitespace(node match {
-    case elem: Element => (elem.child map (_.text)).mkString(" ")
+  override def toString(node: Node): String = Strings.squashWhitespace(node match { // TODO why the squash?
+    case elem: Element => (elem.child map (_.text)).mkString(" ") // TODO hope this is not used: no tags, no attributes...
     case text: Text => text.data.toString
     case special: scala.xml.SpecialNode => Strings.sbToString(special.buildString)
     case node: Node => node.text
@@ -47,22 +47,18 @@ object Xml extends Model {
   ): Element = {
 
     val adapter: scala.xml.parsing.FactoryAdapter = new scala.xml.parsing.NoBindingFactoryAdapter()
-
     adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
 
     // Note: scala.xml.parsing.FactoryAdapter looks for namespace declarations
     // in the attributes passed into startElement(), and does not override
     // startPrefixMapping(), so it does not work with a namespace-aware parser...
     val xmlReader: XMLReader = Xerces.getXMLReader(filters, resolver, xincludeAware = false)
-
     xmlReader.setContentHandler(adapter)
-
     xmlReader.setDTDHandler(adapter)
 
     xmlReader.parse(inputSource)
 
     adapter.scopeStack = adapter.scopeStack.tail
-
     adapter.rootElem.asInstanceOf[Element]
   }
 

@@ -7,7 +7,7 @@ object Dom extends Model {
 
   override type Node = org.w3c.dom.Node
   override type Element = org.w3c.dom.Element
-  override type Text = org.w3c.dom.CharacterData
+  override type Text = org.w3c.dom.Text
 
   override protected def loadFromSource(
     inputSource: InputSource,
@@ -31,7 +31,11 @@ object Dom extends Model {
   override def asText(node: Node): Text =    node.asInstanceOf[Text]
   override def getText(text: Text): String = text.getData
   override def mkText(text: String, seed: Node): Text = seed.getOwnerDocument.createTextNode(text)
-  override def toString(node: Node): String = node.getTextContent
+
+  override def toString(node: Node): String = node match {
+    case comment: org.w3c.dom.Comment => s"<!--${comment.getTextContent}-->"
+    case node: Node => node.getTextContent
+  }
 
   override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
   override def asElement(node: Node): Element = node.asInstanceOf[Element]
@@ -84,7 +88,7 @@ object Dom extends Model {
 
   override def getAttributes(element: Element): Seq[Attribute.Value[String]] = {
     val list: org.w3c.dom.NamedNodeMap = element.getAttributes
-    for {
+    val result = for {
       index <- 0 until list.getLength
       attribute = list.item(index).asInstanceOf[org.w3c.dom.Attr]
       uri = attribute.getNamespaceURI
@@ -95,6 +99,11 @@ object Dom extends Model {
       name = localName,
       namespace = Namespace(uri = uri, prefix = prefix)
     ).optional.withValue(Option(attribute.getValue))
+
+    // Dom does not have attribute ordering, so unfortunately the order in the source file
+    // gets lost; at least enforce some definitive ordering so that the files do not change
+    // on every pretty-printing:
+    result.sortBy(_.attribute.qName)
   }
 
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element = {

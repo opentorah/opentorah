@@ -3,13 +3,9 @@ package org.opentorah.site
 import org.opentorah.html
 import org.opentorah.mathjax.{Delimiters, MathJaxConfiguration}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Doctype, Element, Parsable, PrettyPrinter, RawXml, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, PrettyPrinter, RawXml, Xml}
 import zio.ZIO
-import java.io.File
-import scala.annotation.tailrec
 
-// TODO pretty-print all discovered files (TEI, DocBook...) by the Site-determined PrettyPrinter; use this in `collector`
-//   and add to ProcessDocBookDirect...
 // TODO add static site server/generator.
 // TODO consolidate all js, css etc. files in `asset` (singular)
 // TODO fix favicon to the default `favicon.ico` and convert the Alter Rebbe picture.
@@ -50,7 +46,7 @@ abstract class Site[S <: Site[S]](
   final def renderHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[String] = for {
     content <- resolveHtmlContent(htmlContent)
     siteNavigationLinks <- getNavigationLinks
-    htmlContentNavigationLinks <- htmlContent.navigationLinks(this)
+    htmlContentNavigationLinks <- navigationLinks(htmlContent)
   } yield htmlPrettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
     htmlContent,
     navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks,
@@ -77,9 +73,23 @@ abstract class Site[S <: Site[S]](
 
   def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]]
 
-  final def a(htmlContent: HtmlContent[S]): html.a = a(htmlContent.path(this))
+  final def a(htmlContent: HtmlContent[S]): html.a = a(path(htmlContent))
 
-  def a(path: Store.Path): html.a
+  final def a(path: Store.Path): html.a = html
+    .a(path.map(_.structureName))
+    .setTarget((path.last match {
+      case htmlContent: HtmlContent[S] => viewer(htmlContent)
+      case _ => defaultViewer
+    }).name)
+
+  def path(htmlContent: HtmlContent[S]): Store.Path
+
+  def style(htmlContent: HtmlContent[S]): String
+
+  def viewer(htmlContent: HtmlContent[S]): Viewer
+
+  // TODO split into prev, next, up and more?
+  def navigationLinks(htmlContent: HtmlContent[S]): Caching.Parser[Seq[Xml.Element]]
 }
 
 object Site {
@@ -101,27 +111,4 @@ object Site {
   val emailAttribute: Attribute.Required[String] = Attribute("email").required
   val githubUsernameAttribute: Attribute.Optional[String] = Attribute("githubUsername").optional
   val twitterUsernameAttribute: Attribute.Optional[String] = Attribute("twitterUsername").optional
-
-  def prettyPrint(roots: List[File], f: Xml.Element => (PrettyPrinter, Option[Doctype])): Unit = {
-    val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
-    val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)
-    xmlFiles.foreach { file =>
-      val xml: Xml.Element = Xml.loadFromUrl(Files.file2url(file))
-      val (prettyPrinter, doctype) = f(xml)
-      Files.write(
-        file = file,
-        content = prettyPrinter.renderXml(xml, doctype)
-      )
-    }
-  }
-
-  @tailrec
-  def listXmlFiles(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match {
-    case Nil => result
-    case current :: tail =>
-      val (directories: List[File], files: List[File]) = current.listFiles.toList.partition(_.isDirectory)
-      listXmlFiles(result ++ files.filter(isXml), tail ++ directories)
-  }
-
-  private def isXml(file: File): Boolean = Files.nameAndExtension(file.getName)._2.contains("xml")
 }

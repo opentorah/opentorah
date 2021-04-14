@@ -2,15 +2,15 @@ package org.opentorah.site
 
 import org.opentorah.html
 import org.opentorah.xml.Xml
-import zio.ZIO
 
 trait HtmlContent[S <: Site[S]] {
-  def viewer: Viewer
-  def style: String = "/css/main"  // TODO `css` is always prepended; codify (and change to `asset`)
+  final def a(site: S): html.a = site.a(this)
+
   def htmlHeadTitle: Option[String]
+
   def htmlBodyTitle: Option[Xml.Nodes] = None
-  def navigationLinks(site: S): Caching.Parser[Seq[Xml.Element]] = ZIO.succeed(Seq.empty)
-  def content        (site: S): Caching.Parser[    Xml.Element ]
-  final def a        (site: S): html.a = site.a(this)
-  def path           (site: S): Store.Path
+
+  // TODO make this class unaware of its position in the site's hierarchy:
+  // inject positional data needed to construct the content into this method.
+  def content(site: S): Caching.Parser[Xml.Element]
 }

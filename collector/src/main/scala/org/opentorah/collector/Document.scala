@@ -2,10 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
-import org.opentorah.site.{Caching, Directory, Store, Viewer}
+import org.opentorah.site.{Caching, Directory, HtmlContent, Store}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
-import zio.ZIO
 
 final class Document(
   override val name: String,
@@ -47,44 +46,16 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   final class TeiFacet(document: Document, collectionFacet: Collection.TeiFacet)
     extends Facet[TeiFacet, Collection.TeiFacet](document, collectionFacet)
 
-  abstract class HtmlFacet[DF <: HtmlFacet[DF, F], F <: Collection.HtmlFacet[DF, F]](document: Document, collectionFacet: F)
-    extends Facet[DF, F](document, collectionFacet) with HtmlContent
+  abstract class HtmlFacet[DF <: HtmlFacet[DF, F], F <: Collection.HtmlFacet[DF, F]](document: Document, val collectionFacet: F)
+    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Site]
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
-
-    final override def navigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]] = for {
-      siblings <- collection.siblings(document)
-      collectionNavigationLinks <- collection.navigationLinks(site)
-      moreLinks <- moreNavigationLinks(site)
-    } yield {
-      val (prev: Option[Document], next: Option[Document]) = siblings
-
-      collectionNavigationLinks ++
-      prev.toSeq.map(prev => collectionFacet.of(prev    ).a(site)("⇦"          )) ++
-      Seq(                   collectionFacet.of(document).a(site)(document.name)) ++
-      next.toSeq.map(next => collectionFacet.of(next    ).a(site)("⇨"          )) ++
-      moreLinks
-    }
-
-    protected def moreNavigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]]
   }
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
     extends HtmlFacet[TextFacet, Collection.TextFacet](document, collectionFacet)
   {
-    override def viewer: Viewer = Viewer.Document
     override def htmlHeadTitle: Option[String] = None
-
-    override protected def moreNavigationLinks(site: Site): Caching.Parser[Seq[Xml.Element]] =
-      collection.translations(document).map { translations =>
-        Seq(collection.facsimileFacet.of(document).a(site)(text = Tei.facsimileSymbol)) ++ {
-          for (translation <- if (document.isTranslation) Seq.empty else translations)
-            yield collectionFacet.of(translation).a(site)(s"[${translation.lang}]")
-        }
-      }
-
-    override def path(site: Site): Store.Path =
-      collection.path(site) ++ Seq(collection.textFacet.of(document))
 
     override def content(site: Site): Caching.Parser[Xml.Element] = for {
       tei <- getTei
@@ -99,14 +70,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
     extends HtmlFacet[FacsimileFacet, Collection.FacsimileFacet](document, collectionFacet)
   {
-    override def viewer: Viewer = Viewer.Facsimile
     override def htmlHeadTitle: Option[String] = None
-
-    override protected def moreNavigationLinks(site: Site): Parser[Seq[Xml.Element]] =
-      ZIO.succeed(Seq(collection.textFacet.of(document).a(site)(text = "A")))
-
-    override def path(site: Site): Store.Path =
-      collection.path(site) ++ Seq(collection.facsimileFacet, collection.facsimileFacet.of(document))
 
     override def content(site: Site): Caching.Parser[Xml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site
   siteUrl="www.opentorah.org"
-  favicon="alter-rebbe"
+  favicon="favicon.ico"
   isMathJaxEnabled="true"
   useMathJax3="true"
   licenseName="Creative Commons Attribution 4.0 International License"

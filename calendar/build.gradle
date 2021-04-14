@@ -36,13 +36,10 @@ task processDocBookDirect(type: JavaExec) {
     projectDir,
     "$rootDir/docs/site.xml",
     'calendar',
+    "version=$project.version,a=b",
+    "$rootDir/docs/calendar/paperDirect",
     dataGeneratorClassName
   ]
 }
 site.dependsOn processDocBookDirect
-site.doLast {
-  project.sync {
-    from "$buildDir/docBookDirect"
-    into "$rootDir/docs/calendar/paperDirect"
-  }
-}
+

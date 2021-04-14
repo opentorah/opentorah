@@ -82,6 +82,7 @@ object Service extends App {
 
   val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
 
+  // TODO read favicon name from the Site
   val staticPaths: Set[String] = Set("assets", "js", "sass", "alter-rebbe.jpg", "robots.txt")
 
   private def routes(siteUrl: String): HttpRoutes[ServiceTask] = {
