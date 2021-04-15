@@ -70,7 +70,7 @@ class PluginTestProject private(
     )
 
     Files.write(
-      file = layout.inputFile(documentName),
+      file = layout.forDocument(prefixed = false, documentName).inputFile,
       replace = false,
       content = document
     )

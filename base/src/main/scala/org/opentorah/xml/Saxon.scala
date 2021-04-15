@@ -3,8 +3,8 @@ package org.opentorah.xml
 import org.slf4j.Logger
 import java.io.File
 import javax.xml.transform.sax.{SAXSource, SAXTransformerFactory}
-import javax.xml.transform.{ErrorListener, Source, Transformer, TransformerException}
-import org.xml.sax.{InputSource, XMLFilter, XMLReader}
+import javax.xml.transform.{ErrorListener, Transformer, TransformerException}
+import org.xml.sax.{InputSource, XMLFilter}
 
 sealed abstract class Saxon(name: String) {
 

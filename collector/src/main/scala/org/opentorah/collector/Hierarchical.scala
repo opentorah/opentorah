@@ -1,10 +1,10 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
-import org.opentorah.site.{Caching, Store}
+import org.opentorah.site.{Caching, HtmlContent, Store}
 import org.opentorah.xml.{Element, Elements, Xml}
 
-trait Hierarchical extends Store with HtmlContent {
+trait Hierarchical extends Store with HtmlContent[Site] {
   def title: Title.Value
 
   final def titleString: String = Xml.toString(title.xml)

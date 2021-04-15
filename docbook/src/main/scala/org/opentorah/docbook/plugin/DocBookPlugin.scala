@@ -25,7 +25,6 @@ final class DocBookPlugin extends Plugin[Project] {
     processDocBookTask.outputFormats.set(extension.outputFormats)
     processDocBookTask.dataGeneratorClass.set(extension.dataGeneratorClass)
     processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
-    processDocBookTask.siteFile.set(extension.siteFile)
     processDocBookTask.isMathJaxEnabled.set(extension.mathJax.isEnabled)
     processDocBookTask.useMathJax3.set(extension.mathJax.useMathJax3)
     processDocBookTask.nodeVersion.set(extension.mathJax.nodeVersion)
@@ -76,6 +75,8 @@ object DocBookPlugin {
   def layoutForProject(project: Project): Layout = new Layout(
     frameworksDir = project.getGradle.getGradleUserHomeDir,
     projectDir = project.getProjectDir,
-    buildDir = project.getBuildDir
+    buildDir = project.getBuildDir,
+    catalogDirectoryOverride = None,
+    outputRootOverride = None
   )
 }

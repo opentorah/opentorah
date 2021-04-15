@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{EntityRelated, EntityType, Entity => TeiEntity}
-import org.opentorah.site.{Caching, Directory, Store, Viewer}
+import org.opentorah.site.{Caching, Directory, HtmlContent}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
@@ -11,15 +11,12 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends Directory.Entry(name) with HtmlContent {
+) extends Directory.Entry(name) with HtmlContent[Site] {
   def id: String = name
 
-  override def viewer: Viewer = Viewer.Names
   override def htmlHeadTitle: Option[String] = Some(mainName)
 
   def teiEntity(site: Site): Caching.Parser[TeiEntity] = site.entities.getFile(this)
-
-  override def path(site: Site): Store.Path = Seq(site.entities, this)
 
   override def content(site: Site): Caching.Parser[Xml.Element] = for {
     entity <- teiEntity(site)

@@ -2,15 +2,14 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityRelated, EntityType, Tei, Title}
-import org.opentorah.site.{By, Caching, Selector, Store, Viewer}
+import org.opentorah.site.{By, Caching, HtmlContent, Selector, Store}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, ContentType, Element, FromUrl, Parsable, Parser, Unparser, Xml}
 
 final class EntityLists(
   override val selector: Selector,
   val lists: Seq[EntityLists.EntityList]
-) extends By with HtmlContent {
-  override def viewer: Viewer = Viewer.Names
+) extends By with HtmlContent[Site] {
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
@@ -31,8 +30,6 @@ final class EntityLists(
 
       nonEmptyLists = Some(lists.filterNot(list => result(list).isEmpty))
     }
-
-  override def path(site: Site): Store.Path = Seq(site.entityLists)
 
   override def content(site: Site): Caching.Parser[Xml.Element] = for { _ <- setUp(site) } yield {
     <div>

@@ -5,7 +5,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Input, Internal, TaskAction}
-import org.opentorah.docbook.{Layout, Operations, ProcessDocBookDirect, Stylesheets}
+import org.opentorah.docbook.{Layout, Operations, Stylesheets}
 import org.opentorah.docbook.section.{DocBook2, Section, Sections, Variant}
 import org.opentorah.fop.{FopFonts, MathJaxRunner}
 import org.opentorah.mathjax.{Delimiters, MathJax, MathJaxConfiguration}
@@ -108,9 +108,6 @@ class ProcessDocBookTask extends DefaultTask {
   @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
     getProject.getObjects.property(classOf[Boolean])
 
-  @Input @BeanProperty val siteFile: Property[File] =
-    getProject.getObjects.property(classOf[File])
-
   @Input @BeanProperty val xslt1version: Property[String] =
     getProject.getObjects.property(classOf[String])
 
@@ -188,6 +185,7 @@ class ProcessDocBookTask extends DefaultTask {
     )
 
     val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
+    val mathJax: MathJax = MathJax.get(useMathJax3 = useMathJax3.get)
 
     val mathJaxRunner: Option[MathJaxRunner] =
       if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None else Some(GradleOperations.getMathJaxRunner(
@@ -197,7 +195,7 @@ class ProcessDocBookTask extends DefaultTask {
         overwriteNode = false,
         overwriteMathJax = false,
         j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
-        mathJax = MathJax.get(useMathJax3 = useMathJax3.get),
+        mathJax = mathJax,
         configuration = mathJaxConfiguration
       ))
 
@@ -207,20 +205,23 @@ class ProcessDocBookTask extends DefaultTask {
     Operations.writeFopConfigurationFile(layout)
 
     // Catalog
-    val resolver: Resolver = Operations.writeCatalog(
+    Operations.writeCatalog(
       layout,
-      Some(xslt1),
-      Some(xslt2),
+      xslt1,
+      xslt2,
       substitutionsMap
     )
+
+    val resolver: Resolver = new Resolver(layout.catalogFile)
 
     // CSS file
     val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
     Operations.writeCssFile(layout, cssFileName)
 
     // Input documents
-    for ((name: String, _ /*prefixed*/: Boolean) <- inputDocuments) Operations.writeInputFile(layout, name)
+    Operations.writeInputDocuments(layout, inputDocuments)
 
+    // Fonts
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
     val epubEmbeddedFontsString: String = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
       .map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
@@ -233,7 +234,7 @@ class ProcessDocBookTask extends DefaultTask {
       isInfoEnabled = logger.isInfoEnabled,
       embeddedFonts = epubEmbeddedFontsString,
       cssFileName = cssFileName,
-      useMathJax3 = useMathJax3.get,
+      mathJax = mathJax,
       mathJaxConfiguration = mathJaxConfiguration,
       enableMathJax = enableMathJax
     )
@@ -258,12 +259,12 @@ class ProcessDocBookTask extends DefaultTask {
 
       Operations.runSaxon(
         docBook2 = docBook2,
-        inputFile = layout.inputFile(documentName),
+        inputFile = forDocument.inputFile,
         // In processing instructions and CSS, substitute xslParameters also - because why not?
         substitutions = allSubstitutions,
         mathJaxRunner = mathJaxRunner,
         resolver = resolver,
-        stylesheetFile = layout.stylesheetFile(forDocument.mainStylesheet(variant)),
+        stylesheetFile = forDocument.mainStylesheetFile(variant),
         saxonOutputFile = saxonOutputFile
       )
 
@@ -305,12 +306,5 @@ class ProcessDocBookTask extends DefaultTask {
         )
       }
     }
-
-    if (siteFile.get != Extension.dummySiteFile) ProcessDocBookDirect.run(
-      layout = layout,
-      siteFile = siteFile.get,
-      inputDocuments = inputDocuments,
-      resolver = resolver
-    )
   }
 }

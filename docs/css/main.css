@@ -475,6 +475,16 @@ preface > title {
   display: block;
 }
 
+part > title {
+  font-size: 170%;
+  display: block;
+}
+
+chapter > title {
+  font-size: 170%;
+  display: block;
+}
+
 section > title {
   font-size: 170%;
   text-indent: -0.5em;
@@ -534,6 +544,22 @@ itemizedlist {
 listitem {
   display: list-item;
   text-align: -webkit-match-parent;
+}
+
+a.footnote {
+  color: red;
+}
+
+div.endnotes {
+  padding-top: 2em;
+}
+
+.endnote + .endnote {
+  padding-left: 1em;
+}
+
+a.endnote-backlink {
+  color: red;
 }
 
 /*# sourceMappingURL=main.css.map */

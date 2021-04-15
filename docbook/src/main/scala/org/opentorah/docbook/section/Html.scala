@@ -1,7 +1,6 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import org.opentorah.mathjax.MathJax
 import org.opentorah.xml.Xml
 
 object Html extends DocBook2 {
@@ -18,9 +17,8 @@ object Html extends DocBook2 {
     "root.filename" -> rootFilename(values.documentName),
     "html.stylesheet" -> values.cssFile
   ) ++ values.mathJaxConfiguration.fold[Parameters](Map.empty){ mathJaxConfiguration =>
-    val mathJax: MathJax = MathJax.get(values.useMathJax3)
     Map(
-      mathJaxConfigurationParameterName -> mathJax.htmlConfigurationString(mathJaxConfiguration)
+      mathJaxConfigurationParameterName -> values.mathJax.htmlConfigurationString(mathJaxConfiguration)
     )
   }
 
@@ -30,11 +28,10 @@ object Html extends DocBook2 {
 
   override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes =
     if (values.mathJaxConfiguration.isEmpty) Seq.empty else {
-      val mathJax: MathJax = MathJax.get(values.useMathJax3)
       Seq(
         <!-- Add MathJax support -->,
         <xsl:template name="user.head.content">
-          {mathJax.head(<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>)}
+          {values.mathJax.head(<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>)}
         </xsl:template>
       )
     }

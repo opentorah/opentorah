@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
-import org.opentorah.site.{By, Caching, Directory, Selector, Store}
+import org.opentorah.site.{By, Caching, Directory, HtmlContent, Selector, Store}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.UIO
 import java.net.URL
@@ -15,7 +15,7 @@ final class Notes(
   "md",
   Note,
   new Notes.All(_),
-) with By with HtmlContent {
+) with By with HtmlContent[Site] {
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
@@ -28,8 +28,6 @@ final class Notes(
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
   override def acceptsIndexHtml: Boolean = true
-
-  override def path(site: Site): Store.Path = Seq(site.notes)
 
   override def content(site: Site): Caching.Parser[Xml.Element] = directoryEntries.map(notes =>
     <div>{notes.sortBy(_.title).map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)

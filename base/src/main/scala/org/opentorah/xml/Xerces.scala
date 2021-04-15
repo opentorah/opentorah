@@ -20,6 +20,9 @@ object Xerces {
     if (xincludeAware) {
       saxParserFactory.setNamespaceAware(true) // needed for XIncludeAware to kick in
       saxParserFactory.setXIncludeAware(true)
+      // suppress adding `xml:base` on include:
+      // constant `org.apache.xerces.parsers.XIncludeAwareParserConfiguration.XINCLUDE_FIXUP_BASE_URIS` is protected...
+      saxParserFactory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false)
     }
 
     val result: XMLReader = filters.foldLeft(saxParserFactory.newSAXParser.getXMLReader) { case (parent, filter) =>

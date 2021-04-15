@@ -2,11 +2,11 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.html
-import org.opentorah.site.{Caching, ListFile, Store, Site => HtmlSite, WithSource}
+import org.opentorah.site.{Caching, HtmlContent, ListFile, Store, WithSource, Site => HtmlSite}
 import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
   ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Attribute, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Dom, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{App, ExitCode, Task, UIO, URIO, ZEnv, ZIO}
 import java.io.File
@@ -53,7 +53,7 @@ final class Site(
 
   override protected def resolveNavigationalLink(url: String): Caching.Parser[Xml.Element] = resolve(url).map { pathOpt =>
     val path: Store.Path = pathOpt.get
-    a(path)(text = path.last.asInstanceOf[HtmlContent].htmlHeadTitle.getOrElse("NO TITLE"))
+    a(path)(text = path.last.asInstanceOf[HtmlContent[Site]].htmlHeadTitle.getOrElse("NO TITLE"))
   }
 
   override protected def resolveHtmlContent(htmlContent: org.opentorah.site.HtmlContent[Site]): Caching.Parser[Xml.Element] =
@@ -123,7 +123,7 @@ final class Site(
 
   private def content(path: Store.Path): Caching.Parser[(String, Boolean)] = path.lastOption.getOrElse(this) match {
     case teiFacet   : Document.TeiFacet => renderTeiContent (teiFacet   ).map((_, true ))
-    case htmlContent: HtmlContent       => renderHtmlContent(htmlContent).map((_, false))
+    case htmlContent: HtmlContent[Site] => renderHtmlContent(htmlContent).map((_, false))
   }
 
   private def renderTeiContent(teiFacet: Document.TeiFacet): Caching.Parser[String] = teiFacet.getTei.map(tei =>
@@ -149,13 +149,79 @@ final class Site(
     )))
   )
 
-  // TODO move to site?
-  override def a(path: Store.Path): html.a = html
-    .a(path.map(_.structureName))
-    .setTarget((path.last match {
-      case htmlContent: HtmlContent => htmlContent.viewer
-      case _ => Viewer.default
-    }).name)
+  override def style(htmlContent: HtmlContent[Site]): String = htmlContent match {
+    case _: Collection.Alias => "wide"
+    case _: Collection       => "wide"
+    case _                   => "main"
+  }
+
+  override def viewer(htmlContent: HtmlContent[Site]): org.opentorah.site.Viewer = htmlContent match {
+    case _: Collection.Alias        => Viewer.Collection
+    case _: Collection              => Viewer.Collection
+    case _: Document.TextFacet      => Viewer.Document
+    case _: Document.FacsimileFacet => Viewer.Facsimile
+    case _: EntityLists             => Viewer.Names
+    case _: Entity                  => Viewer.Names
+    case Reports                    => Viewer.Names
+    case _                          => Viewer.default
+  }
+
+  override def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[Xml.Element]] = htmlContent match {
+    case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
+    case collection: Collection => collectionNavigationLinks(collection)
+
+    case htmlFacet: Document.HtmlFacet[_, _] => for {
+      siblings <- htmlFacet.collection.siblings(htmlFacet.document)
+      collection = htmlFacet.collection
+      document = htmlFacet.document
+      collectionFacet = htmlFacet.collectionFacet
+      collectionNavigationLinks <- collectionNavigationLinks(collection)
+      moreLinks <- htmlFacet match {
+        case _: Document.TextFacet =>
+          collection.translations(htmlFacet.document).map { translations =>
+            Seq(a(collection.facsimileFacet.of(htmlFacet.document))(text = Tei.facsimileSymbol)) ++ {
+              for (translation <- if (document.isTranslation) Seq.empty else translations)
+                yield a(collectionFacet.of(translation))(s"[${translation.lang}]")
+            }
+          }
+        case _: Document.FacsimileFacet =>
+          ZIO.succeed(Seq(a(collection.textFacet.of(document))(text = "A")))
+      }
+    } yield {
+      val (prev: Option[Document], next: Option[Document]) = siblings
+
+      collectionNavigationLinks ++
+        prev.toSeq.map(prev => a(collectionFacet.of(prev    ))("⇦"          )) ++
+        Seq(                   a(collectionFacet.of(document))(document.name)) ++
+        next.toSeq.map(next => a(collectionFacet.of(next    ))("⇨"          )) ++
+        moreLinks
+    }
+
+    case _ => ZIO.succeed (Seq.empty)
+  }
+
+  private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[Xml.Element]] =
+    ZIO.succeed(Seq(a(collection)(s"[${names.name}]")))
+
+  def path(htmlContent: HtmlContent[Site]): Store.Path = htmlContent match {
+    case textFacet      : Document.TextFacet      =>
+      path(textFacet.collection     ) ++ Seq(                                          textFacet     )
+    case facsimileFacet : Document.FacsimileFacet =>
+      path(facsimileFacet.collection) ++ Seq(facsimileFacet.collection.facsimileFacet, facsimileFacet)
+
+    case collection     : Collection  =>
+      collection.alias.fold(store2path(collection))(alias => Seq(alias2collectionAlias(alias)))
+
+    case collectionAlias: Collection.Alias => Seq(collectionAlias)
+    case index          : Index            => Seq(index)
+    case hierarchy      : Hierarchy        => store2path(hierarchy)
+    case entityLists    : EntityLists      => Seq(entityLists)
+    case entity         : Entity           => Seq(entities, entity)
+    case notes          : Notes            => Seq(notes)
+    case note           : Note             => Seq(notes, note)
+    case Reports                           => Seq(Reports)
+    case report         : Report[_]        => Seq(Reports, report)
+  }
 
   override def findByName(name: String): Caching.Parser[Option[Store]] =
     ZIO.succeed(alias2collectionAlias.get(name)) >>= {
@@ -173,7 +239,7 @@ final class Site(
 
   private def linkResolver(textFacet: Option[Document.TextFacet]): LinksResolver = new LinksResolver {
     private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
-      textFacet.collection.facsimileFacet.of(textFacet.document).path(Site.this))
+      path(textFacet.collection.facsimileFacet.of(textFacet.document)))
 
     def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
       toTask(parser.map { a =>
@@ -201,6 +267,7 @@ final class Site(
     caching.logEnabled = false
 
     for {
+      _ <- if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint())
       _ <- Effects.effect(Site.logger.info("Writing site lists."))
       _ <- entities.writeDirectory()
       _ <- notes.writeDirectory()
@@ -245,15 +312,13 @@ final class Site(
 
       _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries >>= (ZIO.foreach_(_)(document =>
           resolveHtmlContent(collection.textFacet.of(document)))))
-
-      _ <- if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint())
     } yield ()
   }
 
   def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
 
-    def withSource(htmlContent: HtmlContent, nodes: Xml.Nodes): Parser[Seq[WithSource[T]]] = {
-      val source: String = Files.mkUrl(htmlContent.path(this).map(_.structureName))
+    def withSource(htmlContent: HtmlContent[Site], nodes: Xml.Nodes): Parser[Seq[WithSource[T]]] = {
+      val source: String = Files.mkUrl(path(htmlContent).map(_.structureName))
       finder(nodes).map(_.map(new WithSource[T](source, _)))
     }
 
@@ -276,13 +341,17 @@ final class Site(
 
   private def prettyPrint(): Unit = {
     Site.logger.info("Pretty-printing site.")
-    HtmlSite.prettyPrint(
+    PrettyPrinter.prettyPrint(
       List(
 //        Files.url2file(fromUrl.url),  // leave the site.xml file alone :)
         Files.url2file(entities.directoryUrl),
         Files.url2file(Files.subdirectory(fromUrl.url, "archive")) // TODO do not assume the directory name!
       ),
-      xml => if (xml.label == "TEI") (Tei.prettyPrinter, None) else (Store.prettyPrinter, None)
+      element =>
+        if (Dom.getName(element) == "TEI")
+          (Tei.prettyPrinter, None)
+        else
+          (Store.prettyPrinter, None)
     )
   }
 

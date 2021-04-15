@@ -8,30 +8,54 @@ import java.io.File
 // unpacking frameworks under `/build` after each `./gradlew clean` takes noticeable time -
 // around 14 seconds; so, I am caching unpacked frameworks under `~/.gradle`.
 
-final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: File) {
+final class Layout(
+  frameworksDir: File,
+  val projectDir: File,
+  val buildDir: File,
+  catalogDirectoryOverride: Option[File],
+  outputRootOverride: Option[File]
+) {
   // frameworks
   private def frameworkDirectory(name: String): File = new File(frameworksDir, name)
-
-  // Node: ~/.gradle/nodejs
   val nodeRoot: File = frameworkDirectory("nodejs")
   val j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
-
-  // DocBook XSLT: ~/.gradle/docbook
   val docBookXslDirectory: File = Files.file(frameworksDir, Seq("docbook"))
 
+  // build/
+  private def buildDirectory(name: String): File = new File(buildDir, name)
   // src/main/
-  private val sourceDir: File = new File(new File(projectDir, "src"), "main")
-  private def sourceDirectory(name: String): File = new File(sourceDir, name)
+  private def sourceDirectory(name: String): File = Files.file(projectDir, Seq("src", "main", name))
+
+  // Catalog
+  val catalogDirectory: File = catalogDirectoryOverride.getOrElse(sourceDirectory("xml"))
+  private def catalogFile(name: String): File = Files.file(catalogDirectory, Seq(name))
+  val dtdFile: File = catalogFile("substitutions.dtd")
+  val catalogFile: File = catalogFile("catalog.xml")
+  val customCatalogFile: File = catalogFile("catalog-custom.xml")
+
+  // build/docBook
+  // build/docBookTmp
+
+  val intermediateRoot: File = buildDirectory("docBookTmp")
+  val outputRoot: File = outputRootOverride.getOrElse(buildDirectory("docBook"))
+
+  def forDocument(prefixed: Boolean, documentName: String): Layout.ForDocument = new Layout.ForDocument(prefixed, documentName) {
+    override protected def inputDirectory: File = Layout.this.inputDirectory
+    override protected def stylesheetDirectory: File = Layout.this.stylesheetDirectory
+    override protected def root(isIntermediate: Boolean): File = if (isIntermediate) intermediateRoot else outputRoot
+  }
+
+  // build/data
+  val dataDirectory: File = buildDirectory("data")
 
   // src/main/docBook/
   val inputDirectory: File = sourceDirectory("docBook")
-  def inputFile(inputFileName: String): File = new File(inputDirectory, inputFileName + ".xml")
 
   // src/main/css/
   val cssDirectoryName: String = "css"
   val cssDirectory: File = sourceDirectory(cssDirectoryName)
   def cssFile(name: String): File = new File(cssDirectory, name + ".css")
-  def cssFileRelativeToOutputDirectory(name: String): String = cssDirectoryName + "/" + name + ".css"
+  def cssFileRelativeToOutputDirectory(name: String): String = cssDirectoryName + "/" + name + ".css" // TODO eliminate
 
   // src/main/images/
   val imagesDirectoryName: String = "images"
@@ -48,44 +72,35 @@ final class Layout(val frameworksDir: File, val projectDir: File, val buildDir: 
   def customStylesheet(commonSection: CommonSection): String = commonSection.name + "-custom.xsl"
   def customStylesheet(variant: Variant): String = variant.fullName + "-custom.xsl"
   def paramsStylesheet(variant: Variant): String = variant.fullName + "-params.xsl"
-
-  // src/main/xml/
-  private val xmlDirectory: File = sourceDirectory("xml")
-  def xmlFile(name: String): File = new File(xmlDirectory, name)
-  val catalogGroupBase: String = "../../.." // to get to the project root // Files.relativize(dataDirectory, xmlDirectory),
-  val substitutionsDtdFileName: String = "substitutions.dtd"
-  val catalogFile: File = xmlFile("catalog.xml")
-  val catalogCustomFileName: String = "catalog-custom.xml"
-
-  // build/
-  private def buildDirectory(name: String): File = new File(buildDir, name)
-  val buildDirRelative: String =
-    if (buildDir.getParentFile == projectDir) buildDir.getName
-    else throw new IllegalArgumentException("buildDir that is not a child of projectDir is not yet supported! ")
-
-  // build/data
-  def dataDirectoryName: String = "data"
-  val dataDirectory: File = buildDirectory(dataDirectoryName)
-  val dataDirectoryRelative: String = s"$buildDirRelative/$dataDirectoryName/"
-
-  // build/docBook
-  // build/docBookTmp
-
-  val outputRoot: File = buildDirectory("docBook")
-  val intermediateRoot: File = buildDirectory("docBookTmp")
-
-  def forDocument(prefixed: Boolean, documentName: String): Layout.ForDocument = new Layout.ForDocument(prefixed, documentName) {
-    override protected def root(isIntermediate: Boolean): File = if (isIntermediate) intermediateRoot else outputRoot
-  }
-
-  // build/docBookDirect
-  val directOutputRoot: File = buildDirectory("docBookDirect")
 }
 
 object Layout {
+  def buildDir(root: File): File = new File(root, "build")
+
+  def buildDirectory(root: File, name: String): File = new File(buildDir(root), name)
+
+  def forRoot(
+    root: File,
+    catalogDirectoryOverride: Option[File] = None,
+    outputRootOverride: Option[File] = None
+  ): Layout = new Layout(
+    frameworksDir = buildDir(root),
+    projectDir = root,
+    buildDir = buildDir(root),
+    catalogDirectoryOverride = catalogDirectoryOverride,
+    outputRootOverride = outputRootOverride
+  )
+
+  def forCurrent: Layout =
+    forRoot(new File(".").getAbsoluteFile.getParentFile)
+
   abstract class ForDocument(prefixed: Boolean, documentName: String) {
-    final def mainStylesheet(variant: Variant): String =
-      variant.fullName + (if (!prefixed) "" else "-" + documentName) + ".xsl"
+    final def mainStylesheetFile(variant: Variant): File =
+      stylesheetFile(variant.fullName + (if (!prefixed) "" else "-" + documentName) + ".xsl")
+
+    final def inputFile: File = new File(inputDirectory, documentName + ".xml")
+
+    private def stylesheetFile(name: String) = new File(stylesheetDirectory, name)
 
     final def saxonOutputDirectory(variant: Variant): File = outputDirectory(variant, isSaxon = true)
 
@@ -114,15 +129,10 @@ object Layout {
     private def isIntermediate(variant: Variant, isSaxon: Boolean): Boolean =
       isSaxon && variant.docBook2.usesIntermediate
 
+    protected def inputDirectory: File
+
+    protected def stylesheetDirectory: File
+
     protected def root(isIntermediate: Boolean): File
   }
-
-  def forRoot(root: File): Layout = new Layout(
-    frameworksDir = new File(root, "build"),
-    projectDir = root,
-    buildDir = new File(root, "build")
-  )
-
-  def forCurrent: Layout =
-    forRoot(new File(".").getAbsoluteFile.getParentFile)
 }

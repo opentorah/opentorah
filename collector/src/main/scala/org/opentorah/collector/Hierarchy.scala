@@ -21,8 +21,6 @@ final class Hierarchy(
 
   override def findByName(name: String): Parser[Option[Store]] = Store.findByName(name, Seq(by))
 
-  override def path(site: Site): Store.Path = site.store2path(this)
-
   override protected def innerContent(site: Site): Parser[Xml.Element] = ZIO.succeed(by.oneLevelIndex(site))
 }
 

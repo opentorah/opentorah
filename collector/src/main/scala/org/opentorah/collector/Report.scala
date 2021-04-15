@@ -3,17 +3,15 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.html
 import org.opentorah.tei.{EntityReference, Unclear}
-import org.opentorah.site.{Caching, Store, WithSource}
+import org.opentorah.site.{Caching, HtmlContent, Store, WithSource}
 import org.opentorah.util.Strings
 import org.opentorah.xml.Xml
 import java.net.URI
 
-abstract class Report[T](val name: String, val title: String) extends Store with HtmlContent {
+abstract class Report[T](val name: String, val title: String) extends Store with HtmlContent[Site] {
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
   final override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
-
-  final override def path(site: Site): Store.Path = Seq(Reports, this)
 
   final override def content(site: Site): Caching.Parser[Xml.Element] =
     lines(site).map(lines => <div>{lines.map(line => lineToXml(line, site))}</div>)

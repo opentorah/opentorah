@@ -1,9 +1,9 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Strings
+import org.opentorah.util.{Files, Strings}
 import org.typelevel.paiges.Doc
+import java.io.File
 
-// TODO keep empty lines!
 final case class PrettyPrinter(
   width: Int = 120,
   indent: Int = 2,
@@ -256,4 +256,30 @@ object PrettyPrinter {
   val hiddenNewline: String = "\\n"
 
   val default: PrettyPrinter = new PrettyPrinter
+
+  def prettyPrint(roots: List[File], f: Dom.Element => (PrettyPrinter, Option[Doctype])): Unit = {
+    val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
+    val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)
+    xmlFiles.foreach { file =>
+      // Note: Scala XML ignores XML comments when parsing a file
+      // (see https://github.com/scala/scala-xml/issues/508);
+      // using Dom instead:
+      val xml: Dom.Element = Dom.loadFromUrl(Files.file2url(file))
+      val (prettyPrinter, doctype) = f(xml)
+      Files.write(
+        file = file,
+        content = prettyPrinter.renderXml(xml, doctype)
+      )
+    }
+  }
+
+  @scala.annotation.tailrec
+  def listXmlFiles(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match {
+    case Nil => result
+    case current :: tail =>
+      val (directories: List[File], files: List[File]) = current.listFiles.toList.partition(_.isDirectory)
+      listXmlFiles(result ++ files.filter(isXml), tail ++ directories)
+  }
+
+  private def isXml(file: File): Boolean = Files.nameAndExtension(file.getName)._2.contains("xml")
 }
