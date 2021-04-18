@@ -9,11 +9,9 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
   xmlLogger.info(s"Resolver(catalogFile = $catalogFile)")
 
   private val parentResolver: org.xmlresolver.Resolver = {
-    val properties: java.util.Properties = new java.util.Properties
-    properties.setProperty("cacheUnderHome", "yes")
-    val configuration: org.xmlresolver.Configuration = new org.xmlresolver.Configuration(properties, null)
-    val catalog: org.xmlresolver.Catalog = new org.xmlresolver.Catalog(configuration, catalogFile.getAbsolutePath)
-    new org.xmlresolver.Resolver(catalog)
+    val configuration: org.xmlresolver.XMLResolverConfiguration = new org.xmlresolver.XMLResolverConfiguration()
+    configuration.setFeature[java.lang.Boolean](org.xmlresolver.ResolverFeature.CACHE_UNDER_HOME, true)
+    new org.xmlresolver.Resolver(new org.xmlresolver.Catalog(configuration, catalogFile.getAbsolutePath))
   }
 
   override def resolve(href: String, base: String): Source = resolve[Source](

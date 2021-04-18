@@ -6,7 +6,7 @@ pluginManagement {
 
   plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
-    id 'com.github.maiflai.scalatest' version '0.30'
+    id 'com.github.maiflai.scalatest' version '0.31'
     id 'com.google.cloud.tools.jib' version '3.0.0'
     id 'org.podval.tools.cloudrun' version '0.2.0'
     id 'com.gradle.plugin-publish' version '0.14.0'
@@ -15,39 +15,141 @@ pluginManagement {
   }
 }
 
+enableFeaturePreview('VERSION_CATALOGS')
+enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
+
+final String scalaVersion      = '2.13.5'
+final String scalaVersionMajor = '2.13'
+final String scalaLibrary      = 'org.scala-lang:scala-library'
+
+// Scala3:
+// scalaVersion       = '3.0.0-RC3'
+// scalaVersionMajor  = '3.0.0-RC3'
+// scalaLibrary       = 'org.scala-lang:scala3-library_3.0.0-RC3'
+// scalaCompiler      = 'org.scala-lang:scala3-compiler_3.0.0-RC3'
+// scalaCompiler 'org.scala-sbt:compiler-bridge_2.13:1.3.5:sources'
+
+// latest version supported by ScalTest seems to be 0.36.8;
+// I need flexmark for Markdown to Html conversion, and would prefer to use a later version...
+final String flexmarkVersion = '0.36.8'
+final String http4sVersion   = '0.21.22'
+final String batikVersion    = '1.14'
+
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
   }
+
+  // Yes,I know about 'libs.versions.toml', but:
+  // - I do not want to use yet another configuration language;
+  // - it doesn't allow me to interpolate 'scalaVersionMajor';
+  // - this way all the both plugin and dependency versions are in the same file.
+  versionCatalogs {libs {
+    // Scala
+    alias('scala-library').to("$scalaLibrary:$scalaVersion")
+    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.0-RC1")
+
+    // Zinc
+    // first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
+    // previous version - 1.3.5 - doesn't work with Scala 2.13...
+    // on the other hand, build works without any zinc just fine ;)
+    alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
+
+    // XML
+    // TODO use the new APIs introduced in 2.0:
+    alias('xmlresolver').to('org.xmlresolver:xmlresolver:2.1.0')
+    alias('xerces' ).to('xerces:xercesImpl:2.12.1')
+    alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
+    alias('saxon10').to('net.sf.saxon:Saxon-HE:10.5')
+    // tagsoup     = "1.2.1" TODO use org.jsoup?
+    // xmlApis     = "1.4.01"
+
+    // J2V8
+    alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
+
+    // ZIO
+    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.7")
+    alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:2.4.0.0")
+    alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.0")
+    alias('cats-effect'     ).to("org.typelevel:cats-effect_$scalaVersionMajor:2.4.1")
+
+    // HTTP (TODO switch to https://github.com/dream11/zio-http?)
+    alias('http4s-dsl'         ).to("org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion")
+    alias('http4s-blaze-server').to("org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion")
+    alias('http4s-blaze-client').to("org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion")
+
+    // Paiges
+    alias('paiges').to("org.typelevel:paiges-core_$scalaVersionMajor:0.4.1")
+
+    // Caching
+    // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
+    // and since I am not at the point of using anything other than Caffeine,
+    // I'll use it directly - albeit not Scala-idiomatically ;)
+    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.2')
+
+    // FOP
+    alias('fop-core'   ).to('org.apache.xmlgraphics:fop:2.6')
+    alias('fop-hyph'   ).to('net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
+    alias('fop-jeuclid').to('de.rototor.jeuclid:jeuclid-fop:3.1.14')
+    alias('batik-transcoder').to("org.apache.xmlgraphics:batik-transcoder:$batikVersion")
+    alias('batik-extension' ).to("org.apache.xmlgraphics:batik-extension:$batikVersion")
+    //final String jaiVersion = '1.1.3'
+
+    // Logging
+    alias('slf4j'  ).to('org.slf4j:slf4j-api:1.7.30')
+    alias('logback').to('ch.qos.logback:logback-classic:1.2.3')
+    alias('logstash').to('net.logstash.logback:logstash-logback-encoder:6.6')
+
+    // flexmark
+    alias('flexmark-core'           ).to("com.vladsch.flexmark:flexmark:$flexmarkVersion")
+    alias('flexmark-profile-pegdown').to("com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion")
+    alias('flexmark-ext-toc'        ).to("com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion")
+    // alias('flexmark-util-ast').to("com.vladsch.flexmark:flexmark-util-ast:$flexmarkVersion")
+    // alias('flexmark-util-data').to("com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion")
+
+    // Testing
+    alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
+    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.7")
+    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.4")
+    alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
+    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.2")
+
+    // Documentation
+    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.20")
+
+    // --- bundles ---
+    bundle('http4s', [
+            'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
+            'zio-interop-cats', 'cats-core', 'cats-effect'
+    ])
+    bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])  // 'flexmark-util-ast', 'flexmark-util-data'
+  }}
 }
 
-rootProject.name = 'org.opentorah'
+rootProject.name = 'opentorah'
 
 include ':base'
-project(':base'             ).name = 'opentorah-base'
+project(':base'     ).name = 'opentorah-base'
 
 include ':site'
-project(':site'            ).name = 'opentorah-site'
+project(':site'     ).name = 'opentorah-site'
 
 include ':tei'
-project(':tei'             ).name = 'opentorah-tei'
+project(':tei'      ).name = 'opentorah-tei'
 
 include ':texts'
-project(':texts'           ).name = 'opentorah-texts'
+project(':texts'    ).name = 'opentorah-texts'
 
 include ':calendar'
-project(':calendar'        ).name = 'opentorah-calendar'
+project(':calendar' ).name = 'opentorah-calendar'
 
 include ':schedule'
-project(':schedule'        ).name = 'opentorah-schedule'
+project(':schedule' ).name = 'opentorah-schedule'
 
 include ':collector'
-project(':collector'       ).name = 'opentorah-collector'
+project(':collector').name = 'opentorah-collector'
 
 include ':docbook'
-project(":docbook"         ).name = 'opentorah-docbook'
-
-include ':dream-paper'
-include ':typesetting-paper'
+project(":docbook"  ).name = 'opentorah-docbook'
 
 //includeBuild '../../Projects/cloud-run'

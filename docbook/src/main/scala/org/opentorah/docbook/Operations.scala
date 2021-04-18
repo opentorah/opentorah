@@ -4,35 +4,13 @@ import org.opentorah.docbook.section.{CommonSection, DocBook2, NonOverridablePar
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin, MathJaxRunner}
 import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Catalog, Doctype, EvalFilter, PrettyPrinter, Resolver, Sax, Saxon, XInclude, Xml}
+import org.opentorah.xml.{Catalog, EvalFilter, PrettyPrinter, Resolver, Sax, Saxon, XInclude, Xml}
 import java.io.{File, FileWriter}
 import scala.xml.Comment
 
 object Operations {
 
-  def write(
-    file: File,
-    replace: Boolean,
-    doctype: Option[Doctype] = None,
-    elem: Xml.Element
-  ): Unit = Files.write(
-    file,
-    replace,
-    content = PrettyPrinter.default.renderXml(element = elem, doctype)
-  )
-
-  def writeCatalog(
-    file: File,
-    replace: Boolean,
-    content: Xml.Nodes
-  ): Unit = write(
-    file = file,
-    replace = replace,
-    doctype = Some(Catalog),
-    elem = Catalog.catalog(content)
-  )
-
-  def writeFopConfigurationFile(layout: Layout): Unit = write(
+  def writeFopConfigurationFile(layout: Layout): Unit = PrettyPrinter.default.write(
     file = layout.fopConfigurationFile,
     replace = false,
     elem =
@@ -57,7 +35,7 @@ object Operations {
   )
 
   def writeInputDocuments(layout: Layout, inputDocuments: List[(String, Boolean)]): Unit =
-    for ((documentName: String, prefixed: Boolean) <- inputDocuments) write(
+    for ((documentName: String, prefixed: Boolean) <- inputDocuments) PrettyPrinter.default.write(
       file = layout.forDocument(prefixed, documentName).inputFile,
       replace = false,
       doctype = Some(DocBook),
@@ -68,30 +46,6 @@ object Operations {
   private def xsltUri(stylesheets: Stylesheets, directory: File): Seq[Xml.Node] = Seq(
     Comment(s" DocBook $stylesheets stylesheets "),
     Catalog.rewriteUri(rewritePrefix = s"$directory/", uriStartString = stylesheets.uri)
-  )
-
-  def data(dataDirectory: File): Seq[Xml.Element] = Seq(
-    "data:",
-    "data:/",
-    "urn:docbook:data:/",
-    "urn:docbook:data:",
-    "urn:docbook:data/",
-    "http://opentorah.org/docbook/data/"
-  ).map(dataSystemId => Catalog.rewriteSystem(
-    rewritePrefix = Files.file2url(dataDirectory).toString,
-    systemIdStartString = dataSystemId
-  ))
-
-  def dtdLink(dtdFile: File): Xml.Element =
-    Catalog.public(publicId = DocBook.dtdId, uri = Files.file2url(dtdFile).toString)
-
-  def writeDtd(
-    dtdFile: File,
-    substitutions: Map[String, String]
-  ): Unit = Files.write(
-    file = dtdFile,
-    replace = true,
-    content = Catalog.dtd(substitutions)
   )
 
   def writeCatalog(
@@ -105,10 +59,10 @@ object Operations {
     val dtdFile: File = layout.dtdFile
     val dataDirectory: File = layout.dataDirectory
 
-    writeDtd(dtdFile, substitutions)
+    DocBook.writeDtd(dtdFile, substitutions)
 
     // Custom XML catalog
-    writeCatalog(
+    Catalog.write(
       file = customCatalogFile,
       replace = false,
       content = Seq(
@@ -118,7 +72,7 @@ object Operations {
     )
 
     // XML catalog
-    writeCatalog(
+    Catalog.write(
       file = catalogFile,
       replace = true,
       content = Seq(
@@ -127,11 +81,11 @@ object Operations {
         Catalog.nextCatalog(customCatalogFile.getPath),
 
         Comment(" substitutions DTD "),
-        dtdLink(dtdFile),
+        DocBook.dtdLink(dtdFile),
 
         Comment(" generated data ")
       ) ++
-      data(dataDirectory) ++
+      DocBook.data(dataDirectory) ++
 
       xsltUri(Stylesheets.xslt1, xslt1) ++
       xsltUri(Stylesheets.xslt2, xslt2)
@@ -150,19 +104,19 @@ object Operations {
     enableMathJax: Boolean
   ): Unit = {
     // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) Operations.write(
+    for (section: CommonSection <- CommonSection.all) PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.customStylesheet(section)),
       replace = false,
       elem = section.customStylesheet
     )
-    for (variant: Variant <- sections.allVariants) Operations.write(
+    for (variant: Variant <- sections.allVariants) PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.customStylesheet(variant)),
       replace = false,
       elem = variant.docBook2.customStylesheet
     )
 
     // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) Operations.write(
+    for (variant: Variant <- sections.allVariants) PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
       replace = true,
       elem = variant.docBook2.paramsStylesheet(sections.parameters(variant))
@@ -203,7 +157,7 @@ object Operations {
     // xsl:param has the last value assigned to it, so customization must come last;
     // since it is imported (so as not to be overwritten), and import elements must come first,
     // a separate "-param" file is written with the "default" values for the parameters :)
-    write(
+    PrettyPrinter.default.write(
       file = forDocument.mainStylesheetFile(variant),
       replace = true,
       elem = variant.docBook2.mainStylesheet(

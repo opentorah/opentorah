@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.site.{By, Caching, Directory, HtmlContent, Selector, Store}
+import org.opentorah.site.HtmlContent
+import org.opentorah.store.{By, Caching, Directory, Selector, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
@@ -30,8 +31,8 @@ final class Collection(
   override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
 
   def facsimileUrl(site: Site): String = {
-    val pathStr = site.store2path(this).map(_.structureName).mkString("/")
-    site.facsimilesUrl + pathStr  + "/"
+    val pathStr: String = site.store2path(this).map(_.structureName).mkString("/")
+    site.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
   }
 
   def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =

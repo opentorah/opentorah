@@ -30,7 +30,7 @@ import org.opentorah.xml.Xml
  */
 trait MathJax {
 
-  def head(payload: Xml.Nodes): Xml.Nodes
+  def body(payload: Xml.Nodes): Seq[Xml.Element]
 
   final def htmlConfigurationString(configuration: MathJaxConfiguration): String =
     Json.fromMap(htmlConfiguration(configuration))
@@ -69,9 +69,9 @@ object MathJax {
 
   private object MathJax2 extends MathJax {
 
-    override def head(payload: Xml.Nodes): Xml.Nodes = Seq(
+    // TODO? <script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"/>
+    override def body(payload: Xml.Nodes): Seq[Xml.Element] = Seq(
       <script type="text/javascript">window.MathJax={payload};</script>,
-      // TODO? <script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"/>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
     )
 
@@ -171,10 +171,14 @@ made clear that:
   // TODO https://docs.mathjax.org/en/latest/options/input/tex.html
   private object MathJax3 extends MathJax {
 
-    override def head(payload: Xml.Nodes): Xml.Nodes = Seq(
-      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>,
+    override def body(payload: Xml.Nodes): Seq[Xml.Element] = Seq(
+      <script
+        src="https://polyfill.io/v3/polyfill.min.js?features=es6"/>,
       <script>MathJax = {payload};</script>,
-      <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script
+        id="MathJax-script"
+        async="async"
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"/>
     )
 
     override def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Any] = Map(

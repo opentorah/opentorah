@@ -8,20 +8,19 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity=
     "sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
     <link rel="icon" href="/favicon.ico"/>
-    <link rel="stylesheet" href=
-    "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css"/>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css"/>
+  </head>
+  <body>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>MathJax = { "tex":{ "processEscapes":true, "inlineMath":[["$", "$"]], "displayMath":[["$$", "$$"]] }
     };</script>
     <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     ></script>
-  </head>
-  <body>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <header class="site-header" role="banner">
       <div class="wrapper">
-        <a class="site-title" rel="author" target="defaultViewer" href="/">the Open Torah Project</a>
+        <a class="site-title" rel="author" href="/">the Open Torah Project</a>
         <nav class="site-nav">
           <input type="checkbox" id="nav-trigger" class="nav-trigger"></input>
           <label for="nav-trigger"><span class="menu-icon"><svg viewBox="0 0 18 15" width="18px" height="15px"><path d=
@@ -1925,5 +1924,5 @@
       </div>
     </footer>
   </body>
-  <script type="module">import loadWindow from '/js/window.js'; loadWindow('defaultViewer', null);</script>
+  <script type="module">import loadWindow from '/js/window.js'; loadWindow(null, null);</script>
 </html>

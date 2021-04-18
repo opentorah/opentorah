@@ -6,7 +6,7 @@ object Html extends Dialect with Doctype {
 
   override val namespace: Namespace = Namespace(uri="http://www.w3.org/1999/xhtml", prefix="xhtml")
 
-  override val mimeType: String = "application/xhtml+xml"
+  override val mimeType: String = "text/html" // Note: and not "application/xhtml+xml"
 
   override val doctype: String = "<!DOCTYPE html>"
 

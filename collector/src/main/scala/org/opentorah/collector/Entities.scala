@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{Entity => TeiEntity}
-import org.opentorah.site.{By, Caching, Directory, Selector}
+import org.opentorah.store.{By, Caching, Directory, Selector}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser}
 import java.net.URL
 

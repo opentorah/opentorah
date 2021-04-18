@@ -1,6 +1,6 @@
 # Changelog
 
-Modules covered: `base`, `site`, `tei`, `texts`, `dream-paper` and `typesetting-paper`.
+Modules covered: `base`, `site`, `tei` and `texts`.
 
 ## [Unreleased]
 

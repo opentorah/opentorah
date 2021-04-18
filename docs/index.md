@@ -7,12 +7,12 @@ There are a few ongoing projects:
 - [archive documents](https://www.alter-rebbe.org) from the early history of Chabad
  (including the arrests of the Alter Rebbe in 1798 and 1800);
 - code that [generates](https://github.com/opentorah/opentorah/tree/master/collector) the above website;   
-- paper ([HTML](/dream/paper/html/index.html), [PDF](/dream/paper/pdf/dream.pdf),
-  [EPUB](/dream/paper/epub2/dream.epub)) describing ideas (dating from 1991) for the dream environment for
+- paper ([HTML](/texts/paper/dream/html/index.html), [PDF](/texts/paper/dream/pdf/dream.pdf),
+  [EPUB](/texts/paper/dream/epub2/dream.epub)) describing ideas (dating from 1991) for the dream environment for
    working with Jewish texts;
-- companion paper ([HTML](/typesetting/paper/html/index.html), [PDF](/typesetting/paper/pdf/typesetting.pdf),
-  [EPUB](/typesetting/paper/epub2/typesetting.epub)) on typesetting Jewish texts;
-- [code](https://github.com/opentorah/opentorah/tree/master/store) implementing some of those ideas and
+- companion paper ([HTML](/texts/paper/typesetting/html/index.html), [PDF](/texts/paper/typesetting/pdf/typesetting.pdf),
+  [EPUB](/texts/paper/typesetting/epub2/typesetting.epub)) on typesetting Jewish texts;
+- [code](https://github.com/opentorah/opentorah/tree/master/site) implementing some of those ideas and
   [code](https://github.com/opentorah/opentorah/tree/master/texts) for working with specific Jewish texts;
 - paper ([HTML](/calendar/paper/html/index.html), [PDF](/calendar/paper/pdf/calendar.pdf),
   [EPUB](/calendar/paper/epub2/calendar.epub)) on Rambam's Laws of the Sanctification of the Moon;
@@ -23,10 +23,8 @@ There are a few ongoing projects:
 - [code](https://github.com/opentorah/opentorah/tree/master/calendar) implementing Rambam's calculations
   with dates, time intervals and angles and related algorithms;   
 - [code](https://github.com/opentorah/opentorah/tree/master/schedule) for calculating Torah reading/learning schedules;
-- code re-used in multiple projects for processing [metadata](https://github.com/opentorah/opentorah/tree/master/metadata),
-  [XML](https://github.com/opentorah/opentorah/tree/master/xml),
-  [TEI](https://github.com/opentorah/opentorah/tree/master/tei) and general
-  [utilities](https://github.com/opentorah/opentorah/tree/master/util);   
+- [code](https://github.com/opentorah/opentorah/tree/master/base) used by other modules for
+  processing metadata, XML, TEI and general utilities;   
 - desire to publishing this paper in multiple formats was part of the motivation for writing
   [Gradle DocBook plugin](https://github.com/opentorah/opentorah/tree/master/docbook) in general
-  and its support for [mathematics](https://github.com/opentorah/opentorah/tree/master/fop) in DocBook in particular;
+  and its support for mathematics in DocBook in particular;

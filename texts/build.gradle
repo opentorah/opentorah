@@ -4,10 +4,12 @@ plugins {
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'signing'
+  id 'org.opentorah.docbook'
 }
 
 description = 'Jewish Texts'
 
+ext.documents = ['dream', 'typesetting']
 apply from: '../configure.gradle'
 
 dependencies {

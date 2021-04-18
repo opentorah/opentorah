@@ -19,6 +19,18 @@ final case class PrettyPrinter(
   def renderXml(element: Xml.Element): String = renderXml(element, doctype = None)
   def renderXml(element: Xml.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
   def renderXml(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = true, doctype)
+
+  def write(
+    file: File,
+    replace: Boolean,
+    doctype: Option[Doctype] = None,
+    elem: Xml.Element
+  ): Unit = Files.write(
+    file,
+    replace,
+    content = renderXml(element = elem, doctype)
+  )
+
   def render(element: Xml.Element): String = render(element, doctype = None)
   def render(element: Xml.Element, doctype: Doctype): String = render(element, doctype = Some(doctype))
   def render(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = false, doctype)
@@ -249,6 +261,11 @@ final case class PrettyPrinter(
 }
 
 object PrettyPrinter {
+
+  trait Recognizer {
+    def recognize(model: Model)(element: model.Element): (PrettyPrinter, Option[Doctype])
+  }
+
   // The only way I found to not let Paiges screw up indentation in the <pre><code>..</code></pre> blocks
   // is to give it the whole block as one unbreakable text, and for that I need to hide newlines from it -
   // and then restore them in render()...
@@ -257,18 +274,19 @@ object PrettyPrinter {
 
   val default: PrettyPrinter = new PrettyPrinter
 
-  def prettyPrint(roots: List[File], f: Dom.Element => (PrettyPrinter, Option[Doctype])): Unit = {
+  // TODO abstract over Model
+  def prettyPrint(roots: List[File], model: Model, recognizer: Recognizer): Unit = {
     val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
     val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)
     xmlFiles.foreach { file =>
       // Note: Scala XML ignores XML comments when parsing a file
       // (see https://github.com/scala/scala-xml/issues/508);
-      // using Dom instead:
-      val xml: Dom.Element = Dom.loadFromUrl(Files.file2url(file))
-      val (prettyPrinter, doctype) = f(xml)
+      // using Dom instead; use Dom to keep them...
+      val element: model.Element = model.loadFromUrl(Files.file2url(file))
+      val (prettyPrinter, doctype) = recognizer.recognize(model)(element)
       Files.write(
         file = file,
-        content = prettyPrinter.renderXml(xml, doctype)
+        content = prettyPrinter.render(model)(element, addXmlHeader = true, doctype)
       )
     }
   }

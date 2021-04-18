@@ -1,41 +1,44 @@
 package org.opentorah.site
 
 import org.opentorah.html.Html
-import org.opentorah.mathjax.MathJax
+import org.opentorah.util.Json
 import org.opentorah.xml.{Attribute, XLink, Xml}
 
 object HtmlTheme {
 
+  // TODO put scripts on the bottom of body, libraries in the head?
+  // TODO copy SEO stuff from Minima...
   // TODO remove post-related stuff
-  // TODO conditionalize syntax highlighting (https://highlightjs.org/)
+  // TODO conditionalize (and update) the tag character
   // TODO consolidate css, js etc. under 'asset'
-  // TODO do not force the favicon to be jpeg
   def toHtml[S <: Site[S]](
     htmlContent: HtmlContent[S],
     navigationLinks: Seq[Xml.Element], // normally, <a>s
     content: Xml.Element,
     site: S
-  ): Xml.Element =
+  ): Xml.Element = {
+    val common: SiteCommon = site.common
+    val isMathJaxEnabled    : Boolean = common.getMathJax    .isEnabled && HtmlTheme.isMathPresent(content)
+    val isHighlighterEnabled: Boolean = common.getHighlighter.isEnabled && HtmlTheme.isCodePresent(content)
+
     <html>
       <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        {htmlContent.htmlHeadTitle.toSeq.map(title => <title>{title}</title>)}
+        {Xml.optional(htmlContent.htmlHeadTitle)(title => <title>{title}</title>)}
         <link rel="stylesheet" href={s"/css/${site.style(htmlContent)}.css"}/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
-        <link rel="icon" href={s"/${site.favicon}"}/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css"/>
-        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
-        <script>hljs.highlightAll();</script>
-        {if (!site.isMathJaxEnabled) Seq.empty else {
-           val mathJax: MathJax = MathJax.get(site.useMathJax3)
-           mathJax.head(Xml.mkText(mathJax.htmlConfigurationString(site.mathJaxConfiguration)))}}
+        {Xml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
+        {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.head}
       </head>
       <body>
+        {if (!isMathJaxEnabled    ) Seq.empty else common.getMathJax    .body}
+        {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.body}
         <header class="site-header" role="banner">
           <div class="wrapper">
-            <a class="site-title" rel="author" target={site.defaultViewer.name} href="/">{site.title.xml}</a>
+            {Xml.optional(common.title)(title => <a class="site-title" rel="author"
+               target={site.defaultViewer.map(_.name).orNull} href="/">{title.xml}</a>)}
             <nav class="site-nav">
               <input type="checkbox" id="nav-trigger" class="nav-trigger" />
               <label for="nav-trigger">
@@ -52,10 +55,8 @@ object HtmlTheme {
         <main class="page-content" aria-label="Content">
           <div class="wrapper">
             <article class="post">
-              {htmlContent.htmlBodyTitle.toSeq.map(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
-              <div class="post-content">
-                {content}
-              </div>
+              {Xml.optional(htmlContent.htmlBodyTitle)(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
+              <div class="post-content">{content}</div>
             </article>
           </div>
         </main>
@@ -65,39 +66,36 @@ object HtmlTheme {
             <div class="footer-col-wrapper">
               <div class="footer-col footer-col-1">
                 <ul class="contact-list">
-                  <li class="p-name">{site.siteUrl}</li>
-                  <li><a class="u-email" href={s"mailto:${site.email}"}>{site.email}</a></li>
+                  {Xml.optional(common.url)(url => <li class="p-name">{url}</li>)}
+                  {Xml.optional(common.email)(email => <li><a class="u-email" href={s"mailto:$email"}>{email}</a></li>)}
                 </ul>
               </div>
               <div class="footer-col footer-col-2">
                 <ul class="social-media-list">{
-                  social(site.githubUsername, "github.com", "github") ++
-                  social(site.twitterUsername, "www.twitter.com", "twitter")
+                  for ((service, username) <- common.getSocial.list) yield
+                    <li>
+                      <a href={s"${service.serviceUrl}/$username"}>
+                        <svg class="svg-icon">
+                          <use xmlns:xlink={XLink.namespace.uri} xlink:href={service.iconUrl}/>
+                        </svg>
+                        <span class="username">{username}</span>
+                      </a>
+                    </li>
                 }</ul>
               </div>
-              <div class="footer-col footer-col-3">{site.footer.xml}</div>
+              {Xml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.xml}</div>)}
             </div>
           </div>
         </footer>
       </body>
       <script type='module'>
         import loadWindow from '/js/window.js';
-        loadWindow('{site.viewer(htmlContent).name}', {optionToJs(site.googleAnalyticsId)});</script>
+        loadWindow({Json.optionToJs(site.viewer(htmlContent).map(_.name))}, {Json.optionToJs(common.googleAnalyticsId)});</script>
     </html>
-
-  private def optionToJs(value: Option[String]): String =
-    value.fold("null")(value => s"'$value'")
+  }
 
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
 
-  private def social(username: Option[String], serviceUrl: String, iconPart: String): Seq[Xml.Element] =
-    username.toSeq.map(username =>
-    <li>
-      <a href={s"https://$serviceUrl/$username"}>
-        <svg class="svg-icon">
-          <use xmlns:xlink={XLink.namespace.uri} xlink:href={s"/assets/icons.svg#$iconPart"}/>
-        </svg>
-        <span class="username">{username}</span>
-      </a>
-    </li>)
+  private def isMathPresent(content: Xml.Element): Boolean = true // TODO
+  private def isCodePresent(content: Xml.Element): Boolean = true // TODO
 }

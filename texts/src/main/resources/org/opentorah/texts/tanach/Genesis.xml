@@ -58,7 +58,6 @@
     <name n="Genesis" lang="en"/>
     <name n="Берешит" lang="ru" transliterated="yes"/>
 
-    <aliyah n="1" fromChapter="1" fromVerse="1"/>
     <aliyah n="2" fromChapter="1" fromVerse="6"/>
     <aliyah n="3" fromChapter="1" fromVerse="9" toVerse="13"/>
 

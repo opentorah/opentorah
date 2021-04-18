@@ -149,6 +149,9 @@ object Xml extends Model {
     nodes.flatMap(node => node.flatMap(_ \\ elementName).filter(isElement).map[Element](asElement))
   )(descendant => elements.parse(From.xml("descendants", descendant)))
 
+  def optional[T](option: Option[T])(f: T => Nodes): Nodes =
+    option.fold[Nodes](Seq.empty)(value => f(value))
+
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match {
     case Nil => Nil
     case n :: Nil => Seq(n)

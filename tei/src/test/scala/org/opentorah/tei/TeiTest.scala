@@ -4,7 +4,7 @@ import org.opentorah.html
 import org.opentorah.xml.{From, Parser, Xml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import zio.{UIO, URIO}
+import zio.{UIO, URIO, ZLayer}
 
 final class TeiTest extends AnyFlatSpec with Matchers {
 
@@ -33,7 +33,7 @@ final class TeiTest extends AnyFlatSpec with Matchers {
       )
     }
 
-    Parser.run(Tei.toHtml(resolver, element))
+    Parser.run(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
   }
 
   "905" should "work" in {

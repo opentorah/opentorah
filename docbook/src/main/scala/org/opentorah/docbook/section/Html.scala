@@ -31,7 +31,7 @@ object Html extends DocBook2 {
       Seq(
         <!-- Add MathJax support -->,
         <xsl:template name="user.head.content">
-          {values.mathJax.head(<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>)}
+          {values.mathJax.body(<xsl:value-of select={s"$$$mathJaxConfigurationParameterName"}/>)}
         </xsl:template>
       )
     }

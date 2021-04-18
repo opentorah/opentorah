@@ -12,16 +12,12 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-base')
+  compileOnly project(':opentorah-tei')
 
-  // TODO merge into base with flexmark and caffeine dependencies compileOnly...
+  compileOnly libs.bundles.markdown
+  compileOnly libs.bundles.http4s
+  compileOnly libs.logback
+  compileOnly libs.logstash
 
-  implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-  implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
-//  implementation "com.vladsch.flexmark:flexmark-util-ast:$flexmarkVersion"
-//  implementation "com.vladsch.flexmark:flexmark-util-data:$flexmarkVersion"
-
-  // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
-  // and since I am not at the point of using anything other than Caffeine,
-  // I'll use it directly - albeit not Scala-idiomatically ;)
-  implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
+  implementation libs.caffeine // TODO make optional
 }

@@ -1,5 +1,7 @@
 package org.opentorah.xml
 
+import java.io.File
+
 object Catalog extends Dialect with Doctype {
   override val namespace: Namespace = Namespace(uri = "urn:oasis:names:tc:entity:xmlns:xml:catalog", prefix = null)
 
@@ -10,6 +12,17 @@ object Catalog extends Dialect with Doctype {
   val dtdUri: String = "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd"
 
   override val doctype: String = s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
+
+  def write(
+    file: File,
+    replace: Boolean,
+    content: Xml.Nodes
+  ): Unit = PrettyPrinter.default.write(
+    file = file,
+    replace = replace,
+    doctype = Some(Catalog),
+    elem = catalog(content)
+  )
 
   def catalog(content: Xml.Nodes): Xml.Element =
     <catalog xmlns={namespace.uri} prefer="public">{content}</catalog>

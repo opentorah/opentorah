@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site
-  siteUrl="www.opentorah.org"
-  favicon="favicon.ico"
-  isMathJaxEnabled="true"
-  useMathJax3="true"
-  licenseName="Creative Commons Attribution 4.0 International License"
-  licenseUrl="http://creativecommons.org/licenses/by/4.0/"
-  email="dub@opentorah.org"
-  githubUsername="opentorah"
-  twitterUsername="theopentorah"
->
-  <title>the Open Torah Project</title>
-  <footer>
-    documents related to early Chabad history<br/>
-    🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
-    <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
-  </footer>
+<site>
+  <common
+    url="www.opentorah.org"
+    favicon="favicon.ico"
+    email="dub@opentorah.org"
+  >
+    <title>the Open Torah Project</title>
+    <license
+      name="Creative Commons Attribution 4.0 International License"
+      url="http://creativecommons.org/licenses/by/4.0/"
+    />
+    <social
+      github="opentorah"
+      twitter="theopentorah"
+    />
+    <footer>
+      documents related to early Chabad history<br/>
+      🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
+      <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
+    </footer>
+    <highlighter
+      isEnabled="true"
+      usePrism="true"
+    />
+    <mathJax
+      isEnabled="true"
+      useV3="true"
+    />
+  </common>
 </site>
