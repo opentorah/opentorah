@@ -7,11 +7,6 @@
 - merged FOP plugin back into this module: nobody used it ;)
 - use the 'site' module;
 - support to MathJax3;
-- introduced ProcessDocBookDirect: direct (no XSLT) transformation from DocBook to HTML;
-- transforming DocBook -> HTML in DocBook.scala;
-- DocBook plugin calls ProcessDocBookDirect;
-- working on the DocBook stylesheet and element transform;
-- PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
 - `DoubleEscapeHtmlNodeExtension` removed;
 
 ## [0.7.53] - 2020-08-23

@@ -17,29 +17,7 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-base')
-
-  // using direct transformation:
-  implementation project(':opentorah-site'), libs.logback
-  implementation project(':opentorah-tei'), libs.xmlresolver, libs.saxon10, libs.logstash // TODO why?
-
   implementation libs.scala.xml
 
   testImplementation libs.cats.core
 }
-
-// using direct transformation:
-task processDocBookDirect(type: JavaExec) {
-  group = 'publishing'
-  classpath = sourceSets.main.runtimeClasspath
-  main = 'org.opentorah.docbook.ProcessDocBookDirect'
-  args = [
-    "$projectDir/build",
-    "$rootDir/docs/site.xml",
-    "$projectDir/src/main/docBook/calendar.xml",
-    "version=$project.version,a=b",
-    "$rootDir/docs/calendar/paperDirect",
-    dataGeneratorClassName
-  ]
-}
-site.dependsOn processDocBookDirect
-

@@ -12,6 +12,7 @@ final class SiteCommon(
   private val social: Option[SiteSocial],
   val footer: Option[SiteCommon.Footer.Value],
   val pages: Seq[String],
+  val docbook: Seq[SiteDocBook],
   private val tei: Option[SiteTei],
   private val highlighter: Option[SiteHighlighter],
   private val mathJax: Option[SiteMathJax]
@@ -43,6 +44,7 @@ object SiteCommon extends Element[SiteCommon]("common") {
       footer <- Footer.element.optional()
       pages <- SitePage.seq()
       tei <- SiteTei.optional()
+      docbook <- SiteDocBook.seq()
       highlighter <- SiteHighlighter.optional()
       mathJax <- SiteMathJax.optional()
     } yield new SiteCommon(
@@ -55,6 +57,7 @@ object SiteCommon extends Element[SiteCommon]("common") {
       social,
       footer,
       pages,
+      docbook,
       tei,
       highlighter,
       mathJax
@@ -70,6 +73,7 @@ object SiteCommon extends Element[SiteCommon]("common") {
       SiteSocial.optional(_.social),
       Footer.element.optional(_.footer),
       SitePage.seq(_.pages),
+      SiteDocBook.seq(_.docbook),
       SiteTei.optional(_.tei),
       SiteHighlighter.optional(_.highlighter),
       SiteMathJax.optional(_.mathJax)

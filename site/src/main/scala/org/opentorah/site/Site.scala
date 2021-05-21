@@ -18,6 +18,8 @@ class Site[S <: Site[S]](
   val common: SiteCommon
 ) extends FindByName with FromUrl.With { this: S =>
 
+  final def logger: Logger = Site.logger
+
   def defaultViewer: Option[Viewer] = None
 
   final val caching: Caching.Simple = new Caching.Simple
@@ -122,6 +124,7 @@ class Site[S <: Site[S]](
     (if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint(Xml))) *>
     Effects.effect(Site.logger.info("Writing site lists.")) *>
     ZIO.foreach_(directoriesToWrite)(_.writeDirectory()) *>
+    ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this))) *>
     buildMore
   }
 

@@ -75,6 +75,8 @@ object Files {
   def getParent(url: URL): URL = new URL(url, "..")
 
   def subUrl(base: Option[URL], url: String): URL = base.fold(new URL(url))(new URL(_, url))
+  def subUrl(base: URL, url: String): URL = new URL(base, url)
+  def subFile(base: URL, url: String): File = url2file(subUrl(base, url))
 
   def isFileUrl(url: URL): Boolean = url.getProtocol == "file"
   def isJarUrl(url: URL): Boolean = url.getProtocol == "jar"

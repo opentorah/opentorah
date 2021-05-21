@@ -6,9 +6,8 @@ import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
 import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
-import zio.{App, ExitCode, UIO, URIO, ZEnv, ZIO}
-import java.io.File
+import org.opentorah.xml.{FromUrl, Parser, Xml}
+import zio.{UIO, ZIO}
 import java.net.URL
 
 // TODO retrieve TEI(?) references from notes.
@@ -180,7 +179,7 @@ final class Site(
 
       def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
         toTask(parser.map { a =>
-          if (a.isEmpty) Site.logger.warn(error)
+          if (a.isEmpty) logger.warn(error)
           a
         }).orDie
 
@@ -204,20 +203,20 @@ final class Site(
   override protected def directoriesToWrite: Seq[Directory[_, _, _]] = Seq(entities, notes) ++ collections
 
   override protected def buildMore: Caching.Parser[Unit] = for {
-      _ <- Effects.effect(Site.logger.info("Writing references."))
+      _ <- Effects.effect(logger.info("Writing references."))
       allReferences <- allWithSource[EntityReference](
         nodes => ZIO.foreach(EntityType.values)(entityType =>
           Xml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
       )
       _ <- Effects.effect(references.write(allReferences))
 
-      _ <- Effects.effect(Site.logger.info("Writing unclears."))
+      _ <- Effects.effect(logger.info("Writing unclears."))
       allUnclears <- allWithSource[Unclear.Value](
         nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
       _ <- Effects.effect(unclears.write(allUnclears))
 
-      _ <- Effects.effect(Site.logger.info("Verifying site."))
+      _ <- Effects.effect(logger.info("Verifying site."))
 
       errorOpts <- getReferences >>= (ZIO.foreach(_) { value =>
         val reference: EntityReference = value.value
@@ -275,45 +274,3 @@ final class Site(
   )
 }
 
-object Site extends org.opentorah.site.SiteReader[Site] with App {
-
-  // TODO move into Site
-  override def run(args: List[String]): URIO[ZEnv, ExitCode] = {
-    if (args.length > 1) {
-      val url: URL = Files.file2url(new File(args.head))
-      val command: String = args(1)
-      require((command == "buildAndPrettyPrintSite") || (command == "buildSite"))
-      val withPrettyPrint: Boolean = command == "buildAndPrettyPrintSite"
-      readSite(url) >>= (_.build(withPrettyPrint))
-    } else {
-      ???
-    }
-  }.exitCode
-
-  // TODO move into SiteReader descendent?
-  override def contentParsable: Parsable[Site] = new Parsable[Site] {
-    override def parser: Parser[Site] = for {
-      fromUrl <- Element.currentFromUrl
-      common <- SiteCommon.required()
-      entities <- Entities.required()
-      entityLists <- EntityLists.required()
-      notes <- Notes.required()
-      by <- ByHierarchy.followRedirects.required()
-    } yield new Site(
-      fromUrl,
-      common,
-      entities,
-      entityLists,
-      notes,
-      by
-    )
-
-    override def unparser: Unparser[Site] = Unparser.concat[Site](
-      SiteCommon.required(_.common),
-      Entities.required(_.entities),
-      EntityLists.required(_.entityLists),
-      Notes.required(_.notes),
-      ByHierarchy.required(_.by)
-    )
-  }
-}

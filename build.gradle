@@ -1,4 +1,4 @@
-// when on the project path, mdoc's version of FlexMark  conflicts with the ScalaTest's;
+// when on the project path, mdoc's version of FlexMark conflicts with the ScalaTest's;
 // when it is here, I do not need to introduce `mdoc` configuration - and I can
 // call it directly.
 buildscript {
@@ -11,7 +11,6 @@ plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
-  id 'io.miret.etienne.sass'
 }
 
 ext.mdocRunner = mdoc.Main
@@ -45,10 +44,4 @@ subprojects {
   deploy.group = 'publishing'
 }
 
-compileSass {
-  group = 'publishing'
-
-  sourceDir = project.file ("$rootDir/docs/sass")
-  outputDir = project.file ("$rootDir/docs/css")
-}
 

@@ -1,0 +1,40 @@
+plugins {
+  id 'io.miret.etienne.sass'
+  id 'java-library'
+  id 'scala'
+}
+
+compileSass {
+  group = 'publishing'
+
+  version = '1.34.0'
+
+  sourceDir = project.file ("$projectDir/sass")
+  outputDir = project.file ("$projectDir/css")
+}
+site.dependsOn(compileSass)
+
+dependencies {
+  implementation project(':opentorah-site')
+  implementation project(':opentorah-tei')
+  implementation project(':opentorah-base')
+
+  implementation project(':opentorah-calendar')
+
+  implementation libs.bundles.http4s
+  implementation libs.logback
+  implementation libs.logstash
+
+  implementation libs.xmlresolver
+  implementation libs.saxon10
+}
+
+task buildAndPrettyPrintSite(type: JavaExec) {
+  group = 'publishing'
+  dependsOn(compileSass)
+
+  main = 'org.opentorah.site.SiteServiceCommon'
+  args = ['buildAndPrettyPrintSite', projectDir]
+  classpath = sourceSets.main.runtimeClasspath
+}
+site.dependsOn(buildAndPrettyPrintSite)
