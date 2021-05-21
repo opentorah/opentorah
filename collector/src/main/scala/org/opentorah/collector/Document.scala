@@ -2,7 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
-import org.opentorah.site.{Caching, Directory, HtmlContent, Store}
+import org.opentorah.site.HtmlContent
+import org.opentorah.store.{Caching, Directory, Store}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
 

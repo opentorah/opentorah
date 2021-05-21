@@ -3,7 +3,8 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.html
 import org.opentorah.tei.{EntityReference, Unclear}
-import org.opentorah.site.{Caching, HtmlContent, Store, WithSource}
+import org.opentorah.site.HtmlContent
+import org.opentorah.store.{Caching, Store, WithSource}
 import org.opentorah.util.Strings
 import org.opentorah.xml.Xml
 import java.net.URI

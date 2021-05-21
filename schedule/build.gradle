@@ -8,8 +8,6 @@ plugins {
 
 description = 'Jewish Readings and Learning Schedules'
 
-ext.isService = true
-
 apply from: '../configure.gradle'
 
 //jib {
@@ -23,6 +21,9 @@ dependencies {
 
   implementation project(':opentorah-base')
 
+  implementation libs.bundles.http4s
+
+  // TODO still?
   // looks like Gradle API (which I do not see among the dependencies) drags in
   // its implementation, causing "Class path contains multiple SLF4J bindings." warning; so:
   configurations.testRuntimeOnly {

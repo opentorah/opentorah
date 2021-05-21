@@ -18,7 +18,7 @@ so this is how I did it:
 
 To extract directories from a repository into a separate one:
 
-```
+```shell
   $ git filter-repo --path <path1> --path <path2> ...
 ```
 
@@ -31,7 +31,7 @@ files in them previously resided in. Looking through the output of
 
 To merge repository `old` into repository `new` preserving history (one hopes!):
 
-```
+```shell
   $ cd <new>
   $ git remote add -f old <old>
   $ git merge ald/master --allow-unrelated-histories
@@ -42,14 +42,3 @@ but revision history is automatically discarded, and for the generated files
 (like HTML, PDF and EPUB of the papers) to be visible on the site they need to be checked in,
 I might end up pruning their history periodically using `$ git filter-repo`...
 
-## Module Dependencies ##
-```
-util         *used by all*
-xml          fop   docbook[xml]             (xml, but not metadata)
-metadata     tei[api metadata]
-calendar                                    (metadata, but no tei)
-             texts[api metadata, api tei]
-             collector[api metadata, tei]   (tei, but no texts or calendar(yet))  
-schedule[api calendar, api texts]
-calendar-service             
-```

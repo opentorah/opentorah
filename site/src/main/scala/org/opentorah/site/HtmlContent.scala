@@ -1,6 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.html
+import org.opentorah.store.Caching
 import org.opentorah.xml.Xml
 
 trait HtmlContent[S <: Site[S]] {

@@ -1,73 +1,28 @@
 package org.opentorah.collector
 
-import org.opentorah.metadata.Names
 import org.opentorah.html
-import org.opentorah.site.{Caching, HtmlContent, ListFile, Store, WithSource, Site => HtmlSite}
-import org.opentorah.tei.{Availability, CalendarDesc, EntityReference, EntityType, LangUsage, Language, LinksResolver,
-  ProfileDesc, PublicationStmt, Publisher, SourceDesc, Tei, Unclear}
+import org.opentorah.html.Html
+import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
+import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
+import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Attribute, Dom, Element, FromUrl, Parsable, Parser, PrettyPrinter, Unparser, Xml}
-import org.slf4j.{Logger, LoggerFactory}
-import zio.{App, ExitCode, Task, UIO, URIO, ZEnv, ZIO}
+import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import zio.{App, ExitCode, UIO, URIO, ZEnv, ZIO}
 import java.io.File
 import java.net.URL
 
 // TODO retrieve TEI(?) references from notes.
 final class Site(
-  override val fromUrl: FromUrl,
-  override val names: Names,
-  title: HtmlSite.Title.Value,
-  siteUrl: String,
-  val facsimilesUrl: String,
-  favicon: String,
-  val sourceDesc: SourceDesc.Value,
-  val calendarDesc: CalendarDesc.Value,
-  pages: Seq[String],
-  licenseName: String,
-  licenseUrl: String,
-  googleAnalyticsId: Option[String],
-  email: String,
-  githubUsername: Option[String],
-  twitterUsername: Option[String],
-  footer: HtmlSite.Footer.Value,
+  fromUrl: FromUrl,
+  common: SiteCommon,
   val entities: Entities,
   val entityLists: EntityLists,
   val notes: Notes,
   val by: ByHierarchy
-) extends HtmlSite[Site](
-  title,
-  siteUrl,
-  favicon,
-  pages,
-  licenseName,
-  licenseUrl,
-  googleAnalyticsId,
-  isMathJaxEnabled = false,
-  useMathJax3 = true,
-  email,
-  githubUsername,
-  twitterUsername,
-  footer,
-  Viewer.default
-) with Store with FromUrl.With {
-
-  override protected def resolveNavigationalLink(url: String): Caching.Parser[Xml.Element] = resolve(url).map { pathOpt =>
-    val path: Store.Path = pathOpt.get
-    a(path)(text = path.last.asInstanceOf[HtmlContent[Site]].htmlHeadTitle.getOrElse("NO TITLE"))
-  }
-
-  override protected def resolveHtmlContent(htmlContent: org.opentorah.site.HtmlContent[Site]): Caching.Parser[Xml.Element] =
-    htmlContent.content(this) >>= (content => Tei.toHtml(
-      linkResolver(htmlContent match {
-        case htmlFacet: Document.TextFacet => Some(htmlFacet)
-        case _ => None
-      }),
-      content
-    ))
-
-  // TODO move to site
-  override protected def htmlPrettyPrinter: PrettyPrinter = Site.htmlPrettyPrinter
-
+) extends org.opentorah.site.Site[Site](
+  fromUrl,
+  common
+) {
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
 
   private def getPaths(path: Store.Path, by: ByHierarchy): Seq[Store.Path] = by.stores.flatMap { store =>
@@ -86,13 +41,13 @@ final class Site(
     if last.isInstanceOf[Collection]
   } yield last.asInstanceOf[Collection]
 
-  val hierarchies: Seq[Hierarchy] = for {
+  private val hierarchies: Seq[Hierarchy] = for {
     path <- paths
     last = path.last
     if last.isInstanceOf[Hierarchy]
   } yield last.asInstanceOf[Hierarchy]
 
-  val alias2collectionAlias: Map[String, Collection.Alias] = collections
+  private val alias2collectionAlias: Map[String, Collection.Alias] = collections
     .filter(_.alias.isDefined)
     .map(collection => collection.alias.get -> new Collection.Alias(collection))
     .toMap
@@ -111,43 +66,19 @@ final class Site(
   )
   def getUnclears: Caching.Parser[Seq[WithSource[Unclear.Value]]] = unclears.get
 
-  override def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] =
-    if (path.isEmpty) ZIO.some(Seq(Index.Flat))
-    else Store.resolve(path, this, Seq.empty)
+  override def defaultViewer: Option[Viewer] = Some(Viewer.default)
 
-  // TODO generalize and move to site
+  override protected def index: Caching.Parser[Option[Store.Path]] = ZIO.some(Seq(Index.Flat))
+
   // TODO ZIOify logging!
   //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
-  def resolveContent(path: Seq[String]): Task[Option[(String, Boolean)]] =
-    toTask(resolve(path) >>= (_.map(content(_).map(Some(_))).getOrElse(ZIO.none)))
 
-  private def content(path: Store.Path): Caching.Parser[(String, Boolean)] = path.lastOption.getOrElse(this) match {
-    case teiFacet   : Document.TeiFacet => renderTeiContent (teiFacet   ).map((_, true ))
-    case htmlContent: HtmlContent[Site] => renderHtmlContent(htmlContent).map((_, false))
+  override protected def content(path: Store.Path): Caching.Parser[org.opentorah.site.Site.Response] = path.lastOption.getOrElse(this) match {
+    case teiFacet   : Document.TeiFacet =>
+      teiFacet.getTei.map(renderTeiContent).map(content => new org.opentorah.site.Site.Response(content, Tei.mimeType))
+    case htmlContent: HtmlContent[Site] =>
+      renderHtmlContent(htmlContent).map(content => new org.opentorah.site.Site.Response(content, Html.mimeType))
   }
-
-  private def renderTeiContent(teiFacet: Document.TeiFacet): Caching.Parser[String] = teiFacet.getTei.map(tei =>
-    Tei.renderXml(tei.copy(teiHeader = tei.teiHeader.copy(
-      fileDesc = tei.teiHeader.fileDesc.copy(
-        publicationStmt = Some(new PublicationStmt(
-          publisher = Some(new Publisher.Value(<ptr target={s"http://$siteUrl"}/>)),
-          availability = Some(new Availability(
-            status = Some("free"),
-            xml = <licence><ab><ref n="license" target={licenseUrl}>{licenseName}</ref></ab></licence>
-          ))
-        )),
-        sourceDesc = Some(sourceDesc)
-      ),
-      profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc.empty).copy(
-        langUsage = Some(LangUsage(languages = Seq(Language(
-          ident = tei.text.lang.get,
-          usage = None,
-          text = None
-        )))),
-        calendarDesc = Some(calendarDesc)
-      ))
-    )))
-  )
 
   override def style(htmlContent: HtmlContent[Site]): String = htmlContent match {
     case _: Collection.Alias => "wide"
@@ -155,18 +86,18 @@ final class Site(
     case _                   => "main"
   }
 
-  override def viewer(htmlContent: HtmlContent[Site]): org.opentorah.site.Viewer = htmlContent match {
-    case _: Collection.Alias        => Viewer.Collection
-    case _: Collection              => Viewer.Collection
-    case _: Document.TextFacet      => Viewer.Document
-    case _: Document.FacsimileFacet => Viewer.Facsimile
-    case _: EntityLists             => Viewer.Names
-    case _: Entity                  => Viewer.Names
-    case Reports                    => Viewer.Names
-    case _                          => Viewer.default
+  override def viewer(htmlContent: HtmlContent[Site]): Option[org.opentorah.site.Viewer] = htmlContent match {
+    case _: Collection.Alias        => Some(Viewer.Collection)
+    case _: Collection              => Some(Viewer.Collection)
+    case _: Document.TextFacet      => Some(Viewer.Document  )
+    case _: Document.FacsimileFacet => Some(Viewer.Facsimile )
+    case _: EntityLists             => Some(Viewer.Names     )
+    case _: Entity                  => Some(Viewer.Names     )
+    case Reports                    => Some(Viewer.Names     )
+    case _                          => defaultViewer
   }
 
-  override def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[Xml.Element]] = htmlContent match {
+  override protected def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[Xml.Element]] = htmlContent match {
     case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
     case collection: Collection => collectionNavigationLinks(collection)
 
@@ -201,9 +132,9 @@ final class Site(
   }
 
   private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[Xml.Element]] =
-    ZIO.succeed(Seq(a(collection)(s"[${names.name}]")))
+    ZIO.succeed(Seq(a(collection)(s"[${collection.names.name}]")))
 
-  def path(htmlContent: HtmlContent[Site]): Store.Path = htmlContent match {
+  override protected def path(htmlContent: HtmlContent[Site]): Store.Path = htmlContent match {
     case textFacet      : Document.TextFacet      =>
       path(textFacet.collection     ) ++ Seq(                                          textFacet     )
     case facsimileFacet : Document.FacsimileFacet =>
@@ -237,43 +168,42 @@ final class Site(
         }
     }
 
-  private def linkResolver(textFacet: Option[Document.TextFacet]): LinksResolver = new LinksResolver {
-    private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
-      path(textFacet.collection.facsimileFacet.of(textFacet.document)))
+  override protected def linkResolver(htmlContent: org.opentorah.site.HtmlContent[org.opentorah.collector.Site]): LinksResolver = {
+    val textFacet: Option[Document.TextFacet] = htmlContent match {
+      case htmlFacet: Document.TextFacet => Some(htmlFacet)
+      case _ => None
+    }
 
-    def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
-      toTask(parser.map { a =>
-        if (a.isEmpty) Site.logger.warn(error)
-        a
-      }).orDie
+    new LinksResolver {
+      private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
+        path(textFacet.collection.facsimileFacet.of(textFacet.document)))
 
-    override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
-      Site.this.resolve(url).map(_.map(path => a(path))),
-      s"did not resolve: $url"
-    )
+      def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
+        toTask(parser.map { a =>
+          if (a.isEmpty) Site.logger.warn(error)
+          a
+        }).orDie
 
-    override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
-      entities.findByName(ref).map(_.map(entity => entity.a(Site.this))),
-      s"did not find reference: $ref"
-    )
+      override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
+        Site.this.resolve(url).map(_.map(path => a(path))),
+        s"did not resolve: $url"
+      )
 
-    override def facs(pageId: String): UIO[Option[html.a]] = toUIO(
-      ZIO.succeed(facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId))),
-      "did not get facsimile: $pageId"
-    )
+      override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
+        entities.findByName(ref).map(_.map(entity => entity.a(Site.this))),
+        s"did not find reference: $ref"
+      )
+
+      override def facs(pageId: String): UIO[Option[html.a]] = toUIO(
+        ZIO.succeed(facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId))),
+        "did not get facsimile: $pageId"
+      )
+    }
   }
 
-  def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
-    caching.logEnabled = false
+  override protected def directoriesToWrite: Seq[Directory[_, _, _]] = Seq(entities, notes) ++ collections
 
-    for {
-      _ <- if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint())
-      _ <- Effects.effect(Site.logger.info("Writing site lists."))
-      _ <- entities.writeDirectory()
-      _ <- notes.writeDirectory()
-      // Collection lists must exist by the time we gather references and such:
-      _ <- ZIO.foreach_(collections)(_.writeDirectory())
-
+  override protected def buildMore: Caching.Parser[Unit] = for {
       _ <- Effects.effect(Site.logger.info("Writing references."))
       allReferences <- allWithSource[EntityReference](
         nodes => ZIO.foreach(EntityType.values)(entityType =>
@@ -313,7 +243,6 @@ final class Site(
       _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries >>= (ZIO.foreach_(_)(document =>
           resolveHtmlContent(collection.textFacet.of(document)))))
     } yield ()
-  }
 
   def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
 
@@ -339,91 +268,40 @@ final class Site(
     } yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten
   }
 
-  private def prettyPrint(): Unit = {
-    Site.logger.info("Pretty-printing site.")
-    PrettyPrinter.prettyPrint(
-      List(
-//        Files.url2file(fromUrl.url),  // leave the site.xml file alone :)
-        Files.url2file(entities.directoryUrl),
-        Files.url2file(Files.subdirectory(fromUrl.url, "archive")) // TODO do not assume the directory name!
-      ),
-      element =>
-        if (Dom.getName(element) == "TEI")
-          (Tei.prettyPrinter, None)
-        else
-          (Store.prettyPrinter, None)
-    )
-  }
-
-  private def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
+  override protected def prettyPrintRoots: Seq[URL] = Seq(
+//    fromUrl.url,  // leave the site.xml file alone :)
+    entities.directoryUrl,
+    Files.subdirectory(fromUrl.url, "archive") // TODO do not assume the directory name!
+  )
 }
 
-object Site extends Element[Site]("site") with App {
+object Site extends org.opentorah.site.SiteReader[Site] with App {
 
-  private val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
-  val htmlPrettyPrinter: PrettyPrinter = Tei.prettyPrinter.copy(
-    alwaysStackElements = Tei.prettyPrinter.alwaysStackElements ++ Set("nav", "header", "main", "div", "store"),
-    // Note: only the ones derived from TEI notes need to cling, but:
-    clingyElements = Tei.prettyPrinter.clingyElements ++ Set("a"),
-    allowEmptyElements = false,
-    // ... except, some elements are mis-processed when they *are* non-empty (e.g., <br>),
-    // and in general, it's weird to expand the elements that are always empty:
-    keepEmptyElements = Set("br", "meta", "link", "img", "data"),
-    preformattedElements = Set("pre")
-  )
-
-  def read(rootUrl: URL): Task[Site] = Parser.toTask {
-    Effects.effect(logger.info(s"Reading site from $rootUrl")) *>
-    Site.parse(Files.fileInDirectory(rootUrl, "site.xml"))
-  }
-
+  // TODO move into Site
   override def run(args: List[String]): URIO[ZEnv, ExitCode] = {
-    val withPrettyPrint: Boolean = args.length > 1 && (args(1) == "prettyPrint")
-    Site.read(Files.file2url(new File(args.head))) >>= (_.build(withPrettyPrint))
+    if (args.length > 1) {
+      val url: URL = Files.file2url(new File(args.head))
+      val command: String = args(1)
+      require((command == "buildAndPrettyPrintSite") || (command == "buildSite"))
+      val withPrettyPrint: Boolean = command == "buildAndPrettyPrintSite"
+      readSite(url) >>= (_.build(withPrettyPrint))
+    } else {
+      ???
+    }
   }.exitCode
 
-  private val facsimilesUrlAttribute: Attribute.Required[String] = Attribute("facsimilesUrl").required
-
+  // TODO move into SiteReader descendent?
   override def contentParsable: Parsable[Site] = new Parsable[Site] {
     override def parser: Parser[Site] = for {
       fromUrl <- Element.currentFromUrl
-      names <- Names.withDefaultNameParsable()
-      title <- HtmlSite.Title.element.required()
-      siteUrl <- HtmlSite.siteUrlAttribute()
-      facsimilesUrl <- facsimilesUrlAttribute()
-      favicon <- HtmlSite.faviconAttribute()
-      sourceDesc <- SourceDesc.element.required()
-      calendarDesc <- CalendarDesc.element.required()
-      pages <- HtmlSite.Page.seq()
-      licenseName <- HtmlSite.licenseNameAttribute()
-      licenseUrl <- HtmlSite.licenseUrlAttribute()
-      googleAnalyticsId <- HtmlSite.googleAnalyticsIdAttribute()
-      email <- HtmlSite.emailAttribute()
-      githubUsername <- HtmlSite.githubUsernameAttribute()
-      twitterUsername <- HtmlSite.twitterUsernameAttribute()
-      footer <- HtmlSite.Footer.element.required()
+      common <- SiteCommon.required()
       entities <- Entities.required()
       entityLists <- EntityLists.required()
       notes <- Notes.required()
       by <- ByHierarchy.followRedirects.required()
     } yield new Site(
       fromUrl,
-      names,
-      title,
-      siteUrl,
-      facsimilesUrl,
-      favicon,
-      sourceDesc,
-      calendarDesc,
-      pages,
-      licenseName,
-      licenseUrl,
-      googleAnalyticsId,
-      email,
-      githubUsername,
-      twitterUsername,
-      footer,
+      common,
       entities,
       entityLists,
       notes,
@@ -431,21 +309,7 @@ object Site extends Element[Site]("site") with App {
     )
 
     override def unparser: Unparser[Site] = Unparser.concat[Site](
-      Names.withDefaultNameParsable(_.names),
-      HtmlSite.Title.element.required(_.title),
-      HtmlSite.siteUrlAttribute(_.siteUrl),
-      facsimilesUrlAttribute(_.facsimilesUrl),
-      HtmlSite.faviconAttribute(_.favicon),
-      SourceDesc.element.required(_.sourceDesc),
-      CalendarDesc.element.required(_.calendarDesc),
-      HtmlSite.Page.seq(_.pages),
-      HtmlSite.licenseNameAttribute(_.licenseName),
-      HtmlSite.licenseUrlAttribute(_.licenseUrl),
-      HtmlSite.googleAnalyticsIdAttribute(_.googleAnalyticsId),
-      HtmlSite.emailAttribute(_.email),
-      HtmlSite.githubUsernameAttribute(_.githubUsername),
-      HtmlSite.twitterUsernameAttribute(_.twitterUsername),
-      HtmlSite.Footer.element.required(_.footer),
+      SiteCommon.required(_.common),
       Entities.required(_.entities),
       EntityLists.required(_.entityLists),
       Notes.required(_.notes),

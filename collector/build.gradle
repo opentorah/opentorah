@@ -10,21 +10,19 @@ plugins {
 
 description = 'Archive Collector'
 
-ext.isService = true
-
 apply from: '../configure.gradle'
 
 dependencies {
-  implementation project(':opentorah-tei')
-  implementation project(':opentorah-site')
   implementation project(':opentorah-base')
+  implementation project(':opentorah-site')
+  implementation project(':opentorah-tei')
 
-  // pretty-printing now uses Dom to retain comments...
-  implementation "net.sf.saxon:Saxon-HE:$saxon10Version"
+  implementation libs.bundles.markdown
+  implementation libs.bundles.http4s
+  implementation libs.logback
+  implementation libs.logstash
 
-  implementation "ch.qos.logback:logback-classic:$logbackVersion"
-
-  testImplementation "org.podval.tools:org.podval.tools.run:$podvalRunVersion"
+  testImplementation libs.podvalRun
 }
 
 jib.from.image = 'adoptopenjdk:11'

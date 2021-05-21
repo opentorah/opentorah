@@ -17,4 +17,7 @@ object Json {
     case value: String => "\"" + Strings.escape(value) + "\""
     case other => other.toString
   }
+
+  def optionToJs(value: Option[String]): String =
+    value.fold("null")(value => s"'$value'")
 }

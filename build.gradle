@@ -3,7 +3,7 @@
 // call it directly.
 buildscript {
   dependencies {
-    classpath "org.scalameta:mdoc_$scalaVersionMajor:$mdocVersion"
+    classpath libs.mdoc
   }
 }
 

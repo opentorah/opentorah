@@ -1,7 +1,5 @@
 # Changelog
 
-Modules covered: `docbook` and `fop`.
-
 ## [Unreleased]
 
 ## [0.7.56] - 2021-0

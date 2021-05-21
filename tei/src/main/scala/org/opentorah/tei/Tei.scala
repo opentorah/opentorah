@@ -3,7 +3,7 @@ package org.opentorah.tei
 import org.opentorah.util.Files
 import org.opentorah.html
 import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
-import zio.{Has, URIO, ZLayer}
+import zio.{Has, URIO}
 import java.net.URI
 
 final case class Tei(
@@ -16,8 +16,6 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 
   override val mimeType: String = "application/tei+xml"
-
-  def renderXml(tei: Tei): String = prettyPrinter.renderXml(Tei.xmlElement(tei))
 
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>""" + "\n" +
   override val prettyPrinter: PrettyPrinter = new PrettyPrinter(
@@ -40,9 +38,6 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
       Text.required(_.text)
     )
   }
-
-  def toHtml(linksResolver: LinksResolver, element: Xml.Element): Parser[Xml.Element] =
-    toHtml(element).provideLayer(ZLayer.succeed(linksResolver))
 
   def concat[A](unparsers: Unparser[A]*): Unparser[A] =
     Unparser.concatInNamespace(Tei.namespace, unparsers)

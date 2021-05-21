@@ -13,6 +13,8 @@ final case class a(
 ) {
   def setId(value: String): a = copy(id = Some(value))
 
+  def setTarget(value: Option[String]): a = value.fold(this)(setTarget)
+
   def setTarget(value: String): a = copy(target = Some(value))
 
   def addClass(value: String): a = copy(classes = classes :+ value)

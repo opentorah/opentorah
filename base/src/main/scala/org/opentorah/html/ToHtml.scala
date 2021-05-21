@@ -3,7 +3,7 @@ package org.opentorah.html
 import org.opentorah.xml.{Attribute, Namespace, Xml}
 import zio.{Has, URIO}
 
-// Converting other XML dialects (e.g., TEI) to HTML
+// Converting other XML dialects (e.g., TEI, DocBook) to HTML
 trait ToHtml[R <: Has[_]] {
   protected def namespace: Namespace
 

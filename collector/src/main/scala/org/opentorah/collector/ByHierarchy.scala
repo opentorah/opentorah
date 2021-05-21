@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.site.{By, Selector, Store}
+import org.opentorah.store.{By, Selector, Store}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
 
 final class ByHierarchy(
