@@ -25,7 +25,7 @@ dependencies {
   implementation libs.logback
   implementation libs.logstash
 
-  implementation libs.xmlresolver
+  implementation libs.xmlresolver, libs.jing
   implementation libs.saxon10
 }
 
@@ -33,7 +33,7 @@ task buildAndPrettyPrintSite(type: JavaExec) {
   group = 'publishing'
   dependsOn(compileSass)
 
-  main = 'org.opentorah.site.SiteServiceCommon'
+  mainClass = 'org.opentorah.site.SiteServiceCommon'
   args = ['buildAndPrettyPrintSite', projectDir]
   classpath = sourceSets.main.runtimeClasspath
 }

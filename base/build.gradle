@@ -21,7 +21,7 @@ dependencies {
   // - are declared here as 'compileOnly';
   // - need to be supplied as 'runtimeOnly' where needed.
 
-  compileOnly libs.xmlresolver
+  compileOnly libs.xmlresolver, libs.jing
   compileOnly libs.saxon6 // Saxon 6 (XSLT 1.0)
   compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
   compileOnly libs.caffeine
