@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dependency updates;
 - correct `jib.from.image`;
 - centralized dependency versions using Gradle 7 features;
+- added 'docs' module;
 
 ## [0.2.4] - 2021-02-04
 - moved from JCenter/Bintray to Maven Central (see http://dub.podval.org/2021/02/04/bintray-is-dead.html)!

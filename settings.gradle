@@ -5,11 +5,11 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.38.0'
+    id 'com.github.ben-manes.versions' version '0.39.0'
     id 'com.github.maiflai.scalatest' version '0.31'
     id 'com.google.cloud.tools.jib' version '3.0.0'
     id 'org.podval.tools.cloudrun' version '0.2.0'
-    id 'com.gradle.plugin-publish' version '0.14.0'
+    id 'com.gradle.plugin-publish' version '0.15.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
     id 'io.miret.etienne.sass' version '1.1.1'
   }
@@ -18,7 +18,7 @@ pluginManagement {
 enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
-final String scalaVersion      = '2.13.5'
+final String scalaVersion      = '2.13.6'
 final String scalaVersionMajor = '2.13'
 final String scalaLibrary      = 'org.scala-lang:scala-library'
 
@@ -32,7 +32,7 @@ final String scalaLibrary      = 'org.scala-lang:scala-library'
 // latest version supported by ScalTest seems to be 0.36.8;
 // I need flexmark for Markdown to Html conversion, and would prefer to use a later version...
 final String flexmarkVersion = '0.36.8'
-final String http4sVersion   = '0.21.22'
+final String http4sVersion   = '1.0.0-M23'
 final String batikVersion    = '1.14'
 
 dependencyResolutionManagement {
@@ -47,7 +47,7 @@ dependencyResolutionManagement {
   versionCatalogs {libs {
     // Scala
     alias('scala-library').to("$scalaLibrary:$scalaVersion")
-    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.0-RC1")
+    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.0")
 
     // Zinc
     // first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
@@ -64,14 +64,17 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
     // xmlApis     = "1.4.01"
 
+    // Google Cloud
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:1.114.0')
+
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
-    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.7")
-    alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:2.4.0.0")
-    alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.0")
-    alias('cats-effect'     ).to("org.typelevel:cats-effect_$scalaVersionMajor:2.4.1")
+    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.8")
+    alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
+    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.1.1")
+    alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:3.1.1.0")
 
     // HTTP (TODO switch to https://github.com/dream11/zio-http?)
     alias('http4s-dsl'         ).to("org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion")
@@ -109,13 +112,13 @@ dependencyResolutionManagement {
 
     // Testing
     alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
-    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.7")
-    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.4")
+    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.9")
+    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
     alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
-    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.2")
+    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // Documentation
-    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.20")
+    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.21")
 
     // --- bundles ---
     bundle('http4s', [
@@ -151,5 +154,7 @@ project(':collector').name = 'opentorah-collector'
 
 include ':docbook'
 project(":docbook"  ).name = 'opentorah-docbook'
+
+include ':docs'
 
 //includeBuild '../../Projects/cloud-run'

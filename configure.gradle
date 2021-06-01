@@ -3,12 +3,11 @@
 // if project.document or project.documents exist, it is configured as a paper, and:
 //   project.dataGeneratorClassName, if present, is used to configure the data generator (bye default it is not configured)
 //   isMathJaxEnabled, if present, determines if MathJax support is enabled (by default it is not);
-// all projects are configured as a library.
+// all projects are configured as a library (except for the docs one).
 
 final String projectBaseName = project.name.substring('opentorah-'.length())
 
-// everything is a Scala library
-
+// Scala
 dependencies {
   implementation libs.scala.library
 
@@ -25,113 +24,6 @@ dependencies {
   testImplementation libs.algebraLaws
 }
 
-// library
-final String gitHubRepository = "opentorah/opentorah"
-final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-final String orgName = 'Open Torah Project'
-final String orgUrl = 'http://www.opentorah.org'
-
-jar {
-  // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
-  //   Since this library is included as a jar in our jib projects, we want the jar to built reproducibly.
-  preserveFileTimestamps false
-  reproducibleFileOrder true
-
-  // Because why not?
-  manifest {
-    attributes(
-            'Implementation-Title'  : project.description,
-            'Implementation-Version': project.version
-    )
-  }
-}
-
-task sourcesJar(type: Jar) {
-  from sourceSets.main.allSource
-  archiveClassifier.set('sources')
-}
-
-task scaladocJar(type: Jar) {
-  from scaladoc.destinationDir
-  archiveClassifier.set('scaladoc')
-}
-scaladocJar.dependsOn(scaladoc)
-
-// there is no Java in the project, but Maven Central requires javadoc JAR...
-task javadocJar(type: Jar) {
-  from javadoc.destinationDir
-  archiveClassifier.set('javadoc')
-}
-javadocJar.dependsOn(javadoc)
-
-publishing {
-  repositories {
-    maven {
-      name = 'mavenCentral'
-      url = version.endsWith('SNAPSHOT') ?
-              'https://oss.sonatype.org/content/repositories/snapshots' :
-              'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-
-      // Note: this will use mavenCentralUsername and mavenCentralPassword properties - if they are available
-      credentials(PasswordCredentials)
-    }
-
-    publications {
-      library(MavenPublication) {
-        from components.java
-        artifact sourcesJar
-        artifact scaladocJar
-        artifact javadocJar
-
-        pom {
-          name = project.name
-          description = project.description
-          url = "$gitHubRepositoryUrl/tree/master/$project.name"
-          scm {
-            url = "$gitHubRepositoryUrl"
-            connection = "scm:git:git://github.com/${gitHubRepository}.git"
-            developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
-          }
-          licenses {
-            license {
-              name = 'The Apache Software License, Version 2.0'
-              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-              distribution = 'repo'
-              comments = 'A business-friendly OSS license'
-            }
-          }
-          organization {
-            name = orgName
-            url = orgUrl
-          }
-          developers {
-            developer {
-              id = 'dub'
-              name = 'Leonid Dubinsky'
-              email = 'dub@opentorah.org'
-              organization = orgName
-              organizationUrl = orgUrl
-              timezone = '-5'
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-signing {
-  useInMemoryPgpKeys(findProperty('gnupg.dub-opentorah-org.key'), findProperty('gnupg.dub-opentorah-org.password'))
-  sign publishing.publications.library
-}
-
-task uploadLibrary
-uploadLibrary.description('Upload artifacts')
-uploadLibrary.group('publishing')
-uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
-
-upload.dependsOn(uploadLibrary)
-
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.with {
     targetCompatibility = '1.8'
@@ -139,35 +31,144 @@ tasks.withType(ScalaCompile) {
   }
 }
 
-// mdoc
-final String inputDirectory = "$projectDir/src/docs"
+// library
+if (project.name != 'docs') {
+  final String gitHubRepository = "opentorah/opentorah"
+  final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
+  final String orgName = 'Open Torah Project'
+  final String orgUrl = 'http://www.opentorah.org'
 
-if (file(inputDirectory).exists()) {
-  final String outputDirectory = "$buildDir/docs/mdoc"
-  final String publishDirectory = "$rootDir/docs/$projectBaseName/docs"
+  jar {
+    // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
+    //   Since this library is included as a jar in our jib projects, we want the jar to built reproducibly.
+    preserveFileTimestamps false
+    reproducibleFileOrder true
 
-  task mdoc
-  mdoc.description = 'Process and publish mdoc documentation'
-  mdoc.group = 'publishing'
-  mdoc.dependsOn classes
-  site.dependsOn mdoc
+    // Because why not?
+    manifest {
+      attributes(
+              'Implementation-Title': project.description,
+              'Implementation-Version': project.version
+      )
+    }
+  }
 
-  mdoc.doLast {
-    // clean
-    project.delete(outputDirectory)
+  task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+  }
 
-    // process
-    final String[] args = [
-      '--in' , inputDirectory ,
-      '--out', outputDirectory,
-      '--classpath', sourceSets.main.runtimeClasspath.asPath
-    ]
-    mdocRunner.main(args)
+  task scaladocJar(type: Jar) {
+    from scaladoc.destinationDir
+    archiveClassifier.set('scaladoc')
+  }
+  scaladocJar.dependsOn(scaladoc)
 
-    // publish
-    project.sync {
-      from outputDirectory
-      into publishDirectory
+  // there is no Java in the project, but Maven Central requires javadoc JAR...
+  task javadocJar(type: Jar) {
+    from javadoc.destinationDir
+    archiveClassifier.set('javadoc')
+  }
+  javadocJar.dependsOn(javadoc)
+
+  publishing {
+    repositories {
+      maven {
+        name = 'mavenCentral'
+        url = version.endsWith('SNAPSHOT') ?
+                'https://oss.sonatype.org/content/repositories/snapshots' :
+                'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+
+        // Note: this will use mavenCentralUsername and mavenCentralPassword properties - if they are available
+        credentials(PasswordCredentials)
+      }
+
+      publications {
+        library(MavenPublication) {
+          from components.java
+          artifact sourcesJar
+          artifact scaladocJar
+          artifact javadocJar
+
+          pom {
+            name = project.name
+            description = project.description
+            url = "$gitHubRepositoryUrl/tree/master/$project.name"
+            scm {
+              url = "$gitHubRepositoryUrl"
+              connection = "scm:git:git://github.com/${gitHubRepository}.git"
+              developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+            }
+            licenses {
+              license {
+                name = 'The Apache Software License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'repo'
+                comments = 'A business-friendly OSS license'
+              }
+            }
+            organization {
+              name = orgName
+              url = orgUrl
+            }
+            developers {
+              developer {
+                id = 'dub'
+                name = 'Leonid Dubinsky'
+                email = 'dub@opentorah.org'
+                organization = orgName
+                organizationUrl = orgUrl
+                timezone = '-5'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  signing {
+    useInMemoryPgpKeys(findProperty('gnupg.dub-opentorah-org.key'), findProperty('gnupg.dub-opentorah-org.password'))
+    sign publishing.publications.library
+  }
+
+  task uploadLibrary
+  uploadLibrary.description('Upload artifacts')
+  uploadLibrary.group('publishing')
+  uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
+
+  upload.dependsOn(uploadLibrary)
+
+  // mdoc
+  final String inputDirectory = "$projectDir/src/docs"
+
+  if (file(inputDirectory).exists()) {
+    final String outputDirectory = "$buildDir/docs/mdoc"
+    final String publishDirectory = "$rootDir/docs/$projectBaseName/docs"
+
+    task mdoc
+    mdoc.description = 'Process and publish mdoc documentation'
+    mdoc.group = 'publishing'
+    mdoc.dependsOn classes
+    site.dependsOn mdoc
+
+    mdoc.doLast {
+      // clean
+      project.delete(outputDirectory)
+
+      // process
+      final String[] args = [
+              '--in', inputDirectory,
+              '--out', outputDirectory,
+              '--classpath', sourceSets.main.runtimeClasspath.asPath
+      ]
+      mdocRunner.main(args)
+
+      // publish
+      project.sync {
+        from outputDirectory
+        into publishDirectory
+      }
     }
   }
 }

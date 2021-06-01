@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import cats.data.OptionT
-import cats.effect.{Blocker, ExitCode}  // TODO upgrade to Cats Effects 3.
+import cats.effect.ExitCode
 //import cats.implicits._
 //import fs2.io
 import fs2.Stream
@@ -9,22 +9,29 @@ import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.{`Content-Length`, `Content-Type`}
 import org.http4s.implicits._
-import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.util.CaseInsensitiveString
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s._
 import org.slf4j.{Logger, LoggerFactory}
 import org.opentorah.util.{Effects, Files}
+import org.opentorah.xml.{Element, Parser}
+import org.typelevel.ci.CIString
 import zio.duration.Duration
 import zio.interop.catz._
 import zio.{App, RIO, Task, URIO, ZEnv, ZIO}
+import java.io.File
 import java.net.URL
-import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.jdk.CollectionConverters.SeqHasAsJava
 
-abstract class Service[S <: Site[S]] extends App {
+abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
+
+  // This is supposed to be set when running in Cloud Run
+  private val serviceName: Option[String] = Option(System.getenv("K_SERVICE"))
+
   LoggerFactory.getILoggerFactory match {
-    case logback: ch.qos.logback.classic.LoggerContext =>
-      logback.getLogger(Logger.ROOT_LOGGER_NAME).setLevel(ch.qos.logback.classic.Level.INFO)
+    case loggerContext: ch.qos.logback.classic.LoggerContext =>
+      SiteService.configureLogback(loggerContext, inCloudRun = serviceName.isDefined)
+
     case _ =>
   }
 
@@ -32,25 +39,54 @@ abstract class Service[S <: Site[S]] extends App {
 
   type ServiceTask[+A] = RIO[ServiceEnvironment, A]
 
-  def siteReader: SiteReader[S]
+  private final def readSite(url: URL): Task[S] = readSiteFile(Files.fileInDirectory(url, "site.xml"))
+
+  private final def readSiteFile(url: URL): Task[S] = Parser.toTask(
+    Effects.effect(logger.info(s"Reading site from $url")) *>
+    parse(url)
+  )
+
+  // TODO remove?
+//  private final def doReadSiteFile(file: File): S = Parser.run(readSiteFile(file))
+//  private final def readSiteFile(file: File): Parser[S] = parse(Files.file2url(file))
 
   // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
   // with `Metadata-Flavor: Google` header;
   // or do I even need it for logging?
-  def projectId: String
+  protected def projectId: String
 
   // TODO does this belong in the base class?
-  def bucketName: String
-
-  val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
+  protected def bucketName: String
 
   val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
   import dsl._
 
-  final override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] =
-    serve(args)
+  final override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
+    if (args.isEmpty) serve(urlString = None) else args.head match {
+      case "serveRemoteSite"         => serve(urlString = None)
+      case "serveSite"               => serve(urlString = args.lift(1))
+      case "buildAndPrettyPrintSite" => build(urlString = args(1), withPrettyPrint = true)
+      case "buildSite"               => build(urlString = args(1), withPrettyPrint = false)
+      case "uploadSite"              => upload(directoryPath = args(1), serviceAccountKey = args(2), dryRun = false)
+      case "uploadSiteDryRun"        => upload(directoryPath = args(1), serviceAccountKey = args(2), dryRun = true )
+    }
+  }.exitCode
 
-  private def serve(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
+  private def build(urlString: String, withPrettyPrint: Boolean): Task[Unit] = {
+    val url: URL = Files.file2url(new File(urlString))
+    readSite(url) >>= (_.build(withPrettyPrint))
+  }
+
+  private def upload(directoryPath: String, serviceAccountKey: String, dryRun: Boolean): Task[Unit] =
+    Effects.effectTotal(new GoogleCloudStorageSynchronizer(
+      serviceAccountKey = serviceAccountKey,
+      bucketName = bucketName,
+      bucketPrefix = "",
+      directoryPath = directoryPath + "/",
+      dryRun = dryRun
+    ).sync())
+
+  private def serve(urlString: Option[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
     def getParameter(name: String, defaultValue: String): String = Option(System.getenv(name)).fold {
       info(s"No value for '$name' in the environment; using default: '$defaultValue'")
       defaultValue
@@ -59,8 +95,8 @@ abstract class Service[S <: Site[S]] extends App {
       value
     }
 
-    val siteUrl: String = if (args.nonEmpty) {
-      val result = args.head
+    val siteUrl: String = if (urlString.nonEmpty) {
+      val result: String = urlString.get
       info(s"siteUri argument supplied: $result")
       result
     } else getParameter("STORE", s"http://$bucketName/") // TODO switch to https
@@ -69,8 +105,6 @@ abstract class Service[S <: Site[S]] extends App {
 
     val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
-    // This is supposed to be set when running in Cloud Run
-    val serviceName: Option[String] = Option(System.getenv("K_SERVICE"))
     warning(s"serviceName=$serviceName")
 
     ZIO.runtime[ServiceEnvironment].flatMap { implicit rts =>
@@ -93,7 +127,7 @@ abstract class Service[S <: Site[S]] extends App {
 
     // TODO move near the SiteReader
     var site: Option[S] = None
-    def getSite: Task[S] = site.map(Task.succeed(_)).getOrElse(siteReader.readSite(Service.toUrl(siteUri)).map { result =>
+    def getSite: Task[S] = site.map(Task.succeed(_)).getOrElse(readSite(SiteService.toUrl(siteUri)).map { result =>
       site = Some(result)
       result
     })
@@ -109,32 +143,33 @@ abstract class Service[S <: Site[S]] extends App {
       //   match expected type cats.effect.Sync[org.opentorah.collector.Service.ServiceTask]
       //val F: Sync[ServiceTask] = taskConcurrentInstance
 
-      val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path)
+      val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path.toString)
       val urlStr: String = Files.mkUrl(path)
 
       OptionT(
         (getSite >>= (_.resolveContent(path))).map(_.map { response =>
           val bytes: Array[Byte] = response.content.getBytes
           Response[ServiceTask](
-            headers = Headers(List(
+            headers = Headers(
               `Content-Type`(MediaType.unsafeParse(response.mimeType), Charset.`UTF-8`),
               `Content-Length`.unsafeFromLong(bytes.length)
               // TODO more headers!
-            )),
+            ),
             body = Stream.emits(bytes)
           )
         })
           // Note: without this ascription, incorrect type is inferred:
           : ServiceTask[Option[Response[ServiceTask]]]
       )
-        .orElse(StaticFile.fromURL[ServiceTask](
-          Service.toUrl(siteUri.resolve(Service.relativize(Service.addIndex(request.uri)))),
-          blocker,
-          Some(request)
-        ))
+        .orElse {
+          val path: Uri.Path = request.uri.path
+          val implied: Uri.Path = if (path.endsWithSlash) path/Uri.Path.Segment("index.html") else path
+          val uri: Uri = siteUri.copy(path = siteUri.path.addSegments(implied.segments))
+          StaticFile.fromURL[ServiceTask](SiteService.toUrl(uri), Some(request))
+        }
         .getOrElseF(NotFound(s"Not found: $urlStr"))
         .timed.mapEffect { case (duration: Duration, response: Response[ServiceTask]) =>
-        val durationStr: String = Service.formatDuration(duration)
+        val durationStr: String = SiteService.formatDuration(duration)
 
         if (response.status.isInstanceOf[NotFound.type])
           warning(request, s"NOT $durationStr $urlStr")
@@ -164,12 +199,12 @@ abstract class Service[S <: Site[S]] extends App {
   private def warning(request: Request[ServiceTask], message: String): Unit = log(Some(request), message, "WARNING")
   private def warning(                               message: String): Unit = log(None         , message, "WARNING")
 
-  final def logger: Logger = LoggerFactory.getLogger(getClass)
+  private final def logger: Logger = Site.logger
 
   private def log(request: Option[Request[ServiceTask]], message: String, severity: String): Unit = {
     val trace: Option[String] = request.flatMap(_
-      .headers.get(CaseInsensitiveString("X-Cloud-Trace-Context"))
-      .map(_.value.split("/")(0))
+      .headers.get(CIString("X-Cloud-Trace-Context"))
+      .map(_.toString.split("/")(0))
     )
 
     val arguments: Seq[StructuredArgument] =
@@ -180,12 +215,30 @@ abstract class Service[S <: Site[S]] extends App {
   }
 }
 
-object Service {
-  private def addIndex(uri: Uri): Uri =
-    if (uri.path.endsWith("/")) uri.copy(path = uri.path + "index.html") else uri
+object SiteService {
 
-  private def relativize(uri: Uri): Uri =
-    if (uri.path.startsWith("/")) uri.copy(path = uri.path.substring(1)) else uri
+  private def configureLogback(loggerContext: ch.qos.logback.classic.LoggerContext, inCloudRun: Boolean): Unit = {
+    val rootLogger: ch.qos.logback.classic.Logger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME)
+
+    if (inCloudRun) {
+      val statusManager = loggerContext.getStatusManager
+      if (statusManager != null) statusManager.add(new ch.qos.logback.core.status.InfoStatus("Configuring logger", loggerContext))
+
+      val encoder = new net.logstash.logback.encoder.LogstashEncoder
+      // Ignore default logging fields
+      encoder.setExcludeMdcKeyNames(List("timestamp", "version", "logger", "thread", "level", "levelValue").asJava)
+
+      val consoleAppender = new ch.qos.logback.core.ConsoleAppender[ch.qos.logback.classic.spi.ILoggingEvent]
+      consoleAppender.setName("jsonConsoleAppender")
+      consoleAppender.setContext(loggerContext)
+      consoleAppender.setEncoder(encoder)
+
+      rootLogger.detachAndStopAllAppenders()
+      rootLogger.addAppender(consoleAppender)
+    }
+
+    rootLogger.setLevel(ch.qos.logback.classic.Level.INFO)
+  }
 
   private def toUrl(uri: Uri): URL = new URL(uri.toString)
 
@@ -197,4 +250,3 @@ object Service {
     }
   }
 }
-

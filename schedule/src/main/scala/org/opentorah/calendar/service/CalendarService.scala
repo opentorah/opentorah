@@ -1,17 +1,16 @@
 package org.opentorah.calendar.service
 
-import cats.effect.{Blocker, ExitCode}
+import cats.effect.ExitCode
 import org.opentorah.metadata.{Language, LanguageSpec}
 import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
 import org.http4s.headers.`Content-Type`
 import org.http4s.MediaType
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import zio.{App, Task, ZEnv, ZIO}
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-import java.util.concurrent.Executors
 
 /*
   There is currently no need for the polished, public UI.
@@ -32,8 +31,6 @@ import java.util.concurrent.Executors
  */
 object CalendarService extends App {
 
-  private val blocker: Blocker = Blocker.liftExecutorService(Executors.newFixedThreadPool(2))
-
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
   private val dsl = Http4sDsl[Task]
@@ -41,8 +38,7 @@ object CalendarService extends App {
 
   private val service: HttpRoutes[Task] = HttpRoutes.of[Task] {
     case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
-      StaticFile.fromResource("/" + path, blocker, Some(request))
-        .getOrElseF(NotFound())
+      StaticFile.fromResource("/" + path, Some(request)).getOrElseF(NotFound())
 
     case GET -> Root
       :? OptionalLanguageQueryParamMatcher(maybeLanguage)

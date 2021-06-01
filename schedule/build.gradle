@@ -18,15 +18,6 @@ apply from: '../configure.gradle'
 dependencies {
   api project(':opentorah-calendar')
   api project(':opentorah-texts')
-
   implementation project(':opentorah-base')
-
   implementation libs.bundles.http4s
-
-  // TODO still?
-  // looks like Gradle API (which I do not see among the dependencies) drags in
-  // its implementation, causing "Class path contains multiple SLF4J bindings." warning; so:
-  configurations.testRuntimeOnly {
-    exclude group: 'ch.qos.logback', module: 'logback-classic'
-  }
 }

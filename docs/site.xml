@@ -19,6 +19,12 @@
       🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
       <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
     </footer>
+    <docbook
+      documents="../calendar/src/main/docBook/calendar.xml"
+      outputDirectory="./calendar/paperDirect"
+      buildDirectory="../calendar/build/"
+      dataGeneratorClass="org.opentorah.calendar.paper.Tables"
+    />
     <highlighter
       isEnabled="true"
       usePrism="true"

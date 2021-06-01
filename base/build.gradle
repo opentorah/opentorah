@@ -10,10 +10,6 @@ description = 'Open Torah Base'
 
 apply from: '../configure.gradle'
 
-// Optional dependencies:
-// - are declared here as 'compileOnly';
-// - need to be supplied as 'runtimeOnly' where needed.
-
 dependencies {
   api libs.scala.xml  // TODO api?
   api libs.zio.core
@@ -21,13 +17,14 @@ dependencies {
   implementation libs.xerces
   implementation libs.paiges
 
+  // Optional dependencies:
+  // - are declared here as 'compileOnly';
+  // - need to be supplied as 'runtimeOnly' where needed.
+
   compileOnly libs.xmlresolver
   compileOnly libs.saxon6 // Saxon 6 (XSLT 1.0)
   compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
-
   compileOnly libs.caffeine
-
-  // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
 
   testRuntimeOnly libs.saxon10

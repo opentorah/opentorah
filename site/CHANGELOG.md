@@ -13,15 +13,14 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 - HtmlTheme supports MathJax;
 - support to MathJax3;
 - code highlighting using `highlightjs`;
-- introduced ProcessDocBookDirect: direct (no XSLT) transformation from DocBook to HTML;
-- transforming DocBook -> HTML in DocBook.scala;
-- DocBook plugin calls ProcessDocBookDirect;
-- 'calendar' paper uses ProcessDocBookDirect directly (without plugin);
-- working on the DocBook stylesheet and element transform;
 - PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
 - `DoubleEscapeHtmlNodeExtension` removed;
 - moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the 'site' module;
 - pretty-printing in Site;
+- consolidated Site commands (including siteUpload) into SiteService;
+- Site proceses DocBook directly;
+- transforming DocBook -> HTML in DocBook.scala;
+- working on the DocBook stylesheet and element transform;
 
 ## [0.2.0] - 2021-01-27
 My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:
