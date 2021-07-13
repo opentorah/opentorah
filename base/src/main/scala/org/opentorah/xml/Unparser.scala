@@ -3,7 +3,7 @@ package org.opentorah.xml
 import org.opentorah.util.Collections
 
 final class Unparser[A] private(
-  val attributes: A => Seq[Attribute.Value[_]],
+  val attributes: A => Attribute.Values,
   val content: A => Seq[Xml.Node],
   val namespace: Option[Namespace]
 )
@@ -11,9 +11,9 @@ final class Unparser[A] private(
 object Unparser {
 
   def apply[A](
-    attributes: A => Seq[Attribute.Value[_]] = (_: A) => Seq.empty,
-    content   : A => Seq[Xml.Node]           = (_: A) => Seq.empty,
-    namespace : Option[Namespace]            = None
+    attributes: A => Attribute.Values = (_: A) => Seq.empty,
+    content   : A => Xml.Nodes        = (_: A) => Seq.empty,
+    namespace : Option[Namespace]     = None
   ): Unparser[A] = new Unparser[A](
     attributes,
     content,

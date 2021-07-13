@@ -110,7 +110,7 @@ object Sax extends PreModel {
     attributes
   }
 
-  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ??? // TODO implement
+  override def setAttributes(attributes: Attribute.Values, element: Element): Element = ??? // TODO implement
 
   // Note: XMLObj.setAttributes() sets namespace on an attribute only if it already saw
   // the declarations of that namespace, so I am making sure that they are there (and in the beginning);

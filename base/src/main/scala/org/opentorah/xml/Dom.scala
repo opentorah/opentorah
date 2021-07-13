@@ -119,7 +119,7 @@ object Dom extends Model {
     element
   }
 
-  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = ??? // TODO implement
+  override def setAttributes(attributes: Attribute.Values, element: Element): Element = ??? // TODO implement
 
   override def getChildren(element: Element): Nodes = {
     val list: org.w3c.dom.NodeList = element.getChildNodes

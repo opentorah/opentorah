@@ -21,6 +21,8 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 - Site proceses DocBook directly;
 - transforming DocBook -> HTML in DocBook.scala;
 - working on the DocBook stylesheet and element transform;
+- experimenting with the PDF generation with Playwright;
+- allow allowing `RawXml` elements to have attributes;
 
 ## [0.2.0] - 2021-01-27
 My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:

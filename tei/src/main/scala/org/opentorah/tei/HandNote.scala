@@ -1,3 +1,3 @@
 package org.opentorah.tei
 
-object HandNote extends TeiRawXml("handNote")
+object HandNote extends TeiRawXml("handNote", attributesAllowed = true)

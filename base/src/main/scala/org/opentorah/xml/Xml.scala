@@ -126,7 +126,7 @@ object Xml extends Model {
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
     addAttributes(Seq(attribute.required.withValue(value)), element)
 
-  override def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element =
+  override def setAttributes(attributes: Attribute.Values, element: Element): Element =
     element.copy(attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null)(
       (attributeValue, next) => toMetaData(attributeValue, next))
     )
