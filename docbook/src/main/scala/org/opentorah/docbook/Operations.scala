@@ -44,8 +44,8 @@ object Operations {
     )
 
   private def xsltUri(stylesheets: Stylesheets, directory: File): Seq[Xml.Node] = Seq(
-    Comment(s" DocBook $stylesheets stylesheets "),
-    Catalog.rewriteUri(rewritePrefix = s"$directory/", uriStartString = stylesheets.uri)
+    Comment(s" DocBook ${stylesheets.name} stylesheets "),
+    Catalog.rewriteUri(rewritePrefix = s"$directory/", uriStartString = s"${stylesheets.uri}/")
   )
 
   def writeCatalog(

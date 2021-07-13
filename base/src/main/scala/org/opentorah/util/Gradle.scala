@@ -5,7 +5,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.file.{CopySpec, FileCollection, FileCopyDetails, RelativePath}
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginConvention // TODO update to JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
 import org.gradle.process.{ExecResult, JavaExecSpec}
@@ -140,7 +140,7 @@ object Gradle {
     args: String*
   ): ExecResult = project.javaexec((exec: JavaExecSpec) => {
     exec.setClasspath(classpath)
-    exec.setMain(mainClass)
+    exec.getMainClass.set(mainClass)
     exec.args(args: _*)
   })
 }

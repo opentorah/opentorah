@@ -1,7 +1,7 @@
 package org.opentorah.docbook
 
 trait Stylesheets {
-  protected def name: String
+  def name: String
 
   protected def groupId: String
   protected def artifactId: String

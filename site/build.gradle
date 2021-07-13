@@ -16,6 +16,8 @@ dependencies {
 
   compileOnly libs.google.cloud.storage
   compileOnly libs.bundles.markdown
+  //compileOnly libs.playwright
+  implementation libs.playwright // temporarily, for testing
   compileOnly libs.bundles.http4s
   compileOnly libs.logback
   compileOnly libs.logstash
