@@ -34,6 +34,7 @@ object Element {
     override def unparser: Unparser[Xml.Nodes] = Unparser[Xml.Nodes](content = identity)
   }
 
+  // TODO move to Attribute
   def allAttributes: Parser[Seq[Attribute.Value[String]]] = Context.takeAllAttributes
 
 //  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {

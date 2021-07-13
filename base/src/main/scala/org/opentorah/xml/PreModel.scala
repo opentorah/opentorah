@@ -33,11 +33,11 @@ trait PreModel {
 
   protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element
 
-  def setAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element
+  def setAttributes(attributes: Attribute.Values, element: Element): Element
 
-  final def addAttributes(attributes: Seq[Attribute.Value[_]], element: Element): Element = {
-    val existing: Seq[Attribute.Value[_]] = getAttributes(element)
-    val toAdd: Seq[Attribute.Value[_]] = attributes
+  final def addAttributes(attributes: Attribute.Values, element: Element): Element = {
+    val existing: Attribute.Values = getAttributes(element)
+    val toAdd: Attribute.Values = attributes
       .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
 
     setAttributes(existing ++ toAdd, element)

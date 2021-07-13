@@ -1,8 +1,15 @@
 package org.opentorah.xml
 
-class RawXml(elementName: String, namespace: Option[Namespace] = None) {
+import zio.ZIO
 
-  final class Value(val xml: Xml.Nodes)
+class RawXml(
+  elementName: String,
+  namespace: Option[Namespace] = None,
+  attributesAllowed: Boolean = false
+) {
+
+  // TODO rename 'xml' to 'content'.
+  final class Value(val xml: Xml.Nodes, val attributes: Attribute.Values = Seq.empty)
 
   object element extends Element[Value](elementName) {
 
@@ -11,9 +18,16 @@ class RawXml(elementName: String, namespace: Option[Namespace] = None) {
     override def contentType: ContentType = ContentType.Mixed
 
     override def contentParsable: Parsable[Value] = new Parsable[Value] {
-      override def parser: Parser[Value] = Element.nodes().map(new Value(_))
+      override def parser: Parser[Value] = for {
+        attributes <- if (attributesAllowed) Element.allAttributes else ZIO.succeed(Seq.empty)
+        xml <- Element.nodes()
+      } yield new Value(
+        xml,
+        attributes
+      )
 
       override def unparser: Unparser[Value] = Unparser(
+        attributes = _.attributes,
         content = _.xml,
         namespace = namespace
       )

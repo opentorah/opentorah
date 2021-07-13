@@ -49,6 +49,8 @@ object Attribute {
     def set(element: Sax.Element): Sax.Element = Sax.setAttribute(this, element)
   }
 
+  type Values = Seq[Value[_]]
+
   sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A] {
     final override def unparser: Unparser[A] = Unparser(
       attributes = value => Seq(withValue(value))
