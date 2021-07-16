@@ -27,25 +27,31 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
   override def resolve(href: String, base: String): Source = resolve[Source](
     call = _.resolve(href, base),
     parameters = s"Resolver.resolve(href=$href, base=$base)",
-    id = _.getSystemId
+    id = _.getSystemId,
+    // `file:`-based URIs are not resolved: calling parser will arrive at the same result.
+    ignoreUnresolved = base.startsWith("file:")
   )
 
   override def resolveEntity(publicId: String, systemId: String): InputSource = resolve[InputSource](
     call = _.resolveEntity(publicId, systemId),
     parameters = s"Resolver.resolveEntity(publicId=$publicId, systemId=$systemId)",
-    id = _.getSystemId
+    id = _.getSystemId,
+    ignoreUnresolved = false
   )
 
   private def resolve[R](
     call: org.xmlresolver.Resolver => R,
     parameters: String,
-    id: R => String
+    id: R => String,
+    ignoreUnresolved: Boolean
   ): R = {
     val result = Option(call(parentResolver))
 
     result.fold {
-      // Note: `file:`-based URIs are not resolved (and thus logged here): calling parser will arrive at the same result.
-      xmlLogger.error(s"$parameters\n  unresolved")
+      if (ignoreUnresolved)
+        xmlLogger.debug(s"$parameters\n  unresolved")
+      else
+        xmlLogger.error(s"$parameters\n  unresolved")
     } { result =>
       xmlLogger.debug(s"$parameters\n  resolved to: ${id(result)}")
     }

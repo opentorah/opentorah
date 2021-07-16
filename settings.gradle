@@ -11,7 +11,7 @@ pluginManagement {
     id 'org.podval.tools.cloudrun' version '0.2.0'
     id 'com.gradle.plugin-publish' version '0.15.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
-    id 'io.miret.etienne.sass' version '1.1.1'
+    id 'io.miret.etienne.sass' version '1.1.2'
   }
 }
 
@@ -47,7 +47,7 @@ dependencyResolutionManagement {
   versionCatalogs {libs {
     // Scala
     alias('scala-library').to("$scalaLibrary:$scalaVersion")
-    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.0")
+    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.1")
 
     // Zinc
     // first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
     alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
 
     // XML
-    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.0.1')
+    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.0.2')
     alias('jing').to('org.relaxng:jing:20181222')
     alias('xerces' ).to('xerces:xercesImpl:2.12.1')
     alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
@@ -65,15 +65,16 @@ dependencyResolutionManagement {
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:1.117.1')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:1.118.0')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
+    // TODO update to 2.0.0-M1 and fix the issues with Blocking in org.opentorah.util.Effects
     alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.9")
     alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
-    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.1.1")
+    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.2.1")
     alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:3.1.1.0")
 
     // HTTP (TODO switch to https://github.com/dream11/zio-http?)
@@ -99,7 +100,7 @@ dependencyResolutionManagement {
     //final String jaiVersion = '1.1.3'
 
     // Playwright
-    alias('playwright').to('com.microsoft.playwright:playwright:1.12.1')
+    alias('playwright').to('com.microsoft.playwright:playwright:1.13.0')
 
     // Logging
     alias('slf4j'  ).to('org.slf4j:slf4j-api:1.7.30')
@@ -121,7 +122,7 @@ dependencyResolutionManagement {
     alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // Documentation
-    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.21")
+    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.22")
 
     // --- bundles ---
     bundle('http4s', [

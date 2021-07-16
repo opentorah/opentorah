@@ -17,10 +17,7 @@ dependencies {
   implementation project(':opentorah-base')
   implementation project(':opentorah-site')
 
-  // TODO: remove exclusion when xmlresolver 3.0.2 releases.
-  implementation (libs.xmlresolver) {
-    exclude group: 'org.slf4j', module: 'slf4j-simple'
-  }
+  implementation libs.xmlresolver
   runtimeOnly libs.jing
   implementation libs.saxon6
   implementation libs.saxon10
