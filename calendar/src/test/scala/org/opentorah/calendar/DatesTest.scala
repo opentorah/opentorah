@@ -84,8 +84,8 @@ final class DatesTest extends AnyFlatSpec with Matchers {
         val dateG = Gregorian.Year(yearG).month(monthG).day(dayG).toMoment.
           hours(hours).minutes(minutes).partsWithoutMinutes(parts)
 
-        Gregorian.Moment.from(molad) shouldBe dateG
-        molad.to(Gregorian)          shouldBe dateG
+        Gregorian.Moment.from(molad.asInstanceOf[Calendar#Moment]) shouldBe dateG
+        molad.to(Gregorian) shouldBe dateG
 
         dateG.to(Jewish   ).day shouldBe dayJ
     }

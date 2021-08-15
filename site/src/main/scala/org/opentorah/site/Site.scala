@@ -57,7 +57,7 @@ class Site[S <: Site[S]](
   final protected def renderTeiContent(tei: Tei): String = Tei.prettyPrinter.renderXml(Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
     fileDesc = tei.teiHeader.fileDesc.copy(
       publicationStmt = Some(new PublicationStmt(
-        publisher = common.url.map(url => new Publisher.Value(<ptr target={s"http://$url"}/>)),
+        publisher = common.url.map(url => Publisher(<ptr target={s"http://$url"}/>)),
         availability = Some(new Availability(
           status = Some("free"),
           xml = Xml.optional(common.license)(license => <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)

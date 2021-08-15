@@ -1,5 +1,6 @@
 package org.opentorah.schedule.rambam
 
+import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
@@ -69,7 +70,7 @@ object RambamSchedule {
     def scheduleMonth(month: Month): Seq[String] = {
       val lessons = for {
         day <- month.days
-        gDay = Gregorian.Day.from(day)
+        gDay = Gregorian.Day.from(day.asInstanceOf[Calendar#Day])
       } yield formatter.formatLesson(
         day.numberInMonth,
         gDay.month.numberInYear,

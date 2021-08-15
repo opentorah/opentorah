@@ -18,21 +18,20 @@ pluginManagement {
 enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
+// Scala2:
 final String scalaVersion      = '2.13.6'
 final String scalaVersionMajor = '2.13'
 final String scalaLibrary      = 'org.scala-lang:scala-library'
 
 // Scala3:
-// scalaVersion       = '3.0.0-RC3'
-// scalaVersionMajor  = '3.0.0-RC3'
-// scalaLibrary       = 'org.scala-lang:scala3-library_3.0.0-RC3'
-// scalaCompiler      = 'org.scala-lang:scala3-compiler_3.0.0-RC3'
-// scalaCompiler 'org.scala-sbt:compiler-bridge_2.13:1.3.5:sources'
+//final String scalaVersion       = '3.0.3-RC1-bin-20210813-e4b421c-NIGHTLY' // '3.0.2-RC1'
+//final String scalaVersionMajor  = '3'
+//final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 
 // latest version supported by ScalTest seems to be 0.36.8;
 // I need flexmark for Markdown to Html conversion, and would prefer to use a later version...
 final String flexmarkVersion = '0.36.8'
-final String http4sVersion   = '1.0.0-M23'
+final String http4sVersion   = '1.0.0-M24'
 final String batikVersion    = '1.14'
 
 dependencyResolutionManagement {
@@ -72,9 +71,9 @@ dependencyResolutionManagement {
 
     // ZIO
     // TODO update to 2.0.0-M1 and fix the issues with Blocking in org.opentorah.util.Effects
-    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.9")
+    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.10")
     alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
-    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.2.1")
+    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.2.2")
     alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:3.1.1.0")
 
     // HTTP (TODO switch to https://github.com/dream11/zio-http?)
@@ -116,7 +115,7 @@ dependencyResolutionManagement {
 
     // Testing
     alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
-    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.3.0-SNAP3")
+    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.9")
     alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
     alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
     alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
@@ -126,8 +125,8 @@ dependencyResolutionManagement {
 
     // --- bundles ---
     bundle('http4s', [
-            'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
-            'zio-interop-cats', 'cats-core', 'cats-effect'
+      'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
+      'zio-interop-cats', 'cats-core', 'cats-effect'
     ])
     bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])  // 'flexmark-util-ast', 'flexmark-util-data'
   }}

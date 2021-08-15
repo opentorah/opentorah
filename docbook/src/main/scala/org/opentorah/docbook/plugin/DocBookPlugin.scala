@@ -1,7 +1,7 @@
 package org.opentorah.docbook.plugin
 
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.{DefaultTask, Plugin, Project}
+import org.gradle.api.{Action, DefaultTask, Plugin, Project}
 import org.opentorah.docbook.Layout
 import org.opentorah.fop.FopFonts
 import org.opentorah.util.Gradle
@@ -14,40 +14,42 @@ final class DocBookPlugin extends Plugin[Project] {
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
 
     val processDocBookTask: ProcessDocBookTask = project.getTasks.create("processDocBook", classOf[ProcessDocBookTask])
-    processDocBookTask.xslt1version.set(extension.xslt1version)
-    processDocBookTask.xslt2version.set(extension.xslt2version)
-    processDocBookTask.document.set(extension.document)
-    processDocBookTask.documents.set(extension.documents)
-    processDocBookTask.parameters.set(extension.parameters)
-    processDocBookTask.substitutions.set(extension.substitutions)
-    processDocBookTask.cssFile.set(extension.cssFile)
-    processDocBookTask.epubEmbeddedFonts.set(extension.epubEmbeddedFonts)
-    processDocBookTask.outputFormats.set(extension.outputFormats)
-    processDocBookTask.dataGeneratorClass.set(extension.dataGeneratorClass)
-    processDocBookTask.isJEuclidEnabled.set(extension.isJEuclidEnabled)
-    processDocBookTask.isMathJaxEnabled.set(extension.mathJax.isEnabled)
-    processDocBookTask.useMathJax3.set(extension.mathJax.useMathJax3)
-    processDocBookTask.nodeVersion.set(extension.mathJax.nodeVersion)
-    processDocBookTask.useJ2V8.set(extension.mathJax.useJ2V8)
-    processDocBookTask.mathJaxFont.set(extension.mathJax.font)
-    processDocBookTask.mathJaxExtensions.set(extension.mathJax.extensions)
-    processDocBookTask.texDelimiter.set(extension.mathJax.texDelimiter)
-    processDocBookTask.texInlineDelimiter.set(extension.mathJax.texInlineDelimiter)
-    processDocBookTask.asciiMathDelimiter.set(extension.mathJax.asciiMathDelimiter)
-    processDocBookTask.processMathJaxEscapes.set(extension.mathJax.processEscapes)
+    processDocBookTask.getXslt1version().set(extension.getXslt1version())
+    processDocBookTask.getXslt2version().set(extension.getXslt2version())
+    processDocBookTask.getDocument().set(extension.getDocument())
+    processDocBookTask.getDocuments().set(extension.getDocuments())
+    processDocBookTask.getParameters().set(extension.getParameters())
+    processDocBookTask.getSubstitutions().set(extension.getSubstitutions())
+    processDocBookTask.getCssFile().set(extension.getCssFile())
+    processDocBookTask.getEpubEmbeddedFonts().set(extension.getEpubEmbeddedFonts())
+    processDocBookTask.getOutputFormats().set(extension.getOutputFormats())
+    processDocBookTask.getDataGeneratorClass().set(extension.getDataGeneratorClass())
+    processDocBookTask.getJEuclidEnabled().set(extension.getJEuclidEnabled())
+    processDocBookTask.getMathJaxEnabled().set(extension.mathJax.getEnabled())
+    processDocBookTask.getUseMathJax3().set(extension.mathJax.getUseMathJax3())
+    processDocBookTask.getNodeVersion().set(extension.mathJax.getNodeVersion())
+    processDocBookTask.getUseJ2V8().set(extension.mathJax.getUseJ2V8())
+    processDocBookTask.getMathJaxFont().set(extension.mathJax.getFont())
+    processDocBookTask.getMathJaxExtensions().set(extension.mathJax.getExtensions())
+    processDocBookTask.getTexDelimiter().set(extension.mathJax.getTexDelimiter())
+    processDocBookTask.getTexInlineDelimiter().set(extension.mathJax.getTexInlineDelimiter())
+    processDocBookTask.getAsciiMathDelimiter().set(extension.mathJax.getAsciiMathDelimiter())
+    processDocBookTask.getProcessMathJaxEscapes().set(extension.mathJax.getProcessEscapes())
 
     project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
-    project.afterEvaluate((project: Project) => {
-      val logger = project.getLogger
-      def info(message: String): Unit = logger.info(message, null, null, null)
+    project.afterEvaluate(new Action[Project] {
+      override def execute(project: Project): Unit = {
+        val logger = project.getLogger
+        def info(message: String): Unit = logger.info(message, null, null, null)
 
-      // Note: even when DocBook plugin is applied after the Scala one,
-      // there is no 'classes' task during its application - but there is after project evaluation:
-      Gradle.getClassesTask(project).fold(info("No 'classes' task found.")){ classesTask =>
-        info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
-        processDocBookTask.getDependsOn.add(classesTask)
+        // Note: even when DocBook plugin is applied after the Scala one,
+        // there is no 'classes' task during its application - but there is after project evaluation:
+        Gradle.getClassesTask(project).fold(info("No 'classes' task found.")){ classesTask =>
+          info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
+          processDocBookTask.getDependsOn.add(classesTask)
+        }
       }
     })
   }

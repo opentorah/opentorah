@@ -17,7 +17,7 @@ final case class Schedule private(
 
 object Schedule {
 
-  final case class DaySchedule private(
+  final case class DaySchedule /* TODO private */(
     day: Day,
     dayNames: Seq[WithNames],
     morning: Option[Reading],
@@ -35,7 +35,7 @@ object Schedule {
 
   def apply(year: Year, inHolyLand: Boolean): Schedule = Schedule(year.firstDay, year.lastDay, inHolyLand)
 
-  private final case class Builder private(
+  private final case class Builder /* TODO private */(
     from: Day,
     to: Day,
     inHolyLand: Boolean,

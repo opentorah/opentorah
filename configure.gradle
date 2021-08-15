@@ -26,8 +26,15 @@ dependencies {
 
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.with {
-    targetCompatibility = '1.8'
-    additionalParameters = ['-feature']
+    //targetCompatibility = '1.8'
+    additionalParameters = [
+      "-feature",
+//      "-deprecation",
+//      "-unchecked",
+//      "-Xsemanticdb",
+//      "-Ysafe-init",
+//      "-explain",
+    ]
   }
 }
 
@@ -47,8 +54,8 @@ if (project.name != 'docs') {
     // Because why not?
     manifest {
       attributes(
-              'Implementation-Title': project.description,
-              'Implementation-Version': project.version
+        'Implementation-Title': project.description,
+        'Implementation-Version': project.version
       )
     }
   }
@@ -76,8 +83,8 @@ if (project.name != 'docs') {
       maven {
         name = 'mavenCentral'
         url = version.endsWith('SNAPSHOT') ?
-                'https://oss.sonatype.org/content/repositories/snapshots' :
-                'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+          'https://oss.sonatype.org/content/repositories/snapshots' :
+          'https://oss.sonatype.org/service/local/staging/deploy/maven2'
 
         // Note: this will use mavenCentralUsername and mavenCentralPassword properties - if they are available
         credentials(PasswordCredentials)
@@ -158,9 +165,9 @@ if (project.name != 'docs') {
 
       // process
       final String[] args = [
-              '--in', inputDirectory,
-              '--out', outputDirectory,
-              '--classpath', sourceSets.main.runtimeClasspath.asPath
+        '--in', inputDirectory,
+        '--out', outputDirectory,
+        '--classpath', sourceSets.main.runtimeClasspath.asPath
       ]
       mdocRunner.main(args)
 

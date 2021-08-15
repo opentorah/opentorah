@@ -15,7 +15,7 @@ final class Sections(
   def parameters(variant: Variant): Seq[(String, Parameters)] = {
     val docBook2: DocBook2 = variant.docBook2
 
-    docBook2.commonSections.map { section: CommonSection =>
+    docBook2.commonSections.map { (section: CommonSection) =>
       section.name -> (section.parameters ++ commonSections.getOrElse(section, Map.empty))
     } ++ Seq(
       docBook2.name -> (docBook2.parameters ++ docBook2s.getOrElse(docBook2, Map.empty))

@@ -4,9 +4,9 @@ import Angles.Rotation
 
 final class Exactify(small: Rotation, mult: Int, round: Int, big: Rotation) {
 
-  def findFit: (Interval, Int) = findFit(round)
+  def findFit: (Interval, Int) = findFit0(round)
 
-  private def findFit(length: Int): (Interval, Int) = {
+  private def findFit0(length: Int): (Interval, Int) = {
     val result = find(/*squeeze(*/enclose(length)/*, length)*/, length)
     require(fits(result._1))
     result

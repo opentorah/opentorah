@@ -15,22 +15,22 @@ object Season extends NamedCompanion {
   // tkufos KH 9:3, 10:3
 
   // sun enters Tele (Aries)
-  final case object TkufasNisan extends Season("Spring Equinox")
+  case object TkufasNisan extends Season("Spring Equinox")
   final def SpringEquinox: Season = TkufasNisan
   final def VernalEquinox: Season = SpringEquinox
 
   // sun enters Sarton (Cancer)
-  final case object TkufasTammuz extends Season("Summer Solstice")
+  case object TkufasTammuz extends Season("Summer Solstice")
   final def SummerSolstice: Season = TkufasTammuz
   final def EstivalSolstice: Season = SummerSolstice
 
   // sun enters Moznaim (Libra)
-  final case object TkufasTishrei extends Season("Autumnal Equinox")
+  case object TkufasTishrei extends Season("Autumnal Equinox")
   final def AutumnalEquinox: Season = TkufasTishrei
   final def FallEquinox: Season = AutumnalEquinox
 
   // sun enters Gdi (Capricorn)
-  final case object TkufasTeves extends Season("Winter Solstice")
+  case object TkufasTeves extends Season("Winter Solstice")
   final def WinterSolstice: Season = TkufasTeves
   final def SouthernSolstice: Season = WinterSolstice
 

@@ -13,7 +13,7 @@ class NumbersLawsTest(val numbers: Numbers) extends AnyFunSuite with FunSuiteDis
   val ranges: Seq[Int] = headRange +: numbers.ranges
 
   def digits: Gen[Seq[Int]] = Gen.sequence[Seq[Int], Int](
-    ranges.map { range: Int => Gen.choose[Int](0, range-1) }
+    ranges.map { (range: Int) => Gen.choose[Int](0, range-1) }
   )
 
   def vectors: Gen[numbers.Vector] = for { d <- digits } yield { numbers.Vector.fromDigits(d) }

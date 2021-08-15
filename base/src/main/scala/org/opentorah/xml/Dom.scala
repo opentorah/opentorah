@@ -6,7 +6,7 @@ import org.xml.sax.{InputSource, XMLFilter}
 object Dom extends Model {
 
   override type Node = org.w3c.dom.Node
-  override type Element = org.w3c.dom.Element
+  override type PreElement = org.w3c.dom.Element
   override type Text = org.w3c.dom.Text
 
   override protected def loadFromSource(

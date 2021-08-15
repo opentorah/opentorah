@@ -40,11 +40,11 @@ object FopFonts {
   def getFiles(configurationFile: File, fontFamilyNames: List[String]): List[URI] =
     if (fontFamilyNames.isEmpty) List.empty else {
       val fontFamilies: Map[String, List[FontSpec]] = getFamilies(configurationFile)
-      val uris: List[URI] = fontFamilyNames.flatMap { fontFamilyName: String =>
+      val uris: List[URI] = fontFamilyNames.flatMap { (fontFamilyName: String) =>
         fontFamilies.get(fontFamilyName).fold[List[URI]] {
           logger.error(s"Font family $fontFamilyName not found!")
           List.empty
-        } { fontSpecs: List[FontSpec] => fontSpecs.flatMap { fontSpec: FontSpec =>
+        } { (fontSpecs: List[FontSpec]) => fontSpecs.flatMap { (fontSpec: FontSpec) =>
           val uri: Option[URI] = Option(fontSpec.getFontMetrics.getFontURI)
           if (uri.isEmpty) logger.error(s"No URI for fontSpec ${fontSpec.getKey}!")
           uri

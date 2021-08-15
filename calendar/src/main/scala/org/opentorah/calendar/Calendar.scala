@@ -15,9 +15,11 @@ trait Calendar extends Times {
   //  Roman :  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
   def epochHours: Int
 
+  type YearCharacter
+
   abstract class YearBase(final override val number: Int) extends Numbered with LanguageString { this: Year =>
 
-    final override type T = Year
+    final override type T = Year // TODO turn back into Numbered's type parameter?
 
     def character: YearCharacter
 
@@ -76,8 +78,6 @@ trait Calendar extends Times {
 
   type Year <: YearBase
 
-  type YearCharacter
-
   protected def areYearsPositive: Boolean
 
   final val cacheYears: Boolean = true
@@ -120,13 +120,17 @@ trait Calendar extends Times {
     def lengthInMonths(yearNumber: Int): Int
   }
 
-  val Year: YearCompanion
+  type YearCompanionType <: YearCompanion
 
-  trait MonthBase extends Numbered { this: Month =>
+  final val Year: YearCompanionType = createYearCompanion
+
+  protected def createYearCompanion: YearCompanionType
+
+  class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered { this: Month =>
 
     final override type T = Month
 
-    protected var yearOpt: Option[Year]
+    protected var yearOpt: Option[Year] = yearOption
 
     require(0 < number)
 
@@ -195,13 +199,17 @@ trait Calendar extends Times {
     private[opentorah] def numberInYear(monthNumber: Int): Int
   }
 
-  val Month: MonthCompanion
+  type MonthCompanionType <: MonthCompanion
 
-  trait DayBase extends Numbered with LanguageString { this: Day =>
+  final val Month: MonthCompanionType = createMonthCompanion
+
+  protected def createMonthCompanion: MonthCompanionType
+
+  class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered with LanguageString { this: Day =>
 
     final override type T = Day
 
-    protected var monthOpt: Option[Month]
+    protected var monthOpt: Option[Month] = monthOption
 
     require(0 < number)
 
@@ -266,15 +274,13 @@ trait Calendar extends Times {
 
   type Day <: DayBase
 
-  trait DayCompanion {
-    final def apply(number: Int): Day = apply(None, number)
+  final class DayCompanion {
+    final def apply(number: Int): Day = newDay(None, number)
 
     private[opentorah] final def witNumberInMonth(month: Month, numberInMonth: Int): Day = {
       require (0 < numberInMonth && numberInMonth <= month.length)
-      apply(Some(month), month.firstDayNumber + numberInMonth - 1)
+      newDay(Some(month), month.firstDayNumber + numberInMonth - 1)
     }
-
-    private[opentorah] def apply(monthOpt: Option[Month], number: Int): Day
 
     final def from(day: Calendar#Day): Day = day.to(Calendar.this)
 
@@ -284,7 +290,9 @@ trait Calendar extends Times {
       ((dayNumber - 1) + (Jewish.epochDayNumberInWeek - 1) + epoch - Jewish.epoch) % Week.length + 1
   }
 
-  val Day: DayCompanion
+  final val Day: DayCompanion = new DayCompanion
+
+  protected def newDay(monthOpt: Option[Month], number: Int): Day
 
   abstract class MomentBase(digits: Digits) extends TimePointBase(digits) with LanguageString { this: Moment =>
     final def calendar: Calendar = Calendar.this
@@ -325,26 +333,19 @@ trait Calendar extends Times {
 
   final override type Point = Moment
 
-  trait MomentCompanion extends PointCompanion {
-    final def from(moment: Calendar#Moment): Moment = moment.to(Calendar.this)
+  final class MomentCompanion extends PointCompanion {
+    def from(moment: Calendar#Moment): Moment = moment.to(Calendar.this)
   }
 
-  override val Point: MomentCompanion
+  final override type PointCompanionType = MomentCompanion
 
-  def Moment: MomentCompanion
+  final override protected def createPointCompanion: PointCompanionType = new MomentCompanion
 
-  final override type Vector = TimeVectorBase
-
+  final def Moment: MomentCompanion = Point
+  
   final type TimeVector = Vector
-
-  final override lazy val Vector: VectorCompanion = new VectorCompanion {
-    override protected def newNumber(digits: Digits): Vector =
-      new TimeVectorBase(digits) {
-        final override def companion: VectorCompanion = TimeVector
-      }
-  }
-
-  final val TimeVector: VectorCompanion = Vector
+  
+  final def TimeVector: VectorCompanion = Vector
 
   def inToString(number: Int)(implicit spec: LanguageSpec): String
 }

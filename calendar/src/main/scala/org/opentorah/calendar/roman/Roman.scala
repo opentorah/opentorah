@@ -55,7 +55,9 @@ trait Roman extends Calendar {
     override def lengthInMonths(yearNumber: Int): Int = monthsInYear
   }
 
-  final override lazy val Year: RomanYearCompanion = new RomanYearCompanion
+  final override type YearCompanionType = RomanYearCompanion
+  
+  final override protected def createYearCompanion: YearCompanionType = new RomanYearCompanion
 
   private val monthsInYear: Int = 12
 
@@ -65,7 +67,7 @@ trait Roman extends Calendar {
 
   protected def isLeapYear(yearNumber: Int): Boolean
 
-  trait RomanMonth extends MonthBase
+  final class RomanMonth(yearOptInitial: Option[Year], monthNumber: Int) extends MonthBase(yearOptInitial, monthNumber)
 
   final override type Month = RomanMonth
 
@@ -77,10 +79,7 @@ trait Roman extends Calendar {
 
   final class RomanMonthCompanion extends MonthCompanion {
     override private[opentorah] def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new RomanMonth {
-        override protected var yearOpt: Option[Year] = yearOption
-        override def number: Int = monthNumber
-      }
+      new RomanMonth(yearOption, monthNumber)
 
     override private[opentorah] def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / monthsInYear + 1
 
@@ -106,25 +105,17 @@ trait Roman extends Calendar {
     protected override def resourceName: String = "RomanMonth"
   }
 
-  final override lazy val Month: RomanMonthCompanion = new RomanMonthCompanion
+  final override type MonthCompanionType = RomanMonthCompanion
+  
+  final override protected def createMonthCompanion: MonthCompanionType = new RomanMonthCompanion
 
-  trait RomanDay extends DayBase
+  final class RomanDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber)
 
   final override type Day = RomanDay
 
-  final class RomanDayCompanion extends DayCompanion {
-    override private[opentorah] def apply(monthOption: Option[Month], dayNumber: Int): Day =
-      new RomanDay {
-        override protected var monthOpt: Option[Month] = monthOption
-        override def number: Int = dayNumber
-      }
-  }
-
-  final override lazy val Day: RomanDayCompanion = new RomanDayCompanion
+  final override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = new RomanDay(monthOption, dayNumber)
 
   final class RomanMoment(digits: Seq[Int]) extends MomentBase(digits) {
-    override def companion: RomanMomentCompanion = Point
-
     def morningHours(value: Int): Moment = firstHalfHours(value)
 
     def afternoonHours(value: Int): Moment = secondHalfHours(value)
@@ -132,13 +123,7 @@ trait Roman extends Calendar {
 
   final override type Moment = RomanMoment
 
-  final class RomanMomentCompanion extends MomentCompanion {
-    override protected def newNumber(digits: Seq[Int]): Point = new RomanMoment(digits)
-  }
-
-  final override lazy val Point: RomanMomentCompanion = new RomanMomentCompanion
-
-  final override def Moment: RomanMomentCompanion = Point
+  final override protected def newPoint(digits: Seq[Int]): Point = new RomanMoment(digits)
 
   final override def inToString(number: Int)(implicit spec: LanguageSpec): String = number.toString
 }

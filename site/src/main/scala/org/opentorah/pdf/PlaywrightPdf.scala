@@ -12,7 +12,7 @@ object PlaywrightPdf {
   def main(args: Array[String]): Unit = Using(create(
     browserPath = Some("/tmp/xxx/"),
     skipBrowserDownload = false
-  )) { playwright: Playwright =>
+  )) { (playwright: Playwright) =>
     val browser: Browser = playwright.chromium().launch()
     val page: Page = browser.newPage()
     page.navigate("http://www.alter-rebbe.org")
