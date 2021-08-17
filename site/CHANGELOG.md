@@ -4,8 +4,7 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 
 ## [Unreleased]
 
-## [0.2.6] - 2021-0
-
+## [0.2.6] - 2021-08-17
 - added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;
 - added theme files to the project's site;
 - added SASS -> CSS compilation to the project's site;
@@ -15,10 +14,10 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 - code highlighting using `highlightjs`;
 - PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;
 - `DoubleEscapeHtmlNodeExtension` removed;
-- moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the 'site' module;
+- moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the
+  'store' package of the 'base' module;
 - pretty-printing in Site;
 - consolidated Site commands (including siteUpload) into SiteService;
-- Site proceses DocBook directly;
 - transforming DocBook -> HTML in DocBook.scala;
 - working on the DocBook stylesheet and element transform;
 - experimenting with the PDF generation with Playwright;
