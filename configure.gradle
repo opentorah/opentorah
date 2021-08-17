@@ -238,7 +238,7 @@ if (project.hasProperty('document') || project.hasProperty('documents')) {
     ]
 
     mathJax {
-      isEnabled = isMathJaxEnabled
+      enabled = isMathJaxEnabled
     }
   }
 
