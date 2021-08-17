@@ -279,7 +279,6 @@ object PrettyPrinter {
 
   val default: PrettyPrinter = new PrettyPrinter
 
-  // TODO abstract over Model
   def prettyPrint(roots: List[File], model: Model, recognizer: Recognizer): Unit = {
     val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
     val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)

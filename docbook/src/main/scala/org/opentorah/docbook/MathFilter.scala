@@ -2,7 +2,7 @@ package org.opentorah.docbook
 
 import org.opentorah.mathjax.{DelimitersAndInput, Input, MathJaxConfiguration, MathML}
 import org.opentorah.mathjax.MathML.displayAttribute
-import org.opentorah.xml.{Attribute, Namespace, WarningFilter}
+import org.opentorah.xml.{Attribute, Dom, Namespace, WarningFilter}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -229,8 +229,8 @@ object MathFilter {
   @SerialVersionUID(1L)
   val inputAttribute: Attribute.OrDefault[Input] = (new InputAttribute).orDefault
 
-  def unwrap(mathML: org.w3c.dom.Element): String = mathML
-    .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[org.w3c.dom.Element]
-    .getElementsByTagName(MathML.mi  ).item(0).asInstanceOf[org.w3c.dom.Element]
+  def unwrap(mathML: Dom.Element): String = mathML
+    .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Dom.Element]
+    .getElementsByTagName(MathML.mi  ).item(0).asInstanceOf[Dom.Element]
     .getTextContent
 }

@@ -21,7 +21,7 @@ class RawXml(
 
     override def contentParsable: Parsable[Value] = new Parsable[Value] {
       override def parser: Parser[Value] = for {
-        attributes <- if (attributesAllowed) Element.allAttributes else ZIO.succeed(Seq.empty)
+        attributes <- if (attributesAllowed) Attribute.allAttributes else ZIO.succeed(Seq.empty)
         xml <- Element.nodes()
       } yield new Value(
         xml,

@@ -51,6 +51,8 @@ object Attribute {
 
   type Values = Seq[Value[_]]
 
+  def allAttributes: Parser[Seq[Value[String]]] = Context.takeAllAttributes
+
   sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A] {
     final override def unparser: Unparser[A] = Unparser(
       attributes = value => Seq(withValue(value))

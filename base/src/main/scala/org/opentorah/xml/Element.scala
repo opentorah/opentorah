@@ -34,9 +34,6 @@ object Element {
     override def unparser: Unparser[Xml.Nodes] = Unparser[Xml.Nodes](content = identity)
   }
 
-  // TODO move to Attribute
-  def allAttributes: Parser[Seq[Attribute.Value[String]]] = Context.takeAllAttributes
-
 //  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {
 //    final def withRedirect(fromUrl: FromUrl.With, follow: Boolean): Elements[A] = new Elements[A] {
 //      override def toXmlElement(value: A): Xml.Element =

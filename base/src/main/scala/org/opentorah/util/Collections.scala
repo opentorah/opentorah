@@ -27,15 +27,12 @@ object Collections {
     Seq(ks) ++ group(notks, key)
   }
 
-  def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter { case (_, ts) => ts.length > 1 }.keySet
+  private def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter { case (_, ts) => ts.length > 1 }.keySet
 
   def checkNoDuplicates[T](seq: Seq[T], what: String): Unit = {
     val result = duplicates(seq)
     require(result.isEmpty, s"Duplicate $what: $result")
   }
-
-  def removeConsecutiveDuplicates[T](seq: Seq[T]): Seq[T] =
-    removeConsecutiveDuplicates[T, T](Seq.empty, seq.toList)(identity)
 
   def removeConsecutiveDuplicatesWith[T, D](seq: Seq[T])(f: T => D): Seq[T] =
     removeConsecutiveDuplicates[T, D](Seq.empty, seq.toList)(f)
@@ -64,7 +61,7 @@ object Collections {
   def pruneSequenceOfMaps[K, A, B](tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = pruneSequenceOfMaps(Seq.empty, tail)
 
   @scala.annotation.tailrec
-  def pruneSequenceOfMaps[K, A, B](acc: Seq[(K, Map[A, B])], tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = tail match {
+  private def pruneSequenceOfMaps[K, A, B](acc: Seq[(K, Map[A, B])], tail: Seq[(K, Map[A, B])]): Seq[(K, Map[A, B])] = tail match {
     case Nil => acc
     case (key, map) :: nextTail => pruneSequenceOfMaps(acc :+ (key, map -- nextTail.flatMap(_._2.keys).toSet), nextTail)
   }

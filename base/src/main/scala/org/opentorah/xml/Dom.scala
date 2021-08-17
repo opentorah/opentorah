@@ -8,6 +8,7 @@ object Dom extends Model {
   override type Node = org.w3c.dom.Node
   override type PreElement = org.w3c.dom.Element
   override type Text = org.w3c.dom.Text
+  override type Comment = org.w3c.dom.Comment
 
   override protected def loadFromSource(
     inputSource: InputSource,
@@ -31,6 +32,8 @@ object Dom extends Model {
   override def asText(node: Node): Text =    node.asInstanceOf[Text]
   override def getText(text: Text): String = text.getData
   override def mkText(text: String, seed: Node): Text = seed.getOwnerDocument.createTextNode(text)
+
+  def mkComment(text: String, seed: Node): Comment = seed.getOwnerDocument.createComment(text)
 
   override def toString(node: Node): String = node match {
     case comment: org.w3c.dom.Comment => s"<!--${comment.getTextContent}-->"

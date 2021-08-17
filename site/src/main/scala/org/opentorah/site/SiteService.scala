@@ -194,8 +194,10 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.int
 
     HttpRoutes.strict[ServiceTask] {
       case request@GET -> Root / "reset-cached-site" => for {
-        _ <- Effects.effectTotal(info(request, "RST"))
-        _ <- Effects.effectTotal({cachedSite = None})
+        _ <- Effects.effectTotal({
+          info(request, "RST")
+          cachedSite = None
+        })
         _ <- getSite
         result <- Ok("Site reset!")
       } yield result

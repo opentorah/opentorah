@@ -8,7 +8,6 @@ import zio.{Has, ZIO, ZLayer}
 import java.net.URL
 import java.time.Duration
 
-// TODO move into xml
 trait Caching {
   def getCached[T <: AnyRef](url: URL, load: URL => Caching.Parser[T]): Caching.Parser[T]
 }

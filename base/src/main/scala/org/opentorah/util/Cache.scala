@@ -1,6 +1,5 @@
 package org.opentorah.util
 
-// TODO generalize Parser to take additional state and pass Cache in instead of using global one!
 abstract class Cache[S, T] extends Function[S, T] {
   private val values = new collection.mutable.WeakHashMap[S, T]
 
