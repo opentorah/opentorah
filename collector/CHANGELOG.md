@@ -2,8 +2,7 @@
 
 ## [Unreleased]
 
-## [0.2.6] - 2021-0
-
+## [0.2.6] - 2021-08-17
 - use the 'site' module;
 - code highlighting using `highlightjs`;
 - PrettyPrinter encodes XML specials in attributes, character data and preformatted blocks;

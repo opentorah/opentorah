@@ -2,9 +2,9 @@
 
 ## [Unreleased]
 
-## [0.7.56] - 2021-0
-- `mathJax.isEnabled` renamed `mathJax.enabled`;
-- `isJEuclidEnabled` renamed `jEuclidEnabled`;
+## [0.8.3] - 2021-08-17
+- **note:** `mathJax.isEnabled` renamed `mathJax.enabled`;
+- **note:** `isJEuclidEnabled` renamed `jEuclidEnabled`;
 - support for MathJax3;
 - merged FOP plugin back into this module: nobody used it ;)
 - use the 'site' module;

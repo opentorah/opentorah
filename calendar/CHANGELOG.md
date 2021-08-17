@@ -3,11 +3,14 @@
 Modules covered: `calendar` and `schedule`.
 
 ## [Unreleased]
-- fixed a bug with the first day of the Jewish epoch (molad BaHaRaD) haing number 2 instead of 1;
+
+## [0.3.7] - 2021-08-17
+- fixed a bug with the first day of the Jewish epoch (molad BaHaRaD) having number 2 instead of 1;
 - fixed dates printing bug;
 - cleaned up calendar conversions and more;
 - added Julian calendar;
 - merged `calendar-service` module into `schedule`;
+- cleaned up `Numbers` and `Calendar`;
 
 ## [0.3.4] - 2021-01-15
 - preparing for the switch to Scala 2.13/3;
