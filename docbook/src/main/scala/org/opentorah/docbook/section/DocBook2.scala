@@ -48,7 +48,7 @@ trait DocBook2 extends Section {
 
       <!-- Non-overridable parameters -->
       {DocBook2.parametersBySection(
-        parameterSections.map { section: Section => section.name -> section.nonOverridableParameters(values) })}
+        parameterSections.map { (section: Section) => section.name -> section.nonOverridableParameters(values) })}
 
       {mainStylesheetBody(values)}
     </xsl:stylesheet>

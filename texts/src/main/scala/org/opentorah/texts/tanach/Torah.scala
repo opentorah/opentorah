@@ -99,11 +99,11 @@ object Torah extends WithBookSpans[Chumash] {
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
 
-    val result: Parser[Custom.Sets[Torah]] = Effects.mapValues(days){ spans: Seq[Numbered] =>
+    val result: Parser[Custom.Sets[Torah]] = Effects.mapValues(days){ (spans: Seq[Numbered]) =>
       parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     }
 
-    result.map(Custom.Of(_))
+    result.map(Custom.Of(_, full = true)) // TODO why does Scala 3 require 'full' being supplied?!
   }
 
   private def addImplied1(

@@ -63,11 +63,11 @@ final class Collection(
         Collection.addresseeColumn,
         languageColumn(site),
 
-        Collection.Column("Документ", "document", { document: Document =>
+        Collection.Column("Документ", "document", { (document: Document) =>
           ZIO.succeed(textFacet.of(document).a(site)(text = document.baseName))
         }),
 
-        Collection.Column("Страницы", "pages", { document: Document =>
+        Collection.Column("Страницы", "pages", { (document: Document) =>
           val text: Document.TextFacet = textFacet.of(document)
           ZIO.succeed(Xml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
             page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
@@ -125,7 +125,7 @@ final class Collection(
     }.map(rows => <table class="document-header">{rows}</table>)
 
   private def languageColumn(site: Site): Collection.Column =
-    Collection.Column("Язык", "language", { document: Document =>
+    Collection.Column("Язык", "language", { (document: Document) =>
       translations(document).map(documentTranslations =>
         Seq(Xml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
           Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))

@@ -7,7 +7,7 @@ trait Times extends NonPeriodicNumbers {
   import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
   trait Time[N <: Time[N]] extends Number[N] { this: N =>
-    private def Digit: Times.Digit.type = Times.Digit
+    private def Digit: TimesDigits.type = TimesDigits
 
     final def days: Int = get(Digit.DAYS)
 
@@ -61,17 +61,19 @@ trait Times extends NonPeriodicNumbers {
     final def moments(value: Int): N = set(Digit.MOMENTS, value)
   }
 
-  abstract class TimePointBase(digits: Digits)
-    extends PointNumber(digits) with Time[Point]
-  { this: Point =>
-  }
+  class TimePointBase(digits: Digits) extends PointNumber(digits) with Time[Point] { this: Point => }
 
   override type Point <: TimePointBase
 
-  abstract class TimeVectorBase(digits: Digits) extends VectorNumber(digits) with Time[Vector] { this: Vector =>
-  }
+  final class TimeVectorBase(digits: Digits) extends VectorNumber(digits) with Time[Vector] { this: Vector => }
 
-  override type Vector <: TimeVectorBase
+  final override type Vector = TimeVectorBase
+
+  final override type VectorCompanionType = VectorCompanion
+
+  final override protected def createVectorCompanion: VectorCompanionType = new VectorCompanion
+
+  final override protected def newVector(digits: Seq[Int]): Vector = new TimeVectorBase(digits)
 
   final override val maxLength: Int = 3
 
@@ -81,19 +83,12 @@ trait Times extends NonPeriodicNumbers {
     case 2 => Times.momentsPerPart
   }
 
-  final override val Digit: DigitsDescriptor = Times.Digit
+  final override type DigitType = DigitsDescriptor
+
+  final override protected def createDigit: DigitsDescriptor = TimesDigits
 }
 
 object Times {
-  final object Digit extends DigitsDescriptor {
-    object DAYS extends DigitBase("d")
-    object HOURS extends DigitBase("h")
-    object PARTS extends DigitBase("p")
-    object MOMENTS extends DigitBase("m")
-
-    override val values: Seq[Digit] = Seq(DAYS, HOURS, PARTS, MOMENTS)
-  }
-
   final val hoursPerDay: Int = 24
   require(hoursPerDay % 2 == 0)
 

@@ -118,25 +118,25 @@ object Custom extends NamedCompanion {
 
   type Sets[T] = Map[Set[Custom], T]
 
-  case object Common extends Custom(None)
-    case object Ashkenaz extends Custom(Some(Common))
-      case object Italki extends Custom(Some(Ashkenaz))
-      case object Frankfurt extends Custom(Some(Ashkenaz))
-      case object Lita extends Custom(Some(Ashkenaz))
+  case object Common extends Custom(None){}
+    case object Ashkenaz extends Custom(Some(Common)){}
+      case object Italki extends Custom(Some(Ashkenaz)){}
+      case object Frankfurt extends Custom(Some(Ashkenaz)){}
+      case object Lita extends Custom(Some(Ashkenaz)){}
         case object ChayeyOdom extends Custom(Some(Lita)) { override def name: String = "Chayey Odom" }
-      case object Hagra extends Custom(Some(Ashkenaz))
-    case object Sefard extends Custom(Some(Common))
-      case object Chabad extends Custom(Some(Sefard))
-      case object Magreb extends Custom(Some(Sefard))
-        case object Algeria extends Custom(Some(Magreb))
-        case object Toshbim extends Custom(Some(Magreb))
-        case object Djerba extends Custom(Some(Magreb))
-        case object Morocco extends Custom(Some(Magreb))
-          case object Fes extends Custom(Some(Morocco))
-      case object Bavlim extends Custom(Some(Sefard))
-      case object Teiman extends Custom(Some(Sefard))
-        case object Baladi extends Custom(Some(Teiman))
-        case object Shami extends Custom(Some(Teiman))
+      case object Hagra extends Custom(Some(Ashkenaz)){}
+    case object Sefard extends Custom(Some(Common)){}
+      case object Chabad extends Custom(Some(Sefard)){}
+      case object Magreb extends Custom(Some(Sefard)){}
+        case object Algeria extends Custom(Some(Magreb)){}
+        case object Toshbim extends Custom(Some(Magreb)){}
+        case object Djerba extends Custom(Some(Magreb)){}
+        case object Morocco extends Custom(Some(Magreb)){}
+          case object Fes extends Custom(Some(Morocco)){}
+      case object Bavlim extends Custom(Some(Sefard)){}
+      case object Teiman extends Custom(Some(Sefard)){}
+        case object Baladi extends Custom(Some(Teiman)){}
+        case object Shami extends Custom(Some(Teiman)){}
 
   override val values: Seq[Custom] = Seq(
     Common,

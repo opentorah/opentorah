@@ -215,7 +215,7 @@ docBook {
   // embedded fonts should be OpenType or WOFF!
 
   mathJax {
-    isEnabled = true
+    enabled = true
     // MathML processing for PDF is disabled by default
 
     useJ2V8 = true
@@ -232,8 +232,8 @@ docBook {
     asciiMathDelimiter = '`'
   }
 
-  isJEuclidEnabled = false
-  // no more than one of `isJEuclidEnabled` and `mathJax.isEnabled` can be `true` 
+  jEuclidEnabled = false
+  // no more than one of `jEuclidEnabled` and `mathJax.enabled` can be `true` 
 }
 
 docBook.parameters.html2 = [

@@ -117,8 +117,8 @@ final class MathFilter(
       characters(chars.substring(index + delimitersStarting.start.length))
     }
 
-  } { delimiters: DelimitersAndInput =>
-    MathFilter.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { index: Int =>
+  } { (delimiters: DelimitersAndInput) =>
+    MathFilter.findUnescaped(delimiters.end, chars).fold { addToMath(chars) } { (index: Int) =>
       if (index != 0) addToMath(chars.take(index))
       flush(closedByDelimiter = true)
       characters(chars.substring(index + delimiters.end.length))

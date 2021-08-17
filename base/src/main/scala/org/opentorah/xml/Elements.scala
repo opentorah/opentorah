@@ -123,7 +123,7 @@ object Elements {
 
     override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[B] = for {
       url <- Elements.redirectAttribute.optional()
-      result <- url.fold(noRedirect(parser.asInstanceOf[Parser[A]])) { url: String =>
+      result <- url.fold(noRedirect(parser.asInstanceOf[Parser[A]])) { (url: String) =>
         for {
           currentBaseUrl <- Context.currentBaseUrl
           from <- Effects.effect(Files.subUrl(currentBaseUrl, url))

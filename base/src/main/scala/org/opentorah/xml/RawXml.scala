@@ -9,7 +9,9 @@ class RawXml(
 ) {
 
   // TODO rename 'xml' to 'content'.
-  final class Value(val xml: Xml.Nodes, val attributes: Attribute.Values = Seq.empty)
+  final class Value(val xml: Xml.Nodes, val attributes: Attribute.Values)
+
+  def apply(xml: Xml.Nodes, attributes: Attribute.Values = Seq.empty): Value = new Value(xml, attributes)
 
   object element extends Element[Value](elementName) {
 

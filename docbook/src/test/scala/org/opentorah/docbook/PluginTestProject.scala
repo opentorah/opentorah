@@ -62,7 +62,7 @@ class PluginTestProject private(
           |$substitutionsFormatted
           |
           |  mathJax {
-          |    isEnabled = $isMathJaxEnabled
+          |    enabled = $isMathJaxEnabled
           |    useJ2V8 = $useJ2V8
           |  }
           |}

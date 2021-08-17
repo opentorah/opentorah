@@ -1,29 +1,27 @@
 package org.opentorah.site
 
 import cats.data.OptionT
-import cats.effect.ExitCode
-//import cats.implicits._
-//import fs2.io
 import fs2.Stream
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.{`Content-Length`, `Content-Type`}
-import org.http4s.implicits._
+import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.blaze.server.BlazeServerBuilder
-import org.http4s._
+import org.http4s.{Charset, Headers, HttpRoutes, MediaType, Response, Request, StaticFile, Uri}
 import org.slf4j.{Logger, LoggerFactory}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Element, Parser}
 import org.typelevel.ci.CIString
 import zio.duration.Duration
 import zio.interop.catz._
-import zio.{App, RIO, Task, URIO, ZEnv, ZIO}
+import zio.{RIO, Task, URIO, ZEnv}
 import java.io.File
 import java.net.URL
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
-abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
+// see https://zio.dev/docs/howto/interop/with-cats-effect
+abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.interop.catz.CatsApp {
 
   // This is supposed to be set when running in Cloud Run
   private val serviceName: Option[String] = Option(System.getenv("K_SERVICE"))
@@ -35,9 +33,9 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
     case _ =>
   }
 
-  type ServiceEnvironment = ZEnv
+  private type ServiceEnvironment = ZEnv
 
-  type ServiceTask[+A] = RIO[ServiceEnvironment, A]
+  private type ServiceTask[+A] = RIO[ServiceEnvironment, A]
 
   private final def readSite(url: URL): Task[S] = readSiteFile(Files.fileInDirectory(url, "site.xml"))
 
@@ -57,9 +55,6 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
 
   // TODO does this belong in the base class?
   protected def bucketName: String
-
-  val dsl: Http4sDsl[ServiceTask] = Http4sDsl[ServiceTask]
-  import dsl._
 
   final override def run(args: List[String]): URIO[ServiceEnvironment, zio.ExitCode] = {
     if (args.isEmpty) serve(urlString = None) else args.head match {
@@ -103,32 +98,47 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
 
     val port: Int = getParameter("PORT", "8080").toInt
 
-    val executionContext: ExecutionContextExecutor = ExecutionContext.global
-
     warning(s"serviceName=$serviceName")
 
-    ZIO.runtime[ServiceEnvironment].flatMap { implicit rts =>
-      BlazeServerBuilder[ServiceTask](executionContext)
-        // To be accessible when running in a docker container the server
-        // must bind to all IPs, not just 127.0.0.1:
-        .bindHttp(port, "0.0.0.0")
-        .withWebSockets(false)
-        .withHttpApp(routes(siteUrl).orNotFound)
-        .serve
-        .compile[ServiceTask, ServiceTask, ExitCode]
-        .drain
-    }
+    stream(port, siteUrl)
+      .compile
+      .drain
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err"))
       .exitCode
   }
 
+  private def stream(port: Int, siteUrl: String): Stream[ServiceTask, Nothing] = {
+    import org.http4s.implicits._
+
+    val executionContext: ExecutionContextExecutor = ExecutionContext.global
+    val httpApp = routes(siteUrl).orNotFound
+
+    val result = for {
+      _ <- BlazeClientBuilder[ServiceTask](executionContext).stream
+      exitCode <- BlazeServerBuilder[ServiceTask](executionContext)
+        // To be accessible when running in a docker container the server
+        // must bind to all IPs, not just 127.0.0.1:
+        .bindHttp(port, "0.0.0.0")
+        .withWebSockets(false)
+        .withHttpApp(httpApp)
+        .serve : Stream[ServiceTask, cats.effect.ExitCode]
+    } yield exitCode
+
+    // TODO Scala 3.0.2 requires this cast (there is some ascription workaround...), but Scala 2 does not?!
+    (result.asInstanceOf[Stream[ServiceTask, cats.effect.ExitCode]])
+      .drain
+  }
+
   private def routes(siteUrl: String): HttpRoutes[ServiceTask] = {
+    val dsl = new Http4sDsl[ServiceTask] {}
+    import dsl._
+
     val siteUri: Uri = Uri.unsafeFromString(siteUrl)
 
     // TODO move near the SiteReader
-    var site: Option[S] = None
-    def getSite: Task[S] = site.map(Task.succeed(_)).getOrElse(readSite(SiteService.toUrl(siteUri)).map { result =>
-      site = Some(result)
+    var cachedSite: Option[S] = None
+    def getSite: Task[S] = cachedSite.map(Task.succeed(_)).getOrElse(readSite(SiteService.toUrl(siteUri)).map { result =>
+      cachedSite = Some(result)
       result
     })
 
@@ -146,21 +156,23 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
       val path: Seq[String] = Files.splitAndDecodeUrl(request.uri.path.toString)
       val urlStr: String = Files.mkUrl(path)
 
-      OptionT(
-        (getSite >>= (_.resolveContent(path))).map(_.map { response =>
-          val bytes: Array[Byte] = response.content.getBytes
+      OptionT[ServiceTask, Response[ServiceTask]](for {
+        site <- getSite
+        siteResponse <- site.resolveContent(path)
+        result = siteResponse.map { siteResponse =>
+          val bytes: Array[Byte] = siteResponse.content.getBytes
           Response[ServiceTask](
             headers = Headers(
-              `Content-Type`(MediaType.unsafeParse(response.mimeType), Charset.`UTF-8`),
+              `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`),
               `Content-Length`.unsafeFromLong(bytes.length)
               // TODO more headers!
             ),
-            body = Stream.emits(bytes)
+            //  // TODO Scala 3.0.2 requires this cast (but there is some)
+            // TODO Scala 3.0.2 requires this cast, but Scala 2 does not?!
+            body = Stream.emits(bytes).asInstanceOf[Stream[ServiceTask, Byte]]
           )
-        })
-          // Note: without this ascription, incorrect type is inferred:
-          : ServiceTask[Option[Response[ServiceTask]]]
-      )
+        }
+      } yield result)
         .orElse {
           val path: Uri.Path = request.uri.path
           val implied: Uri.Path = if (path.endsWithSlash) path/Uri.Path.Segment("index.html") else path
@@ -169,23 +181,24 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with App {
         }
         .getOrElseF(NotFound(s"Not found: $urlStr"))
         .timed.mapEffect { case (duration: Duration, response: Response[ServiceTask]) =>
-        val durationStr: String = SiteService.formatDuration(duration)
+          val durationStr: String = SiteService.formatDuration(duration)
 
-        if (response.status.isInstanceOf[NotFound.type])
-          warning(request, s"NOT $durationStr $urlStr")
-        else
-          info   (request, s"GOT $durationStr $urlStr")
+          if (response.status.isInstanceOf[NotFound.type])
+            warning(request, s"NOT $durationStr $urlStr")
+          else
+            info   (request, s"GOT $durationStr $urlStr")
 
-        response
+          response
       }
     }
 
-    HttpRoutes.of[ServiceTask] {
-      case request@GET -> Root / "reset-cached-site" =>
-        Effects.effectTotal(info(request, "RST")) *>
-          Effects.effectTotal({site = None}) *>
-          getSite *>
-          Ok("Site reset!")
+    HttpRoutes.strict[ServiceTask] {
+      case request@GET -> Root / "reset-cached-site" => for {
+        _ <- Effects.effectTotal(info(request, "RST"))
+        _ <- Effects.effectTotal({cachedSite = None})
+        _ <- getSite
+        result <- Ok("Site reset!")
+      } yield result
 
       case request@GET -> _ => get(request)
     }

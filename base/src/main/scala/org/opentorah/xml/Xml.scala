@@ -16,7 +16,7 @@ object Xml extends Model {
 
   override type Node = scala.xml.Node
 
-  override type Element = scala.xml.Elem
+  override type PreElement = scala.xml.Elem
 
   // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
   override type Text = scala.xml.Atom[_]

@@ -8,8 +8,8 @@ import java.net.URL
 trait Model extends PreModel {
   type Node
   final type Nodes = Seq[Node]
-  override type Element <: Node
-  final override type PreElement = Element
+  override type PreElement <: Node
+  final override type Element = PreElement
   type Text <: Node
 
   final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =

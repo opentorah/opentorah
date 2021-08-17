@@ -34,7 +34,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
     )(name =>  getFile(name) >>= (file=> entryMaker(name, file)))
       .map(listFile.write)
 
-  final protected def getDirectory: Caching.Parser[W] = listFile.get
+  final def getDirectory: Caching.Parser[W] = listFile.get
 
   final def directoryEntries: Caching.Parser[Seq[M]] = getDirectory.map(_.entries)
 

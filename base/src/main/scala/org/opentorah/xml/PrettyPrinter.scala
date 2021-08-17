@@ -139,20 +139,25 @@ final case class PrettyPrinter(
 
         if (stackElements) {
           // If this is clearly a bunch of elements - stack 'em with an indent:
-          start +
-            Doc.cat(children.map(child => (Doc.hardLine + child).nested(indent))) +
-            Doc.hardLine + end
+          Doc.cat(Seq(
+            start,
+            Doc.cat(children.map(child => (Doc.hardLine + child).nested(indent))),
+            Doc.hardLine,
+            end
+          ))
         } else if (nestElements.contains(label)) {
           // If this is forced-nested element - nest it:
           Doc.intercalate(Doc.lineOrSpace, children).tightBracketBy(left = start, right = end, indent)
         } else {
           // Mixed content or non-break-off-able attachments on the side(s) cause flow-style;
           // character content should stick to the opening and closing tags:
-          start +
-          (if (canBreakLeft && !charactersLeft) Doc.lineOrEmpty else Doc.empty) +
-          Doc.intercalate(Doc.lineOrSpace, children) +
-          (if (canBreakRight && !charactersRight) Doc.lineOrEmpty else Doc.empty) +
-          end
+          Doc.cat(Seq(
+            start,
+            if (canBreakLeft && !charactersLeft) Doc.lineOrEmpty else Doc.empty,
+            Doc.intercalate(Doc.lineOrSpace, children),
+            if (canBreakRight && !charactersRight) Doc.lineOrEmpty else Doc.empty,
+            end
+          ))
         }
       }
     }

@@ -7,32 +7,31 @@ pluginManagement {
   plugins {
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'com.github.maiflai.scalatest' version '0.31'
-    id 'com.google.cloud.tools.jib' version '3.1.2'
+    id 'com.google.cloud.tools.jib' version '3.1.4'
     id 'org.podval.tools.cloudrun' version '0.2.0'
     id 'com.gradle.plugin-publish' version '0.15.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
-    id 'io.miret.etienne.sass' version '1.1.1'
+    id 'io.miret.etienne.sass' version '1.1.2'
   }
 }
 
 enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
+// Scala2:
 final String scalaVersion      = '2.13.6'
 final String scalaVersionMajor = '2.13'
 final String scalaLibrary      = 'org.scala-lang:scala-library'
 
 // Scala3:
-// scalaVersion       = '3.0.0-RC3'
-// scalaVersionMajor  = '3.0.0-RC3'
-// scalaLibrary       = 'org.scala-lang:scala3-library_3.0.0-RC3'
-// scalaCompiler      = 'org.scala-lang:scala3-compiler_3.0.0-RC3'
-// scalaCompiler 'org.scala-sbt:compiler-bridge_2.13:1.3.5:sources'
+//final String scalaVersion       = '3.0.3-RC1-bin-20210813-e4b421c-NIGHTLY' // '3.0.2-RC1'
+//final String scalaVersionMajor  = '3'
+//final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 
 // latest version supported by ScalTest seems to be 0.36.8;
 // I need flexmark for Markdown to Html conversion, and would prefer to use a later version...
 final String flexmarkVersion = '0.36.8'
-final String http4sVersion   = '1.0.0-M23'
+final String http4sVersion   = '1.0.0-M24'
 final String batikVersion    = '1.14'
 
 dependencyResolutionManagement {
@@ -47,7 +46,7 @@ dependencyResolutionManagement {
   versionCatalogs {libs {
     // Scala
     alias('scala-library').to("$scalaLibrary:$scalaVersion")
-    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.0")
+    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.1")
 
     // Zinc
     // first version of zinc that ships for Scala 2.13 is 1.4.0, but doesn't seem to work for me...
@@ -56,7 +55,7 @@ dependencyResolutionManagement {
     alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
 
     // XML
-    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.0.1')
+    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.0.2')
     alias('jing').to('org.relaxng:jing:20181222')
     alias('xerces' ).to('xerces:xercesImpl:2.12.1')
     alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
@@ -65,15 +64,16 @@ dependencyResolutionManagement {
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:1.117.1')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.0.1')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
-    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.9")
+    // TODO update to 2.0.0-M1 and fix the issues with Blocking in org.opentorah.util.Effects
+    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.10")
     alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
-    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.1.1")
+    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.2.3")
     alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:3.1.1.0")
 
     // HTTP (TODO switch to https://github.com/dream11/zio-http?)
@@ -99,11 +99,11 @@ dependencyResolutionManagement {
     //final String jaiVersion = '1.1.3'
 
     // Playwright
-    alias('playwright').to('com.microsoft.playwright:playwright:1.12.1')
+    alias('playwright').to('com.microsoft.playwright:playwright:1.14.0')
 
     // Logging
-    alias('slf4j'  ).to('org.slf4j:slf4j-api:1.7.30')
-    alias('logback').to('ch.qos.logback:logback-classic:1.2.3')
+    alias('slf4j'  ).to('org.slf4j:slf4j-api:1.7.32')
+    alias('logback').to('ch.qos.logback:logback-classic:1.2.5')
     alias('logstash').to('net.logstash.logback:logstash-logback-encoder:6.6')
 
     // flexmark
@@ -115,18 +115,18 @@ dependencyResolutionManagement {
 
     // Testing
     alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
-    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.3.0-SNAP3")
+    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.9")
     alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
     alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
     alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // Documentation
-    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.21")
+    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.22")
 
     // --- bundles ---
     bundle('http4s', [
-            'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
-            'zio-interop-cats', 'cats-core', 'cats-effect'
+      'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
+      'zio-interop-cats', 'cats-core', 'cats-effect'
     ])
     bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])  // 'flexmark-util-ast', 'flexmark-util-data'
   }}

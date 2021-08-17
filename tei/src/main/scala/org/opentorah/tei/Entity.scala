@@ -3,7 +3,7 @@ package org.opentorah.tei
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Unparser, Xml}
 
-final case class Entity private(
+final case class Entity( /* TODO private? */
   id: Option[String],
   entityType: EntityType,
   role: Option[String],
@@ -19,7 +19,8 @@ object Entity extends EntityRelated[Entity](
   elementName = _.element,
   entityType = _.entityType
 ) {
-  override def toString: String = "Entity"
+  // TODO: with this, in Scala 3 I get 'Double definition' error:
+  // override def toString: String = "Entity"
 
   override protected def contentType: ContentType = ContentType.Elements
 

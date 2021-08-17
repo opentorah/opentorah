@@ -3,10 +3,11 @@
 ## [Unreleased]
 
 ## [0.7.56] - 2021-0
-
+- `mathJax.isEnabled` renamed `mathJax.enabled`;
+- `isJEuclidEnabled` renamed `jEuclidEnabled`;
+- support for MathJax3;
 - merged FOP plugin back into this module: nobody used it ;)
 - use the 'site' module;
-- support to MathJax3;
 - `DoubleEscapeHtmlNodeExtension` removed;
 
 ## [0.7.53] - 2020-08-23

@@ -15,9 +15,9 @@ abstract class EntityRelated[E](
     override def contentParsable: Parsable[E] = EntityRelated.this.parsable(entityType)
   }
 
-  final object Person       extends ForEntityType(EntityType.Person      )
-  final object Place        extends ForEntityType(EntityType.Place       )
-  final object Organization extends ForEntityType(EntityType.Organization)
+  object Person       extends ForEntityType(EntityType.Person      )
+  object Place        extends ForEntityType(EntityType.Place       )
+  object Organization extends ForEntityType(EntityType.Organization)
 
   final override protected val elements: Seq[ForEntityType] = Seq(Person, Place, Organization)
 

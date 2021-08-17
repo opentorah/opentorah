@@ -2,13 +2,33 @@ package org.opentorah.numbers
 
 trait Numbers {
 
+  // TODO is there a way to bring this into the family, so that digits from one are statically blocked from being used in another?
+  type DigitType <: DigitsDescriptor
+
+  final val Digit: DigitType = createDigit
+
+  protected def createDigit: DigitType
+
+  // TODO do type arithmetics here:
+  //   type NumberExtension[N <: Number[N]] <: Number[N]
+  //   final type Point = PointNumber with NumberExtension[Point]
+  //   final type Vector = VectorNumber with NumberExtension[Vector]
+
   type Point <: PointNumber
 
-  val Point: PointCompanion
+  type PointCompanionType <: PointCompanion
+
+  final val Point: PointCompanionType = createPointCompanion
+
+  protected def createPointCompanion: PointCompanionType
 
   type Vector <: VectorNumber
 
-  val Vector: VectorCompanion
+  type VectorCompanionType <: VectorCompanion
+
+  final val Vector: VectorCompanionType = createVectorCompanion
+
+  protected def createVectorCompanion: VectorCompanionType
 
   /** Number (Point or Vector) from the number system.
    * Number is a sequence of fractions where numerator is the `digit` and denominator
@@ -139,6 +159,7 @@ trait Numbers {
 
   /** Vector from the number system. */
   abstract class VectorNumber(digits: Digits) extends Number[Vector](digits) { this: Vector =>
+    final override def companion: VectorCompanionType = Vector
 
     /** Returns Vector resulting from adding specified Vector to this one. */
     final def +(that: Vector): Vector = Vector.fromDigits(add(that))
@@ -162,15 +183,20 @@ trait Numbers {
     final def canonical: Vector = Vector.canonical(digits)
   }
 
-  trait VectorCompanion extends NumberCompanion[Vector] {
+  class VectorCompanion extends NumberCompanion[Vector] {
+    final override protected def newNumber(digits: Seq[Int]): Vector = newVector(digits)
+
     protected final override def isCanonical: Boolean = false
 
     private[numbers] final def canonical(digits: Digits): Vector =
       Vector.newNumber(normalize(digits, isCanonical = true))
   }
 
+  protected def newVector(digits: Seq[Int]): Vector
+
   /** Point from the number system. */
   abstract class PointNumber(digits: Digits) extends Number[Point](digits) { this: Point =>
+    final override def companion: PointCompanionType = Point
 
     /** Returns Point resulting from adding specified Vector to this one. */
     final def +(that: Vector): Point = Point.fromDigits(add(that))
@@ -179,9 +205,13 @@ trait Numbers {
     final def -(that: Vector): Point = Point.fromDigits(subtract(that))
   }
 
-  trait PointCompanion extends NumberCompanion[Point] {
-    protected final override def isCanonical: Boolean = true
+  class PointCompanion extends NumberCompanion[Point] {
+    final override protected def newNumber(digits: Seq[Int]): Point = newPoint(digits)
+
+    final override protected def isCanonical: Boolean = true
   }
+
+  protected def newPoint(digits: Seq[Int]): Point
 
   def headRangeOpt: Option[Int]
 
@@ -209,8 +239,6 @@ trait Numbers {
 
     mult(BigInt(1), ranges :+ 0)
   }
-
-  val Digit: DigitsDescriptor
 
   private[numbers] final def to[T: Convertible](digits: Digits): T =
     digits zip denominators.take(digits.length) map (Convertible[T].div _).tupled reduce Convertible[T].plus
@@ -271,7 +299,7 @@ trait Numbers {
       (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
       (headDigit: Int) =>
         if (!isCanonical) headDigit
-        else headRangeOpt.fold(headDigit){ headRange: Int => forDigit(headDigit, headRange)._2 }
+        else headRangeOpt.fold(headDigit){ (headRange: Int) => forDigit(headDigit, headRange)._2 }
     )
 
     // fit all digits within their ranges

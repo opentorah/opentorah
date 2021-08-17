@@ -2,36 +2,35 @@ package org.opentorah.docbook.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.provider.{ListProperty, Property}
-import scala.beans.BeanProperty
 
 class MathJaxExtension @javax.inject.Inject() (project: Project) {
-  @BeanProperty val isEnabled: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
+  private val enabled: Property[Boolean] = project.getObjects.property(classOf[Boolean])
+  final def getEnabled(): Property[Boolean] = enabled
 
-  @BeanProperty val useMathJax3: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
+  private val useMathJax3: Property[Boolean] = project.getObjects.property(classOf[Boolean])
+  final def getUseMathJax3(): Property[Boolean] = useMathJax3
 
-  @BeanProperty val nodeVersion: Property[String] =
-    project.getObjects.property(classOf[String])
+  private val nodeVersion: Property[String] = project.getObjects.property(classOf[String])
+  final def getNodeVersion(): Property[String] = nodeVersion
 
-  @BeanProperty val useJ2V8: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
+  private val useJ2V8: Property[Boolean] = project.getObjects.property(classOf[Boolean])
+  final def getUseJ2V8(): Property[Boolean] = useJ2V8
 
-  @BeanProperty val font: Property[String] =
-    project.getObjects.property(classOf[String])
+  private val font: Property[String] = project.getObjects.property(classOf[String])
+  final def getFont(): Property[String] = font
 
-  @BeanProperty val extensions: ListProperty[String] =
-    project.getObjects.listProperty(classOf[String])
+  private val extensions: ListProperty[String] = project.getObjects.listProperty(classOf[String])
+  final def getExtensions(): ListProperty[String] = extensions
 
-  @BeanProperty val texDelimiter: Property[String] =
-    project.getObjects.property(classOf[String])
+  private val texDelimiter: Property[String] = project.getObjects.property(classOf[String])
+  final def getTexDelimiter(): Property[String] = texDelimiter
 
-  @BeanProperty val texInlineDelimiter: Property[String] =
-    project.getObjects.property(classOf[String])
+  private val texInlineDelimiter: Property[String] = project.getObjects.property(classOf[String])
+  final def getTexInlineDelimiter(): Property[String] = texInlineDelimiter
 
-  @BeanProperty val asciiMathDelimiter: Property[String] =
-    project.getObjects.property(classOf[String])
+  private val asciiMathDelimiter: Property[String] = project.getObjects.property(classOf[String])
+  final def getAsciiMathDelimiter(): Property[String] = asciiMathDelimiter
 
-  @BeanProperty val processEscapes: Property[Boolean] =
-    project.getObjects.property(classOf[Boolean])
+  private val processEscapes: Property[Boolean] = project.getObjects.property(classOf[Boolean])
+  final def getProcessEscapes(): Property[Boolean] = processEscapes
 }

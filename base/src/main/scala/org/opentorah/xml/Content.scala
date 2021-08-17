@@ -22,7 +22,7 @@ private[xml] object Content {
 
   type Next[A] = IO[Effects.Error, (Content, A)]
 
-  private final case object Empty extends Content {
+  private case object Empty extends Content {
     override def takeNextElement(p: Xml.Element => Boolean): Next[Option[Xml.Element]] =
       IO.fail(s"No element in $this")
 

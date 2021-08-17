@@ -1,13 +1,14 @@
 package org.opentorah.calendar
 
 import SimpleTimes.{Point, Vector}
-import Times.Digit
 import org.opentorah.numbers.BigRational
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+
+  private def Digit: TimesDigits.type = TimesDigits
 
   "isZero()/isPositive()/isNegative()/signum()/abs()/unary_-()" should "be correct" in {
     Vector(0).isZero shouldBe true

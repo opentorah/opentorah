@@ -12,7 +12,6 @@ import org.opentorah.mathjax.{Delimiters, MathJax, MathJaxConfiguration}
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.Resolver
-import scala.beans.BeanProperty
 import scala.jdk.CollectionConverters._
 
 // Note: Task class can not be final for Gradle to be able to decorate it.
@@ -66,68 +65,70 @@ class ProcessDocBookTask extends DefaultTask {
     getOutputs.dir(directory)
   }
 
-  @Input @BeanProperty val document: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val document: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getDocument(): Property[String] = document
 
-  @Input @BeanProperty val documents: ListProperty[String] =
-    getProject.getObjects.listProperty(classOf[String])
+  private val documents: ListProperty[String] = getProject.getObjects.listProperty(classOf[String])
+  @Input final def getDocuments(): ListProperty[String] = documents
 
-  @Input @BeanProperty val parameters: MapProperty[String, java.util.Map[String, String]] =
+  private val parameters: MapProperty[String, java.util.Map[String, String]] =
     getProject.getObjects.mapProperty(classOf[String], classOf[java.util.Map[String, String]])
+  @Input final def getParameters(): MapProperty[String, java.util.Map[String, String]] = parameters
 
-  @Input @BeanProperty val substitutions: MapProperty[String, String] =
+  private val substitutions: MapProperty[String, String] =
     getProject.getObjects.mapProperty(classOf[String], classOf[String])
+  @Input final def getSubstitutions(): MapProperty[String, String] = substitutions
 
-  @Input @BeanProperty val outputFormats: ListProperty[String] =
-    getProject.getObjects.listProperty(classOf[String])
+  private val outputFormats: ListProperty[String] = getProject.getObjects.listProperty(classOf[String])
+  @Input final def getOutputFormats(): ListProperty[String] = outputFormats
 
-  @Input @BeanProperty val isMathJaxEnabled: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
+  private val mathJaxEnabled: Property[Boolean] = getProject.getObjects.property(classOf[Boolean])
+  @Input final def getMathJaxEnabled(): Property[Boolean] = mathJaxEnabled
 
-  @Input @BeanProperty val useMathJax3: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
+  private val useMathJax3: Property[Boolean] = getProject.getObjects.property(classOf[Boolean])
+  @Input final def getUseMathJax3(): Property[Boolean] = useMathJax3
 
-  @Input @BeanProperty val useJ2V8: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
+  private val useJ2V8: Property[Boolean] = getProject.getObjects.property(classOf[Boolean])
+  @Input final def getUseJ2V8(): Property[Boolean] = useJ2V8
 
-  @Input @BeanProperty val mathJaxFont: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val mathJaxFont: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getMathJaxFont(): Property[String] = mathJaxFont
 
-  @Input @BeanProperty val mathJaxExtensions: ListProperty[String] =
-    getProject.getObjects.listProperty(classOf[String])
+  private val mathJaxExtensions: ListProperty[String] = getProject.getObjects.listProperty(classOf[String])
+  @Input final def getMathJaxExtensions(): ListProperty[String] = mathJaxExtensions
 
-  @Input @BeanProperty val texDelimiter: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val texDelimiter: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getTexDelimiter(): Property[String] = texDelimiter
 
-  @Input @BeanProperty val texInlineDelimiter: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val texInlineDelimiter: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getTexInlineDelimiter(): Property[String] = texInlineDelimiter
 
-  @Input @BeanProperty val asciiMathDelimiter: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val asciiMathDelimiter: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getAsciiMathDelimiter(): Property[String] = asciiMathDelimiter
 
-  @Input @BeanProperty val isJEuclidEnabled: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
+  private val jEuclidEnabled: Property[Boolean] = getProject.getObjects.property(classOf[Boolean])
+  @Input final def getJEuclidEnabled(): Property[Boolean] = jEuclidEnabled
 
-  @Input @BeanProperty val xslt1version: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val xslt1version: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getXslt1version(): Property[String] = xslt1version
 
-  @Input @BeanProperty val xslt2version: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val xslt2version: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getXslt2version(): Property[String] = xslt2version
 
-  @Input @BeanProperty val nodeVersion: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val nodeVersion: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getNodeVersion(): Property[String] = nodeVersion
 
-  @Input @BeanProperty val cssFile: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val cssFile: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getCssFile(): Property[String] = cssFile
 
-  @Input @BeanProperty val epubEmbeddedFonts: ListProperty[String] =
-    getProject.getObjects.listProperty(classOf[String])
+  private val epubEmbeddedFonts: ListProperty[String] = getProject.getObjects.listProperty(classOf[String])
+  @Input final def getEpubEmbeddedFonts(): ListProperty[String] = epubEmbeddedFonts
 
-  @Input @BeanProperty val dataGeneratorClass: Property[String] =
-    getProject.getObjects.property(classOf[String])
+  private val dataGeneratorClass: Property[String] = getProject.getObjects.property(classOf[String])
+  @Input final def getDataGeneratorClass(): Property[String] = dataGeneratorClass
 
-  @Input @BeanProperty val processMathJaxEscapes: Property[Boolean] =
-    getProject.getObjects.property(classOf[Boolean])
+  private val processMathJaxEscapes: Property[Boolean] = getProject.getObjects.property(classOf[Boolean])
+  @Input final def getProcessMathJaxEscapes(): Property[Boolean] = processMathJaxEscapes
 
   @TaskAction
   def processDocBook(): Unit = {
@@ -173,7 +174,7 @@ class ProcessDocBookTask extends DefaultTask {
     val xslt2: File = GradleOperations.unpackStylesheets(getProject, Stylesheets.xslt2, xslt2version.get, layout.docBookXslDirectory)
 
     // MathJax
-    require(!isMathJaxEnabled.get || !isJEuclidEnabled.get)
+    require(!getMathJaxEnabled().get || !getJEuclidEnabled().get)
 
     val mathJaxConfiguration: MathJaxConfiguration = MathJaxConfiguration(
       font = mathJaxFont.get,
@@ -184,11 +185,11 @@ class ProcessDocBookTask extends DefaultTask {
       processEscapes = processMathJaxEscapes.get
     )
 
-    val enableMathJax: Boolean = isMathJaxEnabled.get || isJEuclidEnabled.get
-    val mathJax: MathJax = MathJax.get(useMathJax3 = useMathJax3.get)
+    val enableMathJax: Boolean = getMathJaxEnabled().get || getJEuclidEnabled().get
+    val mathJax: MathJax = MathJax.get(useMathJax3 = getUseMathJax3().get)
 
     val mathJaxRunner: Option[MathJaxRunner] =
-      if (!processors.exists(_.isPdf) || !isMathJaxEnabled.get) None else Some(GradleOperations.getMathJaxRunner(
+      if (!processors.exists(_.isPdf) || !getMathJaxEnabled().get) None else Some(GradleOperations.getMathJaxRunner(
         getProject,
         nodeRoot = layout.nodeRoot,
         nodeVersion = nodeVersion.get,
@@ -301,7 +302,7 @@ class ProcessDocBookTask extends DefaultTask {
           saxonOutputDirectory = saxonOutputDirectory,
           saxonOutputFile = saxonOutputFile,
           substitutions = allSubstitutions,
-          isJEuclidEnabled = isJEuclidEnabled.get,
+          isJEuclidEnabled = getJEuclidEnabled().get,
           mathJaxRunner = mathJaxRunner
         )
       }

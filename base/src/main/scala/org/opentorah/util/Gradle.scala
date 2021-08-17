@@ -7,7 +7,7 @@ import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.file.{CopySpec, FileCollection, FileCopyDetails, RelativePath}
 import org.gradle.api.plugins.JavaPluginConvention // TODO update to JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.{Project, Task}
+import org.gradle.api.{Action, Project, Task}
 import org.gradle.process.{ExecResult, JavaExecSpec}
 import org.slf4j.{Logger, LoggerFactory}
 import scala.jdk.CollectionConverters._
@@ -77,10 +77,11 @@ object Gradle {
     logger.info(s"Unpacking $archiveFile into $into")
 
     into.mkdir()
-    project.copy((copySpec: CopySpec) => copySpec
-      .from(if (isZip) project.zipTree(archiveFile) else project.tarTree(archiveFile))
-      .into(into)
-    )
+    project.copy(new Action[CopySpec] {
+      override def execute(copySpec: CopySpec): Unit = copySpec
+        .from(if (isZip) project.zipTree(archiveFile) else project.tarTree(archiveFile))
+        .into(into)
+    })
   }
 
   // Extract just the specified directory from a ZIP file.
@@ -138,9 +139,11 @@ object Gradle {
     mainClass: String,
     classpath: FileCollection,
     args: String*
-  ): ExecResult = project.javaexec((exec: JavaExecSpec) => {
-    exec.setClasspath(classpath)
-    exec.getMainClass.set(mainClass)
-    exec.args(args: _*)
+  ): ExecResult = project.javaexec(new Action[JavaExecSpec]{
+    override def execute(exec: JavaExecSpec): Unit = {
+      exec.setClasspath(classpath)
+      exec.getMainClass.set(mainClass)
+      exec.args(args: _*)
+    }
   })
 }

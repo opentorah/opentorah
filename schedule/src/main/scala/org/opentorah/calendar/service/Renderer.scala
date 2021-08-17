@@ -91,7 +91,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
         {yearLink(year+1, text = Some(">"))}
         <table>
           <tbody>
-            {year.months.map { month: Calendar#MonthBase =>
+            {year.months.map { (month: Calendar#MonthBase) =>
             <tr>
               <td>{monthLink(month)}</td>
               <td>{monthNameLink(month)}</td>
@@ -116,7 +116,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       {monthNameLink(month+1, text = Some(">"))}
       <table>
         <tbody>
-        {month.days.map { day: Calendar#DayBase => <tr><td>{dayLink(day)}</td></tr>}}
+        {month.days.map { (day: Calendar#DayBase) => <tr><td>{dayLink(day)}</td></tr>}}
         </tbody>
       </table>
       </div>
@@ -135,7 +135,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       <div>
       <div>{dayLinks(firstDay, other = false)} {firstDay.name.toLanguageString(spec)}</div>
       <div>{dayLinks(secondDay, other = true)} {secondDay.name.toLanguageString(spec)}</div>
-      <div>{daySchedule.dayNames.map { withNames: WithNames =>
+      <div>{daySchedule.dayNames.map { (withNames: WithNames) =>
         <span class="name">{withNames.names.doFind(spec).name}</span>}}</div>
       {renderOptionalReading("Morning", daySchedule.morning)}
       {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
@@ -204,7 +204,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       <tr><td>{spec.toString(3)}</td>{renderRambamChapter(schedule.threeChapters.chapter3)}</tr>
     </table>,
     <span class="subheading">Sefer Hamitzvos</span>,
-    <table>{schedule.seferHamitzvos.parts.map { part: SeferHamitzvosLessons.Part =>
+    <table>{schedule.seferHamitzvos.parts.map { (part: SeferHamitzvosLessons.Part) =>
       <tr><td>{part.toLanguageString(spec)}</td></tr>
     }}</table>,
     <span class="subheading">1 chapter</span>,
@@ -275,7 +275,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       val spans = haftarah.spans
       val parts: Seq[Seq[Haftarah.BookSpan]] =
         Collections.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
-      parts map { part: Seq[Haftarah.BookSpan] =>
+      parts map { (part: Seq[Haftarah.BookSpan]) =>
         <tr>
           <td>{Haftarah.toLanguageString(part)(spec)}</td>
           <td>{renderSource(part.head.source)}</td>
@@ -324,7 +324,7 @@ object Renderer {
 
     override protected def gregorian(day: Calendar#DayBase): Gregorian.Day = {
       try {
-        Gregorian.Day.from(jewish(day))
+        Gregorian.Day.from(jewish(day).asInstanceOf[Calendar#Day])
       } catch {
         case _: IllegalArgumentException => Gregorian.Year(1).month(1).day(1)
       }

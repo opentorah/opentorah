@@ -87,8 +87,9 @@ object Jewish extends Calendar {
     override def lengthInMonths(yearNumber: Int): Int = LeapYearsCycle.yearLengthInMonths(yearNumber)
 
     // KH 8:7-8
-    val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
-    val shortLeapYearLength: Int = yearLength((true, Kind.Short)) // 383
+    // lazy to make initialization work
+    lazy val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
+    lazy val shortLeapYearLength: Int = yearLength((true, Kind.Short)) // 383
 
     def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
       val daysOverShort: Int = lengthInDays - (if (isLeap) shortLeapYearLength else shortNonLeapYearLength)
@@ -115,9 +116,11 @@ object Jewish extends Calendar {
     }
   }
 
-  override lazy val Year = new JewishYearCompanion
+  override type YearCompanionType = JewishYearCompanion
 
-  trait JewishMonth extends MonthBase {
+  override protected def createYearCompanion: YearCompanionType = new JewishYearCompanion
+
+  final class JewishMonth(yearOptInitial: Option[Year], monthNumber: Int) extends MonthBase(yearOptInitial, monthNumber) {
     def newMoon: Moment = Moon.newMoon(number)
   }
 
@@ -131,10 +134,7 @@ object Jewish extends Calendar {
 
   final class JewishMonthCompanion extends MonthCompanion {
     private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new JewishMonth {
-        override protected var yearOpt: Option[Year] = yearOption
-        override def number: Int = monthNumber
-      }
+      new JewishMonth(yearOption, monthNumber)
 
     override private[opentorah] def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
 
@@ -161,9 +161,11 @@ object Jewish extends Calendar {
     protected override def resourceName: String = "JewishMonth"
   }
 
-  override lazy val Month: JewishMonthCompanion = new JewishMonthCompanion
+  override type MonthCompanionType = JewishMonthCompanion
 
-  trait JewishDay extends DayBase {
+  override protected def createMonthCompanion: MonthCompanionType = new JewishMonthCompanion
+
+  final class JewishDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber) {
     def isShabbos: Boolean = is(Week.Day.Shabbos)
 
     def roshChodeshOf: Option[Month.Name] =
@@ -182,19 +184,9 @@ object Jewish extends Calendar {
 
   override type Day = JewishDay
 
-  final class JewishDayCompanion extends DayCompanion {
-    private[opentorah] override def apply(monthOption: Option[Month], dayNumber: Int): Day =
-      new JewishDay {
-        override protected var monthOpt: Option[Month] = monthOption
-        override def number: Int = dayNumber
-      }
-  }
-
-  override lazy val Day: JewishDayCompanion = new JewishDayCompanion
+  override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = new JewishDay(monthOption, dayNumber)
 
   final class JewishMoment(digits: Seq[Int]) extends MomentBase(digits) {
-    override def companion: JewishMomentCompanion = Point
-
     def nightHours(value: Int): Moment = firstHalfHours(value)
 
     def dayHours(value: Int): Moment = secondHalfHours(value)
@@ -202,13 +194,7 @@ object Jewish extends Calendar {
 
   override type Moment = JewishMoment
 
-  final class JewishMomentCompanion extends MomentCompanion {
-    override protected def newNumber(digits: Seq[Int]): Point = new JewishMoment(digits)
-  }
-
-  override lazy val Point: JewishMomentCompanion = new JewishMomentCompanion
-
-  override def Moment: JewishMomentCompanion = Point
+  override protected def newPoint(digits: Seq[Int]): Point = new JewishMoment(digits)
 
   override def inToString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)
 }
