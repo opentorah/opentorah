@@ -1,7 +1,5 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Strings
-
 /* from https://www.w3.org/TR/xml-names/
 
   The prefix xml is by definition bound to the namespace name http://www.w3.org/XML/1998/namespace.
@@ -49,12 +47,12 @@ sealed trait Namespace {
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
   // Scala XML
-  final def declare(element: scala.xml.Elem): scala.xml.Elem = Xml.declareNamespace(this, element)
+  final def declare(element: Xml.Element): Xml.Element = Xml.declareNamespace(this, element)
 
   // DOM
-  final def ensureDeclared(element: org.w3c.dom.Element): Unit = if (!isDeclared(element)) declare(element)
-  final def isDeclared(element: org.w3c.dom.Element): Boolean = Dom.isNamespaceDeclared(this, element)
-  final def declare(element: org.w3c.dom.Element): Unit = Dom.declareNamespace(this, element)
+  final def ensureDeclared(element: Dom.Element): Unit = if (!isDeclared(element)) declare(element)
+  final def isDeclared(element: Dom.Element): Boolean = Dom.isNamespaceDeclared(this, element)
+  final def declare(element: Dom.Element): Unit = Dom.declareNamespace(this, element)
 
   // SAX
   final def ensureDeclared(attributes: org.xml.sax.helpers.AttributesImpl): Unit = if (!isDeclared(attributes)) declare(attributes)
@@ -130,12 +128,12 @@ object Namespace {
   )
 
   // Scala XML
-  def get(element: scala.xml.Elem): Namespace = Xml.getNamespace(element)
-  def getAll(element: scala.xml.Elem): Seq[Namespace] = Xml.getNamespaces(element)
+  def get(element: Xml.Element): Namespace = Xml.getNamespace(element)
+  def getAll(element: Xml.Element): Seq[Namespace] = Xml.getNamespaces(element)
 
   // DOM
-  def get(element: org.w3c.dom.Element): Namespace = Dom.getNamespace(element)
-  def getAll(element: org.w3c.dom.Element): Seq[Namespace] = Dom.getNamespaces(element)
+  def get(element: Dom.Element): Namespace = Dom.getNamespace(element)
+  def getAll(element: Dom.Element): Seq[Namespace] = Dom.getNamespaces(element)
 
   // SAX
   def getAll(attributes: org.xml.sax.Attributes): Seq[Namespace] = Sax.getNamespaces(attributes)

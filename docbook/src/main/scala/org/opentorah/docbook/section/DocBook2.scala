@@ -4,7 +4,6 @@ import java.io.File
 import org.opentorah.xml.{Xml, Xsl}
 import org.opentorah.util.Collections
 import Section.Parameters
-import scala.xml.Comment
 
 trait DocBook2 extends Section {
 
@@ -104,7 +103,7 @@ object DocBook2 {
     val result = for {
       (sectionName: String, sectionParameters: Parameters) <- Collections.pruneSequenceOfMaps(parameters)
       if sectionParameters.nonEmpty
-    } yield Comment(s" $sectionName ") +: toXml(sectionParameters)
+    } yield Xml.mkComment(s" $sectionName ") +: toXml(sectionParameters)
     result.flatten
   }
 

@@ -1,7 +1,6 @@
 package org.opentorah.highlighter
 
 import org.opentorah.xml.Xml
-import scala.xml.Elem
 
 trait Highlighter {
   def head: Seq[Xml.Element]
@@ -38,13 +37,13 @@ object Highlighter {
   private object Prism extends Highlighter {
     val version: String = "1.23.0"
 
-    override def head: Seq[Elem] = Seq(
+    override def head: Seq[Xml.Element] = Seq(
       <link
         rel="stylesheet"
         href={s"https://cdn.jsdelivr.net/npm/prismjs@$version/themes/prism.css"}/>
     )
 
-    override def body: Seq[Elem] = Seq(
+    override def body: Seq[Xml.Element] = Seq(
       <script
         src={s"https://cdn.jsdelivr.net/npm/prismjs@$version/components/prism-core.min.js"}/>,
       <script

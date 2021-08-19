@@ -24,7 +24,10 @@ object Name extends Element[Name]("name") {
       _ <- Effects.check(n.isEmpty  || characters.isEmpty, "Both 'n' attribute and text are present.")
       name = n.orElse(characters)
       languageSpec <- LanguageSpec()
-    } yield new Name(name.get, languageSpec)
+    } yield new Name(
+      name = name.get,
+      languageSpec = languageSpec
+    )
 
     override val unparser: Unparser[Name] = Unparser.concat(
       nAttribute.required(_.name),

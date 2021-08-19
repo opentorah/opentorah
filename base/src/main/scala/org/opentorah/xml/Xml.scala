@@ -21,6 +21,8 @@ object Xml extends Model {
   // Note: some whitespace is packaged not in Text, but in a different subclass of Atom[String], so:
   override type Text = scala.xml.Atom[_]
 
+  override type Comment = scala.xml.Comment
+
   // TODO up into the Model
   final class Transform[R](transform: Element => URIO[R, Element]) {
     val one: Element => URIO[R, Element] = element => for {
@@ -68,6 +70,9 @@ object Xml extends Model {
 
   override def mkText(text: String, seed: Node): Text = mkText(text)
   def mkText(text: String): Text = new scala.xml.Text(text)
+
+  def mkComment(text: String, seed: Node): Comment = mkComment(text)
+  def mkComment(text: String): Comment = scala.xml.Comment(text)
 
   override def isElement(node: Node): Boolean = node.isInstanceOf[Element]
   override def asElement(node: Node): Element = node.asInstanceOf[Element]

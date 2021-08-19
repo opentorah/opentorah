@@ -10,7 +10,7 @@ object Effects {
   def error2throwable[R, A](zio: ZIO[R, Error, A]): ZIO[R, Throwable, A] =
     zio.mapError(new IllegalArgumentException(_))
 
-  def throwable2error[R, A](zio: ZIO[R, Throwable, A]): ZIO[R, Error, A] =
+  private def throwable2error[R, A](zio: ZIO[R, Throwable, A]): ZIO[R, Error, A] =
     zio.mapError(_.getMessage)
 
   val ok: IO[Error, Unit] = IO.succeed(())
@@ -41,7 +41,6 @@ object Effects {
     results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
   } yield results
 
-  // TODO move into Effects
   def mapValues[R, A, B, C](map: Map[A, B])(f: B => ZIO[R, Error, C]): ZIO[R, Error, Map[A, C]] =
     collectAll(map.toSeq.map { case (a, b) => f(b).map(a -> _) }).map(_.toMap)
 

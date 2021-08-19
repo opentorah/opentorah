@@ -5,7 +5,6 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{Elements, Parser, PrettyPrinter, Xml}
 import zio.ZIO
 
-// TODO move the package into 'base' and make caching dependency compileOnly
 trait Store extends FindByName with WithNames {
   def displayName: String = names.doFind(Language.Russian.toSpec).name
 

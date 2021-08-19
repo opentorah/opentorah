@@ -35,7 +35,7 @@ object Strings {
     .replace("\n", "\\n")
 
   def spacesToUnderscores(what: String): String = what.replace(' ', '_')
-  def underscoresToSpaces(what: String): String = what.replace('_', ' ')
+  //def underscoresToSpaces(what: String): String = what.replace('_', ' ')
 
   def encodeXmlSpecials(string: String): String = string
     .replaceAll("&", "&amp;")

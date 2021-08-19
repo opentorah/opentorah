@@ -69,7 +69,7 @@ private[xml] object Content {
       (copy(nextElementNumber = newNextElementNumber, nodes = newNodes), result)
     }
 
-    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed(copy(nodes = Seq.empty), nodes)
+    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed((copy(nodes = Seq.empty), nodes))
 
     override def takeCharacters: Next[Option[String]] =
       IO.fail(s"No characters in $this")
@@ -81,7 +81,7 @@ private[xml] object Content {
       (copy(nextElementNumber = newNextElementNumber, nodes = newNodes), result)
     }
 
-    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed(copy(nodes = Seq.empty), nodes)
+    override def takeAllNodes: Next[Xml.Nodes] = IO.succeed((copy(nodes = Seq.empty), nodes))
 
     override def takeCharacters: Next[Option[String]] = {
       val (elements: Seq[Xml.Element], characters: Option[String]) = partition(nodes)

@@ -4,7 +4,7 @@ import java.io.File
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.artifacts.{Configuration, Dependency}
-import org.gradle.api.file.{CopySpec, FileCollection, FileCopyDetails, RelativePath}
+import org.gradle.api.file.{CopySpec, FileCollection}
 import org.gradle.api.plugins.JavaPluginConvention // TODO update to JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Action, Project, Task}
@@ -84,23 +84,6 @@ object Gradle {
     })
   }
 
-  // Extract just the specified directory from a ZIP file.
-  // Gradle 5 did not get the new API to do this easier:
-  //   https://github.com/gradle/gradle/issues/1108
-  //   https://github.com/gradle/gradle/pull/5405
-  // Anyway, I ended up not using it (currently)...
-  def extract(project: Project, zipFile: File, toExtract: String, isDirectory: Boolean, into: File): Unit = {
-    val toDrop: Int = toExtract.count(_ == '/') + (if (isDirectory) 1 else 0)
-    project.copy((copySpec: CopySpec) => copySpec
-      .into(into)
-      .from(project.zipTree(zipFile))
-      .include(toExtract + (if (isDirectory) "/**" else ""))
-      .eachFile((file: FileCopyDetails) =>
-        file.setRelativePath(new RelativePath(true, file.getRelativePath.getSegments.drop(toDrop): _*))
-      )
-      .setIncludeEmptyDirs(false))
-  }
-
   def copyDirectory(
     project: Project,
     into: File,
@@ -122,17 +105,9 @@ object Gradle {
   def getClassesTask(project: Project): Option[Task] =
     mainSourceSet(project).flatMap(mainSourceSet => getTask(project, mainSourceSet.getClassesTaskName))
 
-  // Note: 'classes' task itself never does work: it has no action;
-  // at least for Scala, it depends on the tasks that actually do something - when there is something to do.
-  def didWork(classesTask: Task): Boolean =
-    classesTask.getDidWork || classesTask.getTaskDependencies.getDependencies(classesTask).asScala.exists(_.getDidWork)
-
   def mainSourceSet(project: Project): Option[SourceSet] =
     Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))
       .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
-
-  def classesDirs(project: Project): Set[File] =
-    mainSourceSet(project).fold(Set.empty[File])(_.getOutput.getClassesDirs.getFiles.asScala.toSet)
 
   def javaexec(
     project: Project,

@@ -3,7 +3,7 @@ package org.opentorah.xml
 trait PreModel {
 
   // Type of the attributes container suitable for getting.
-  type PreElement
+  type PreElement // TODO rename Attributes and use where org.sax.Attributes is used now...
 
   // Type of the attributes container suitable for setting.
   type Element <: PreElement

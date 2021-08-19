@@ -11,6 +11,7 @@ trait Model extends PreModel {
   override type PreElement <: Node
   final override type Element = PreElement
   type Text <: Node
+  type Comment <: Node
 
   final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
     loadFromSource(new InputSource(new StringReader(string)), filters, resolver)
@@ -26,6 +27,7 @@ trait Model extends PreModel {
 
   // Note: seed is the node used (for DOM) to get at the document so that a new node can be created.
   def mkText(text: String, seed: Node): Text
+  def mkComment(text: String, seed: Node): Comment
 
   final def isWhitespace(node: Node): Boolean = isText(node) && getText(asText(node)).trim.isEmpty
   final def isCharacters(node: Node): Boolean = isText(node) && getText(asText(node)).trim.nonEmpty

@@ -24,8 +24,6 @@ object Files {
     name
   }
 
-  def pathAndName(path: String): (Option[String], String) = Strings.splitRight(path, '/')
-
   def nameAndExtension(fullName: String): (String, Option[String]) = Strings.split(fullName, '.')
 
   def prefixedDirectory(directory: File, prefix: Option[String]): File =
@@ -54,8 +52,6 @@ object Files {
     result
   }
 
-  def file2string(file: File): String = read(file).mkString("\n")
-
   def readFile(file: File): Array[Byte] =
     java.nio.file.Files.readAllBytes(Paths.get(file.toURI))
 
@@ -72,17 +68,11 @@ object Files {
 
   def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
 
-  def getParent(url: URL): URL = new URL(url, "..")
+  //def getParent(url: URL): URL = new URL(url, "..")
 
   def subUrl(base: Option[URL], url: String): URL = base.fold(new URL(url))(new URL(_, url))
-  def subUrl(base: URL, url: String): URL = new URL(base, url)
+  private def subUrl(base: URL, url: String): URL = new URL(base, url)
   def subFile(base: URL, url: String): File = url2file(subUrl(base, url))
-
-  def isFileUrl(url: URL): Boolean = url.getProtocol == "file"
-  def isJarUrl(url: URL): Boolean = url.getProtocol == "jar"
-
-  def add(url: Seq[String], what: String): Seq[String] =
-    url.init :+ (url.last + what)
 
   def splitUrl(url: String): Seq[String] = {
     require(url.startsWith("/"))
@@ -91,7 +81,7 @@ object Files {
 
   def splitAndDecodeUrl(url: String): Seq[String] = splitUrl(url).map(urlDecode)
 
-  def urlDecode(segment: String): String = URLDecoder.decode(segment, StandardCharsets.UTF_8)
+  private def urlDecode(segment: String): String = URLDecoder.decode(segment, StandardCharsets.UTF_8)
 
   def mkUrl(segments: Seq[String]): String = segments.mkString("/", "/", "")
 
