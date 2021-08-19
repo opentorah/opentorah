@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
 final case class TitleStmt(
   titles: Seq[Title.Value],

@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, ScalaXml}
 
 final case class Availability(
   status: Option[String],
-  xml: Xml.Nodes
+  xml: ScalaXml.Nodes
 )
 
 object Availability extends Element[Availability]("availability") {

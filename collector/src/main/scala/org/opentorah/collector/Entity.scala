@@ -4,7 +4,7 @@ import org.opentorah.tei.{EntityRelated, EntityType, Entity => TeiEntity}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Directory}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Entity(
@@ -19,7 +19,7 @@ final class Entity(
 
   def teiEntity(site: Site): Caching.Parser[TeiEntity] = site.entities.getFile(this)
 
-  override def content(site: Site): Caching.Parser[Xml.Element] = for {
+  override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {
     entity <- teiEntity(site)
     references <- site.getReferences
     sources <- ZIO.foreach(
@@ -44,18 +44,18 @@ final class Entity(
       } yield collection -> Collections.removeConsecutiveDuplicatesWith(texts.get)(_.document.name)
         .sortBy(_.document.name)
 
-    val mentions: Xml.Element =
+    val mentions: ScalaXml.Element =
       <p class="mentions">
         {a(site)(text = "[...]")}
         {if (fromEntities.isEmpty) Seq.empty else
         <l>
           <em>{site.entityLists.selector.title.get}:</em>
-          {Xml.multi(nodes = fromEntities.map(fromEntity => fromEntity.a(site)(fromEntity.mainName)))}
+          {ScalaXml.multi(nodes = fromEntities.map(fromEntity => fromEntity.a(site)(fromEntity.mainName)))}
         </l>
         }
         {for ((collection, texts) <- byCollection) yield
         <l>{collection.pathHeaderHorizontal(site)}:
-          {Xml.multi(separator = " ", nodes = texts.map(text => text.a(site)(text = text.document.baseName)))}</l>}
+          {ScalaXml.multi(separator = " ", nodes = texts.map(text => text.a(site)(text = text.document.baseName)))}</l>}
       </p>
 
     TeiEntity.xmlElement(entity.copy(content = entity.content :+ mentions))

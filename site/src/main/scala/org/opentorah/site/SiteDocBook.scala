@@ -73,7 +73,7 @@ final class SiteDocBook(
         (if (!prefixed) Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
       val htmlContent: DocBookHtmlContent[S] = new DocBookHtmlContent(documentFile, resolver)
-      val content: String = Parser.run[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
+      val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
       Files.write(outputFile, content)
     }
   }

@@ -1,6 +1,5 @@
 package org.opentorah.docbook
 
-import org.opentorah.fop.MathJaxRunner
 import org.opentorah.mathjax.{MathJaxConfiguration, MathML}
 import org.opentorah.xml.{Dom, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -111,7 +110,7 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
 //        , new org.opentorah.xml.TracingFilter
       )
     )
-    val result: String = DocBook.prettyPrinter.renderXml(element)
+    val result: String = DocBook.prettyPrinter.renderWithHeader(Dom)(element)
 //    println(result)
     result
   }

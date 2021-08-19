@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import org.opentorah.metadata.{Language, WithNames}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Elements, Parser, PrettyPrinter, Xml}
+import org.opentorah.xml.{Elements, Parser, PrettyPrinter, ScalaXml}
 import zio.ZIO
 
 trait Store extends FindByName with WithNames {
@@ -36,7 +36,7 @@ object Store {
     ZIO.succeed(stores.find(_.names.hasName(name)))
 
   def renderXml[T <: Store](elements: Elements[T], value: T): String = renderXml(elements.xmlElement(value))
-  def renderXml(xml: Xml.Element): String = prettyPrinter.renderXml(xml)
+  def renderXml(element: ScalaXml.Element): String = prettyPrinter.renderWithHeader(ScalaXml)(element)
 
   val prettyPrinter: PrettyPrinter = new PrettyPrinter(
     nestElements = Set("p"), // TODO remnants of TEI?

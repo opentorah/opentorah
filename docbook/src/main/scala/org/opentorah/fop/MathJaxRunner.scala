@@ -2,6 +2,7 @@ package org.opentorah.fop
 
 import org.opentorah.docbook.MathFilter
 import org.opentorah.mathjax.{Input, MathJax, MathJaxConfiguration, MathML, Output}
+import org.opentorah.xml.Dom
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{Document, Element}
@@ -15,12 +16,12 @@ abstract class MathJaxRunner(
   final def typeset(mathMLDocument: Document): SVGDocument = {
     val element: Element = mathMLDocument.getDocumentElement
 
-    val input: Input = MathFilter.inputAttribute.get(element)
+    val input: Input = MathFilter.inputAttribute.get(Dom)(element)
     val math: String =
-      if (input == Input.MathML) MathML.prettyPrinter.render(element)
+      if (input == Input.MathML) MathML.prettyPrinter.render(Dom)(element)
       else MathFilter.unwrap(element)
 
-    val fontSize: Float = Sizes.fontSizeAttribute.required.get(element)
+    val fontSize: Float = Sizes.fontSizeAttribute.required.get(Dom)(element)
 
     val outputName: String = Output.Svg.name(isNode = false)
 
@@ -39,7 +40,7 @@ abstract class MathJaxRunner(
     val result: SVGDocument = Svg.fromString(svg)
 
     // set font size on the resulting SVG - it is needed for the sizes calculations:
-    Sizes.fontSizeAttribute.required.withValue(fontSize).set(result.getDocumentElement)
+    Sizes.fontSizeAttribute.required.withValue(fontSize).set(Dom)(result.getDocumentElement)
 
     result
   }

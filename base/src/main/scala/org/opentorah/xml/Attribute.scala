@@ -44,14 +44,12 @@ object Attribute {
 
     def valueToString: Option[String] = effectiveValue.map(attribute.toString)
 
-    def set(element: Xml.Element): Xml.Element = Xml.setAttribute(this, element)
-    def set(element: Dom.Element): Dom.Element = Dom.setAttribute(this, element)
-    def set(element: Sax.Element): Sax.Element = Sax.setAttribute(this, element)
+    def set(xml: XmlAttributes)(element: xml.Element): xml.Element = xml.setAttribute(this, element)
   }
 
   type Values = Seq[Value[_]]
 
-  def allAttributes: Parser[Seq[Value[String]]] = Context.takeAllAttributes
+  def allAttributes: Parser[Seq[Value[String]]] = Context.allAttributes
 
   sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A] {
     final override def unparser: Unparser[A] = Unparser(
@@ -62,9 +60,7 @@ object Attribute {
 
     def effectiveValue(value: Option[T]): Option[T]
 
-    def get(element: Xml.Element): A
-    def get(element: Dom.Element): A
-    def get(attributes: Sax.PreElement): A
+    def get(xml: XmlAttributes)(element: xml.Attributes): A
   }
 
   private def optionalParser[T](attribute: Attribute[T]): Parser[Option[T]] =
@@ -78,9 +74,8 @@ object Attribute {
     override def effectiveValue(value: Option[T]): Option[T] =
       if (!setDefault) value.filterNot(_ == attribute.default)
       else value.orElse(Some(attribute.default))
-    override def get(element   : Xml.Element   ): Option[T] = Xml.getAttribute(attribute, element   )
-    override def get(element   : Dom.Element   ): Option[T] = Dom.getAttribute(attribute, element   )
-    override def get(attributes: Sax.PreElement): Option[T] = Sax.getAttribute(attribute, attributes)
+
+    override def get(xml: XmlAttributes)(element: xml.Attributes): Option[T] = xml.getAttribute(attribute, element)
   }
 
   final class OrDefault[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, T](attribute) {
@@ -89,18 +84,16 @@ object Attribute {
     override def effectiveValue(value: Option[T]): Option[T] =
       if (!setDefault) value.filterNot(_ == attribute.default)
       else value.orElse(Some(attribute.default))
-    override def get(element   : Xml.Element   ): T = Xml.getAttributeWithDefault(attribute, element   )
-    override def get(element   : Dom.Element   ): T = Dom.getAttributeWithDefault(attribute, element   )
-    override def get(attributes: Sax.PreElement): T = Sax.getAttributeWithDefault(attribute, attributes)
+
+    override def get(xml: XmlAttributes)(element: xml.Attributes): T = xml.getAttributeWithDefault(attribute, element)
   }
 
   final class Required[T](attribute: Attribute[T]) extends Parsable[T, T](attribute) {
     override protected def parser: Parser[T] = Effects.required(optionalParser(attribute), attribute)
     override def withValue(value: T): Attribute.Value[T] = new Attribute.Value[T](this, Option(value))
     override def effectiveValue(value: Option[T]): Option[T] = value.orElse(Some(attribute.default))
-    override def get(element   : Xml.Element   ): T = Xml.doGetAttribute[T](attribute, element   )
-    override def get(element   : Dom.Element   ): T = Dom.doGetAttribute[T](attribute, element   )
-    override def get(attributes: Sax.PreElement): T = Sax.doGetAttribute[T](attribute, attributes)
+
+    override def get(xml: XmlAttributes)(element: xml.Attributes): T = xml.doGetAttribute(attribute, element)
   }
 
   final class StringAttribute(

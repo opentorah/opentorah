@@ -2,7 +2,7 @@ package org.opentorah.site
 
 import org.opentorah.html.Html
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, XLink, Xml}
+import org.opentorah.xml.{Attribute, ScalaXml, XLink}
 
 object HtmlTheme {
 
@@ -13,10 +13,10 @@ object HtmlTheme {
   // TODO consolidate css, js etc. under 'asset'
   def toHtml[S <: Site[S]](
     htmlContent: HtmlContent[S],
-    navigationLinks: Seq[Xml.Element], // normally, <a>s
-    content: Xml.Element,
+    navigationLinks: Seq[ScalaXml.Element], // normally, <a>s
+    content: ScalaXml.Element,
     site: S
-  ): Xml.Element = {
+  ): ScalaXml.Element = {
     val common: SiteCommon = site.common
     val isMathJaxEnabled    : Boolean = common.getMathJax    .isEnabled && HtmlTheme.isMathPresent(content)
     val isHighlighterEnabled: Boolean = common.getHighlighter.isEnabled && HtmlTheme.isCodePresent(content)
@@ -26,10 +26,10 @@ object HtmlTheme {
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        {Xml.optional(htmlContent.htmlHeadTitle)(title => <title>{title}</title>)}
+        {ScalaXml.optional(htmlContent.htmlHeadTitle)(title => <title>{title}</title>)}
         <link rel="stylesheet" href={s"/css/${site.style(htmlContent)}.css"}/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
-        {Xml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
+        {ScalaXml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
         {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.head}
       </head>
       <body>
@@ -37,8 +37,8 @@ object HtmlTheme {
         {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.body}
         <header class="site-header" role="banner">
           <div class="wrapper">
-            {Xml.optional(common.title)(title => <a class="site-title" rel="author"
-               target={site.defaultViewer.map(_.name).orNull} href="/">{title.xml}</a>)}
+            {ScalaXml.optional(common.title)(title => <a class="site-title" rel="author"
+               target={site.defaultViewer.map(_.name).orNull} href="/">{title.content}</a>)}
             <nav class="site-nav">
               <input type="checkbox" id="nav-trigger" class="nav-trigger" />
               <label for="nav-trigger">
@@ -48,14 +48,14 @@ object HtmlTheme {
                   </svg>
                 </span>
               </label>
-              <div class="trigger">{navigationLinks.map(pageLinkClass.set)}</div>
+              <div class="trigger">{navigationLinks.map(pageLinkClass.set(ScalaXml))}</div>
             </nav>
           </div>
         </header>
         <main class="page-content" aria-label="Content">
           <div class="wrapper">
             <article class="post">
-              {Xml.optional(htmlContent.htmlBodyTitle)(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
+              {ScalaXml.optional(htmlContent.htmlBodyTitle)(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
               <div class="post-content">{content}</div>
             </article>
           </div>
@@ -66,8 +66,8 @@ object HtmlTheme {
             <div class="footer-col-wrapper">
               <div class="footer-col footer-col-1">
                 <ul class="contact-list">
-                  {Xml.optional(common.url)(url => <li class="p-name">{url}</li>)}
-                  {Xml.optional(common.email)(email => <li><a class="u-email" href={s"mailto:$email"}>{email}</a></li>)}
+                  {ScalaXml.optional(common.url)(url => <li class="p-name">{url}</li>)}
+                  {ScalaXml.optional(common.email)(email => <li><a class="u-email" href={s"mailto:$email"}>{email}</a></li>)}
                 </ul>
               </div>
               <div class="footer-col footer-col-2">
@@ -83,7 +83,7 @@ object HtmlTheme {
                     </li>
                 }</ul>
               </div>
-              {Xml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.xml}</div>)}
+              {ScalaXml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.content}</div>)}
             </div>
           </div>
         </footer>
@@ -96,6 +96,6 @@ object HtmlTheme {
 
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
 
-  private def isMathPresent(content: Xml.Element): Boolean = true // TODO
-  private def isCodePresent(content: Xml.Element): Boolean = true // TODO
+  private def isMathPresent(content: ScalaXml.Element): Boolean = true // TODO
+  private def isCodePresent(content: ScalaXml.Element): Boolean = true // TODO
 }

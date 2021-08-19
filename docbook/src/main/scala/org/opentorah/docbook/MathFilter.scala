@@ -2,7 +2,7 @@ package org.opentorah.docbook
 
 import org.opentorah.mathjax.{DelimitersAndInput, Input, MathJaxConfiguration, MathML}
 import org.opentorah.mathjax.MathML.displayAttribute
-import org.opentorah.xml.{Attribute, Dom, Namespace, WarningFilter}
+import org.opentorah.xml.{Attribute, Dom, Namespace, Sax, WarningFilter}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -69,8 +69,8 @@ final class MathFilter(
     val isMathMLMath: Boolean = (uri == MathML.namespace.uri) && (localName == MathML.math)
     val attributes: Attributes = if (!isMathMLMath) atts else {
       val result: AttributesImpl = new AttributesImpl(atts)
-      val isInline: Option[Boolean] = displayAttribute.optional.get(atts)
-      displayAttribute.optionalSetDefault.withValue(checkInline(isInline)).set(result)
+      val isInline: Option[Boolean] = displayAttribute.optional.get(Sax)(atts)
+      displayAttribute.optionalSetDefault.withValue(checkInline(isInline)).set(Sax)(result)
       result
     }
 
@@ -138,7 +138,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    MathFilter.inputAttribute.withValue(input.withInline(isInline)).set(attributes)
+    MathFilter.inputAttribute.withValue(input.withInline(isInline)).set(Sax)(attributes)
 
     def mml(): Unit = {
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,

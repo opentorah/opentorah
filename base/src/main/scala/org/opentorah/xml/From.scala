@@ -9,9 +9,9 @@ sealed abstract class From(val name: String) {
 
   def url: Option[URL]
 
-  def load: IO[Effects.Error, Xml.Element]
+  def load: IO[Effects.Error, ScalaXml.Element]
 
-  final def loadTask: Task[Xml.Element] = Effects.error2throwable(load)
+  final def loadTask: Task[ScalaXml.Element] = Effects.error2throwable(load)
 
   def isRedirect: Boolean
 }
@@ -20,15 +20,15 @@ object From {
 
   private final class FromXml(
     name: String,
-    elem: Xml.Element
+    elem: ScalaXml.Element
   ) extends From(name) {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
-    override def load: IO[Effects.Error, Xml.Element] = IO.succeed(elem)
+    override def load: IO[Effects.Error, ScalaXml.Element] = IO.succeed(elem)
   }
 
-  def xml(name: String, elem: Xml.Element): From = new FromXml(name, elem)
+  def xml(name: String, elem: ScalaXml.Element): From = new FromXml(name, elem)
 
   private final class FromString(
     name: String,
@@ -37,7 +37,7 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: IO[Effects.Error, Xml.Element] = Effects.effect(Xml.loadFromString(string))
+    override def load: IO[Effects.Error, ScalaXml.Element] = Effects.effect(ScalaXml.loadFromString(string))
   }
 
   def string(name: String, string: String): From = new FromString(name, string)
@@ -47,7 +47,7 @@ object From {
   {
     override def toString: String = s"From.url($fromUrl, isRedirect=$isRedirect)"
     override def url: Option[URL] = Some(fromUrl)
-    override def load: IO[Effects.Error, Xml.Element] = Effects.effect(Xml.loadFromUrl(fromUrl))
+    override def load: IO[Effects.Error, ScalaXml.Element] = Effects.effect(ScalaXml.loadFromUrl(fromUrl))
   }
 
   def url(url: URL): From = new FromUrl(url, false)
@@ -64,8 +64,8 @@ object From {
     override def isRedirect: Boolean = false
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
-    override def load: IO[Effects.Error, Xml.Element] = url
-      .map(url => Effects.effect(Xml.loadFromUrl(url)))
+    override def load: IO[Effects.Error, ScalaXml.Element] = url
+      .map(url => Effects.effect(ScalaXml.loadFromUrl(url)))
       .getOrElse(IO.fail(s"Resource not found: $this"))
   }
 

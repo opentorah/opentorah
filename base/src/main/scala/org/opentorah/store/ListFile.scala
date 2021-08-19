@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Element, Elements, Parsable, PrettyPrinter}
+import org.opentorah.xml.{Element, Elements, Parsable, PrettyPrinter, ScalaXml}
 import java.net.URL
 
 final class ListFile[M, W <: AnyRef](
@@ -12,7 +12,7 @@ final class ListFile[M, W <: AnyRef](
 ) {
   def write(entries: Seq[M]): Unit = Files.write(
     file = Files.url2file(url),
-    content = PrettyPrinter.default.renderXml(list.xmlElement(entries))
+    content = PrettyPrinter.default.renderWithHeader(ScalaXml)(list.xmlElement(entries))
   )
 
   def get: Caching.Parser[W] = Caching.getCached[W](

@@ -1,6 +1,6 @@
 package org.opentorah.calendar.paper
 
-import org.opentorah.xml.{PrettyPrinter, Xml}
+import org.opentorah.xml.{PrettyPrinter, ScalaXml}
 import java.io.{File, FileOutputStream, PrintStream}
 
 object Table {
@@ -19,7 +19,7 @@ final case class Table(rows: Int*)(columns: Table.Column*) {
 
   //             <row>{for (c <- columns) yield <entry>{c.subheading}</entry>}</row>
   def writeDocbook(directory: File, name: String): Unit = {
-    val xml: Xml.Element =
+    val element: ScalaXml.Element =
       <informaltable xmlns="http://docbook.org/ns/docbook" version="5.0" frame="all" xml:id={name}>
         <tgroup cols={columns.length.toString}>
           <thead>
@@ -34,7 +34,7 @@ final case class Table(rows: Int*)(columns: Table.Column*) {
 
     val out: PrintStream = new PrintStream(new FileOutputStream(new File(directory, name + ".xml")))
     out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-    out.print(PrettyPrinter.default.render(xml))
+    out.print(PrettyPrinter.default.render(ScalaXml)(element))
     out.println()
   }
 }

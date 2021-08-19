@@ -31,7 +31,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
   final def writeDirectory(): Caching.Parser[Unit] =
     ZIO.foreach(
       Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
-    )(name =>  getFile(name) >>= (file=> entryMaker(name, file)))
+    )(name => getFile(name).flatMap(file=> entryMaker(name, file)))
       .map(listFile.write)
 
   final def getDirectory: Caching.Parser[W] = listFile.get

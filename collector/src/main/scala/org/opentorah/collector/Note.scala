@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Directory}
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Note(
@@ -12,8 +12,8 @@ final class Note(
 ) extends Directory.Entry(name) with HtmlContent[Site] {
 
   override def htmlHeadTitle: Option[String] = title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
-  override def content(site: Site): Caching.Parser[Xml.Element] = site.notes.getFile(this).map(_.content)
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+  override def content(site: Site): Caching.Parser[ScalaXml.Element] = site.notes.getFile(this).map(_.content)
 }
 
 object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {

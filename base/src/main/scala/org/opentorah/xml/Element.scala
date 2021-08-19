@@ -16,10 +16,10 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
   final override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A] =
     parser.asInstanceOf[Parser[A]]
 
-  override def xmlElement(value: A): Xml.Element =
-    Xml.setAttributes(
+  override def xmlElement(value: A): ScalaXml.Element =
+    ScalaXml.setAttributes(
       contentParsable.unparser.attributes(value),
-      contentParsable.unparser.namespace.fold(<elem/>)(_.default.declare(<elem/>))
+      contentParsable.unparser.namespace.fold(<elem/>)(namespace => ScalaXml.declareNamespace(namespace.default, <elem/>))
     ).copy(
       label = elementName,
       child = contentParsable.unparser.content(value)
@@ -29,9 +29,9 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
 object Element {
   def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
 
-  val nodes: Parsable[Xml.Nodes] = new Parsable[Xml.Nodes] {
-    override protected def parser: Parser[Xml.Nodes] = Context.allNodes
-    override def unparser: Unparser[Xml.Nodes] = Unparser[Xml.Nodes](content = identity)
+  val nodes: Parsable[ScalaXml.Nodes] = new Parsable[ScalaXml.Nodes] {
+    override protected def parser: Parser[ScalaXml.Nodes] = Context.allNodes
+    override def unparser: Unparser[ScalaXml.Nodes] = Unparser[ScalaXml.Nodes](content = identity)
   }
 
 //  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {

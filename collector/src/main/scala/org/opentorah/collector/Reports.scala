@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Selector, Store}
-import org.opentorah.xml.{Parser, Xml}
+import org.opentorah.xml.{Parser, ScalaXml}
 import zio.ZIO
 
 object Reports extends By with HtmlContent[Site] {
@@ -17,9 +17,9 @@ object Reports extends By with HtmlContent[Site] {
   val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
   override def acceptsIndexHtml: Boolean = true
 
-  override def content(site: Site): Parser[Xml.Element] =
+  override def content(site: Site): Parser[ScalaXml.Element] =
     ZIO.succeed(<div>{reports.map(report => <l>{report.a(site)(text = report.title)}</l>)}</div>)
 }

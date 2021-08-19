@@ -16,36 +16,36 @@ object Catalog extends Dialect with Doctype {
   def write(
     file: File,
     replace: Boolean,
-    content: Xml.Nodes
+    content: ScalaXml.Nodes
   ): Unit = PrettyPrinter.default.write(
     file = file,
     replace = replace,
     doctype = Some(Catalog),
-    elem = catalog(content)
+    element = catalog(content)
   )
 
-  def catalog(content: Xml.Nodes): Xml.Element =
+  def catalog(content: ScalaXml.Nodes): ScalaXml.Element =
     <catalog xmlns={namespace.uri} prefer="public">{content}</catalog>
 
-  def group(base: String, content: Xml.Nodes): Xml.Element =
+  def group(base: String, content: ScalaXml.Nodes): ScalaXml.Element =
     <group xml:base={base}>{content}</group>
 
   // There seems to be some confusion with the rewriteURI form:
   // Catalog DTD requires 'uriIdStartString' attribute (and that is what IntelliJ wants),
   // but XMLResolver looks for the 'uriStartString' attribute (and this seems to work in Oxygen).
-  def rewriteUri(rewritePrefix: String, uriStartString: String): Xml.Element =
+  def rewriteUri(rewritePrefix: String, uriStartString: String): ScalaXml.Element =
     <rewriteURI rewritePrefix={rewritePrefix} uriStartString={uriStartString}/>
 
-  def rewriteSystem(rewritePrefix: String, systemIdStartString: String): Xml.Element =
+  def rewriteSystem(rewritePrefix: String, systemIdStartString: String): ScalaXml.Element =
     <rewriteSystem rewritePrefix={rewritePrefix} systemIdStartString={systemIdStartString}/>
 
-  def public(publicId: String, uri: String): Xml.Element =
+  def public(publicId: String, uri: String): ScalaXml.Element =
     <public publicId={publicId} uri={uri}/>
 
-  def nextCatalog(catalog: String): Xml.Element =
+  def nextCatalog(catalog: String): ScalaXml.Element =
     <nextCatalog catalog={catalog}/>
 
-  def nextCatalogSystem: Xml.Element =
+  def nextCatalogSystem: ScalaXml.Element =
     nextCatalog("/etc/xml/catalog")
 
   def dtd(substitutions: Map[String, String]): String = substitutions.toSeq.map {

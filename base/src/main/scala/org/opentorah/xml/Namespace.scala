@@ -45,19 +45,6 @@ sealed trait Namespace {
     new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
-
-  // Scala XML
-  final def declare(element: Xml.Element): Xml.Element = Xml.declareNamespace(this, element)
-
-  // DOM
-  final def ensureDeclared(element: Dom.Element): Unit = if (!isDeclared(element)) declare(element)
-  final def isDeclared(element: Dom.Element): Boolean = Dom.isNamespaceDeclared(this, element)
-  final def declare(element: Dom.Element): Unit = Dom.declareNamespace(this, element)
-
-  // SAX
-  final def ensureDeclared(attributes: org.xml.sax.helpers.AttributesImpl): Unit = if (!isDeclared(attributes)) declare(attributes)
-  final def isDeclared(attributes: org.xml.sax.helpers.AttributesImpl): Boolean = Sax.isNamespaceDeclared(this, attributes)
-  final def declare(attributes: org.xml.sax.helpers.AttributesImpl): Unit = Sax.declareNamespace(this, attributes)
 }
 
 object Namespace {
@@ -126,15 +113,4 @@ object Namespace {
     prefix = Option(prefix),
     uri = Option(uri)
   )
-
-  // Scala XML
-  def get(element: Xml.Element): Namespace = Xml.getNamespace(element)
-  def getAll(element: Xml.Element): Seq[Namespace] = Xml.getNamespaces(element)
-
-  // DOM
-  def get(element: Dom.Element): Namespace = Dom.getNamespace(element)
-  def getAll(element: Dom.Element): Seq[Namespace] = Dom.getNamespaces(element)
-
-  // SAX
-  def getAll(attributes: org.xml.sax.Attributes): Seq[Namespace] = Sax.getNamespaces(attributes)
 }

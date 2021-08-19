@@ -4,7 +4,7 @@ import org.opentorah.util.Collections
 
 final class Unparser[A] private(
   val attributes: A => Attribute.Values,
-  val content: A => Seq[Xml.Node],
+  val content: A => Seq[ScalaXml.Node],
   val namespace: Option[Namespace]
 )
 
@@ -12,7 +12,7 @@ object Unparser {
 
   def apply[A](
     attributes: A => Attribute.Values = (_: A) => Seq.empty,
-    content   : A => Xml.Nodes        = (_: A) => Seq.empty,
+    content   : A => ScalaXml.Nodes   = (_: A) => Seq.empty,
     namespace : Option[Namespace]     = None
   ): Unparser[A] = new Unparser[A](
     attributes,

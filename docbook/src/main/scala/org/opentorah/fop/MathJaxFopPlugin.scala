@@ -8,7 +8,7 @@ import org.apache.xmlgraphics.image.loader.impl.{AbstractImagePreloader, ImageXM
 import org.apache.xmlgraphics.image.loader.spi.{ImageConverter, ImageLoaderFactory, ImagePreloader}
 import org.apache.xmlgraphics.image.loader.{ImageContext, ImageInfo}
 import org.opentorah.mathjax.MathML
-import org.opentorah.xml.Namespace
+import org.opentorah.xml.Dom
 import org.w3c.dom.svg.SVGDocument
 import org.w3c.dom.{DOMImplementation, Document}
 
@@ -62,7 +62,7 @@ final class MathJaxFopPlugin(mathJax: MathJaxRunner) extends FopPlugin {
       if (!src.isInstanceOf[DOMSource]) null else {
         val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
-        if (MathML.namespace.getUri != Namespace.get(document.getDocumentElement).getUri) null else {
+        if (MathML.namespace.getUri != Dom.getNamespace(document.getDocumentElement).getUri) null else {
           val svgDocument: SVGDocument = mathJax.typeset(document)
           val sizes: Sizes = Sizes(svgDocument)
           // convert sizes from exs to points:

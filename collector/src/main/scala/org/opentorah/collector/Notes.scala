@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Directory, Selector, Store}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.UIO
 import java.net.URL
 
@@ -27,10 +27,10 @@ final class Notes(
   )
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
   override def acceptsIndexHtml: Boolean = true
 
-  override def content(site: Site): Caching.Parser[Xml.Element] = directoryEntries.map(notes =>
+  override def content(site: Site): Caching.Parser[ScalaXml.Element] = directoryEntries.map(notes =>
     <div>{notes.sortBy(_.title).map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
 }
 

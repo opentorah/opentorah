@@ -5,14 +5,14 @@ import org.opentorah.tei.{EntityRelated, EntityType, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Selector, Store}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, ContentType, Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 
 final class EntityLists(
   override val selector: Selector,
   val lists: Seq[EntityLists.EntityList]
 ) extends By with HtmlContent[Site] {
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
   private var list2entities: Option[Map[EntityLists.EntityList, Seq[Entity]]] = None
   private var nonEmptyLists: Option[Seq[EntityLists.EntityList]] = None
@@ -32,12 +32,12 @@ final class EntityLists(
       nonEmptyLists = Some(lists.filterNot(list => result(list).isEmpty))
     }
 
-  override def content(site: Site): Caching.Parser[Xml.Element] = for { _ <- setUp(site) } yield {
+  override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {_ <- setUp(site)} yield {
     <div>
       <p>{nonEmptyLists.get.map(list => <l>{a(site).setFragment(list.names.name)(xml = list.title)}</l>)}</p>
       {nonEmptyLists.get.map(list =>
       <list id={list.names.name}>
-        <head xmlns={Tei.namespace.uri}>{list.title.xml}</head>
+        <head xmlns={Tei.namespace.uri}>{list.title.content}</head>
         {list2entities.get(list).map(entity => <l>{entity.a(site)(text = entity.mainName)}</l>)}
       </list>
     )}</div>

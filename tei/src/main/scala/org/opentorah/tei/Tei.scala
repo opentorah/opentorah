@@ -2,7 +2,7 @@ package org.opentorah.tei
 
 import org.opentorah.util.Files
 import org.opentorah.html
-import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, ScalaXml, Unparser}
 import zio.{Has, URIO}
 import java.net.URI
 
@@ -42,8 +42,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
   def concat[A](unparsers: Unparser[A]*): Unparser[A] =
     Unparser.concatInNamespace(Tei.namespace, unparsers)
 
-  override protected def isEndNote(element: Xml.Element): Boolean =
-    (element.label == "note") && placeAttribute.get(element).contains("end")
+  override protected def isEndNote(element: ScalaXml.Element): Boolean =
+    (ScalaXml.getName(element) == "note") && placeAttribute.get(ScalaXml)(element).contains("end")
 
   private val targetAttribute: Attribute.Required[String] = Attribute("target").required
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
@@ -56,13 +56,13 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
   // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
   // based on the 'rendition' itself.
   // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
-  override protected def elementTransform(element: Xml.Element): URIO[Has[LinksResolver], Xml.Element] = {
-    val children: Xml.Nodes = Xml.getChildren(element)
+  override protected def elementTransform(element: ScalaXml.Element): URIO[Has[LinksResolver], ScalaXml.Element] = {
+    val children: ScalaXml.Nodes = ScalaXml.getChildren(element)
 
-    element.label match {
+    ScalaXml.getName(element) match {
       case label if EntityType.isName(label) =>
-        require(!Xml.isEmpty(children), element)
-        val ref: Option[String] = EntityName.refAttribute.get(element)
+        require(!ScalaXml.isEmpty(children), element)
+        val ref: Option[String] = EntityName.refAttribute.get(ScalaXml)(element)
 
         if (ref.isEmpty) URIO.succeed(html.a()(children))
         else URIO.accessM[Has[LinksResolver]](_.get.findByRef(ref.get)).map(_.
@@ -71,17 +71,17 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
         )
 
       case "ref" =>
-        require(!Xml.isEmpty(children), element)
+        require(!ScalaXml.isEmpty(children), element)
         reference(element).map(_(children))
 
       case "ptr" =>
-        require(Xml.isEmpty(children), element)
+        require(ScalaXml.isEmpty(children), element)
         reference(element).map(_(Seq.empty))
 
       // TODO feed pageId through State to obtain unique id
       case Pb.elementName =>
-        require(Xml.isEmpty(children), element)
-        val pageId: String = Pb.pageId(Pb.nAttribute.get(element))
+        require(ScalaXml.isEmpty(children), element)
+        val pageId: String = Pb.pageId(Pb.nAttribute.get(ScalaXml)(element))
         URIO.accessM[Has[LinksResolver]](_.get.facs(pageId)).map(_
           .getOrElse(html.a(Seq(pageId)))
           .copy(id = Some(pageId))
@@ -90,8 +90,8 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
 
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
-        require(Xml.isEmpty(children), element)
-        URIO.succeed(<img src={urlAttribute.get(element)}/>)
+        require(ScalaXml.isEmpty(children), element)
+        URIO.succeed(<img src={urlAttribute.get(ScalaXml)(element)}/>)
 
       case "table" =>
         URIO.succeed(<table>{children}</table>)
@@ -102,15 +102,15 @@ object Tei extends Element[Tei]("TEI") with Dialect with html.ToHtml[Has[LinksRe
         URIO.succeed(<tr>{children}</tr>)
 
       case "cell" =>
-        URIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
+        URIO.succeed(<td colspan={colsAttribute.get(ScalaXml)(element).orNull}>{children}</td>)
 
       case _ =>
         URIO.succeed(element)
     }
   }
 
-  private def reference(element: Xml.Element): URIO[Has[LinksResolver], html.a] = {
-    val uri: URI = new URI(targetAttribute.get(element))
+  private def reference(element: ScalaXml.Element): URIO[Has[LinksResolver], html.a] = {
+    val uri: URI = new URI(targetAttribute.get(ScalaXml)(element))
 
     // TODO maybe just call up regardless?
     if (uri.isAbsolute) URIO.succeed(html.a(uri))

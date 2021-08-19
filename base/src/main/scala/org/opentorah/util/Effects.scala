@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import zio.blocking.Blocking
-import zio.{IO, Runtime, Task, UIO, ZIO}
+import zio.{IO, Runtime, Task, ZIO}
 
 object Effects {
 
@@ -13,10 +13,10 @@ object Effects {
   private def throwable2error[R, A](zio: ZIO[R, Throwable, A]): ZIO[R, Error, A] =
     zio.mapError(_.getMessage)
 
-  val ok: IO[Error, Unit] = IO.succeed(())
+  val ok: IO[Error, Unit] = ZIO.succeed(())
 
   def check(condition: Boolean, message: => String): IO[Error, Unit] =
-    if (condition) ok else IO.fail(message)
+    if (condition) ok else ZIO.fail(message)
 
   // Note: when running with 1 cpu (on Cloud Run or in local Docker),
   // take care to avoid deadlocks:
@@ -27,6 +27,7 @@ object Effects {
   def unsafeRun[E, A](io: => IO[E, A]): A =
     blockingRuntime.unsafeRun[E, A](io)
 
+  // Note: run effects on the blocking threadpool:
   def effectTotal[A](effect: => A): Task[A] =
     Blocking.Service.live.effectBlocking(effect)
 
@@ -38,7 +39,7 @@ object Effects {
     runs <- ZIO.foreach(zios)(_.either)
     errors: Seq[Error] = runs.flatMap(_.left.toOption)
     results: Seq[A] = runs.flatMap(_.toOption)
-    results <- if (errors.nonEmpty) IO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else IO.succeed(results)
+    results <- if (errors.nonEmpty) ZIO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else ZIO.succeed(results)
   } yield results
 
   def mapValues[R, A, B, C](map: Map[A, B])(f: B => ZIO[R, Error, C]): ZIO[R, Error, Map[A, C]] =

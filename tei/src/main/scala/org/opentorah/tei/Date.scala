@@ -1,11 +1,11 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml}
 
 final case class Date(
   when: String,
   calendar: Option[String],
-  xml: Xml.Nodes
+  xml: ScalaXml.Nodes
 )
 
 object Date extends Element[Date]("date") {

@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Xml}
 
 final case class EntityReference(
   entityType: EntityType,
-  name: Xml.Nodes,
+  name: ScalaXml.Nodes,
   id: Option[String],
   role: Option[String],
   ref: Option[String]

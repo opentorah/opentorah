@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Element, Parsable, Parser, ScalaXml}
 
 final case class Creation(
   date: Date,
-  xml: Xml.Nodes
+  xml: ScalaXml.Nodes
 )
 
 object Creation extends Element[Creation]("creation") {

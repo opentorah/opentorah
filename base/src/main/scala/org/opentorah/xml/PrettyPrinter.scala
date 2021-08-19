@@ -16,43 +16,36 @@ final case class PrettyPrinter(
   keepEmptyElements: Set[String] = Set.empty,
   preformattedElements: Set[String] = Set.empty
 ) {
-  def renderXml(element: Xml.Element): String = renderXml(element, doctype = None)
-  def renderXml(element: Xml.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
-  def renderXml(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = true, doctype)
 
-  def write(
-    file: File,
-    replace: Boolean,
-    doctype: Option[Doctype] = None,
-    elem: Xml.Element
-  ): Unit = Files.write(
-    file,
-    replace,
-    content = renderXml(element = elem, doctype)
-  )
+  def render(
+    xml: Xml,
+    doctype: Option[Doctype] = None
+  )(
+    element: xml.Element
+  ): String = render(xml, addXmlHeader = false, doctype = doctype)(element)
 
-  def render(element: Xml.Element): String = render(element, doctype = None)
-  def render(element: Xml.Element, doctype: Doctype): String = render(element, doctype = Some(doctype))
-  def render(element: Xml.Element, doctype: Option[Doctype]): String = render(Xml)(element, addXmlHeader = false, doctype)
-
-  def renderXml(element: Dom.Element): String = renderXml(element, doctype = None)
-  def renderXml(element: Dom.Element, doctype: Doctype): String = renderXml(element, doctype = Some(doctype))
-  def renderXml(element: Dom.Element, doctype: Option[Doctype]): String = render(Dom)(element, addXmlHeader = true, doctype)
-  def render(element: Dom.Element): String = render(element, doctype = None)
-  def render(element: Dom.Element, doctype: Doctype): String = render(element, doctype = Some(doctype))
-  def render(element: Dom.Element, doctype: Option[Doctype]): String = render(Dom)(element, addXmlHeader = false, doctype)
+  def renderWithHeader(
+    xml: Xml,
+    doctype: Option[Doctype] = None
+  )(
+    element: xml.Element
+  ): String =  render(xml, addXmlHeader = true, doctype = doctype)(element)
 
   private def render(
-    model: Model,
-  )(
-    element: model.Element,
+    xml: Xml,
     addXmlHeader: Boolean,
     doctype: Option[Doctype]
+  )(
+    element: xml.Element
   ): String = {
-    val forModel: ForModel = new ForModel(model)
+    val prefix: String =
+      (if (!addXmlHeader) "" else Xml.header + "\n") +
+      doctype.fold("")(doctype => doctype.doctype + "\n")
+
+    val forModel: ForModel = new ForModel(xml)
 
     val result: String = forModel.fromElement(
-      element.asInstanceOf[forModel.model.Element], // yuck...
+      element.asInstanceOf[forModel.xml.Element], // TODO: yuck...
       parent = None,
       canBreakLeft = true,
       canBreakRight = true
@@ -60,23 +53,32 @@ final case class PrettyPrinter(
       .render(width)
       .replace(PrettyPrinter.hiddenNewline, "\n")
 
-    (if (!addXmlHeader) "" else Xml.header + "\n") +
-    doctype.fold("")(doctype => doctype.doctype + "\n") +
-    result + "\n"
+    prefix + result + "\n"
   }
 
-  // Note: methods below all need access to model: Model, often - for the types of parameters, so parameter model
-  // must come first, and thus can not be implicit; it is cleaner to scope them in a class with model a constructor parameter.
-  private final class ForModel(val model: Model) {
+  def write(
+    file: File,
+    replace: Boolean,
+    doctype: Option[Doctype] = None,
+    element: ScalaXml.Element
+  ): Unit = Files.write(
+    file,
+    replace,
+    content = renderWithHeader(ScalaXml, doctype)(element)
+  )
 
-    private def fromPreformattedElement(element: model.Element, parent: Option[model.Element]): Seq[String] = {
+  // Note: methods below all need access to xml: Xml, often - for the types of parameters, so parameter 'xml'
+  // must come first, and thus can not be implicit; it is cleaner to scope them in a class with 'xml' a constructor parameter.
+  private final class ForModel(val xml: Xml) {
+
+    private def fromPreformattedElement(element: xml.Element, parent: Option[xml.Element]): Seq[String] = {
       val attributeValues: Seq[Attribute.Value[String]] = getAttributeValues(element, parent)
       val attributes: String = if (attributeValues.isEmpty) "" else attributeValues
         .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueToString.get + "\"")
         .mkString(" ", ", ", "")
 
       val children: Seq[String] =
-        model.getChildren(element).flatMap(node => fromPreformattedNode(node, Some(element)))
+        xml.getChildren(element).flatMap(node => fromPreformattedNode(node, Some(element)))
 
       val name: String = getName(element)
 
@@ -86,8 +88,8 @@ final case class PrettyPrinter(
     }
 
     def fromElement(
-      element: model.Element,
-      parent: Option[model.Element],
+      element: xml.Element,
+      parent: Option[xml.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
@@ -101,13 +103,13 @@ final case class PrettyPrinter(
           Doc.text("\"" + encodeXmlSpecials(attributeValue.valueToString.get) + "\"")
         ))
 
-      val nodes: model.Nodes = atomize(Seq.empty, model.getChildren(element))
-      val whitespaceLeft: Boolean = nodes.headOption.exists(model.isWhitespace)
-      val whitespaceRight: Boolean = nodes.lastOption.exists(model.isWhitespace)
-      val charactersLeft: Boolean = nodes.headOption.exists(model.isCharacters)
-      val charactersRight: Boolean = nodes.lastOption.exists(model.isCharacters)
-      val chunks: Seq[model.Nodes] = chunkify(Seq.empty, Seq.empty, nodes, flush = false)
-      val noText: Boolean = chunks.forall(_.forall(!model.isText(_)))
+      val nodes: xml.Nodes = atomize(Seq.empty, xml.getChildren(element))
+      val whitespaceLeft: Boolean = nodes.headOption.exists(xml.isWhitespace)
+      val whitespaceRight: Boolean = nodes.lastOption.exists(xml.isWhitespace)
+      val charactersLeft: Boolean = nodes.headOption.exists(xml.isCharacters)
+      val charactersRight: Boolean = nodes.lastOption.exists(xml.isCharacters)
+      val chunks: Seq[xml.Nodes] = chunkify(Seq.empty, Seq.empty, nodes, flush = false)
+      val noText: Boolean = chunks.forall(_.forall(!xml.isText(_)))
 
       val children: Seq[Doc] = {
         val canBreakLeft1 = canBreakLeft || whitespaceLeft
@@ -123,7 +125,7 @@ final case class PrettyPrinter(
         }
       }
 
-      val label: String = model.getName(element)
+      val label: String = xml.getName(element)
       val name: String = getName(element)
 
       if (children.isEmpty) {
@@ -162,62 +164,62 @@ final case class PrettyPrinter(
       }
     }
 
-    private def getName(element: model.Element): String =
-      model.getPrefix(element).fold("")(_ + ":") + model.getName(element)
+    private def getName(element: xml.Element): String =
+      xml.getPrefix(element).fold("")(_ + ":") + xml.getName(element)
 
-    private def getAttributeValues(element: model.Element, parent: Option[model.Element]): Seq[Attribute.Value[String]] = {
-      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(model.getNamespaces)
-      model.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
-      model.getAttributes(element).filterNot(_.value.isEmpty)
+    private def getAttributeValues(element: xml.Element, parent: Option[xml.Element]): Seq[Attribute.Value[String]] = {
+      val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(xml.getNamespaces)
+      xml.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
+      xml.getAttributes(element).filterNot(_.value.isEmpty)
     }
 
     @scala.annotation.tailrec
-    private def atomize(result: model.Nodes, nodes: model.Nodes): model.Nodes =
+    private def atomize(result: xml.Nodes, nodes: xml.Nodes): xml.Nodes =
       if (nodes.isEmpty) result else {
-        val (texts: model.Nodes, tail: model.Nodes) = nodes.span(model.isText)
+        val (texts: xml.Nodes, tail: xml.Nodes) = nodes.span(xml.isText)
 
-        val newResult: model.Nodes = if (texts.isEmpty) result else result ++
+        val newResult: xml.Nodes = if (texts.isEmpty) result else result ++
           processText(Seq.empty, texts.head,
-            Strings.squashBigWhitespace(texts.map(model.asText).map(model.getText).mkString("")))
+            Strings.squashBigWhitespace(texts.map(xml.asText).map(xml.getText).mkString("")))
 
         if (tail.isEmpty) newResult
         else atomize(newResult :+ tail.head, tail.tail)
       }
 
     @scala.annotation.tailrec
-    private def processText(result: Seq[model.Text], seed: model.Node, text: String): Seq[model.Text] =
+    private def processText(result: Seq[xml.Text], seed: xml.Node, text: String): Seq[xml.Text] =
       if (text.isEmpty) result else {
         val (spaces: String, tail: String) = text.span(_ == ' ')
-        val newResult = if (spaces.isEmpty) result else result :+ model.mkText(" ", seed)
+        val newResult = if (spaces.isEmpty) result else result :+ xml.mkText(" ", seed)
         val (word: String, tail2: String) = tail.span(_ != ' ')
 
         if (word.isEmpty) newResult
-        else processText(newResult :+ model.mkText(word, seed), seed, tail2)
+        else processText(newResult :+ xml.mkText(word, seed), seed, tail2)
       }
 
     @scala.annotation.tailrec
     private def chunkify(
-      result: Seq[model.Nodes],
-      current: model.Nodes,
-      nodes: model.Nodes,
+      result: Seq[xml.Nodes],
+      current: xml.Nodes,
+      nodes: xml.Nodes,
       flush: Boolean
-    ): Seq[model.Nodes] =
+    ): Seq[xml.Nodes] =
       if (flush) chunkify(result :+ current.reverse, Nil, nodes, flush = false) else (current, nodes) match {
         case (Nil    , Nil    ) => result
         case (_      , Nil    )                                           => chunkify(result, current     , Nil     , flush = true )
-        case (Nil    , n :: ns) if  model.isWhitespace(n)                 => chunkify(result, Nil         , ns      , flush = false)
-        case (_      , n :: ns) if  model.isWhitespace(n)                 => chunkify(result, current     , ns      , flush = true )
-        case (Nil    , n :: ns) if !model.isWhitespace(n)                 => chunkify(result, n :: Nil    , ns      , flush = false)
-        case (c :: cs, n :: ns) if !model.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns      , flush = false)
-        case (c :: _ , n :: ns) if !model.isWhitespace(n) && !cling(c, n) => chunkify(result, current     , n :: ns , flush = true )
+        case (Nil    , n :: ns) if  xml.isWhitespace(n)                 => chunkify(result, Nil         , ns      , flush = false)
+        case (_      , n :: ns) if  xml.isWhitespace(n)                 => chunkify(result, current     , ns      , flush = true )
+        case (Nil    , n :: ns) if !xml.isWhitespace(n)                 => chunkify(result, n :: Nil    , ns      , flush = false)
+        case (c :: cs, n :: ns) if !xml.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns      , flush = false)
+        case (c :: _ , n :: ns) if !xml.isWhitespace(n) && !cling(c, n) => chunkify(result, current     , n :: ns , flush = true )
       }
 
-    private def cling(c: model.Node, n: model.Node): Boolean = model.isText(c) || model.isText(n) ||
-      (model.isElement(n) && clingyElements.contains(model.getName(model.asElement(n))))
+    private def cling(c: xml.Node, n: xml.Node): Boolean = xml.isText(c) || xml.isText(n) ||
+      (xml.isElement(n) && clingyElements.contains(xml.getName(xml.asElement(n))))
 
     private def fromChunk(
-      nodes: model.Nodes,
-      parent: Option[model.Element],
+      nodes: xml.Nodes,
+      parent: Option[xml.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc = {
@@ -231,29 +233,29 @@ final case class PrettyPrinter(
       })
     }
 
-    private def fromPreformattedNode(node: model.Node, parent: Option[model.Element]): Seq[String] =
-      if (model.isElement(node)) fromPreformattedElement(model.asElement(node), parent)
-      else if (model.isText(node)) preformattedLines(model.getText(model.asText(node)))
-      else preformattedLines(model.toString(node))
+    private def fromPreformattedNode(node: xml.Node, parent: Option[xml.Element]): Seq[String] =
+      if (xml.isElement(node)) fromPreformattedElement(xml.asElement(node), parent)
+      else if (xml.isText(node)) preformattedLines(xml.getText(xml.asText(node)))
+      else preformattedLines(xml.toString(node))
 
     private def fromNode(
-      node: model.Node,
-      parent: Option[model.Element],
+      node: xml.Node,
+      parent: Option[xml.Element],
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc =
-      if (model.isElement(node)) {
-        val element: model.Element = model.asElement(node)
-        if (preformattedElements.contains(model.getName(element)))
+      if (xml.isElement(node)) {
+        val element: xml.Element = xml.asElement(node)
+        if (preformattedElements.contains(xml.getName(element)))
           Doc.text(fromPreformattedElement(element, parent).mkString(PrettyPrinter.hiddenNewline))
         else {
           val result: Doc = fromElement(element, parent, canBreakLeft, canBreakRight)
           // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-          if (canBreakRight && model.getName(element) == "lb") result + Doc.hardLine else result
+          if (canBreakRight && xml.getName(element) == "lb") result + Doc.hardLine else result
         }
       }
-      else if (model.isText(node)) Doc.text(encodeXmlSpecials(model.getText(model.asText(node))))
-      else Doc.paragraph(model.toString(node))
+      else if (xml.isText(node)) Doc.text(encodeXmlSpecials(xml.getText(xml.asText(node))))
+      else Doc.paragraph(xml.toString(node))
   }
 
   private def preformattedLines(string: String): Seq[String] =
@@ -268,7 +270,7 @@ final case class PrettyPrinter(
 object PrettyPrinter {
 
   trait Recognizer {
-    def recognize(model: Model)(element: model.Element): (PrettyPrinter, Option[Doctype])
+    def recognize(xml: Xml)(element: xml.Element): (PrettyPrinter, Option[Doctype])
   }
 
   // The only way I found to not let Paiges screw up indentation in the <pre><code>..</code></pre> blocks
@@ -279,18 +281,18 @@ object PrettyPrinter {
 
   val default: PrettyPrinter = new PrettyPrinter
 
-  def prettyPrint(roots: List[File], model: Model, recognizer: Recognizer): Unit = {
+  def prettyPrint(roots: List[File], xml: Xml, recognizer: Recognizer): Unit = {
     val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
     val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)
     xmlFiles.foreach { file =>
       // Note: Scala XML ignores XML comments when parsing a file
       // (see https://github.com/scala/scala-xml/issues/508);
       // using Dom instead; use Dom to keep them...
-      val element: model.Element = model.loadFromUrl(Files.file2url(file))
-      val (prettyPrinter, doctype) = recognizer.recognize(model)(element)
+      val element: xml.Element = xml.loadFromUrl(Files.file2url(file))
+      val (prettyPrinter, doctype) = recognizer.recognize(xml)(element)
       Files.write(
         file = file,
-        content = prettyPrinter.render(model)(element, addXmlHeader = true, doctype)
+        content = prettyPrinter.render(xml, addXmlHeader = true, doctype)(element)
       )
     }
   }

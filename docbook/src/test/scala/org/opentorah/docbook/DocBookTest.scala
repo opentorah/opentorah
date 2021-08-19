@@ -1,7 +1,7 @@
 package org.opentorah.docbook
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Dom, Resolver, Xml}
+import org.opentorah.xml.{Dom, Resolver, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import java.io.File

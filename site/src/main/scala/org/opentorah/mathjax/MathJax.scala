@@ -1,7 +1,7 @@
 package org.opentorah.mathjax
 
 import org.opentorah.util.Json
-import org.opentorah.xml.Xml
+import org.opentorah.xml.ScalaXml
 
 /*
   THE PLAN:
@@ -30,7 +30,7 @@ import org.opentorah.xml.Xml
  */
 trait MathJax {
 
-  def body(payload: Xml.Nodes): Seq[Xml.Element]
+  def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element]
 
   final def htmlConfigurationString(configuration: MathJaxConfiguration): String =
     Json.fromMap(htmlConfiguration(configuration))
@@ -70,7 +70,7 @@ object MathJax {
   private object MathJax2 extends MathJax {
 
     // TODO? <script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"/>
-    override def body(payload: Xml.Nodes): Seq[Xml.Element] = Seq(
+    override def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element] = Seq(
       <script type="text/javascript">window.MathJax={payload};</script>,
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
     )
@@ -171,7 +171,7 @@ made clear that:
   // TODO https://docs.mathjax.org/en/latest/options/input/tex.html
   private object MathJax3 extends MathJax {
 
-    override def body(payload: Xml.Nodes): Seq[Xml.Element] = Seq(
+    override def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element] = Seq(
       <script
         src="https://polyfill.io/v3/polyfill.min.js?features=es6"/>,
       <script>MathJax = {payload};</script>,

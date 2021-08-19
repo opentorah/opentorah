@@ -3,10 +3,10 @@ package org.opentorah.xml
 import org.xml.sax.{InputSource, XMLFilter}
 
 // Note: declareNamespace() and setAttribute[s]() modify in-place.
-object Dom extends Model {
+object Dom extends Xml {
 
   override type Node = org.w3c.dom.Node
-  override type PreElement = org.w3c.dom.Element
+  override type Attributes = org.w3c.dom.Element
   override type Text = org.w3c.dom.Text
   override type Comment = org.w3c.dom.Comment
 
@@ -45,13 +45,13 @@ object Dom extends Model {
   override def getName(element: Element): String = element.getLocalName
   override def getPrefix(element: Element): Option[String] = Option(element.getPrefix)
 
-  override def getNamespace(element: Element): Namespace = Namespace(
-    uri = element.getNamespaceURI,
-    prefix = element.getPrefix
+  override def getNamespace(attributes: Attributes): Namespace = Namespace(
+    uri = attributes.getNamespaceURI,
+    prefix = attributes.getPrefix
   )
 
-  override def getNamespaces(element: Element): Seq[Namespace] = {
-    val list: org.w3c.dom.NamedNodeMap = element.getAttributes
+  override def getNamespaces(attributes: Attributes): Seq[Namespace] = {
+    val list: org.w3c.dom.NamedNodeMap = attributes.getAttributes
     for {
       index <- 0 until list.getLength
       attribute = list.item(index).asInstanceOf[org.w3c.dom.Attr]
@@ -72,25 +72,25 @@ object Dom extends Model {
     )
   }
 
-  override def isNamespaceDeclared(namespace: Namespace, element: Element): Boolean =
-    namespace.attribute.get(element) == namespace.getUri
+  override def isNamespaceDeclared(namespace: Namespace, attributes: Attributes): Boolean =
+    namespace.attribute.get(Dom)(attributes) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element = {
-    namespace.attributeValue.set(element)
+    setAttribute(namespace.attributeValue, element)
     element
   }
 
-  override protected def getAttributeValueString(attribute: Attribute[_], element: Element): Option[String] = {
+  override protected def getAttributeValueString(attribute: Attribute[_], attributes: Attributes): Option[String] = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     Option(
-      if (namespace.isDefault) element.getAttribute(name)
-      else element.getAttributeNS(namespace.getUri.orNull, name)
+      if (namespace.isDefault) attributes.getAttribute(name)
+      else attributes.getAttributeNS(namespace.getUri.orNull, name)
     )
   }
 
-  override def getAttributes(element: Element): Seq[Attribute.Value[String]] = {
-    val list: org.w3c.dom.NamedNodeMap = element.getAttributes
+  override def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]] = {
+    val list: org.w3c.dom.NamedNodeMap = attributes.getAttributes
     val result = for {
       index <- 0 until list.getLength
       attribute = list.item(index).asInstanceOf[org.w3c.dom.Attr]
@@ -115,7 +115,7 @@ object Dom extends Model {
     val valueStr: String = attribute.toString(value)
     if (namespace.isDefault) element.setAttribute(name, valueStr) else {
       // declare the attribute's namespace if it is not declared - unless the attribute *is* a namespace declaration ;)
-      if (namespace != Namespace.Xmlns) namespace.ensureDeclared(element)
+      if (namespace != Namespace.Xmlns) ensureNamespaceDeclared(namespace, element)
 
       element.setAttributeNS(namespace.getUri.orNull, namespace.qName(name), valueStr)
     }
