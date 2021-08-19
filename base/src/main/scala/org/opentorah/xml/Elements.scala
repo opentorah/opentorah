@@ -12,12 +12,12 @@ trait Elements[A] {
 
   protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A]
 
-  def xmlElement(value: A): Xml.Element =
+  def xmlElement(value: A): ScalaXml.Element =
     elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
   private def nested(
     from: Option[From],
-    nextElement: Xml.Element,
+    nextElement: ScalaXml.Element,
     element: Element[_]
   ): Parser[A] = Context.nested(
     from,
@@ -28,12 +28,12 @@ trait Elements[A] {
 
   private def optionalParser: Parser[Option[A]] = for {
     // TODO take namespace into account!
-    nextElement <- Context.nextElement(element => elementByName(element.label).isDefined)
+    nextElement <- Context.nextElement(element => elementByName(ScalaXml.getName(element)).isDefined)
     result <- nextElement
       .map(nextElement => nested(
         from = None,
         nextElement,
-        element = elementByName(nextElement.label).get
+        element = elementByName(ScalaXml.getName(nextElement)).get
       ).map(Some(_)))
       .getOrElse(ZIO.none)
   } yield result
@@ -41,7 +41,7 @@ trait Elements[A] {
   final def parse(from: From): Parser[A] = for {
     _ <- Context.checkNoLeftovers
     nextElement <- from.load
-    elementName = nextElement.label
+    elementName = ScalaXml.getName(nextElement)
     result <- elementByName(elementName)
       .map(element => nested(
         Some(from),
@@ -81,23 +81,23 @@ object Elements {
     def xml(value: A): C
   }
 
-  final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[Xml.Element]] {
+  final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[ScalaXml.Element]] {
     override protected def parser: Parser[Option[A]] = elements.optionalParser
-    override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.xmlElement)
+    override def xml(value: Option[A]): Option[ScalaXml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Option[A]] = Unparser[Option[A]](
       content = value => xml(value).toSeq
     )
   }
 
-  final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element] {
+  final class Required[A](elements: Elements[A]) extends Parsable[A, ScalaXml.Element] {
     override protected def parser: Parser[A] = Effects.required(elements.optionalParser, elements)
-    override def xml(value: A): Xml.Element = elements.xmlElement(value)
+    override def xml(value: A): ScalaXml.Element = elements.xmlElement(value)
     override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
     )
   }
 
-  final class Sequence[A](elements: Elements[A]) extends Parsable[Seq[A], Seq[Xml.Element]]{
+  final class Sequence[A](elements: Elements[A]) extends Parsable[Seq[A], Seq[ScalaXml.Element]]{
     override protected def parser: Parser[Seq[A]] = all(Seq.empty)
     private def all(acc: Seq[A]): Parser[Seq[A]] = for {
       next <- elements.optionalParser
@@ -105,7 +105,7 @@ object Elements {
         .map(next => all(acc :+ next))
         .getOrElse(ZIO.succeed(acc))
     } yield result
-    override def xml(value: Seq[A]): Seq[Xml.Element] = value.map(elements.xmlElement)
+    override def xml(value: Seq[A]): Seq[ScalaXml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Seq[A]] = Unparser[Seq[A]](
       content = value => xml(value)
     )

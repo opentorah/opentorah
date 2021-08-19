@@ -17,7 +17,7 @@ trait NamedCompanion {
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
   // - not final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Parser.run(Metadata.load[Key, Names](
+  lazy val toNames: Map[Key, Names] = Parser.unsafeRun(Metadata.load[Key, Names](
     from = From.resource(this, resourceName),
     content = Names.NamesMetadata,
     keys = values,

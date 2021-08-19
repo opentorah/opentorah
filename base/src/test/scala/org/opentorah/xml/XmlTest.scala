@@ -8,13 +8,13 @@ import java.net.URL
 final class XmlTest extends AnyFlatSpec with Matchers {
 
   def parseOrError[A](parser: Parser[A]): Either[Effects.Error, A] =
-    Parser.run(parser.either)
+    Parser.unsafeRun(parser.either)
 
-  def loadResource(model: Model, name: String): model.Element =
-    model.loadFromUrl(Parser.getClass.getResource(name + ".xml"))
+  def loadResource(xml: Xml, name: String): xml.Element =
+    xml.loadFromUrl(Parser.getClass.getResource(name + ".xml"))
 
-  def firstElement(element: Xml.Element): Xml.Element =
-    Xml.getChildren(element).filter(Xml.isElement).map(Xml.asElement).head
+  def firstElement(element: ScalaXml.Element): ScalaXml.Element =
+    ScalaXml.getChildren(element).filter(ScalaXml.isElement).map(ScalaXml.asElement).head
 
   "text parsing" should "work" in {
     parseOrError(
@@ -31,7 +31,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
         </s>))
     ).isLeft shouldBe true
 
-    Parser.run(
+    Parser.unsafeRun(
       new Element[String]("a") {
         override def contentType: ContentType = ContentType.Characters
 
@@ -44,7 +44,7 @@ final class XmlTest extends AnyFlatSpec with Matchers {
   }
 
   "From.resource()" should "work" in {
-    loadResource(Xml, "1")
+    loadResource(ScalaXml, "1")
   }
 
   private final class X(
@@ -82,50 +82,50 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     val r1 = resource("1")
     def checkUrl(url: URL, name: String): Unit = url.toString.endsWith(s"/$name.xml") shouldBe true
 
-    val direct: X = Parser.run(file2element.parse(resource("9")))
+    val direct: X = Parser.unsafeRun(file2element.parse(resource("9")))
     direct.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val followed: X = Parser.run(file2element.followRedirects.parse(r1))
+    val followed: X = Parser.unsafeRun(file2element.followRedirects.parse(r1))
     followed.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val redirect = Parser.run(file2element.orRedirect.parse(r1)).swap.toOption.get
+    val redirect = Parser.unsafeRun(file2element.orRedirect.parse(r1)).swap.toOption.get
     checkUrl(redirect.url, "2")
 
-    val redirected: X = Parser.run(redirect.followRedirects)
+    val redirected: X = Parser.unsafeRun(redirect.followRedirects)
     redirected.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withTrue: X = Parser.run(file2element.withRedirect(true).parse(r1)).toOption.get
+    val withTrue: X = Parser.unsafeRun(file2element.withRedirect(true).parse(r1)).toOption.get
     withTrue.name shouldBe "X"
     checkUrl(direct.fromUrl.url, "9")
 
-    val withFalse = Parser.run(file2element.withRedirect(false).parse(r1)).swap.toOption.get
+    val withFalse = Parser.unsafeRun(file2element.withRedirect(false).parse(r1)).swap.toOption.get
     checkUrl(withFalse.url, "2")
   }
 
   "Attribute.get()" should "work" in {
-    Attribute("id").optional.get(<x id="2"/>) shouldBe Some("2")
-    Attribute("id", Xml.namespace).optional.get(<x xml:id="3"/>) shouldBe Some("3")
+    Attribute("id").optional.get(ScalaXml)(<x id="2"/>) shouldBe Some("2")
+    Attribute("id", Xml.namespace).optional.get(ScalaXml)(<x xml:id="3"/>) shouldBe Some("3")
     Dom.getAttributes(loadResource(Dom, "namespace")) shouldBe Seq.empty
   }
 
   private val teiNamespace: Namespace = Namespace(prefix = "tei", uri = "http://www.tei-c.org/ns/1.0")
 
-  "Namespace.get()" should "work" in {
-    Namespace.get(<TEI/>) shouldBe Namespace.No
-    Namespace.get(<TEI xml:id="3"/>) shouldBe Namespace.No
-    Namespace.get(teiNamespace.declare(<tei:TEI/>)) shouldBe teiNamespace
-    Namespace.get(teiNamespace.declare(<TEI/>)) shouldBe Namespace.No
-    Namespace.get(teiNamespace.default.declare(<TEI/>)) shouldBe teiNamespace.default
-    Namespace.get(<TEI xmlns={teiNamespace.uri}/>) shouldBe teiNamespace.default
+  "ScalaXml.getNamespace()" should "work" in {
+    ScalaXml.getNamespace(<TEI/>) shouldBe Namespace.No
+    ScalaXml.getNamespace(<TEI xml:id="3"/>) shouldBe Namespace.No
+    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace, <tei:TEI/>)) shouldBe teiNamespace
+    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace, <TEI/>)) shouldBe Namespace.No
+    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace.default, <TEI/>)) shouldBe teiNamespace.default
+    ScalaXml.getNamespace(<TEI xmlns={teiNamespace.uri}/>) shouldBe teiNamespace.default
 
-    Namespace.get(<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/></TEI>) shouldBe teiNamespace.default
+    ScalaXml.getNamespace(<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/></TEI>) shouldBe teiNamespace.default
 
-    Namespace.get(loadResource(Xml, "namespace")) shouldBe teiNamespace.default
-    Namespace.get(firstElement(loadResource(Xml, "namespace"))) shouldBe teiNamespace.default
+    ScalaXml.getNamespace(loadResource(ScalaXml, "namespace")) shouldBe teiNamespace.default
+    ScalaXml.getNamespace(firstElement(loadResource(ScalaXml, "namespace"))) shouldBe teiNamespace.default
 
-    Namespace.get(loadResource(Dom, "namespace")) shouldBe teiNamespace.default
+    Dom.getNamespace(loadResource(Dom, "namespace")) shouldBe teiNamespace.default
   }
 }

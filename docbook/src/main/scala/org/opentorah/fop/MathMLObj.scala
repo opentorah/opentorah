@@ -3,7 +3,7 @@ package org.opentorah.fop
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.{FOEventHandler, FONode, PropertyList, XMLObj}
 import org.opentorah.mathjax.MathML
-import org.opentorah.xml.Sax
+import org.opentorah.xml.{Dom, Sax}
 import org.xml.sax.{Attributes, Locator}
 import java.awt.geom.Point2D
 
@@ -34,7 +34,7 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
 
     createBasicDocument()
 
-    Sizes.fontSizeAttribute.optional.withValue(fontSize).set(getDOMDocument.getDocumentElement)
+    Sizes.fontSizeAttribute.optional.withValue(fontSize).set(Dom)(getDOMDocument.getDocumentElement)
   }
 
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions

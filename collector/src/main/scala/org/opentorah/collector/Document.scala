@@ -5,7 +5,7 @@ import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType,
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Directory, Store}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 
 final class Document(
   override val name: String,
@@ -22,11 +22,11 @@ final class Document(
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
-  def getDate: Xml.Text = Xml.mkText(date.getOrElse(""))
-  def getDescription: Xml.Nodes = description.toSeq.flatMap(_.xml)
-  def getAuthors: Xml.Nodes = Xml.multi(authors.flatMap(_.xml))
-  def getAddressee: Seq[Xml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
-  def getTranscribers: Xml.Nodes = Xml.multi(editors
+  def getDate: ScalaXml.Text = ScalaXml.mkText(date.getOrElse(""))
+  def getDescription: ScalaXml.Nodes = description.toSeq.flatMap(_.content)
+  def getAuthors: ScalaXml.Nodes = ScalaXml.multi(authors.flatMap(_.content))
+  def getAddressee: Seq[ScalaXml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
+  def getTranscribers: ScalaXml.Nodes = ScalaXml.multi(editors
     .filter(_.role.contains("transcriber"))
     .flatMap(_.persName)
     .map(EntityReference.xmlElement))
@@ -58,13 +58,13 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[Xml.Element] = for {
+    override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {
       tei <- getTei
       header <- collection.documentHeader(document)
     } yield
       <div>
         {header}
-        {tei.text.body.xml}
+        {tei.text.body.content}
       </div>
   }
 
@@ -73,7 +73,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[Xml.Element] = collection.documentHeader(document).map(header =>
+    override def content(site: Site): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
         {header}
         <div class={Viewer.Facsimile.name}>
@@ -102,12 +102,12 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   }
 
   override def apply(name: String, tei: Tei): Parser[Document] = for {
-    pbs <- Xml.descendants(tei.text.body.xml, Pb.elementName, Pb)
+    pbs <- ScalaXml.descendants(tei.text.body.content, Pb.elementName, Pb)
     lang = tei.text.lang
     language = splitLang(name)._2
     _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
-    persNames <- Xml.descendants(
-      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.xml).getOrElse(Seq.empty),
+    persNames <- ScalaXml.descendants(
+      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content).getOrElse(Seq.empty),
       elementName = EntityType.Person.nameElement,
       elements = EntityReference
     )

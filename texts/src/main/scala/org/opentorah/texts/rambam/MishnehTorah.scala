@@ -111,7 +111,7 @@ object MishnehTorah {
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] = {
-    val result: Seq[Book] = Parser.run(Metadata.loadResource(this, Book))
+    val result: Seq[Book] = Parser.unsafeRun(Metadata.loadResource(this, Book))
     require(result.map(_.number) == (0 to 14))
     result
   }

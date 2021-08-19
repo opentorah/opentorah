@@ -1,7 +1,7 @@
 package org.opentorah.html
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{RawXml, Xml}
+import org.opentorah.xml.{RawXml, ScalaXml}
 import java.net.URI
 
 final case class a(
@@ -31,14 +31,14 @@ final case class a(
     (uri => new URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
   ))
 
-  def apply(text: String): Xml.Element = apply(Seq(Xml.mkText(text)))
+  def apply(text: String): ScalaXml.Element = apply(Seq(ScalaXml.mkText(text)))
 
-  def apply(element: Xml.Element): Xml.Element = apply(Seq(element))
+  def apply(element: ScalaXml.Element): ScalaXml.Element = apply(Seq(element))
 
-  def apply(xml: RawXml#Value): Xml.Element = apply(xml.xml)
+  def apply(xml: RawXml#Value): ScalaXml.Element = apply(xml.content)
 
-  def apply(children: Xml.Nodes): Xml.Element = {
-    val result: Xml.Element =
+  def apply(children: ScalaXml.Nodes): ScalaXml.Element = {
+    val result: ScalaXml.Element =
       <a
       href={uri.map(_.toString).orNull}
       target={target.orNull}
@@ -46,7 +46,7 @@ final case class a(
       id={id.orNull}
       >{children}</a>
 
-    if (!declareNamespace) result else Html.namespace.default.declare(result)
+    if (!declareNamespace) result else ScalaXml.declareNamespace(Html.namespace.default, result)
   }
 }
 

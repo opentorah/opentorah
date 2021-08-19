@@ -32,5 +32,5 @@ object Selector extends Element[Selector]("selector") {
   def byName(name: String): Selector = values.find(_.names.hasName(name)).get
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
-  private lazy val values: Seq[Selector] = Parser.run(Metadata.loadResource(this, this))
+  private lazy val values: Seq[Selector] = Parser.unsafeRun(Metadata.loadResource(this, this))
 }

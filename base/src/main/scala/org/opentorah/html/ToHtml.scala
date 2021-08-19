@@ -1,18 +1,18 @@
 package org.opentorah.html
 
-import org.opentorah.xml.{Attribute, Namespace, Xml}
+import org.opentorah.xml.{Attribute, Namespace, ScalaXml, Xml}
 import zio.{Has, URIO}
 
 // Converting other XML dialects (e.g., TEI, DocBook) to HTML
 trait ToHtml[R <: Has[_]] {
   protected def namespace: Namespace
 
-  protected def isEndNote(element: Xml.Element): Boolean
+  protected def isEndNote(element: ScalaXml.Element): Boolean
 
-  protected def elementTransform(element: Xml.Element): URIO[R, Xml.Element]
+  protected def elementTransform(element: ScalaXml.Element): URIO[R, ScalaXml.Element]
 
-  final def toHtml(element: Xml.Element): URIO[R, Xml.Element] = {
-    def result: URIO[Has[EndNotes] with R, Xml.Element] = for {
+  final def toHtml(element: ScalaXml.Element): URIO[R, ScalaXml.Element] = {
+    def result: URIO[Has[EndNotes] with R, ScalaXml.Element] = for {
       mainDiv <- transform.one(element)
       endNotesRaw <- EndNotes.getEndNotes
       endNotesDone <- transform.all(endNotesRaw)
@@ -29,25 +29,25 @@ trait ToHtml[R <: Has[_]] {
     result.provideSomeLayer[R](EndNotes.empty)
   }
 
-  private def transform: Xml.Transform[Has[EndNotes] with R] =
-    new Xml.Transform(element => elementTransformEffective(element).map(transformElement(element)))
+  private def transform: ScalaXml.Transform[Has[EndNotes] with R] =
+    new ScalaXml.Transform(element => elementTransformEffective(element).map(transformElement(element)))
 
-  private def elementTransformEffective(element: Xml.Element): URIO[Has[EndNotes] with R, Xml.Element] =
-    if (Namespace.get(element) != namespace.default) URIO.succeed(element) else
+  private def elementTransformEffective(element: ScalaXml.Element): URIO[Has[EndNotes] with R, ScalaXml.Element] =
+    if (ScalaXml.getNamespace(element) != namespace.default) URIO.succeed(element) else
     if (isEndNote(element)) EndNotes.addEndNote(
-      id = Xml.idAttribute.optional.get(element),
-      content = Xml.getChildren(element)
+      id = Xml.idAttribute.optional.get(ScalaXml)(element),
+      content = ScalaXml.getChildren(element)
     ) else
       elementTransform(element)
 
-  private def transformElement(element: Xml.Element)(newElement: Xml.Element): Xml.Element = {
-    val name: String = element.label
-    val attributes: Seq[Attribute.Value[String]] = Xml.getAttributes(element)
-    if (newElement eq element) Xml.setAttributes(
+  private def transformElement(element: ScalaXml.Element)(newElement: ScalaXml.Element): ScalaXml.Element = {
+    val name: String = ScalaXml.getName(element)
+    val attributes: Seq[Attribute.Value[String]] = ScalaXml.getAttributes(element)
+    if (newElement eq element) ScalaXml.setAttributes(
       element = if (Html.reservedElements.contains(name)) element.copy(label = addPrefix(name)) else element,
       attributes = attributes.map(transformXmlAttribute)
-    ) else Xml.addAttributes(
-      element = Html.namespace.default.declare(newElement),
+    ) else ScalaXml.addAttributes(
+      element = ScalaXml.declareNamespace(Html.namespace.default, newElement),
       attributes = Html.classAttribute.required.withValue(name) +: attributes.map(transformAttribute)
     )
   }

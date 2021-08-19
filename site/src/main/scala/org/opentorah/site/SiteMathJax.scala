@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.mathjax.{Delimiters, MathJax, MathJaxConfiguration}
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
 final class SiteMathJax(
   val isEnabled: Boolean,
@@ -22,7 +22,7 @@ final class SiteMathJax(
     texInlineDelimiters = Delimiters("$")
   )
 
-  def body: Xml.Nodes = mathJax.body(Xml.mkText(mathJax.htmlConfigurationString(configuration)))
+  def body: ScalaXml.Nodes = mathJax.body(ScalaXml.mkText(mathJax.htmlConfigurationString(configuration)))
 
   private def mathJax: MathJax = MathJax.get(useV3)
 }

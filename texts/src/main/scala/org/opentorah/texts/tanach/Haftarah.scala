@@ -35,7 +35,7 @@ object Haftarah extends WithBookSpans[Prophets] {
     }
   }
 
-  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.run(Metadata.load(
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(Metadata.load(
     from = From.resource(this),
     content = Week,
     keys = Parsha.values,

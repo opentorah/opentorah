@@ -78,7 +78,7 @@ object Chumash {
           }
 
           val book: Chumash = parsha.book
-          Some(Parser.run(Torah.processDays(
+          Some(Parser.unsafeRun(Torah.processDays(
             book,
             combined,
             book.chapters.merge(

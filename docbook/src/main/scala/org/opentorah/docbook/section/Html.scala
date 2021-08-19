@@ -1,7 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import org.opentorah.xml.Xml
+import org.opentorah.xml.ScalaXml
 
 object Html extends DocBook2 {
   override def name: String = "html"
@@ -26,7 +26,7 @@ object Html extends DocBook2 {
 
   val mathJaxConfigurationParameterName: String = "mathjax.configuration"
 
-  override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes =
+  override protected def mainStylesheetBody(values: NonOverridableParameters): ScalaXml.Nodes =
     if (values.mathJaxConfiguration.isEmpty) Seq.empty else {
       Seq(
         <!-- Add MathJax support -->,
@@ -36,5 +36,5 @@ object Html extends DocBook2 {
       )
     }
 
-  override protected def customStylesheetBody: Xml.Nodes = Seq.empty
+  override protected def customStylesheetBody: ScalaXml.Nodes = Seq.empty
 }

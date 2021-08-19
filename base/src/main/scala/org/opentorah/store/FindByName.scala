@@ -25,7 +25,8 @@ trait FindByName {
       acceptsIndexHtml && ((path == Seq("index.html")) || (path == Seq("index")))
 
     if (theEnd) ZIO.succeed(if (acc.isEmpty) None else Some(acc.reverse))
-    else findByName(path.head) >>=
-      (_.fold[Caching.Parser[Option[Store.Path]]](ZIO.none)(next => next.resolve(path.tail, next +: acc)))
+    else findByName(path.head).flatMap(
+      _.fold[Caching.Parser[Option[Store.Path]]](ZIO.none)(next => next.resolve(path.tail, next +: acc))
+    )
   }
 }

@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{By, Selector, Store}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser, ScalaXml}
 
 final class ByHierarchy(
   override val fromUrl: FromUrl,
@@ -14,13 +14,13 @@ final class ByHierarchy(
   override def findByName(name: String): Parser[Option[Store]] = Store.findByName(name, stores)
 
   // TODO generate hierarchy root index and reference it from the summary.
-  def oneLevelIndex(site: Site): Xml.Element =
+  def oneLevelIndex(site: Site): ScalaXml.Element =
     <p>
       <l>{displayName}:</l>
       <ul>{stores.map(store => <li>{store.a(site)(text = store.displayTitle)}</li>)}</ul>
     </p>
 
-  def treeIndex(site: Site): Xml.Element = {
+  def treeIndex(site: Site): ScalaXml.Element = {
     <div class="tree-index">
       <ul>
         <li><em>{displayName}</em></li>

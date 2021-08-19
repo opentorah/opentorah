@@ -5,7 +5,7 @@ import org.opentorah.html
 import org.opentorah.store.{Caching, Directory, FindByName, Store}
 import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Doctype, FromUrl, Model, Parser, PrettyPrinter, Xml}
+import org.opentorah.xml.{Doctype, FromUrl, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{IO, Task, ZIO, ZLayer}
 import java.net.URL
@@ -47,52 +47,54 @@ class Site[S <: Site[S]](
     content <- resolveHtmlContent(htmlContent)
     siteNavigationLinks <- getNavigationLinks
     htmlContentNavigationLinks <- navigationLinks(htmlContent)
-  } yield Site.prettyPrinter.render(doctype = html.Html, element = HtmlTheme.toHtml(
+  } yield Site.prettyPrinter.render(ScalaXml, doctype = Some(html.Html))(HtmlTheme.toHtml(
       htmlContent,
       navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks,
       content = content,
       site = this
     ))
 
-  final protected def renderTeiContent(tei: Tei): String = Tei.prettyPrinter.renderXml(Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
-    fileDesc = tei.teiHeader.fileDesc.copy(
-      publicationStmt = Some(new PublicationStmt(
-        publisher = common.url.map(url => Publisher(<ptr target={s"http://$url"}/>)),
-        availability = Some(new Availability(
-          status = Some("free"),
-          xml = Xml.optional(common.license)(license => <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)
-        ))
-      )),
-      sourceDesc = common.getTei.sourceDesc
-    ),
-    profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc.empty).copy(
-      langUsage = Some(LangUsage(languages = Seq(Language(
-        ident = tei.text.lang.get,
-        usage = None,
-        text = None
-      )))),
-      calendarDesc = common.getTei.calendarDesc
-    ))
-  ))))
+  final protected def renderTeiContent(tei: Tei): String = Tei.prettyPrinter.renderWithHeader(ScalaXml)(
+    Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
+      fileDesc = tei.teiHeader.fileDesc.copy(
+        publicationStmt = Some(new PublicationStmt(
+          publisher = common.url.map(url => Publisher(<ptr target={s"http://$url"}/>)),
+          availability = Some(new Availability(
+            status = Some("free"),
+            xml = ScalaXml.optional(common.license)(license => <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)
+          ))
+        )),
+        sourceDesc = common.getTei.sourceDesc
+      ),
+      profileDesc = Some(tei.teiHeader.profileDesc.getOrElse(ProfileDesc.empty).copy(
+        langUsage = Some(LangUsage(languages = Seq(Language(
+          ident = tei.text.lang.get,
+          usage = None,
+          text = None
+        )))),
+        calendarDesc = common.getTei.calendarDesc
+      ))
+    )))
+  )
 
-  private var navigationLinks: Option[Seq[Xml.Element]] = None
+  private var navigationLinks: Option[Seq[ScalaXml.Element]] = None
 
-  private def getNavigationLinks: Caching.Parser[Seq[Xml.Element]] =
+  private def getNavigationLinks: Caching.Parser[Seq[ScalaXml.Element]] =
     if (navigationLinks.isDefined) ZIO.succeed(navigationLinks.get) else
       ZIO.foreach(common.pages)(resolveNavigationalLink).map { result =>
         navigationLinks = Some(result)
         result
       }
 
-  private def resolveNavigationalLink(url: String): Caching.Parser[Xml.Element] = // TODO html.a!
+  private def resolveNavigationalLink(url: String): Caching.Parser[ScalaXml.Element] = // TODO html.a!
     resolve(url).map { pathOpt =>
       val path: Store.Path = pathOpt.get
       a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
     }
 
-  final protected def resolveHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[Xml.Element] =
+  final protected def resolveHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[ScalaXml.Element] =
     htmlContent.content(this) >>= { content =>
-      if (Xml.getNamespace(content) == DocBook.namespace.default)
+      if (ScalaXml.getNamespace(content) == DocBook.namespace.default)
         DocBook.toHtml(content).provideLayer(ZLayer.succeed(()))
       else
         Tei    .toHtml(content).provideLayer(ZLayer.succeed(linkResolver(htmlContent)))
@@ -116,25 +118,25 @@ class Site[S <: Site[S]](
   def viewer(htmlContent: HtmlContent[S]): Option[Viewer] = defaultViewer
 
   // TODO split into prev, next, up and more?
-  protected def navigationLinks(htmlContent: HtmlContent[S]): Caching.Parser[Seq[Xml.Element]] = ZIO.succeed (Seq.empty)
+  protected def navigationLinks(htmlContent: HtmlContent[S]): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed (Seq.empty)
 
   final def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
     caching.logEnabled = false
 
-    (if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint(Xml))) *>
+    (if (!withPrettyPrint) Effects.ok else Effects.effect(prettyPrint(ScalaXml))) *>
     Effects.effect(Site.logger.info("Writing site lists.")) *>
     ZIO.foreach_(directoriesToWrite)(_.writeDirectory()) *>
     ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this))) *>
     buildMore
   }
 
-  final private def prettyPrint(model: Model): Unit = {
+  final private def prettyPrint(xml: Xml): Unit = {
     Site.logger.info("Pretty-printing site.")
     PrettyPrinter.prettyPrint(
       roots = prettyPrintRoots.toList.map(Files.url2file),
-      model,
+      xml,
       recognizer = new PrettyPrinter.Recognizer {
-        override def recognize(model: Model)(element: model.Element): (PrettyPrinter, Option[Doctype]) =
+        override def recognize(model: Xml)(element: model.Element): (PrettyPrinter, Option[Doctype]) =
           if (model.getName(element) == "TEI")
             (Tei.prettyPrinter, None)
           else

@@ -63,11 +63,11 @@ object Tanach extends NamedCompanion {
   }
 
   private def loadMetadata(): Unit = {
-    val metadata: Map[Book, Parsed] = Parser.run(
+    val metadata: Map[Book, Parsed] = Parser.unsafeRun(
       Metadata.load(
         from = From.resource(Tanach),
         content = Parsed.followRedirects
-      ) >>= (Metadata.bind[Book, Parsed](
+      ).flatMap(Metadata.bind[Book, Parsed](
         keys = values,
         _,
         getKey = _.book
@@ -77,6 +77,6 @@ object Tanach extends NamedCompanion {
     book2names = Some(Collections.mapValues(metadata)(_.names))
     book2chapters = Some(Collections.mapValues(metadata)(_.chapters))
 
-    book2metadata = Some(Collections.mapValues(metadata)(metadata => Parser.run(metadata.resolve)))
+    book2metadata = Some(Collections.mapValues(metadata)(metadata => Parser.unsafeRun(metadata.resolve)))
   }
 }

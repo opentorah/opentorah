@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, Xml}
+import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Xml}
 
 final case class Pb(
   n: String,
@@ -9,7 +9,7 @@ final case class Pb(
   isMissing: Boolean = false,
   isEmpty: Boolean = false
 ) {
-  def addAttributes(element: Xml.Element): Xml.Element = Xml.setAttributes(Xml.getAttributes(element) ++ Seq(
+  def addAttributes(element: ScalaXml.Element): ScalaXml.Element = ScalaXml.setAttributes(ScalaXml.getAttributes(element) ++ Seq(
     Pb.missingAttribute.withValue(isMissing),
     Pb.emptyAttribute.withValue(isEmpty)
   ), element)

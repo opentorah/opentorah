@@ -8,10 +8,9 @@ class RawXml(
   attributesAllowed: Boolean = false
 ) {
 
-  // TODO rename 'xml' to 'content'.
-  final class Value(val xml: Xml.Nodes, val attributes: Attribute.Values)
+  final class Value(val content: ScalaXml.Nodes, val attributes: Attribute.Values)
 
-  def apply(xml: Xml.Nodes, attributes: Attribute.Values = Seq.empty): Value = new Value(xml, attributes)
+  def apply(content: ScalaXml.Nodes, attributes: Attribute.Values = Seq.empty): Value = new Value(content, attributes)
 
   object element extends Element[Value](elementName) {
 
@@ -30,7 +29,7 @@ class RawXml(
 
       override def unparser: Unparser[Value] = Unparser(
         attributes = _.attributes,
-        content = _.xml,
+        content = _.content,
         namespace = namespace
       )
     }

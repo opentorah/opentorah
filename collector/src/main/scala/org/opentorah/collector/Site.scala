@@ -6,7 +6,7 @@ import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
 import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{FromUrl, Parser, Xml}
+import org.opentorah.xml.{FromUrl, Parser, ScalaXml}
 import zio.{UIO, ZIO}
 import java.net.URL
 
@@ -96,7 +96,7 @@ final class Site(
     case _                          => defaultViewer
   }
 
-  override protected def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[Xml.Element]] = htmlContent match {
+  override protected def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match {
     case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
     case collection: Collection => collectionNavigationLinks(collection)
 
@@ -130,7 +130,7 @@ final class Site(
     case _ => ZIO.succeed (Seq.empty)
   }
 
-  private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[Xml.Element]] =
+  private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[ScalaXml.Element]] =
     ZIO.succeed(Seq(a(collection)(s"[${collection.names.name}]")))
 
   override protected def path(htmlContent: HtmlContent[Site]): Store.Path = htmlContent match {
@@ -206,13 +206,13 @@ final class Site(
       _ <- Effects.effect(logger.info("Writing references."))
       allReferences <- allWithSource[EntityReference](
         nodes => ZIO.foreach(EntityType.values)(entityType =>
-          Xml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
+          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
       )
       _ <- Effects.effect(references.write(allReferences))
 
       _ <- Effects.effect(logger.info("Writing unclears."))
       allUnclears <- allWithSource[Unclear.Value](
-        nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
+        nodes => ScalaXml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
       _ <- Effects.effect(unclears.write(allUnclears))
 
@@ -220,7 +220,7 @@ final class Site(
 
       errorOpts <- getReferences >>= (ZIO.foreach(_) { value =>
         val reference: EntityReference = value.value
-        val name: Xml.Nodes = reference.name
+        val name: ScalaXml.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
           if (ref.contains(" ")) ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
           else entities.findByName(ref).map(_
@@ -243,9 +243,9 @@ final class Site(
           resolveHtmlContent(collection.textFacet.of(document)))))
     } yield ()
 
-  def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
+  def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
 
-    def withSource(htmlContent: HtmlContent[Site], nodes: Xml.Nodes): Parser[Seq[WithSource[T]]] = {
+    def withSource(htmlContent: HtmlContent[Site], nodes: ScalaXml.Nodes): Parser[Seq[WithSource[T]]] = {
       val source: String = Files.mkUrl(path(htmlContent).map(_.structureName))
       finder(nodes).map(_.map(new WithSource[T](source, _)))
     }
@@ -256,7 +256,7 @@ final class Site(
         entity.teiEntity(this) >>= (teiEntity => withSource(entity, teiEntity.content)))
       fromHierarchicals <- ZIO.foreach(hierarchies ++ collections) { hierarchical => withSource(
         hierarchical,
-        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.xml)
+        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.content)
       )}
       fromDocuments <- ZIO.foreach(collections) { collection =>
         collection.directoryEntries >>= (documents => ZIO.foreach(documents) { document =>

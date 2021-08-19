@@ -3,16 +3,16 @@ package org.opentorah.collector
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Store}
-import org.opentorah.xml.{Element, Elements, Xml}
+import org.opentorah.xml.{Element, Elements, ScalaXml}
 
 trait Hierarchical extends Store with HtmlContent[Site] {
   def title: Title.Value
 
-  final def titleString: String = Xml.toString(title.xml)
+  final def titleString: String = ScalaXml.toString(title.content)
 
   def storeAbstract: Option[Abstract.Value]
 
-  final def storeAbstractXmlElement: Seq[Xml.Element] =
+  final def storeAbstractXmlElement: Seq[ScalaXml.Element] =
     storeAbstract.toSeq.map(storeAbstract => Abstract.element.xmlElement(storeAbstract))
 
   def body: Option[Body.Value]
@@ -34,14 +34,14 @@ trait Hierarchical extends Store with HtmlContent[Site] {
     pathHeaderHorizontal(site.store2path(this), Seq.empty).mkString(", ")
   }
 
-  final override def content(site: Site): Caching.Parser[Xml.Element] = {
+  final override def content(site: Site): Caching.Parser[ScalaXml.Element] = {
     @scala.annotation.tailrec
-    def pathHeaderVertical(path: Store.Path, result: Seq[Xml.Element]): Seq[Xml.Element] =
+    def pathHeaderVertical(path: Store.Path, result: Seq[ScalaXml.Element]): Seq[ScalaXml.Element] =
       if (path.isEmpty) result else pathHeaderVertical(
         path = path.tail.tail,
         result = result :+ {
           val hierarchy: Hierarchy = path.tail.head.asInstanceOf[Hierarchy]
-          <l>{path.head.displayName} {hierarchy.a(site)(text = hierarchy.displayName)}: {hierarchy.title.xml}</l>
+          <l>{path.head.displayName} {hierarchy.a(site)(text = hierarchy.displayName)}: {hierarchy.title.content}</l>
         }
       )
 
@@ -51,18 +51,18 @@ trait Hierarchical extends Store with HtmlContent[Site] {
       <div>
         <div class="store-header">
           {pathHeaderVertical(path.init.init, Seq.empty)}
-          <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.xml}</head>
+          <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.content}</head>
           {storeAbstractXmlElement}
-          {body.toSeq.map(_.xml)}
+          {body.toSeq.map(_.content)}
         </div>
         {inner}
       </div>
     )
   }
 
-  protected def innerContent(site: Site): Caching.Parser[Xml.Element]
+  protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element]
 
-  def flatIndexEntry(site: Site): Xml.Element =
+  def flatIndexEntry(site: Site): ScalaXml.Element =
     <div>
       {a(site)(text = pathHeaderHorizontal(site) + ": " + titleString)}
       {storeAbstractXmlElement}

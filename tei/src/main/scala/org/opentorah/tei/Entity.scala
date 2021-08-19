@@ -1,14 +1,14 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Unparser, Xml}
 
-final case class Entity( /* TODO private? */
+final case class Entity(/* TODO private? */
   id: Option[String],
   entityType: EntityType,
   role: Option[String],
   names: Seq[EntityName],
-  content: Xml.Nodes // TODO rename body?
+  content: ScalaXml.Nodes // TODO rename body?
 ) {
   def name: String = names.head.name
 

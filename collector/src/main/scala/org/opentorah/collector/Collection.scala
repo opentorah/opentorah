@@ -5,7 +5,7 @@ import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Directory, Selector, Store}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 import java.net.URL
 
@@ -53,7 +53,7 @@ final class Collection(
     case None => Store.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
   }
 
-  override protected def innerContent(site: Site): Caching.Parser[Xml.Element] =
+  override protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element] =
     for {
       directory <- getDirectory
       columns = Seq[Collection.Column](
@@ -69,7 +69,7 @@ final class Collection(
 
         Collection.Column("Страницы", "pages", { (document: Document) =>
           val text: Document.TextFacet = textFacet.of(document)
-          ZIO.succeed(Xml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
+          ZIO.succeed(ScalaXml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
             page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
           )))
         }),
@@ -82,14 +82,14 @@ final class Collection(
             column.value(document).map(value => <td class={column.cssClass}>{value}</td>)
           }.map(cells => <tr>{cells}</tr>)
         }
-          .map(documentRows => part.title.fold[Xml.Nodes](Seq.empty)(title =>
-            <tr><td colspan={columns.length.toString}><span class="part-title">{title.xml}</span></td></tr>
+          .map(documentRows => part.title.fold[ScalaXml.Nodes](Seq.empty)(title =>
+            <tr><td colspan={columns.length.toString}><span class="part-title">{title.content}</span></td></tr>
           ) ++ documentRows)
       }
     } yield {
       val missingPages: Seq[Page] = directory.entries.sortBy(_.name).flatMap(_.pages(pageType)).filter(_.pb.isMissing)
 
-      def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] = {
+      def listMissing(flavour: String, isMissing: Page => Boolean): Seq[ScalaXml.Element] = {
         val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
         if (missing.isEmpty) Seq.empty
         else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
@@ -114,7 +114,7 @@ final class Collection(
     Collection.transcribersColumn
   )
 
-  def documentHeader(document: Document): Caching.Parser[Xml.Element] =
+  def documentHeader(document: Document): Caching.Parser[ScalaXml.Element] =
     ZIO.foreach(documentHeaderColumns) { column =>
       column.value(document).map(value =>
         <tr>
@@ -127,8 +127,8 @@ final class Collection(
   private def languageColumn(site: Site): Collection.Column =
     Collection.Column("Язык", "language", { (document: Document) =>
       translations(document).map(documentTranslations =>
-        Seq(Xml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-          Seq(Xml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))
+        Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
+          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))
     })
 }
 
@@ -137,7 +137,7 @@ object Collection extends Element[Collection]("collection") {
   final case class Column(
     heading: String,
     cssClass: String,
-    value: Document => Caching.Parser[Xml.Nodes]
+    value: Document => Caching.Parser[ScalaXml.Nodes]
   )
 
   val descriptionColumn : Column = Column("Описание"   , "description", document => ZIO.succeed(document.getDescription ))
@@ -156,8 +156,8 @@ object Collection extends Element[Collection]("collection") {
 
     override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
-    override def htmlBodyTitle: Option[Xml.Nodes] = collection.htmlBodyTitle
-    override def content(site: Site): Caching.Parser[Xml.Element] = collection.content(site)
+    override def htmlBodyTitle: Option[ScalaXml.Nodes] = collection.htmlBodyTitle
+    override def content(site: Site): Caching.Parser[ScalaXml.Element] = collection.content(site)
   }
 
   final class Documents(

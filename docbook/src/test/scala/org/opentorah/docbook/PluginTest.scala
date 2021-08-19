@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.xml.{Doctype, PrettyPrinter, XLink, Xml}
+import org.opentorah.xml.{Doctype, PrettyPrinter, ScalaXml, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
@@ -12,13 +12,13 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     name: String,
     substitutions: Map[String, String],
     doctype: Option[Doctype],
-    document: Xml.Element)(
+    document: ScalaXml.Element)(
     inIndexHtml: String*
   ): Unit = {
     val project = PluginTestProject(
       prefix = "pluginTestProjects",
       name,
-      document = prettyPrinter.renderXml(document, doctype),
+      document = prettyPrinter.renderWithHeader(ScalaXml, doctype = doctype)(document),
       substitutions,
       isPdfEnabled = true
     )
@@ -35,14 +35,14 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     // Entity reference in the attribute value trips up IntelliJ's Scala XML parser:
     // it reports "No closing tag" and underlines XML literal around the entity reference in red.
     // In reality, everything works as intended:
-    prettyPrinter.render(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
+    prettyPrinter.render(ScalaXml)(<e a="http://&version;"/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // If the attribute value is enclosed in {}, making it dynamic, IntelliJ does not complain any longer -
     // but Scala XML encodes the entity reference, so nothing works...
     // UPDATE 2021-02-15: things started working all of a sudden;
     // tzorich iyun if this is connected to the recent changes in the PrettyPrinter (handling preformatted elements)
     // or Markdown (double-escaping dangerous symbols), although I don't see how can it be...
-    prettyPrinter.render(<e a={"http://&version;"}/>) shouldBe """<e a="http://&version;"/>""" + "\n"
+    prettyPrinter.render(ScalaXml)(<e a={"http://&version;"}/>) shouldBe """<e a="http://&version;"/>""" + "\n"
 
     // UPDATE 2021-04: PrettyPrinter now escapes '&' (and '<') by default,
     // so to keep the expectations I had to disable this encoding...
@@ -105,7 +105,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
       prefix = "pluginTestProjects",
       name = "substitutions-without-DTD-entity-substitutions",
       substitutions = Map[String, String]("version" -> "\"v1.0.0\""),
-      document = prettyPrinter.renderXml(
+      document = prettyPrinter.renderWithHeader(ScalaXml)(
         <article xmlns={DocBook.namespace.uri} version={DocBook.version} xmlns:xlink={XLink.namespace.uri}>
           <para>Processing instruction: <?eval version ?>.</para>
           <para>Entity: &version;.</para>

@@ -1,14 +1,14 @@
 package org.opentorah.site
 
 import org.opentorah.highlighter.Highlighter
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
 final class SiteHighlighter(
   val isEnabled: Boolean,
   val usePrism: Boolean
 ) {
-  def head: Seq[Xml.Element] = highlighter.head
-  def body: Seq[Xml.Element] = highlighter.body
+  def head: Seq[ScalaXml.Element] = highlighter.head
+  def body: Seq[ScalaXml.Element] = highlighter.body
 
   private def highlighter: Highlighter = Highlighter.get(usePrism)
 }

@@ -1,7 +1,7 @@
 package org.opentorah.docbook.section
 
 import Section.Parameters
-import org.opentorah.xml.Xml
+import org.opentorah.xml.ScalaXml
 import java.io.File
 
 trait Epub extends DocBook2 {
@@ -20,9 +20,9 @@ trait Epub extends DocBook2 {
 
   override def usesCss: Boolean = false
 
-  final override protected def mainStylesheetBody(values: NonOverridableParameters): Xml.Nodes = Seq.empty
+  final override protected def mainStylesheetBody(values: NonOverridableParameters): ScalaXml.Nodes = Seq.empty
 
-  final override protected def customStylesheetBody: Xml.Nodes = Seq.empty
+  final override protected def customStylesheetBody: ScalaXml.Nodes = Seq.empty
 
   final override def postProcess(
     inputDirectory: File,

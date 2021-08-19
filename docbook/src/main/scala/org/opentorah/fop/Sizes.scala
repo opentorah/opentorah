@@ -54,7 +54,7 @@ final class Sizes private(
 
   def setViewPortSizes(svgDocument: SVGDocument): Unit = {
     def set(attribute: Attribute.Required[String], value: Float): Unit =
-      attribute.withValue(toPoints(value).toString + "pt").set(svgDocument.getDocumentElement)
+      attribute.withValue(toPoints(value).toString + "pt").set(Dom)(svgDocument.getDocumentElement)
 
     set(Sizes.widthAttribute, width)
     set(Sizes.heightAttribute, height)
@@ -84,10 +84,10 @@ object Sizes {
   */
   def apply(svgDocument: SVGDocument): Sizes = {
     val element: Dom.Element = svgDocument.getDocumentElement
-    val viewBox: Array[Float] = viewBoxAttribute.get(element).split(" ").map(_.toFloat)
+    val viewBox: Array[Float] = viewBoxAttribute.get(Dom)(element).split(" ").map(_.toFloat)
 
     new Sizes(
-      fontSize = fontSizeAttribute.required.get(element),
+      fontSize = fontSizeAttribute.required.get(Dom)(element),
       minX = viewBox(0),
       minY = viewBox(1),
       width = viewBox(2),
