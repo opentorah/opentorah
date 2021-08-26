@@ -4,7 +4,7 @@ import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 import zio.ZIO
 
-final class Names(val names: Seq[Name]) extends LanguageString {
+final class Names(val names: Seq[Name]) extends Language.ToString {
   Collections.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
@@ -30,7 +30,7 @@ final class Names(val names: Seq[Name]) extends LanguageString {
 
   def name: String = doFind(LanguageSpec.empty).name
 
-  def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name
+  override def toLanguageString(implicit spec: LanguageSpec): String = doFind(spec).name
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
 
@@ -41,6 +41,7 @@ final class Names(val names: Seq[Name]) extends LanguageString {
 }
 
 object Names {
+  // TODO create a mix-in for Named that overrides names as a val with this as a value?
   def apply(name: String): Names = new Names(Seq(Name(name)))
 
   def checkDisjoint(nameses: Seq[Names]): Unit = {
@@ -52,7 +53,7 @@ object Names {
     }
   }
 
-  // If I ever figure out how to work with Custom using Cats typeclasses, something similar
+  // TODO If I ever figure out how to work with Custom using Cats typeclasses, something similar
   // should work here too :)
   def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names = {
     val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)

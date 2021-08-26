@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{LanguageSpec, Metadata, Names, WithNumber}
+import org.opentorah.metadata.{LanguageSpec, Named, Names, WithNumber}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 import zio.ZIO
@@ -35,7 +35,7 @@ object Haftarah extends WithBookSpans[Prophets] {
     }
   }
 
-  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(Metadata.load(
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(Named.load(
     from = From.resource(this),
     content = Week,
     keys = Parsha.values,

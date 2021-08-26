@@ -1,10 +1,10 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{NamedCompanion, Names, WithName, WithNames}
+import org.opentorah.metadata.{NamedCompanion, Named, Names}
 import Jewish.{Day, Year}
 import Jewish.Month._
 
-sealed trait SpecialDay extends WithNames {
+sealed trait SpecialDay extends Named {
   def date(year: Year): Day
   final def correctedDate(year: Year): Day = correctDate(date(year))
   protected def correctDate(date: Day): Day = date
@@ -14,7 +14,7 @@ object SpecialDay extends NamedCompanion {
 
   type Key = LoadNames
 
-  sealed class LoadNames(override val name: String) extends WithName with WithNames {
+  sealed class LoadNames(override val name: String) extends Named {
     final override def names: Names = toNames(this)
   }
 
@@ -131,7 +131,7 @@ object SpecialDay extends NamedCompanion {
 
   private object Chanukah extends LoadNames("Chanukah")
 
-  sealed class Chanukah(override val dayNumber: Int) extends WithNames with DayOf with RabbinicFestival {
+  sealed class Chanukah(override val dayNumber: Int) extends Named with DayOf with RabbinicFestival {
     final override lazy val names: Names = namesWithNumber(Chanukah, dayNumber)
     final override def firstDay: SpecialDay = Chanukah1
     final override def date(year: Year): Day = year.month(Kislev).day(25)+(dayNumber-1)
@@ -238,7 +238,7 @@ object SpecialDay extends NamedCompanion {
     override def dayNumber: Int = 8
   }
 
-  case class Omer(number: Int) extends WithNames {
+  case class Omer(number: Int) extends Named {
     override def names: Names = namesWithNumber(Omer, number)
   }
 
@@ -273,7 +273,7 @@ object SpecialDay extends NamedCompanion {
     override def date(year: Year): Day = year.month(Av).day(9)
   }
 
-  private def namesWithNumber(withNames: WithNames, number: Int): Names = withNames.names.withNumber(number)
+  private def namesWithNumber(withNames: Named, number: Int): Names = withNames.names.withNumber(number)
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,

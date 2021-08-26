@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Names, WithNames}
+import org.opentorah.metadata.{Named, Names}
 import org.opentorah.texts.tanach.Parsha.{Mattos, Nitzavim}
 
-final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) extends WithNames {
+final case class WeeklyReading(parsha: Parsha, secondParsha: Option[Parsha]) extends Named {
   def isCombined: Boolean = secondParsha.isDefined
 
   override def names: Names = if (!isCombined) parsha.names else

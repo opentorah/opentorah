@@ -11,6 +11,13 @@ sealed class Language(code: String) extends Named {
 }
 
 object Language extends NamedCompanion {
+
+  trait ToString {
+    final override def toString: String = toLanguageString(LanguageSpec.empty)
+
+    def toLanguageString(implicit spec: LanguageSpec): String
+  }
+
   override type Key = Language
 
   override val values: Seq[Language] = Seq(English, Russian, Polish, French, German, Lithuanian, Hebrew)

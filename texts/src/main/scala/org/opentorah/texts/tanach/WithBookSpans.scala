@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{LanguageSpec, LanguageString, WithNames}
+import org.opentorah.metadata.{Language, LanguageSpec, Named}
 import org.opentorah.xml.{Attribute, Parser}
 
 trait WithBookSpans[Book <: Tanach.Book] {
@@ -12,7 +12,7 @@ trait WithBookSpans[Book <: Tanach.Book] {
 
     final def :+(that: BookSpan): Many = apply(spans :+ that)
 
-    def from(source: WithNames): Many = apply(spans.map(_.from(source)))
+    def from(source: Named): Many = apply(spans.map(_.from(source)))
   }
 
   protected type Many <: Spans
@@ -21,7 +21,7 @@ trait WithBookSpans[Book <: Tanach.Book] {
 
   final type Customs = Custom.Of[Many]
 
-  final class BookSpan private(val book: Book, val span: Span, val source: Option[WithNames]) extends LanguageString {
+  final class BookSpan private(val book: Book, val span: Span, val source: Option[Named]) extends Language.ToString {
     require(book.chapters.contains(span), s"Book $book doesn't contain span $span")
 
     override def toLanguageString(implicit spec: LanguageSpec): String =
@@ -29,7 +29,7 @@ trait WithBookSpans[Book <: Tanach.Book] {
 
     def +(next: BookSpan): BookSpan = merge(Seq(this, next))
 
-    def from(source: WithNames): BookSpan = new BookSpan(book, span, Some(source))
+    def from(source: Named): BookSpan = new BookSpan(book, span, Some(source))
 
     override def hashCode(): Int = book.hashCode()*37 + span.hashCode() + 73
 
@@ -40,7 +40,7 @@ trait WithBookSpans[Book <: Tanach.Book] {
   }
 
   object BookSpan {
-    def apply(book: Book, span: Span, source: Option[WithNames] = None): BookSpan = new BookSpan(book, span, source)
+    def apply(book: Book, span: Span, source: Option[Named] = None): BookSpan = new BookSpan(book, span, source)
   }
 
   final class BookSpanParsed(val book: Option[String], val span: SpanParsed) {
@@ -68,7 +68,7 @@ trait WithBookSpans[Book <: Tanach.Book] {
     require(spans.forall(_.book == book))
     require(book.chapters.consecutive(spans.map(_.span)))
 
-    val source: Option[WithNames] = spans.map(_.source).reduce[Option[WithNames]] { case (source1, source2) =>
+    val source: Option[Named] = spans.map(_.source).reduce[Option[Named]] { case (source1, source2) =>
       if (source1.isEmpty && source2.isEmpty) None else {
         require(source1.isDefined)
         require(source2.isDefined)

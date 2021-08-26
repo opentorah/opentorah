@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.metadata.Language
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Store}
@@ -21,14 +22,14 @@ trait Hierarchical extends Store with HtmlContent[Site] {
 
   final override def htmlHeadTitle: Option[String] = Some(titleString)
 
-  final def displayTitle: String = displayName + ": " + titleString
+  final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
   final def pathHeaderHorizontal(site: Site): String = {
     @scala.annotation.tailrec
     def pathHeaderHorizontal(path: Store.Path, result: Seq[String]): Seq[String] =
       if (path.isEmpty) result else pathHeaderHorizontal(
         path = path.tail.tail,
-        result = result :+ s"${path.head.displayName} ${path.tail.head.displayName}"
+        result = result :+ s"${Hierarchical.displayName(path.head)} ${Hierarchical.displayName(path.tail.head)}"
       )
 
     pathHeaderHorizontal(site.store2path(this), Seq.empty).mkString(", ")
@@ -41,7 +42,7 @@ trait Hierarchical extends Store with HtmlContent[Site] {
         path = path.tail.tail,
         result = result :+ {
           val hierarchy: Hierarchy = path.tail.head.asInstanceOf[Hierarchy]
-          <l>{path.head.displayName} {hierarchy.a(site)(text = hierarchy.displayName)}: {hierarchy.title.content}</l>
+          <l>{Hierarchical.displayName(path.head)} {hierarchy.a(site)(text = Hierarchical.displayName(hierarchy))}: {hierarchy.title.content}</l>
         }
       )
 
@@ -51,7 +52,7 @@ trait Hierarchical extends Store with HtmlContent[Site] {
       <div>
         <div class="store-header">
           {pathHeaderVertical(path.init.init, Seq.empty)}
-          <head xmlns={Tei.namespace.uri}>{path.init.last.displayName} {displayName}: {title.content}</head>
+          <head xmlns={Tei.namespace.uri}>{Hierarchical.displayName(path.init.last)} {Hierarchical.displayName(this)}: {title.content}</head>
           {storeAbstractXmlElement}
           {body.toSeq.map(_.content)}
         </div>
@@ -77,4 +78,6 @@ object Hierarchical extends Elements.Union[Hierarchical] {
     case _: Hierarchy  => Hierarchy
     case _: Collection => Collection
   }
+
+  def displayName(store: Store): String = store.names.doFind(Language.Russian.toSpec).name
 }

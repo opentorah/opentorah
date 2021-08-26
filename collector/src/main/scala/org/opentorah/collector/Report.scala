@@ -9,7 +9,7 @@ import org.opentorah.util.Strings
 import org.opentorah.xml.ScalaXml
 import java.net.URI
 
-abstract class Report[T](val name: String, val title: String) extends Store with HtmlContent[Site] {
+abstract class Report[T](override val name: String, val title: String) extends Store with HtmlContent[Site] {
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
   final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

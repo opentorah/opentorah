@@ -57,6 +57,12 @@ trait Elements[A] {
   final def required: Elements.Required[A] = new Elements.Required[A](this)
   final def seq     : Elements.Sequence[A] = new Elements.Sequence[A](this)
 
+  // Note: this is only used in Named and ListFile, but still...
+  final def wrappedSeq(wrapperElementName: String): Element[Seq[A]] =
+    new Element[Seq[A]](wrapperElementName) {
+      override def contentParsable: Parsable[Seq[A]] = Elements.this.seq
+    }
+
   final def followRedirects: Elements.HandleRedirect[A, A] = followRedirects(identity)
 
   private def followRedirects[B](f: Parser[A] => Parser[B]): Elements.HandleRedirect[A, B] = new Elements.HandleRedirect(

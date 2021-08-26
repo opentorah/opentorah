@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{LanguageSpec, LanguageString}
+import org.opentorah.metadata.{Language, LanguageSpec}
 
-final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] with LanguageString {
+final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] with Language.ToString {
   require(chapter > 0)
   require(verse > 0)
 

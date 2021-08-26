@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory, Selector, Store}
+import org.opentorah.store.{By, Caching, Directory, FindByName, Selector, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -50,7 +50,7 @@ final class Collection(
   // With no facet, "document" is assumed
   override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name) >>= { // TODO ZIO.someOrElseM?
     case Some(result) => ZIO.some(result)
-    case None => Store.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
+    case None => FindByName.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
   }
 
   override protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element] =
@@ -184,7 +184,7 @@ object Collection extends Element[Collection]("collection") {
 
   sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
 
-    final override def findByName(name: String): Caching.Parser[Option[DF]] = Store.findByName(
+    final override def findByName(name: String): Caching.Parser[Option[DF]] = FindByName.findByName(
       name,
       extension,
       name => (collection.getDirectory >>= (_.get(name))).map(_.map(of)),

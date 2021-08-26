@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Metadata, NamedCompanion, Names}
+import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
@@ -42,7 +42,7 @@ object Chumash {
   ) extends Tanach.Parsed(book, names, chapters) {
 
     def resolve: Parser[BookMetadata] = for {
-      parsha2metadataParsed <- Metadata.bind[Parsha, Parsha.Parsed](
+      parsha2metadataParsed <- Named.bind[Parsha, Parsha.Parsed](
         keys = book.parshiot,
         metadatas = weeks,
         getKey = _.parsha

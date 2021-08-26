@@ -188,7 +188,7 @@ private[xml] object Context {
   }}
 
   private def partition(nodes: ScalaXml.Nodes): (Seq[ScalaXml.Element], Option[String]) = {
-    val (elems: Seq[ScalaXml.Element], nonElems: Seq[ScalaXml.Element]) = nodes.partition(ScalaXml.isElement)
+    val (elems, nonElems) = nodes.partition(ScalaXml.isElement)
     val characters: String = nonElems.map(ScalaXml.toString).mkString.trim
     (elems.map(ScalaXml.asElement), if (characters.isEmpty) None else Some(characters))
   }

@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.html
 import org.opentorah.html.Html
 import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
-import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
+import org.opentorah.store.{Caching, Directory, FindByName, ListFile, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{FromUrl, Parser, ScalaXml}
@@ -157,12 +157,12 @@ final class Site(
     ZIO.succeed(alias2collectionAlias.get(name)) >>= {
       case Some(result) => ZIO.some(result)
       case None =>
-        Store.findByName(name, Seq(entities, notes, Reports, by)) >>= {
+        FindByName.findByName(name, Seq(entities, notes, Reports, by)) >>= {
           case Some(result) => ZIO.some(result)
-          case None => Store.findByName(
+          case None => FindByName.findByName(
             name,
             "html",
-            name => Store.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
+            name => FindByName.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
           )
         }
     }
