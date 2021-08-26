@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{LanguageSpec, LanguageString}
+import org.opentorah.metadata.{Language, LanguageSpec}
 
-final case class Span(from: Verse, to: Verse) extends LanguageString {
+final case class Span(from: Verse, to: Verse) extends Language.ToString {
   require(from <= to, s"Empty span: $from..$to")
 
   def contains(verse: Verse): Boolean = (from <= verse) && (verse <= to)

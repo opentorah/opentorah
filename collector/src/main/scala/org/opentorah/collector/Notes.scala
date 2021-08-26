@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory, Selector, Store}
+import org.opentorah.store.{By, Caching, Directory, FindByName, Selector, Store}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.UIO
 import java.net.URL
@@ -20,10 +20,10 @@ final class Notes(
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = Store.findByName(
+  override def findByName(name: String): Caching.Parser[Option[Store]] = FindByName.findByName(
     name,
     "html",
-    name => getDirectory >>= (_.findByName(name))
+    name => getDirectory.flatMap(_.findByName(name))
   )
 
   override def htmlHeadTitle: Option[String] = selector.title

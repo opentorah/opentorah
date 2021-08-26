@@ -140,7 +140,7 @@ class Site[S <: Site[S]](
           if (model.getName(element) == "TEI")
             (Tei.prettyPrinter, None)
           else
-            (Store.prettyPrinter, None)
+            (Site.storePrettyPrinter, None)
       }
     )
   }
@@ -159,6 +159,11 @@ object Site {
   final class Response(
     val content: String,
     val mimeType: String
+  )
+
+  val storePrettyPrinter: PrettyPrinter = new PrettyPrinter(
+    nestElements = Set("p"), // TODO remnants of TEI?
+    alwaysStackElements = Set("store", "by")
   )
 
   val prettyPrinter: PrettyPrinter = PrettyPrinter(

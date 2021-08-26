@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{Language, Metadata, Name, Names, WithNames}
-import org.opentorah.xml.{Unparser, Attribute, Element, Elements, Parsable, Parser}
+import org.opentorah.metadata.{Language, Name, Named, Names}
+import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, Unparser}
 
 object SeferHamitzvosLessons {
 
@@ -23,7 +23,7 @@ object SeferHamitzvosLessons {
     }
   }
 
-  sealed trait Part extends WithNames
+  sealed trait Part extends Named
 
   private object Part extends Elements.Union[Part] {
     override protected val elements: Seq[Element[_ <: Part]] = Seq(Positive, Negative, NamedPart)
@@ -81,5 +81,5 @@ object SeferHamitzvosLessons {
   }
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(Metadata.loadResource(this, Lesson))
+  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(Named.load(From.resource(this), Lesson))
 }

@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{WithNames, WithNumber}
+import org.opentorah.metadata.{Named, WithNumber}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
@@ -22,7 +22,7 @@ final case class Torah private(override val spans: Seq[Torah.BookSpan])
     Torah(drop(withDrop))
   }
 
-  def fromWithNumbers(source: WithNames): Torah =  Torah {
+  def fromWithNumbers(source: Named): Torah =  Torah {
     spans.zipWithIndex.map { case (aliyah, index) =>
       aliyah.from(new Source.AndNumber(withNames = source, number = index + 1))
     }

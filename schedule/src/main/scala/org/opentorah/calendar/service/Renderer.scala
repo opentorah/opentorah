@@ -4,7 +4,7 @@ import org.opentorah.calendar.{Calendar, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.html
-import org.opentorah.metadata.{Language, LanguageSpec, Numbered, WithNames}
+import org.opentorah.metadata.{Language, LanguageSpec, Named, Numbered}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
@@ -135,7 +135,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
       <div>
       <div>{dayLinks(firstDay, other = false)} {firstDay.name.toLanguageString(spec)}</div>
       <div>{dayLinks(secondDay, other = true)} {secondDay.name.toLanguageString(spec)}</div>
-      <div>{daySchedule.dayNames.map { (withNames: WithNames) =>
+      <div>{daySchedule.dayNames.map { (withNames: Named) =>
         <span class="name">{withNames.names.doFind(spec).name}</span>}}</div>
       {renderOptionalReading("Morning", daySchedule.morning)}
       {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
@@ -274,7 +274,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     haftarah.fold(Seq(<tr><td>None</td></tr>)){ haftarah =>
       val spans = haftarah.spans
       val parts: Seq[Seq[Haftarah.BookSpan]] =
-        Collections.group[Haftarah.BookSpan, Option[WithNames]](spans, span => span.source)
+        Collections.group[Haftarah.BookSpan, Option[Named]](spans, span => span.source)
       parts map { (part: Seq[Haftarah.BookSpan]) =>
         <tr>
           <td>{Haftarah.toLanguageString(part)(spec)}</td>
@@ -286,7 +286,7 @@ sealed abstract class Renderer(location: Location, spec: LanguageSpec) {
     renderMaftir(maftirAndHaftarah.flatMap(_.maftir)) ++
       renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
-  private def renderSource(source: Option[WithNames]): String =
+  private def renderSource(source: Option[Named]): String =
     source.fold[String]("")(_.toLanguageString(spec))
 
   private def renderCustoms[T](

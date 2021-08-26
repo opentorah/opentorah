@@ -1,17 +1,17 @@
 package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Selector, Store}
+import org.opentorah.store.{By, Caching, FindByName, Selector, Store}
 import org.opentorah.xml.{Parser, ScalaXml}
 import zio.ZIO
 
 object Reports extends By with HtmlContent[Site] {
   override def selector: Selector = Selector.byName("report")
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = Store.findByName(
+  override def findByName(name: String): Caching.Parser[Option[Store]] = FindByName.findByName(
     name,
     "html",
-    name => Store.findByName(name, reports)
+    name => FindByName.findByName(name, reports)
   )
 
   val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)

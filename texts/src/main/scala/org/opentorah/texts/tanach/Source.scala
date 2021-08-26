@@ -1,16 +1,16 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Names, WithNames}
+import org.opentorah.metadata.{Named, Names}
 
 object Source {
-  trait Numbers extends WithNames {
-    def withNames: WithNames
+  trait Numbers extends Named {
+    def withNames: Named
 
     def from: Int
 
     def to: Int
 
-    override def merge(other: WithNames): WithNames = {
+    override def merge(other: Named): Named = {
       require(other.isInstanceOf[Numbers])
       val that = other.asInstanceOf[Numbers]
       require(this.withNames == that.withNames)
@@ -19,7 +19,7 @@ object Source {
     }
   }
 
-  final class AndNumber(override val withNames: WithNames, val number: Int) extends Numbers {
+  final class AndNumber(override val withNames: Named, val number: Int) extends Numbers {
     require(number > 0)
 
     override def from: Int = number
@@ -31,7 +31,7 @@ object Source {
     ))
   }
 
-  final class AndNumbers(override val withNames: WithNames, override val from: Int, override val to: Int) extends Numbers {
+  final class AndNumbers(override val withNames: Named, override val from: Int, override val to: Int) extends Numbers {
     require(from > 0)
     require(to > from)
 

@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Element, Elements, Parsable, PrettyPrinter, ScalaXml}
+import org.opentorah.xml.{Element, Elements, PrettyPrinter, ScalaXml}
 import java.net.URL
 
 final class ListFile[M, W <: AnyRef](
@@ -20,7 +20,5 @@ final class ListFile[M, W <: AnyRef](
     load = (url: URL) => list.parse(url).map(wrapper)
   )
 
-  private val list: Element[Seq[M]] = new Element[Seq[M]](name) {
-    override def contentParsable: Parsable[Seq[M]] = entry.seq
-  }
+  private val list: Element[Seq[M]] = entry.wrappedSeq(name)
 }

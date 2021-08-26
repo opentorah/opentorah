@@ -57,15 +57,15 @@ object Directory {
   class Wrapper[M](name2entry: Map[String, M]) {
     final def entries: Seq[M] = name2entry.values.toSeq
 
-    final def findByName(name: String): Caching.Parser[Option[M]] = Store.findByName(name, "html", get)
+    final def findByName(name: String): Caching.Parser[Option[M]] = FindByName.findByName(name, "html", get)
 
     final def get(name: String): Parser[Option[M]] = ZIO.succeed(name2entry.get(name))
   }
 
   abstract class Entry(
-    val name: String
+    override val name: String
   ) extends Store {
-    final override def names: Names = Names(name)
+    final override val names: Names = Names(name)
   }
 
   trait EntryMaker[T, M <: Entry] extends Elements[M] {

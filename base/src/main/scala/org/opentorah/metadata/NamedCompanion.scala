@@ -7,7 +7,7 @@ trait NamedCompanion {
   // TODO try pushing
   //     final override def names: Names = toNames(this)
   // into the base class of the Key...
-  type Key <: WithName with WithNames
+  type Key <: Named
 
   def values: Seq[Key]
 
@@ -16,8 +16,8 @@ trait NamedCompanion {
   //   Language metadata file references Language instances by name :)
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
-  // - not final so that it can be overridden in Tanach, for instance.
-  lazy val toNames: Map[Key, Names] = Parser.unsafeRun(Metadata.load[Key, Names](
+  // - not final so that it can be overridden in Tanach :)
+  lazy val toNames: Map[Key, Names] = Parser.unsafeRun(Named.load[Key, Names](
     from = From.resource(this, resourceName),
     content = Names.NamesMetadata,
     keys = values,

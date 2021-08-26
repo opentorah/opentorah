@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Metadata, Named, NamedCompanion, Names}
+import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
 
@@ -34,7 +34,7 @@ object Tanach extends NamedCompanion {
       override def parser: Parser[Parsed] = for {
         names <- Names.withDefaultNameParsable()
         chapters <- Chapters.parser
-        book <- Metadata.find[Book](values, names)
+        book <- Named.find[Book](values, names)
         result <- book.parser(names, chapters)
       } yield result
 
@@ -64,10 +64,10 @@ object Tanach extends NamedCompanion {
 
   private def loadMetadata(): Unit = {
     val metadata: Map[Book, Parsed] = Parser.unsafeRun(
-      Metadata.load(
+      Named.load(
         from = From.resource(Tanach),
         content = Parsed.followRedirects
-      ).flatMap(Metadata.bind[Book, Parsed](
+      ).flatMap(Named.bind[Book, Parsed](
         keys = values,
         _,
         getKey = _.book

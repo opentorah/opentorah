@@ -3,7 +3,7 @@ package org.opentorah.schedule.tanach
 import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.calendar.jewish.SpecialDay
-import org.opentorah.metadata.WithNames
+import org.opentorah.metadata.Named
 import org.opentorah.texts.tanach.{Reading, WeeklyReading}
 import org.opentorah.util.{Cache, Collections, PairSlider}
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
@@ -19,7 +19,7 @@ object Schedule {
 
   final case class DaySchedule /* TODO private */(
     day: Day,
-    dayNames: Seq[WithNames],
+    dayNames: Seq[Named],
     morning: Option[Reading],
     purimAlternativeMorning: Option[Reading],
     afternoon: Option[Reading],

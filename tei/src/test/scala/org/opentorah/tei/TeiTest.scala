@@ -9,9 +9,9 @@ import zio.{UIO, URIO, ZLayer}
 final class TeiTest extends AnyFlatSpec with Matchers {
 
   "Parsing" should "work" in {
-//    println(Tei.prettyPrinter.renderXml(Parser.load(From.resource(Tei, "905"))))
+//    println(Tei.prettyPrinter.renderWithHeader(Parser.load(From.resource(Tei, "905"))))
     val tei: Tei = Parser.unsafeRun(Tei.parse(From.resource(Tei, "905")))
-//    println(Tei.prettyPrinter.renderXml(Tei.toXmlElement(tei)))
+//    println(Tei.prettyPrinter.renderWithHeader(Tei.toXmlElement(tei)))
   }
 
   "Entity parsing" should "work" in {

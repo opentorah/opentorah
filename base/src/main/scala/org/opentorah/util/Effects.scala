@@ -39,7 +39,7 @@ object Effects {
     runs <- ZIO.foreach(zios)(_.either)
     errors: Seq[Error] = runs.flatMap(_.left.toOption)
     results: Seq[A] = runs.flatMap(_.toOption)
-    results <- if (errors.nonEmpty) ZIO.fail(errors.mkString("Errors:\n  ", "\n  ", "\n.")) else ZIO.succeed(results)
+    _ <- check(errors.isEmpty, errors.mkString("Errors:\n  ", "\n  ", "\n."))
   } yield results
 
   def mapValues[R, A, B, C](map: Map[A, B])(f: B => ZIO[R, Error, C]): ZIO[R, Error, Map[A, C]] =

@@ -1,7 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.metadata.{LanguageSpec, LanguageString, Named, NamedCompanion, Numbered}
+import org.opentorah.metadata.{Language, LanguageSpec, Named, NamedCompanion, Numbered}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
@@ -17,7 +17,7 @@ trait Calendar extends Times {
 
   type YearCharacter
 
-  abstract class YearBase(final override val number: Int) extends Numbered with LanguageString { this: Year =>
+  abstract class YearBase(final override val number: Int) extends Numbered with Language.ToString { this: Year =>
 
     final override type T = Year // TODO turn back into Numbered's type parameter?
 
@@ -205,7 +205,7 @@ trait Calendar extends Times {
 
   protected def createMonthCompanion: MonthCompanionType
 
-  class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered with LanguageString { this: Day =>
+  class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered with Language.ToString { this: Day =>
 
     final override type T = Day
 
@@ -294,7 +294,7 @@ trait Calendar extends Times {
 
   protected def newDay(monthOpt: Option[Month], number: Int): Day
 
-  abstract class MomentBase(digits: Digits) extends TimePointBase(digits) with LanguageString { this: Moment =>
+  abstract class MomentBase(digits: Digits) extends TimePointBase(digits) with Language.ToString { this: Moment =>
     final def calendar: Calendar = Calendar.this
 
     final def day: Day = Day(dayNumber)

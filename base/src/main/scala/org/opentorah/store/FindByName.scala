@@ -1,5 +1,7 @@
 package org.opentorah.store
 
+import org.opentorah.util.Files
+import org.opentorah.xml.Parser
 import zio.ZIO
 
 trait FindByName {
@@ -29,4 +31,27 @@ trait FindByName {
       _.fold[Caching.Parser[Option[Store.Path]]](ZIO.none)(next => next.resolve(path.tail, next +: acc))
     )
   }
+}
+
+object FindByName {
+
+  def findByName[M](
+    fullName: String,
+    allowedExtension: String,
+    findByName: String => Caching.Parser[Option[M]],
+    assumeAllowedExtension: Boolean = false
+  ): Caching.Parser[Option[M]] = {
+    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(fullName)
+
+    val name: Option[String] =
+      if (extension.isDefined && !extension.contains(allowedExtension))
+        if (assumeAllowedExtension) Some(fullName) else None
+      else
+        Some(fileName)
+
+    name.fold[Caching.Parser[Option[M]]](ZIO.none)(name => findByName(name))
+  }
+
+  def findByName(name: String, stores: Seq[Store]): Parser[Option[Store]] =
+    ZIO.succeed(stores.find(_.names.hasName(name)))
 }

@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Metadata, Named, NamedCompanion, Names, WithNumber}
+import org.opentorah.metadata.{Named, NamedCompanion, Names, WithNumber}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
 
@@ -112,7 +112,7 @@ object Parsha extends NamedCompanion {
     aliyot <- Aliyah.seq()
     daysParsed <- DayParsed.seq()
     maftir <- Maftir.required()
-    parsha <- Metadata.find[Parsha](book.parshiot, names)
+    parsha <- Named.find[Parsha](book.parshiot, names)
   } yield {
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     new Parsed(
