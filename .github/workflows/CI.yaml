@@ -20,9 +20,6 @@ jobs:
           java-version: 11
           distribution: 'zulu'
 
-#      - name: "Assemble"
-#        run: ./gradlew --no-daemon --console=plain assemble
-
 #  disabled while working on fast-changing Markdown files...
 #      - name: "Build and push container image to GCR and deploy Cloud Run service"
 #        env:
