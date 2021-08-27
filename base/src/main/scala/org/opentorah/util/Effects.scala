@@ -21,19 +21,23 @@ object Effects {
   // Note: when running with 1 cpu (on Cloud Run or in local Docker),
   // take care to avoid deadlocks:
 
-  // Note: using blockingRuntime to avoid deadlocks with nested unsafeRun() calls:
+  // Note: using blockingRuntime to avoid deadlocks with nested unsafeRun() calls (TODO is this still needed?):
   private val blockingRuntime: Runtime[_] = Runtime.default.withExecutor(Blocking.Service.live.blockingExecutor)
+  // ZIO 2:   private val blockingRuntime: Runtime[_] = Runtime.default.withExecutor(Runtime.default.platform.blockingExecutor)
 
   def unsafeRun[E, A](io: => IO[E, A]): A =
     blockingRuntime.unsafeRun[E, A](io)
 
   // Note: run effects on the blocking threadpool:
   def effectTotal[A](effect: => A): Task[A] =
-    Blocking.Service.live.effectBlocking(effect)
+    Blocking.Service.live.effectBlocking(effect) // ZIO 2: ZIO.succeedBlocking(effect)
 
   // Note: run effects on the blocking threadpool:
+  def attempt[A](f: => A): Task[A] =
+    Blocking.Service.live.effectBlocking(f) // ZIO 2: ZIO.attemptBlocking(f)
+
   def effect[A](f: => A): IO[Error, A] =
-    throwable2error(Blocking.Service.live.effectBlocking(f))
+    throwable2error(attempt(f))
 
   def collectAll[R, A](zios: Seq[ZIO[R, Error, A]]): ZIO[R, Error, Seq[A]] = for {
     runs <- ZIO.foreach(zios)(_.either)

@@ -425,12 +425,6 @@ object Renderer {
     override protected def second(day: Calendar#DayBase): Calendar#DayBase = jewish(day)
   }
 
-  def renderer(kindStr: String, location: Location, spec: LanguageSpec): Renderer = {
-    if (kindStr == jewishRendererName) new JewishRenderer(location, spec)
-    else if (kindStr == gregorianRenderername) new GregorianRenderer(location, spec)
-    else throw new IllegalArgumentException(s"Unrecognized kind $kindStr")
-  }
-
   def renderRoot(location: Location, spec: LanguageSpec): String = renderHtml(
     url = Seq.empty,
     content =
@@ -480,4 +474,14 @@ object Renderer {
 
   private def suffix(location: Location, spec: LanguageSpec): String =
     s"inHolyLand=${location.inHolyLand}&lang=${spec.languageName}"
+
+  def renderer(
+    kindStr: String,
+    location: Location,
+    spec: LanguageSpec
+  ): Renderer = {
+    if (kindStr == jewishRendererName) new JewishRenderer(location, spec)
+    else if (kindStr == gregorianRenderername) new GregorianRenderer(location, spec)
+    else throw new IllegalArgumentException(s"Unrecognized kind $kindStr")
+  }
 }

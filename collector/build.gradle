@@ -27,7 +27,7 @@ dependencies {
     exclude group: 'com.vladsch.flexmark', module: 'flexmark'
   }
 
-  implementation libs.bundles.http4s
+  implementation libs.zhttp
   implementation libs.logback
   implementation libs.logstash
 

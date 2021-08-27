@@ -21,7 +21,6 @@ dependencies {
 
   implementation project(':opentorah-calendar')
 
-  implementation libs.bundles.http4s
   implementation libs.logback
   implementation libs.logstash
 
