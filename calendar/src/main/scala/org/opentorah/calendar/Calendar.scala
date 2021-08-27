@@ -19,7 +19,7 @@ trait Calendar extends Times {
 
   abstract class YearBase(final override val number: Int) extends Numbered with Language.ToString { this: Year =>
 
-    final override type T = Year // TODO turn back into Numbered's type parameter?
+    final override type T = Year // TODO turn back into Numbered's type parameter!
 
     def character: YearCharacter
 
@@ -275,18 +275,18 @@ trait Calendar extends Times {
   type Day <: DayBase
 
   final class DayCompanion {
-    final def apply(number: Int): Day = newDay(None, number)
+    def apply(number: Int): Day = newDay(None, number)
 
-    private[opentorah] final def witNumberInMonth(month: Month, numberInMonth: Int): Day = {
+    private[opentorah] def witNumberInMonth(month: Month, numberInMonth: Int): Day = {
       require (0 < numberInMonth && numberInMonth <= month.length)
       newDay(Some(month), month.firstDayNumber + numberInMonth - 1)
     }
 
-    final def from(day: Calendar#Day): Day = day.to(Calendar.this)
+    def from(day: Calendar#Day): Day = day.to(Calendar.this)
 
     // Note: change of day because of the time offset is not taken into account,
     // so careful with things like molad announcements...
-    final def numberInWeek(dayNumber: Int): Int =
+    def numberInWeek(dayNumber: Int): Int =
       ((dayNumber - 1) + (Jewish.epochDayNumberInWeek - 1) + epoch - Jewish.epoch) % Week.length + 1
   }
 

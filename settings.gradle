@@ -55,7 +55,7 @@ dependencyResolutionManagement {
     alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
 
     // XML
-    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.0.2')
+    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.1.0')
     alias('jing').to('org.relaxng:jing:20181222')
     alias('xerces' ).to('xerces:xercesImpl:2.12.1')
     alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...

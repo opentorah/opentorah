@@ -3,6 +3,7 @@ package org.opentorah.calendar
 import org.opentorah.calendar.jewish.Jewish.{Day, Moment, Month, TimeVector, Year}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Moon, NewYear, Season, Sun}
 import Week.Day._
+import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.metadata.Language
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
@@ -79,13 +80,15 @@ class TextTest extends AnyFunSpec with Matchers {
         Мой вопрос: решает ли таков изменение твою проблему.
        */
       it("molad Nisan example") { // TODO Note: Rambam says 5 instead of 17:
-//        for (yearNumber <- 1.to(6000)) {
+//        for (yearNumber <- 4890.to(4966) /*1.to(6000)*/) { // Rambam: 1138–1204
 //          val moladNisan = Year(yearNumber).month(Month.Nisan).newMoon
-//          if (moladNisan.parts == 107) println(
-//            moladNisan.day.toLanguageString(Language.English.toSpec) + " " +
-//            moladNisan.day.name + " " +
-//            s"${moladNisan.hours}h ${moladNisan.parts}p"
-//          )
+//          if (moladNisan.day.name == Rishon) //(moladNisan.parts == 107)
+//            println(
+//              moladNisan.day.toLanguageString(Language.English.toSpec) + " " +
+//              moladNisan.to(Gregorian).toLanguageString(Language.English.toSpec) + " " +
+//              moladNisan.day.name + " " +
+//              s"${moladNisan.hours}h ${moladNisan.parts}p"
+//            )
 //        }
         (TimeVector().hours(17).parts(107) + Moon.meanLunarPeriod).time shouldBe
           TimeVector().hours( 5).parts(900)

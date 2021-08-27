@@ -36,7 +36,7 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
     call = _.resolveEntity(publicId, systemId),
     parameters = s"Resolver.resolveEntity(publicId=$publicId, systemId=$systemId)",
     id = _.getSystemId,
-    ignoreUnresolved = false
+    ignoreUnresolved = systemId.startsWith("file:")
   )
 
   private def resolve[R](
