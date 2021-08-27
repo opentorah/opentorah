@@ -19,5 +19,7 @@ dependencies {
   implementation project(':opentorah-base')
   implementation libs.scala.xml
 
+  testImplementation libs.zio.test
+  testImplementation libs.zio.prelude
   testImplementation libs.cats.core
 }

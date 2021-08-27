@@ -17,9 +17,7 @@ trait Calendar extends Times {
 
   type YearCharacter
 
-  abstract class YearBase(final override val number: Int) extends Numbered with Language.ToString { this: Year =>
-
-    final override type T = Year // TODO turn back into Numbered's type parameter!
+  abstract class YearBase(final override val number: Int) extends Numbered[Year] with Language.ToString { this: Year =>
 
     def character: YearCharacter
 
@@ -126,9 +124,7 @@ trait Calendar extends Times {
 
   protected def createYearCompanion: YearCompanionType
 
-  class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered { this: Month =>
-
-    final override type T = Month
+  class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered[Month] { this: Month =>
 
     protected var yearOpt: Option[Year] = yearOption
 
@@ -205,9 +201,7 @@ trait Calendar extends Times {
 
   protected def createMonthCompanion: MonthCompanionType
 
-  class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered with Language.ToString { this: Day =>
-
-    final override type T = Day
+  class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered[Day] with Language.ToString { this: Day =>
 
     protected var monthOpt: Option[Month] = monthOption
 

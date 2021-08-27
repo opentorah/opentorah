@@ -1,16 +1,10 @@
 package org.opentorah.calendar.service
 
-import cats.effect.ExitCode
+import io.netty.handler.codec.http.{HttpHeaderNames, HttpHeaderValues}
 import org.opentorah.metadata.{Language, LanguageSpec}
-import org.http4s.{Charset, HttpRoutes, QueryParamDecoder, Response, StaticFile}
-import org.http4s.dsl.Http4sDsl
-import org.http4s.implicits._
-import org.http4s.headers.`Content-Type`
-import org.http4s.MediaType
-import org.http4s.blaze.server.BlazeServerBuilder
-import zio.{App, Task, ZEnv, ZIO}
-import zio.interop.catz._
-import zio.interop.catz.implicits._
+import org.opentorah.util.{Logging, Zhttp}
+import zhttp.http._
+import zio.ZIO
 
 /*
   There is currently no need for the polished, public UI.
@@ -29,85 +23,53 @@ import zio.interop.catz.implicits._
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends App {
+object CalendarService extends zio.App {
+
+  Logging.configureLogBack(useLogStash = false)
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
-  private val dsl = Http4sDsl[Task]
-  import dsl._
+  private val routes = Http.collectM[Request] {
+    case request @ Method.GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
+      for {
+        static <- Zhttp.staticResource("/" + path, Some(request))
+      } yield static.getOrElse(Zhttp.notFound(path))
 
-  private val service: HttpRoutes[Task] = HttpRoutes.of[Task] {
-    case request @ GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
-      StaticFile.fromResource("/" + path, Some(request)).getOrElseF(NotFound())
+    case request @ Method.GET -> Root =>
+      renderHtml(Renderer.renderRoot(getLocation(request), getLanguage(request)))
 
-    case GET -> Root
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    => renderHtml(Renderer.renderRoot(toLocation(maybeLocation), toSpec(maybeLanguage)))
+    case request@ Method.GET -> Root / kindStr =>
+      renderHtml(renderer(kindStr, request).renderLanding)
 
-    case GET -> Root / kindStr
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      renderHtml(renderer(kindStr, maybeLocation, maybeLanguage).renderLanding)
+    case request@ Method.GET -> Root / kindStr / yearStr =>
+      renderHtml(renderer(kindStr, request).renderYear(yearStr))
 
-    case GET -> Root / kindStr / yearStr
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      renderHtml(renderer(kindStr, maybeLocation, maybeLanguage).renderYear(yearStr))
+    case request @ Method.GET -> Root / kindStr / yearStr / monthStr =>
+      renderHtml(renderer(kindStr, request).renderMonth(yearStr, monthStr))
 
-    case GET -> Root / kindStr / yearStr / monthStr
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      renderHtml(renderer(kindStr, maybeLocation, maybeLanguage).renderMonth(yearStr, monthStr))
-
-    case GET -> Root / kindStr / yearStr / monthStr / dayStr
-      :? OptionalLanguageQueryParamMatcher(maybeLanguage)
-      :? OptionalInHolyLandQueryParamMatcher(maybeLocation)
-    =>
-      renderHtml(renderer(kindStr, maybeLocation, maybeLanguage).renderDay(yearStr, monthStr, dayStr))
+    case request@ Method.GET -> Root / kindStr / yearStr / monthStr / dayStr =>
+      renderHtml(renderer(kindStr, request).renderDay(yearStr, monthStr, dayStr))
   }
 
-  private implicit val languageQueryParamDecoder: QueryParamDecoder[Language] =
-    QueryParamDecoder[String].map(Language.getForName)
+  private def renderer(kindStr: String, request: Request): Renderer =
+    Renderer.renderer(kindStr, getLocation(request), getLanguage(request))
 
-  private object OptionalLanguageQueryParamMatcher extends OptionalQueryParamDecoderMatcher[Language]("lang")
+  private def getLanguage(request: Request): LanguageSpec = Zhttp.queryParameter(request, "lang")
+    .map(Language.getForName)
+    .getOrElse(Language.English).toSpec
 
-  private implicit val locationQueryParamDecoder: QueryParamDecoder[Location] =
-    QueryParamDecoder[Boolean].map(if (_) Location.HolyLand else Location.Diaspora)
+  private def getLocation(request: Request): Location = Zhttp.queryParameter(request, "inHolyLand")
+    .map(value => value == "true")
+    .map(if (_) Location.HolyLand else Location.Diaspora)
+    .getOrElse(Location.Diaspora)
 
-  private object OptionalInHolyLandQueryParamMatcher extends OptionalQueryParamDecoderMatcher[Location]("inHolyLand")
+  def renderHtml(content: String): ResponseM[Any, Nothing] = ZIO.succeed(Response.http(
+    headers = List(Header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_HTML)), // TODO UTF-8?
+    content = Zhttp.textData(content)
+  ))
 
-  private def renderer(
-    kindStr: String,
-    maybeLocation: Option[Location],
-    maybeLanguage: Option[Language]
-  ): Renderer = Renderer.renderer(kindStr, toLocation(maybeLocation), toSpec(maybeLanguage))
-
-  private def toSpec(language: Option[Language]): LanguageSpec = language.getOrElse(Language.English).toSpec
-
-  private def toLocation(location: Option[Location]): Location = location.getOrElse(Location.Diaspora)
-
-  def renderHtml(content: String): Task[Response[Task]] = Ok(content).map(
-    _.withContentType(`Content-Type`(MediaType.`text`.`html`, Charset.`UTF-8`))
+  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, zio.ExitCode] = Zhttp.start(
+    port = scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090),
+    routes
   )
-
-  // To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1:
-  val server: ZIO[ZEnv, Throwable, Unit] = ZIO.runtime[ZEnv].flatMap { implicit rts =>
-    BlazeServerBuilder[Task](executionContext = scala.concurrent.ExecutionContext.global)
-      .bindHttp(host = "0.0.0.0", port = getServicePort)
-      .withWebSockets(false)
-      .withHttpApp(service.orNotFound)
-      .serve
-      .compile[Task, Task, ExitCode]
-      .drain
-  }
-
-  private def getServicePort: Int =
-    scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090)
-
-  def run(args: List[String]): ZIO[ZEnv, Nothing, zio.ExitCode] =
-    server.exitCode
 }

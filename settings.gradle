@@ -28,10 +28,13 @@ final String scalaLibrary      = 'org.scala-lang:scala-library'
 //final String scalaVersionMajor  = '3'
 //final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 
+// TODO update to 2.0.0-M1 and fix the issues with Blocking etc. - once zhttp is updated...
+final String zioVersion = '1.0.11'
+
 // latest version supported by ScalTest seems to be 0.36.8;
 // I need flexmark for Markdown to Html conversion, and would prefer to use a later version...
 final String flexmarkVersion = '0.36.8'
-final String http4sVersion   = '1.0.0-M24'
+
 final String batikVersion    = '1.14'
 
 dependencyResolutionManagement {
@@ -64,22 +67,21 @@ dependencyResolutionManagement {
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.0.2')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.0')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
-    // TODO update to 2.0.0-M1 and fix the issues with Blocking in org.opentorah.util.Effects
-    alias('zio-core'        ).to("dev.zio:zio_$scalaVersionMajor:1.0.11")
-    alias('cats-core'       ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
-    alias('cats-effect'     ).to("org.typelevel:cats-effect-kernel_$scalaVersionMajor:3.2.3")
-    alias('zio-interop-cats').to("dev.zio:zio-interop-cats_$scalaVersionMajor:3.1.1.0")
+    alias('zio-core'   ).to("dev.zio:zio_$scalaVersionMajor:$zioVersion")
+    alias('zio-streams').to("dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
+    alias('zio-test'   ).to("dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
+    alias('zio-prelude').to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC6")
 
-    // HTTP (TODO switch to https://github.com/dream11/zio-http?)
-    alias('http4s-dsl'         ).to("org.http4s:http4s-dsl_$scalaVersionMajor:$http4sVersion")
-    alias('http4s-blaze-server').to("org.http4s:http4s-blaze-server_$scalaVersionMajor:$http4sVersion")
-    alias('http4s-blaze-client').to("org.http4s:http4s-blaze-client_$scalaVersionMajor:$http4sVersion")
+    alias('cats-core'  ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
+
+    // ZHTTP
+    alias('zhttp').to("io.d11:zhttp_$scalaVersionMajor:1.0.0.0-RC17")
 
     // Paiges
     alias('paiges').to("org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
@@ -121,13 +123,9 @@ dependencyResolutionManagement {
     alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // Documentation
-    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.22")
+    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.23")
 
     // --- bundles ---
-    bundle('http4s', [
-      'http4s-dsl', 'http4s-blaze-server', 'http4s-blaze-client',
-      'zio-interop-cats', 'cats-core', 'cats-effect'
-    ])
     bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])  // 'flexmark-util-ast', 'flexmark-util-data'
   }}
 }

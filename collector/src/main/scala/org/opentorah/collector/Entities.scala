@@ -18,7 +18,7 @@ final class Entities(
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
 
-  override def findByName(name: String): Caching.Parser[Option[Entity]] = getDirectory >>= (_.findByName(name))
+  override def findByName(name: String): Caching.Parser[Option[Entity]] = getDirectory.flatMap(_.findByName(name))
 }
 
 object Entities extends Element[Entities]("entities") {

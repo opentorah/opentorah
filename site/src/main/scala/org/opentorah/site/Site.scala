@@ -32,7 +32,7 @@ class Site[S <: Site[S]](
 
   final def resolveContent(path: Seq[String]): Task[Option[Site.Response]] =
     if (path.headOption.exists(staticPaths.contains)) Task.none
-    else toTask(resolve(path) >>= (_.map(content(_).map(Some(_))).getOrElse(ZIO.none)))
+    else toTask(resolve(path).flatMap(_.map(content(_).map(Some(_))).getOrElse(ZIO.none)))
 
   final def resolve(url: String): Caching.Parser[Option[Store.Path]] = resolve(Files.splitAndDecodeUrl(url))
 
@@ -93,7 +93,7 @@ class Site[S <: Site[S]](
     }
 
   final protected def resolveHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[ScalaXml.Element] =
-    htmlContent.content(this) >>= { content =>
+    htmlContent.content(this).flatMap { content =>
       if (ScalaXml.getNamespace(content) == DocBook.namespace.default)
         DocBook.toHtml(content).provideLayer(ZLayer.succeed(()))
       else

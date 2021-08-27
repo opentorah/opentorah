@@ -1,13 +1,11 @@
 package org.opentorah.metadata
 
-trait Numbered {
+trait Numbered[T] {
 
   def number: Int
 
-  type T
-
   final override def equals(other: Any): Boolean = other match {
-    case that: Numbered => number == that.number
+    case that: Numbered[T] => number == that.number
     case _ => false
   }
 
@@ -19,7 +17,7 @@ trait Numbered {
 object Numbered {
   import scala.language.implicitConversions
 
-  implicit def numberedOrdering[T <: Numbered]: Ordering[T] = (x: T, y: T ) => x.number - y.number
+  implicit def numberedOrdering[T <: Numbered[T]]: Ordering[T] = (x: T, y: T ) => x.number - y.number
 
-  implicit def numberedOrderingOps[T <: Numbered](lhs: T): Ordering[T]#OrderingOps = numberedOrdering.mkOrderingOps(lhs)
+  implicit def numberedOrderingOps[T <: Numbered[T]](lhs: T): Ordering[T]#OrderingOps = numberedOrdering.mkOrderingOps(lhs)
 }

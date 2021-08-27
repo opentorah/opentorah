@@ -74,7 +74,8 @@ object Files {
   private def subUrl(base: URL, url: String): URL = new URL(base, url)
   def subFile(base: URL, url: String): File = url2file(subUrl(base, url))
 
-  def splitUrl(url: String): Seq[String] = {
+  def splitUrl(urlRaw: String): Seq[String] = {
+    val url: String = if (urlRaw.isEmpty) "/" else urlRaw
     require(url.startsWith("/"))
     url.substring(1).split("/").toIndexedSeq.filterNot(_.isBlank)
   }

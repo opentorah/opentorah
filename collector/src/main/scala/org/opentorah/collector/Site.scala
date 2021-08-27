@@ -154,10 +154,10 @@ final class Site(
   }
 
   override def findByName(name: String): Caching.Parser[Option[Store]] =
-    ZIO.succeed(alias2collectionAlias.get(name)) >>= {
+    ZIO.succeed(alias2collectionAlias.get(name)).flatMap {
       case Some(result) => ZIO.some(result)
       case None =>
-        FindByName.findByName(name, Seq(entities, notes, Reports, by)) >>= {
+        FindByName.findByName(name, Seq(entities, notes, Reports, by)).flatMap {
           case Some(result) => ZIO.some(result)
           case None => FindByName.findByName(
             name,
@@ -218,7 +218,7 @@ final class Site(
 
       _ <- Effects.effect(logger.info("Verifying site."))
 
-      errorOpts <- getReferences >>= (ZIO.foreach(_) { value =>
+      errorOpts <- getReferences.flatMap(ZIO.foreach(_) { value =>
         val reference: EntityReference = value.value
         val name: ScalaXml.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
@@ -239,7 +239,7 @@ final class Site(
       allEntities <- entities.directoryEntries
       _ <- ZIO.foreach_(hierarchies ++ collections ++ allNotes ++ allEntities)(resolveHtmlContent)
 
-      _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries >>= (ZIO.foreach_(_)(document =>
+      _ <- ZIO.foreach_(collections)(collection => collection.directoryEntries.flatMap(ZIO.foreach_(_)(document =>
           resolveHtmlContent(collection.textFacet.of(document)))))
     } yield ()
 
@@ -253,15 +253,15 @@ final class Site(
     for {
       entities <- entities.directoryEntries
       fromEntities <- ZIO.foreach(entities)(entity =>
-        entity.teiEntity(this) >>= (teiEntity => withSource(entity, teiEntity.content)))
+        entity.teiEntity(this).flatMap(teiEntity => withSource(entity, teiEntity.content)))
       fromHierarchicals <- ZIO.foreach(hierarchies ++ collections) { hierarchical => withSource(
         hierarchical,
         Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.content)
       )}
       fromDocuments <- ZIO.foreach(collections) { collection =>
-        collection.directoryEntries >>= (documents => ZIO.foreach(documents) { document =>
+        collection.directoryEntries.flatMap(documents => ZIO.foreach(documents) { document =>
           val text: Document.TextFacet = collection.textFacet.of(document)
-          text.getTei >>= (tei => withSource(text, Seq(Tei.xmlElement(tei))))
+          text.getTei.flatMap(tei => withSource(text, Seq(Tei.xmlElement(tei))))
         })
       }
     } yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten

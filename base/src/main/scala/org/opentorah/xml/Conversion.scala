@@ -23,7 +23,11 @@ object Conversion {
   }
 
   trait BooleanConversion extends Conversion[Boolean] {
-    final override def fromString(value: String): Boolean = (value == "yes") || value.toBoolean
+    final override def fromString(value: String): Boolean = value match {
+      case "yes" => true
+      case "no"  => false
+      case value => value.toBoolean
+    }
   }
 
   trait IntConversion extends Conversion[Int] {

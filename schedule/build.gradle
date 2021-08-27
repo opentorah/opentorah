@@ -19,5 +19,6 @@ dependencies {
   api project(':opentorah-calendar')
   api project(':opentorah-texts')
   implementation project(':opentorah-base')
-  implementation libs.bundles.http4s
+  implementation libs.zhttp
+  implementation libs.logback
 }

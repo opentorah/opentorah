@@ -13,6 +13,7 @@ apply from: '../configure.gradle'
 dependencies {
   api libs.scala.xml  // TODO api?
   api libs.zio.core
+  api libs.zio.streams
 
   implementation libs.xerces
   implementation libs.paiges
@@ -21,10 +22,13 @@ dependencies {
   // - are declared here as 'compileOnly';
   // - need to be supplied as 'runtimeOnly' where needed.
 
+  compileOnly libs.logback
+  compileOnly libs.logstash
   compileOnly libs.xmlresolver, libs.jing
   compileOnly libs.saxon6  // Saxon 6 (XSLT 1.0)
   compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
   compileOnly libs.caffeine
+  compileOnly libs.zhttp
   compileOnly gradleApi()
 
   testRuntimeOnly libs.saxon10

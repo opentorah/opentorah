@@ -48,7 +48,7 @@ final class Collection(
   override def acceptsIndexHtml: Boolean = true
 
   // With no facet, "document" is assumed
-  override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name) >>= { // TODO ZIO.someOrElseM?
+  override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name).flatMap { // TODO ZIO.someOrElseM?
     case Some(result) => ZIO.some(result)
     case None => FindByName.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
   }
@@ -187,7 +187,7 @@ object Collection extends Element[Collection]("collection") {
     final override def findByName(name: String): Caching.Parser[Option[DF]] = FindByName.findByName(
       name,
       extension,
-      name => (collection.getDirectory >>= (_.get(name))).map(_.map(of)),
+      name => collection.getDirectory.flatMap(_.get(name)).map(_.map(of)),
       // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
       // assume the required extension is implied, and the one found is part of the document name.
       assumeAllowedExtension = true
