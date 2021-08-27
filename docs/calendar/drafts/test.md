@@ -1,4 +1,8 @@
-# Test Page #
+---
+layout: page
+title: Test Page
+---
+## Subtitle ##
 
 Blah
 
