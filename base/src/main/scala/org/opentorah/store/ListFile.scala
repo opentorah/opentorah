@@ -20,5 +20,5 @@ final class ListFile[M, W <: AnyRef](
     load = (url: URL) => list.parse(url).map(wrapper)
   )
 
-  private val list: Element[Seq[M]] = entry.wrappedSeq(name)
+  private def list: Element[Seq[M]] = entry.wrappedSeq(name)
 }
