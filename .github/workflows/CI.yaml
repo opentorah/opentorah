@@ -23,7 +23,8 @@ jobs:
 #      - name: "Assemble"
 #        run: ./gradlew --no-daemon --console=plain assemble
 
-      - name: "Build and push container image to GCR and deploy Cloud Run service"
-        env:
-          gcloudServiceAccountKey: ${{secrets.gcloudServiceAccountKey}}
-        run: ./gradlew --no-daemon --console=plain deploy
+#  disabled while working on fast-changing Markdown files...
+#      - name: "Build and push container image to GCR and deploy Cloud Run service"
+#        env:
+#          gcloudServiceAccountKey: ${{secrets.gcloudServiceAccountKey}}
+#        run: ./gradlew --no-daemon --console=plain deploy
