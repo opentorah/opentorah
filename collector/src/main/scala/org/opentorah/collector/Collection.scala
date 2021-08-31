@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory, Stores, Selector, Store}
+import org.opentorah.store.{By, Caching, Directory, Selector, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -25,13 +25,14 @@ final class Collection(
   Document,
   new Collection.Documents(_, parts)
 ) with Hierarchical {
+
   override def getBy: Option[ByHierarchy] = None
 
   override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
 
-  def facsimileUrl(site: Collector): String = {
-    val pathStr: String = site.store2path(this).map(_.structureName).mkString("/")
-    site.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
+  def facsimileUrl(collector: Collector): String = {
+    val pathStr: String = collector.store2path(this).map(_.structureName).mkString("/")
+    collector.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
   }
 
   def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =
@@ -43,15 +44,17 @@ final class Collection(
   val teiFacet      : Collection.TeiFacet       = new Collection.TeiFacet      (this)
   val textFacet     : Collection.TextFacet      = new Collection.TextFacet     (this)
   val facsimileFacet: Collection.FacsimileFacet = new Collection.FacsimileFacet(this)
-  override val stores: Seq[Store] = Seq(textFacet, facsimileFacet, teiFacet)
+
+  override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(textFacet, facsimileFacet, teiFacet)
 
   // With no facet, "document" is assumed
-  override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name).flatMap { // TODO ZIO.someOrElseM?
-    case Some(result) => ZIO.some(result)
-    case None => findByNameInStores(name)
-  }
+  override def findByName(name: String): Caching.Parser[Option[Store]] =
+    textFacet.findByName(name).flatMap {
+      case Some(result) => ZIO.some(result) // TODO ZIO.someOrElseM?
+      case None => findByNameAmongNonTerminalStores(name)
+    }
 
-  override protected def innerContent(site: Collector): Caching.Parser[ScalaXml.Element] =
+  override protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element] =
     for {
       directory <- getDirectory
       columns = Seq[Collection.Column](
@@ -59,16 +62,16 @@ final class Collection(
         Collection.dateColumn,
         Collection.authorsColumn,
         Collection.addresseeColumn,
-        languageColumn(site),
+        languageColumn(collector),
 
         Collection.Column("Документ", "document", { (document: Document) =>
-          ZIO.succeed(textFacet.of(document).a(site)(text = document.baseName))
+          ZIO.succeed(textFacet.of(document).a(collector)(text = document.baseName))
         }),
 
         Collection.Column("Страницы", "pages", { (document: Document) =>
           val text: Document.TextFacet = textFacet.of(document)
           ZIO.succeed(ScalaXml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
-            page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
+            page.pb.addAttributes(text.a(collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
           )))
         }),
 
@@ -122,11 +125,11 @@ final class Collection(
       )
     }.map(rows => <table class="document-header">{rows}</table>)
 
-  private def languageColumn(site: Collector): Collection.Column =
+  private def languageColumn(collector: Collector): Collection.Column =
     Collection.Column("Язык", "language", { (document: Document) =>
       translations(document).map(documentTranslations =>
         Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))
+          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(collector)(text = translation.lang))))
     })
 }
 
@@ -144,16 +147,15 @@ object Collection extends Element[Collection]("collection") {
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store with Stores with HtmlContent[Collector] {
+  final class Alias(val collection: Collection) extends Store.NonTerminal with HtmlContent[Collector] {
     def alias: String = collection.alias.get
 
     override val names: Names = Names(alias)
 
     override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
-    override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[ScalaXml.Nodes] = collection.htmlBodyTitle
-    override def content(site: Collector): Caching.Parser[ScalaXml.Element] = collection.content(site)
+    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(collector)
   }
 
   final class Documents(
@@ -178,17 +180,18 @@ object Collection extends Element[Collection]("collection") {
     lazy val parts: Seq[CollectionPart.Part] = CollectionPart.getParts(partsRaw, originalDocuments)
   }
 
-  sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By with Stores {
-    final override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
+  sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
 
-    final override def findByName(name: String): Caching.Parser[Option[DF]] = findByName(
-      fullName = name,
-      findByName = name => collection.getDirectory.flatMap(_.get(name)).map(_.map(of)),
-      allowedExtension = extension,
-      // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
-      // assume the required extension is implied, and the one found is part of the document name.
-      assumeAllowedExtension = true
-    )
+    final override def findByName(name: String): Caching.Parser[Option[DF]] =
+      for {
+        result <- collection.findByNameInDirectory(
+          name = name,
+          allowedExtension = extension,
+          // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
+          // assume the required extension is implied, and the one found is part of the document name.
+          assumeAllowedExtension = true
+        )
+      } yield result.map(of)
 
     def of(document: Document): DF
 

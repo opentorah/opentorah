@@ -4,6 +4,7 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 
 ## [Unreleased]
 - XML processing cleanup;
+- Store cleanup;
 
 ## [0.2.6] - 2021-08-17
 - added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;

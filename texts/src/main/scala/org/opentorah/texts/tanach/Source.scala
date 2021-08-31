@@ -12,7 +12,7 @@ object Source {
 
     override def merge(other: Named): Named = {
       require(other.isInstanceOf[Numbers])
-      val that = other.asInstanceOf[Numbers]
+      val that: Numbers = other.asInstanceOf[Numbers]
       require(this.withNames == that.withNames)
       require(this.to+1 == that.from)
       new AndNumbers(this.withNames, this.from, that.to)

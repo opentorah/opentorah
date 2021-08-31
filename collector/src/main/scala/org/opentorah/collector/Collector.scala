@@ -2,8 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.html
 import org.opentorah.html.Html
-import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
-import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
+import org.opentorah.site.{HtmlContent, Site, SiteCommon, Viewer}
+import org.opentorah.store.{Caching, Directory, ListFile, Store, Stores, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{FromUrl, Parser, ScalaXml}
@@ -18,7 +18,7 @@ final class Collector(
   val entityLists: EntityLists,
   val notes: Notes,
   val by: ByHierarchy
-) extends org.opentorah.site.Site[Collector](
+) extends Site[Collector](
   fromUrl,
   common
 ) {
@@ -72,11 +72,12 @@ final class Collector(
   // TODO ZIOify logging!
   //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
 
-  override protected def content(path: Store.Path): Caching.Parser[org.opentorah.site.Site.Response] = path.lastOption.getOrElse(this) match {
+  override protected def content(store: Store): Caching.Parser[Option[Site.Response]] = store match {
     case teiFacet   : Document.TeiFacet =>
-      teiFacet.getTei.map(renderTeiContent).map(content => new org.opentorah.site.Site.Response(content, Tei.mimeType))
+      teiFacet.getTei.map(renderTeiContent).map(content => Some(new Site.Response(content, Tei.mimeType)))
     case htmlContent: HtmlContent[Collector] =>
-      renderHtmlContent(htmlContent).map(content => new org.opentorah.site.Site.Response(content, Html.mimeType))
+      renderHtmlContent(htmlContent).map(content => Some(new Site.Response(content, Html.mimeType)))
+    case _ => ZIO.none
   }
 
   override def style(htmlContent: HtmlContent[Collector]): String = htmlContent match {
@@ -85,12 +86,14 @@ final class Collector(
     case _                   => "main"
   }
 
-  override def viewer(htmlContent: HtmlContent[Collector]): Option[org.opentorah.site.Viewer] = htmlContent match {
+  override def viewer(htmlContent: HtmlContent[Collector]): Option[Viewer] = htmlContent match {
     case _: Collection.Alias        => Some(Viewer.Collection)
     case _: Collection              => Some(Viewer.Collection)
     case _: Document.TextFacet      => Some(Viewer.Document  )
     case _: Document.FacsimileFacet => Some(Viewer.Facsimile )
     case _: EntityLists             => Some(Viewer.Names     )
+    case _: EntityList              => Some(Viewer.Names     )
+    case _: Entities                => Some(Viewer.Names     )
     case _: Entity                  => Some(Viewer.Names     )
     case Reports                    => Some(Viewer.Names     )
     case _                          => defaultViewer
@@ -146,6 +149,8 @@ final class Collector(
     case index          : Index            => Seq(index)
     case hierarchy      : Hierarchy        => store2path(hierarchy)
     case entityLists    : EntityLists      => Seq(entityLists)
+    case entityList     : EntityList       => Seq(entityLists, entityList)
+    case entity         : Entities         => Seq(entities)
     case entity         : Entity           => Seq(entities, entity)
     case notes          : Notes            => Seq(notes)
     case note           : Note             => Seq(notes, note)
@@ -153,23 +158,21 @@ final class Collector(
     case report         : Report[_]        => Seq(Reports, report)
   }
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] =
+  override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(entityLists, entities, notes, Reports, by)
+
+  override def findByName(name: String): Caching.Parser[Option[Store]] = {
     ZIO.succeed(alias2collectionAlias.get(name)).flatMap {
-      case Some(result) => ZIO.some(result)
-      case None => findByNameInStores(name).flatMap {
-        case Some(result) => ZIO.some(result)
-        case None => findByName(
-          fullName = name,
-          findByName = name => findByNameInStores(name, Seq(Index.Flat, Index.Tree, entityLists)),
-          allowedExtension = "html",
-          assumeAllowedExtension = false
-        )
+      case Some(result) => ZIO.some(result) // TODO use someOrElseM
+      case None => findByNameAmongNonTerminalStores(name).flatMap {
+        case Some(result) => ZIO.some(result) // TODO use someOrElseM
+        case None => findByNameAmongTerminalStores(name)
       }
     }
+  }
 
-  override val stores: Seq[Store] = Seq(entities, notes, Reports, by)
+  override protected def terminalStores: Seq[Store.Terminal] = Seq(Index.Flat, Index.Tree)
 
-  override protected def linkResolver(htmlContent: org.opentorah.site.HtmlContent[org.opentorah.collector.Collector]): LinksResolver = {
+  override protected def linkResolver(htmlContent: HtmlContent[Collector]): LinksResolver = {
     val textFacet: Option[Document.TextFacet] = htmlContent match {
       case htmlFacet: Document.TextFacet => Some(htmlFacet)
       case _ => None

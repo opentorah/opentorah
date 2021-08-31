@@ -3,6 +3,9 @@ package org.opentorah.store
 import org.opentorah.metadata.{Named, Names}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 
+// TODO introduce transparent (optional) selectors;
+// concentrate resolution logic in resolve();
+// rename the other resolve() ;)
 final class Selector(
   override val names: Names,
   val title: Option[String]

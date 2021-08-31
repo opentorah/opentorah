@@ -3,7 +3,7 @@ package org.opentorah.store
 import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Parser, Unparser}
 
-trait By extends Store {
+trait By extends Store.NonTerminal {
 
   def selector: Selector
 
