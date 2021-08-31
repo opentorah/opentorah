@@ -48,7 +48,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     extends Facet[TeiFacet, Collection.TeiFacet](document, collectionFacet)
 
   abstract class HtmlFacet[DF <: HtmlFacet[DF, F], F <: Collection.HtmlFacet[DF, F]](document: Document, val collectionFacet: F)
-    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Site]
+    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Collector]
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
   }
@@ -58,7 +58,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {
+    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for {
       tei <- getTei
       header <- collection.documentHeader(document)
     } yield
@@ -73,19 +73,19 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
+    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
         {header}
         <div class={Viewer.Facsimile.name}>
           <div class="facsimileScroller">{
             val text: TextFacet = collection.textFacet.of(document)
-            val facsimileUrl: String = collection.facsimileUrl(site)
+            val facsimileUrl: String = collection.facsimileUrl(collector)
             // TODO generate lists of images and check for missing ones and orphans
 
             for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
               val n: String = page.pb.n
               val pageId: String = Pb.pageId(n)
-              text.a(site).setFragment(pageId)(
+              text.a(collector).setFragment(pageId)(
                 <figure>
                   <img
                   id={pageId}

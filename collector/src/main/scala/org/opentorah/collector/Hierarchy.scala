@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.store.{FindByName, Store}
+import org.opentorah.store.Store
 import org.opentorah.tei.{Abstract, Body, Title}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -15,13 +15,12 @@ final class Hierarchy(
   val by: ByHierarchy
 ) extends Hierarchical with FromUrl.With {
 
+  override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(by)
+
   override def getBy: Option[ByHierarchy] = Some(by)
 
-  override def acceptsIndexHtml: Boolean = true
-
-  override def findByName(name: String): Parser[Option[Store]] = FindByName.findByName(name, Seq(by))
-
-  override protected def innerContent(site: Site): Parser[ScalaXml.Element] = ZIO.succeed(by.oneLevelIndex(site))
+  override protected def innerContent(collector: Collector): Parser[ScalaXml.Element] =
+    ZIO.succeed(by.oneLevelIndex(collector))
 }
 
 object Hierarchy extends Element[Hierarchy]("store") {

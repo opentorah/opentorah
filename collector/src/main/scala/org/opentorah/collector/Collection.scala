@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory, FindByName, Selector, Store}
+import org.opentorah.store.{By, Caching, Directory, Selector, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -30,9 +30,9 @@ final class Collection(
 
   override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
 
-  def facsimileUrl(site: Site): String = {
-    val pathStr: String = site.store2path(this).map(_.structureName).mkString("/")
-    site.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
+  def facsimileUrl(collector: Collector): String = {
+    val pathStr: String = collector.store2path(this).map(_.structureName).mkString("/")
+    collector.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
   }
 
   def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =
@@ -45,15 +45,16 @@ final class Collection(
   val textFacet     : Collection.TextFacet      = new Collection.TextFacet     (this)
   val facsimileFacet: Collection.FacsimileFacet = new Collection.FacsimileFacet(this)
 
-  override def acceptsIndexHtml: Boolean = true
+  override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(textFacet, facsimileFacet, teiFacet)
 
   // With no facet, "document" is assumed
-  override def findByName(name: String): Caching.Parser[Option[Store]] = textFacet.findByName(name).flatMap { // TODO ZIO.someOrElseM?
-    case Some(result) => ZIO.some(result)
-    case None => FindByName.findByName(name, Seq(textFacet, facsimileFacet, teiFacet))
-  }
+  override def findByName(name: String): Caching.Parser[Option[Store]] =
+    textFacet.findByName(name).flatMap {
+      case Some(result) => ZIO.some(result) // TODO ZIO.someOrElseM?
+      case None => findByNameAmongNonTerminalStores(name)
+    }
 
-  override protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element] =
+  override protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element] =
     for {
       directory <- getDirectory
       columns = Seq[Collection.Column](
@@ -61,16 +62,16 @@ final class Collection(
         Collection.dateColumn,
         Collection.authorsColumn,
         Collection.addresseeColumn,
-        languageColumn(site),
+        languageColumn(collector),
 
         Collection.Column("Документ", "document", { (document: Document) =>
-          ZIO.succeed(textFacet.of(document).a(site)(text = document.baseName))
+          ZIO.succeed(textFacet.of(document).a(collector)(text = document.baseName))
         }),
 
         Collection.Column("Страницы", "pages", { (document: Document) =>
           val text: Document.TextFacet = textFacet.of(document)
           ZIO.succeed(ScalaXml.multi(separator = " ", nodes = document.pages(pageType).map(page =>
-            page.pb.addAttributes(text.a(site).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
+            page.pb.addAttributes(text.a(collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
           )))
         }),
 
@@ -124,11 +125,11 @@ final class Collection(
       )
     }.map(rows => <table class="document-header">{rows}</table>)
 
-  private def languageColumn(site: Site): Collection.Column =
+  private def languageColumn(collector: Collector): Collection.Column =
     Collection.Column("Язык", "language", { (document: Document) =>
       translations(document).map(documentTranslations =>
         Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(site)(text = translation.lang))))
+          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(collector)(text = translation.lang))))
     })
 }
 
@@ -146,18 +147,15 @@ object Collection extends Element[Collection]("collection") {
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store with HtmlContent[Site] {
-
+  final class Alias(val collection: Collection) extends Store.NonTerminal with HtmlContent[Collector] {
     def alias: String = collection.alias.get
 
     override val names: Names = Names(alias)
 
-    override def acceptsIndexHtml: Boolean = collection.acceptsIndexHtml
-
     override def findByName(name: String): Caching.Parser[Option[Store]] = collection.findByName(name)
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[ScalaXml.Nodes] = collection.htmlBodyTitle
-    override def content(site: Site): Caching.Parser[ScalaXml.Element] = collection.content(site)
+    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(collector)
   }
 
   final class Documents(
@@ -184,14 +182,16 @@ object Collection extends Element[Collection]("collection") {
 
   sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
 
-    final override def findByName(name: String): Caching.Parser[Option[DF]] = FindByName.findByName(
-      name,
-      extension,
-      name => collection.getDirectory.flatMap(_.get(name)).map(_.map(of)),
-      // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
-      // assume the required extension is implied, and the one found is part of the document name.
-      assumeAllowedExtension = true
-    )
+    final override def findByName(name: String): Caching.Parser[Option[DF]] =
+      for {
+        result <- collection.findByNameInDirectory(
+          name = name,
+          allowedExtension = extension,
+          // Document name can have dots (e.g., 273.2), so if it is referenced without the extension -
+          // assume the required extension is implied, and the one found is part of the document name.
+          assumeAllowedExtension = true
+        )
+      } yield result.map(of)
 
     def of(document: Document): DF
 

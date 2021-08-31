@@ -3,10 +3,10 @@ package org.opentorah.collector
 import org.opentorah.metadata.Language
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Store}
+import org.opentorah.store.{Caching, Store, Stores}
 import org.opentorah.xml.{Element, Elements, ScalaXml}
 
-trait Hierarchical extends Store with HtmlContent[Site] {
+trait Hierarchical extends Store.NonTerminal with Stores.NonTerminal with HtmlContent[Collector] {
   def title: Title.Value
 
   final def titleString: String = ScalaXml.toString(title.content)
@@ -24,7 +24,7 @@ trait Hierarchical extends Store with HtmlContent[Site] {
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
-  final def pathHeaderHorizontal(site: Site): String = {
+  final def pathHeaderHorizontal(collector: Collector): String = {
     @scala.annotation.tailrec
     def pathHeaderHorizontal(path: Store.Path, result: Seq[String]): Seq[String] =
       if (path.isEmpty) result else pathHeaderHorizontal(
@@ -32,23 +32,23 @@ trait Hierarchical extends Store with HtmlContent[Site] {
         result = result :+ s"${Hierarchical.displayName(path.head)} ${Hierarchical.displayName(path.tail.head)}"
       )
 
-    pathHeaderHorizontal(site.store2path(this), Seq.empty).mkString(", ")
+    pathHeaderHorizontal(collector.store2path(this), Seq.empty).mkString(", ")
   }
 
-  final override def content(site: Site): Caching.Parser[ScalaXml.Element] = {
+  final override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = {
     @scala.annotation.tailrec
     def pathHeaderVertical(path: Store.Path, result: Seq[ScalaXml.Element]): Seq[ScalaXml.Element] =
       if (path.isEmpty) result else pathHeaderVertical(
         path = path.tail.tail,
         result = result :+ {
           val hierarchy: Hierarchy = path.tail.head.asInstanceOf[Hierarchy]
-          <l>{Hierarchical.displayName(path.head)} {hierarchy.a(site)(text = Hierarchical.displayName(hierarchy))}: {hierarchy.title.content}</l>
+          <l>{Hierarchical.displayName(path.head)} {hierarchy.a(collector)(text = Hierarchical.displayName(hierarchy))}: {hierarchy.title.content}</l>
         }
       )
 
-    val path: Store.Path = site.store2path(this)
+    val path: Store.Path = collector.store2path(this)
 
-    innerContent(site).map(inner =>
+    innerContent(collector).map(inner =>
       <div>
         <div class="store-header">
           {pathHeaderVertical(path.init.init, Seq.empty)}
@@ -61,11 +61,11 @@ trait Hierarchical extends Store with HtmlContent[Site] {
     )
   }
 
-  protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element]
+  protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element]
 
-  def flatIndexEntry(site: Site): ScalaXml.Element =
+  def flatIndexEntry(collector: Collector): ScalaXml.Element =
     <div>
-      {a(site)(text = pathHeaderHorizontal(site) + ": " + titleString)}
+      {a(collector)(text = pathHeaderHorizontal(collector) + ": " + titleString)}
       {storeAbstractXmlElement}
     </div>
 }

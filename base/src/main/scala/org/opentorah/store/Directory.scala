@@ -17,7 +17,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends FromUrl.With {
+) extends Store.NonTerminal with FromUrl.With {
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
@@ -33,6 +33,23 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
       Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
     )(name => getFile(name).flatMap(file=> entryMaker(name, file)))
       .map(listFile.write)
+
+  // Note: Entities, Notes and Collection derive from this;
+  // in Entities and Notes findByName() delegates to findByNameInDirectory(),
+  // but I can't make it a default and remove overrides from Entity and Note,
+  // because Entity's findByName() needs to return Entity, not just Store,
+  // but if I type this default with M, Collection's findByName(), which returns
+  // document facet, becomes invalid...
+  final def findByNameInDirectory(
+    name: String,
+    allowedExtension: String = "html",
+    assumeAllowedExtension: Boolean = false
+  ): Caching.Parser[Option[M]] = Stores.findByNameWithExtension(
+    name = name,
+    findByName = name => getDirectory.map(_.get(name)),
+    allowedExtension = allowedExtension,
+    assumeAllowedExtension = assumeAllowedExtension
+  )
 
   final def getDirectory: Caching.Parser[W] = listFile.get
 
@@ -54,17 +71,15 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
 
 object Directory {
 
-  class Wrapper[M](name2entry: Map[String, M]) {
+  abstract class Wrapper[M <: Store](name2entry: Map[String, M]) {
     final def entries: Seq[M] = name2entry.values.toSeq
 
-    final def findByName(name: String): Caching.Parser[Option[M]] = FindByName.findByName(name, "html", get)
-
-    final def get(name: String): Parser[Option[M]] = ZIO.succeed(name2entry.get(name))
+    final def get(name: String): Option[M] = name2entry.get(name)
   }
 
   abstract class Entry(
     override val name: String
-  ) extends Store {
+  ) extends Store.Terminal {
     final override val names: Names = Names(name)
   }
 

@@ -9,11 +9,11 @@ import zio.ZIO
 final class Note(
   override val name: String,
   val title: Option[String]
-) extends Directory.Entry(name) with HtmlContent[Site] {
+) extends Directory.Entry(name) with HtmlContent[Collector] {
 
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
-  override def content(site: Site): Caching.Parser[ScalaXml.Element] = site.notes.getFile(this).map(_.content)
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
 }
 
 object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {

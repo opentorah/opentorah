@@ -2,8 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.html
 import org.opentorah.html.Html
-import org.opentorah.site.{HtmlContent, SiteCommon, Viewer}
-import org.opentorah.store.{Caching, Directory, FindByName, ListFile, Store, WithSource}
+import org.opentorah.site.{HtmlContent, Site, SiteCommon, Viewer}
+import org.opentorah.store.{Caching, Directory, ListFile, Store, Stores, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{FromUrl, Parser, ScalaXml}
@@ -11,14 +11,14 @@ import zio.{UIO, ZIO}
 import java.net.URL
 
 // TODO retrieve TEI(?) references from notes.
-final class Site(
+final class Collector(
   fromUrl: FromUrl,
   common: SiteCommon,
   val entities: Entities,
   val entityLists: EntityLists,
   val notes: Notes,
   val by: ByHierarchy
-) extends org.opentorah.site.Site[Site](
+) extends Site[Collector](
   fromUrl,
   common
 ) {
@@ -72,31 +72,34 @@ final class Site(
   // TODO ZIOify logging!
   //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
 
-  override protected def content(path: Store.Path): Caching.Parser[org.opentorah.site.Site.Response] = path.lastOption.getOrElse(this) match {
+  override protected def content(store: Store): Caching.Parser[Option[Site.Response]] = store match {
     case teiFacet   : Document.TeiFacet =>
-      teiFacet.getTei.map(renderTeiContent).map(content => new org.opentorah.site.Site.Response(content, Tei.mimeType))
-    case htmlContent: HtmlContent[Site] =>
-      renderHtmlContent(htmlContent).map(content => new org.opentorah.site.Site.Response(content, Html.mimeType))
+      teiFacet.getTei.map(renderTeiContent).map(content => Some(new Site.Response(content, Tei.mimeType)))
+    case htmlContent: HtmlContent[Collector] =>
+      renderHtmlContent(htmlContent).map(content => Some(new Site.Response(content, Html.mimeType)))
+    case _ => ZIO.none
   }
 
-  override def style(htmlContent: HtmlContent[Site]): String = htmlContent match {
+  override def style(htmlContent: HtmlContent[Collector]): String = htmlContent match {
     case _: Collection.Alias => "wide"
     case _: Collection       => "wide"
     case _                   => "main"
   }
 
-  override def viewer(htmlContent: HtmlContent[Site]): Option[org.opentorah.site.Viewer] = htmlContent match {
+  override def viewer(htmlContent: HtmlContent[Collector]): Option[Viewer] = htmlContent match {
     case _: Collection.Alias        => Some(Viewer.Collection)
     case _: Collection              => Some(Viewer.Collection)
     case _: Document.TextFacet      => Some(Viewer.Document  )
     case _: Document.FacsimileFacet => Some(Viewer.Facsimile )
     case _: EntityLists             => Some(Viewer.Names     )
+    case _: EntityList              => Some(Viewer.Names     )
+    case _: Entities                => Some(Viewer.Names     )
     case _: Entity                  => Some(Viewer.Names     )
     case Reports                    => Some(Viewer.Names     )
     case _                          => defaultViewer
   }
 
-  override protected def navigationLinks(htmlContent: HtmlContent[Site]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match {
+  override protected def navigationLinks(htmlContent: HtmlContent[Collector]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match {
     case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
     case collection: Collection => collectionNavigationLinks(collection)
 
@@ -133,7 +136,7 @@ final class Site(
   private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[ScalaXml.Element]] =
     ZIO.succeed(Seq(a(collection)(s"[${collection.names.name}]")))
 
-  override protected def path(htmlContent: HtmlContent[Site]): Store.Path = htmlContent match {
+  override protected def path(htmlContent: HtmlContent[Collector]): Store.Path = htmlContent match {
     case textFacet      : Document.TextFacet      =>
       path(textFacet.collection     ) ++ Seq(                                          textFacet     )
     case facsimileFacet : Document.FacsimileFacet =>
@@ -146,6 +149,8 @@ final class Site(
     case index          : Index            => Seq(index)
     case hierarchy      : Hierarchy        => store2path(hierarchy)
     case entityLists    : EntityLists      => Seq(entityLists)
+    case entityList     : EntityList       => Seq(entityLists, entityList)
+    case entity         : Entities         => Seq(entities)
     case entity         : Entity           => Seq(entities, entity)
     case notes          : Notes            => Seq(notes)
     case note           : Note             => Seq(notes, note)
@@ -153,21 +158,21 @@ final class Site(
     case report         : Report[_]        => Seq(Reports, report)
   }
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] =
-    ZIO.succeed(alias2collectionAlias.get(name)).flatMap {
-      case Some(result) => ZIO.some(result)
-      case None =>
-        FindByName.findByName(name, Seq(entities, notes, Reports, by)).flatMap {
-          case Some(result) => ZIO.some(result)
-          case None => FindByName.findByName(
-            name,
-            "html",
-            name => FindByName.findByName(name, Seq(Index.Flat, Index.Tree, entityLists))
-          )
-        }
-    }
+  override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(entityLists, entities, notes, Reports, by)
 
-  override protected def linkResolver(htmlContent: org.opentorah.site.HtmlContent[org.opentorah.collector.Site]): LinksResolver = {
+  override def findByName(name: String): Caching.Parser[Option[Store]] = {
+    ZIO.succeed(alias2collectionAlias.get(name)).flatMap {
+      case Some(result) => ZIO.some(result) // TODO use someOrElseM
+      case None => findByNameAmongNonTerminalStores(name).flatMap {
+        case Some(result) => ZIO.some(result) // TODO use someOrElseM
+        case None => findByNameAmongTerminalStores(name)
+      }
+    }
+  }
+
+  override protected def terminalStores: Seq[Store.Terminal] = Seq(Index.Flat, Index.Tree)
+
+  override protected def linkResolver(htmlContent: HtmlContent[Collector]): LinksResolver = {
     val textFacet: Option[Document.TextFacet] = htmlContent match {
       case htmlFacet: Document.TextFacet => Some(htmlFacet)
       case _ => None
@@ -184,12 +189,12 @@ final class Site(
         }).orDie
 
       override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
-        Site.this.resolve(url).map(_.map(path => a(path))),
+        Collector.this.resolve(url).map(_.map(path => a(path))),
         s"did not resolve: $url"
       )
 
       override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
-        entities.findByName(ref).map(_.map(entity => entity.a(Site.this))),
+        entities.findByName(ref).map(_.map(entity => entity.a(Collector.this))),
         s"did not find reference: $ref"
       )
 
@@ -245,7 +250,7 @@ final class Site(
 
   def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
 
-    def withSource(htmlContent: HtmlContent[Site], nodes: ScalaXml.Nodes): Parser[Seq[WithSource[T]]] = {
+    def withSource(htmlContent: HtmlContent[Collector], nodes: ScalaXml.Nodes): Parser[Seq[WithSource[T]]] = {
       val source: String = Files.mkUrl(path(htmlContent).map(_.structureName))
       finder(nodes).map(_.map(new WithSource[T](source, _)))
     }

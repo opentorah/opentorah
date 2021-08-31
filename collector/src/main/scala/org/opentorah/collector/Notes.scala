@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory, FindByName, Selector, Store}
+import org.opentorah.store.{By, Caching, Directory, Selector}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import zio.UIO
 import java.net.URL
@@ -16,22 +16,17 @@ final class Notes(
   "md",
   Note,
   new Notes.All(_),
-) with By with HtmlContent[Site] {
+) with By with HtmlContent[Collector] {
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = FindByName.findByName(
-    name,
-    "html",
-    name => getDirectory.flatMap(_.findByName(name))
-  )
+  override def findByName(name: String): Caching.Parser[Option[Note]] = findByNameInDirectory(name)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
-  override def acceptsIndexHtml: Boolean = true
 
-  override def content(site: Site): Caching.Parser[ScalaXml.Element] = directoryEntries.map(notes =>
-    <div>{notes.sortBy(_.title).map(note => <l>{note.a(site)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = directoryEntries.map(notes =>
+    <div>{notes.sortBy(_.title).map(note => <l>{note.a(collector)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
 }
 
 object Notes extends Element[Notes]("notes") {
