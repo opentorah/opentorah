@@ -17,8 +17,7 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends FromUrl.With {
-
+) extends Store with Stores with FromUrl.With {
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
   private val listFile: ListFile[M, W] = new ListFile[M, W](
@@ -54,10 +53,17 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
 
 object Directory {
 
-  class Wrapper[M](name2entry: Map[String, M]) {
+  abstract class Wrapper[M <: Store](name2entry: Map[String, M]) extends Stores {
+    final override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
+
     final def entries: Seq[M] = name2entry.values.toSeq
 
-    final def findByName(name: String): Caching.Parser[Option[M]] = FindByName.findByName(name, "html", get)
+    final override def findByName(name: String): Caching.Parser[Option[M]] = findByName(
+      fullName = name,
+      findByName = get,
+      allowedExtension = "html",
+      assumeAllowedExtension = false
+    )
 
     final def get(name: String): Parser[Option[M]] = ZIO.succeed(name2entry.get(name))
   }

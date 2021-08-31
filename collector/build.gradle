@@ -35,7 +35,7 @@ dependencies {
 }
 
 jib.from.image = 'adoptopenjdk:11'
-jib.container.mainClass = 'org.opentorah.collector.Service'
+jib.container.mainClass = 'org.opentorah.collector.CollectorService'
 
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)

@@ -68,7 +68,7 @@ object Zhttp {
     } yield result
   }
 
-  def staticFile(url: URL, request: Option[Request] = None): BResponse = {
+  def staticFile(url: URL, request: Option[Request]): BResponse = {
     for {
       isDirectory: Boolean <- Effects.attempt((url.getProtocol == "file") && new File(url.getFile).isDirectory)
       // TODO if isDirectory: ZIO.succeed(None)
@@ -80,7 +80,6 @@ object Zhttp {
       ifModifiedSince: Option[Instant] = request.flatMap(_.getHeaderValue(HttpHeaderNames.IF_MODIFIED_SINCE)).map(Instant.parse)
       expired: Boolean = ifModifiedSince.fold(true)(_.isBefore(lastModified))
 
-      // TODO does this ever get triggered?
       response <- if (!expired) {
         for {
           _ <- Effects.attempt(urlConnection.getInputStream.close()).catchAll(_ => ZIO.succeed(()))
@@ -105,7 +104,8 @@ object Zhttp {
   }
 
   private def nameToContentType(name: String): Option[String] = Files.nameAndExtension(name)._2.map {
-    case "js" => "application/javascript" // Note: without this, browser does not process scripts
+    case "js"           => "application/javascript" // Note: without this, browser does not process scripts
+    case "svg"          => "image/svg+xml"          // Note: without this, browser does not process SVG
     case "jpg" | "jpeg" => "image/jpeg"
     case _ => ""
   }

@@ -12,14 +12,14 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends Directory.Entry(name) with HtmlContent[Site] {
+) extends Directory.Entry(name) with HtmlContent[Collector] {
   def id: String = name
 
   override def htmlHeadTitle: Option[String] = Some(mainName)
 
-  def teiEntity(site: Site): Caching.Parser[TeiEntity] = site.entities.getFile(this)
+  def teiEntity(site: Collector): Caching.Parser[TeiEntity] = site.entities.getFile(this)
 
-  override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {
+  override def content(site: Collector): Caching.Parser[ScalaXml.Element] = for {
     entity <- teiEntity(site)
     references <- site.getReferences
     sources <- ZIO.foreach(

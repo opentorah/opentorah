@@ -48,7 +48,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     extends Facet[TeiFacet, Collection.TeiFacet](document, collectionFacet)
 
   abstract class HtmlFacet[DF <: HtmlFacet[DF, F], F <: Collection.HtmlFacet[DF, F]](document: Document, val collectionFacet: F)
-    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Site]
+    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Collector]
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
   }
@@ -58,7 +58,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {
+    override def content(site: Collector): Caching.Parser[ScalaXml.Element] = for {
       tei <- getTei
       header <- collection.documentHeader(document)
     } yield
@@ -73,7 +73,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   {
     override def htmlHeadTitle: Option[String] = None
 
-    override def content(site: Site): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
+    override def content(site: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
         {header}
         <div class={Viewer.Facsimile.name}>
