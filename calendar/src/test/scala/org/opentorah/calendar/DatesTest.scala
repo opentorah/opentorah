@@ -13,6 +13,10 @@ import org.scalatest.prop.TableDrivenPropertyChecks.{Table, forAll}
 
 final class DatesTest extends AnyFlatSpec with Matchers {
 
+  "Days of the Week" should "load correctly" in {
+    Week.Day.Rishon.names.hasName("воскресенье") shouldBe true
+  }
+
   "Known dates" should "have correct day of the week" in {
     Year(5772).month(Marheshvan).day(24).name shouldBe Sheni
     // Father's yahrtzeit: println(Gregorian.Year(2014).month(April).day(24).to(Jewish))

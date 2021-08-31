@@ -3,21 +3,22 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityRelated, EntityType, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Selector, Store}
+import org.opentorah.store.{By, Caching, Stores, Selector, Store}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, ContentType, Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
+import zio.ZIO
 
 final class EntityLists(
   override val selector: Selector,
   val lists: Seq[EntityLists.EntityList]
-) extends By with HtmlContent[Site] {
+) extends By with HtmlContent[Collector] {
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
   private var list2entities: Option[Map[EntityLists.EntityList, Seq[Entity]]] = None
   private var nonEmptyLists: Option[Seq[EntityLists.EntityList]] = None
 
-  private def setUp(site: Site): Caching.Parser[Unit] = if (list2entities.nonEmpty) Effects.ok else
+  private def setUp(site: Collector): Caching.Parser[Unit] = if (list2entities.nonEmpty) Effects.ok else
     site.entities.directoryEntries.map { allEntities =>
       val result: Map[EntityLists.EntityList, Seq[Entity]] = (for (list <- lists) yield {
         val entities = allEntities.filter(entity =>
@@ -32,7 +33,7 @@ final class EntityLists(
       nonEmptyLists = Some(lists.filterNot(list => result(list).isEmpty))
     }
 
-  override def content(site: Site): Caching.Parser[ScalaXml.Element] = for {_ <- setUp(site)} yield {
+  override def content(site: Collector): Caching.Parser[ScalaXml.Element] = for {_ <- setUp(site)} yield {
     <div>
       <p>{nonEmptyLists.get.map(list => <l>{a(site).setFragment(list.names.name)(xml = list.title)}</l>)}</p>
       {nonEmptyLists.get.map(list =>
@@ -52,7 +53,11 @@ object EntityLists extends Element[EntityLists]("entityLists") {
     val entityType: EntityType,
     val role: Option[String],
     val title: Title.Value,
-  ) extends Store with FromUrl.With
+  ) extends Store with Stores with FromUrl.With {
+    // TODO there is no findByName() here; why is this a HasStores?
+    override def findByName(name: String): Caching.Parser[Option[Store]] = ZIO.none
+    override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
+  }
 
   object EntityList extends EntityRelated[EntityList](
     elementName = _.listElement,

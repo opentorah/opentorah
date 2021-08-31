@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{Entity => TeiEntity}
-import org.opentorah.store.{By, Caching, Directory, Selector}
+import org.opentorah.store.{By, Caching, Directory, Selector, Store}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser}
 import java.net.URL
 
@@ -17,6 +17,8 @@ final class Entities(
 ) with By {
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
+
+  override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
 
   override def findByName(name: String): Caching.Parser[Option[Entity]] = getDirectory.flatMap(_.findByName(name))
 }

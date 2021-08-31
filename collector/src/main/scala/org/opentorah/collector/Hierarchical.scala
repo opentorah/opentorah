@@ -6,7 +6,7 @@ import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Store}
 import org.opentorah.xml.{Element, Elements, ScalaXml}
 
-trait Hierarchical extends Store with HtmlContent[Site] {
+trait Hierarchical extends Store with HtmlContent[Collector] {
   def title: Title.Value
 
   final def titleString: String = ScalaXml.toString(title.content)
@@ -24,7 +24,7 @@ trait Hierarchical extends Store with HtmlContent[Site] {
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
-  final def pathHeaderHorizontal(site: Site): String = {
+  final def pathHeaderHorizontal(site: Collector): String = {
     @scala.annotation.tailrec
     def pathHeaderHorizontal(path: Store.Path, result: Seq[String]): Seq[String] =
       if (path.isEmpty) result else pathHeaderHorizontal(
@@ -35,7 +35,7 @@ trait Hierarchical extends Store with HtmlContent[Site] {
     pathHeaderHorizontal(site.store2path(this), Seq.empty).mkString(", ")
   }
 
-  final override def content(site: Site): Caching.Parser[ScalaXml.Element] = {
+  final override def content(site: Collector): Caching.Parser[ScalaXml.Element] = {
     @scala.annotation.tailrec
     def pathHeaderVertical(path: Store.Path, result: Seq[ScalaXml.Element]): Seq[ScalaXml.Element] =
       if (path.isEmpty) result else pathHeaderVertical(
@@ -61,9 +61,9 @@ trait Hierarchical extends Store with HtmlContent[Site] {
     )
   }
 
-  protected def innerContent(site: Site): Caching.Parser[ScalaXml.Element]
+  protected def innerContent(site: Collector): Caching.Parser[ScalaXml.Element]
 
-  def flatIndexEntry(site: Site): ScalaXml.Element =
+  def flatIndexEntry(site: Collector): ScalaXml.Element =
     <div>
       {a(site)(text = pathHeaderHorizontal(site) + ": " + titleString)}
       {storeAbstractXmlElement}

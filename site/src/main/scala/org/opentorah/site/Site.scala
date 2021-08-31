@@ -2,7 +2,7 @@ package org.opentorah.site
 
 import org.opentorah.docbook.DocBook
 import org.opentorah.html
-import org.opentorah.store.{Caching, Directory, FindByName, Store}
+import org.opentorah.store.{Caching, Directory, Stores, Store}
 import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Doctype, FromUrl, Parser, PrettyPrinter, ScalaXml, Xml}
@@ -13,10 +13,10 @@ import java.net.URL
 // TODO add static site server/generator.
 // TODO consolidate all js, css etc. files in `asset` (singular)
 // TODO fix favicon to the default `favicon.ico` and convert the Alter Rebbe picture.
-class Site[S <: Site[S]](
+abstract class Site[S <: Site[S]](
   override val fromUrl: FromUrl,
   val common: SiteCommon
-) extends FindByName with FromUrl.With { this: S =>
+) extends Stores with FromUrl.With { this: S =>
 
   final def logger: Logger = Site.logger
 
@@ -30,9 +30,11 @@ class Site[S <: Site[S]](
     Set("assets", "css", "js", "sass", "robots.txt") ++
     common.favicon.toSet
 
-  final def resolveContent(path: Seq[String]): Task[Option[Site.Response]] =
+  final def resolveContent(pathString: String): Task[Option[Site.Response]] = {
+    val path: Seq[String] = Files.splitAndDecodeUrl(pathString)
     if (path.headOption.exists(staticPaths.contains)) Task.none
     else toTask(resolve(path).flatMap(_.map(content(_).map(Some(_))).getOrElse(ZIO.none)))
+  }
 
   final def resolve(url: String): Caching.Parser[Option[Store.Path]] = resolve(Files.splitAndDecodeUrl(url))
 
@@ -195,5 +197,8 @@ object Site {
   ) extends Site[Common](
     fromUrl,
     common
-  )
+  ) {
+    override def findByName(name: String): Caching.Parser[Option[Store]] = ZIO.none
+    override def stores: Seq[Store] = Seq.empty
+  }
 }

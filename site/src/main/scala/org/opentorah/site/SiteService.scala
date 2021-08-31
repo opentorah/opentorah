@@ -10,9 +10,8 @@ import zio.duration.Duration
 import zio.stream.ZStream
 import zio.{Chunk, Task, ZEnv, ZIO}
 import zio.blocking.Blocking
-
 import java.io.File
-import java.net.{URI, URL}
+import java.net.URL
 
 
 abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App {
@@ -24,13 +23,17 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
 
   private type ServiceEnvironment = ZEnv
 
-  private final def readSite(url: URL): Task[S] = readSiteFile(Files.fileInDirectory(url, "site.xml"))
+  final def readSite(url: String): Task[S] = readSite(Files.string2url(url))
 
-  private final def readSiteFile(url: URL): Task[S] = Parser.toTask(for {
-    _ <- Effects.effect(logger.info(s"Reading site from $url"))
-    result <- parse(url)
-    _ <- Effects.effect(logger.info(s"Reading site from $url - done"))
-  } yield result)
+  private final def readSite(url: URL): Task[S] = {
+    val siteFileUrl: URL = Files.fileInDirectory(url, "site.xml")
+    val result: Parser[S] = for {
+      _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl"))
+      result <- parse(siteFileUrl)
+      _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl - done"))
+    } yield result
+    Parser.toTask(result)
+  }
 
   // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
   // with `Metadata-Flavor: Google` header;
@@ -88,11 +91,9 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
   }
 
   private def routes(siteUrl: String): RHttpApp[ServiceEnvironment] = {
-    val siteUri: URI = URI.create(siteUrl)
-
     // TODO move near the SiteReader
     var cachedSite: Option[S] = None
-    def getSite: Task[S] = cachedSite.map(Task.succeed(_)).getOrElse(readSite(siteUri.toURL).map { result =>
+    def getSite: Task[S] = cachedSite.map(Task.succeed(_)).getOrElse(readSite(siteUrl).map { result =>
       cachedSite = Some(result)
       result
     })
@@ -111,12 +112,11 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
     )
 
     def get(request: Request): ResponseM[ServiceEnvironment, Throwable] = {
-      val path: Seq[String] = Files.splitAndDecodeUrl(request.url.path.asString)
-      val urlStr: String = Files.mkUrl(path)
+      val pathString: String = request.url.path.asString
 
-      val result = for {
+      val result: ResponseM[Blocking, Throwable] = for {
         site <- getSite
-        siteResponse <- site.resolveContent(path)
+        siteResponse <- site.resolveContent(pathString)
         result <- siteResponse.map(siteResponse => ZIO.succeed {
           val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
 
@@ -130,25 +130,25 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
             content = HttpData.fromStream(ZStream.fromChunk(Chunk.fromArray(bytes)))
           )
         }).getOrElse {
-          val path: String = request.url.path.asString
+          val url: URL = Files.pathUnder(Files.string2url(siteUrl), pathString)
           for {
-            static <- Zhttp.staticFile(URI.create(s"$siteUrl$path").toURL, Some(request))
-          } yield static.getOrElse(Zhttp.notFound(path))
+            static: Option[Response[Blocking, Throwable]] <- Zhttp.staticFile(url, Some(request))
+          } yield static.getOrElse(Zhttp.notFound(pathString))
         }
       } yield result
 
       result.timed.mapEffect { case (duration: Duration, response: Response[Blocking, Throwable]) =>
         val durationStr: String = SiteService.formatDuration(duration)
+        def message(prefix: String): String = s"$prefix $durationStr $pathString"
 
-        val isOk: Boolean = response match {
-          case response: Response.HttpResponse[Blocking, Throwable] => response.status == Status.OK
-          case _ => false
+        // TODO deal with the exhaustivity warning here!
+        response match {
+          case response: Response.HttpResponse[Blocking, Throwable] => response.status match {
+            case Status.OK           => info(request, message("GOT"))
+            case Status.NOT_MODIFIED => info(request, message("UNM"))
+          }
+          case _ => warning(request, message("NOT"))
         }
-
-        if (isOk)
-          info   (request, s"GOT $durationStr $urlStr")
-        else
-          warning(request, s"NOT $durationStr $urlStr")
 
         response
       }

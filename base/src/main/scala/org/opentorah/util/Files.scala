@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import java.io.{BufferedWriter, File, FileWriter}
-import java.net.{URL, URLDecoder}
+import java.net.{URI, URL, URLDecoder}
 import org.slf4j.{Logger, LoggerFactory}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
@@ -64,9 +64,13 @@ object Files {
 
   def file2url(file: File): URL = file.toURI.toURL
 
+  def string2url(string: String): URL = URI.create(string).toURL
+
   def subdirectory(url: URL, subdirectoryName: String): URL = new URL(url, subdirectoryName + "/")
 
   def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
+
+  def pathUnder(url: URL, path: String): URL = new URL(url, if (path.startsWith("/")) path.drop(1) else path)
 
   //def getParent(url: URL): URL = new URL(url, "..")
 
