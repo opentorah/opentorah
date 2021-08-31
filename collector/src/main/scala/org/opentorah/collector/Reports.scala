@@ -1,25 +1,20 @@
 package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Stores, Selector, Store}
+import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.xml.{Parser, ScalaXml}
 import zio.ZIO
 
-object Reports extends By with Stores with HtmlContent[Collector] {
+object Reports extends By with Stores.Terminal with HtmlContent[Collector] {
   override def selector: Selector = Selector.byName("report")
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = findByName(
-    fullName = name,
-    findByName = name => findByNameInStores(name),
-    allowedExtension = "html",
-    assumeAllowedExtension = false
-  )
+  private val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)
 
-  override val stores: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)
+  override protected def terminalStores: Seq[Store.Terminal] = reports
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(site: Collector): Parser[ScalaXml.Element] =
-    ZIO.succeed(<div>{stores.map(report => <l>{report.a(site)(text = report.title)}</l>)}</div>)
+  override def content(collector: Collector): Parser[ScalaXml.Element] =
+    ZIO.succeed(<div>{reports.map(report => <l>{report.a(collector)(text = report.title)}</l>)}</div>)
 }

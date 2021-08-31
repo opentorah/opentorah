@@ -4,7 +4,7 @@
     <name n="names" lang="en"/>
     <name n="имена" lang="ru"/>
   </selector>
-  <selector>
+  <selector title="Имена">
     <name n="name" lang="en"/>
     <name n="имя" lang="ru"/>
   </selector>

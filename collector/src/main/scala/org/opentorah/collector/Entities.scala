@@ -1,8 +1,9 @@
 package org.opentorah.collector
 
+import org.opentorah.site.HtmlContent
 import org.opentorah.tei.{Entity => TeiEntity}
-import org.opentorah.store.{By, Caching, Directory, Selector, Store}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, Unparser}
+import org.opentorah.store.{By, Caching, Directory, Selector}
+import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
 final class Entities(
@@ -14,13 +15,20 @@ final class Entities(
   "xml",
   Entity,
   new Entities.All(_)
-) with By {
+) with By with HtmlContent [Collector] {
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
 
-  override def stores: Seq[Store] = Seq.empty // TODO not really used here, and should probably be a Parser...
+  override def findByName(name: String): Caching.Parser[Option[Entity]] = findByNameInDirectory(name)
 
-  override def findByName(name: String): Caching.Parser[Option[Entity]] = getDirectory.flatMap(_.findByName(name))
+  override def htmlHeadTitle: Option[String] = selector.title
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = directoryEntries.map { allEntities =>
+    <list>
+      {Entity.sort(allEntities).map(entity => Entity.line(entity, collector))}
+    </list>
+  }
 }
 
 object Entities extends Element[Entities]("entities") {

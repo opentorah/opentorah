@@ -111,10 +111,10 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
       content = Zhttp.textData("Site reset!")
     )
 
-    def get(request: Request): ResponseM[ServiceEnvironment, Throwable] = {
+    def get(request: Request): ResponseM[Blocking, Throwable] = {
       val pathString: String = request.url.path.asString
 
-      val result: ResponseM[Blocking, Throwable] = for {
+      for {
         site <- getSite
         siteResponse <- site.resolveContent(pathString)
         result <- siteResponse.map(siteResponse => ZIO.succeed {
@@ -136,29 +136,40 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
           } yield static.getOrElse(Zhttp.notFound(pathString))
         }
       } yield result
-
-      result.timed.mapEffect { case (duration: Duration, response: Response[Blocking, Throwable]) =>
-        val durationStr: String = SiteService.formatDuration(duration)
-        def message(prefix: String): String = s"$prefix $durationStr $pathString"
-
-        // TODO deal with the exhaustivity warning here!
-        response match {
-          case response: Response.HttpResponse[Blocking, Throwable] => response.status match {
-            case Status.OK           => info(request, message("GOT"))
-            case Status.NOT_MODIFIED => info(request, message("UNM"))
-          }
-          case _ => warning(request, message("NOT"))
-        }
-
-        response
-      }
     }
 
     Http.collectM[Request] {
       case request@Method.GET -> Root / "reset-cached-site" => reset(request)
-      case request => get(request)
+      case request => time(request, get(request))
     }
   }
+
+  private def time(
+    request: Request,
+    response: ResponseM[Blocking, Throwable]
+  ): ResponseM[ServiceEnvironment, Throwable] =
+    response.timed.mapEffect { case (duration: Duration, response: Response[Blocking, Throwable]) =>
+      // TODO deal with the exhaustivity warning here!
+      val (isWarning: Boolean, code: String) = response match {
+        case response: Response.HttpResponse[Blocking, Throwable] => response.status match {
+          case Status.OK           => (false, "GOT")
+          case Status.NOT_FOUND    => (true , "NOT")
+          case Status.NOT_MODIFIED => (false, "UNM")
+          case _                   => (false, "---")
+        }
+        case _ => (true, "???")
+      }
+
+      val durationStr: String = SiteService.formatDuration(duration)
+      val message: String = s"$code $durationStr ${request.url.path.asString}"
+
+      if (isWarning)
+        warning(request, message)
+      else
+        info   (request, message)
+
+      response
+    }
 
   // TODO move into Logging?
 

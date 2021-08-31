@@ -104,9 +104,10 @@ object Zhttp {
   }
 
   private def nameToContentType(name: String): Option[String] = Files.nameAndExtension(name)._2.map {
-    case "js"           => "application/javascript" // Note: without this, browser does not process scripts
-    case "svg"          => "image/svg+xml"          // Note: without this, browser does not process SVG
-    case "jpg" | "jpeg" => "image/jpeg"
-    case _ => ""
+    case "js"   => "application/javascript" // Note: without this, browser does not process scripts
+    case "svg"  => "image/svg+xml"          // Note: without this, browser does not process SVG
+    case "jpg"  => "image/jpeg"
+    case "jpeg" => "image/jpeg"
+    case _      => ""
   }
 }

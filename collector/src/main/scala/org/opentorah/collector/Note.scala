@@ -13,7 +13,7 @@ final class Note(
 
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
-  override def content(site: Collector): Caching.Parser[ScalaXml.Element] = site.notes.getFile(this).map(_.content)
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
 }
 
 object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {

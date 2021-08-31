@@ -18,10 +18,15 @@ final class CollectorTest extends AnyFlatSpec with Matchers {
     def resolve(pathString: String): Option[Site.Response] = Effects.unsafeRun(collector.resolveContent(pathString))
     def resolveContent(pathString: String): String = resolve(pathString).get.content
 
-    resolveContent("/") should include("1841 год, дело III отделения на")
+    // TODO add tests:
+    // - with .html
+    // - with index.html
+    // - names/jews; /names/jews/alter-rebbe
+    // - negative, for not found!
+    resolveContent("/") should include("Дела")
+    resolveContent("/collections") should include("Архивы")
     resolveContent("/note/about") should include("Цель настоящего сайта: ")
     resolveContent("/note/help") should include("навигационная полоса содержит:")
-    resolveContent("/collections") should include("Архивы")
     resolveContent("/names") should include("Жиды (они же Евреи)")
     resolveContent("/name/alter-rebbe") should include("основатель направления Хабад")
     resolveContent("/rgada") should include("новые - Елена Волк")
