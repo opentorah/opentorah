@@ -24,7 +24,7 @@ final class Entity(
     references <- collector.getReferences
     sources <- ZIO.foreach(
       references.filter(_.value.ref.contains(id))
-    )(withSource => collector.resolve(withSource.source).map(_.get.last))
+    )(withSource => collector.resolveUrl(withSource.source).map(_.get.last))
   } yield {
 
     val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(

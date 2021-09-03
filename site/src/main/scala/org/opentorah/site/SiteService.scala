@@ -113,29 +113,33 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
 
     def get(request: Request): ResponseM[Blocking, Throwable] = {
       val pathString: String = request.url.path.asString
+      val path: Seq[String] = Files.splitAndDecodeUrl(pathString)
 
-      for {
-        site <- getSite
-        siteResponse <- site.resolveContent(pathString)
-        result <- siteResponse.map(siteResponse => ZIO.succeed {
-          val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
+      def notFound(message: String): Response[Blocking, Throwable] = Zhttp.notFound(pathString + "\n" + message)
 
-          Response.http(
-            headers = List(
-              // TODO: `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`)
-              Header(HttpHeaderNames.CONTENT_TYPE, siteResponse.mimeType),
-              Header.contentLength(bytes.length.toLong)
-              // TODO more headers!
-            ),
-            content = HttpData.fromStream(ZStream.fromChunk(Chunk.fromArray(bytes)))
-          )
-        }).getOrElse {
+      getSite.flatMap { site =>
+        if (site.isStatic(path)) {
           val url: URL = Files.pathUnder(Files.string2url(siteUrl), pathString)
-          for {
-            static: Option[Response[Blocking, Throwable]] <- Zhttp.staticFile(url, Some(request))
-          } yield static.getOrElse(Zhttp.notFound(pathString))
+          Zhttp.staticFile(url, Some(request)).map {
+            case None => notFound(s"Static file $url not found")
+            case Some(response) => response
+          }
+        } else site.getResponse(path).map {
+          case Left(error) => notFound(error)
+          case Right(siteResponse) =>
+            val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
+
+            Response.http(
+              headers = List(
+                // TODO: `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`)
+                Header(HttpHeaderNames.CONTENT_TYPE, siteResponse.mimeType),
+                Header.contentLength(bytes.length.toLong)
+                // TODO more headers!
+              ),
+              content = HttpData.fromStream(ZStream.fromChunk(Chunk.fromArray(bytes)))
+            )
         }
-      } yield result
+      }
     }
 
     Http.collectM[Request] {

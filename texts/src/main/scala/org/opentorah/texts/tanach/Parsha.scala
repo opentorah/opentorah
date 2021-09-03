@@ -1,10 +1,11 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Named, NamedCompanion, Names, WithNumber}
+import org.opentorah.store.Store
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Unparser}
 
-sealed trait Parsha extends Named {
+sealed trait Parsha extends Store { // TODO .NonTerminal - add chapter/verse...?
   def book: Chumash
 
   private def metadata: Parsha.ParshaMetadata = book.metadata.forParsha(this)

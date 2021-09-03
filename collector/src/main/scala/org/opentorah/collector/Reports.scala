@@ -1,16 +1,15 @@
 package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Selector, Store, Stores}
+import org.opentorah.store.{By, Selector, Stores}
 import org.opentorah.xml.{Parser, ScalaXml}
 import zio.ZIO
 
-object Reports extends By with Stores.Terminal with HtmlContent[Collector] {
+object Reports extends By with Stores.Pure with HtmlContent[Collector] {
   override def selector: Selector = Selector.byName("report")
 
   private val reports: Seq[Report[_]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)
-
-  override protected def terminalStores: Seq[Store.Terminal] = reports
+  override def storesPure: Seq[Report[_]] = reports
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

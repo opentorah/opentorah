@@ -1,9 +1,14 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.store.{By, Selector, Stores}
+import org.opentorah.xml.Parser
 
-final class Chapters(chapters: Seq[Int]) {
+final class Chapters(chapters: Seq[Int]) extends By with Stores.Numbered[Chapter] {
+  override def selector: Selector = Selector.byName("chapter")
+  override def length: Int = chapters.length
+  override protected def createNumberedStore(number: Int): Chapter = new Chapter(number, length(number))
+
   def length(chapter: Int): Int = chapters(chapter-1)
 
   def next(verse: Verse): Option[Verse] = {
@@ -59,15 +64,6 @@ final class Chapters(chapters: Seq[Int]) {
 }
 
 object Chapters {
-
-  object Chapter extends Element[WithNumber[Int]]("chapter") {
-    private val lengthAttribute: Attribute.Required[Int] = new Attribute.PositiveIntAttribute("length").required
-
-    override def contentParsable: Parsable[WithNumber[Int]] = new Parsable[WithNumber[Int]] {
-      override def parser: Parser[WithNumber[Int]] = WithNumber.parse(lengthAttribute())
-      override def unparser: Unparser[WithNumber[Int]] = ???
-    }
-  }
 
   val parser: Parser[Chapters] = for {
     chapters <- Chapter.seq()

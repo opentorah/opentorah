@@ -16,7 +16,7 @@ import java.net.URL
 abstract class Site[S <: Site[S]](
   override val fromUrl: FromUrl,
   val common: SiteCommon
-) extends Stores.NonTerminal with Stores.Terminal with FromUrl.With { this: S =>
+) extends Stores.Pure with FromUrl.With { this: S =>
 
   final def logger: Logger = Site.logger
 
@@ -30,31 +30,67 @@ abstract class Site[S <: Site[S]](
     Set("assets", "css", "js", "sass", "robots.txt") ++
     common.favicon.toSet
 
-  final def resolveContent(pathString: String): Task[Option[Site.Response]] = {
-    val path: Seq[String] = Files.splitAndDecodeUrl(pathString)
-    if (path.headOption.exists(staticPaths.contains)) ZIO.none else toTask(
-      resolve(path).flatMap {
-        case None => ZIO.none // TODO someOrElseM?
-        case Some(path) => path.lastOption match {
-          case None => ZIO.none // TODO someOrElseM?
-          case Some(lastOption) => content(lastOption)
-        }
-      }
-    )
+  final def isStatic(path: Seq[String]): Boolean = path.headOption.exists(staticPaths.contains)
+
+  final def getResponse(pathString: String): Task[Either[Effects.Error, Site.Response]] =
+    getResponse(Files.splitAndDecodeUrl(pathString))
+
+  final def getResponse(path: Seq[String]): Task[Either[Effects.Error, Site.Response]] = toTask(
+    resolve(path).flatMap {
+      case Left(error) => ZIO.left(error) // TODO someOrElseM?
+      case Right(Site.PathAndExtension(path, extension)) => content(path.last, extension)
+    }
+  )
+
+  protected val allowedExtensions: Set[String] = Set("html", "xml")
+
+  final def resolveUrl(url: String): Caching.Parser[Option[Store.Path]] =
+    resolveUrl(Files.splitAndDecodeUrl(url))
+
+  // TODO verify the extension?
+  def resolveUrl(url: Seq[String]): Caching.Parser[Option[Store.Path]] =
+    resolve(url).map {
+      case Left(error) => None
+      case Right(Site.PathAndExtension(path, extension)) => Some(path)
+    }
+
+  // If the Either returned is Right, the Store.Path in it isn't empty.
+  final protected def resolve(pathRaw: Seq[String]): Caching.Parser[Either[Effects.Error, Site.PathAndExtension]] = {
+    val (path: Seq[String], mustBeNonTerminal: Boolean, extension: Option[String]) =
+      if (pathRaw.isEmpty) (pathRaw, false, None) else {
+        val last: String = pathRaw.last
+        val (name: String, extension: Option[String]) = Files.nameAndExtension(last)
+
+        val (indexCandidate: String, extensionRequested: Option[String]) =
+          if (!extension.exists(allowedExtensions.contains))
+            (last, None)
+          else
+            (name, extension)
+
+        if (indexCandidate == "index")
+          (pathRaw.init                  , true , extensionRequested)
+        else
+          (pathRaw.init :+ indexCandidate, false, extensionRequested)
+    }
+
+    val result: Caching.Parser[Either[Effects.Error, Store.Path]] =
+      if (path.isEmpty && index.nonEmpty) ZIO.right(index.get)
+      else Stores.resolve(path, this)
+
+    result.map {
+      case Left(error) => Left(error)
+      case Right(path) =>
+        if (mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal]) Left(s"Can not get an index of ${path.last}")
+        else Right(Site.PathAndExtension(path, extension))
+    }
   }
 
-  final def resolve(url: String): Caching.Parser[Option[Store.Path]] = resolve(Files.splitAndDecodeUrl(url))
+  protected def index: Option[Store.Path] = None
 
-  final protected def resolve(path: Seq[String]): Caching.Parser[Option[Store.Path]] =
-    if (Stores.isEndOfPath(path)) index else Stores.resolve(path, this, Seq.empty)
-
-  // TODO derive Site from HtmlContent and delegate to index?
-  protected def index: Caching.Parser[Option[Store.Path]] = ZIO.none
-
-  protected def content(store: Store): Caching.Parser[Option[Site.Response]] = ???
+  protected def content(store: Store, extension: Option[String]): Caching.Parser[Either[Effects.Error, Site.Response]] = ???
 
   final def renderHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[String] = for {
-    content <- resolveHtmlContent(htmlContent)
+    content <- resolveLinksInHtmlContent(htmlContent)
     siteNavigationLinks <- getNavigationLinks
     htmlContentNavigationLinks <- navigationLinks(htmlContent)
   } yield Site.prettyPrinter.render(ScalaXml, doctype = Some(html.Html))(HtmlTheme.toHtml(
@@ -97,12 +133,12 @@ abstract class Site[S <: Site[S]](
       }
 
   private def resolveNavigationalLink(url: String): Caching.Parser[ScalaXml.Element] = // TODO html.a!
-    resolve(url).map { pathOpt =>
+    resolveUrl(url).map { pathOpt =>
       val path: Store.Path = pathOpt.get
       a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
     }
 
-  final protected def resolveHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[ScalaXml.Element] =
+  final protected def resolveLinksInHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[ScalaXml.Element] =
     htmlContent.content(this).flatMap { content =>
       if (ScalaXml.getNamespace(content) == DocBook.namespace.default)
         DocBook.toHtml(content).provideLayer(ZLayer.succeed(()))
@@ -166,6 +202,11 @@ object Site {
 
   final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
+  final case class PathAndExtension(
+    path: Store.Path,
+    extension: Option[String]
+  )
+
   final class Response(
     val content: String,
     val mimeType: String
@@ -205,9 +246,7 @@ object Site {
   ) extends Site[Common](
     fromUrl,
     common
-  ) {
-    override def findByName(name: String): Caching.Parser[Option[Store]] = ZIO.none
-    override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq.empty
-    override protected def terminalStores: Seq[Store.Terminal] = Seq.empty
+  ) with Stores.Pure {
+    override def storesPure: Seq[Store] = Seq.empty
   }
 }

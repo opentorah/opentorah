@@ -16,6 +16,17 @@
     <name n="книга" lang="ru"/>
     <name n="book" lang="en"/>
   </selector>
+  <selector>
+    <name n="parsha" lang="en" transliterated="true"/>
+  </selector>
+  <selector>
+    <name n="глава" lang="ru"/>
+    <name n="chapter" lang="en"/>
+  </selector>
+  <selector>
+    <name n="стих" lang="ru"/>
+    <name n="verse" lang="en"/>
+  </selector>
   <selector title="Архивы">
     <name n="архив" lang="ru"/>
     <name n="archive" lang="en"/>
@@ -64,9 +75,6 @@
     <name n="facsimile" lang="en"/>
     <name n="факсимиле" lang="ru"/>
     <name n="facs" lang="en"/>
-  </selector>
-  <selector>
-    <name n="tei" lang="en"/>
   </selector>
   <selector>
     <name n="language" lang="en"/>

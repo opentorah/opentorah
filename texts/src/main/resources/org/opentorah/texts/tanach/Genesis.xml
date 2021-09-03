@@ -56,6 +56,7 @@
     <name n="Bereishis" lang="en" transliterated="yes"/>
     <name n="Bereshit" lang="en" transliterated="yes" flavour="sefarad"/>
     <name n="Genesis" lang="en"/>
+    <name n="Бытие" lang="ru"/>
     <name n="Берешит" lang="ru" transliterated="yes"/>
 
     <aliyah n="2" fromChapter="1" fromVerse="6"/>

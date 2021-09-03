@@ -19,12 +19,10 @@ final class Entities(
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
 
-  override def findByName(name: String): Caching.Parser[Option[Entity]] = findByNameInDirectory(name)
-
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = directoryEntries.map { allEntities =>
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map { allEntities =>
     <list>
       {Entity.sort(allEntities).map(entity => Entity.line(entity, collector))}
     </list>

@@ -22,9 +22,9 @@ object Zhttp {
 
   def queryParameter(request: Request, name: String): Option[String] = request.url.queryParams.get(name).map(_.last)
 
-  def notFound(path: String): Response[Any, Nothing] = Response.http(
+  def notFound(pathAndMessage: String): Response[Any, Nothing] = Response.http(
     status = Status.NOT_FOUND,
-    content = Zhttp.textData(s"File Not Found: $path")
+    content = Zhttp.textData(s"File Not Found: $pathAndMessage")
   )
 
   def start(

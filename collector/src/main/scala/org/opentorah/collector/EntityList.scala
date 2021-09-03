@@ -13,7 +13,7 @@ final class EntityList(
   val entityType: EntityType,
   val role: Option[String],
   val title: Title.Value,
-) extends Store.NonTerminal with Stores.Terminal with HtmlContent[Collector] with FromUrl.With {
+) extends Store.NonTerminal with Stores.Pure with HtmlContent[Collector] with FromUrl.With {
   private var entities: Seq[Entity] = Seq.empty
 
   def setEntities(value: Seq[Entity]): Unit = {
@@ -22,7 +22,7 @@ final class EntityList(
 
   def getEntities: Seq[Entity] = entities
 
-  override protected def terminalStores: Seq[Store.Terminal] = entities
+  override def storesPure: Seq[Entity] = entities
 
   override def htmlHeadTitle: Option[String] = Some(ScalaXml.toString(title.content))
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = Some(title.content)

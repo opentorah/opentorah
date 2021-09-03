@@ -1,40 +1,44 @@
 package org.opentorah.store
 
-import org.opentorah.util.Files
+import org.opentorah.util.{Effects, Strings}
 import org.opentorah.xml.Parser
 import zio.ZIO
 
 trait Stores {
-  // TODO add getBys and use it in resolve()!
+  def findByName(name: String): Caching.Parser[Option[Store]] =
+    stores.map(_.find(_.names.hasName(name)))
 
-  def findByName(name: String): Caching.Parser[Option[Store]]
+  def stores: Caching.Parser[Seq[Store]]
+
+  // TODO add indexOf(), Comparable...
 }
 
 object Stores {
 
-  trait NonTerminal extends Stores {
+  trait Pure extends Stores {
+    final override def stores: Caching.Parser[Seq[Store]] = ZIO.succeed(storesPure)
 
-    override def findByName(name: String): Caching.Parser[Option[Store]] =
-      findByNameAmongNonTerminalStores(name)
-
-    protected final def findByNameAmongNonTerminalStores(name: String): Caching.Parser[Option[Store.NonTerminal]] =
-      findByNameAmongStores(name, nonTerminalStores)
-
-    protected def nonTerminalStores: Seq[Store.NonTerminal]
+    protected def storesPure: Seq[Store]
   }
 
-  trait Terminal extends Stores {
+  trait Numbered[T <: Store.Numbered] extends Pure {
+    final override def findByName(name: String): Parser[Option[T]] = ZIO.succeed {
+      Strings.toInt(name).flatMap { number =>
+        if (number < minNumber || number > maxNumber) None
+        else Some(createNumberedStore(number))
+      }
+    }
 
-    override def findByName(name: String): Caching.Parser[Option[Store]] =
-      findByNameAmongTerminalStores(name)
+    override def storesPure: Seq[Store] =
+      minNumber.to(maxNumber).map(createNumberedStore)
 
-    protected final def findByNameAmongTerminalStores(name: String): Caching.Parser[Option[Store.Terminal]] =
-      findByNameWithExtension(
-        name = name,
-        findByName = name => findByNameAmongStores(name, terminalStores)
-      )
+    final  def maxNumber: Int = minNumber + length - 1
 
-    protected def terminalStores: Seq[Store.Terminal]
+    def minNumber: Int = 1
+
+    def length: Int
+
+    protected def createNumberedStore(number: Int): T
   }
 
   /*
@@ -44,46 +48,34 @@ object Stores {
 
     Not all `Stores` are read from XML - some are constructed -
     so `Store` does *not* extend `FromUrl.With`.
+
+    If the result is Right, then the Store.Path within it is nonEmpty ;)
    */
+  // TODO I should probably try using ZIO error channel instead of Either,
+  // but for that a lot of types need to change, and the first of them - Effects.Error should be
+  // derived from Throwable (and then I can type all lines in the 'for's :))
   def resolve(
+    path: Seq[String],
+    current: Stores
+  ): Caching.Parser[Either[Effects.Error, Store.Path]] = {
+    // TODO handle empty paths smoother: include starting Store?
+    require(path.nonEmpty)
+    Stores.resolve(path, current, Seq.empty)
+  }
+
+  private def resolve(
     path: Seq[String],
     current: Stores,
     acc: Store.Path
-  ): Caching.Parser[Option[Store.Path]] =
-    if (Stores.isEndOfPath(path)) Stores.endOfPath(acc) else current.findByName(path.head) flatMap {
-      case Some(next: Stores) => resolve(path.tail, next, next +: acc)
-      case Some(next) if Stores.isEndOfPath(path.tail) => Stores.endOfPath(next +: acc)
-      case _ => ZIO.succeed(None) // Note: with the None pattern, I get "match may not be exhaustive" warning...
+  ): Caching.Parser[Either[Effects.Error, Store.Path]] =
+    if (path.isEmpty) ZIO.right(acc.reverse) else {
+      val head: String = path.head
+      val tail: Seq[String] = path.tail
+      current.findByName(head).flatMap {
+        case Some(next: Stores) => resolve(tail, next, next +: acc)
+        case Some(next) if tail.isEmpty => ZIO.right((next +: acc).reverse)
+        case Some(next) => ZIO.left(s"Can not apply '$tail' to $next")
+        case None       => ZIO.left(s"Did not find '$head' in $current")
+      }
     }
-
-  private def findByNameAmongStores[T <: Store](
-    name: String,
-    stores: Seq[T]
-  ): Parser[Option[T]] =
-    ZIO.succeed(stores.find(_.names.hasName(name)))
-
-  def findByNameWithExtension[M <: Store](
-    name: String,
-    findByName: String => Caching.Parser[Option[M]],
-    allowedExtension: String = "html",
-    assumeAllowedExtension: Boolean = false
-  ): Caching.Parser[Option[M]] = {
-    val (fileName: String, extension: Option[String]) = Files.nameAndExtension(name)
-
-    val result: Option[String] =
-      if (extension.isDefined && !extension.contains(allowedExtension))
-        if (assumeAllowedExtension) Some(name) else None
-      else
-        Some(fileName)
-
-    result.fold[Caching.Parser[Option[M]]](ZIO.none)(findByName)
-  }
-
-  // TODO this is too HTML-ly for the 'store' package and should be something like isDirectory/isTerminal
-  // (or be handled by the caller) ...
-  def isEndOfPath(path: Seq[String]): Boolean =
-    path.isEmpty || (path == Seq("index.html")) || (path == Seq("index"))
-
-  private def endOfPath(acc: Store.Path):zio.UIO[Option[Store.Path]] =
-    ZIO.succeed(if (acc.isEmpty) None else Some(acc.reverse))
 }

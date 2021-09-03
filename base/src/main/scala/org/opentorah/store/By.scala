@@ -3,6 +3,7 @@ package org.opentorah.store
 import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Parser, Unparser}
 
+// TODO wrap a Store by a By!
 trait By extends Store.NonTerminal {
 
   def selector: Selector
