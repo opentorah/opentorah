@@ -9,12 +9,12 @@ import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 final class EntityLists(
   override val selector: Selector,
   val lists: Seq[EntityList]
-) extends By with Stores.NonTerminal with HtmlContent[Collector] {
+) extends By with Stores.Pure with HtmlContent[Collector] {
 
   private var setupDone: Boolean = false
 
   def setUp(collector: Collector): Caching.Parser[Unit] = if (setupDone) Effects.ok else
-    collector.entities.directoryEntries.map { allEntities =>
+    collector.entities.stores.map { allEntities =>
       for (list <- lists) list.setEntities(
         allEntities.filter(entity =>
           (entity.entityType == list.entityType) &&
@@ -25,7 +25,7 @@ final class EntityLists(
       setupDone = true
     }
 
-  override protected def nonTerminalStores: Seq[EntityList] = lists
+  override def storesPure: Seq[EntityList] = lists
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

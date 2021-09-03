@@ -45,6 +45,7 @@
     <name lang="he">שמות</name>
     <name lang="en">Exodus</name>
     <name lang="en" transliterated="yes">Shemos</name>
+    <name n="Исход" lang="ru"/>
     <name lang="ru" transliterated="yes">Шмот</name>
 
     <aliyah n="2" fromChapter="1" fromVerse="8"/>

@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
@@ -8,6 +9,13 @@ abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book with Named
   final override type Key = Parsha
 
   final override def values: Seq[Parsha] = parshiot
+
+  final class ByParsha extends By with Stores.Pure {
+    override def selector: Selector = Selector.byName("parsha")
+    override def storesPure: Seq[Parsha] = parshiot
+  }
+
+  override def storesPure: Seq[Store.NonTerminal] = super.storesPure ++ Seq(new ByParsha)
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.
   final override def names: Names = parshiot.head.names

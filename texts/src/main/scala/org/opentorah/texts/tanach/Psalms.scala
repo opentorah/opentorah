@@ -6,6 +6,9 @@ import zio.ZIO
 
 case object Psalms extends Writings {
 
+  // TODO override to add byDayOfMonth, byDayOfWeek, byBook
+  // override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(chapters)
+
   final class BookMetadata(
     val days: Seq[Span],
     val weekDays: Seq[Span],

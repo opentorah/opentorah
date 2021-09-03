@@ -16,4 +16,6 @@ dependencies {
   api project(':opentorah-tei')
 
   implementation project(':opentorah-base')
+
+  testImplementation libs.caffeine
 }

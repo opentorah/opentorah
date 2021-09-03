@@ -36,28 +36,21 @@ final class Document(
 
 object Document extends Element[Document]("document") with Directory.EntryMaker[Tei, Document] {
 
-  sealed abstract class Facet[DF <: Facet[DF, F], F <: Collection.Facet[DF, F]](val document: Document, collectionFacet: F)
-    extends Store
-  {
-    final override def names: Names = Names(document.name)
-    final def collection: Collection = collectionFacet.collection
-    final def getTei: Caching.Parser[Tei] = collection.getFile(document)
-  }
-
-  final class TeiFacet(document: Document, collectionFacet: Collection.TeiFacet)
-    extends Facet[TeiFacet, Collection.TeiFacet](document, collectionFacet)
-
-  abstract class HtmlFacet[DF <: HtmlFacet[DF, F], F <: Collection.HtmlFacet[DF, F]](document: Document, val collectionFacet: F)
-    extends Facet[DF, F](document, collectionFacet) with HtmlContent[Collector]
+  sealed abstract class Facet[DF <: Facet[DF, F], F <: Collection.Facet[DF, F]](val document: Document, val collectionFacet: F)
+    extends Store.Terminal with HtmlContent[Collector]
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
+
+    final override def names: Names = Names(document.name)
+    final def collection: Collection = collectionFacet.collection
+    final def getTei: Caching.Parser[Tei] = collectionFacet.getTei(document)
+
+    override def htmlHeadTitle: Option[String] = None
   }
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends HtmlFacet[TextFacet, Collection.TextFacet](document, collectionFacet)
+    extends Facet[TextFacet, Collection.TextFacet](document, collectionFacet)
   {
-    override def htmlHeadTitle: Option[String] = None
-
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for {
       tei <- getTei
       header <- collection.documentHeader(document)
@@ -69,10 +62,8 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   }
 
   final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
-    extends HtmlFacet[FacsimileFacet, Collection.FacsimileFacet](document, collectionFacet)
+    extends Facet[FacsimileFacet, Collection.FacsimileFacet](document, collectionFacet)
   {
-    override def htmlHeadTitle: Option[String] = None
-
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
         {header}

@@ -4,6 +4,7 @@ import org.opentorah.html
 import org.opentorah.store.Caching
 import org.opentorah.xml.ScalaXml
 
+// TODO doesn't this always extend Store?
 trait HtmlContent[S <: Site[S]] {
   final def a(site: S): html.a = site.a(this)
 

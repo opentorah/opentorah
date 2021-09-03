@@ -12,12 +12,16 @@ import java.net.URL
  * @tparam T type of into which the file is parsed
  * @tparam M type of the files list entry
  */
-abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapper[M]](
+abstract class Directory[
+  T <: AnyRef,
+  M <: Directory.Entry,
+  W <: Directory.Wrapper[M]
+](
   val directory: String,
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends Store.NonTerminal with FromUrl.With {
+) extends Stores with FromUrl.With {
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
@@ -31,29 +35,15 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
   final def writeDirectory(): Caching.Parser[Unit] =
     ZIO.foreach(
       Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
-    )(name => getFile(name).flatMap(file=> entryMaker(name, file)))
+    )(name => getFile(name).flatMap(file => entryMaker(name, file)))
       .map(listFile.write)
 
-  // Note: Entities, Notes and Collection derive from this;
-  // in Entities and Notes findByName() delegates to findByNameInDirectory(),
-  // but I can't make it a default and remove overrides from Entity and Note,
-  // because Entity's findByName() needs to return Entity, not just Store,
-  // but if I type this default with M, Collection's findByName(), which returns
-  // document facet, becomes invalid...
-  final def findByNameInDirectory(
-    name: String,
-    allowedExtension: String = "html",
-    assumeAllowedExtension: Boolean = false
-  ): Caching.Parser[Option[M]] = Stores.findByNameWithExtension(
-    name = name,
-    findByName = name => getDirectory.map(_.get(name)),
-    allowedExtension = allowedExtension,
-    assumeAllowedExtension = assumeAllowedExtension
-  )
+  override def findByName(name: String): Caching.Parser[Option[M]] = getDirectory.map(_.findByName(name))
 
+  override def stores: Caching.Parser[Seq[M]] = getDirectory.map(_.stores)
+
+  // TODO rename getWrapper?
   final def getDirectory: Caching.Parser[W] = listFile.get
-
-  final def directoryEntries: Caching.Parser[Seq[M]] = getDirectory.map(_.entries)
 
   final def getFile(entry: M): Caching.Parser[T] = getFile(entry.name)
 
@@ -72,9 +62,9 @@ abstract class Directory[T <: AnyRef, M <: Directory.Entry, W <: Directory.Wrapp
 object Directory {
 
   abstract class Wrapper[M <: Store](name2entry: Map[String, M]) {
-    final def entries: Seq[M] = name2entry.values.toSeq
+    final def stores: Seq[M] = name2entry.values.toSeq
 
-    final def get(name: String): Option[M] = name2entry.get(name)
+    final def findByName(name: String): Option[M] = name2entry.get(name)
   }
 
   abstract class Entry(

@@ -20,12 +20,10 @@ final class Notes(
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
-  override def findByName(name: String): Caching.Parser[Option[Note]] = findByNameInDirectory(name)
-
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = directoryEntries.map(notes =>
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(notes =>
     <div>{notes.sortBy(_.title).map(note => <l>{note.a(collector)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
 }
 

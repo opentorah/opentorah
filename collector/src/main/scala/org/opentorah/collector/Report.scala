@@ -56,7 +56,7 @@ object Report {
     "misnamed-entities",
     "Неправильно названные файлы с именами"
   ) {
-    override protected def lines(collector: Collector): Caching.Parser[Seq[Entity]] = collector.entities.directoryEntries.map(_
+    override protected def lines(collector: Collector): Caching.Parser[Seq[Entity]] = collector.entities.stores.map(_
       .filterNot(entity => entity.id == getExpectedId(entity))
       .sortBy(_.name)
     )

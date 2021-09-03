@@ -15,21 +15,35 @@ final class CollectorTest extends AnyFlatSpec with Matchers {
     val siteUrl: String = if (isLocal) s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
     val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
 
-    def resolve(pathString: String): Option[Site.Response] = Effects.unsafeRun(collector.resolveContent(pathString))
-    def resolveContent(pathString: String): String = resolve(pathString).get.content
+    def getResponse(pathString: String): Either[Effects.Error, Site.Response] = Effects.unsafeRun(collector.getResponse(pathString))
+    def getContent(pathString: String): String = getResponse(pathString).right.get.content
+    def getError(pathString: String): String = getResponse(pathString).left.get
 
-    // TODO add tests:
-    // - with .html
-    // - with index.html
-    // - names/jews; /names/jews/alter-rebbe
-    // - negative, for not found!
-    resolveContent("/") should include("Дела")
-    resolveContent("/collections") should include("Архивы")
-    resolveContent("/note/about") should include("Цель настоящего сайта: ")
-    resolveContent("/note/help") should include("навигационная полоса содержит:")
-    resolveContent("/names") should include("Жиды (они же Евреи)")
-    resolveContent("/name/alter-rebbe") should include("основатель направления Хабад")
-    resolveContent("/rgada") should include("новые - Елена Волк")
-    resolveContent("/rgada/029") should include("о сѣктѣ каролиновъ")
+    getContent("/") should include("Дела")
+    getContent("/collections") should include("Архивы")
+    getContent("/note/about") should include("Цель настоящего сайта: ")
+    getContent("/note/help") should include("навигационная полоса содержит:")
+    getContent("/names") should include("Жиды (они же Евреи)")
+    getContent("/names/jews") should include("Жиды (они же Евреи)")
+    getContent("/names/jews/alter-rebbe") should include("основатель направления Хабад")
+    getContent("/names/jews/alter-rebbe.html") should include("основатель направления Хабад")
+    getContent("/name") should include("Залман Борухович")
+    getContent("/name/alter-rebbe") should include("основатель направления Хабад")
+    getContent("/dubnov") should include("Вмешательство")
+    getContent("/dubnov/index") should include("Вмешательство")
+    getContent("/dubnov/index.html") should include("Вмешательство")
+    getContent("/rgada") should include("новые - Елена Волк")
+    getContent("/rgada/029") should include("о сѣктѣ каролиновъ")
+    getError  ("/rgada/029/index") should include("get an index")
+    getContent("/rgada/029.html") should include("о сѣктѣ каролиновъ")
+    getContent("/rgada/029.xml") should include("о сѣктѣ каролиновъ")
+    getContent("/rgada/document/029") should include("о сѣктѣ каролиновъ")
+    getContent("/rgada/document/029.html") should include("Черновой вариант")
+    getContent("/rgada/document/029.xml") should include("Черновой вариант")
+    getContent("/rgada/facsimile/029") should include("Черновой вариант")
+    getContent("/rgada/facsimile/029.html") should include("Черновой вариант")
+    getError  ("/rgada/facsimile/029.xml") should include("non-HTML content")
+
+    getContent("/archive/rgada/category/VII/inventory/2/case/3140/document/001") should include("100 рублей")
   }
 }

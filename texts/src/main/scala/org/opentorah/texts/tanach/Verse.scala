@@ -2,6 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Language, LanguageSpec}
 
+// TODO rename to ChapterAndVerse, and rename VerseStore to Verse...
 final case class Verse(chapter: Int, verse: Int) extends Ordered[Verse] with Language.ToString {
   require(chapter > 0)
   require(verse > 0)

@@ -63,4 +63,9 @@ object Strings {
     for (b: Byte <- bytes) sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
     sb.toString
   }
+
+  def toInt(string: String): Option[Int] =
+    try Some(string.toInt) catch {
+      case _: NumberFormatException => None
+    }
 }

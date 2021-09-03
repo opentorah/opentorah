@@ -1,13 +1,21 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
 
-// TODO make this a Store!
-object Tanach extends NamedCompanion {
+// TODO make Tanach a Store in Texts!
+object Tanach extends NamedCompanion with Stores.Pure {
 
   override val values: Seq[Book] = Chumash.all ++ Nach.all
+
+  final class ByBook extends By with Stores.Pure {
+    override def selector: Selector = Selector.byName("book")
+    override def storesPure: Seq[Book] = values
+  }
+
+  override def storesPure: Seq[ByBook] = Seq(new ByBook)
 
   private val metadata: Map[Book, Parsed] = Parser.unsafeRun(
     Named.load(
@@ -26,9 +34,10 @@ object Tanach extends NamedCompanion {
 
   private val book2metadata: Map[Book, BookMetadata] = Collections.mapValues(metadata)(metadata => Parser.unsafeRun(metadata.resolve))
 
-  // TODO make this a Store!
-  trait Book extends Named {
+  trait Book extends Store.NonTerminal with Stores.Pure {
     final def chapters: Chapters = book2chapters(this)
+
+    override def storesPure: Seq[Store.NonTerminal] = Seq(chapters)
 
     def parser(names: Names, chapters: Chapters): Parser[Parsed]
 
