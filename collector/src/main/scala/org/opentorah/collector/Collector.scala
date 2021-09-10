@@ -76,15 +76,17 @@ final class Collector(
   override protected def content(
     store: Store,
     extension: Option[String]
-  ): Caching.Parser[Either[Effects.Error, Site.Response]] = store match {
+  ): Caching.Parser[Site.Response] = store match {
     case textFacet: Document.TextFacet if extension.nonEmpty && extension.contains("xml") =>
-      textFacet.getTei.map(renderTeiContent).map(content => Right(new Site.Response(content, Tei.mimeType)))
+      textFacet.getTei.map(renderTeiContent).map(content => new Site.Response(content, Tei.mimeType))
 
     case htmlContent: HtmlContent[Collector] =>
-      if (extension.nonEmpty && !extension.contains("html")) ZIO.left(s"Can't provide non-HTML content '${extension.get}' of $htmlContent")
-      else renderHtmlContent(htmlContent).map(content => Right(new Site.Response(content, Html.mimeType)))
+      if (extension.nonEmpty && !extension.contains("html"))
+        Effects.fail(s"Can't provide non-HTML content '${extension.get}' of $htmlContent")
+      else
+        renderHtmlContent(htmlContent).map(content => new Site.Response(content, Html.mimeType))
 
-    case _ => ZIO.left(s"Can't provide content of $store")
+    case _ => Effects.fail(s"Can't provide content of $store")
   }
 
   override def style(htmlContent: HtmlContent[Collector]): String = htmlContent match {
@@ -110,16 +112,16 @@ final class Collector(
     case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
     case collection: Collection => collectionNavigationLinks(collection)
 
-    case htmlFacet: Document.Facet[_, _] => for {
-      siblings <- htmlFacet.collection.siblings(htmlFacet.document)
-      collection = htmlFacet.collection
-      document = htmlFacet.document
-      collectionFacet = htmlFacet.collectionFacet
+    case documentFacet: Document.Facet => for {
+      siblings <- documentFacet.collection.siblings(documentFacet.document)
+      collection = documentFacet.collection
+      document = documentFacet.document
+      collectionFacet = documentFacet.collectionFacet
       collectionNavigationLinks <- collectionNavigationLinks(collection)
-      moreLinks <- htmlFacet match {
+      moreLinks <- documentFacet match {
         case _: Document.TextFacet =>
-          collection.translations(htmlFacet.document).map { translations =>
-            Seq(a(collection.facsimileFacet.of(htmlFacet.document))(text = Tei.facsimileSymbol)) ++ {
+          collection.translations(documentFacet.document).map { translations =>
+            Seq(a(collection.facsimileFacet.of(documentFacet.document))(text = Tei.facsimileSymbol)) ++ {
               for (translation <- if (document.isTranslation) Seq.empty else translations)
                 yield a(collectionFacet.of(translation))(s"[${translation.lang}]")
             }

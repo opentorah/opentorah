@@ -5,18 +5,23 @@ import zio.{IO, Runtime, Task, ZIO}
 
 object Effects {
 
-  type Error = String // TODO use more specific type
-
+  class Error(message: String, cause: Throwable) extends Throwable(message, cause) {
+    def this(message: String) = this(message, null)
+    def this(cause: Throwable) = this(null, cause)
+  }
+  
   def error2throwable[R, A](zio: ZIO[R, Error, A]): ZIO[R, Throwable, A] =
     zio.mapError(new IllegalArgumentException(_))
 
   private def throwable2error[R, A](zio: ZIO[R, Throwable, A]): ZIO[R, Error, A] =
-    zio.mapError(_.getMessage)
+    zio.mapError(error => new Error(error))
 
   val ok: IO[Error, Unit] = ZIO.succeed(())
 
+  def fail(message: String) = ZIO.fail(new Error(message))
+  
   def check(condition: Boolean, message: => String): IO[Error, Unit] =
-    if (condition) ok else ZIO.fail(message)
+    if (condition) ok else fail(message)
 
   // Note: when running with 1 cpu (on Cloud Run or in local Docker),
   // take care to avoid deadlocks:

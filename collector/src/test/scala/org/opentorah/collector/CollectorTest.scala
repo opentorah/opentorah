@@ -15,9 +15,10 @@ final class CollectorTest extends AnyFlatSpec with Matchers {
     val siteUrl: String = if (isLocal) s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
     val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
 
-    def getResponse(pathString: String): Either[Effects.Error, Site.Response] = Effects.unsafeRun(collector.getResponse(pathString))
+    def getResponse(pathString: String): Either[Throwable, Site.Response] =
+      Effects.unsafeRun(collector.getResponse(pathString).either)
     def getContent(pathString: String): String = getResponse(pathString).right.get.content
-    def getError(pathString: String): String = getResponse(pathString).left.get
+    def getError(pathString: String): String = getResponse(pathString).left.get.getMessage
 
     getContent("/") should include("Дела")
     getContent("/collections") should include("Архивы")

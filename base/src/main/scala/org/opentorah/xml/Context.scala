@@ -152,7 +152,7 @@ private[xml] object Context {
   def nextElement(p: ScalaXml.Predicate): Parser[Option[ScalaXml.Element]] = modifyCurrent { (current: Current) =>
     current.contentType match {
       case ContentType.Empty | ContentType.Characters =>
-        ZIO.fail(s"No element in $current")
+        Effects.fail(s"No element in $current")
 
       case ContentType.Elements | ContentType.Mixed =>
         val noLeadingWhitespace: Seq[ScalaXml.Node] = current.nodes.dropWhile(ScalaXml.isWhitespace)
@@ -168,7 +168,7 @@ private[xml] object Context {
 
   val takeCharacters: Parser[Option[String]] = modifyCurrent { (current: Current) => current.contentType match {
     case ContentType.Empty | ContentType.Elements =>
-      ZIO.fail(s"No characters in $current")
+      Effects.fail(s"No characters in $current")
 
     case ContentType.Characters =>
       ZIO.succeed((current.characters, current.copy(characters = None)))
@@ -181,7 +181,7 @@ private[xml] object Context {
 
   val allNodes: Parser[ScalaXml.Nodes] = modifyCurrent { (current: Current) => current.contentType match {
     case ContentType.Empty | ContentType.Characters =>
-      ZIO.fail(s"No nodes in $current")
+      Effects.fail(s"No nodes in $current")
 
     case ContentType.Elements | ContentType.Mixed =>
       ZIO.succeed((current.nodes, current.copy(nodes = Seq.empty)))
@@ -195,7 +195,7 @@ private[xml] object Context {
 
   private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError((error: Effects.Error) =>
     ZIO.access[Has[Context]]((contextHas: Has[Context]) =>
-      error + "\n" + contextHas.get.stack.headOption.map(_.toString).getOrElse("")
+      new Effects.Error(error.getMessage + "\n" + contextHas.get.stack.headOption.map(_.toString).getOrElse(""))
     )
   )
 

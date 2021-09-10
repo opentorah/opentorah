@@ -27,7 +27,7 @@ object Text {
   def apply(): Text = new Text
 
   final class TextElement(elementName: String) extends Element[String](elementName) {
-    override def toString: Effects.Error = s"text element $elementName"
+    override def toString: String = s"text element $elementName"
     override def contentType: ContentType = ContentType.Characters
     override def contentParsable: Parsable[String] = Text().required
   }

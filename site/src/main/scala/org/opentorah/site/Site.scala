@@ -32,13 +32,12 @@ abstract class Site[S <: Site[S]](
 
   final def isStatic(path: Seq[String]): Boolean = path.headOption.exists(staticPaths.contains)
 
-  final def getResponse(pathString: String): Task[Either[Effects.Error, Site.Response]] =
+  final def getResponse(pathString: String): Task[Site.Response] =
     getResponse(Files.splitAndDecodeUrl(pathString))
 
-  final def getResponse(path: Seq[String]): Task[Either[Effects.Error, Site.Response]] = toTask(
+  final def getResponse(path: Seq[String]): Task[Site.Response] = toTask(
     resolve(path).flatMap {
-      case Left(error) => ZIO.left(error) // TODO someOrElseM?
-      case Right(Site.PathAndExtension(path, extension)) => content(path.last, extension)
+      case Site.PathAndExtension(path, extension) => content(path.last, extension)
     }
   )
 
@@ -50,12 +49,11 @@ abstract class Site[S <: Site[S]](
   // TODO verify the extension?
   def resolveUrl(url: Seq[String]): Caching.Parser[Option[Store.Path]] =
     resolve(url).map {
-      case Left(error) => None
-      case Right(Site.PathAndExtension(path, extension)) => Some(path)
-    }
+      case Site.PathAndExtension(path, extension) => Some(path)
+    }.orElse(ZIO.none)
 
-  // If the Either returned is Right, the Store.Path in it isn't empty.
-  final protected def resolve(pathRaw: Seq[String]): Caching.Parser[Either[Effects.Error, Site.PathAndExtension]] = {
+  // Store.Path returned is nonEmpty.
+  final protected def resolve(pathRaw: Seq[String]): Caching.Parser[Site.PathAndExtension] = {
     val (path: Seq[String], mustBeNonTerminal: Boolean, extension: Option[String]) =
       if (pathRaw.isEmpty) (pathRaw, false, None) else {
         val last: String = pathRaw.last
@@ -73,21 +71,21 @@ abstract class Site[S <: Site[S]](
           (pathRaw.init :+ indexCandidate, false, extensionRequested)
     }
 
-    val result: Caching.Parser[Either[Effects.Error, Store.Path]] =
-      if (path.isEmpty && index.nonEmpty) ZIO.right(index.get)
+    val result: Caching.Parser[Store.Path] =
+      if (path.isEmpty && index.nonEmpty) ZIO.succeed(index.get)
       else Stores.resolve(path, this)
 
-    result.map {
-      case Left(error) => Left(error)
-      case Right(path) =>
-        if (mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal]) Left(s"Can not get an index of ${path.last}")
-        else Right(Site.PathAndExtension(path, extension))
+    result.flatMap { (path: Store.Path) =>
+        if (mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal])
+          Effects.fail(s"Can not get an index of ${path.last}")
+        else
+          ZIO.succeed(Site.PathAndExtension(path, extension))
     }
   }
 
   protected def index: Option[Store.Path] = None
 
-  protected def content(store: Store, extension: Option[String]): Caching.Parser[Either[Effects.Error, Site.Response]] = ???
+  protected def content(store: Store, extension: Option[String]): Caching.Parser[Site.Response] = ???
 
   final def renderHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[String] = for {
     content <- resolveLinksInHtmlContent(htmlContent)
