@@ -64,7 +64,7 @@ object CalendarService extends zio.App {
     .getOrElse(Location.Diaspora)
 
   def renderHtml(content: String): ResponseM[Any, Nothing] = ZIO.succeed(Response.http(
-    headers = List(Header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_HTML)), // TODO UTF-8?
+    headers = List(Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, HttpHeaderValues.TEXT_HTML)), // TODO UTF-8?
     content = Zhttp.textData(content)
   ))
 

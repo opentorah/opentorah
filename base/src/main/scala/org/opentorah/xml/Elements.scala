@@ -48,7 +48,7 @@ trait Elements[A] {
         nextElement,
         element
       ))
-      .getOrElse(ZIO.fail(s"$this required, but '$elementName' found"))
+      .getOrElse(Effects.fail(s"$this required, but '$elementName' found"))
   } yield result
 
   final def parse(fromUrl: URL): Parser[A] = parse(From.url(fromUrl))

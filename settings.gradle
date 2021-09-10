@@ -19,14 +19,14 @@ enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
 // Scala2:
-final String scalaVersion      = '2.13.6'
-final String scalaVersionMajor = '2.13'
-final String scalaLibrary      = 'org.scala-lang:scala-library'
+//final String scalaVersion      = '2.13.6'
+//final String scalaVersionMajor = '2.13'
+//final String scalaLibrary      = 'org.scala-lang:scala-library'
 
 // Scala3:
-//final String scalaVersion       = '3.0.3-RC1-bin-20210813-e4b421c-NIGHTLY' // '3.0.2-RC1'
-//final String scalaVersionMajor  = '3'
-//final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
+final String scalaVersion       = '3.1.1-RC1-bin-20210908-8e92478-NIGHTLY'
+final String scalaVersionMajor  = '3'
+final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 
 // TODO update to 2.0.0-M1 and fix the issues with Blocking etc. - once zhttp is updated...
 final String zioVersion = '1.0.11'
@@ -67,7 +67,7 @@ dependencyResolutionManagement {
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.0')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.1')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')

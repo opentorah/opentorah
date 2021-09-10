@@ -43,10 +43,9 @@ object Zhttp {
 
     server.make.use(_ =>
       // Waiting for the server to start
-      zio.console.putStrLn(s"Server started on port $port") // TODO use logging
-
+      // TODO use logging
+      zio.console.putStrLn(s"Server started on port $port") *> ZIO.never
       // Ensures the server doesn't die after printing
-      *> ZIO.never
     )
       .provideCustomLayer(ServerChannelFactory.auto ++ EventLoopGroup.auto(nThreads))
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err")) // TODO use logging
@@ -68,6 +67,7 @@ object Zhttp {
     } yield result
   }
 
+  // TODO fail with descriptive messages
   def staticFile(url: URL, request: Option[Request]): BResponse = {
     for {
       isDirectory: Boolean <- Effects.attempt((url.getProtocol == "file") && new File(url.getFile).isDirectory)
@@ -90,9 +90,9 @@ object Zhttp {
           inputStream: InputStream <- Effects.attempt(urlConnection.getInputStream)
         } yield Response.http(
           headers = List(
-            Header(HttpHeaderNames.LAST_MODIFIED, lastModified.toString),
+            Header.custom(HttpHeaderNames.LAST_MODIFIED.toString, lastModified.toString),
             if (contentLength >= 0) Header.contentLength(contentLength) else Header.transferEncodingChunked
-          ) ++ nameToContentType(url.getPath).map(Header(HttpHeaderNames.CONTENT_TYPE, _)).toList,
+          ) ++ nameToContentType(url.getPath).map(Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, _)).toList,
           content = HttpData.fromStream(ZStream.fromInputStream(inputStream))
         )
       }

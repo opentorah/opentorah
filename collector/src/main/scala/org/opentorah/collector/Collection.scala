@@ -156,7 +156,7 @@ object Collection extends Element[Collection]("collection") {
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(collector)
   }
 
-  sealed abstract class Facet[DF <: Document.Facet[DF, F], F <: Facet[DF, F]](val collection: Collection) extends By {
+  sealed abstract class Facet[DF <: Document.Facet](val collection: Collection) extends By {
 
     final override def findByName(name: String): Caching.Parser[Option[DF]] =
       collection.documents.findByName(name).map(_.map(of))
@@ -170,12 +170,12 @@ object Collection extends Element[Collection]("collection") {
     def of(document: Document): DF
   }
 
-  final class TextFacet(collection: Collection) extends Facet[Document.TextFacet, TextFacet](collection) {
+  final class TextFacet(collection: Collection) extends Facet[Document.TextFacet](collection) {
     override def selector: Selector = Selector.byName("document")
     override def of(document: Document): Document.TextFacet = new Document.TextFacet(document, this)
   }
 
-  final class FacsimileFacet(collection: Collection) extends Facet[Document.FacsimileFacet, FacsimileFacet](collection) {
+  final class FacsimileFacet(collection: Collection) extends Facet[Document.FacsimileFacet](collection) {
     override def selector: Selector = Selector.byName("facsimile")
     override def of(document: Document): Document.FacsimileFacet = new Document.FacsimileFacet(document, this)
   }

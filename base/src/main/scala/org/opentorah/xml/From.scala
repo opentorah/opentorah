@@ -66,7 +66,7 @@ object From {
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
     override def load: IO[Effects.Error, ScalaXml.Element] = url
       .map(url => Effects.effect(ScalaXml.loadFromUrl(url)))
-      .getOrElse(IO.fail(s"Resource not found: $this"))
+      .getOrElse(Effects.fail(s"Resource not found: $this"))
   }
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)

@@ -13,7 +13,6 @@ import zio.blocking.Blocking
 import java.io.File
 import java.net.URL
 
-
 abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App {
 
   // This is supposed to be set when running in Cloud Run
@@ -124,21 +123,19 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site") with zio.App
             case None => notFound(s"Static file $url not found")
             case Some(response) => response
           }
-        } else site.getResponse(path).map {
-          case Left(error) => notFound(error)
-          case Right(siteResponse) =>
-            val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
+        } else site.getResponse(path).map { siteResponse =>
+          val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
 
-            Response.http(
-              headers = List(
-                // TODO: `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`)
-                Header(HttpHeaderNames.CONTENT_TYPE, siteResponse.mimeType),
-                Header.contentLength(bytes.length.toLong)
-                // TODO more headers!
-              ),
-              content = HttpData.fromStream(ZStream.fromChunk(Chunk.fromArray(bytes)))
-            )
-        }
+          Response.http(
+            headers = List(
+              // TODO: `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`)
+              Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, siteResponse.mimeType),
+              Header.contentLength(bytes.length.toLong)
+              // TODO more headers!
+            ),
+            content = HttpData.fromStream(ZStream.fromChunk(Chunk.fromArray(bytes)))
+          )
+        }.catchAll(error => ZIO.succeed(notFound(error.getMessage)))
       }
     }
 

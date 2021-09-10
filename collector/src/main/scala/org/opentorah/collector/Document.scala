@@ -36,7 +36,7 @@ final class Document(
 
 object Document extends Element[Document]("document") with Directory.EntryMaker[Tei, Document] {
 
-  sealed abstract class Facet[DF <: Facet[DF, F], F <: Collection.Facet[DF, F]](val document: Document, val collectionFacet: F)
+  sealed abstract class Facet(val document: Document, val collectionFacet: Collection.Facet[_])
     extends Store.Terminal with HtmlContent[Collector]
   {
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
@@ -49,7 +49,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   }
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends Facet[TextFacet, Collection.TextFacet](document, collectionFacet)
+    extends Facet(document, collectionFacet)
   {
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for {
       tei <- getTei
@@ -62,7 +62,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   }
 
   final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
-    extends Facet[FacsimileFacet, Collection.FacsimileFacet](document, collectionFacet)
+    extends Facet(document, collectionFacet)
   {
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">

@@ -49,7 +49,7 @@ object Stores {
     Not all `Stores` are read from XML - some are constructed -
     so `Store` does *not* extend `FromUrl.With`.
 
-    If the result is Right, then the Store.Path within it is nonEmpty ;)
+    Store.Path returned is nonEmpty ;)
    */
   // TODO I should probably try using ZIO error channel instead of Either,
   // but for that a lot of types need to change, and the first of them - Effects.Error should be
@@ -57,7 +57,7 @@ object Stores {
   def resolve(
     path: Seq[String],
     current: Stores
-  ): Caching.Parser[Either[Effects.Error, Store.Path]] = {
+  ): Caching.Parser[Store.Path] = {
     // TODO handle empty paths smoother: include starting Store?
     require(path.nonEmpty)
     Stores.resolve(path, current, Seq.empty)
@@ -67,15 +67,15 @@ object Stores {
     path: Seq[String],
     current: Stores,
     acc: Store.Path
-  ): Caching.Parser[Either[Effects.Error, Store.Path]] =
-    if (path.isEmpty) ZIO.right(acc.reverse) else {
+  ): Caching.Parser[Store.Path] =
+    if (path.isEmpty) ZIO.succeed(acc.reverse) else {
       val head: String = path.head
       val tail: Seq[String] = path.tail
       current.findByName(head).flatMap {
         case Some(next: Stores) => resolve(tail, next, next +: acc)
-        case Some(next) if tail.isEmpty => ZIO.right((next +: acc).reverse)
-        case Some(next) => ZIO.left(s"Can not apply '$tail' to $next")
-        case None       => ZIO.left(s"Did not find '$head' in $current")
+        case Some(next) if tail.isEmpty => ZIO.succeed((next +: acc).reverse)
+        case Some(next) => Effects.fail(s"Can not apply '$tail' to $next")
+        case None       => Effects.fail(s"Did not find '$head' in $current")
       }
     }
 }

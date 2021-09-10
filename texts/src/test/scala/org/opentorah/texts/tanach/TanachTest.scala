@@ -10,10 +10,10 @@ final class TanachTest extends AnyFlatSpec with Matchers {
   // TODO is such setup needed only for tests - or should I abstract it?
   val caching: Caching.Simple = new Caching.Simple
 
-  def resolve(path: String): Either[Effects.Error, Store.Path] =
-    Effects.unsafeRun(Parser.toTask(Caching.provide(caching, Stores.resolve(Files.splitAndDecodeUrl(path), Tanach))))
+  def resolve(path: String): zio.Task[Store.Path] =
+    Parser.toTask(Caching.provide(caching, Stores.resolve(Files.splitAndDecodeUrl(path), Tanach)))
 
-  def doResolve(path: String): Store.Path = resolve(path).right.get
+  def doResolve(path: String): Store.Path = Effects.unsafeRun(resolve(path))
   def doResolveLast(path: String): Store = doResolve(path).last
   def checkName(path: String, name: String): Unit =
     doResolveLast(path).names.hasName(name) shouldBe true
