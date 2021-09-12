@@ -5,9 +5,9 @@ import Angles.{Position, Rotation}
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}
 
-object MoonAnomalyVisible {
+object MoonAnomalyVisible:
   // As printed
-  class Misprinted extends InterpolatedTable[Position] {
+  class Misprinted extends InterpolatedTable[Position]:
     // KH 15:6
     override val values: Map[Position, Rotation] = Map(
       row(  0, 0,  0),
@@ -32,46 +32,38 @@ object MoonAnomalyVisible {
     )
 
     // KH 15:4, 15:7
-    final override def calculate(moonAnomalyTrue: Position): Rotation = {
+    final override def calculate(moonAnomalyTrue: Position): Rotation =
       val angle: Position = moonAnomalyTrue
-      if (angle <= Position(180)) -interpolate(angle) else interpolate(reflect(angle))
-    }
+      if angle <= Position(180) then -interpolate(angle) else interpolate(reflect(angle))
 
-    private final def reflect(position: Position): Position = {
+    private final def reflect(position: Position): Position =
       Position.zero + (Angles.period - (position - Position.zero))
-    }
-  }
 
   final val misprinted: InterpolatedTable[Position] = new Misprinted
 
   // Misprints corrected.
-  final val table: InterpolatedTable[Position] = new Misprinted {
+  final val table: InterpolatedTable[Position] = new Misprinted:
     override val values: Map[Position, Rotation] = misprinted.values ++ Map(
       row(120, 4, 40),
       row(150, 2, 48),
       row(170, 0, 59)
     )
-  }
 
-  def mnasfrome(maslul: Position, e: Double): Rotation = {
+  def mnasfrome(maslul: Position, e: Double): Rotation =
     val maslulRadians = maslul.toRadians
     val inRadians = asin(sin(maslulRadians)/sqrt(e*e + 2*e*cos(maslulRadians) + 1))
     Rotation.fromRadians(inRadians, 1)
-  }
 
-  def efrommnas(maslul: Position, mnas: Rotation): Double = {
+  def efrommnas(maslul: Position, mnas: Rotation): Double =
     val maslulRadians = maslul.toRadians
     val mnasRadians = mnas.toRadians
     sin(maslulRadians)/sin(mnasRadians)*abs(cos(mnasRadians))-cos(maslulRadians)
-  }
 
   def efrommnasround(maslul: Position, mnas: Rotation): Double = roundTo(efrommnas(maslul, mnas), 2)
 
-  private def roundTo(value: Double, digits: Int): Double = {
+  private def roundTo(value: Double, digits: Int): Double =
     val quotient = pow(10, digits)
     round(value*quotient)/quotient
-  }
 
   private def row(argumentDegrees: Int, valueDegrees: Int, valueMinutes: Int): (Position, Rotation) =
     Position(argumentDegrees) -> Rotation(valueDegrees, valueMinutes)
-}

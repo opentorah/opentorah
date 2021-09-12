@@ -2,7 +2,7 @@ package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Moment, Month, TimeVector, Year}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Moon, NewYear, Season, Sun}
-import Week.Day._
+import Week.Day.*
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.metadata.Language
 import org.scalatest.funspec.AnyFunSpec
@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers
 /**
   * Tests based on the statements from the text itself.
   */
-class TextTest extends AnyFunSpec with Matchers {
+class TextTest extends AnyFunSpec, Matchers:
   describe("Chapter 6") {
     describe("Law 2: Time Units") {
       it("hours") {
@@ -155,31 +155,25 @@ class TextTest extends AnyFunSpec with Matchers {
         var numberRegular: Int = 0
         var numberFull: Int = 0
         var numberShort: Int = 0
-        for {
+        for
           yearNumber <- 2 to 6000 // TODO remove magic constants
           year: Year = Year(yearNumber)
           if !year.isLeap
           firstDay: Day = year.firstDay
           nextYearFirstDay: Day = year.next.firstDay
           kind: Year.Kind = year.kind
-        } {
-          if (firstDay.is(Chamishi)) {
-            if (nextYearFirstDay.is(Sheni)) {
+        do
+          if firstDay.is(Chamishi) then
+            if nextYearFirstDay.is(Sheni) then
               numberRegular += 1
               kind shouldBe Year.Kind.Regular
-            }
-            if (nextYearFirstDay.is(Shlishi)) {
+            if nextYearFirstDay.is(Shlishi) then
               numberFull += 1
               kind shouldBe Year.Kind.Full
-            }
-          }
-          if (firstDay.is(Shabbos)) {
-            if (nextYearFirstDay.is(Shlishi)) {
+          if firstDay.is(Shabbos) then
+            if nextYearFirstDay.is(Shlishi) then
               numberShort += 1
               kind shouldBe Year.Kind.Short
-            }
-          }
-        }
 
         // Verify that we saw some years with properties from the text
         assert(numberRegular > 0) // 1084 of them!
@@ -190,17 +184,15 @@ class TextTest extends AnyFunSpec with Matchers {
 
     describe("Law 10") {
       it("year kind laws") {
-        for (yearNumber <- NewYear.delaysEnabledFromYear to 6000) { // TODO remove magic constants
+        for yearNumber <- NewYear.delaysEnabledFromYear to 6000 do // TODO remove magic constants
           val year: Year = Year(yearNumber)
           val kind: Year.Kind = year.kind
-          year.firstDay.name match {
+          year.firstDay.name match
             case Shlishi  => assert(kind == Year.Kind.Regular)
             case Shabbos  => assert(kind != Year.Kind.Regular)
             case Sheni    => assert(kind != Year.Kind.Regular)
-            case Chamishi => assert(kind != (if (year.isLeap) Year.Kind.Regular else Year.Kind.Short))
-            case _ => throw new IllegalArgumentException
-          }
-        }
+            case Chamishi => assert(kind != (if year.isLeap then Year.Kind.Regular else Year.Kind.Short))
+            case _ => throw IllegalArgumentException()
       }
     }
   }
@@ -219,7 +211,7 @@ class TextTest extends AnyFunSpec with Matchers {
       it("tkufos of 4930") {
         val year: Year = Year(4930)
 
-        LeapYearsCycle.forYear(year) shouldBe YearsCycle.In(260, 9)
+        LeapYearsCycle.forYear(Jewish)(year) shouldBe YearsCycle.In(260, 9)
 
         val tkufasNisan: Moment = Sun.Shmuel.seasonForYear(Season.TkufasNisan, year)
         tkufasNisan.day.name shouldBe Chamishi
@@ -276,4 +268,3 @@ class TextTest extends AnyFunSpec with Matchers {
 
   private def remainderForWeek(ofWhat: TimeVector): TimeVector =
     ofWhat - (week * (ofWhat.toRational / week.toRational).whole)
-}

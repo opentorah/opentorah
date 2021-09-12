@@ -23,20 +23,19 @@ import org.opentorah.numbers.BigRational
  He also recalculated the values for the precession of the equinoxes (54.5" per year, or 1° in 66
  years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
  */
-object AngularVelocities {
+object AngularVelocities:
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 //    SunLongitudeMean.exactify
     SunApogee.exactify
 
 //    MoonAnomalyMean.exactify
     //    MoonLongitudeMean.exactify
     //    MoonHeadMean.exactify
-  }
 
-  def sunLongitudeMean(): Unit = {
+  def sunLongitudeMean(): Unit =
     def m(n: Int): Rotation = (SunLongitudeMean.rambamValue * n).roundTo(Angles.Digit.SECONDS)
-    for (n <- List(1, 10, 100, 1000, 10000, 354))
+    for n: Int <- List(1, 10, 100, 1000, 10000, 354) do
       println(s"$n ${m(n)}")
 
     val v29 = Rotation(9, 51, 23)*3 - Rotation(0, 59, 8)
@@ -59,5 +58,3 @@ object AngularVelocities {
     println("Shmuel  : " + Sun.Shmuel.yearLength.toRational.toDouble + " " + Sun.Shmuel.yearLength)
 
     println((SunLongitudeMean.almagestValue*1000).roundToMinutes)
-  }
-}

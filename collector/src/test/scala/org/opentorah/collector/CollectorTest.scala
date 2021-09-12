@@ -7,12 +7,12 @@ import org.scalatest.matchers.should.Matchers
 
 import java.io.File
 
-final class CollectorTest extends AnyFlatSpec with Matchers {
+final class CollectorTest extends AnyFlatSpec, Matchers:
 
   "Collector smoke tests" should "work" in {
     val localStorePath: String = "/home/dub/OpenTorah/alter-rebbe.org/"
-    val isLocal: Boolean = new File(localStorePath).exists()
-    val siteUrl: String = if (isLocal) s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
+    val isLocal: Boolean = File(localStorePath).exists()
+    val siteUrl: String = if isLocal then s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
     val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
 
     def getResponse(pathString: String): Either[Throwable, Site.Response] =
@@ -24,12 +24,16 @@ final class CollectorTest extends AnyFlatSpec with Matchers {
     getContent("/collections") should include("Архивы")
     getContent("/note/about") should include("Цель настоящего сайта: ")
     getContent("/note/help") should include("навигационная полоса содержит:")
+
+    // This one verifies that the name lists are set up properly, even when the list of lists has not
+    // been accessed yet:
+    getContent("/names/jews/alter-rebbe.html") should include("основатель направления Хабад")
     getContent("/names") should include("Жиды (они же Евреи)")
     getContent("/names/jews") should include("Жиды (они же Евреи)")
     getContent("/names/jews/alter-rebbe") should include("основатель направления Хабад")
-    getContent("/names/jews/alter-rebbe.html") should include("основатель направления Хабад")
     getContent("/name") should include("Залман Борухович")
     getContent("/name/alter-rebbe") should include("основатель направления Хабад")
+
     getContent("/dubnov") should include("Вмешательство")
     getContent("/dubnov/index") should include("Вмешательство")
     getContent("/dubnov/index.html") should include("Вмешательство")
@@ -47,4 +51,3 @@ final class CollectorTest extends AnyFlatSpec with Matchers {
 
     getContent("/archive/rgada/category/VII/inventory/2/case/3140/document/001") should include("100 рублей")
   }
-}

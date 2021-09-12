@@ -6,7 +6,7 @@ import org.opentorah.xml.Parser
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-final class TanachTest extends AnyFlatSpec with Matchers {
+final class TanachTest extends AnyFlatSpec, Matchers:
   // TODO is such setup needed only for tests - or should I abstract it?
   val caching: Caching.Simple = new Caching.Simple
 
@@ -51,4 +51,3 @@ final class TanachTest extends AnyFlatSpec with Matchers {
   it should "contain /book/Бытие/parsha/Noach" in {
     checkName("/book/Бытие/parsha/Noach", "Ноах")
   }
-}

@@ -3,7 +3,7 @@ package org.opentorah.astronomy
 import org.opentorah.angles.Angles.{Position, Rotation}
 import org.opentorah.numbers.BigRational
 
-trait Calculators {
+trait Calculators:
   def sunLongitudeMean: Int => Rotation
 
   def sunApogee: Int => Rotation
@@ -31,11 +31,10 @@ trait Calculators {
   def moonCircuitPortion: Position => BigRational
 
   def moonLongitude3Portion: Position => BigRational
-}
 
 
-object Calculators {
-  class TextLike extends Calculators {
+object Calculators:
+  class TextLike extends Calculators:
     override def sunLongitudeMean: Int => Rotation = SunLongitudeMean.calculate
     override def sunApogee: Int => Rotation = SunApogee.calculate
     override def sunLongitudeCorrection: Rotation => Rotation = SunLongitudeCorrection.table.calculate
@@ -50,11 +49,8 @@ object Calculators {
     override def moonLatitudeSightingAdjustment: Position => Rotation = MoonLatitudeSightingAdjustment.calculate
     override def moonCircuitPortion: Position => BigRational = MoonCircuitPortion.calculate
     override def moonLongitude3Portion: Position => BigRational = MoonLongitude3Portion.calculate
-  }
 
   object Text extends TextLike
 
-  object Misprints extends TextLike {
+  object Misprints extends TextLike:
     override def moonAnomalyVisible: Position => Rotation = MoonAnomalyVisible.misprinted.calculate
-  }
-}

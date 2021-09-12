@@ -8,15 +8,15 @@ import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
 import org.opentorah.util.{Files, Gradle}
 import java.io.File
 
-object GradleOperations {
+object GradleOperations:
 
   private def info(project: Project, message: String): Unit = project.getLogger.info(message, null, null, null)
 
-  def generateData(project: Project, mainClass: String, dataDirectory: File): Unit = {
+  def generateData(project: Project, mainClass: String, dataDirectory: File): Unit =
     val mainSourceSet: Option[SourceSet] = Gradle.mainSourceSet(project)
-    if (mainSourceSet.isEmpty) project.getLogger.warn(
+    if mainSourceSet.isEmpty then project.getLogger.warn(
       s"Skipping DocBook data generation: no Java plugin in the project")
-    else {
+    else
       info(project, s"Running DocBook data generator $mainClass into $dataDirectory")
       Gradle.javaexec(
         project,
@@ -24,14 +24,12 @@ object GradleOperations {
         mainSourceSet.get.getRuntimeClasspath,
         dataDirectory.toString
       )
-    }
-  }
 
-  def unpackStylesheets(project: Project, stylesheets: Stylesheets, version: String, root: File): File = {
+  def unpackStylesheets(project: Project, stylesheets: Stylesheets, version: String, root: File): File =
     val file: File = Gradle.getArtifact(project, stylesheets.dependencyNotation(version)).get
-    val into: File = new File(root, file.getName)
+    val into: File = File(root, file.getName)
     val directory: File = Files.file(into, stylesheets.archiveSubdirectoryPath)
-    if (!directory.exists) Gradle.unpack(
+    if !directory.exists then Gradle.unpack(
       project,
       file,
       isZip = true,
@@ -39,7 +37,6 @@ object GradleOperations {
     )
 
     directory
-  }
 
   def getMathJaxRunner(
     project: Project,
@@ -53,7 +50,7 @@ object GradleOperations {
   ): MathJaxRunner = MathJaxRunner.get(
     node = installNode(
       project,
-      new NodeDistribution(nodeVersion),
+      NodeDistribution(nodeVersion),
       into = nodeRoot,
       overwrite = overwriteNode
     ),
@@ -72,10 +69,10 @@ object GradleOperations {
     nodeDistribution: NodeDistribution,
     into: File,
     overwrite: Boolean
-  ): Node = {
+  ): Node =
     val result: Node = Node.fromDistribution(nodeDistribution, into)
 
-    if (!overwrite && result.exists) info(project, s"Existing installation detected: $result") else {
+    if !overwrite && result.exists then info(project, s"Existing installation detected: $result") else
       info(project, s"Installing $this as $result")
 
       val artifact: File = Gradle.getArtifact(
@@ -94,22 +91,19 @@ object GradleOperations {
       )
 
       result.fixup(nodeDistribution)
-    }
 
     result
-  }
 
   private def installJ2V8(project: Project, j2v8Dictribution: J2V8Distribution, into: File): Option[J2V8] =
-    if (j2v8Dictribution.version.isEmpty) {
+    if j2v8Dictribution.version.isEmpty then
       project.getLogger.warn(s"No $j2v8Dictribution")
       None
-    } else Gradle.getArtifact(project, j2v8Dictribution.dependencyNotation).map { artifact =>
+    else Gradle.getArtifact(project, j2v8Dictribution.dependencyNotation).map(artifact =>
       Gradle.unpack(
         project,
         artifact,
         isZip = true,
         into
       )
-      new J2V8(libraryPath = new File(into, j2v8Dictribution.libraryName).getAbsolutePath)
-    }
-}
+      J2V8(libraryPath = File(into, j2v8Dictribution.libraryName).getAbsolutePath)
+    )

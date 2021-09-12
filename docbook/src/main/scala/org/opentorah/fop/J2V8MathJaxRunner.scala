@@ -1,10 +1,10 @@
 package org.opentorah.fop
 
-import com.eclipsesource.v8._
+import com.eclipsesource.v8.*
 import com.eclipsesource.v8.utils.V8ObjectUtils
 import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
 import java.io.File
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // NOTE: some tests failed unless I typeset specific TeX math first; some - even then;
 // re-configuring and forcibly re-starting MathJax before each typeset call breaks the tests even more;
@@ -25,15 +25,15 @@ final class J2V8MathJaxRunner(
 ) extends MathJaxRunner(
   mathJax,
   configuration
-) {
+):
 
   override def typeset(
-    options: Map[String, Any],
+    options: Map[String, Matchable],
     outputName: String
-  ): String = {
+  ): String =
     val nodeJS: NodeJS = NodeJS.createNodeJS
     def v8: V8 = nodeJS.getRuntime
-    val mathJaxNode: V8Object = nodeJS.require(new File(node.nodeModules, mathJax.packageName))
+    val mathJaxNode: V8Object = nodeJS.require(File(node.nodeModules, mathJax.packageName))
 
     val configurationArgs: V8Array =
       V8ObjectUtils.toV8Array(v8, List(J2V8.map2java(mathJax.nodeConfiguration(configuration))).asJava)
@@ -42,11 +42,11 @@ final class J2V8MathJaxRunner(
 
     var data: V8Object = null
 
-    val callback: V8Function = new V8Function(v8, (_ /*receiver*/: V8Object, parameters: V8Array) => {
+    val callback: V8Function = V8Function(v8, (_ /*receiver*/: V8Object, parameters: V8Array) => {
       data = parameters.getObject(0)
       val errors: V8Array = data.getArray(mathJax.errorsArray)
-      if (!errors.isUndefined)
-        throw new IllegalArgumentException(V8ObjectUtils.toList(errors).asScala.map(_.asInstanceOf[String]).mkString("\n"))
+      if !errors.isUndefined then
+        throw IllegalArgumentException(V8ObjectUtils.toList(errors).asScala.map(_.asInstanceOf[String]).mkString("\n"))
       errors.release()
       null
     })
@@ -61,7 +61,7 @@ final class J2V8MathJaxRunner(
     //  }
     val callResult: V8Object = mathJaxNode.executeObjectFunction(mathJax.typesetFunction, typesetArgs)
 
-    while (nodeJS.isRunning) nodeJS.handleMessage()
+    while nodeJS.isRunning do nodeJS.handleMessage()
 
     callback.release()
     typesetArgs.release()
@@ -74,6 +74,4 @@ final class J2V8MathJaxRunner(
     nodeJS.release()
 
     result
-  }
-}
 

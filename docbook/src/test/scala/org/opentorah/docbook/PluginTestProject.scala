@@ -12,39 +12,38 @@ class PluginTestProject private(
   isPdfEnabled: Boolean,
   isMathJaxEnabled: Boolean,
   useJ2V8: Boolean
-) {
+):
   projectDir.mkdirs()
 
   val layout: Layout = Layout.forRoot(projectDir)
 
-  def write(): Unit = {
+  def write(): Unit =
     val documentName: String = "test"
 
     // reference plugin's root project
     Files.write(
-      file = new File(projectDir, "settings.gradle"),
+      file = File(projectDir, "settings.gradle"),
       replace = true,
       content =
         s"""|includeBuild '$pluginRootDir'
             |""".stripMargin
     )
 
-    val substitutionsFormatted: String = if (substitutions.isEmpty) "" else {
-      val contents: String = substitutions.map { case (name: String, value: String) =>
+    val substitutionsFormatted: String = if substitutions.isEmpty then "" else
+      val contents: String = substitutions.map((name: String, value: String) =>
         s""""$name": $value"""
-      }.mkString(",\n")
+      ).mkString(",\n")
 
       s"""
          |  substitutions = [
          |    $contents
          |  ]
          |""".stripMargin
-    }
 
-    val outputFormats: String = if (isPdfEnabled) """ "html", "pdf" """ else """ "html" """
+    val outputFormats: String = if isPdfEnabled then """ "html", "pdf" """ else """ "html" """
 
     Files.write(
-      file = new File(projectDir, "build.gradle"),
+      file = File(projectDir, "build.gradle"),
       replace = true,
       content =
       s"""|plugins {
@@ -74,7 +73,6 @@ class PluginTestProject private(
       replace = false,
       content = document
     )
-  }
 
   def destroy(): Unit = Files.deleteFiles(projectDir)
 
@@ -92,13 +90,11 @@ class PluginTestProject private(
         .saxonOutputFile(docBook2.defaultVariant)
     ).mkString("\n")
 
-  private def getRunner(logInfo: Boolean): GradleRunner = {
+  private def getRunner(logInfo: Boolean): GradleRunner =
     val result = GradleRunner.create.withProjectDir(projectDir)
-    if (logInfo) result.withArguments("-d", "processDocBook") else result.withArguments("processDocBook")
-  }
-}
+    if logInfo then result.withArguments("-d", "processDocBook") else result.withArguments("processDocBook")
 
-object PluginTestProject {
+object PluginTestProject:
 
   private val documentName: String = "test"
 
@@ -110,7 +106,7 @@ object PluginTestProject {
     isPdfEnabled: Boolean = false,
     isMathJaxEnabled: Boolean = false,
     useJ2V8: Boolean = false
-  ): PluginTestProject = {
+  ): PluginTestProject =
     val layout: Layout = Layout.forCurrent
 
     val result: PluginTestProject = new PluginTestProject(
@@ -126,5 +122,3 @@ object PluginTestProject {
     result.write()
 
     result
-  }
-}

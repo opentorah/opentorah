@@ -4,7 +4,7 @@ import Section.Parameters
 import org.opentorah.docbook.DocBook
 import org.opentorah.xml.{ScalaXml, Xsl}
 
-trait Section {
+trait Section:
 
   def name: String
 
@@ -23,10 +23,8 @@ trait Section {
   protected def customStylesheetBody: ScalaXml.Nodes
 
   def usesDocBookXslt2: Boolean = false
-}
 
-object Section {
+object Section:
   type Parameters = Map[String, String]
 
   val all: List[Section] = CommonSection.all ++ DocBook2.all
-}

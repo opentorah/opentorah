@@ -1,6 +1,6 @@
 package org.opentorah.calendar.roman
 
-object Julian extends Roman {
+object Julian extends Roman:
 
   override protected def yearFirstDayCorrection(yearNumber: Int): Int =
     (yearNumber - 1)/4
@@ -16,4 +16,3 @@ object Julian extends Roman {
 //    BigRational(1, 4),
 //    length = maxLength
 //  )
-}

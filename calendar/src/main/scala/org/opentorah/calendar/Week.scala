@@ -2,13 +2,12 @@ package org.opentorah.calendar
 
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 
-object Week {
+object Week:
 
-  sealed trait Day extends Named {
+  sealed trait Day extends Named:
     final override def names: Names = Day.toNames(this)
-  }
 
-  object Day extends NamedCompanion {
+  object Day extends NamedCompanion:
     override type Key = Day
 
     case object Sunday    extends Day
@@ -32,7 +31,5 @@ object Week {
     require(values.length == length)
 
     def forNumber(numberInWeek: Int): Day = values(numberInWeek - 1)
-  }
 
   final val length: Int = 7
-}

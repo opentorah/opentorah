@@ -21,11 +21,11 @@ abstract class Directory[
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends Stores with FromUrl.With {
+) extends Stores, FromUrl.With:
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
-  private val listFile: ListFile[M, W] = new ListFile[M, W](
+  private val listFile: ListFile[M, W] = ListFile[M, W](
     url = Files.fileInDirectory(fromUrl.url, directory + "-list-generated.xml"),
     name = "directory",
     entryMaker,
@@ -57,27 +57,22 @@ abstract class Directory[
   )
 
   protected def loadFile(url: URL): Parser[T]
-}
 
-object Directory {
+object Directory:
 
-  abstract class Wrapper[M <: Store](name2entry: Map[String, M]) {
+  abstract class Wrapper[M <: Store](name2entry: Map[String, M]):
     final def stores: Seq[M] = name2entry.values.toSeq
 
     final def findByName(name: String): Option[M] = name2entry.get(name)
-  }
 
   abstract class Entry(
     override val name: String
-  ) extends Store.Terminal {
+  ) extends Store.Terminal:
     final override val names: Names = Names(name)
-  }
 
-  trait EntryMaker[T, M <: Entry] extends Elements[M] {
+  trait EntryMaker[T, M <: Entry] extends Elements[M]:
     def apply(name: String, content: T): Parser[M]
-  }
 
   val directoryAttribute: Attribute.Required[String] = Attribute("directory").required
 
   val fileNameAttribute: Attribute.Required[String] = Attribute("n").required
-}

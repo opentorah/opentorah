@@ -1,28 +1,16 @@
 package org.opentorah.mathjax
 
-sealed trait Output {
-  def name: String
-  final def name(isNode: Boolean): String = if (isNode) name + "Node" else name
-  def css: Boolean = false
-}
+enum Output(
+  val name: String,
+  val css: Boolean = false
+):
+  final def name(isNode: Boolean): String = if isNode then name + "Node" else name
 
-object Output {
-
-  case object MathML extends Output {
-    override val name: String = "mml"
-  }
+  case MathML extends Output("mml")
 
   // For SVG, width, height and style attributes are repeated in separate keys of the returned data.
-  case object Svg extends Output {
-    override val name: String = "svg"
-  }
+  case Svg extends Output("svg")
 
-  case object Html extends Output {
-    override val name: String = "html"
-  }
+  case Html extends Output("html")
 
-  case object HtmlWithCss extends Output {
-    override val name: String = "html"
-    override val css: Boolean = true
-  }
-}
+  case HtmlWithCss extends Output("html", css = true)

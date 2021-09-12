@@ -4,7 +4,7 @@ import org.opentorah.xml.{Doctype, PrettyPrinter, ScalaXml, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
-class PluginTest extends AnyFlatSpecLike with Matchers {
+class PluginTest extends AnyFlatSpecLike, Matchers:
 
   private val prettyPrinter: PrettyPrinter = PrettyPrinter.default.copy(encodeXmlSpecials = false)
 
@@ -14,7 +14,7 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     doctype: Option[Doctype],
     document: ScalaXml.Element)(
     inIndexHtml: String*
-  ): Unit = {
+  ): Unit =
     val project = PluginTestProject(
       prefix = "pluginTestProjects",
       name,
@@ -27,9 +27,8 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
 
     val indexHtml: String = project.indexHtml
 
-    for (string: String <- inIndexHtml)
+    for string: String <- inIndexHtml do
       indexHtml.contains(string) shouldBe true
-  }
 
   "Scala XML" should "handle entity reference in dynamic attribute values - but doesn't" in {
     // Entity reference in the attribute value trips up IntelliJ's Scala XML parser:
@@ -116,4 +115,3 @@ class PluginTest extends AnyFlatSpecLike with Matchers {
     project.fail().contains(
       """The entity "version" was referenced, but not declared.""") shouldBe true
   }
-}

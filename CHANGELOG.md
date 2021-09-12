@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - switched from http4s to zhttp;
+- switched to Scala 3 and its syntax!
 
 ## [0.2.6] - 2021-08-17
 - consolidated 'util', 'xml' and 'metadata' modules into 'base';

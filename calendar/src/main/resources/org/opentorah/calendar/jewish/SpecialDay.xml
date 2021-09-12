@@ -197,4 +197,9 @@
      <name lang="he" n="תשע באב"/>
      <name lang="ru" transliterated="yes" n="Тиша беав"/>
   </names>
+
+  <names>
+      <name lang="en" transliterated="yes" n="Shabbos Selichos"/>
+      <name lang="ru" transliterated="yes" n="Шабос Слихос"/>
+  </names>
 </SpecialDay>

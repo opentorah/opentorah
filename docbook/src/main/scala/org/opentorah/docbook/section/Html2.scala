@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 import Section.Parameters
 import org.opentorah.xml.ScalaXml
 
-object Html2 extends DocBook2 {
+object Html2 extends DocBook2:
   override def name: String = "html2"
   override protected def stylesheetUriName: String = "html/chunk"
   override protected def outputFileExtension: String = "html"
@@ -42,4 +42,3 @@ object Html2 extends DocBook2 {
       <db:refsection/>
     </xsl:param>
   )
-}

@@ -3,21 +3,21 @@ package org.opentorah.collector
 import org.opentorah.site.{SiteCommon, SiteService}
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
-object CollectorService extends SiteService[Collector] {
+object CollectorService extends SiteService[Collector]:
 
   override def projectId: String = "alter-rebbe-2"
 
   override def bucketName: String = "store.alter-rebbe.org"
 
-  override def contentParsable: Parsable[Collector] = new Parsable[Collector] {
-    override def parser: Parser[Collector] = for {
+  override def contentParsable: Parsable[Collector] = new Parsable[Collector]:
+    override def parser: Parser[Collector] = for
       fromUrl <- Element.currentFromUrl
       common <- SiteCommon.required()
       entities <- Entities.required()
       entityLists <- EntityLists.required()
       notes <- Notes.required()
       by <- ByHierarchy.followRedirects.required()
-    } yield new Collector(
+    yield Collector(
       fromUrl,
       common,
       entities,
@@ -33,5 +33,3 @@ object CollectorService extends SiteService[Collector] {
       Notes.required(_.notes),
       ByHierarchy.required(_.by)
     )
-  }
-}

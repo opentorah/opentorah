@@ -2,7 +2,7 @@ package org.opentorah.tei
 
 import org.opentorah.xml.RawXml
 
-class TeiRawXml(
+open class TeiRawXml(
   elementName: String,
   attributesAllowed: Boolean = false
 ) extends RawXml(

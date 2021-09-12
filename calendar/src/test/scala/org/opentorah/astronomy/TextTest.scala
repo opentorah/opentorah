@@ -9,7 +9,7 @@ import Jewish.{Day, Month, Year}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class TextTest extends AnyFunSpec with Matchers {
+class TextTest extends AnyFunSpec, Matchers:
   describe("Chapter 11") {
     describe("Law 7") {
       it("angle units") {
@@ -28,11 +28,10 @@ class TextTest extends AnyFunSpec with Matchers {
       it("zodiac") {
         Zodiac.values.length shouldBe 12
         Zodiac.Aries.start shouldBe Position(0)
-        Zodiac.values.init.zip(Zodiac.values.tail).foreach {
-          case (prev: Zodiac, next: Zodiac) =>
+        Zodiac.values.init.zip(Zodiac.values.tail).foreach((prev: Zodiac, next: Zodiac) =>
             (prev.start + Rotation(30)) shouldBe prev.end
             next.start shouldBe prev.end
-        }
+        )
 
         Zodiac.Gemini  .at(Rotation(10, 30, 40)) shouldBe Position(70, 30, 40)
         Zodiac.Aquarius.at(Rotation(20        )) shouldBe Position(320)
@@ -183,4 +182,3 @@ class TextTest extends AnyFunSpec with Matchers {
       }
     }
   }
-}

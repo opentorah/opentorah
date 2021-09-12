@@ -3,7 +3,7 @@ package org.opentorah.calendar.jewish
 import Jewish.{Moment, TimeVector, Year}
 import org.opentorah.calendar.YearsCycle
 
-abstract class Sun extends Season.ForYear {
+abstract class Sun extends Season.ForYear:
   def yearLength: TimeVector
 
   final def seasonLength: TimeVector = yearLength /(4, Jewish.maxLength)
@@ -13,10 +13,9 @@ abstract class Sun extends Season.ForYear {
 
   def firstTkufasNisanBeforeFirstMoladNisan: TimeVector
 
-  final override def seasonForYear(season: Season, year: Year): Moment = {
+  final override def seasonForYear(season: Season, year: Year): Moment =
     val numberInYear: Int = season.numberInYear - Season.TkufasNisan.numberInYear
-    seasonForYear(if (numberInYear >= 0) numberInYear else numberInYear + 4, year)
-  }
+    seasonForYear(if numberInYear >= 0 then numberInYear else numberInYear + 4, year)
 
   // This method calculates tkufas Tishrei and Teves of year n in year n, before tkufas Nisan,
   // not year n+1 like in the Rambam's text.
@@ -25,11 +24,10 @@ abstract class Sun extends Season.ForYear {
 
   private def seasonForYear(number: Int, year: Year): Moment = firstTkufasNisan +
     seasonLength * ((year.number - 1) * Season.numberOfValues + number)
-}
 
-object Sun {
+object Sun:
 
-  object Shmuel extends Sun with YearsCycle {
+  object Shmuel extends Sun, YearsCycle:
     // KH 9:1
     final override val yearLength: TimeVector =
       TimeVector().days(365).hours(6)
@@ -50,9 +48,8 @@ object Sun {
     // It happens more often than on the Passover Eve on 7 days.
     def birkasHachama(cycle: Int): Moment =
       firstTkufasNisan + yearLength * length * cycle + TimeVector().hours(12)
-  }
 
-  object RavAda extends Sun {
+  object RavAda extends Sun:
     // KH 10:1
     final override val yearLength: TimeVector =
       LeapYearsCycle.cycleLength /(LeapYearsCycle.yearsInCycle, Jewish.maxLength)
@@ -60,5 +57,3 @@ object Sun {
     // KH 10:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
       TimeVector().hours(9).parts(642)
-  }
-}

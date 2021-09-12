@@ -4,7 +4,7 @@ import org.opentorah.html.Html
 import org.opentorah.util.Json
 import org.opentorah.xml.{Attribute, ScalaXml, XLink}
 
-object HtmlTheme {
+object HtmlTheme:
 
   // TODO put scripts on the bottom of body, libraries in the head?
   // TODO copy SEO stuff from Minima...
@@ -16,7 +16,7 @@ object HtmlTheme {
     navigationLinks: Seq[ScalaXml.Element], // normally, <a>s
     content: ScalaXml.Element,
     site: S
-  ): ScalaXml.Element = {
+  ): ScalaXml.Element =
     val common: SiteCommon = site.common
     val isMathJaxEnabled    : Boolean = common.getMathJax    .isEnabled && HtmlTheme.isMathPresent(content)
     val isHighlighterEnabled: Boolean = common.getHighlighter.isEnabled && HtmlTheme.isCodePresent(content)
@@ -30,11 +30,11 @@ object HtmlTheme {
         <link rel="stylesheet" href={s"/css/${site.style(htmlContent)}.css"}/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
         {ScalaXml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
-        {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.head}
+        {if !isHighlighterEnabled then Seq.empty else common.getHighlighter.head}
       </head>
       <body>
-        {if (!isMathJaxEnabled    ) Seq.empty else common.getMathJax    .body}
-        {if (!isHighlighterEnabled) Seq.empty else common.getHighlighter.body}
+        {if !isMathJaxEnabled     then Seq.empty else common.getMathJax    .body}
+        {if !isHighlighterEnabled then Seq.empty else common.getHighlighter.body}
         <header class="site-header" role="banner">
           <div class="wrapper">
             {ScalaXml.optional(common.title)(title => <a class="site-title" rel="author"
@@ -72,7 +72,7 @@ object HtmlTheme {
               </div>
               <div class="footer-col footer-col-2">
                 <ul class="social-media-list">{
-                  for ((service, username) <- common.getSocial.list) yield
+                  for (service, username) <- common.getSocial.list yield
                     <li>
                       <a href={s"${service.serviceUrl}/$username"}>
                         <svg class="svg-icon">
@@ -92,10 +92,8 @@ object HtmlTheme {
         import loadWindow from '/js/window.js';
         loadWindow({Json.optionToJs(site.viewer(htmlContent).map(_.name))}, {Json.optionToJs(common.googleAnalyticsId)});</script>
     </html>
-  }
 
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
 
   private def isMathPresent(content: ScalaXml.Element): Boolean = true // TODO
   private def isCodePresent(content: ScalaXml.Element): Boolean = true // TODO
-}

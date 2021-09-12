@@ -5,7 +5,7 @@ import org.opentorah.calendar.roman.{Gregorian, Julian}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-final class EpochTest extends AnyFlatSpec with Matchers {
+final class EpochTest extends AnyFlatSpec, Matchers:
 
   "First Jewish year (of Chaos)" should "be correct" in {
     val year1: Jewish.Year = Jewish.Year(1)
@@ -120,4 +120,3 @@ final class EpochTest extends AnyFlatSpec with Matchers {
     val revolution: Julian.Day = Julian.Year(1917).month(Julian.Month.October).day(25)
     revolution.to(Gregorian) shouldBe Gregorian.Year(1917).month(Gregorian.Month.November).day(7)
   }
-}

@@ -3,7 +3,7 @@ package org.opentorah.calendar.jewish
 import Jewish.{Moment, Month, TimeVector, Year}
 
 // TODO fold into Epoch? or into Calendar?
-object Moon {
+object Moon:
   final def newMoon(number: Int): Moment = firstNewMoon + meanLunarPeriod*(number-1)
 
   // KH 6:3
@@ -19,4 +19,3 @@ object Moon {
 
   // KH 6:8
   final lazy val firstMoladNisan: Moment = Year(1).month(Month.Nisan).newMoon
-}

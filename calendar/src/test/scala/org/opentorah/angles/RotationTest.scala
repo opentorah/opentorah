@@ -5,16 +5,15 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import Angles.{Position, Rotation}
 
-class RotationTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+class RotationTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers:
 
   behavior of "Rotation"
 
   it should "construct correctly" in {
-    def construction(degrees: Int, minutes: Int): Unit = {
+    def construction(degrees: Int, minutes: Int): Unit =
       val angle = Rotation(degrees, minutes)
       angle.degrees shouldBe degrees
       angle.minutes shouldBe minutes
-    }
 
     construction(  5, 34)
     construction( 54, 34)
@@ -23,10 +22,9 @@ class RotationTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with 
   }
 
   it should "convert correctly" in {
-    def conversion(degrees: Int, minutes: Int): Unit = {
+    def conversion(degrees: Int, minutes: Int): Unit =
       val angle = Rotation(degrees, minutes)
       Rotation.fromDegrees(angle.toDegrees, 2) shouldBe angle
-    }
 
     conversion(5, 34)
     conversion(54, 34)
@@ -99,4 +97,3 @@ class RotationTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with 
     Rotation(90)*4 shouldBe Rotation(360)
     Rotation(90)*5 shouldBe Rotation(450)
   }
-}

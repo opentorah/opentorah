@@ -6,7 +6,7 @@ import javax.xml.transform.sax.{SAXSource, SAXTransformerFactory}
 import javax.xml.transform.{ErrorListener, Transformer, TransformerException}
 import org.xml.sax.{InputSource, XMLFilter}
 
-sealed abstract class Saxon(name: String) {
+sealed abstract class Saxon(name: String):
 
   final override def toString: String = name
 
@@ -16,7 +16,7 @@ sealed abstract class Saxon(name: String) {
     stylesheetFile: Option[File],
     inputSource: InputSource,
     result: javax.xml.transform.Result
-  ): Unit = {
+  ): Unit =
     xmlLogger.debug(
       s"""Saxon.transform(
          |  saxon = $this,
@@ -28,23 +28,22 @@ sealed abstract class Saxon(name: String) {
 
     val transformerFactory: SAXTransformerFactory = getTransformerFactory(resolver)
 
-    val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer) {
-      stylesheetFile => transformerFactory.newTransformer(new SAXSource(
+    val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer)(
+      stylesheetFile => transformerFactory.newTransformer(SAXSource(
         Xerces.getXMLReader(filters = Seq.empty, resolver, xincludeAware = true), // no need to filter stylesheets
         Sax.file2inputSource(stylesheetFile)
       ))
-    }
+    )
 
     transformer.transform(
-      new SAXSource(
+      SAXSource(
         Xerces.getXMLReader(filters, resolver, xincludeAware = true),
         inputSource
       ),
       result
     )
-  }
 
-  private def getTransformerFactory(resolver: Option[Resolver]): SAXTransformerFactory = {
+  private def getTransformerFactory(resolver: Option[Resolver]): SAXTransformerFactory =
     val result: SAXTransformerFactory = newTransformerFactory
 
     result.setErrorListener(Saxon.errorListener(xmlLogger))
@@ -63,35 +62,29 @@ sealed abstract class Saxon(name: String) {
     result.setAttribute(sourceParserClassAttribute, Xerces.saxParserName)
 
     result
-  }
 
   protected def newTransformerFactory: SAXTransformerFactory
 
   protected def styleParserClassAttribute: String
 
   protected def sourceParserClassAttribute: String
-}
 
-object Saxon {
+object Saxon:
 
-  object Saxon6 extends Saxon("Saxon 6") {
-    override protected def newTransformerFactory: SAXTransformerFactory = new com.icl.saxon.TransformerFactoryImpl
+  object Saxon6 extends Saxon("Saxon 6"):
+    override protected def newTransformerFactory: SAXTransformerFactory = com.icl.saxon.TransformerFactoryImpl()
     override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
-  }
 
   // Saxon6 produces unmodifiable DOM, which can not be serialized; Saxon 10's DOM can.
-  object Saxon10 extends Saxon("Saxon 10") {
-    override protected def newTransformerFactory: SAXTransformerFactory = new net.sf.saxon.TransformerFactoryImpl
+  object Saxon10 extends Saxon("Saxon 10"):
+    override protected def newTransformerFactory: SAXTransformerFactory = net.sf.saxon.TransformerFactoryImpl()
     override protected def styleParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS
-  }
 
-  def errorListener(logger: Logger): ErrorListener = new ErrorListener {
+  def errorListener(logger: Logger): ErrorListener = new ErrorListener:
     override def warning   (exception: TransformerException): Unit = logger.warn (message(exception))
     override def error     (exception: TransformerException): Unit = logger.error(message(exception))
     override def fatalError(exception: TransformerException): Unit = logger.error(message(exception))
 
     private def message(exception: TransformerException): String = exception.getMessageAndLocation
-  }
-}

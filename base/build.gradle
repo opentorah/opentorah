@@ -11,7 +11,7 @@ description = 'Open Torah Base'
 apply from: '../configure.gradle'
 
 dependencies {
-  api libs.scala.xml  // TODO api?
+  api libs.scala.xml
   api libs.zio.core
   api libs.zio.streams
 

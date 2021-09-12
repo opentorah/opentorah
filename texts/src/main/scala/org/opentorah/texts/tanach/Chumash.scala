@@ -5,51 +5,48 @@ import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
-abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book with NamedCompanion {
+abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book, NamedCompanion:
   final override type Key = Parsha
 
   final override def values: Seq[Parsha] = parshiot
 
-  final class ByParsha extends By with Stores.Pure {
+  final class ByParsha extends By, Stores.Pure:
     override def selector: Selector = Selector.byName("parsha")
     override def storesPure: Seq[Parsha] = parshiot
-  }
 
   override def storesPure: Seq[Store.NonTerminal] = super.storesPure ++ Seq(new ByParsha)
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.
   final override def names: Names = parshiot.head.names
 
-  override def parser(names: Names, chapters: Chapters): Parser[Chumash.Parsed] = for {
-    weeks <- new Parsha.WeekParsable(this).seq()
+  override def parser(names: Names, chapters: Chapters): Parser[Chumash.Parsed] = for
+    weeks: Seq[Parsha.Parsed] <- Parsha.WeekParsable(this).seq()
     _ <- Effects.check(names.getDefaultName.isDefined,
       "Only default name is allowed for a Chumash book")
     _ <- Effects.check(weeks.head.names.hasName(names.getDefaultName.get),
       "Chumash book name must be a name of the book's first parsha")
-  } yield new Chumash.Parsed(this, names, chapters, weeks)
+  yield Chumash.Parsed(this, names, chapters, weeks)
 
   final override def metadata: Chumash.BookMetadata =
     Tanach.forBook(this).asInstanceOf[Chumash.BookMetadata]
-}
 
-object Chumash {
+object Chumash:
 
   final class BookMetadata(
     book: Chumash,
     parsha2metadata: Map[Parsha, Parsha.ParshaMetadata]
-  ) extends Tanach.BookMetadata(book) {
+  ) extends Tanach.BookMetadata(book):
 
     def forParsha(parsha: Parsha): Parsha.ParshaMetadata = parsha2metadata(parsha)
-  }
 
   final class Parsed(
     book: Chumash,
     names: Names,
     chapters: Chapters,
     weeks: Seq[Parsha.Parsed]
-  ) extends Tanach.Parsed(book, names, chapters) {
+  ) extends Tanach.Parsed(book, names, chapters):
 
-    def resolve: Parser[BookMetadata] = for {
+    def resolve: Parser[BookMetadata] = for
       parsha2metadataParsed <- Named.bind[Parsha, Parsha.Parsed](
         keys = book.parshiot,
         metadatas = weeks,
@@ -73,17 +70,17 @@ object Chumash {
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
-    } yield new BookMetadata(book, parsha2metadata)
+    yield BookMetadata(book, parsha2metadata)
 
     private def combineDays(
       parsha2span: Map[Parsha, Span],
       weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]
-    ): Seq[Option[Torah.Customs]] = weeks match {
+    ): Seq[Option[Torah.Customs]] = weeks match
       case (parsha, days) :: (parshaNext, daysNext) :: tail =>
-        val result: Option[Torah.Customs] = if (!parsha.combines) None else  {
-          val combined: Custom.Sets[Seq[Torah.Numbered]] = daysNext ++ days.map { case (customs, value) =>
+        val result: Option[Torah.Customs] = if !parsha.combines then None else 
+          val combined: Custom.Sets[Seq[Torah.Numbered]] = daysNext ++ days.map((customs, value) =>
             (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
-          }
+          )
 
           val book: Chumash = parsha.book
           Some(Parser.unsafeRun(Torah.processDays(
@@ -94,7 +91,6 @@ object Chumash {
               parsha2span(parshaNext)
             )
           )))
-        }
 
         result +: combineDays(parsha2span, (parshaNext, daysNext) +: tail)
 
@@ -103,8 +99,6 @@ object Chumash {
         Seq(None)
 
       case Nil => Nil
-    }
-  }
 
   case object Genesis extends Chumash(Parsha.genesis)
   case object Exodus extends Chumash(Parsha.exodus)
@@ -115,4 +109,3 @@ object Chumash {
   val all: Seq[Chumash] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
 
   def forName(name: String): Chumash = Tanach.getForName(name).asInstanceOf[Chumash]
-}

@@ -5,7 +5,7 @@ import org.opentorah.xml.{Dom, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
-class MathFilterTest extends AnyFlatSpecLike with Matchers {
+class MathFilterTest extends AnyFlatSpecLike, Matchers:
 
   it should "work for wrapped display TeX" in {
     // Serializer outputs UTF-16; xml namespace is made explicit; order of attributes and spacing are different -
@@ -104,14 +104,12 @@ class MathFilterTest extends AnyFlatSpecLike with Matchers {
          |""".stripMargin
   }
 
-  private def parse(string: String): String = {
+  private def parse(string: String): String =
     val element: Dom.Element = Dom.loadFromString(string, filters = Seq(
-        new MathFilter(MathJaxConfiguration())
+        MathFilter(MathJaxConfiguration())
 //        , new org.opentorah.xml.TracingFilter
       )
     )
     val result: String = DocBook.prettyPrinter.renderWithHeader(Dom)(element)
 //    println(result)
     result
-  }
-}

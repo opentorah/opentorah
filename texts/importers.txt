@@ -6,7 +6,7 @@ import scala.xml.{Elem, XML}
 
 object TagSoupXmlLoader {
   def get(): XMLLoader[Elem] =
-    XML.withSAXParser(new SAXFactoryImpl().newSAXParser())
+    XML.withSAXParser(SAXFactoryImpl().newSAXParser())
 }
 
 

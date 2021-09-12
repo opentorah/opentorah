@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 import Section.Parameters
 import org.opentorah.xml.ScalaXml
 
-object Pdf extends DocBook2 {
+object Pdf extends DocBook2:
   override def name: String = "pdf"
   override def isPdf: Boolean = true
   override protected def stylesheetUriName: String = "fo/docbook"
@@ -36,4 +36,3 @@ object Pdf extends DocBook2 {
       <xsl:attribute name="break-before">page</xsl:attribute>
     </xsl:attribute-set>
   )
-}

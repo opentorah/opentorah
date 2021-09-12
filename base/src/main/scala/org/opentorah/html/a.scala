@@ -10,7 +10,7 @@ final case class a(
   id: Option[String] = None,
   classes: Seq[String] = Seq.empty,
   declareNamespace: Boolean = false
-) {
+):
   def setId(value: String): a = copy(id = Some(value))
 
   def setTarget(value: Option[String]): a = value.fold(this)(setTarget)
@@ -22,13 +22,13 @@ final case class a(
   def withNamespace: a = copy(declareNamespace = true)
 
   def setFragment(value: String): a = copy(uri = Some(
-    uri.fold(new URI(null, null, null, null, value))
-    (uri => new URI(uri.getScheme, uri.getAuthority, uri.getPath, uri.getQuery, value))
+    uri.fold(URI(null, null, null, null, value))
+    (uri => URI(uri.getScheme, uri.getAuthority, uri.getPath, uri.getQuery, value))
   ))
 
   def setQuery(value: String): a = copy(uri = Some(
-    uri.fold(new URI(null, null, null, "/", value))
-    (uri => new URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
+    uri.fold(URI(null, null, null, "/", value))
+    (uri => URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
   ))
 
   def apply(text: String): ScalaXml.Element = apply(Seq(ScalaXml.mkText(text)))
@@ -37,21 +37,18 @@ final case class a(
 
   def apply(xml: RawXml#Value): ScalaXml.Element = apply(xml.content)
 
-  def apply(children: ScalaXml.Nodes): ScalaXml.Element = {
+  def apply(children: ScalaXml.Nodes): ScalaXml.Element =
     val result: ScalaXml.Element =
       <a
       href={uri.map(_.toString).orNull}
       target={target.orNull}
-      class={if (classes.isEmpty) null else classes.mkString(" ")}
+      class={if classes.isEmpty then null else classes.mkString(" ")}
       id={id.orNull}
       >{children}</a>
 
-    if (!declareNamespace) result else ScalaXml.declareNamespace(Html.namespace.default, result)
-  }
-}
+    if !declareNamespace then result else ScalaXml.declareNamespace(Html.namespace.default, result)
 
-object a {
-  def apply(path: Seq[String]): a = apply(new URI(null, null, Files.mkUrl(path), null))
+object a:
+  def apply(path: Seq[String]): a = apply(URI(null, null, Files.mkUrl(path), null))
 
   def apply(uri: URI): a = a(uri = Some(uri))
-}

@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-trait Stylesheets {
+trait Stylesheets:
   def name: String
 
   protected def groupId: String
@@ -14,10 +14,9 @@ trait Stylesheets {
   def uri: String
 
   def archiveSubdirectoryPath: Seq[String]
-}
 
-object Stylesheets {
-  object xslt1 extends Stylesheets {
+object Stylesheets:
+  object xslt1 extends Stylesheets:
     override def name: String = "XSLT"
     override def groupId: String = "net.sf.docbook"
     override def artifactId: String = "docbook-xsl"
@@ -31,9 +30,8 @@ object Stylesheets {
 
     override def uri: String = "http://docbook.sourceforge.net/release/xsl-ns/current"
     override def archiveSubdirectoryPath: Seq[String] = Seq("docbook")
-  }
 
-  object xslt2 extends Stylesheets {
+  object xslt2 extends Stylesheets:
     override def name: String = "XSLT 2.0"
     override def groupId: String = "org.docbook"
     override def artifactId: String = "docbook-xslt2"
@@ -42,5 +40,3 @@ object Stylesheets {
 
     override def uri: String = "https://cdn.docbook.org/release/latest/xslt"
     override def archiveSubdirectoryPath: Seq[String] = Seq("xslt", "base")
-  }
-}

@@ -7,9 +7,7 @@ final class FromUrl(
   val inline: Boolean
 )
 
-object FromUrl {
+object FromUrl:
 
-  trait With {
+  trait With:
     def fromUrl: FromUrl
-  }
-}

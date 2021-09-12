@@ -6,9 +6,9 @@ import org.opentorah.docbook.Layout
 import org.opentorah.fop.FopFonts
 import org.opentorah.util.Gradle
 
-final class DocBookPlugin extends Plugin[Project] {
+final class DocBookPlugin extends Plugin[Project]:
 
-  def apply(project: Project): Unit = {
+  def apply(project: Project): Unit =
 //    project.logger.lifecycle(Util.applicationString)
 
     val extension: Extension = project.getExtensions.create("docBook", classOf[Extension], project)
@@ -39,46 +39,39 @@ final class DocBookPlugin extends Plugin[Project] {
     project.getTasks.create("listFopFonts", classOf[DocBookPlugin.ListFopFontsTask])
     project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
-    project.afterEvaluate(new Action[Project] {
-      override def execute(project: Project): Unit = {
-        val logger = project.getLogger
-        def info(message: String): Unit = logger.info(message, null, null, null)
+    project.afterEvaluate((project: Project) =>
+      val logger = project.getLogger
+      def info(message: String): Unit = logger.info(message, null, null, null)
 
-        // Note: even when DocBook plugin is applied after the Scala one,
-        // there is no 'classes' task during its application - but there is after project evaluation:
-        Gradle.getClassesTask(project).fold(info("No 'classes' task found.")){ classesTask =>
-          info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
-          processDocBookTask.getDependsOn.add(classesTask)
-        }
-      }
-    })
-  }
-}
+      // Note: even when DocBook plugin is applied after the Scala one,
+      // there is no 'classes' task during its application - but there is after project evaluation:
+      Gradle.getClassesTask(project).fold(info("No 'classes' task found."))(classesTask =>
+        info("Found 'classes' task; adding it as dependency of 'processDocBook'.")
+        processDocBookTask.getDependsOn.add(classesTask)
+      )
+      ()
+    )
 
-object DocBookPlugin {
+object DocBookPlugin:
 
-  /* not final so that Gradle could do its thing */ class ListFopFontsTask extends DefaultTask {
+  /* not final so that Gradle could do its thing */ class ListFopFontsTask extends DefaultTask:
     setDescription("List FOP fonts")
 
-    @TaskAction def execute(): Unit = {
+    @TaskAction def execute(): Unit =
       val result = FopFonts.list(configurationFile = layoutForProject(getProject).fopConfigurationFile)
       System.out.print(result)
       System.out.flush()
-    }
-  }
 
-  /* not final so that Gradle could do its thing */ class DeleteFopFontsCacheTask extends DefaultTask {
+  /* not final so that Gradle could do its thing */ class DeleteFopFontsCacheTask extends DefaultTask:
     setDescription("Delete FOP fonts cache")
 
     @TaskAction def execute(): Unit =
       FopFonts.deleteCache(layoutForProject(getProject).fopConfigurationFile)
-  }
 
-  def layoutForProject(project: Project): Layout = new Layout(
+  def layoutForProject(project: Project): Layout = Layout(
     frameworksDir = project.getGradle.getGradleUserHomeDir,
     projectDir = project.getProjectDir,
     buildDir = project.getBuildDir,
     catalogDirectoryOverride = None,
     outputRootOverride = None
   )
-}

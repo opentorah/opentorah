@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 trait Writings extends Nach
 
-object Writings {
+object Writings:
   case object Proverbs extends Writings
   case object Job extends Writings
   case object SongOfSongs extends Writings { override def name: String = "Song of Songs" }
@@ -18,4 +18,3 @@ object Writings {
 
   val all: Seq[Writings] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
     Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)
-}

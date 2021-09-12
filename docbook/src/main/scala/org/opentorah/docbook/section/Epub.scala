@@ -4,7 +4,7 @@ import Section.Parameters
 import org.opentorah.xml.ScalaXml
 import java.io.File
 
-trait Epub extends DocBook2 {
+trait Epub extends DocBook2:
   final override protected def outputFileExtension: String = "epub"
   final override def usesRootFile: Boolean = false
   final override def copyDestinationDirectoryName: Option[String] = Some("OEBPS")
@@ -27,7 +27,7 @@ trait Epub extends DocBook2 {
   final override def postProcess(
     inputDirectory: File,
     outputFile: File
-  ): Unit = {
+  ): Unit =
     val zip = new org.apache.tools.ant.taskdefs.Zip
     zip.setProject(new org.apache.tools.ant.Project)
     zip.setPreserve0Permissions(true)
@@ -38,5 +38,3 @@ trait Epub extends DocBook2 {
     fileSet.appendIncludes(Array("mimetype", "META-INF/**", "OEBPS/**"))
     zip.addFileset(fileSet)
     zip.execute()
-  }
-}

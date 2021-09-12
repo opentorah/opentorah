@@ -1,11 +1,12 @@
 package org.opentorah.calendar
 
-trait YearsCycle {
+trait YearsCycle:
   def length: Int
 
   final def yearsInCycle: Int = length
 
-  final def forYear(year: Calendar#YearBase): YearsCycle.In = forNumber(year.number)
+  // TODO maybe parameterize the trait itself with the Calendar?
+  final def forYear(calendar: Calendar)(year: calendar.Year): YearsCycle.In = forNumber(year.number)
 
   def first: Int
 
@@ -16,8 +17,6 @@ trait YearsCycle {
 
   final def inCycle(cycleNumber: Int, numberInCycle: Int): Int =
     first + (cycleNumber - 1)*length + numberInCycle - 1
-}
 
-object YearsCycle {
+object YearsCycle:
   final case class In(cycleNumber: Int, numberInCycle: Int)
-}

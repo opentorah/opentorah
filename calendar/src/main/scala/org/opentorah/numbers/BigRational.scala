@@ -15,8 +15,7 @@ package org.opentorah.numbers
   * @param denominator  of the number (positive)
   */
 final case class BigRational private(numerator: BigInt, denominator: BigInt)
-  extends Comparable[BigRational] with Ordered[BigRational]
-{
+  extends Comparable[BigRational], Ordered[BigRational]:
   // Representation invariants
   require(denominator > 0)
   require(numerator.gcd(denominator) == 1)
@@ -53,17 +52,16 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt)
 
   def fraction: BigRational = this - BigRational(whole)
 
-  def round: Int = whole + (if (fraction.abs <= BigRational.oneHalf) 0 else fraction.signum)
+  def round: Int = whole + (if fraction.abs <= BigRational.oneHalf then 0 else fraction.signum)
 
   override def toString: String = s"$numerator/$denominator"
 
   override def compare(that: BigRational): Int = (this - that).signum
 
   def toDouble: Double = numerator.toDouble / denominator.toDouble
-}
 
 
-object BigRational {
+object BigRational:
   // Used in apply(), so it is instantiated directly to avoid cycle (and thus `null` value) during initialization.
   val zero: BigRational = new BigRational(0, 1)
 
@@ -71,30 +69,25 @@ object BigRational {
 
   val one: BigRational = BigRational(1, 1)
 
-  final def apply(numerator: BigInt, denominator: BigInt): BigRational = {
-    if (denominator == 0) throw new ArithmeticException("Division by 0")
-    if (numerator == 0) zero else {
+  final def apply(numerator: BigInt, denominator: BigInt): BigRational =
+    if denominator == 0 then throw ArithmeticException("Division by 0")
+    if numerator == 0 then zero else
       val gcd: BigInt = numerator.gcd(denominator)
       new BigRational(
         numerator = (numerator / gcd) * denominator.signum,
         denominator = (denominator / gcd).abs
       )
-    }
-  }
 
   final def apply(numerator: Int): BigRational = apply(numerator, 1)
 
-  final def apply(value: String): BigRational = {
+  final def apply(value: String): BigRational =
     val values = value.split('/')
-    if (values.length != 2) throw new ArithmeticException(s"Invalid BigRational: $value")
+    if values.length != 2 then throw ArithmeticException(s"Invalid BigRational: $value")
     apply(BigInt(values(0).trim), BigInt(values(1).trim))
-  }
 
-  final def continuedFraction(value: BigRational, length: Int): Digits = {
+  final def continuedFraction(value: BigRational, length: Int): Digits =
     require(length >= 1)
     val whole: Int = value.whole
     val fraction: BigRational = value.fraction
-    if (fraction.isZero || (length == 1)) Seq(whole)
+    if fraction.isZero || (length == 1) then Seq(whole)
     else whole +: continuedFraction(fraction.invert, length-1)
-  }
-}

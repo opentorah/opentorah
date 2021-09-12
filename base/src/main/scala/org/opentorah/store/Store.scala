@@ -4,16 +4,14 @@ import org.opentorah.metadata.{Named, Names}
 
 trait Store extends Named
 
-object Store {
+object Store:
   type Path = Seq[Store]
 
   trait Terminal extends Store
 
-  trait NonTerminal extends Store with Stores
+  trait NonTerminal extends Store, Stores
 
-  trait Numbered extends Store {
+  trait Numbered extends Store:
     final override def names: Names = Names(number.toString)
 
     def number: Int
-  }
-}

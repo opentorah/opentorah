@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.opentorah.angles.Angles.Position
 
-class MoonAnomalyVisibleTest extends AnyFlatSpec with Matchers {
+class MoonAnomalyVisibleTest extends AnyFlatSpec, Matchers:
 
   behavior of "Anomaly"
 
@@ -16,13 +16,10 @@ class MoonAnomalyVisibleTest extends AnyFlatSpec with Matchers {
     test(MoonAnomalyVisible.table)
   }
 
-  private def test(table: InterpolatedTable[Position]): Unit = {
-    for (maslul <- (0 to 18).map(_ * 10).map(Position(_))) {
+  private def test(table: InterpolatedTable[Position]): Unit =
+    for maslul <- (0 to 18).map(_ * 10).map(Position(_)) do
       val mnas = table.calculate(maslul).abs
       val e: Double = MoonAnomalyVisible.efrommnasround(maslul, mnas)
       val mnasfrome = MoonAnomalyVisible.mnasfrome(maslul, e)
       val mnasRound = mnas.roundToMinutes
       mnasfrome.roundToMinutes shouldBe mnas.roundToMinutes
-    }
-  }
-}

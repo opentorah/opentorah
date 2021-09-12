@@ -19,7 +19,7 @@ import org.xml.sax.SAXException
    I had to create a FopFactoryConfigProxy class (see below) that forwards all methods except getImageManager,
    where it supplies a fresh instance of ImageImplRegistry to each factory.
  */
-object FopFactoryFactory {
+object FopFactoryFactory:
 
   @throws(classOf[SAXException])
   @throws(classOf[IOException])
@@ -30,12 +30,12 @@ object FopFactoryFactory {
   @throws(classOf[SAXException])
   @throws(classOf[IOException])
   def newFactory(baseURI: URI, configurationStream: InputStream): FopFactory =
-    newFactory(new FopConfParser(configurationStream, baseURI))
+    newFactory(FopConfParser(configurationStream, baseURI))
 
   @throws(classOf[SAXException])
   @throws(classOf[IOException])
   def newFactory(configurationFile: File, inputFile: File): FopFactory =
-    newFactory(new FopConfParser(configurationFile, inputFile.getParentFile.toURI))
+    newFactory(FopConfParser(configurationFile, inputFile.getParentFile.toURI))
 
   @throws(classOf[SAXException])
   @throws(classOf[IOException])
@@ -43,15 +43,14 @@ object FopFactoryFactory {
     newFactory(configurationParser.getFopFactoryBuilder.buildConfig)
 
   def newFactory(configuration: FopFactoryConfig): FopFactory =
-    FopFactory.newInstance(new FopFactoryConfigProxy(configuration))
+    FopFactory.newInstance(FopFactoryConfigProxy(configuration))
 
 
-  class FopFactoryConfigProxy(delegate: FopFactoryConfig) extends FopFactoryConfig {
-    private val imageManager: ImageManager = new ImageManager(
+  class FopFactoryConfigProxy(delegate: FopFactoryConfig) extends FopFactoryConfig:
+    private val imageManager: ImageManager = ImageManager(
       new ImageImplRegistry,
-      new ImageContext() {
-        def getSourceResolution: Float = delegate.getSourceResolution
-      }
+      new ImageContext():
+        override def getSourceResolution: Float = delegate.getSourceResolution
     )
 
     override def getImageManager: ImageManager = imageManager
@@ -78,5 +77,3 @@ object FopFactoryFactory {
     override def getHyphenationPatternNames: java.util.Map[String, String] = delegate.getHyphenationPatternNames
     override def getFallbackResolver: org.apache.xmlgraphics.image.loader.impl.AbstractImageSessionContext.FallbackResolver = delegate.getFallbackResolver
     override def isTableBorderOverpaint: Boolean = delegate.isTableBorderOverpaint
-  }
-}

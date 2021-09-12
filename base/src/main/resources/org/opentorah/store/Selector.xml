@@ -22,6 +22,17 @@
   <selector>
     <name n="глава" lang="ru"/>
     <name n="chapter" lang="en"/>
+    <name n="פרק" lang="he"/>
+  </selector>
+  <selector>
+    <name n="positive" lang="en"/>
+    <name n="повелевающая" lang="ru"/>
+    <name n="עשה" lang="he"/>
+  </selector>
+  <selector>
+    <name n="negative" lang="en"/>
+    <name n="запрещающая" lang="ru"/>
+    <name n="לא תעשה" lang="he"/>
   </selector>
   <selector>
     <name n="стих" lang="ru"/>

@@ -2,7 +2,7 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.Rotation
 
-object MoonHeadMean extends Time2Rotation {
+object MoonHeadMean extends Time2Rotation:
 
   // KH 16:2
   final override val one        : Rotation = Rotation(  0,  3, 11) // few thirds less (f6)
@@ -17,4 +17,3 @@ object MoonHeadMean extends Time2Rotation {
   final override val rambamValue = Rotation(0)
 
   final override val almagestValue = Rotation(0)
-}

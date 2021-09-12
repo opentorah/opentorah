@@ -6,28 +6,27 @@ import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unpars
 final class SiteHighlighter(
   val isEnabled: Boolean,
   val usePrism: Boolean
-) {
+):
   def head: Seq[ScalaXml.Element] = highlighter.head
   def body: Seq[ScalaXml.Element] = highlighter.body
 
   private def highlighter: Highlighter = Highlighter.get(usePrism)
-}
 
-object SiteHighlighter extends Element[SiteHighlighter]("highlighter") {
+object SiteHighlighter extends Element[SiteHighlighter]("highlighter"):
 
-  val empty: SiteHighlighter = new SiteHighlighter(
+  val empty: SiteHighlighter = SiteHighlighter(
     isEnabled = false,
     usePrism = false
   )
 
-  val isEnabledAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("isEnabled").orDefault
-  val usePrismAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("usePrism").orDefault
+  val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
+  val usePrismAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("usePrism").orDefault
 
-  override def contentParsable: Parsable[SiteHighlighter] = new Parsable[SiteHighlighter] {
-    override def parser: Parser[SiteHighlighter] = for {
-      isEnabled <- isEnabledAttribute()
-      usePrism <- usePrismAttribute()
-    } yield new SiteHighlighter(
+  override def contentParsable: Parsable[SiteHighlighter] = new Parsable[SiteHighlighter]:
+    override def parser: Parser[SiteHighlighter] = for
+      isEnabled: Boolean <- isEnabledAttribute()
+      usePrism: Boolean <- usePrismAttribute()
+    yield SiteHighlighter(
       isEnabled,
       usePrism
     )
@@ -36,5 +35,3 @@ object SiteHighlighter extends Element[SiteHighlighter]("highlighter") {
       isEnabledAttribute(_.isEnabled),
       usePrismAttribute(_.usePrism)
     )
-  }
-}

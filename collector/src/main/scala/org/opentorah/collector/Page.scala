@@ -3,19 +3,17 @@ package org.opentorah.collector
 import org.opentorah.tei.Pb
 import org.opentorah.xml.{Attribute, Namespace}
 
-sealed abstract class Page(val pb: Pb) {
+sealed abstract class Page(val pb: Pb):
   def base: String
   def displayName: String
-}
 
-object Page {
+object Page:
 
-  sealed trait Type {
+  sealed trait Type:
     def name: String
     def apply(pb: Pb): Page
-  }
 
-  object Manuscript extends Type {
+  object Manuscript extends Type:
     override def name: String = "manuscript"
 
     private val frontSuffix: String = "-1"
@@ -26,60 +24,52 @@ object Page {
 
     def base(name: String): String = name.dropRight(frontSuffix.length)
 
-    override def apply(pb: Pb): Page = {
+    override def apply(pb: Pb): Page =
       val n = pb.n
       val (base: String, back: Boolean) =
-        if (n.endsWith(frontSuffix)) (n.dropRight(frontSuffix.length), false) else {
-          if (!n.endsWith(backSuffix)) throw new IllegalArgumentException(s"No suffix: $n")
+        if n.endsWith(frontSuffix) then (n.dropRight(frontSuffix.length), false) else
+          if !n.endsWith(backSuffix) then throw IllegalArgumentException(s"No suffix: $n")
           (n.dropRight(backSuffix.length), true)
-        }
 
       val numberOfDigits = base.takeWhile(_.isDigit).length
-      if (numberOfDigits < numberOfDigitsInName) // LVIA2 has 4-digit page numbers!
-        throw new IllegalArgumentException()
+      if numberOfDigits < numberOfDigitsInName then // LVIA2 has 4-digit page numbers!
+        throw IllegalArgumentException()
       val s: String = base.drop(numberOfDigits)
-      if (s.nonEmpty && (s != "a"))
-        throw new IllegalArgumentException(s"Illegal page name: $s [$n]")
+      if s.nonEmpty && (s != "a") then
+        throw IllegalArgumentException(s"Illegal page name: $s [$n]")
 
       new Manuscript(base, back, pb)
-    }
-  }
 
   private final class Manuscript(
     override val base: String,
     back: Boolean,
     pb: Pb
-  ) extends Page(pb) {
-    override def displayName: String = base + (if (back) "об" else "")
-  }
+  ) extends Page(pb):
+    override def displayName: String = base + (if back then "об" else "")
 
-  object Book extends Type {
+  object Book extends Type:
     override def name: String = "book"
 
-    override def apply(pb: Pb): Page = {
+    override def apply(pb: Pb): Page =
       val n = pb.n
-      if (n.dropWhile(_.isDigit).nonEmpty) throw new IllegalArgumentException()
+      if n.dropWhile(_.isDigit).nonEmpty then throw IllegalArgumentException()
       new Book(pb)
-    }
-  }
 
   private final class Book(
     pb: Pb
-  ) extends Page(pb) {
+  ) extends Page(pb):
     override def base: String = pb.n
     override def displayName: String = pb.n
-  }
 
   val values: Seq[Type] = Seq(Manuscript, Book)
 
   val typeAttribute: Attribute.OrDefault[Type] = new Attribute[Type](
     "pageType",
     namespace = Namespace.No,
-    default = Manuscript)
-  {
+    default = Manuscript
+  ):
     override def toString(value: Type): String = value.name
 
     override def fromString(value: String): Type =
-      values.find(_.name == value).getOrElse(throw new IllegalArgumentException(s"Unknown page type: $value"))
-  }.orDefault
-}
+      values.find(_.name == value).getOrElse(throw IllegalArgumentException(s"Unknown page type: $value"))
+  .orDefault

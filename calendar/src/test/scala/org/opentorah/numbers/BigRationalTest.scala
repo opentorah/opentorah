@@ -7,53 +7,53 @@ import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary.arbitrary
 import BigRational.{one, oneHalf, zero}
 
-final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
-  import BigRationalTest._
+final class BigRationalTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers:
+  import BigRationalTest.*
 
   val minusThreeHalfs: BigRational = BigRational(-3, 2)
 
   "apply()" should "not allow zero denominator" in {
-    forAll(bigInt) { n => assertThrows[ArithmeticException](BigRational(n, 0)) }
+    forAll(bigInt)(n => assertThrows[ArithmeticException](BigRational(n, 0)))
   }
 
   "apply()" should "detect zero numerator" in {
-    forAll(nonZeroBigInt) { n => BigRational(0, n) shouldBe zero }
+    forAll(nonZeroBigInt)(n => BigRational(0, n) shouldBe zero)
   }
 
   "apply()" should "handle sign correctly" in {
-    forAll(bigInt, nonZeroBigInt) { (n, d) => BigRational(-n, -d) shouldBe BigRational(n, d) }
+    forAll(bigInt, nonZeroBigInt)((n, d) => BigRational(-n, -d) shouldBe BigRational(n, d))
   }
 
   "signum" should "be stored in the numerator" in {
-    forAll(bigInt, nonZeroBigInt) { (n, d) => BigRational(n, d).signum shouldBe BigRational(n, d).numerator.signum }
+    forAll(bigInt, nonZeroBigInt)((n, d) => BigRational(n, d).signum shouldBe BigRational(n, d).numerator.signum)
   }
 
   "apply()" should "simplify via GCD correctly" in {
-    forAll(bigInt, nonZeroBigInt, nonZeroInt) { (n, d, c) => BigRational(n*c, d*c) shouldBe BigRational(n, d) }
+    forAll(bigInt, nonZeroBigInt, nonZeroInt)((n, d, c) => BigRational(n*c, d*c) shouldBe BigRational(n, d))
   }
 
   "apply(numerator, denominator)" should "be identity" in {
-    forAll(rational) { r => BigRational(r.numerator, r.denominator) shouldBe r }
+    forAll(rational)(r => BigRational(r.numerator, r.denominator) shouldBe r)
   }
 
   "apply(toString)" should "be identity" in {
-    forAll(rational) { r => BigRational(r.toString) shouldBe r }
+    forAll(rational)(r => BigRational(r.toString) shouldBe r)
   }
 
   "signum() and <" should "be consistent" in {
-    forAll(rational) { r =>
+    forAll(rational)(r =>
       (r.signum == -1) == (r < zero) shouldBe true
       (r.signum ==  0) == (r == zero) shouldBe true
       (r.signum ==  1) == (r > zero) shouldBe true
-    }
+    )
   }
 
   "abs()" should "be determined by signum()" in {
-    forAll(rational) { r => r.abs shouldBe (if (r.signum < 0) -r else r) }
+    forAll(rational)(r => r.abs shouldBe (if r.signum < 0 then -r else r))
   }
 
   "abs()" should "be idempotent" in {
-    forAll(rational) { r => r.abs.abs shouldBe r.abs }
+    forAll(rational)(r => r.abs.abs shouldBe r.abs)
   }
 
   "0" should "fixed point of unary -" in {
@@ -61,28 +61,28 @@ final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChe
   }
 
   "unary -" should "be self-inverse" in {
-    forAll(rational) { r => -(-r) shouldBe r }
+    forAll(rational)(r => -(-r) shouldBe r)
   }
 
   "unary -" should "be inverse of +" in {
-    forAll(rational) { r => r + -r shouldBe zero }
+    forAll(rational)(r => r + -r shouldBe zero)
   }
 
   "invert()" should "be self-inverse" in {
-    forAll(nonZeroRational) { r => r.invert.invert shouldBe r }
+    forAll(nonZeroRational)(r => r.invert.invert shouldBe r)
   }
 
   "+ and >" should "be consistent" in {
-    forAll(rational, rational) { (l, r) => (r < r + l) shouldBe l.signum > 0 }
+    forAll(rational, rational)((l, r) => (r < r + l) shouldBe l.signum > 0)
   }
 
   "-" should "be inverse of +" in {
-    forAll(rational) { r => r - r shouldBe zero }
-    forAll(rational, rational) { (l, r) => l + r - r shouldBe l }
+    forAll(rational)(r => r - r shouldBe zero)
+    forAll(rational, rational)((l, r) => l + r - r shouldBe l)
   }
 
   "-, unary - and +" should "be related correctly" in {
-    forAll(rational, rational) { (l, r) => l - r shouldBe l + (-r) }
+    forAll(rational, rational)((l, r) => l - r shouldBe l + (-r))
   }
 
   "1" should "fixed point of invert()" in {
@@ -90,28 +90,28 @@ final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChe
   }
 
   "/" should "be inverse of *" in {
-    forAll(rational, nonZeroRational) { (l, r) => l * r / r shouldBe l }
-    forAll(nonZeroRational) { r => r / r shouldBe one }
+    forAll(rational, nonZeroRational)((l, r) => l * r / r shouldBe l)
+    forAll(nonZeroRational)(r => r / r shouldBe one)
   }
 
   "/, * and invert()" should "be consistent" in {
-    forAll(rational, nonZeroRational) { (l, r) => l / r shouldBe l * r.invert }
+    forAll(rational, nonZeroRational)((l, r) => l / r shouldBe l * r.invert)
   }
 
   "fraction()" should "be idempotent where defined" in {
-    forAll(rational) { r =>
-    try {
-        r.fraction.fraction shouldBe r.fraction
-      } catch { case _: ArithmeticException => /* whole() is too big */ }
-    }
+    forAll(rational)(r =>
+      try r.fraction.fraction shouldBe r.fraction
+      catch 
+        case _: ArithmeticException => /* whole() is too big */ 
+    )
   }
 
   "whole()+fraction()" should "be identity where defined" in {
-    forAll(rational) { r =>
-      try {
-        BigRational(r.whole) + r.fraction shouldBe r
-      } catch { case _: ArithmeticException => /* whole() is too big */ }
-    }
+    forAll(rational)(r =>
+      try BigRational(r.whole) + r.fraction shouldBe r
+      catch
+        case _: ArithmeticException => /* whole() is too big */
+    )
   }
 
   "toString()" should "be correct" in {
@@ -199,26 +199,24 @@ final class BigRationalTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChe
     minusThreeHalfs.whole shouldBe -1
     minusThreeHalfs.fraction shouldBe -oneHalf
   }
-}
 
-object BigRationalTest {
-  def nonZeroInt: Gen[Int] = for {
+object BigRationalTest:
+  def nonZeroInt: Gen[Int] = for
     result <- arbitrary[Int] if result != 0
-  } yield result
+  yield result
 
   def bigInt: Gen[BigInt] = arbitrary[BigInt]
 
-  def nonZeroBigInt: Gen[BigInt] = for {
+  def nonZeroBigInt: Gen[BigInt] = for
     result <- arbitrary[BigInt] if result != 0
-  } yield result
+  yield result
 
-  def rational: Gen[BigRational] = for {
+  def rational: Gen[BigRational] = for
     numerator <- bigInt
     denominator <- nonZeroBigInt
-  } yield BigRational(numerator, denominator)
+  yield BigRational(numerator, denominator)
 
-  def nonZeroRational: Gen[BigRational] = for {
+  def nonZeroRational: Gen[BigRational] = for
     numerator <- nonZeroBigInt
     denominator <- nonZeroBigInt
-  } yield BigRational(numerator, denominator)
-}
+  yield BigRational(numerator, denominator)

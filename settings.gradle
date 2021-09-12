@@ -9,7 +9,7 @@ pluginManagement {
     id 'com.github.maiflai.scalatest' version '0.31'
     id 'com.google.cloud.tools.jib' version '3.1.4'
     id 'org.podval.tools.cloudrun' version '0.2.0'
-    id 'com.gradle.plugin-publish' version '0.15.0'
+    id 'com.gradle.plugin-publish' version '0.16.0'
     id 'org.opentorah.docbook' version docBookPluginVersion
     id 'io.miret.etienne.sass' version '1.1.2'
   }
@@ -18,13 +18,7 @@ pluginManagement {
 enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
-// Scala2:
-//final String scalaVersion      = '2.13.6'
-//final String scalaVersionMajor = '2.13'
-//final String scalaLibrary      = 'org.scala-lang:scala-library'
-
-// Scala3:
-final String scalaVersion       = '3.1.1-RC1-bin-20210908-8e92478-NIGHTLY'
+final String scalaVersion       = '3.1.1-RC1-bin-20210917-3a6a949-NIGHTLY'
 final String scalaVersionMajor  = '3'
 final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 
@@ -61,13 +55,13 @@ dependencyResolutionManagement {
     alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.1.0')
     alias('jing').to('org.relaxng:jing:20181222')
     alias('xerces' ).to('xerces:xercesImpl:2.12.1')
+    alias('saxon10').to('net.sf.saxon:Saxon-HE:10.6')
     alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
-    alias('saxon10').to('net.sf.saxon:Saxon-HE:10.5')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.1')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.3')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
@@ -90,7 +84,7 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.3')
+    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.4')
 
     // FOP
     alias('fop-core'   ).to('org.apache.xmlgraphics:fop:2.6')

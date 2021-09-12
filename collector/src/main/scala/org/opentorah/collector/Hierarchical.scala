@@ -10,7 +10,7 @@ import org.opentorah.xml.{Element, Elements, ScalaXml}
 // push Hierarchical/ByHierarchy into Site;
 // push up Collector-specific stuff (if any);
 // do 'texts' site!
-trait Hierarchical extends Store.NonTerminal with Stores.Pure with HtmlContent[Collector] {
+trait Hierarchical extends Store.NonTerminal, Stores.Pure, HtmlContent[Collector]:
   def title: Title.Value
 
   final def titleString: String = ScalaXml.toString(title.content)
@@ -28,21 +28,20 @@ trait Hierarchical extends Store.NonTerminal with Stores.Pure with HtmlContent[C
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
-  final def pathHeaderHorizontal(collector: Collector): String = {
+  final def pathHeaderHorizontal(collector: Collector): String =
     @scala.annotation.tailrec
     def pathHeaderHorizontal(path: Store.Path, result: Seq[String]): Seq[String] =
-      if (path.isEmpty) result else pathHeaderHorizontal(
+      if path.isEmpty then result else pathHeaderHorizontal(
         path = path.tail.tail,
         result = result :+ s"${Hierarchical.displayName(path.head)} ${Hierarchical.displayName(path.tail.head)}"
       )
 
     pathHeaderHorizontal(collector.store2path(this), Seq.empty).mkString(", ")
-  }
 
-  final override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = {
+  final override def content(collector: Collector): Caching.Parser[ScalaXml.Element] =
     @scala.annotation.tailrec
     def pathHeaderVertical(path: Store.Path, result: Seq[ScalaXml.Element]): Seq[ScalaXml.Element] =
-      if (path.isEmpty) result else pathHeaderVertical(
+      if path.isEmpty then result else pathHeaderVertical(
         path = path.tail.tail,
         result = result :+ {
           val hierarchy: Hierarchy = path.tail.head.asInstanceOf[Hierarchy]
@@ -63,7 +62,6 @@ trait Hierarchical extends Store.NonTerminal with Stores.Pure with HtmlContent[C
         {inner}
       </div>
     )
-  }
 
   protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element]
 
@@ -72,16 +70,13 @@ trait Hierarchical extends Store.NonTerminal with Stores.Pure with HtmlContent[C
       {a(collector)(text = pathHeaderHorizontal(collector) + ": " + titleString)}
       {storeAbstractXmlElement}
     </div>
-}
 
-object Hierarchical extends Elements.Union[Hierarchical] {
+object Hierarchical extends Elements.Union[Hierarchical]:
 
-  protected def elements: Seq[Element[_ <: Hierarchical]] = Seq(Hierarchy, Collection)
+  protected def elements: Seq[Element[? <: Hierarchical]] = Seq(Hierarchy, Collection)
 
-  override protected def elementByValue(value: Hierarchical): Element[_] = value match {
+  override protected def elementByValue(value: Hierarchical): Element[?] = value match
     case _: Hierarchy  => Hierarchy
     case _: Collection => Collection
-  }
 
   def displayName(store: Store): String = store.names.doFind(Language.Russian.toSpec).name
-}

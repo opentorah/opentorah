@@ -20,7 +20,7 @@ final class GoogleCloudStorageSynchronizer(
   bucketPrefix: String,
   directoryPath: String,
   dryRun: Boolean
-) {
+):
   require(directoryPath.endsWith("/"))
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[GoogleCloudStorageSynchronizer])
@@ -36,8 +36,8 @@ final class GoogleCloudStorageSynchronizer(
     .build()
     .getService
 
-  def sync(): Unit = {
-    log(s"Synchronizing $directoryPath to $bucketName/$bucketPrefix" + (if (dryRun) " (dry run)" else ""))
+  def sync(): Unit =
+    log(s"Synchronizing $directoryPath to $bucketName/$bucketPrefix" + (if dryRun then " (dry run)" else ""))
 
     log(s"Listing files in $directoryPath")
     val files: Map[String, File] = listDirectory(directoryPath)
@@ -54,80 +54,74 @@ final class GoogleCloudStorageSynchronizer(
     log(s"Found ${toDelete.length} blobs to delete")
 
     val newFiles: List[(String, File)] = files.toList
-      .filter { case (name, _) => !blobs.contains(name) }
-      .sortBy { case (name, _) => name }
+      .filter((name, _) => !blobs.contains(name))
+      .sortBy((name, _) => name)
 
     val toCreateDirectories: List[String] = newFiles
-      .filter { case (_, file) => file.isDirectory }
-      .map    { case (name, _) => name }
+      .filter((_, file) => file.isDirectory)
+      .map   ((name, _) => name)
     log(s"Found ${toCreateDirectories.length} directories to create")
 
     val toUpload: List[(String, File)] = newFiles
-      .filter { case (_, file) => !file.isDirectory }
+      .filter((_, file) => !file.isDirectory)
     log(s"Found ${toUpload.length} files to upload")
 
-    val existing: List[(Blob, File)] = for {
+    val existing: List[(Blob, File)] = for
       (name, blob) <- blobs.toList
       file <- files.get(name)
-    } yield (blob, file)
+    yield (blob, file)
 
     val flavourChanged: List[String] = existing
-      .filter { case (blob, file) => isDirectory(blob) != file.isDirectory }
-      .map    { case (blob, file) =>
-        def status(isDirectory: Boolean): String = if (isDirectory) "is" else "is not "
+      .filter((blob, file) => isDirectory(blob) != file.isDirectory)
+      .map   ((blob, file) =>
+        def status(isDirectory: Boolean): String = if isDirectory then "is" else "is not "
         s"Blob $blob ${status(isDirectory(blob))} but file $file ${status(file.isDirectory)}"
-      }
+      )
 
-    if (flavourChanged.nonEmpty)
-      throw new IllegalArgumentException("isDirectory changes: " + flavourChanged.mkString("\n"))
+    if flavourChanged.nonEmpty then
+      throw IllegalArgumentException("isDirectory changes: " + flavourChanged.mkString("\n"))
 
     val toUpdate: List[(Blob, File)] = existing
-      .filter { case (_   , file) => !file.isDirectory }
-      .filter { case (blob, file) => file.lastModified() > blob.getUpdateTime }
-      .filter { case (blob, file) => blob.getCrc32cToHexString !=
+      .filter((_   , file) => !file.isDirectory)
+      .filter((blob, file) => file.lastModified() > blob.getUpdateTime)
+      .filter((blob, file) => blob.getCrc32cToHexString !=
         Strings.bytes2hex(Hashing.crc32c.hashBytes(Files.readFile(file)).asBytes.toIndexedSeq.reverse)
-      }
-      .sortBy { case (blob, _   ) => blob.getName }
+      )
+      .sortBy((blob, _   ) => blob.getName)
     log(s"Found ${toUpdate.length} blobs to update")
 
 
-    if (toDelete.nonEmpty) {
+    if toDelete.nonEmpty then
       log(s"Deleting ${toDelete.length} blobs")
-      for (blob <- toDelete) run(s"Deleting blob ${blob.getName}", blob.delete())
+      for blob <- toDelete do run(s"Deleting blob ${blob.getName}", blob.delete())
       log(s"Done deleting")
-    }
 
-    if (toCreateDirectories.nonEmpty) {
+    if toCreateDirectories.nonEmpty then
       log(s"Creating ${toCreateDirectories.length} new directory blobs")
-      for (newDirectory <- toCreateDirectories) run(s"Creating new directory blob $newDirectory", createDirectoryBlob(newDirectory))
+      for newDirectory <- toCreateDirectories do run(s"Creating new directory blob $newDirectory", createDirectoryBlob(newDirectory))
       log(s"Done creating directory blobs")
-    }
 
-    if (toUpload.nonEmpty) {
+    if toUpload.nonEmpty then
       log(s"Uploading ${toUpload.length} files")
-      for ((name, file) <- toUpload) run(s"Uploading $file to $name", write(name, file))
+      for (name, file) <- toUpload do run(s"Uploading $file to $name", write(name, file))
       log(s"Done uploading")
-    }
 
-    if (toUpdate.nonEmpty) {
+    if toUpdate.nonEmpty then
       log(s"Updating ${toUpdate.length} blobs")
-      for ((blob, file) <- toUpdate) run(s"Updating ${blob.getName} from $file", write(blob.getName, file))
+      for (blob, file) <- toUpdate do run(s"Updating ${blob.getName} from $file", write(blob.getName, file))
       log(s"Done updating")
-    }
-  }
 
   private def run(message: String, action: => Unit): Unit =
-    if (dryRun)
+    if dryRun then
       log(s"NOT $message")
-    else {
+    else
       log(message)
       action
-    }
 
   private def createDirectoryBlob(blobName: String): Unit =
     storage.create(BlobInfo.newBuilder(BlobId.of(bucketName, blobName)).build())
 
-  private def write(blobName: String, file: File): Unit = {
+  private def write(blobName: String, file: File): Unit =
     val contentType: String = URLConnection.getFileNameMap.getContentTypeFor(file.getName)
     val blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, blobName))
       .setContentType(contentType)
@@ -136,49 +130,44 @@ final class GoogleCloudStorageSynchronizer(
     val writer: WriteChannel = storage.writer(blobInfo)
     writer.write(ByteBuffer.wrap(content, 0, content.length))
     writer.close()
-  }
 
-  private def listDirectory(directoryPath: String): Map[String, File] = {
+  private def listDirectory(directoryPath: String): Map[String, File] =
     @tailrec
-    def listDirectories(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match {
+    def listDirectories(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match
       case Nil => result
       case current :: tail =>
-        val gsignore = new File(current, ".gsignore")
-        val ignore: Set[String] = if (!gsignore.exists()) Set.empty else Files.read(gsignore).toSet + ".gsignore"
+        val gsignore = File(current, ".gsignore")
+        val ignore: Set[String] = if !gsignore.exists() then Set.empty else Files.read(gsignore).toSet + ".gsignore"
         val (directories: List[File], files: List[File]) = current.listFiles.toList
           .filterNot(file => ignore.contains(file.getName))
           .partition(_.isDirectory)
         listDirectories(result ++ directories ++ files, tail ++ directories)
-    }
 
-    listDirectories(List.empty, List(new File(directoryPath)))
-      .map { file =>
+    listDirectories(List.empty, List(File(directoryPath)))
+      .map(file =>
         val name: String = Strings.drop(file.getAbsolutePath, directoryPath)
-        (if (file.isDirectory) s"$name/" else name) -> file
-      }
+        (if file.isDirectory then s"$name/" else name) -> file
+      )
       .toMap
-  }
 
-  private def listBucketDirectory(bucketPrefix: String): Map[String, Blob] = {
+  private def listBucketDirectory(bucketPrefix: String): Map[String, Blob] =
     @tailrec
-    def listDirectories(result: List[Blob], directoriesToList: List[String]): List[Blob] = directoriesToList match {
+    def listDirectories(result: List[Blob], directoriesToList: List[String]): List[Blob] = directoriesToList match
       case Nil => result
       case current :: tail =>
         val (directories: List[Blob], files: List[Blob]) = listBucketFiles(current).partition(isDirectory)
         // Note: list() includes the directory being listed it seems...
         val newDirectories: List[Blob] = directories.filterNot(directory => result.exists(_.getName == directory.getName))
         listDirectories(result ++ newDirectories ++ files, tail ++ newDirectories.map(_.getName))
-    }
 
     listDirectories(List.empty, List(bucketPrefix))
       .map(blob => blob.getName -> blob)
       .toMap
-  }
 
-  private def listBucketFiles(bucketPrefix: String): List[Blob] = {
+  private def listBucketFiles(bucketPrefix: String): List[Blob] =
     @tailrec
     def listPages(result: List[Blob], page: Page[Blob]): List[Blob] =
-      if (page == null) result
+      if page == null then result
       else listPages(result ++ page.iterateAll().asScala.toList, page.getNextPage)
 
     listPages(
@@ -189,8 +178,6 @@ final class GoogleCloudStorageSynchronizer(
         Storage.BlobListOption.prefix(bucketPrefix)
       )
     )
-  }
 
   private def isDirectory(blob: Blob): Boolean = blob.getName.endsWith("/")
-}
 

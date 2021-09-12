@@ -4,7 +4,7 @@ import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
-import org.opentorah.texts.tanach.Parsha._
+import org.opentorah.texts.tanach.Parsha.*
 import org.opentorah.util.Collections
 
 /**
@@ -101,7 +101,7 @@ import org.opentorah.util.Collections
   assumptions of the algorithm itself hold is verified by the unit tests for the years 1-6000;
   I am too lazy to prove the theorems :)
  */
-object WeeklyReadingSchedule {
+object WeeklyReadingSchedule:
   private final val fromBereishisToBemidbar: Int = Parsha.distance(Bereishis, Bemidbar)
   private final val allowedBeforePesach: Set[Parsha] = Set[Parsha](Tzav, Metzora, Acharei)
   private final val fromBemidbarToVa_eschanan: Int = Parsha.distance(Bemidbar, Va_eschanan)
@@ -123,7 +123,6 @@ object WeeklyReadingSchedule {
     fromShabbosBereishis: Day,
     toShabbosBereishis: Day,
     festivals: Set[Day]): Seq[(Day, WeeklyReading)] =
-  {
     require(fromShabbosBereishis.year == year)
     require(toShabbosBereishis.year == year+1)
 
@@ -134,7 +133,7 @@ object WeeklyReadingSchedule {
 
     val combine: Set[Parsha] = combined(year, weeks)
 
-    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match {
+    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match
       case first :: second :: rest if combine.contains(first) =>
         require(!combine.contains(second))
         WeeklyReading(first, Some(second)) +: process(rest)
@@ -142,17 +141,15 @@ object WeeklyReadingSchedule {
         require(!combine.contains(first))
         WeeklyReading(first, None) +: process(rest)
       case Nil =>  Nil
-    }
 
     val result = process(Parsha.values.init)
 
     require(result.length == weeks.length)
 
     weeks zip result
-  }
 
   // What weekly portions combine in this cycle.
-  private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] = {
+  private def combined(year: Year, weeks: Seq[Day]): Set[Parsha] =
     def weeksTo(day: Day): Int = weeks.takeWhile(_ < day).length
 
     val weeksBeforePesach: Int = weeksTo(Pesach1.date(year).shabbosBefore)
@@ -165,10 +162,10 @@ object WeeklyReadingSchedule {
     val combinefromBereishisToBemidbar: Int = fromBereishisToBemidbar - weeksToShavuot
     val combineFromBemidbarToVa_eschananCandidate: Int = fromBemidbarToVa_eschanan - weeksFromShavuotToAfterTishaBeAv
 
-    val (combineFromBereishisToVayikra: Int, combineFromVayikraToBemidbar: Int, combineFromBemidbarToVa_eschanan: Int) = {
-      if (combinefromBereishisToBemidbar < 0)
+    val (combineFromBereishisToVayikra: Int, combineFromVayikraToBemidbar: Int, combineFromBemidbarToVa_eschanan: Int) =
+      if combinefromBereishisToBemidbar < 0 then
         (0, 0, combinefromBereishisToBemidbar + combineFromBemidbarToVa_eschananCandidate)
-      else {
+      else
         // and maybe rename it to ...beforTzav or something?
         val doCombineVayakhelPekudei: Boolean =
           (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
@@ -177,15 +174,13 @@ object WeeklyReadingSchedule {
             !allowedBeforePesach.contains(parshahBeforePesach)
           }
 
-        val combineFromBereishisToVayikra: Int = if (doCombineVayakhelPekudei) 1 else 0
+        val combineFromBereishisToVayikra: Int = if doCombineVayakhelPekudei then 1 else 0
 
         (
           combineFromBereishisToVayikra,
           combinefromBereishisToBemidbar - combineFromBereishisToVayikra,
           combineFromBemidbarToVa_eschananCandidate
         )
-      }
-    }
 
     val weeksFromVa_eschanan: Int = weeks.length - weeksToShavuot - weeksFromShavuotToAfterTishaBeAv
     val combineFromVa_eschanan: Int = fromVa_eschanan - weeksFromVa_eschanan
@@ -194,10 +189,7 @@ object WeeklyReadingSchedule {
     take(combinableFromVayikraToBemidbar, combineFromVayikraToBemidbar) ++
     take(combinableFromBemidbarToVa_eschanan, combineFromBemidbarToVa_eschanan) ++
     take(combinableFromVa_eschanan, combineFromVa_eschanan)
-  }
 
-  private def take(what: Seq[Parsha], number: Int): Set[Parsha] = {
+  private def take(what: Seq[Parsha], number: Int): Set[Parsha] =
     require(0 <= number && number <= what.length)
     what.take(number).toSet
-  }
-}

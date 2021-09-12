@@ -33,7 +33,10 @@ tasks.withType(ScalaCompile) {
   scalaCompileOptions.with {
     //targetCompatibility = '1.8'
     additionalParameters = [
-      "-feature",
+      '-new-syntax',
+      '-feature',
+      //'-source:future'
+      //'-language:strictEquality',
 //      "-deprecation",
 //      "-unchecked",
 //      "-Xsemanticdb",

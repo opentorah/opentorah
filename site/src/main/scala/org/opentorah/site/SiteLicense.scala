@@ -7,16 +7,16 @@ final class SiteLicense(
   val url: String,
 )
 
-object SiteLicense extends Element[SiteLicense]("license") {
+object SiteLicense extends Element[SiteLicense]("license"):
 
   private val nameAttribute: Attribute.Required[String] = Attribute("name").required
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
 
-  override def contentParsable: Parsable[SiteLicense] = new Parsable[SiteLicense] {
-    override def parser: Parser[SiteLicense] = for {
-      name <- nameAttribute()
-      url <- urlAttribute()
-    } yield new SiteLicense(
+  override def contentParsable: Parsable[SiteLicense] = new Parsable[SiteLicense]:
+    override def parser: Parser[SiteLicense] = for
+      name: String <- nameAttribute()
+      url: String <- urlAttribute()
+    yield SiteLicense(
       name,
       url
     )
@@ -25,6 +25,4 @@ object SiteLicense extends Element[SiteLicense]("license") {
       nameAttribute(_.name),
       urlAttribute(_.url)
     )
-  }
-}
 

@@ -17,7 +17,7 @@ final class Document(
   val authors: Seq[Author.Value],
   val addressee: Option[EntityReference],
   val pbs: Seq[Pb]
-) extends Directory.Entry(name) {
+) extends Directory.Entry(name):
   def baseName: String = Document.splitLang(name)._1
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
@@ -32,13 +32,11 @@ final class Document(
     .map(EntityReference.xmlElement))
 
   def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
-}
 
-object Document extends Element[Document]("document") with Directory.EntryMaker[Tei, Document] {
+object Document extends Element[Document]("document"), Directory.EntryMaker[Tei, Document]:
 
-  sealed abstract class Facet(val document: Document, val collectionFacet: Collection.Facet[_])
-    extends Store.Terminal with HtmlContent[Collector]
-  {
+  sealed abstract class Facet(val document: Document, val collectionFacet: Collection.Facet[?])
+    extends Store.Terminal, HtmlContent[Collector]:
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
 
     final override def names: Names = Names(document.name)
@@ -46,24 +44,20 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     final def getTei: Caching.Parser[Tei] = collectionFacet.getTei(document)
 
     override def htmlHeadTitle: Option[String] = None
-  }
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends Facet(document, collectionFacet)
-  {
-    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for {
-      tei <- getTei
-      header <- collection.documentHeader(document)
-    } yield
+    extends Facet(document, collectionFacet):
+    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for
+      tei: Tei <- getTei
+      header: ScalaXml.Element <- collection.documentHeader(document)
+    yield
       <div>
         {header}
         {tei.text.body.content}
       </div>
-  }
 
   final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
-    extends Facet(document, collectionFacet)
-  {
+    extends Facet(document, collectionFacet):
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
       <div class="facsimileWrapper">
         {header}
@@ -73,7 +67,7 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
             val facsimileUrl: String = collection.facsimileUrl(collector)
             // TODO generate lists of images and check for missing ones and orphans
 
-            for (page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing)) yield {
+            for page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing) yield
               val n: String = page.pb.n
               val pageId: String = Pb.pageId(n)
               text.a(collector).setFragment(pageId)(
@@ -86,23 +80,22 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
                   <figcaption>{n}</figcaption>
                 </figure>
               )
-            }}</div>
+            }</div>
         </div>
       </div>
     )
-  }
 
-  override def apply(name: String, tei: Tei): Parser[Document] = for {
-    pbs <- ScalaXml.descendants(tei.text.body.content, Pb.elementName, Pb)
-    lang = tei.text.lang
-    language = splitLang(name)._2
+  override def apply(name: String, tei: Tei): Parser[Document] = for
+    pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content, Pb.elementName, Pb)
+    lang: Option[String] = tei.text.lang
+    language: Option[String] = splitLang(name)._2
     _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
-    persNames <- ScalaXml.descendants(
+    persNames: Seq[EntityReference] <- ScalaXml.descendants(
       nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content).getOrElse(Seq.empty),
       elementName = EntityType.Person.nameElement,
       elements = EntityReference
     )
-  } yield new Document(
+  yield new Document(
     name,
     isTranslation = language.isDefined,
     lang = lang.get,
@@ -114,13 +107,12 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
     pbs = pbs
   )
 
-  private def splitLang(name: String): (String, Option[String]) = {
+  private def splitLang(name: String): (String, Option[String]) =
     val dash: Int = name.lastIndexOf('-')
-    if ((dash == -1) || (dash != name.length-3)) (name, None)
+    if (dash == -1) || (dash != name.length-3) then (name, None)
     else (name.substring(0, dash), Some(name.substring(dash+1)))
-  }
 
-  private val isTranslationAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("isTranslation").orDefault
+  private val isTranslationAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isTranslation").orDefault
   private val langAttribute: Attribute.Required[String] = Attribute("lang").required
   private val dateAttribute: Attribute.Optional[String] = Attribute("date").optional
   private val editorsElement: Elements.Sequence[Editor] = Editor.seq
@@ -129,18 +121,18 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
   private val addresseeElement: Elements.Optional[EntityReference] = EntityReference.optional
   private val pbsElement: Elements.Sequence[Pb] = Pb.seq
 
-  override def contentParsable: Parsable[Document] = new Parsable[Document] {
-    override def parser: Parser[Document] = for {
-      name <- Directory.fileNameAttribute()
-      isTranslation <- isTranslationAttribute()
-      lang <- langAttribute()
-      editors <- editorsElement()
-      description <- abstractElement()
-      date <- dateAttribute()
-      authors <- authorsElement()
-      addressee <- addresseeElement()
-      pbs <- pbsElement()
-    } yield new Document(
+  override def contentParsable: Parsable[Document] = new Parsable[Document]:
+    override def parser: Parser[Document] = for
+      name: String <- Directory.fileNameAttribute()
+      isTranslation: Boolean <- isTranslationAttribute()
+      lang: String <- langAttribute()
+      editors: Seq[Editor] <- editorsElement()
+      description: Option[Abstract.Value] <- abstractElement()
+      date: Option[String] <- dateAttribute()
+      authors: Seq[Author.Value] <- authorsElement()
+      addressee: Option[EntityReference] <- addresseeElement()
+      pbs: Seq[Pb] <- pbsElement()
+    yield new Document(
       name,
       isTranslation,
       lang,
@@ -163,5 +155,3 @@ object Document extends Element[Document]("document") with Directory.EntryMaker[
       addresseeElement(_.addressee),
       pbsElement(_.pbs)
     )
-  }
-}

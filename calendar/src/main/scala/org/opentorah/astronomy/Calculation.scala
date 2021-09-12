@@ -8,7 +8,7 @@ import org.opentorah.numbers.BigRational
 final class Calculation(
   val calculator: Calculator,
   val day: Day
-) {
+):
   // Precision of calculations
   val length: Int = Angles.maxLength
 
@@ -97,7 +97,7 @@ final class Calculation(
   lazy val latitudeSightingAdjustment: Rotation =
     calculators.moonLatitudeSightingAdjustment(moonLongitudeTrue)
   lazy val latitude2: Rotation =
-    if (isMoonLatitudeNortherly) latitude1 - latitudeSightingAdjustment
+    if isMoonLatitudeNortherly then latitude1 - latitudeSightingAdjustment
     else latitude1 + latitudeSightingAdjustment
 
   // KH 17:10
@@ -106,10 +106,10 @@ final class Calculation(
 
   // KH 17:11
   lazy val longitude3: Rotation =
-    rounders.longitude3(if (
+    rounders.longitude3(if
       (isMoonLatitudeNortherly && inNortherlyInclinedConstellations) ||
       (!isMoonLatitudeNortherly && !inNortherlyInclinedConstellations)
-    ) longitude2 - moonCircuit else longitude2 + moonCircuit)
+    then longitude2 - moonCircuit else longitude2 + moonCircuit)
 
   // KH 17:12
   lazy val moonLongitude3Portion: BigRational =
@@ -122,7 +122,7 @@ final class Calculation(
   lazy val geographicCorrection: Rotation =
     rounders.geographicCorrection(latitude1 *(BigRational(2, 3), length))
   lazy val arcOfSighting: Rotation = rounders.arcOfSighting(
-    if (isMoonLatitudeNortherly) longitude4 + geographicCorrection
+    if isMoonLatitudeNortherly then longitude4 + geographicCorrection
     else longitude4 - geographicCorrection)
 
   // KH 17:3-4,15-21
@@ -130,4 +130,3 @@ final class Calculation(
     MoonSightable.forLongitude1(longitude1, inNortherlyInclinedConstellations)
       .orElse(MoonSightable.forArcOfSighting(arcOfSighting))
       .getOrElse(MoonSightable.forSightingLimits(arcOfSighting, longitude1))
-}

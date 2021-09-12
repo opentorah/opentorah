@@ -3,7 +3,7 @@ package org.opentorah.docbook.plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.{ListProperty, Property}
 
-class MathJaxExtension @javax.inject.Inject() (project: Project) {
+class MathJaxExtension @javax.inject.Inject() (project: Project):
   private val enabled: Property[Boolean] = project.getObjects.property(classOf[Boolean])
   final def getEnabled(): Property[Boolean] = enabled
 
@@ -33,4 +33,3 @@ class MathJaxExtension @javax.inject.Inject() (project: Project) {
 
   private val processEscapes: Property[Boolean] = project.getObjects.property(classOf[Boolean])
   final def getProcessEscapes(): Property[Boolean] = processEscapes
-}

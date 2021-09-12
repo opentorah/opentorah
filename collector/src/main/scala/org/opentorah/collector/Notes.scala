@@ -15,8 +15,8 @@ final class Notes(
   directory,
   "md",
   Note,
-  new Notes.All(_),
-) with By with HtmlContent[Collector] {
+  Notes.All(_),
+), By, HtmlContent[Collector]:
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
@@ -25,18 +25,17 @@ final class Notes(
 
   override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(notes =>
     <div>{notes.sortBy(_.title).map(note => <l>{note.a(collector)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
-}
 
-object Notes extends Element[Notes]("notes") {
+object Notes extends Element[Notes]("notes"):
 
   final class All(name2entry: Map[String, Note]) extends Directory.Wrapper[Note](name2entry)
 
-  override def contentParsable: Parsable[Notes] = new Parsable[Notes] {
-    override def parser: Parser[Notes] = for {
-      fromUrl <- Element.currentFromUrl
-      selector <- By.selectorParser
-      directory <- Directory.directoryAttribute()
-    } yield new Notes(
+  override def contentParsable: Parsable[Notes] = new Parsable[Notes]:
+    override def parser: Parser[Notes] = for
+      fromUrl: FromUrl <- Element.currentFromUrl
+      selector: Selector <- By.selectorParser
+      directory: String <- Directory.directoryAttribute()
+    yield Notes(
       fromUrl,
       selector,
       directory
@@ -46,5 +45,3 @@ object Notes extends Element[Notes]("notes") {
       By.selectorUnparser,
       Directory.directoryAttribute(_.directory)
     )
-  }
-}

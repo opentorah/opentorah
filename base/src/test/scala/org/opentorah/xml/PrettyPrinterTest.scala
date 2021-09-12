@@ -4,19 +4,18 @@ import org.opentorah.util.Effects
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
+final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
 
   private def render(from: From, width: Int): String =
-    new PrettyPrinter(
+    PrettyPrinter(
       width,
       indent = 2,
       clingyElements = Set("note")
     ).render(ScalaXml)(Effects.unsafeRun(from.loadTask))
 
-  private def check(from: From, width: Int, expected: String): Unit = {
+  private def check(from: From, width: Int, expected: String): Unit =
     val result = render(from, width)
     result shouldBe expected.stripMargin + "\n"
-  }
 
   private def check(xml: ScalaXml.Element, width: Int, expected: String): Unit =
     check(From.xml("test XML", xml), width, expected)
@@ -152,4 +151,3 @@ final class PrettyPrinterTest extends AnyFlatSpec with Matchers {
     s"""<ref target="https://forum.j-roots.info/viewtopic.php?t=5970&amp;start=240">text</ref>"""
     )
   }
-}

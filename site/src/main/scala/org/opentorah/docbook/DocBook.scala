@@ -7,7 +7,7 @@ import zio.{Has, URIO}
 import java.io.File
 import java.net.URI
 
-object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
+object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
 
   override val namespace: Namespace = Namespace(uri = "http://docbook.org/ns/docbook", prefix = "db")
 
@@ -22,9 +22,8 @@ object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
 
   def doctypeString(rootElementName: String): String = s"""<!DOCTYPE $rootElementName PUBLIC "$dtdId" "$dtdUri">"""
 
-  def doctype(rootElementName: String): Doctype = new Doctype {
+  def doctype(rootElementName: String): Doctype = new Doctype:
     override def doctype: String = doctypeString(rootElementName)
-  }
 
   val version: String = "5.0"
 
@@ -62,11 +61,10 @@ object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
   // (see https://github.com/scala/scala-xml/issues/506),
   // but DocBook uses XInclude to assemble the document,
   // so I parse to Dom, pretty-print combined document to String and re-parse it with Xml:
-  def loadFromFile(file: File, resolver: Option[Resolver]): ScalaXml.Element = {
+  def loadFromFile(file: File, resolver: Option[Resolver]): ScalaXml.Element =
     val element: Dom.Element = Dom.loadFromUrl(Files.file2url(file), resolver = resolver)
     val string: String = DocBook.prettyPrinter.renderWithHeader(Dom)(element)
     ScalaXml.loadFromString(string)
-  }
 
   // TODO put endnotes below the component that has them
   override protected def isEndNote(element: ScalaXml.Element): Boolean = ScalaXml.getName(element) == "footnote"
@@ -74,15 +72,15 @@ object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
   private val linkendAttribute: Attribute.Required[String] = Attribute("linkend").required
 
-  override protected def elementTransform(element: ScalaXml.Element): URIO[Has[Unit], ScalaXml.Element] = {
+  override protected def elementTransform(element: ScalaXml.Element): URIO[Has[Unit], ScalaXml.Element] =
     val children: ScalaXml.Nodes = ScalaXml.getChildren(element)
 
-    ScalaXml.getName(element) match {
+    ScalaXml.getName(element) match
       // TODO link, olink, xref, anchor
 
       case "ulink" =>
         require(!ScalaXml.isEmpty(children), element)
-        URIO.succeed(html.a(new URI(urlAttribute.get(ScalaXml)(element)))(children))
+        URIO.succeed(html.a(URI(urlAttribute.get(ScalaXml)(element)))(children))
 
       // TODO look up the reference in the bibliography entry itself
       // TODO add chunk name for chunked mode
@@ -109,6 +107,3 @@ object DocBook extends Dialect with Doctype with html.ToHtml[Has[Unit]] {
 
       case _ =>
         URIO.succeed(element)
-    }
-  }
-}

@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-trait Parsable[T] {
+trait Parsable[T]:
   protected def parser: Parser[T]
 
   final def apply(): Parser[T] = parser
@@ -12,4 +12,3 @@ trait Parsable[T] {
     attributes = unparser.attributes compose f,
     content    = unparser.content compose f
   )
-}

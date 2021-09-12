@@ -28,16 +28,16 @@ import org.opentorah.xml.ScalaXml
     - inputs;
     - texExtensions.
  */
-trait MathJax {
+trait MathJax:
 
   def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element]
 
   final def htmlConfigurationString(configuration: MathJaxConfiguration): String =
     Json.fromMap(htmlConfiguration(configuration))
 
-  def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Any]
+  def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable]
 
-  def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Any]
+  def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable]
 
   val exInEms: Float
 
@@ -54,20 +54,19 @@ trait MathJax {
     inputName: String,
     outputName: String,
     fontSize: Float
-  ): Map[String, Any]
+  ): Map[String, Matchable]
 
   def nodeSnippet(
     configuration: MathJaxConfiguration,
-    options: Map[String, Any],
+    options: Map[String, Matchable],
     outputName: String
   ): String
-}
 
-object MathJax {
+object MathJax:
 
-  def get(useMathJax3: Boolean): MathJax = if (useMathJax3) MathJax3 else MathJax2
+  def get(useMathJax3: Boolean): MathJax = if useMathJax3 then MathJax3 else MathJax2
 
-  private object MathJax2 extends MathJax {
+  private object MathJax2 extends MathJax:
 
     // TODO? <script async src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML"/>
     override def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element] = Seq(
@@ -75,7 +74,7 @@ object MathJax {
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"/>
     )
 
-    override def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Any] = Map(
+    override def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable] = Map(
       "displayMessages"     -> configuration.displayMessages,
       "displayErrors"       -> configuration.displayErrors,
       "undefinedCharError"  -> configuration.undefinedCharError,
@@ -89,7 +88,7 @@ object MathJax {
       )
     )
 
-    override def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Any] = Map(
+    override def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable] = Map(
       "jax" -> (MathJaxConfiguration.inputs ++ List("output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG")),
       "extensions" -> List("tex2jax.js", "mml2jax.js", "asciimath2jax.js", "MathMenu.js", "MathZoom.js"),
       "tex2jax" -> Map(
@@ -133,7 +132,7 @@ made clear that:
       inputName: String,
       outputName: String,
       fontSize: Float
-    ): Map[String, Any] = Map(
+    ): Map[String, Matchable] = Map(
       "useFontCache" -> true, // use <defs> and <use> in svg output ('true' by default)?
       "useGlobalCache" -> false, // use common <defs> for all equations?
       "linebreaks" -> false, // automatic linebreaking
@@ -154,7 +153,7 @@ made clear that:
     // that is why I collect both out and err in Node.node()...
     override def nodeSnippet(
       configuration: MathJaxConfiguration,
-      options: Map[String, Any],
+      options: Map[String, Matchable],
       outputName: String
     ): String =
       s"""
@@ -165,11 +164,10 @@ made clear that:
          |  if (!data.$errorsArray) { console.error(data.$outputName); }
          |});
          |""".stripMargin
-  }
 
 
   // TODO https://docs.mathjax.org/en/latest/options/input/tex.html
-  private object MathJax3 extends MathJax {
+  private object MathJax3 extends MathJax:
 
     override def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element] = Seq(
       <script
@@ -181,11 +179,11 @@ made clear that:
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"/>
     )
 
-    override def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Any] = Map(
+    override def nodeConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable] = Map(
       // TODO !!!
     )
 
-    override def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Any] = Map(
+    override def htmlConfiguration(configuration: MathJaxConfiguration): Map[String, Matchable] = Map(
       // OLD
       //    "jax" -> (MathJaxConfiguration.inputs ++ List("output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG")),
       //    "extensions" -> List("tex2jax.js", "mml2jax.js", "asciimath2jax.js", "MathMenu.js", "MathZoom.js"),
@@ -218,7 +216,7 @@ made clear that:
       inputName: String,
       outputName: String,
       fontSize: Float
-    ): Map[String, Any] = Map(
+    ): Map[String, Matchable] = Map(
       "useFontCache" -> true, // use <defs> and <use> in svg output ('true' by default)?
       "useGlobalCache" -> false, // use common <defs> for all equations?
       "linebreaks" -> false, // automatic linebreaking
@@ -239,7 +237,7 @@ made clear that:
     // that is why I collect both out and err in Node.node()...
     override def nodeSnippet(
       configuration: MathJaxConfiguration,
-      options: Map[String, Any],
+      options: Map[String, Matchable],
       outputName: String
     ): String =
       s"""
@@ -250,5 +248,3 @@ made clear that:
          |  if (!data.$errorsArray) { console.error(data.$outputName); }
          |});
          |""".stripMargin
-  }
-}

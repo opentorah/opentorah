@@ -2,7 +2,7 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.Rotation
 
-object MoonAnomalyMean extends Time2Rotation {
+object MoonAnomalyMean extends Time2Rotation:
   // KH 14:3
   final override val one        : Rotation = Rotation( 13,  3, 54)
   final override val ten        : Rotation = Rotation(130, 39,  0)
@@ -26,4 +26,3 @@ object MoonAnomalyMean extends Time2Rotation {
 //    [13°3′53″55‴47,49, 2..13°3′53″55‴48,10,37] (6)    13°3′54″ * 10000 -> 329°48′20″: [13°3′53″55‴48..13°3′53″55‴48] (4)
 //    [13°3′53″54‴48,36,12..13°3′53″56‴52,44,27] (6)    13°3′54″ * 29 -> 18°53′4″: [13°3′53″55‴..13°3′53″56‴] (3)
 //    [13°3′53″56‴ 0,55,51..13°3′53″56‴11,6    ] (6)    13°3′54″ * 354 -> 305°0′13″: [13°3′53″56‴1..13°3′53″56‴11] (4)
-}

@@ -3,7 +3,7 @@ package org.opentorah.astronomy
 import org.opentorah.angles.Angles.{Position, Rotation}
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 
-trait Epoch {
+trait Epoch:
   def day: Day
 
   final def daysAfterEpoch(day: Day): Int = day.number - this.day.number
@@ -17,11 +17,10 @@ trait Epoch {
   def moonAnomalyMean: Position
 
   def moonHeadMean: Position
-}
 
 
-object Epoch {
-  object Text extends Epoch {
+object Epoch:
+  object Text extends Epoch:
     final override lazy val day: Day = Year(4938).month(Month.Nisan).day(3)
 
     // KH 12:2
@@ -38,5 +37,3 @@ object Epoch {
 
     // KH 14:4; f7
     final override def moonHeadMean: Position = Position(180, 57, 28)
-  }
-}

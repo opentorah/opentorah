@@ -9,14 +9,13 @@ import zio.ZIO
 final class Note(
   override val name: String,
   val title: Option[String]
-) extends Directory.Entry(name) with HtmlContent[Collector] {
+) extends Directory.Entry(name), HtmlContent[Collector]:
 
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
   override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
-}
 
-object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, Note] {
+object Note extends Element[Note]("note"), Directory.EntryMaker[Markdown, Note]:
 
   override def apply(name: String, markdown: Markdown): Parser[Note] = ZIO.succeed(new Note(
     name,
@@ -25,11 +24,11 @@ object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, No
 
   private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional
 
-  override def contentParsable: Parsable[Note] = new Parsable[Note] {
-    override def parser: Parser[Note] = for {
-      name <- Directory.fileNameAttribute()
-      title <- titleAttribute()
-    } yield new Note(
+  override def contentParsable: Parsable[Note] = new Parsable[Note]:
+    override def parser: Parser[Note] = for
+      name: String <- Directory.fileNameAttribute()
+      title: Option[String] <- titleAttribute()
+    yield new Note(
       name,
       title
     )
@@ -38,5 +37,3 @@ object Note extends Element[Note]("note") with Directory.EntryMaker[Markdown, No
       Directory.fileNameAttribute(_.name),
       titleAttribute(_.title)
     )
-  }
-}

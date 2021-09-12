@@ -21,7 +21,7 @@
 
 ## [0.2.1] - 2021-01-31
 - use correct thread-pools to avoid ZIO dead-locks with nested `unsafeRun()` calls in CPU-constrained situation;
-- use latest Cloud Run Gradle plugin to run in the local Docker;
+- use the latest Cloud Run Gradle plugin to run in the local Docker;
 
 ## [0.2.0] - 2021-01-27
 My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:

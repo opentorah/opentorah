@@ -8,15 +8,13 @@ final class CollectionPart(
   val names: Names,
   val from: String,
   val title: Title.Value
-) {
-  def take(documents: Seq[Document]): CollectionPart.Part = {
-    if (documents.isEmpty) throw new IllegalArgumentException("No documents for Part!")
-    if (documents.head.baseName != from) throw new IllegalArgumentException("Incorrect 'from' document")
-    new CollectionPart.Part(Some(title), documents)
-  }
-}
+):
+  def take(documents: Seq[Document]): CollectionPart.Part =
+    if documents.isEmpty then throw IllegalArgumentException("No documents for Part!")
+    if documents.head.baseName != from then throw IllegalArgumentException("Incorrect 'from' document")
+    CollectionPart.Part(Some(title), documents)
 
-object CollectionPart extends Element[CollectionPart]("part") {
+object CollectionPart extends Element[CollectionPart]("part"):
 
   final class Part(
     val title: Option[Title.Value],
@@ -27,7 +25,7 @@ object CollectionPart extends Element[CollectionPart]("part") {
     parts: Seq[CollectionPart],
     documents: Seq[Document]
   ): Seq[Part] =
-    if (parts.isEmpty) Seq(new Part(None, documents))
+    if parts.isEmpty then Seq(Part(None, documents))
     else splitParts(Seq.empty, parts, documents)
 
   @scala.annotation.tailrec
@@ -35,7 +33,7 @@ object CollectionPart extends Element[CollectionPart]("part") {
     result: Seq[Part],
     parts: Seq[CollectionPart],
     documents: Seq[Document]
-  ): Seq[Part] = parts match {
+  ): Seq[Part] = parts match
     case p1 :: p2 :: ds =>
       val (partDocuments: Seq[Document], tail: Seq[Document]) = documents.span(_.baseName != p2.from)
       splitParts(result :+ p1.take(partDocuments), p2 :: ds, tail)
@@ -44,19 +42,18 @@ object CollectionPart extends Element[CollectionPart]("part") {
       result :+ p1.take(documents)
 
     case Nil =>
-      if (documents.nonEmpty)
-        throw new IllegalArgumentException("Documents left over: " + documents.mkString(", ") + ".")
+      if documents.nonEmpty then
+        throw IllegalArgumentException("Documents left over: " + documents.mkString(", ") + ".")
       result
-  }
 
   private val fromAttribute: Attribute.Required[String] = Attribute("from").required
 
-  override def contentParsable: Parsable[CollectionPart] = new Parsable[CollectionPart] {
-    override def parser: Parser[CollectionPart] = for {
-      names <- Names.withDefaultNameParsable()
-      from <- fromAttribute()
-      title <- Title.element.required()
-    } yield new CollectionPart(
+  override def contentParsable: Parsable[CollectionPart] = new Parsable[CollectionPart]:
+    override def parser: Parser[CollectionPart] = for
+      names: Names <- Names.withDefaultNameParsable()
+      from: String <- fromAttribute()
+      title: Title.Value <- Title.element.required()
+    yield CollectionPart(
       names,
       from,
       title
@@ -67,5 +64,3 @@ object CollectionPart extends Element[CollectionPart]("part") {
       fromAttribute(_.from),
       Title.element.required(_.title)
     )
-  }
-}

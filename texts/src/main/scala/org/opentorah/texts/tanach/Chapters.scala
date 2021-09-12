@@ -4,32 +4,30 @@ import org.opentorah.metadata.WithNumber
 import org.opentorah.store.{By, Selector, Stores}
 import org.opentorah.xml.Parser
 
-final class Chapters(chapters: Seq[Int]) extends By with Stores.Numbered[Chapter] {
+final class Chapters(chapters: Seq[Int]) extends By, Stores.Numbered[Chapter]:
   override def selector: Selector = Selector.byName("chapter")
   override def length: Int = chapters.length
-  override protected def createNumberedStore(number: Int): Chapter = new Chapter(number, length(number))
+  override protected def createNumberedStore(number: Int): Chapter = Chapter(number, length(number))
 
   def length(chapter: Int): Int = chapters(chapter-1)
 
-  def next(verse: Verse): Option[Verse] = {
+  def next(verse: Verse): Option[Verse] =
     require(contains(verse))
-    if (verse.verse < length(verse.chapter))
+    if verse.verse < length(verse.chapter) then
       Some(Verse(verse.chapter, verse.verse+1))
-    else if (verse.chapter+1 <= chapters.length)
+    else if verse.chapter+1 <= chapters.length then
       Some(Verse(verse.chapter+1, 1))
     else
       None
-  }
 
-  def prev(verse: Verse): Option[Verse] = {
+  def prev(verse: Verse): Option[Verse] =
     require(contains(verse))
-    if (verse.verse > 1)
+    if verse.verse > 1 then
       Some(Verse(verse.chapter, verse.verse-1))
-    else if (verse.chapter-1 >= 1)
+    else if verse.chapter-1 >= 1 then
       Some(Verse(verse.chapter-1, length(verse.chapter-1)))
     else
       None
-  }
 
   def first: Verse = Verse(1, 1)
 
@@ -42,31 +40,26 @@ final class Chapters(chapters: Seq[Int]) extends By with Stores.Numbered[Chapter
   def contains(verse: Verse): Boolean =
     (verse.chapter <= chapters.length) && (verse.verse <= length(verse.chapter))
 
-  def consecutive(first: Span, second: Span): Boolean = {
+  def consecutive(first: Span, second: Span): Boolean =
     require(contains(first))
     require(contains(second))
     val nextVerse = next(first.to)
     nextVerse.fold(false)(_ == second.from)
-  }
 
   def consecutive(spans: Seq[Span]): Boolean =
-    spans.zip(spans.tail).forall { case (first, second) => consecutive(first, second) }
+    spans.zip(spans.tail).forall((first, second) => consecutive(first, second))
 
-  def merge(first: Span, second: Span): Span = {
+  def merge(first: Span, second: Span): Span =
     require(consecutive(first, second))
     Span(first.from, second.to)
-  }
 
-  def cover(spans: Seq[Span], span: Span): Boolean = {
+  def cover(spans: Seq[Span], span: Span): Boolean =
     require(contains(span))
     consecutive(spans) && (spans.head.from == span.from) && (spans.last.to == span.to)
-  }
-}
 
-object Chapters {
+object Chapters:
 
-  val parser: Parser[Chapters] = for {
-    chapters <- Chapter.seq()
+  val parser: Parser[Chapters] = for
+    chapters: Seq[WithNumber[Int]] <- Chapter.seq()
     _ <- WithNumber.checkConsecutive(chapters, "chapter")
-  } yield new Chapters(WithNumber.dropNumbers(chapters))
-}
+  yield Chapters(WithNumber.dropNumbers(chapters))

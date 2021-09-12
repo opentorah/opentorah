@@ -7,7 +7,7 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{Catalog, EvalFilter, PrettyPrinter, Resolver, Sax, Saxon, ScalaXml, XInclude, Xml}
 import java.io.{File, FileWriter}
 
-object Operations {
+object Operations:
 
   def writeFopConfigurationFile(layout: Layout): Unit = PrettyPrinter.default.write(
     file = layout.fopConfigurationFile,
@@ -34,7 +34,7 @@ object Operations {
   )
 
   def writeInputDocuments(layout: Layout, inputDocuments: List[(String, Boolean)]): Unit =
-    for ((documentName: String, prefixed: Boolean) <- inputDocuments) PrettyPrinter.default.write(
+    for (documentName: String, prefixed: Boolean) <- inputDocuments do PrettyPrinter.default.write(
       file = layout.forDocument(prefixed, documentName).inputFile,
       replace = false,
       doctype = Some(DocBook),
@@ -52,7 +52,7 @@ object Operations {
     xslt1: File,
     xslt2: File,
     substitutions: Map[String, String]
-  ): Unit = {
+  ): Unit =
     val catalogFile: File = layout.catalogFile
     val customCatalogFile: File = layout.customCatalogFile
     val dtdFile: File = layout.dtdFile
@@ -89,7 +89,6 @@ object Operations {
       xsltUri(Stylesheets.xslt1, xslt1) ++
       xsltUri(Stylesheets.xslt2, xslt2)
     )
-  }
 
   def writeStylesheets(
     layout: Layout,
@@ -101,31 +100,31 @@ object Operations {
     mathJax: MathJax,
     mathJaxConfiguration: MathJaxConfiguration,
     enableMathJax: Boolean
-  ): Unit = {
+  ): Unit =
     // Custom stylesheet
-    for (section: CommonSection <- CommonSection.all) PrettyPrinter.default.write(
+    for section: CommonSection <- CommonSection.all do PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.customStylesheet(section)),
       replace = false,
       element = section.customStylesheet
     )
-    for (variant: Variant <- sections.allVariants) PrettyPrinter.default.write(
+    for variant: Variant <- sections.allVariants do PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.customStylesheet(variant)),
       replace = false,
       element = variant.docBook2.customStylesheet
     )
 
     // Parameters stylesheet
-    for (variant: Variant <- sections.allVariants) PrettyPrinter.default.write(
+    for variant: Variant <- sections.allVariants do PrettyPrinter.default.write(
       file = layout.stylesheetFile(layout.paramsStylesheet(variant)),
       replace = true,
       element = variant.docBook2.paramsStylesheet(sections.parameters(variant))
     )
 
     // Main stylesheet
-    for {
+    for
       variant: Variant <- sections.allVariants
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } Operations.writeMainStylesheet(
+    do Operations.writeMainStylesheet(
       layout = layout,
       documentName = documentName,
       prefixed = prefixed,
@@ -137,7 +136,6 @@ object Operations {
       mathJaxConfiguration = mathJaxConfiguration,
       enableMathJax = enableMathJax
     )
-  }
 
   def writeMainStylesheet(
     layout: Layout,
@@ -150,7 +148,7 @@ object Operations {
     mathJax: MathJax,
     mathJaxConfiguration: MathJaxConfiguration,
     enableMathJax: Boolean
-  ): Unit = {
+  ): Unit =
     val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
 
     // xsl:param has the last value assigned to it, so customization must come last;
@@ -161,23 +159,22 @@ object Operations {
       replace = true,
       element = variant.docBook2.mainStylesheet(
         paramsStylesheetName = layout.paramsStylesheet(variant),
-        stylesheetUriBase = (if (variant.docBook2.usesDocBookXslt2) Stylesheets.xslt2 else Stylesheets.xslt1).uri,
+        stylesheetUriBase = (if variant.docBook2.usesDocBookXslt2 then Stylesheets.xslt2 else Stylesheets.xslt1).uri,
         customStylesheets =
           variant.docBook2.commonSections.map(layout.customStylesheet) ++
             (variant.baseVariant.toSeq :+ variant).map(layout.customStylesheet),
-        values = new NonOverridableParameters(
+        values = NonOverridableParameters(
           isInfoEnabled = isInfoEnabled,
           embeddedFonts = embeddedFonts,
           cssFile = layout.cssFileRelativeToOutputDirectory(cssFileName),
           imagesDirectoryName = layout.imagesDirectoryName,
           mathJax = mathJax,
-          mathJaxConfiguration = if(!enableMathJax) None else Some(mathJaxConfiguration),
+          mathJaxConfiguration = if !enableMathJax then None else Some(mathJaxConfiguration),
           documentName = documentName,
           saxonOutputDirectory = forDocument.saxonOutputDirectory(variant)
         )
       )
     )
-  }
 
   def runSaxon(
     docBook2: DocBook2,
@@ -187,7 +184,7 @@ object Operations {
     resolver: Resolver,
     stylesheetFile: File,
     saxonOutputFile: File
-  ): Unit = {
+  ): Unit =
     // Run Saxon.
     // Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
     // ("Don't know how to chunk with Saxonica").
@@ -202,28 +199,26 @@ object Operations {
     // - produces unmodifiable DOM (see Saxon) - unlike Saxon 10,
     // - carries within it obsolete org.w3c.dom classes (Level 2), which cause IDE to highlight
     //   as errors uses of the (Level 3) method org.w3c.dom.Node.getTextContent()...
-    val saxon: Saxon = if (!docBook2.usesDocBookXslt2) Saxon.Saxon6 else Saxon.Saxon10
+    val saxon: Saxon = if !docBook2.usesDocBookXslt2 then Saxon.Saxon6 else Saxon.Saxon10
 
     // do not output the 'main' file when chunking in XSLT 1.0
     val result: javax.xml.transform.stream.StreamResult = new javax.xml.transform.stream.StreamResult
-    if (docBook2.usesRootFile) {
+    if docBook2.usesRootFile then
       result.setSystemId(saxonOutputFile)
-      result.setWriter(new FileWriter(saxonOutputFile))
-    } else {
+      result.setWriter(FileWriter(saxonOutputFile))
+    else
       result.setSystemId("dev-null")
       result.setOutputStream((_: Int) => {})
-    }
 
     saxon.transform(
-      filters = Seq(new EvalFilter(substitutions)) ++
-        (if (mathJaxRunner.isDefined && docBook2.isPdf) Seq(new MathFilter(mathJaxRunner.get.configuration)) else Seq.empty),
+      filters = Seq(EvalFilter(substitutions)) ++
+        (if mathJaxRunner.isDefined && docBook2.isPdf then Seq(MathFilter(mathJaxRunner.get.configuration)) else Seq.empty),
       // ++ Seq(new TracingFilter),
       resolver = Some(resolver),
       stylesheetFile = Some(stylesheetFile),
       inputSource = Sax.file2inputSource(inputFile),
       result = result
     )
-  }
 
   def postProcess(
     layout: Layout,
@@ -234,11 +229,11 @@ object Operations {
     substitutions: Map[String, String],
     isJEuclidEnabled: Boolean,
     mathJaxRunner: Option[MathJaxRunner]
-  ): Unit = {
-    if (docBook2.isPdf) {
+  ): Unit =
+    if docBook2.isPdf then
       val fopPlugin: Option[FopPlugin] =
-        if (isJEuclidEnabled) Some(new JEuclidFopPlugin)
-        else mathJaxRunner.map(new MathJaxFopPlugin(_))
+        if isJEuclidEnabled then Some(new JEuclidFopPlugin)
+        else mathJaxRunner.map(MathJaxFopPlugin(_))
 
       Fop.run(
         saxon = Saxon.Saxon10,
@@ -252,11 +247,8 @@ object Operations {
         outputFile,
         fopPlugin,
       )
-    }
 
     docBook2.postProcess(
       inputDirectory = saxonOutputDirectory,
       outputFile
     )
-  }
-}

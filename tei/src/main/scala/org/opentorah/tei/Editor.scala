@@ -2,20 +2,20 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
 
-final case class Editor(
-  role: Option[String],
-  persName: Option[EntityReference]
+final class Editor(
+  val role: Option[String],
+  val persName: Option[EntityReference]
 )
 
-object Editor extends Element[Editor]("editor") {
+object Editor extends Element[Editor]("editor"):
 
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
 
-  override def contentParsable: Parsable[Editor] = new Parsable[Editor] {
-    override def parser: Parser[Editor] = for {
-      role <- roleAttribute()
-      persName <- EntityReference.Person.optional()
-    } yield new Editor(
+  override def contentParsable: Parsable[Editor] = new Parsable[Editor]:
+    override def parser: Parser[Editor] = for
+      role: Option[String] <- roleAttribute()
+      persName: Option[EntityReference] <- EntityReference.Person.optional()
+    yield Editor(
       role,
       persName
     )
@@ -24,5 +24,3 @@ object Editor extends Element[Editor]("editor") {
       roleAttribute(_.role),
       EntityReference.Person.optional(_.persName)
     )
-  }
-}

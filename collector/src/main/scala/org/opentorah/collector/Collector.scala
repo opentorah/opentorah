@@ -21,35 +21,36 @@ final class Collector(
 ) extends Site[Collector](
   fromUrl,
   common
-) {
+):
   private val paths: Seq[Store.Path] = getPaths(Seq.empty, by)
 
   private def getPaths(path: Store.Path, by: ByHierarchy): Seq[Store.Path] =
     Effects.unsafeRun(toTask(by.stores)).flatMap { store =>
     val storePath: Store.Path = path ++ Seq(by, store)
-    Seq(storePath) ++ (store match {
+    Seq(storePath) ++ (store match
       case hierarchy : Hierarchy  => getPaths(storePath, hierarchy.by)
       case _ => Seq.empty
-    })
+    )
   }
 
+  // TODO eliminate
   val store2path: Map[Store, Store.Path] = paths.map(path => path.last -> path).toMap
 
-  val collections: Seq[Collection] = for {
-    path <- paths
-    last = path.last
+  val collections: Seq[Collection] = for
+    path: Store.Path <- paths
+    last: Store = path.last
     if last.isInstanceOf[Collection]
-  } yield last.asInstanceOf[Collection]
+  yield last.asInstanceOf[Collection]
 
-  private val hierarchies: Seq[Hierarchy] = for {
-    path <- paths
-    last = path.last
+  private val hierarchies: Seq[Hierarchy] = for
+    path: Store.Path <- paths
+    last: Store = path.last
     if last.isInstanceOf[Hierarchy]
-  } yield last.asInstanceOf[Hierarchy]
+  yield last.asInstanceOf[Hierarchy]
 
   private val alias2collectionAlias: Map[String, Collection.Alias] = collections
     .filter(_.alias.isDefined)
-    .map(collection => collection.alias.get -> new Collection.Alias(collection))
+    .map(collection => collection.alias.get -> Collection.Alias(collection))
     .toMap
 
   private val references: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
@@ -76,26 +77,24 @@ final class Collector(
   override protected def content(
     store: Store,
     extension: Option[String]
-  ): Caching.Parser[Site.Response] = store match {
+  ): Caching.Parser[Site.Response] = store match
     case textFacet: Document.TextFacet if extension.nonEmpty && extension.contains("xml") =>
-      textFacet.getTei.map(renderTeiContent).map(content => new Site.Response(content, Tei.mimeType))
+      textFacet.getTei.map(renderTeiContent).map(content => Site.Response(content, Tei.mimeType))
 
-    case htmlContent: HtmlContent[Collector] =>
-      if (extension.nonEmpty && !extension.contains("html"))
+    case htmlContent: HtmlContent[?] =>
+      if extension.nonEmpty && !extension.contains("html") then
         Effects.fail(s"Can't provide non-HTML content '${extension.get}' of $htmlContent")
       else
-        renderHtmlContent(htmlContent).map(content => new Site.Response(content, Html.mimeType))
+        renderHtmlContent(htmlContent.asInstanceOf[HtmlContent[Collector]]).map(content => Site.Response(content, Html.mimeType))
 
     case _ => Effects.fail(s"Can't provide content of $store")
-  }
 
-  override def style(htmlContent: HtmlContent[Collector]): String = htmlContent match {
+  override def style(htmlContent: HtmlContent[Collector]): String = htmlContent match
     case _: Collection.Alias => "wide"
     case _: Collection       => "wide"
     case _                   => "main"
-  }
 
-  override def viewer(htmlContent: HtmlContent[Collector]): Option[Viewer] = htmlContent match {
+  override def viewer(htmlContent: HtmlContent[Collector]): Option[Viewer] = htmlContent match
     case _: Collection.Alias        => Some(Viewer.Collection)
     case _: Collection              => Some(Viewer.Collection)
     case _: Document.TextFacet      => Some(Viewer.Document  )
@@ -106,46 +105,43 @@ final class Collector(
     case _: Entity                  => Some(Viewer.Names     )
     case Reports                    => Some(Viewer.Names     )
     case _                          => defaultViewer
-  }
 
-  override protected def navigationLinks(htmlContent: HtmlContent[Collector]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match {
+  override protected def navigationLinks(htmlContent: HtmlContent[Collector]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match
     case collectionAlias: Collection.Alias => collectionNavigationLinks(collectionAlias.collection)
     case collection: Collection => collectionNavigationLinks(collection)
 
-    case documentFacet: Document.Facet => for {
-      siblings <- documentFacet.collection.siblings(documentFacet.document)
-      collection = documentFacet.collection
-      document = documentFacet.document
-      collectionFacet = documentFacet.collectionFacet
-      collectionNavigationLinks <- collectionNavigationLinks(collection)
-      moreLinks <- documentFacet match {
-        case _: Document.TextFacet =>
-          collection.translations(documentFacet.document).map { translations =>
-            Seq(a(collection.facsimileFacet.of(documentFacet.document))(text = Tei.facsimileSymbol)) ++ {
-              for (translation <- if (document.isTranslation) Seq.empty else translations)
-                yield a(collectionFacet.of(translation))(s"[${translation.lang}]")
-            }
-          }
-        case _: Document.FacsimileFacet =>
-          ZIO.succeed(Seq(a(collection.textFacet.of(document))(text = "A")))
-      }
-    } yield {
-      val (prev: Option[Document], next: Option[Document]) = siblings
+    case documentFacet: Document.Facet =>
+      val collection: Collection = documentFacet.collection
+      val document: Document = documentFacet.document
+      val collectionFacet: Collection.Facet[?] = documentFacet.collectionFacet
+      for
+        siblings: (Option[Document], Option[Document]) <- collection.siblings(documentFacet.document)
+        collectionNavigationLinks: Seq[ScalaXml.Element] <- collectionNavigationLinks(collection)
+        moreLinks: Seq[ScalaXml.Element] <- documentFacet match
+          case _: Document.TextFacet =>
+            collection.translations(documentFacet.document).map(translations =>
+              Seq(a(collection.facsimileFacet.of(documentFacet.document))(text = Tei.facsimileSymbol)) ++ (
+                for translation <- if document.isTranslation then Seq.empty else translations
+                  yield a(collectionFacet.of(translation))(s"[${translation.lang}]")
+                )
+            )
+          case _: Document.FacsimileFacet =>
+            ZIO.succeed(Seq(a(collection.textFacet.of(document))(text = "A")))
+      yield
+        val (prev: Option[Document], next: Option[Document]) = siblings
 
-      collectionNavigationLinks ++
+        collectionNavigationLinks ++
         prev.toSeq.map(prev => a(collectionFacet.of(prev    ))("⇦"          )) ++
         Seq(                   a(collectionFacet.of(document))(document.name)) ++
         next.toSeq.map(next => a(collectionFacet.of(next    ))("⇨"          )) ++
         moreLinks
-    }
 
     case _ => ZIO.succeed (Seq.empty)
-  }
 
   private def collectionNavigationLinks(collection: Collection): Caching.Parser[Seq[ScalaXml.Element]] =
     ZIO.succeed(Seq(a(collection)(s"[${collection.names.name}]")))
 
-  override protected def path(htmlContent: HtmlContent[Collector]): Store.Path = htmlContent match {
+  override protected def path(htmlContent: HtmlContent[Collector]): Store.Path = htmlContent match
     case textFacet      : Document.TextFacet      =>
       path(textFacet.collection     ) ++ Seq(                                textFacet     )
     case facsimileFacet : Document.FacsimileFacet =>
@@ -164,34 +160,31 @@ final class Collector(
     case notes          : Notes            => Seq(notes)
     case note           : Note             => Seq(notes, note)
     case Reports                           => Seq(Reports)
-    case report         : Report[_]        => Seq(Reports, report)
-  }
+    case report         : Report[?]        => Seq(Reports, report)
+  
+  override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
 
-  override def storesPure: Seq[Store] =
+  override protected def storesPure: Seq[Store] =
     Seq(Index.Flat, Index.Tree, entityLists, entities, notes, Reports, by)
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = {
-    ZIO.succeed(alias2collectionAlias.get(name)).flatMap {
-      case Some(result) => ZIO.some(result) // TODO use someOrElseM
-      case None => super.findByName(name)
-    }
-  }
+  override def findByName(name: String): Caching.Parser[Option[Store]] = alias2collectionAlias.get(name) match
+    case Some(result) => ZIO.some(result)
+    case None => super.findByName(name)
 
-  override protected def linkResolver(htmlContent: HtmlContent[Collector]): LinksResolver = {
-    val textFacet: Option[Document.TextFacet] = htmlContent match {
+  override protected def linkResolver(htmlContent: HtmlContent[Collector]): LinksResolver =
+    val textFacet: Option[Document.TextFacet] = htmlContent match
       case htmlFacet: Document.TextFacet => Some(htmlFacet)
       case _ => None
-    }
 
-    new LinksResolver {
+    new LinksResolver:
       private val facsUrl: Option[Store.Path] = textFacet.map(textFacet =>
         path(textFacet.collection.facsimileFacet.of(textFacet.document)))
 
       def toUIO(parser: Caching.Parser[Option[html.a]], error: => String): UIO[Option[html.a]] =
-        toTask(parser.map { a =>
-          if (a.isEmpty) logger.warn(error)
+        toTask(parser.map(a =>
+          if a.isEmpty then logger.warn(error)
           a
-        }).orDie
+        )).orDie
 
       override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
         Collector.this.resolveUrl(url).map(_.map(path => a(path))),
@@ -207,80 +200,76 @@ final class Collector(
         ZIO.succeed(facsUrl.map(facsUrl => a(facsUrl).setFragment(pageId))),
         "did not get facsimile: $pageId"
       )
-    }
-  }
 
-  override protected def directoriesToWrite: Seq[Directory[_, _, _]] = Seq(entities, notes) ++ collections.map(_.documents)
+  override protected def directoriesToWrite: Seq[Directory[?, ?, ?]] = Seq(entities, notes) ++ collections.map(_.documents)
 
-  override protected def buildMore: Caching.Parser[Unit] = for {
+  override protected def buildMore: Caching.Parser[Unit] = for
       _ <- Effects.effect(logger.info("Writing references."))
-      allReferences <- allWithSource[EntityReference](
+      allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](
         nodes => ZIO.foreach(EntityType.values)(entityType =>
-          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten)
+          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten) // TODO toIndexSeq?
       )
       _ <- Effects.effect(references.write(allReferences))
 
       _ <- Effects.effect(logger.info("Writing unclears."))
-      allUnclears <- allWithSource[Unclear.Value](
+      allUnclears: Seq[WithSource[Unclear.Value]] <- allWithSource[Unclear.Value](
         nodes => ScalaXml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
       _ <- Effects.effect(unclears.write(allUnclears))
 
       _ <- Effects.effect(logger.info("Verifying site."))
 
-      errorOpts <- getReferences.flatMap(ZIO.foreach(_) { value =>
+      errorOpts: Seq[Option[String]] <- getReferences.flatMap(ZIO.foreach(_)(value =>
         val reference: EntityReference = value.value
         val name: ScalaXml.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
-          if (ref.contains(" ")) ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
+          if ref.contains(" ") then ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
           else entities.findByName(ref).map(_
             .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """))(named =>
-              if (named.entityType == reference.entityType) None
+              if named.entityType == reference.entityType then None
               else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
             )
           )
         )
-      })
-      errors = errorOpts.flatten
+      ))
+      errors: Seq[String] = errorOpts.flatten
       _ <- Effects.check(errors.isEmpty, errors.mkString("\n"))
 
       // detect and log unresolved references
-      allNotes <- notes.stores
-      allEntities <- entities.stores
-      _ <- ZIO.foreach_(hierarchies ++ collections ++ allNotes ++ allEntities)(resolveLinksInHtmlContent)
+      allNotes: Seq[Note] <- notes.stores
+      allEntities: Seq[Entity] <- entities.stores
+      allStores: Seq[HtmlContent[Collector]] = hierarchies ++ collections ++ allNotes ++ allEntities
+      _ <- ZIO.foreach_(allStores)(resolveLinksInHtmlContent)
 
       _ <- ZIO.foreach_(collections)(collection => collection.documents.stores.flatMap(ZIO.foreach_(_)(document =>
           resolveLinksInHtmlContent(collection.textFacet.of(document)))))
-    } yield ()
+    yield ()
 
-  def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] = {
+  def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] =
 
-    def withSource(htmlContent: HtmlContent[Collector], nodes: ScalaXml.Nodes): Parser[Seq[WithSource[T]]] = {
+    def withSource(htmlContent: HtmlContent[Collector], nodes: ScalaXml.Nodes): Parser[Seq[WithSource[T]]] =
       val source: String = Files.mkUrl(path(htmlContent).map(_.structureName))
       finder(nodes).map(_.map(new WithSource[T](source, _)))
-    }
 
-    for {
-      entities <- entities.stores
-      fromEntities <- ZIO.foreach(entities)(entity =>
+    for
+      entities: Seq[Entity] <- entities.stores
+      fromEntities: Seq[Seq[WithSource[T]]] <- ZIO.foreach(entities)(entity =>
         entity.teiEntity(this).flatMap(teiEntity => withSource(entity, teiEntity.content)))
-      fromHierarchicals <- ZIO.foreach(hierarchies ++ collections) { hierarchical => withSource(
+      fromHierarchicals: Seq[Seq[WithSource[T]]] <- ZIO.foreach(hierarchies ++ collections)(hierarchical => withSource(
         hierarchical,
         Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.content)
-      )}
-      fromDocuments <- ZIO.foreach(collections) { collection =>
-        collection.documents.stores.flatMap(documents => ZIO.foreach(documents) { document =>
+      ))
+      fromDocuments: Seq[Seq[Seq[WithSource[T]]]] <- ZIO.foreach(collections)(collection =>
+        collection.documents.stores.flatMap(documents => ZIO.foreach(documents)(document =>
           val textFacet: Document.TextFacet = collection.textFacet.of(document)
           textFacet.getTei.flatMap(tei => withSource(textFacet, Seq(Tei.xmlElement(tei))))
-        })
-      }
-    } yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten
-  }
+        ))
+      )
+    yield (fromEntities ++ fromHierarchicals ++ fromDocuments.flatten).flatten
 
   override protected def prettyPrintRoots: Seq[URL] = Seq(
 //    fromUrl.url,  // leave the site.xml file alone :)
     entities.directoryUrl,
     Files.subdirectory(fromUrl.url, "archive") // TODO do not assume the directory name!
   )
-}
 
