@@ -5,12 +5,12 @@ import javax.xml.transform.{Source, URIResolver}
 import org.xml.sax.{EntityResolver, InputSource}
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
-final class Resolver(catalogFile: File) extends URIResolver with EntityResolver {
+final class Resolver(catalogFile: File) extends URIResolver, EntityResolver:
 
   xmlLogger.info(s"Resolver(catalogFile = $catalogFile)")
 
-  private val parentResolver: org.xmlresolver.Resolver = {
-    val configuration: org.xmlresolver.XMLResolverConfiguration = new org.xmlresolver.XMLResolverConfiguration()
+  private val parentResolver: org.xmlresolver.Resolver =
+    val configuration: org.xmlresolver.XMLResolverConfiguration = org.xmlresolver.XMLResolverConfiguration()
 
     configuration.setFeature[java.util.List[String]](org.xmlresolver.ResolverFeature.CATALOG_FILES,
       List[String](catalogFile.getAbsolutePath).asJava)
@@ -21,8 +21,7 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
     // To enable validation:
     //configuration.setFeature[java.lang.String](org.xmlresolver.ResolverFeature.CATALOG_LOADER_CLASS, "org.xmlresolver.loaders.ValidatingXmlLoader")
 
-    new org.xmlresolver.Resolver(configuration)
-  }
+    org.xmlresolver.Resolver(configuration)
 
   override def resolve(href: String, base: String): Source = resolve[Source](
     call = _.resolve(href, base),
@@ -44,18 +43,16 @@ final class Resolver(catalogFile: File) extends URIResolver with EntityResolver 
     parameters: String,
     id: R => String,
     ignoreUnresolved: Boolean
-  ): R = {
+  ): R =
     val result = Option(call(parentResolver))
 
-    result.fold {
-      if (ignoreUnresolved)
+    result.fold(
+      if ignoreUnresolved then
         xmlLogger.debug(s"$parameters\n  unresolved")
       else
         xmlLogger.error(s"$parameters\n  unresolved")
-    } { result =>
+    )(result =>
       xmlLogger.debug(s"$parameters\n  resolved to: ${id(result)}")
-    }
+    )
 
     result.getOrElse(null.asInstanceOf[R])
-  }
-}

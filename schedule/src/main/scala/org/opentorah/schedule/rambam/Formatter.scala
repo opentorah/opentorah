@@ -1,6 +1,6 @@
 package org.opentorah.schedule.rambam
 
-trait Formatter {
+trait Formatter:
   def formatLesson(
     dayNumberInMonth: Int,
     gMonthNumber: Int,
@@ -11,11 +11,10 @@ trait Formatter {
   def formatLine(line: String): String
 
   def numColumns: Int
-}
 
 
-object Formatter {
-  val wide: Formatter = new Formatter {
+object Formatter:
+  val wide: Formatter = new Formatter:
     override def formatLesson(
       dayNumberInMonth: Int,
       gMonthNumber: Int,
@@ -26,9 +25,8 @@ object Formatter {
     override def formatLine(line: String): String = f"$line%-14s"
 
     override def numColumns: Int = 4
-  }
 
-  val narrow: Formatter = new Formatter {
+  val narrow: Formatter = new Formatter:
     override def formatLesson(
       dayNumberInMonth: Int,
       gMonthNumber: Int,
@@ -39,5 +37,3 @@ object Formatter {
     override def formatLine(line: String): String = f"${line.take(6)}%-6s"
 
     override def numColumns: Int = 8
-  }
-}

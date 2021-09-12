@@ -15,17 +15,16 @@ final class Documents(
   directory,
   "xml",
   Document,
-  new Documents.All(_, parts)
-) {
+  Documents.All(_, parts)
+):
   override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
-}
 
-object Documents {
+object Documents:
 
   final class All(
     name2entry: Map[String, Document],
     partsRaw: Seq[CollectionPart]
-  ) extends Directory.Wrapper[Document](name2entry) {
+  ) extends Directory.Wrapper[Document](name2entry):
 
     lazy val originalDocuments: Seq[Document] = stores
       .filterNot(_.isTranslation)
@@ -38,9 +37,7 @@ object Documents {
 
     lazy val siblings: Map[String, (Option[Document], Option[Document])] =
       Collections.prevAndNext(originalDocuments)
-        .map { case (document, siblings) => (document.baseName, siblings)}
+        .map((document, siblings) => (document.baseName, siblings))
         .toMap
 
     lazy val parts: Seq[CollectionPart.Part] = CollectionPart.getParts(partsRaw, originalDocuments)
-  }
-}

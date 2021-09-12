@@ -4,9 +4,9 @@ import org.gradle.api.{Action, Project}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.opentorah.mathjax.MathJaxConfiguration
 import org.opentorah.docbook.section.DocBook2
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
-class Extension(project: Project) {
+class Extension(project: Project):
   private val xslt1version: Property[String] = project.getObjects.property(classOf[String])
   final def getXslt1version(): Property[String] = xslt1version
 
@@ -68,4 +68,3 @@ class Extension(project: Project) {
   mathJax.getTexInlineDelimiter().set("$")
   mathJax.getAsciiMathDelimiter().set("`")
   mathJax.getProcessEscapes().set(true)
-}

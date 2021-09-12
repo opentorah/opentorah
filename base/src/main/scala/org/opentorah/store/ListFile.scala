@@ -9,7 +9,7 @@ final class ListFile[M, W <: AnyRef](
   name: String,
   entry: Elements[M],
   wrapper: Seq[M] => W
-) {
+):
   def write(entries: Seq[M]): Unit = Files.write(
     file = Files.url2file(url),
     content = PrettyPrinter.default.renderWithHeader(ScalaXml)(list.xmlElement(entries))
@@ -21,4 +21,3 @@ final class ListFile[M, W <: AnyRef](
   )
 
   private def list: Element[Seq[M]] = entry.wrappedSeq(name)
-}

@@ -9,11 +9,10 @@ import java.io.File
 final class DocBookHtmlContent[S <: Site[S]](
   inputFile: File,
   resolver: Resolver
-) extends org.opentorah.site.HtmlContent[S] {
+) extends org.opentorah.site.HtmlContent[S]:
 
   override def htmlHeadTitle: Option[String] = None // TODO
 
   // TODO Caching.Parser?
   override def content(site: S): Parser[ScalaXml.Element] =
     ZIO.succeed(DocBook.loadFromFile(inputFile, Some(resolver))) // TODO real Parser
-}

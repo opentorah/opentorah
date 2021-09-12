@@ -18,7 +18,7 @@ package org.opentorah.xml
   If there is no default namespace declaration in scope, the namespace name has no value.
   The namespace name for an unprefixed attribute name always has no value.
 */
-sealed trait Namespace {
+sealed trait Namespace derives CanEqual:
 
   def getUri: Option[String]
 
@@ -30,49 +30,43 @@ sealed trait Namespace {
 
   override def toString: String = attributeValue.toString
 
-  override def equals(other: Any): Boolean = other match {
-    case that: Namespace => (this.getUri == that.getUri) && (this.getPrefix == that.getPrefix)
-    case _ => false
-  }
+  override def equals(other: Any): Boolean =
+    val that = other.asInstanceOf[Namespace]
+    (this.getUri == that.getUri) && (this.getPrefix == that.getPrefix)
 
   final def isDefault: Boolean = getPrefix.isEmpty
 
-  final def default: Namespace = if (isDefault) this else Namespace(prefix = None, uri = getUri)
+  final def default: Namespace = if isDefault then this else Namespace(prefix = None, uri = getUri)
 
   // Note: empty string attribute name is used for default namespace attributes;
   // it is processed specially by Namespace.Xmlns.qName()
   final def attribute: Attribute.Optional[String] =
-    new Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
+    Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
-}
 
-object Namespace {
+object Namespace:
 
-  final class Prefixed(prefix: String, override val uri: String) extends Namespace {
+  final class Prefixed(prefix: String, override val uri: String) extends Namespace:
     require((prefix != null) && prefix.nonEmpty)
     require((uri != null) && uri.nonEmpty)
 
     override def getPrefix: Option[String] = Some(prefix)
     override def getUri: Option[String] = Some(uri)
-    override def qName(localName: String): String = {
+    override def qName(localName: String): String =
       require(localName.nonEmpty)
       prefix + ":" + localName
-    }
-  }
 
-  final class Default(override val uri: String) extends Namespace {
+  final class Default(override val uri: String) extends Namespace:
     require((uri != null) && uri.nonEmpty)
 
     override def getPrefix: Option[String] = None
     override def getUri: Option[String] = Some(uri)
-    override def qName(localName: String): String = {
+    override def qName(localName: String): String =
       require(localName.nonEmpty)
       localName
-    }
-  }
 
-  object Xmlns extends Namespace {
+  object Xmlns extends Namespace:
     val prefix: String = "xmlns"
     override def getPrefix: Option[String] = Some(prefix)
     override def uri: String = "http://www.w3.org/2000/xmlns/"
@@ -80,30 +74,26 @@ object Namespace {
 
     // Note: empty string attribute name is used for default namespace attributes.
     def qName(localName: String): String =
-      prefix + (if (localName.isEmpty) "" else ":" + localName)
-  }
+      prefix + (if localName.isEmpty then "" else ":" + localName)
 
-  object No extends Namespace {
+  object No extends Namespace:
     override def toString: String = "<No Namespace>"
     override def getPrefix: Option[String] = None
     override def getUri: Option[String] = None
     override def uri: String = getUri.get
 
-    def qName(localName: String): String = {
+    def qName(localName: String): String =
       require(localName.nonEmpty)
       localName
-    }
-  }
 
   def apply(
     prefix: Option[String],
     uri: Option[String]
   ): Namespace =
-    if (prefix.isEmpty && uri.isEmpty) No else
-    if (prefix.isEmpty && uri.isDefined) new Default(uri.get) else
-    if (uri.isDefined) new Prefixed(prefix.get, uri.get) else {
-      throw new IllegalArgumentException(s"prefix [${prefix.get}] without uri!")
-    }
+    if prefix.isEmpty && uri.isEmpty then No else
+    if prefix.isEmpty && uri.isDefined then Default(uri.get) else
+    if uri.isDefined then Prefixed(prefix.get, uri.get) else
+      throw IllegalArgumentException(s"prefix [${prefix.get}] without uri!")
 
 
   def apply(
@@ -113,4 +103,3 @@ object Namespace {
     prefix = Option(prefix),
     uri = Option(uri)
   )
-}

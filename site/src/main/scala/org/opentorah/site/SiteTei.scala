@@ -9,8 +9,8 @@ class SiteTei(
   val calendarDesc: Option[CalendarDesc.Value]
 )
 
-object SiteTei extends Element[SiteTei]("tei") {
-  val empty: SiteTei = new SiteTei(
+object SiteTei extends Element[SiteTei]("tei"):
+  val empty: SiteTei = SiteTei(
     facsimilesUrl = None,
     sourceDesc = None,
     calendarDesc = None
@@ -18,12 +18,12 @@ object SiteTei extends Element[SiteTei]("tei") {
 
   private val facsimilesUrlAttribute: Attribute.Optional[String] = Attribute("facsimilesUrl").optional
 
-  override def contentParsable: Parsable[SiteTei] = new Parsable[SiteTei] {
-    override def parser: Parser[SiteTei] = for {
-      facsimilesUrl <- facsimilesUrlAttribute()
-      sourceDesc <- SourceDesc.element.optional()
-      calendarDesc <- CalendarDesc.element.optional()
-    } yield new SiteTei(
+  override def contentParsable: Parsable[SiteTei] = new Parsable[SiteTei]:
+    override def parser: Parser[SiteTei] = for
+      facsimilesUrl: Option[String] <- facsimilesUrlAttribute()
+      sourceDesc: Option[SourceDesc.Value] <- SourceDesc.element.optional()
+      calendarDesc: Option[CalendarDesc.Value] <- CalendarDesc.element.optional()
+    yield SiteTei(
       facsimilesUrl,
       sourceDesc,
       calendarDesc
@@ -34,5 +34,3 @@ object SiteTei extends Element[SiteTei]("tei") {
       SourceDesc.element.optional(_.sourceDesc),
       CalendarDesc.element.optional(_.calendarDesc),
     )
-  }
-}

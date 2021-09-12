@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
-import org.opentorah.tei.{Entity => TeiEntity}
+import org.opentorah.tei.{Entity as TeiEntity}
 import org.opentorah.store.{By, Caching, Directory, Selector}
 import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
@@ -14,31 +14,30 @@ final class Entities(
   directory,
   "xml",
   Entity,
-  new Entities.All(_)
-) with By with HtmlContent [Collector] {
+  Entities.All(_)
+), By, HtmlContent [Collector]:
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map { allEntities =>
+  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
     <list>
       {Entity.sort(allEntities).map(entity => Entity.line(entity, collector))}
     </list>
-  }
-}
+  )
 
-object Entities extends Element[Entities]("entities") {
+object Entities extends Element[Entities]("entities"):
 
   final class All(name2entry: Map[String, Entity]) extends Directory.Wrapper[Entity](name2entry)
 
-  override def contentParsable: Parsable[Entities] = new Parsable[Entities] {
-    override def parser: Parser[Entities] = for {
-      fromUrl <- Element.currentFromUrl
-      selector <- By.selectorParser
-      directory <- Directory.directoryAttribute()
-    } yield new Entities(
+  override def contentParsable: Parsable[Entities] = new Parsable[Entities]:
+    override def parser: Parser[Entities] = for
+      fromUrl: FromUrl <- Element.currentFromUrl
+      selector: Selector <- By.selectorParser
+      directory: String <- Directory.directoryAttribute()
+    yield Entities(
       fromUrl,
       selector,
       directory
@@ -48,5 +47,3 @@ object Entities extends Element[Entities]("entities") {
       By.selectorUnparser,
       Directory.directoryAttribute(_.directory)
     )
-  }
-}

@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 trait TreiAsar extends LateProphets
 
-object TreiAsar {
+object TreiAsar:
 
   case object Hosea extends TreiAsar
   case object Joel extends TreiAsar
@@ -19,4 +19,3 @@ object TreiAsar {
 
   val all: Seq[TreiAsar] = Seq(Hosea, Joel, Amos, Obadiah, Jonah, Micah,
     Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi)
-}

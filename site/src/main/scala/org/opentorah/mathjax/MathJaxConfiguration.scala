@@ -1,34 +1,31 @@
 package org.opentorah.mathjax
 
-final case class MathJaxConfiguration(
-  displayMessages: Boolean = false, // determines whether Message.Set() calls are logged
-  displayErrors: Boolean = true, // determines whether error messages are shown on the console
-  undefinedCharError: Boolean = false, // determines whether "unknown characters" (i.e., no glyph in the configured fonts) are saved in the error array
-  extensions: List[String] = List.empty, // a convenience option to add MathJax extensions; example: 'Safe,TeX/noUndefined'
-  fontURL: String = MathJaxConfiguration.fontURL, // for webfont urls in the CSS for HTML output
-  font: String = MathJaxConfiguration.defaultFont,
+final class MathJaxConfiguration(
+  val displayMessages: Boolean = false, // determines whether Message.Set() calls are logged
+  val displayErrors: Boolean = true, // determines whether error messages are shown on the console
+  val undefinedCharError: Boolean = false, // determines whether "unknown characters" (i.e., no glyph in the configured fonts) are saved in the error array
+  val extensions: List[String] = List.empty, // a convenience option to add MathJax extensions; example: 'Safe,TeX/noUndefined'
+  val fontURL: String = MathJaxConfiguration.fontURL, // for webfont urls in the CSS for HTML output
+  val font: String = MathJaxConfiguration.defaultFont,
 
   // paths: Map[String, String] = Map.empty,  // configures custom path variables (e.g., for third party extensions, cf. test/config-third-party-extensions.js)
 
-  texDelimiters: Seq[Delimiters] = Seq(new Delimiters("$$", "$$"), new Delimiters("\\[", "\\]")),
-  texInlineDelimiters: Seq[Delimiters] = Seq(new Delimiters("$", "$"), new Delimiters("\\(", "\\)")),
-  asciiMathDelimiters: Seq[Delimiters] = Seq(new Delimiters("`", "`")),
-  processEscapes: Boolean = true
-) {
+  val texDelimiters: Seq[Delimiters] = Seq(new Delimiters("$$", "$$"), new Delimiters("\\[", "\\]")),
+  val texInlineDelimiters: Seq[Delimiters] = Seq(new Delimiters("$", "$"), new Delimiters("\\(", "\\)")),
+  val asciiMathDelimiters: Seq[Delimiters] = Seq(new Delimiters("`", "`")),
+  val processEscapes: Boolean = true
+):
 
-  if (!MathJaxConfiguration.fonts.contains(font)) {
+  if !MathJaxConfiguration.fonts.contains(font) then
     val knownFonts: String = MathJaxConfiguration.fonts.mkString(", ")
-    throw new IllegalArgumentException(s"Unknown MathJax font $font; known fonts are: $knownFonts")
-  }
+    throw IllegalArgumentException(s"Unknown MathJax font $font; known fonts are: $knownFonts")
 
-  {
     val starts: Seq[String] = (texDelimiters ++ texInlineDelimiters ++ asciiMathDelimiters).map(_.start)
-    if (starts.toSet.size != starts.size) throw new IllegalArgumentException(s"Duplicate start delimiters")
-  }
+    if starts.toSet.size != starts.size then throw IllegalArgumentException(s"Duplicate start delimiters")
 
-  def allDelimiters: Seq[DelimitersAndInput] = {
+  def allDelimiters: Seq[DelimitersAndInput] =
     def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
-      for (delimiters <- values) yield new DelimitersAndInput(delimiters, input)
+      for delimiters <- values yield new DelimitersAndInput(delimiters, input)
 
     val result: Seq[DelimitersAndInput] =
       withInput(texDelimiters, Input.Tex) ++
@@ -36,10 +33,8 @@ final case class MathJaxConfiguration(
       withInput(asciiMathDelimiters, Input.AsciiMath)
 
     result.sortWith((l: DelimitersAndInput, r: DelimitersAndInput) => l.start.length > r.start.length)
-  }
-}
 
-object MathJaxConfiguration {
+object MathJaxConfiguration:
 
   val fontURL: String = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/fonts/HTML-CSS"
 
@@ -53,4 +48,3 @@ object MathJaxConfiguration {
   val inputs: List[String] = List("input/TeX", "input/AsciiMath", "input/MathML")
 
   val texExtensions: List[String] = List("AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js")
-}

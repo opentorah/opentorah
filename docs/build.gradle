@@ -9,8 +9,8 @@ compileSass {
 
   version = '1.34.0'
 
-  sourceDir = project.file ("$projectDir/sass")
-  outputDir = project.file ("$projectDir/css")
+  sourceDir = project.file("$projectDir/sass")
+  outputDir = project.file("$projectDir/css")
 }
 site.dependsOn(compileSass)
 

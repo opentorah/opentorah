@@ -12,7 +12,7 @@ final class Hierarchy(
   override val storeAbstract: Option[Abstract.Value],
   override val body: Option[Body.Value],
   val by: ByHierarchy
-) extends Hierarchical with FromUrl.With {
+) extends Hierarchical, FromUrl.With:
 
   override def storesPure: Seq[ByHierarchy] = Seq(by)
 
@@ -20,19 +20,18 @@ final class Hierarchy(
 
   override protected def innerContent(collector: Collector): Parser[ScalaXml.Element] =
     ZIO.succeed(by.oneLevelIndex(collector))
-}
 
-object Hierarchy extends Element[Hierarchy]("store") {
+object Hierarchy extends Element[Hierarchy]("store"):
 
-  override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy] {
-    override def parser: Parser[Hierarchy] = for {
-      fromUrl <- Element.currentFromUrl
-      names <- Names.withDefaultNameParsable()
-      title <- Title.element.required()
-      storeAbstract <- Abstract.element.optional()
-      body <- Body.element.optional()
-      by <- ByHierarchy.followRedirects.required()
-    } yield new Hierarchy(
+  override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy]:
+    override def parser: Parser[Hierarchy] = for
+      fromUrl: FromUrl <- Element.currentFromUrl
+      names: Names <- Names.withDefaultNameParsable()
+      title: Title.Value <- Title.element.required()
+      storeAbstract: Option[Abstract.Value] <- Abstract.element.optional()
+      body: Option[Body.Value] <- Body.element.optional()
+      by: ByHierarchy <- ByHierarchy.followRedirects.required()
+    yield Hierarchy(
       fromUrl,
       names,
       title,
@@ -48,5 +47,3 @@ object Hierarchy extends Element[Hierarchy]("store") {
       Body.element.optional(_.body),
       ByHierarchy.required(_.by)
     )
-  }
-}

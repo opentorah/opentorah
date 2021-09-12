@@ -1,6 +1,6 @@
 package org.opentorah.xml
 
-abstract class Element[A](val elementName: String) extends Elements[A] {
+abstract class Element[A](val elementName: String) extends Elements[A]:
 
   override def toString: String = s"element '$elementName' [$contentType]"
 
@@ -9,11 +9,11 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
   def contentParsable: Parsable[A]
 
   final override protected def elementByName(elementName: String): Option[Element[A]] =
-    if (this.elementName != elementName) None else Some(this)
+    if this.elementName != elementName then None else Some(this)
 
-  override protected def elementByValue(value: A): Element[_] = this
+  override protected def elementByValue(value: A): Element[?] = this
 
-  final override protected def mapParser(element: Element[_], parser: Parser[_]): Parser[A] =
+  final override protected def mapParser(element: Element[?], parser: Parser[?]): Parser[A] =
     parser.asInstanceOf[Parser[A]]
 
   override def xmlElement(value: A): ScalaXml.Element =
@@ -24,15 +24,13 @@ abstract class Element[A](val elementName: String) extends Elements[A] {
       label = elementName,
       child = contentParsable.unparser.content(value)
     )
-}
 
-object Element {
+object Element:
   def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
 
-  val nodes: Parsable[ScalaXml.Nodes] = new Parsable[ScalaXml.Nodes] {
+  val nodes: Parsable[ScalaXml.Nodes] = new Parsable[ScalaXml.Nodes]:
     override protected def parser: Parser[ScalaXml.Nodes] = Context.allNodes
     override def unparser: Unparser[ScalaXml.Nodes] = Unparser[ScalaXml.Nodes](content = identity)
-  }
 
 //  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {
 //    final def withRedirect(fromUrl: FromUrl.With, follow: Boolean): Elements[A] = new Elements[A] {
@@ -54,4 +52,3 @@ object Element {
 //      children = Seq.empty
 //    )
 //  }
-}

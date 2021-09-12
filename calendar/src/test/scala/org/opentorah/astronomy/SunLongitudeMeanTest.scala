@@ -5,7 +5,7 @@ import org.opentorah.calendar.jewish.Sun
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class SunLongitudeMeanTest extends AnyFlatSpec with Matchers {
+class SunLongitudeMeanTest extends AnyFlatSpec, Matchers:
 
   behavior of "Mean Sun Longitude"
 
@@ -28,4 +28,3 @@ class SunLongitudeMeanTest extends AnyFlatSpec with Matchers {
     assert(SunLongitudeMean.rambamValue *(Sun.RavAda.yearLength.toRational, Angles.maxLength) > Angles.period)
     assert(SunLongitudeMean.rambamValue *(Sun.Shmuel.yearLength.toRational, Angles.maxLength) > Angles.period)
   }
-}

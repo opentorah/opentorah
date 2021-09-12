@@ -2,39 +2,38 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Xml}
 
-final case class Pb(
-  n: String,
-  id: Option[String],
-  facs: Option[String],
-  isMissing: Boolean = false,
-  isEmpty: Boolean = false
-) {
+final class Pb(
+  val n: String,
+  val id: Option[String],
+  val facs: Option[String],
+  val isMissing: Boolean = false,
+  val isEmpty: Boolean = false
+):
   def addAttributes(element: ScalaXml.Element): ScalaXml.Element = ScalaXml.setAttributes(ScalaXml.getAttributes(element) ++ Seq(
     Pb.missingAttribute.withValue(isMissing),
     Pb.emptyAttribute.withValue(isEmpty)
   ), element)
-}
 
-object Pb extends Element[Pb]("pb") {
+object Pb extends Element[Pb]("pb"):
 
   def pageId(n: String): String = s"p$n"
 
   val nAttribute: Attribute.Required[String] = Attribute("n").required
   private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
-  private val missingAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("missing").orDefault
-  private val emptyAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("empty").orDefault
+  private val missingAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("missing").orDefault
+  private val emptyAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("empty").orDefault
   private val facsAttribute: Attribute.Optional[String] = Attribute("facs").optional
 
   override def contentType: ContentType = ContentType.Empty
 
-  override def contentParsable: Parsable[Pb] = new Parsable[Pb] {
-    override val parser: Parser[Pb] = for {
-      n <- nAttribute()
-      id <- idAttribute()
-      facs <- facsAttribute()
-      isMissing <- missingAttribute()
-      isEmpty <- emptyAttribute()
-    } yield new Pb(
+  override def contentParsable: Parsable[Pb] = new Parsable[Pb]:
+    override val parser: Parser[Pb] = for
+      n: String <- nAttribute()
+      id: Option[String] <- idAttribute()
+      facs: Option[String] <- facsAttribute()
+      isMissing: Boolean <- missingAttribute()
+      isEmpty: Boolean <- emptyAttribute()
+    yield Pb(
       n,
       id,
       facs,
@@ -49,5 +48,3 @@ object Pb extends Element[Pb]("pb") {
       missingAttribute(_.isMissing),
       emptyAttribute(_.isEmpty)
     )
-  }
-}

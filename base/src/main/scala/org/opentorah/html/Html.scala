@@ -2,7 +2,7 @@ package org.opentorah.html
 
 import org.opentorah.xml.{Attribute, Dialect, Doctype, Namespace}
 
-object Html extends Dialect with Doctype {
+object Html extends Dialect, Doctype:
 
   override val namespace: Namespace = Namespace(uri="http://www.w3.org/1999/xhtml", prefix="xhtml")
 
@@ -17,4 +17,3 @@ object Html extends Dialect with Doctype {
   val reservedElements: Set[String] = Set("head", "body")
 
   val reservedAttributes: Set[String] = Set("class", "target", "lang")
-}

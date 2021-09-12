@@ -6,11 +6,11 @@ import org.opentorah.util.Util
 import org.opentorah.xml.{Sax, Saxon}
 import org.slf4j.{Logger, LoggerFactory}
 
-object Fop {
+object Fop:
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  private val dateFormat: java.text.DateFormat = new java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
+  private val dateFormat: java.text.DateFormat = java.text.SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy")
 
   // To enable mathematics typesetting in Fop.run(), pass in plugin = Some(plugin), where plugin is
   // - for MathJax: new MathJaxFopPlugin(Mathematics.getMathJax(...))
@@ -26,7 +26,7 @@ object Fop {
     inputFile: File,
     outputFile: File,
     plugin: Option[FopPlugin] = None
-  ): Unit = {
+  ): Unit =
     logger.debug(
       s"""Fop.run(
          |  configurationFile = $configurationFile,
@@ -60,7 +60,6 @@ object Fop {
       inputFile,
       outputFile
     )
-  }
 
   private def setPdfMetadata(
     foUserAgent: FOUserAgent,
@@ -69,18 +68,17 @@ object Fop {
     title: Option[String],
     subject: Option[String],
     keywords: Option[String]
-  ): Unit = {
+  ): Unit =
     foUserAgent.setCreator(Util.applicationString)
-    creationDate.foreach { creationDate =>
+    creationDate.foreach(creationDate =>
       val value: java.util.Date = dateFormat.parse(creationDate)
       foUserAgent.setCreationDate(value)
-    }
+    )
 
     foUserAgent.setAuthor(author.orNull)
     foUserAgent.setTitle(title.orNull)
     foUserAgent.setSubject(subject.orNull)
     foUserAgent.setKeywords(keywords.orNull)
-  }
 
   private def run(
     saxon: Saxon,
@@ -88,20 +86,17 @@ object Fop {
     foUserAgent: FOUserAgent,
     inputFile: File,
     outputFile: File
-  ): Unit = {
-    val outputStream: OutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
+  ): Unit =
+    val outputStream: OutputStream = BufferedOutputStream(FileOutputStream(outputFile))
     val fop: org.apache.fop.apps.Fop = fopFactory.newFop("application/pdf", foUserAgent, outputStream)
 
-    try {
+    try
       saxon.transform(
         filters = Seq.empty,
         resolver = None,
         stylesheetFile = None,
         inputSource = Sax.file2inputSource(inputFile),
-        result = new javax.xml.transform.sax.SAXResult(fop.getDefaultHandler)
+        result = javax.xml.transform.sax.SAXResult(fop.getDefaultHandler)
       )
-    } finally {
+    finally
       outputStream.close()
-    }
-  }
-}

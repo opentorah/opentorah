@@ -3,7 +3,7 @@ package org.opentorah.metadata
 import org.opentorah.util.Util
 import org.opentorah.xml.{From, Parser}
 
-trait NamedCompanion {
+trait NamedCompanion:
   // TODO try pushing
   //     final override def names: Names = toNames(this)
   // into the base class of the Key...
@@ -30,19 +30,17 @@ trait NamedCompanion {
 
   final def forDefaultName(name: String): Option[Key] = values.find(_.name == name)
 
-  final def getForDefaultName(name: String): Key = {
+  final def getForDefaultName(name: String): Key =
     val result = forDefaultName(name)
     require(result.isDefined, s"Unknown $what: $name")
     result.get
-  }
 
   final def forName(name: String): Option[Key] = values.find(_.names.hasName(name))
 
-  final def getForName(name: String): Key = {
+  final def getForName(name: String): Key =
     val result = forName(name)
     require(result.isDefined, s"Unknown $what: $name")
     result.get
-  }
 
   final def numberOfValues: Int = values.length
 
@@ -55,4 +53,3 @@ trait NamedCompanion {
   final def distance(from: Key, to: Key): Int = indexOf(to) - indexOf(from)
 
   final val ordering: Ordering[Key] = (x: Key, y: Key) => distance(x, y)
-}

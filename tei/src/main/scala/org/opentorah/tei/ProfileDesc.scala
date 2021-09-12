@@ -2,20 +2,39 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Element, Elements, Parsable, Parser}
 
-final case class ProfileDesc(
-  documentAbstract: Option[Abstract.Value],
-  creation: Option[Creation],
-  langUsage: Option[LangUsage],
-  textClass: Option[TextClass.Value],
-  correspDesc: Option[CorrespDesc.Value],
-  calendarDesc: Option[CalendarDesc.Value],
-  handNotes: Option[HandNotes],
-  listTranspose: Option[ListTranspose.Value]
-)
+final class ProfileDesc(
+  val documentAbstract: Option[Abstract.Value],
+  val creation: Option[Creation],
+  val langUsage: Option[LangUsage],
+  val textClass: Option[TextClass.Value],
+  val correspDesc: Option[CorrespDesc.Value],
+  val calendarDesc: Option[CalendarDesc.Value],
+  val handNotes: Option[HandNotes],
+  val listTranspose: Option[ListTranspose.Value]
+):
+  def copy(
+    documentAbstract: Option[Abstract.Value] = documentAbstract,
+    creation: Option[Creation] = creation,
+    langUsage: Option[LangUsage] = langUsage,
+    textClass: Option[TextClass.Value] = textClass,
+    correspDesc: Option[CorrespDesc.Value] = correspDesc,
+    calendarDesc: Option[CalendarDesc.Value] = calendarDesc,
+    handNotes: Option[HandNotes] = handNotes,
+    listTranspose: Option[ListTranspose.Value] = listTranspose
+  ): ProfileDesc = ProfileDesc(
+    documentAbstract,
+    creation,
+    langUsage,
+    textClass,
+    correspDesc,
+    calendarDesc,
+    handNotes,
+    listTranspose
+  )
 
-object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
+object ProfileDesc extends Element[ProfileDesc]("profileDesc"):
 
-  def empty: ProfileDesc = new ProfileDesc(
+  def empty: ProfileDesc = ProfileDesc(
     documentAbstract = None,
     creation = None,
     langUsage = None,
@@ -26,8 +45,8 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
     listTranspose = None
   )
 
-  override def contentParsable: Parsable[ProfileDesc] = new Parsable[ProfileDesc] {
-    override val parser: Parser[ProfileDesc] = for {
+  override def contentParsable: Parsable[ProfileDesc] = new Parsable[ProfileDesc]:
+    override val parser: Parser[ProfileDesc] = for
       values <- Elements.choices(Seq(
         Abstract.element,
         Creation,
@@ -38,15 +57,15 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
         HandNotes,
         ListTranspose.element
       ))
-      documentAbstract <- values.optional(Abstract.element)
-      creation <- values.optional(Creation)
-      langUsage <- values.optional(LangUsage)
-      textClass <- values.optional(TextClass.element)
-      correspDesc <- values.optional(CorrespDesc.element)
-      calendarDesc <- values.optional(CalendarDesc.element)
-      handNotes <- values.optional(HandNotes)
-      listTranspose <- values.optional(ListTranspose.element)
-    } yield new ProfileDesc(
+      documentAbstract: Option[Abstract.Value] <- values.optional(Abstract.element)
+      creation: Option[Creation] <- values.optional(Creation)
+      langUsage: Option[LangUsage] <- values.optional(LangUsage)
+      textClass: Option[TextClass.Value] <- values.optional(TextClass.element)
+      correspDesc: Option[CorrespDesc.Value] <- values.optional(CorrespDesc.element)
+      calendarDesc: Option[CalendarDesc.Value] <- values.optional(CalendarDesc.element)
+      handNotes: Option[HandNotes] <- values.optional(HandNotes)
+      listTranspose: Option[ListTranspose.Value] <- values.optional(ListTranspose.element)
+    yield ProfileDesc(
       documentAbstract,
       creation,
       langUsage,
@@ -67,5 +86,3 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc") {
       HandNotes.optional(_.handNotes),
       ListTranspose.element.optional(_.listTranspose)
     )
-  }
-}

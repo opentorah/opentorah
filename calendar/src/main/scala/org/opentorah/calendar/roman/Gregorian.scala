@@ -1,8 +1,8 @@
 package org.opentorah.calendar.roman
 
-import java.util.{GregorianCalendar, Calendar => Cal}
+import java.util.{GregorianCalendar, Calendar as Cal}
 
-object Gregorian extends Roman {
+object Gregorian extends Roman:
 
   override protected def yearFirstDayCorrection(yearNumber: Int): Int =
     (yearNumber - 1)/4 - (yearNumber - 1)/100 + (yearNumber - 1)/400
@@ -22,7 +22,7 @@ object Gregorian extends Roman {
 //    length = maxLength
 //  )
 
-  def now: Gregorian.Moment = {
+  def now: Gregorian.Moment =
     val value: GregorianCalendar = new GregorianCalendar
     Gregorian
       .Year(value.get(Cal.YEAR))
@@ -31,5 +31,3 @@ object Gregorian extends Roman {
       .hours(value.get(Cal.HOUR_OF_DAY))
       .minutes(value.get(Cal.MINUTE))
       .secondsAndMilliseconds(value.get(Cal.SECOND), value.get(Cal.MILLISECOND))
-  }
-}

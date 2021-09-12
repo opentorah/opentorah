@@ -6,14 +6,13 @@ import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
 
 // TODO make Tanach a Store in Texts!
-object Tanach extends NamedCompanion with Stores.Pure {
+object Tanach extends NamedCompanion, Stores.Pure:
 
   override val values: Seq[Book] = Chumash.all ++ Nach.all
 
-  final class ByBook extends By with Stores.Pure {
+  final class ByBook extends By, Stores.Pure:
     override def selector: Selector = Selector.byName("book")
     override def storesPure: Seq[Book] = values
-  }
 
   override def storesPure: Seq[ByBook] = Seq(new ByBook)
 
@@ -34,7 +33,7 @@ object Tanach extends NamedCompanion with Stores.Pure {
 
   private val book2metadata: Map[Book, BookMetadata] = Collections.mapValues(metadata)(metadata => Parser.unsafeRun(metadata.resolve))
 
-  trait Book extends Store.NonTerminal with Stores.Pure {
+  trait Book extends Store.NonTerminal, Stores.Pure:
     final def chapters: Chapters = book2chapters(this)
 
     override def storesPure: Seq[Store.NonTerminal] = Seq(chapters)
@@ -42,11 +41,10 @@ object Tanach extends NamedCompanion with Stores.Pure {
     def parser(names: Names, chapters: Chapters): Parser[Parsed]
 
     def metadata: BookMetadata = forBook(this)
-  }
 
   override type Key = Book
 
-  class BookMetadata(
+  open class BookMetadata(
     val book: Book
   )
 
@@ -56,20 +54,16 @@ object Tanach extends NamedCompanion with Stores.Pure {
     val book: Book,
     val names: Names,
     val chapters: Chapters
-  ) {
+  ):
     def resolve: Parser[BookMetadata]
-  }
 
-  private object Parsed extends Element[Parsed]("book") {
-    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed] {
-      override def parser: Parser[Parsed] = for {
-        names <- Names.withDefaultNameParsable()
-        chapters <- Chapters.parser
-        book <- Named.find[Book](values, names)
-        result <- book.parser(names, chapters)
-      } yield result
+  private object Parsed extends Element[Parsed]("book"):
+    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
+      override def parser: Parser[Parsed] = for
+        names: Names <- Names.withDefaultNameParsable()
+        chapters: Chapters <- Chapters.parser
+        book: Book <- Named.find[Book](values.toIndexedSeq, names)
+        result: Parsed <- book.parser(names, chapters)
+      yield result
 
       override def unparser: Unparser[Parsed] = ???
-    }
-  }
-}

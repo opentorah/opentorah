@@ -14,15 +14,15 @@ final class Layout(
   val buildDir: File,
   catalogDirectoryOverride: Option[File],
   outputRootOverride: Option[File]
-) {
+):
   // frameworks
-  private def frameworkDirectory(name: String): File = new File(frameworksDir, name)
+  private def frameworkDirectory(name: String): File = File(frameworksDir, name)
   val nodeRoot: File = frameworkDirectory("nodejs")
   val j2v8LibraryDirectory: File = frameworkDirectory("j2v8library")
   val docBookXslDirectory: File = Files.file(frameworksDir, Seq("docbook"))
 
   // build/
-  private def buildDirectory(name: String): File = new File(buildDir, name)
+  private def buildDirectory(name: String): File = File(buildDir, name)
   // src/main/
   private def sourceDirectory(name: String): File = Files.file(projectDir, Seq("src", "main", name))
 
@@ -39,11 +39,10 @@ final class Layout(
   val intermediateRoot: File = buildDirectory("docBookTmp")
   val outputRoot: File = outputRootOverride.getOrElse(buildDirectory("docBook"))
 
-  def forDocument(prefixed: Boolean, documentName: String): Layout.ForDocument = new Layout.ForDocument(prefixed, documentName) {
+  def forDocument(prefixed: Boolean, documentName: String): Layout.ForDocument = new Layout.ForDocument(prefixed, documentName):
     override protected def inputDirectory: File = Layout.this.inputDirectory
     override protected def stylesheetDirectory: File = Layout.this.stylesheetDirectory
-    override protected def root(isIntermediate: Boolean): File = if (isIntermediate) intermediateRoot else outputRoot
-  }
+    override protected def root(isIntermediate: Boolean): File = if isIntermediate then intermediateRoot else outputRoot
 
   // build/data
   val dataDirectory: File = buildDirectory("data")
@@ -54,7 +53,7 @@ final class Layout(
   // src/main/css/
   val cssDirectoryName: String = "css"
   val cssDirectory: File = sourceDirectory(cssDirectoryName)
-  def cssFile(name: String): File = new File(cssDirectory, name + ".css")
+  def cssFile(name: String): File = File(cssDirectory, name + ".css")
   def cssFileRelativeToOutputDirectory(name: String): String = cssDirectoryName + "/" + name + ".css" // TODO eliminate
 
   // src/main/images/
@@ -64,26 +63,25 @@ final class Layout(
   // src/main/fop/
   val fopConfigurationDirectory: File = sourceDirectory("fop")
   // FOP configuration file is the same for XSLT 1.0 and 2.0
-  val fopConfigurationFile: File = new File(fopConfigurationDirectory, "fop.xconf")
+  val fopConfigurationFile: File = File(fopConfigurationDirectory, "fop.xconf")
 
   // src/main/xsl/
   val stylesheetDirectory: File = sourceDirectory("xsl")
-  def stylesheetFile(name: String) = new File(stylesheetDirectory, name)
+  def stylesheetFile(name: String) = File(stylesheetDirectory, name)
   def customStylesheet(commonSection: CommonSection): String = commonSection.name + "-custom.xsl"
   def customStylesheet(variant: Variant): String = variant.fullName + "-custom.xsl"
   def paramsStylesheet(variant: Variant): String = variant.fullName + "-params.xsl"
-}
 
-object Layout {
-  def buildDir(root: File): File = new File(root, "build")
+object Layout:
+  def buildDir(root: File): File = File(root, "build")
 
-  def buildDirectory(root: File, name: String): File = new File(buildDir(root), name)
+  def buildDirectory(root: File, name: String): File = File(buildDir(root), name)
 
   def forRoot(
     root: File,
     catalogDirectoryOverride: Option[File] = None,
     outputRootOverride: Option[File] = None
-  ): Layout = new Layout(
+  ): Layout = Layout(
     frameworksDir = buildDir(root),
     projectDir = root,
     buildDir = buildDir(root),
@@ -92,15 +90,15 @@ object Layout {
   )
 
   def forCurrent: Layout =
-    forRoot(new File(".").getAbsoluteFile.getParentFile)
+    forRoot(File(".").getAbsoluteFile.getParentFile)
 
-  abstract class ForDocument(prefixed: Boolean, documentName: String) {
+  abstract class ForDocument(prefixed: Boolean, documentName: String):
     final def mainStylesheetFile(variant: Variant): File =
-      stylesheetFile(variant.fullName + (if (!prefixed) "" else "-" + documentName) + ".xsl")
+      stylesheetFile(variant.fullName + (if !prefixed then "" else "-" + documentName) + ".xsl")
 
-    final def inputFile: File = new File(inputDirectory, documentName + ".xml")
+    final def inputFile: File = File(inputDirectory, documentName + ".xml")
 
-    private def stylesheetFile(name: String) = new File(stylesheetDirectory, name)
+    private def stylesheetFile(name: String) = File(stylesheetDirectory, name)
 
     final def saxonOutputDirectory(variant: Variant): File = outputDirectory(variant, isSaxon = true)
 
@@ -109,10 +107,10 @@ object Layout {
     private def outputDirectory(variant: Variant, isSaxon: Boolean): File =
       outputDirectory(isIntermediate(variant, isSaxon), variant.fullName)
 
-    def outputDirectory(isIntermediate: Boolean, name: String): File = new File(
+    def outputDirectory(isIntermediate: Boolean, name: String): File = File(
       Files.prefixedDirectory(
         directory = root(isIntermediate),
-        prefix = if (!prefixed) None else Some(documentName)
+        prefix = if !prefixed then None else Some(documentName)
       ),
       name
     )
@@ -121,7 +119,7 @@ object Layout {
 
     final def outputFile(variant: Variant): File = outputFile(variant, isSaxon = false)
 
-    private def outputFile(variant: Variant, isSaxon: Boolean): File = new File(
+    private def outputFile(variant: Variant, isSaxon: Boolean): File = File(
       outputDirectory(variant, isSaxon),
       variant.docBook2.rootFileNameWithExtension(documentName, isIntermediate(variant, isSaxon))
     )
@@ -134,5 +132,3 @@ object Layout {
     protected def stylesheetDirectory: File
 
     protected def root(isIntermediate: Boolean): File
-  }
-}

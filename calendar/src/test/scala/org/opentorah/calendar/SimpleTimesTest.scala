@@ -6,7 +6,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+final class SimpleTimesTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers:
 
   private def Digit: TimesDigits.type = TimesDigits
 
@@ -99,11 +99,10 @@ final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChe
   }
 
   "fromRational()" should "be correct" in {
-    def test(value: Vector): Unit = {
+    def test(value: Vector): Unit =
       val rational = value.toRational
       val number = Vector.fromRational(rational, SimpleTimes.maxLength)
       number shouldBe value
-    }
 
     test(-Vector(3, 5))
     test(Vector(3))
@@ -155,4 +154,3 @@ final class SimpleTimesTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChe
     Vector(-3, 5, 4, 1).toString shouldBe "-2d18h1075p75m"
     (-Vector(0, 5, 4, 1)).toString shouldBe "-0d5h4p1m"
   }
-}

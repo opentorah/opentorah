@@ -9,25 +9,23 @@ import org.opentorah.util.Effects
 import org.opentorah.xml.{From, ScalaXml}
 import java.io.InputStreamReader
 import java.net.URL
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final class Markdown(
   val title: Option[String],
   val content: ScalaXml.Element
 )
 
-object Markdown {
+object Markdown:
 
-  def apply(url: URL): Markdown = {
+  def apply(url: URL): Markdown =
     val node: Node = parse(url)
 
-    val heading: Option[Heading] = {
+    val heading: Option[Heading] =
       val firstChild: Node = node.getFirstChild
-      if (!firstChild.isInstanceOf[Heading]) None else {
+      if !firstChild.isInstanceOf[Heading] then None else
         val result: Heading = firstChild.asInstanceOf[Heading]
-        if (result.getLevel != 1) None else Some(result)
-      }
-    }
+        if result.getLevel != 1 then None else Some(result)
 
     // Note: heading is removed from the ast in-place!
     heading.foreach(_.unlink)
@@ -36,15 +34,14 @@ object Markdown {
       title = heading.map(_.getText.toString),
       content = render(node)
     )
-  }
 
-  private def parse(url: URL): Node = parser.parseReader(new InputStreamReader(url.openStream()))
+  private def parse(url: URL): Node = parser.parseReader(InputStreamReader(url.openStream()))
 
   private def render(ast: Node): ScalaXml.Element = Effects.unsafeRun(
     From.string("flexmark", s"<div>${renderer.render(ast)}</div>").load
   )
 
-  private lazy val options: DataHolder = {
+  private lazy val options: DataHolder =
     val result: MutableDataSet = new MutableDataSet
 
     // uncomment to set optional extensions
@@ -54,7 +51,6 @@ object Markdown {
     //result.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
     result
-  }
 
   // You can re-use parser and renderer instances
   private lazy val parser: Parser = Parser
@@ -70,4 +66,3 @@ object Markdown {
       TocExtension.create
     ).asJava)
     .build
-}

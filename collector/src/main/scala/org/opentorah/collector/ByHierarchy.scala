@@ -7,7 +7,7 @@ final class ByHierarchy(
   override val fromUrl: FromUrl,
   override val selector: Selector,
   val hierarchyStores: Seq[Hierarchical]
-) extends By with Stores.Pure with FromUrl.With {
+) extends By, Stores.Pure, FromUrl.With:
 
   override def storesPure: Seq[Hierarchical] = hierarchyStores
 
@@ -18,7 +18,7 @@ final class ByHierarchy(
       <ul>{hierarchyStores.map(store => <li>{store.a(collector)(text = store.displayTitle)}</li>)}</ul>
     </p>
 
-  def treeIndex(collector: Collector): ScalaXml.Element = {
+  def treeIndex(collector: Collector): ScalaXml.Element =
     <div class="tree-index">
       <ul>
         <li><em>{Hierarchical.displayName(this)}</em></li>
@@ -32,17 +32,15 @@ final class ByHierarchy(
         </li>
       </ul>
     </div>
-  }
-}
 
-object ByHierarchy extends Element[ByHierarchy]("by") {
+object ByHierarchy extends Element[ByHierarchy]("by"):
 
-  override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy] {
-    override def parser: Parser[ByHierarchy] = for {
-      fromUrl <- Element.currentFromUrl
-      selector <- By.selectorParser
-      hierarchyStores <- Hierarchical.followRedirects.seq()
-    } yield new ByHierarchy(
+  override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy]:
+    override def parser: Parser[ByHierarchy] = for
+      fromUrl: FromUrl <- Element.currentFromUrl
+      selector: Selector <- By.selectorParser
+      hierarchyStores: Seq[Hierarchical] <- Hierarchical.followRedirects.seq()
+    yield ByHierarchy(
       fromUrl,
       selector,
       hierarchyStores
@@ -52,5 +50,3 @@ object ByHierarchy extends Element[ByHierarchy]("by") {
       By.selectorUnparser,
       Hierarchical.seq(_.hierarchyStores)
     )
-  }
-}

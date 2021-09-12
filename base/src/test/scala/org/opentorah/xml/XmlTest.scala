@@ -5,7 +5,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.net.URL
 
-final class XmlTest extends AnyFlatSpec with Matchers {
+final class XmlTest extends AnyFlatSpec, Matchers:
 
   def parseOrError[A](parser: Parser[A]): Either[Effects.Error, A] =
     Parser.unsafeRun(parser.either)
@@ -21,10 +21,9 @@ final class XmlTest extends AnyFlatSpec with Matchers {
       new Element[Option[String]]("a") {
         override def contentType: ContentType = ContentType.Elements
 
-        override def contentParsable: Parsable[Option[String]] = new Parsable[Option[String]] {
+        override def contentParsable: Parsable[Option[String]] = new Parsable[Option[String]]:
           override def parser: Parser[Option[String]] = Text().optional()
           override def unparser: Unparser[Option[String]] = ???
-        }
       }
         .parse(From.xml("test", <s>
           <a>asdjkh</a>
@@ -35,10 +34,9 @@ final class XmlTest extends AnyFlatSpec with Matchers {
       new Element[String]("a") {
         override def contentType: ContentType = ContentType.Characters
 
-        override def contentParsable: Parsable[String] = new Parsable[String] {
+        override def contentParsable: Parsable[String] = new Parsable[String]:
           override def parser: Parser[String] = Text().required()
           override def unparser: Unparser[String] = ???
-        }
       }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
   }
@@ -52,30 +50,26 @@ final class XmlTest extends AnyFlatSpec with Matchers {
     val name: String
   )
 
-  private val nameParsable: Element[String] = new Element[String]("name") {
+  private val nameParsable: Element[String] = new Element[String]("name"):
     override def contentType: ContentType = ContentType.Characters
 
-    override def contentParsable: Parsable[String] = new Parsable[String] {
+    override def contentParsable: Parsable[String] = new Parsable[String]:
       override def parser: Parser[String] = Text().required()
       override def unparser: Unparser[String] = ???
-    }
-  }
 
-  private val file2element: Element[X] = new Element[X]("x") {
+  private val file2element: Element[X] = new Element[X]("x"):
     override def contentType: ContentType = ContentType.Elements
 
-    override def contentParsable: Parsable[X] = new Parsable[X] {
-      override def parser: Parser[X] = for {
+    override def contentParsable: Parsable[X] = new Parsable[X]:
+      override def parser: Parser[X] = for
         urls <- Context.currentFromUrl
         name <- nameParsable.required()
-      } yield new X(
+      yield X(
         urls,
         name
       )
 
       override def unparser: Unparser[X] = ???
-    }
-  }
 
   "Redirect" should "work" in {
     def resource(name: String) = From.resource(Parser, name)
@@ -128,4 +122,3 @@ final class XmlTest extends AnyFlatSpec with Matchers {
 
     Dom.getNamespace(loadResource(Dom, "namespace")) shouldBe teiNamespace.default
   }
-}

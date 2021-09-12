@@ -2,18 +2,18 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
-final case class PublicationStmt(
-  publisher: Option[Publisher.Value],
-  availability: Option[Availability]
+final class PublicationStmt(
+  val publisher: Option[Publisher.Value],
+  val availability: Option[Availability]
 )
 
-object PublicationStmt extends Element[PublicationStmt]("publicationStmt") {
+object PublicationStmt extends Element[PublicationStmt]("publicationStmt"):
 
-  override def contentParsable: Parsable[PublicationStmt] = new Parsable[PublicationStmt] {
-    override val parser: Parser[PublicationStmt] = for {
-      publisher <- Publisher.element.optional()
-      availability <- Availability.optional()
-    } yield new PublicationStmt(
+  override def contentParsable: Parsable[PublicationStmt] = new Parsable[PublicationStmt]:
+    override val parser: Parser[PublicationStmt] = for
+      publisher: Option[Publisher.Value] <- Publisher.element.optional()
+      availability: Option[Availability] <- Availability.optional()
+    yield PublicationStmt(
       publisher,
       availability
     )
@@ -22,10 +22,8 @@ object PublicationStmt extends Element[PublicationStmt]("publicationStmt") {
       Publisher.element.optional(_.publisher),
       Availability.optional(_.availability)
     )
-  }
 
-  def empty: PublicationStmt = new PublicationStmt(
+  def empty: PublicationStmt = PublicationStmt(
     publisher = None,
     availability = None
   )
-}

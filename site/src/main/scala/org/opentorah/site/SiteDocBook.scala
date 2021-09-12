@@ -13,10 +13,10 @@ final class SiteDocBook(
   val buildDirectory: String,
   val dataGeneratorClass: Option[String],
   val substitutions: Map[String, String]
-) {
+):
   private def logger = Site.logger
 
-  def process[S <: Site[S]](site: Site[S]): Unit = {
+  def process[S <: Site[S]](site: Site[S]): Unit =
     val baseUrl: URL = site.fromUrl.url
     val documentFiles: Seq[File] = documents.map(Files.subFile(baseUrl, _))
     val outputDirectoryFile: File = Files.subFile(baseUrl, outputDirectory)
@@ -31,19 +31,18 @@ final class SiteDocBook(
     )
 
     // layout
-    val catalogDirectory: File = new File(buildDirectoryFile, "docBookCatalog")
-    val dtdFile: File = new File(catalogDirectory, "substitutions.dtd")
-    val catalogFile: File = new File(catalogDirectory, "catalog.xml")
-    val dataDirectory: File = new File(buildDirectoryFile,"data")
+    val catalogDirectory: File = File(buildDirectoryFile, "docBookCatalog")
+    val dtdFile: File = File(catalogDirectory, "substitutions.dtd")
+    val catalogFile: File = File(catalogDirectory, "catalog.xml")
+    val dataDirectory: File = File(buildDirectoryFile,"data")
 
     // Generated data
-    if (dataGeneratorClass.isEmpty)
-      logger.warn("skipping DocBook data generation: 'dataGenerationClass' is not set") else {
+    if dataGeneratorClass.isEmpty then
+      logger.warn("skipping DocBook data generation: 'dataGenerationClass' is not set") else
       logger.warn(s"running DocBook data generator ${dataGeneratorClass.get} into $dataDirectory")
       Class.forName(dataGeneratorClass.get)
         .getMethod("main", classOf[Array[String]])
         .invoke(null, Array(dataDirectory.toString))
-    }
 
     // Write XML catalog
     logger.warn(s"writing XML Catalog into $catalogFile")
@@ -65,18 +64,16 @@ final class SiteDocBook(
 
     // Process all documents
     val prefixed: Boolean = documentFiles.length > 1
-    val resolver: Resolver = new Resolver(catalogFile)
+    val resolver: Resolver = Resolver(catalogFile)
 
-    for (documentFile: File <- documentFiles) {
+    for documentFile: File <- documentFiles do
       val documentName: String = Files.nameAndExtension(documentFile.getName)._1
       val outputFile: File = Files.file(outputDirectoryFile,
-        (if (!prefixed) Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
+        (if !prefixed then Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
-      val htmlContent: DocBookHtmlContent[S] = new DocBookHtmlContent(documentFile, resolver)
+      val htmlContent: DocBookHtmlContent[S] = DocBookHtmlContent(documentFile, resolver)
       val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
       Files.write(outputFile, content)
-    }
-  }
 
   def prettyPrint(): Unit = {
     // TODO enable when PrettyPrinter keeps empty lines and stacks mixed content.
@@ -91,22 +88,21 @@ final class SiteDocBook(
     //          (Store.prettyPrinter, None)
     //    )
   }
-}
 
-object SiteDocBook extends Element[SiteDocBook]("docbook") {
+object SiteDocBook extends Element[SiteDocBook]("docbook"):
 
   private val documentsAttribute: Attribute.Required[String] = Attribute("documents").required
   private val outputDirectoryAttribute: Attribute.Required[String] = Attribute("outputDirectory").required
   private val buildDirectoryAttribute: Attribute.Required[String] = Attribute("buildDirectory").required
   private val dataGeneratorClassAttribute: Attribute.Optional[String] = Attribute("dataGeneratorClass").optional
 
-  override def contentParsable: Parsable[SiteDocBook] = new Parsable[SiteDocBook] {
-    override def parser: Parser[SiteDocBook] = for {
-      documents <- documentsAttribute().map(_.split(",").toList)
-      outputDirectory <- outputDirectoryAttribute()
-      buildDirectory <- buildDirectoryAttribute()
-      dataGeneratorClass <- dataGeneratorClassAttribute()
-    } yield new SiteDocBook(
+  override def contentParsable: Parsable[SiteDocBook] = new Parsable[SiteDocBook]:
+    override def parser: Parser[SiteDocBook] = for
+      documents: Seq[String] <- documentsAttribute().map(_.split(",").toList)
+      outputDirectory: String <- outputDirectoryAttribute()
+      buildDirectory: String <- buildDirectoryAttribute()
+      dataGeneratorClass: Option[String] <- dataGeneratorClassAttribute()
+    yield SiteDocBook(
       documents,
       outputDirectory,
       buildDirectory,
@@ -120,5 +116,3 @@ object SiteDocBook extends Element[SiteDocBook]("docbook") {
       buildDirectoryAttribute(_.buildDirectory),
       dataGeneratorClassAttribute(_.dataGeneratorClass)
     )
-  }
-}

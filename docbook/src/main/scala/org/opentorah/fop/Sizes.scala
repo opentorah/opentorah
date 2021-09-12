@@ -15,7 +15,7 @@ final class Sizes private(
   height: Float,         // in milli-ems
   minX: Float,           // in milli-ems
   minY: Float            // in milli-ems
-) {
+):
   def depth: Float = height + minY
 
   override def toString: String =
@@ -33,7 +33,7 @@ final class Sizes private(
   def getIntrinsicAlignmentAdjust: Length =
     FixedLength.getInstance(-toPoints(depth), "pt")
 
-  def getImageSize(sourceResolution: Float): ImageSize = {
+  def getImageSize(sourceResolution: Float): ImageSize =
     val scale: Float = Sizes.inches2points / sourceResolution
     def millipoints(value: Float): Int = toMilliPoints(value * scale)
     val result: ImageSize = new ImageSize
@@ -45,23 +45,20 @@ final class Sizes private(
     result.setResolution(sourceResolution)
     result.calcPixelsFromSize()
     result
-  }
 
-  def getDimension: Dimension = new Dimension(
+  def getDimension: Dimension = Dimension(
     toMilliPoints(width),
     toMilliPoints(height)
   )
 
-  def setViewPortSizes(svgDocument: SVGDocument): Unit = {
+  def setViewPortSizes(svgDocument: SVGDocument): Unit =
     def set(attribute: Attribute.Required[String], value: Float): Unit =
       attribute.withValue(toPoints(value).toString + "pt").set(Dom)(svgDocument.getDocumentElement)
 
     set(Sizes.widthAttribute, width)
     set(Sizes.heightAttribute, height)
-  }
-}
 
-object Sizes {
+object Sizes:
   val inches2points: Int = 72
 
   val points2Millipoints: Float = 1000.0f
@@ -82,7 +79,7 @@ object Sizes {
    so before handing the SVG image to Batik, I need to convert viewport sizes to units that are interpreted
    the same way by MathJax and Batik: points (see Sizes.setViewPortSizes()).
   */
-  def apply(svgDocument: SVGDocument): Sizes = {
+  def apply(svgDocument: SVGDocument): Sizes =
     val element: Dom.Element = svgDocument.getDocumentElement
     val viewBox: Array[Float] = viewBoxAttribute.get(Dom)(element).split(" ").map(_.toFloat)
 
@@ -93,7 +90,6 @@ object Sizes {
       width = viewBox(2),
       height = viewBox(3)
     )
-  }
 
   private val widthAttribute: Attribute.Required[String] = Attribute("width").required
   private val heightAttribute: Attribute.Required[String] = Attribute("height").required
@@ -104,5 +100,4 @@ object Sizes {
     */
   @SerialVersionUID(1L)
   val fontSizeAttribute: Attribute.FloatAttribute =
-    new Attribute.FloatAttribute("fontSize", namespace = MathFilter.namespace, default = 12.0f)
-}
+    Attribute.FloatAttribute("fontSize", namespace = MathFilter.namespace, default = 12.0f)

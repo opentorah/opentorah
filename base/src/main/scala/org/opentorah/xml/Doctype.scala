@@ -1,5 +1,4 @@
 package org.opentorah.xml
 
-trait Doctype {
+trait Doctype:
   def doctype: String
-}

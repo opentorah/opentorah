@@ -5,14 +5,14 @@ import org.opentorah.xml.{ScalaXml, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
-class MathJaxTest extends AnyFlatSpecLike with Matchers {
+class MathJaxTest extends AnyFlatSpecLike, Matchers:
 
   private def test(
     name: String,
     tex: String,
     svgExpected: String
-  ): Unit = {
-    def test(useJ2V8: Boolean): Unit = {
+  ): Unit =
+    def test(useJ2V8: Boolean): Unit =
       val project = PluginTestProject(
         prefix = "mathJaxTestProjects",
         name = s"$name-useJ2V8-$useJ2V8",
@@ -29,16 +29,13 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
       val log: String = project.run(logInfo = true)
       substring(log, MathJaxRunner.logStart, MathJaxRunner.logSep) shouldBe tex
       substring(log, MathJaxRunner.logSep, MathJaxRunner.logEnd) shouldBe svgExpected
-    }
 
 ///    test(useJ2V8 = true)
     test(useJ2V8 = false)
-  }
 
-  private def substring(string: String, from: String, to: String): String = {
+  private def substring(string: String, from: String, to: String): String =
     val result: String = string.substring(string.indexOf(from) + from.length)
     result.substring(0, result.indexOf(to))
-  }
 
   it should "typeset E = mc^2" in test("emc2", "E = mc^2",
      s"""|<svg xmlns:xlink="${XLink.namespace.uri}" width="9.155ex" height="3.009ex" style="vertical-align: -0.505ex;" viewBox="0 -1078.4 3941.5 1295.7" role="img" focusable="false" xmlns="${Svg.namespace.uri}">
@@ -109,4 +106,3 @@ class MathJaxTest extends AnyFlatSpecLike with Matchers {
          |</g>
          |</svg>""".stripMargin
   )
-}

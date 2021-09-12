@@ -7,58 +7,50 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import scala.io.Source
 
-object Files {
+object Files:
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def filesWithExtensions(directory: File, extension: String): Seq[String] =
-    if (!directory.exists) Seq.empty else for {
+    if !directory.exists then Seq.empty else for
       file <- directory.listFiles.toSeq
       result = nameAndExtension(file.getName)
       if result._2.contains(extension)
-    } yield result._1
+    yield result._1
 
-  def dropAllowedExtension(nameWihtExtension: String, allowedExtension: String): String = {
+  def dropAllowedExtension(nameWihtExtension: String, allowedExtension: String): String =
     val (name: String, extension: Option[String]) = nameAndExtension(nameWihtExtension)
-    if (extension.nonEmpty && !extension.contains(allowedExtension))
-      throw new IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
+    if extension.nonEmpty && !extension.contains(allowedExtension) then
+      throw IllegalArgumentException(s"Extension must be '$allowedExtension' if present: $nameWihtExtension")
     name
-  }
 
   def nameAndExtension(fullName: String): (String, Option[String]) = Strings.split(fullName, '.')
 
   def prefixedDirectory(directory: File, prefix: Option[String]): File =
-    prefix.fold(directory)(prefix => new File(directory, prefix))
+    prefix.fold(directory)(prefix => File(directory, prefix))
 
   def write(file: File, replace: Boolean, content: String): Unit =
-    if (!replace && file.exists) logger.debug(s"Already exists: $file")
+    if !replace && file.exists then logger.debug(s"Already exists: $file")
     else write(file, content)
 
-  def write(file: File, content: String): Unit = {
+  def write(file: File, content: String): Unit =
     logger.debug(s"Writing $file")
     file.getParentFile.mkdirs()
-    val writer: BufferedWriter = new BufferedWriter(new FileWriter(file))
-    try {
-      writer.write(content)
-    } finally {
-      writer.close()
-    }
-  }
+    val writer: BufferedWriter = BufferedWriter(new FileWriter(file))
+    try writer.write(content) finally writer.close()
 
-  def read(file: File): Seq[String] = {
+  def read(file: File): Seq[String] =
     val source = Source.fromFile(file)
     // Note: toList materializes the iterator before closing the source
     val result = source.getLines().toList
     source.close
     result
-  }
 
   def readFile(file: File): Array[Byte] =
     java.nio.file.Files.readAllBytes(Paths.get(file.toURI))
 
-  def deleteFiles(directory: File): Unit = if (directory.exists()) {
-    if (directory.isDirectory) for (file <- directory.listFiles()) deleteFiles(file)
+  def deleteFiles(directory: File): Unit = if directory.exists() then
+    if directory.isDirectory then for file <- directory.listFiles() do deleteFiles(file)
     directory.delete()
-  }
 
   def url2file(url: URL): File = Paths.get(url.toURI).toFile
 
@@ -66,23 +58,22 @@ object Files {
 
   def string2url(string: String): URL = URI.create(string).toURL
 
-  def subdirectory(url: URL, subdirectoryName: String): URL = new URL(url, subdirectoryName + "/")
+  def subdirectory(url: URL, subdirectoryName: String): URL = URL(url, subdirectoryName + "/")
 
-  def fileInDirectory(url: URL, fileName: String): URL = new URL(url, fileName)
+  def fileInDirectory(url: URL, fileName: String): URL = URL(url, fileName)
 
-  def pathUnder(url: URL, path: String): URL = new URL(url, if (path.startsWith("/")) path.drop(1) else path)
+  def pathUnder(url: URL, path: String): URL = URL(url, if path.startsWith("/") then path.drop(1) else path)
 
   //def getParent(url: URL): URL = new URL(url, "..")
 
-  def subUrl(base: Option[URL], url: String): URL = base.fold(new URL(url))(new URL(_, url))
-  private def subUrl(base: URL, url: String): URL = new URL(base, url)
+  def subUrl(base: Option[URL], url: String): URL = base.fold(URL(url))(new URL(_, url))
+  private def subUrl(base: URL, url: String): URL = URL(base, url)
   def subFile(base: URL, url: String): File = url2file(subUrl(base, url))
 
-  def splitUrl(urlRaw: String): Seq[String] = {
-    val url: String = if (urlRaw.isEmpty) "/" else urlRaw
+  def splitUrl(urlRaw: String): Seq[String] =
+    val url: String = if urlRaw.isEmpty then "/" else urlRaw
     require(url.startsWith("/"))
     url.substring(1).split("/").toIndexedSeq.filterNot(_.isBlank)
-  }
 
   def splitAndDecodeUrl(url: String): Seq[String] = splitUrl(url).map(urlDecode)
 
@@ -92,6 +83,5 @@ object Files {
 
   @scala.annotation.tailrec
   def file(directory: File, segments: Seq[String]): File =
-    if (segments.isEmpty) directory
-    else file(new File(directory, segments.head), segments.tail)
-}
+    if segments.isEmpty then directory
+    else file(File(directory, segments.head), segments.tail)

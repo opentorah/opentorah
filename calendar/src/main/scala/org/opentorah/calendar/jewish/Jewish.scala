@@ -3,7 +3,7 @@ package org.opentorah.calendar.jewish
 import org.opentorah.calendar.{Calendar, Week}
 import org.opentorah.metadata.{LanguageSpec, Named, Names}
 
-object Jewish extends Calendar {
+object Jewish extends Calendar:
 
   override def epoch: Int = 0
 
@@ -14,7 +14,7 @@ object Jewish extends Calendar {
   // was a Monday:
   def epochDayNumberInWeek: Int = 2
 
-  final class JewishYear(number: Int) extends YearBase(number) {
+  final class JewishYear(number: Int) extends YearBase(number):
     require(0 <= number)
 
     def newMoon: Moment = month(1).newMoon
@@ -23,10 +23,9 @@ object Jewish extends Calendar {
 
     private def newYearDelay(newMoon: Moment): NewYear.Delay = NewYear.delay(number, newMoon)
 
-    override def firstDayNumber: Int = {
+    override def firstDayNumber: Int =
       val newMoon: Moment = this.newMoon
       newMoon.dayNumber + newYearDelay(newMoon).days
-    }
 
     override def lengthInDays: Int = next.firstDayNumber - this.firstDayNumber
 
@@ -34,10 +33,9 @@ object Jewish extends Calendar {
 
     def kind: Year.Kind = Year.kind(isLeap, lengthInDays)
 
-    def latestAdar: Month = month(if (isLeap) Month.AdarII else Month.Adar)
+    def latestAdar: Month = month(if isLeap then Month.AdarII else Month.Adar)
 
     def isShemittah: Boolean = (number % 7) == 0
-  }
 
   override type Year = JewishYear
 
@@ -45,40 +43,39 @@ object Jewish extends Calendar {
 
   override protected def areYearsPositive: Boolean = true
 
-  final class JewishYearCompanion extends YearCompanion {
+  final class JewishYearCompanion extends YearCompanion:
     type Kind = JewishYearCompanion.Kind
 
     val Kind: JewishYearCompanion.Kind.type = JewishYearCompanion.Kind
 
-    override protected def newYear(number: Int): Year = new JewishYear(number)
+    override protected def newYear(number: Int): Year = JewishYear(number)
 
     override protected def characters: Seq[YearCharacter] =
-      for (isLeap <- Seq(true, false); kind <- Kind.values) yield (isLeap, kind)
+      for isLeap: Boolean <- Seq(true, false); kind <- Kind.values yield (isLeap, kind)
 
     // KH 8:5-6
-    override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = {
+    override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] =
       character match { case (isLeap: Boolean, kind: Kind) =>
         Seq(
-          new MonthNameAndLength(Month.Tishrei   , 30),
-          new MonthNameAndLength(Month.Marheshvan, if (kind == Kind.Full) 30 else 29),
-          new MonthNameAndLength(Month.Kislev    , if (kind == Kind.Short) 29 else 30),
-          new MonthNameAndLength(Month.Teves     , 29),
-          new MonthNameAndLength(Month.Shvat     , 30)
+          MonthNameAndLength(Month.Tishrei   , 30),
+          MonthNameAndLength(Month.Marheshvan, if kind == Kind.Full  then 30 else 29),
+          MonthNameAndLength(Month.Kislev    , if kind == Kind.Short then 29 else 30),
+          MonthNameAndLength(Month.Teves     , 29),
+          MonthNameAndLength(Month.Shvat     , 30)
         ) ++
-          (if (!isLeap)
-            Seq(new MonthNameAndLength(Month.Adar, 29))
+          (if !isLeap then
+            Seq(MonthNameAndLength(Month.Adar, 29))
           else
-            Seq(new MonthNameAndLength(Month.AdarI, 30), new MonthNameAndLength(Month.AdarII, 29))) ++
+            Seq(MonthNameAndLength(Month.AdarI, 30), MonthNameAndLength(Month.AdarII, 29))) ++
           Seq(
-            new MonthNameAndLength(Month.Nisan , 30),
-            new MonthNameAndLength(Month.Iyar  , 29),
-            new MonthNameAndLength(Month.Sivan , 30),
-            new MonthNameAndLength(Month.Tammuz, 29),
-            new MonthNameAndLength(Month.Av    , 30),
-            new MonthNameAndLength(Month.Elul  , 29)
+            MonthNameAndLength(Month.Nisan , 30),
+            MonthNameAndLength(Month.Iyar  , 29),
+            MonthNameAndLength(Month.Sivan , 30),
+            MonthNameAndLength(Month.Tammuz, 29),
+            MonthNameAndLength(Month.Av    , 30),
+            MonthNameAndLength(Month.Elul  , 29)
           )
       }
-    }
 
     override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
 
@@ -91,50 +88,39 @@ object Jewish extends Calendar {
     lazy val shortNonLeapYearLength: Int = yearLength((false, Kind.Short)) //353
     lazy val shortLeapYearLength: Int = yearLength((true, Kind.Short)) // 383
 
-    def kind(isLeap: Boolean, lengthInDays: Int): Kind = {
-      val daysOverShort: Int = lengthInDays - (if (isLeap) shortLeapYearLength else shortNonLeapYearLength)
+    def kind(isLeap: Boolean, lengthInDays: Int): Kind =
+      val daysOverShort: Int = lengthInDays - (if isLeap then shortLeapYearLength else shortNonLeapYearLength)
 
-      daysOverShort match {
+      daysOverShort match
         case 0 => Kind.Short
         case 1 => Kind.Regular
         case 2 => Kind.Full
-        case _ => throw new IllegalArgumentException(
-          "Impossible year length " + lengthInDays + " for " + this)
-      }
-    }
-  }
+        case _ => throw IllegalArgumentException("Impossible year length " + lengthInDays + " for " + this)
 
-  object JewishYearCompanion {
+  object JewishYearCompanion:
     // KH 8:6
-    sealed trait Kind
-    object Kind {
-      case object Short extends Kind
-      case object Regular extends Kind
-      case object Full extends Kind
-
-      val values: Seq[Kind] = Seq(Short, Regular, Full)
-    }
-  }
-
+    enum Kind:
+      case Short
+      case Regular
+      case Full
+  
   override type YearCompanionType = JewishYearCompanion
 
   override protected def createYearCompanion: YearCompanionType = new JewishYearCompanion
 
-  final class JewishMonth(yearOptInitial: Option[Year], monthNumber: Int) extends MonthBase(yearOptInitial, monthNumber) {
+  final class JewishMonth(yearOptInitial: Option[Year], monthNumber: Int) extends MonthBase(yearOptInitial, monthNumber):
     def newMoon: Moment = Moon.newMoon(number)
-  }
 
   final override type Month = JewishMonth
 
-  sealed trait JewishMonthName extends Named {
+  sealed trait JewishMonthName extends Named:
     final override def names: Names = Month.toNames(this)
-  }
 
   override type MonthName = JewishMonthName
 
-  final class JewishMonthCompanion extends MonthCompanion {
+  final class JewishMonthCompanion extends MonthCompanion:
     private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new JewishMonth(yearOption, monthNumber)
+      JewishMonth(yearOption, monthNumber)
 
     override private[opentorah] def yearNumber(monthNumber: Int): Int = LeapYearsCycle.monthYear(monthNumber)
 
@@ -159,19 +145,18 @@ object Jewish extends Calendar {
       Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
 
     protected override def resourceName: String = "JewishMonth"
-  }
 
   override type MonthCompanionType = JewishMonthCompanion
 
   override protected def createMonthCompanion: MonthCompanionType = new JewishMonthCompanion
 
-  final class JewishDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber) {
+  final class JewishDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber):
     def isShabbos: Boolean = is(Week.Day.Shabbos)
 
     def roshChodeshOf: Option[Month.Name] =
-      if (numberInMonth == 1) Some(month.name) else
-        if (numberInMonth == 30) Some(month.next.name)
-        else None
+      if numberInMonth == 1 then Some(month.name) else
+      if numberInMonth == 30 then Some(month.next.name)
+      else None
 
     def isRoshChodesh: Boolean = roshChodeshOf.isDefined
 
@@ -180,21 +165,18 @@ object Jewish extends Calendar {
     def shabbosAfter: Day = next.next(Week.Day.Shabbos)
 
     def shabbosBefore: Day = prev.prev(Week.Day.Shabbos)
-  }
 
   override type Day = JewishDay
 
-  override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = new JewishDay(monthOption, dayNumber)
+  override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = JewishDay(monthOption, dayNumber)
 
-  final class JewishMoment(digits: Seq[Int]) extends MomentBase(digits) {
+  final class JewishMoment(digits: Seq[Int]) extends MomentBase(digits):
     def nightHours(value: Int): Moment = firstHalfHours(value)
 
     def dayHours(value: Int): Moment = secondHalfHours(value)
-  }
 
   override type Moment = JewishMoment
 
-  override protected def newPoint(digits: Seq[Int]): Point = new JewishMoment(digits)
+  override protected def newPoint(digits: Seq[Int]): Point = JewishMoment(digits)
 
-  override def inToString(number: Int)(implicit spec: LanguageSpec): String = spec.toString(number)
-}
+  override def inToString(number: Int)(using spec: LanguageSpec): String = spec.toString(number)

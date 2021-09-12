@@ -27,6 +27,7 @@ dependencies {
     exclude group: 'com.vladsch.flexmark', module: 'flexmark'
   }
 
+  implementation libs.google.cloud.storage
   implementation libs.zhttp
   implementation libs.logback
   implementation libs.logstash

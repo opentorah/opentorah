@@ -6,13 +6,13 @@ import org.opentorah.xml.{Dialect, Namespace, Xerces}
 import org.w3c.dom.svg.SVGDocument
 import java.io.{InputStream, StringBufferInputStream}
 
-object Svg extends Dialect {
+object Svg extends Dialect:
 
   override val namespace: Namespace = Namespace(uri = "http://www.w3.org/2000/svg", prefix = "svg")
 
   override val mimeType: String = "image/svg+xml"
 
-  private lazy val svgFactory: SAXSVGDocumentFactory = {
+  private lazy val svgFactory: SAXSVGDocumentFactory =
     // org.apache.batik.dom.util.SAXDocumentFactory sets up a default SAXParserFactory
     // in a class initializer, so the default should at least implement properties it sets up.
     // And of course it uses the magical service discovery stuff, so depending on the classpath (yuck!),
@@ -30,19 +30,16 @@ object Svg extends Dialect {
     val propertyName: String = Xerces.saxParserFactoryProperty
     val original: String = System.getProperty(propertyName)
     System.setProperty(propertyName, Xerces.saxParserFactoryName)
-    val result = new SAXSVGDocumentFactory(Xerces.saxParserName)
-    if (original != null) System.setProperty(propertyName, original)
+    val result = SAXSVGDocumentFactory(Xerces.saxParserName)
+    if original != null then System.setProperty(propertyName, original)
     result
-  }
 
   def forceXerces(): Unit = svgFactory
 
-  def fromString(what: String): SVGDocument = {
+  def fromString(what: String): SVGDocument =
     // TODO use StringReader instead of the deprecated StringBufferInputStream;
     // mark() call probably does nothing and should then be removed...
-    val in: InputStream = new UnclosableInputStream(new StringBufferInputStream(what))
+    val in: InputStream = UnclosableInputStream(StringBufferInputStream(what))
     val length: Int = in.available
     in.mark(length + 1)
     svgFactory.createSVGDocument(null, in)
-  }
-}

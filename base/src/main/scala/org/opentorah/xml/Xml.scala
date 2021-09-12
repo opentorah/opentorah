@@ -5,7 +5,7 @@ import java.io.StringReader
 import java.net.URL
 
 // This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
-trait Xml extends XmlAttributes {
+trait Xml extends XmlAttributes:
   type Node
   final type Nodes = Seq[Node]
   override type Attributes <: Node
@@ -13,10 +13,10 @@ trait Xml extends XmlAttributes {
   type Text <: Node
   type Comment <: Node
 
-  final type Predicate = ScalaXml.Element => Boolean
+  final type Predicate = Element => Boolean
 
   final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
-    loadFromSource(new InputSource(new StringReader(string)), filters, resolver)
+    loadFromSource(InputSource(StringReader(string)), filters, resolver)
 
   final def loadFromUrl(url: URL, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
     loadFromSource(Sax.url2inputSource(url), filters, resolver)
@@ -49,9 +49,8 @@ trait Xml extends XmlAttributes {
 
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(value => f(value))
-}
 
-object Xml {
+object Xml:
   val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
   val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
 
@@ -59,4 +58,3 @@ object Xml {
 
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
-}

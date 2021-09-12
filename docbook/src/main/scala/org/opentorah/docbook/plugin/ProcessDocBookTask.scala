@@ -12,10 +12,10 @@ import org.opentorah.mathjax.{Delimiters, MathJax, MathJaxConfiguration}
 import org.opentorah.util.Collections.mapValues
 import org.opentorah.util.{Files, Gradle}
 import org.opentorah.xml.Resolver
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 // Note: Task class can not be final for Gradle to be able to decorate it.
-class ProcessDocBookTask extends DefaultTask {
+class ProcessDocBookTask extends DefaultTask:
   setDescription(s"Process DocBook")
   setGroup("publishing")
 
@@ -48,22 +48,20 @@ class ProcessDocBookTask extends DefaultTask {
   //  getProject.afterEvaluate((project: Project) =>
   //    Gradle.classesDirs(project).map(_.getParentFile.getParentFile).foreach(registerInputDirectory))
 
-  private def registerInputDirectory(directory: File): Unit = {
+  private def registerInputDirectory(directory: File): Unit =
     info(s"processDocBook: registering input directory $directory")
     directory.mkdirs()
     getInputs.dir(directory)
-  }
 
   // Register outputs
   private def getProcessOutputDirectories: Set[File] = Set(
     layout.intermediateRoot,
     layout.outputRoot
   )
-  for (directory: File <- getProcessOutputDirectories) {
+  for directory: File <- getProcessOutputDirectories do
     // Note: deleting directories makes the task not up-to-date: Files.deleteRecursively(directory)
     info(s"processDocBook: registering output directory $directory")
     getOutputs.dir(directory)
-  }
 
   private val document: Property[String] = getProject.getObjects.property(classOf[String])
   @Input final def getDocument(): Property[String] = document
@@ -131,14 +129,14 @@ class ProcessDocBookTask extends DefaultTask {
   @Input final def getProcessMathJaxEscapes(): Property[Boolean] = processMathJaxEscapes
 
   @TaskAction
-  def processDocBook(): Unit = {
+  def processDocBook(): Unit =
     def getDocumentName(string: String): Option[String] =
-      if (string.isEmpty) None else Some(Files.dropAllowedExtension(string, "xml"))
+      if string.isEmpty then None else Some(Files.dropAllowedExtension(string, "xml"))
 
     val documentName: Option[String] = getDocumentName(document.get)
     val documentNames: List[String] = documents.get.asScala.toList.flatMap(getDocumentName)
 
-    if (documentName.isEmpty && documentNames.isEmpty) throw new IllegalArgumentException(
+    if documentName.isEmpty && documentNames.isEmpty then throw IllegalArgumentException(
       """At least one document name must be specified using
         |  document = "<document name>"
         |or
@@ -161,12 +159,12 @@ class ProcessDocBookTask extends DefaultTask {
     val unusedSections: Set[Section] =
       sections.usedSections -- processors.flatMap(_.parameterSections).toSet
 
-    if (unusedSections.nonEmpty)
+    if unusedSections.nonEmpty then
       info(s"Unused parameter sections: ${unusedSections.map(_.name).mkString(", ")}")
 
     // Generate data
     val mainClass: String = dataGeneratorClass.get
-    if (mainClass.isEmpty) info("Skipping DocBook data generation: 'dataGenerationClass' is not set")
+    if mainClass.isEmpty then info("Skipping DocBook data generation: 'dataGenerationClass' is not set")
     else GradleOperations.generateData(getProject, mainClass, layout.dataDirectory)
 
     // Unpack DocBook stylesheets
@@ -189,13 +187,13 @@ class ProcessDocBookTask extends DefaultTask {
     val mathJax: MathJax = MathJax.get(useMathJax3 = getUseMathJax3().get)
 
     val mathJaxRunner: Option[MathJaxRunner] =
-      if (!processors.exists(_.isPdf) || !getMathJaxEnabled().get) None else Some(GradleOperations.getMathJaxRunner(
+      if !processors.exists(_.isPdf) || !getMathJaxEnabled().get then None else Some(GradleOperations.getMathJaxRunner(
         getProject,
         nodeRoot = layout.nodeRoot,
         nodeVersion = nodeVersion.get,
         overwriteNode = false,
         overwriteMathJax = false,
-        j2v8Parent = if (!useJ2V8.get) None else Some(layout.j2v8LibraryDirectory),
+        j2v8Parent = if !useJ2V8.get then None else Some(layout.j2v8LibraryDirectory),
         mathJax = mathJax,
         configuration = mathJaxConfiguration
       ))
@@ -213,7 +211,7 @@ class ProcessDocBookTask extends DefaultTask {
       substitutionsMap
     )
 
-    val resolver: Resolver = new Resolver(layout.catalogFile)
+    val resolver: Resolver = Resolver(layout.catalogFile)
 
     // CSS file
     val cssFileName: String = Files.dropAllowedExtension(cssFile.get, "css")
@@ -225,7 +223,7 @@ class ProcessDocBookTask extends DefaultTask {
     // Fonts
     val fontFamilyNames: List[String] = epubEmbeddedFonts.get.asScala.toList
     val epubEmbeddedFontsString: String = FopFonts.getFiles(layout.fopConfigurationFile, fontFamilyNames)
-      .map(uri => new File(uri.getPath).getAbsolutePath).mkString(", ")
+      .map(uri => File(uri.getPath).getAbsolutePath).mkString(", ")
     info(s"Fop.getFontFiles(${fontFamilyNames.mkString(", ")}) = $epubEmbeddedFontsString.")
 
     Operations.writeStylesheets(
@@ -246,10 +244,10 @@ class ProcessDocBookTask extends DefaultTask {
     val allSubstitutions: Map[String, String] = sections.substitutions ++ substitutionsMap
 
     // Process DocBook :)
-    for {
+    for
       variant: Variant <- variants
       (documentName: String, prefixed: Boolean) <- inputDocuments
-    } {
+    do
       logger.lifecycle(s"DocBook: processing '$documentName' to ${variant.fullName}.")
       val docBook2: DocBook2 = variant.docBook2
       val forDocument: Layout.ForDocument = layout.forDocument(prefixed, documentName)
@@ -280,7 +278,7 @@ class ProcessDocBookTask extends DefaultTask {
         substitutions = Map.empty
       )
 
-      if (docBook2.usesCss) {
+      if docBook2.usesCss then
         info(s"Copying CSS")
         Gradle.copyDirectory(
           getProject,
@@ -289,9 +287,8 @@ class ProcessDocBookTask extends DefaultTask {
           directoryName = layout.cssDirectoryName,
           substitutions = allSubstitutions
         )
-      }
 
-      if (docBook2.usesIntermediate) {
+      if docBook2.usesIntermediate then
         info(s"Post-processing ${docBook2.name}")
         forDocument.outputDirectory(variant).mkdirs
 
@@ -305,7 +302,3 @@ class ProcessDocBookTask extends DefaultTask {
           isJEuclidEnabled = getJEuclidEnabled().get,
           mathJaxRunner = mathJaxRunner
         )
-      }
-    }
-  }
-}

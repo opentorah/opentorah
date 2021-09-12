@@ -2,19 +2,19 @@ package org.opentorah.tei
 
 import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
 
-final case class TitleStmt(
-  titles: Seq[Title.Value],
-  authors: Seq[Author.Value],
-  editors: Seq[Editor],
-  sponsors: Seq[Sponsor.Value],
-  funders: Seq[Funder.Value],
-  principals: Seq[Principal.Value],
-  respStmts: Seq[RespStmt.Value]
+final class TitleStmt(
+  val titles: Seq[Title.Value],
+  val authors: Seq[Author.Value],
+  val editors: Seq[Editor],
+  val sponsors: Seq[Sponsor.Value],
+  val funders: Seq[Funder.Value],
+  val principals: Seq[Principal.Value],
+  val respStmts: Seq[RespStmt.Value]
 )
 
-object TitleStmt extends Element[TitleStmt]("titleStmt") {
+object TitleStmt extends Element[TitleStmt]("titleStmt"):
 
-  def empty: TitleStmt = new TitleStmt(
+  def empty: TitleStmt = TitleStmt(
     titles = Seq.empty,
     authors = Seq.empty,
     editors = Seq.empty,
@@ -24,16 +24,16 @@ object TitleStmt extends Element[TitleStmt]("titleStmt") {
     respStmts = Seq.empty
   )
 
-  override def contentParsable: Parsable[TitleStmt] = new Parsable[TitleStmt] {
-    override val parser: Parser[TitleStmt] = for {
-      titles <- Title.element.seq()
-      authors <- Author.element.seq()
-      editors <- Editor.seq()
-      sponsors <- Sponsor.element.seq()
-      funders <- Funder.element.seq()
-      principals <- Principal.element.seq()
-      respStmts <- RespStmt.element.seq()
-    } yield new TitleStmt(
+  override def contentParsable: Parsable[TitleStmt] = new Parsable[TitleStmt]:
+    override val parser: Parser[TitleStmt] = for
+      titles: Seq[Title.Value] <- Title.element.seq()
+      authors: Seq[Author.Value] <- Author.element.seq()
+      editors: Seq[Editor] <- Editor.seq()
+      sponsors: Seq[Sponsor.Value] <- Sponsor.element.seq()
+      funders: Seq[Funder.Value] <- Funder.element.seq()
+      principals: Seq[Principal.Value] <- Principal.element.seq()
+      respStmts: Seq[RespStmt.Value] <- RespStmt.element.seq()
+    yield TitleStmt(
       titles,
       authors,
       editors,
@@ -52,5 +52,3 @@ object TitleStmt extends Element[TitleStmt]("titleStmt") {
       Principal.element.seq(_.principals),
       RespStmt.element.seq(_.respStmts)
     )
-  }
-}

@@ -2,8 +2,8 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.Rotation
 
-object SunLongitudeCorrection  {
-  final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation] {
+object SunLongitudeCorrection :
+  final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation]:
     // KH 13:4
     final override val values: Map[Rotation, Rotation] = Map(
       row(  0, 0,  0),
@@ -28,12 +28,9 @@ object SunLongitudeCorrection  {
     )
 
     // KH 13:2-3
-    final override def calculate(sunCourse: Rotation): Rotation = {
+    final override def calculate(sunCourse: Rotation): Rotation =
       val angle: Rotation = sunCourse.canonical
-      if (angle <= Rotation(180)) -interpolate(angle) else interpolate((Rotation(360) - angle).canonical)
-    }
-  }
+      if angle <= Rotation(180) then -interpolate(angle) else interpolate((Rotation(360) - angle).canonical)
 
   private def row(argumentDegrees: Int, valueDegrees: Int, valueMinutes: Int): (Rotation, Rotation) =
     Rotation(argumentDegrees) -> Rotation(valueDegrees, valueMinutes)
-}

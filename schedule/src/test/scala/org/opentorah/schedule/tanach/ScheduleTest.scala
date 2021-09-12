@@ -2,28 +2,28 @@ package org.opentorah.schedule.tanach
 
 import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.{Jewish, NewYear, YearType}
-import org.opentorah.calendar.jewish.SpecialDay._
+import org.opentorah.calendar.jewish.SpecialDay.*
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
-import org.opentorah.texts.tanach.Parsha._
+import org.opentorah.texts.tanach.Parsha.*
 import Jewish.{Day, Year}
-import YearType._
+import YearType.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-final class ScheduleTest extends AnyFlatSpec with Matchers {
+final class ScheduleTest extends AnyFlatSpec, Matchers:
 
   "Torah readings" should "be assigned correctly" in {
     val start = System.currentTimeMillis()
-    (NewYear.delaysEnabledFromYear to 6000) foreach { number =>
+    (NewYear.delaysEnabledFromYear to 6000).foreach(number =>
       val year = Year(number)
 
       verify(year, inHolyLand = false)
       verify(year, inHolyLand = true)
-    }
+    )
     println("Time in ms: " + (System.currentTimeMillis()-start))
   }
 
-  def verify(year: Year, inHolyLand: Boolean): Unit = {
+  def verify(year: Year, inHolyLand: Boolean): Unit =
     val readings: Map[Day, WeeklyReading] = Schedule.weeklyReadingsForYear(year, inHolyLand)
 
     def findReadings(day: Day): WeeklyReading = readings(day)
@@ -33,7 +33,7 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
     val readingsBeforePesach: WeeklyReading = findReadings(Pesach1.date(year).shabbosBefore)
     readingsBeforePesach.isCombined shouldBe false
     readingsBeforePesach.parsha shouldBe {
-      if (!year.isLeap) Tzav else if (RoshHashanah1.date(year).is(Week.Day.Chamishi)) Acharei else Metzora
+      if !year.isLeap then Tzav else if RoshHashanah1.date(year).is(Week.Day.Chamishi) then Acharei else Metzora
     }
 
     // Shavuot
@@ -53,42 +53,36 @@ final class ScheduleTest extends AnyFlatSpec with Matchers {
     val yearType = YearType.forYear(year)
     val combinedFromStructure: Seq[Parsha] = ReadingStructure.all(yearType).combined(inHolyLand)
     combined shouldBe combinedFromStructure.toSet
-  }
-}
 
-object ReadingStructure {
+object ReadingStructure:
   // This table gives parsha combinations for all occurring year types.
   // Submitted by @michaelko58; sourced from  https://www.shoresh.org.il/spages/articles/parashathibur.htm
   // Primary/classical source needs to be determined.
-  sealed trait Combine {
+  sealed trait Combine:
     final def combined(parsha: Parsha, inHolyLand: Boolean): Option[Parsha] =
-      if(combine(inHolyLand)) Some(parsha) else None
+      if combine(inHolyLand) then Some(parsha) else None
 
     def combine(inHolyLand: Boolean): Boolean
-  }
 
-  case object M extends Combine { // Mehubarim: combined
+  case object M extends Combine: // Mehubarim: combined
     def combine(inHolyLand: Boolean): Boolean = true
-  }
 
-  case object N extends Combine { // Nifradim: separate
+  case object N extends Combine: // Nifradim: separate
     def combine(inHolyLand: Boolean): Boolean = false
-  }
 
-  case object C extends Combine { // mehubarim Chutz lo'oretz: combined in diaspora
+  case object C extends Combine: // mehubarim Chutz lo'oretz: combined in diaspora
     def combine(inHolyLand: Boolean): Boolean = !inHolyLand
-  }
 
-  final case class S
+  final class S
   (
-    vp: Combine, // Vayakhel/Pekudei
-    tm: Combine, // Tazria/Metzora
-    ak: Combine, // Acharei/Kedoshim
-    bb: Combine, // Behar/Bechukosai
-    cb: Combine, // Chukas/Balak
-    mm: Combine, // Mattos/Masai
-    nv: Combine  // Nitzavim/Vayeilech
-  ) {
+    val vp: Combine, // Vayakhel/Pekudei
+    val tm: Combine, // Tazria/Metzora
+    val ak: Combine, // Acharei/Kedoshim
+    val bb: Combine, // Behar/Bechukosai
+    val cb: Combine, // Chukas/Balak
+    val mm: Combine, // Mattos/Masai
+    val nv: Combine  // Nitzavim/Vayeilech
+  ):
     def combined(inHolyLand: Boolean): Seq[Parsha] = Seq[(Combine, Parsha)](
       vp -> Vayakhel,
       tm -> Tazria,
@@ -97,8 +91,7 @@ object ReadingStructure {
       cb -> Chukas,
       mm -> Mattos,
       nv -> Nitzavim
-    ).flatMap { case (c, p) => c.combined(p, inHolyLand) }
-  }
+    ).flatMap((c, p) => c.combined(p, inHolyLand))
 
   val all: Map[YearType, S] = Map(
     // non-leap
@@ -119,4 +112,3 @@ object ReadingStructure {
     L7S -> S(vp = N, tm = N, ak = N, bb = N, cb = N, mm = M, nv = M),
     L7F -> S(vp = N, tm = N, ak = N, bb = N, cb = C, mm = M, nv = M)
   )
-}

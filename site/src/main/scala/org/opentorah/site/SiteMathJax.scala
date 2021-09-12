@@ -6,7 +6,7 @@ import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unpars
 final class SiteMathJax(
   val isEnabled: Boolean,
   val useV3: Boolean
-) {
+):
   // TODO
   //  val mathJaxConfiguration: MathJaxConfiguration = MathJaxConfiguration(
   //    font = mathJaxFont.get,
@@ -25,23 +25,22 @@ final class SiteMathJax(
   def body: ScalaXml.Nodes = mathJax.body(ScalaXml.mkText(mathJax.htmlConfigurationString(configuration)))
 
   private def mathJax: MathJax = MathJax.get(useV3)
-}
 
-object SiteMathJax extends Element[SiteMathJax]("mathJax") {
+object SiteMathJax extends Element[SiteMathJax]("mathJax"):
 
-  val empty: SiteMathJax = new SiteMathJax(
+  val empty: SiteMathJax = SiteMathJax(
     isEnabled = false,
     useV3 = true
   )
 
-  val isEnabledAttribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("isEnabled").orDefault
-  val useV3Attribute: Attribute.OrDefault[Boolean] = new Attribute.BooleanAttribute("useV3").orDefault
+  val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
+  val useV3Attribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("useV3").orDefault
 
-  override def contentParsable: Parsable[SiteMathJax] = new Parsable[SiteMathJax] {
-    override def parser: Parser[SiteMathJax] = for {
-      isEnabled <- isEnabledAttribute()
-      useV3 <- useV3Attribute()
-    } yield new SiteMathJax(
+  override def contentParsable: Parsable[SiteMathJax] = new Parsable[SiteMathJax]:
+    override def parser: Parser[SiteMathJax] = for
+      isEnabled: Boolean <- isEnabledAttribute()
+      useV3: Boolean <- useV3Attribute()
+    yield SiteMathJax(
       isEnabled,
       useV3
     )
@@ -50,6 +49,4 @@ object SiteMathJax extends Element[SiteMathJax]("mathJax") {
       isEnabledAttribute(_.isEnabled),
       useV3Attribute(_.useV3)
     )
-  }
-}
 

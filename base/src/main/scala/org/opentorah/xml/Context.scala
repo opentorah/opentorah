@@ -20,11 +20,10 @@ import zio.{Has, ZIO}
      at zio.Has$HasSyntax$.get$extension(Has.scala:179)
  */
 
-final class Context {
+final class Context:
   private var stack: List[Context.Current] = List.empty
-}
 
-private[xml] object Context {
+private[xml] object Context:
 
   // Note: using case classes Empty, Characters, Elements and Mixed (in the spirit of "parse, do not validate")
   // leads to much verbosity, since copy method is only available on case classes, which shouldn't be inherited from...
@@ -44,32 +43,37 @@ private[xml] object Context {
     nextElement: ScalaXml.Element,
     contentType: ContentType,
     parser: Parser[A]
-  ): Parser[A] = for  {
-    newCurrent <- open(
+  ): Parser[A] = for 
+    newCurrent: Current <- open(
       from: Option[From],
       nextElement,
       contentType
     )
-    result <- access { (context: Context) => context.stack = newCurrent :: context.stack }.bracket[Has[Context], Effects.Error, A](
-      release = (_: Unit) => ZIO.access[Has[Context]] { (contextHas: Has[Context]) =>
+    result: A <- access((context: Context) => context.stack = newCurrent :: context.stack).bracket[Has[Context], Effects.Error, A](
+      release = (_: Unit) => ZIO.access[Has[Context]]((contextHas: Has[Context]) =>
         val context = contextHas.get
         context.stack = context.stack.tail
-      },
-      use = (_: Unit) => addErrorTrace(for { result <- parser; _ <- checkNoLeftovers } yield result)
+      ),
+      use = (_: Unit) => addErrorTrace(
+        for
+          result: A <- parser
+          _ <- checkNoLeftovers 
+        yield result
+      )
     )
-  }  yield result
+  yield result
 
   private def open(
     from: Option[From],
     element: ScalaXml.Element,
     contentType: ContentType
-  ): zio.IO[Effects.Error, Current] = {
+  ): zio.IO[Effects.Error, Current] =
     val name: String = ScalaXml.getName(element)
     val attributes: Seq[Attribute.Value[String]] = ScalaXml.getAttributes(element)
     val nodes: ScalaXml.Nodes = ScalaXml.getChildren(element)
     val (elements: Seq[ScalaXml.Element], characters: Option[String]) = partition(nodes)
 
-    contentType match {
+    contentType match
       case ContentType.Empty =>
         Effects.check(elements.isEmpty, s"Spurious elements: $elements") *>
         Effects.check(characters.isEmpty, s"Spurious characters: '${characters.get}'") *>
@@ -108,33 +112,31 @@ private[xml] object Context {
           contentType = ContentType.Mixed,
           nodes = nodes
         ))
-    }
-  }
 
-  val checkEmpty: Parser[Unit] = access { (context: Context) =>
-    if (context.stack.nonEmpty) throw new IllegalStateException(s"Non-empty context $context!")
-  }
+  val checkEmpty: Parser[Unit] = access((context: Context) =>
+    if context.stack.nonEmpty then throw IllegalStateException(s"Non-empty context $context!")
+  )
 
-  val checkNoLeftovers: Parser[Unit] = access { (context: Context) =>
-    context.stack.headOption.fold(Effects.ok) { (current: Current) =>
+  val checkNoLeftovers: Parser[Unit] = access((context: Context) =>
+    context.stack.headOption.fold(Effects.ok)((current: Current) =>
       Effects.check(current.attributes.isEmpty, s"Unparsed attributes: ${current.attributes}") *>
       Effects.check(current.characters.isEmpty, s"Unparsed characters: ${current.characters.get}") *>
       Effects.check(current.nodes.forall(ScalaXml.isWhitespace), s"Unparsed nodes: ${current.nodes}")
-    }
-  }
+    )
+  )
 
-  val currentBaseUrl: Parser[Option[URL]] = access { (context: Context) =>
+  val currentBaseUrl: Parser[Option[URL]] = access((context: Context) =>
     currentBaseUrl(context)
-  }
+  )
 
-  val currentFromUrl: Parser[FromUrl] = access { (context: Context) => new FromUrl(
+  val currentFromUrl: Parser[FromUrl] = access((context: Context) => FromUrl(
     url = currentBaseUrl(context).get,
     inline = context.stack.head.from.isEmpty
-  )}
+  ))
 
   private def currentBaseUrl(context: Context): Option[URL] = context.stack.flatMap(_.from).head.url
 
-  def takeAttribute(attribute: Attribute[_]): Parser[Option[String]] = modifyCurrent { (current: Current) =>
+  def takeAttribute(attribute: Attribute[?]): Parser[Option[String]] = modifyCurrent((current: Current) =>
     // TODO maybe take namespace into account?
     val (take: Seq[Attribute.Value[String]], leave: Seq[Attribute.Value[String]]) =
       current.attributes.partition((candidate: Attribute.Value[String]) => attribute == candidate.attribute)
@@ -143,14 +145,14 @@ private[xml] object Context {
     val result: Option[String] = take.headOption.flatMap(_.value)
 
     ZIO.succeed((result, current.copy(attributes = leave)))
-  }
+  )
 
-  val allAttributes: Parser[Seq[Attribute.Value[String]]] = modifyCurrent { (current: Current) =>
+  val allAttributes: Parser[Seq[Attribute.Value[String]]] = modifyCurrent((current: Current) =>
     ZIO.succeed((current.attributes, current.copy(attributes = Seq.empty)))
-  }
+  )
 
-  def nextElement(p: ScalaXml.Predicate): Parser[Option[ScalaXml.Element]] = modifyCurrent { (current: Current) =>
-    current.contentType match {
+  def nextElement(p: ScalaXml.Predicate): Parser[Option[ScalaXml.Element]] = modifyCurrent((current: Current) =>
+    current.contentType match
       case ContentType.Empty | ContentType.Characters =>
         Effects.fail(s"No element in $current")
 
@@ -159,14 +161,13 @@ private[xml] object Context {
         val result: Option[ScalaXml.Element] =
           noLeadingWhitespace.headOption.filter(ScalaXml.isElement).map(ScalaXml.asElement).filter(p)
         val newCurrent: Current =
-          if (result.isEmpty) current
+          if result.isEmpty then current
           else current.copy(nodes = noLeadingWhitespace.tail, nextElementNumber = current.nextElementNumber+1)
 
         ZIO.succeed((result, newCurrent))
-    }
-  }
+  )
 
-  val takeCharacters: Parser[Option[String]] = modifyCurrent { (current: Current) => current.contentType match {
+  val takeCharacters: Parser[Option[String]] = modifyCurrent((current: Current) => current.contentType match
     case ContentType.Empty | ContentType.Elements =>
       Effects.fail(s"No characters in $current")
 
@@ -177,21 +178,20 @@ private[xml] object Context {
       val (elements: Seq[ScalaXml.Element], characters: Option[String]) = partition(current.nodes)
       Effects.check(elements.isEmpty, s"Elements in $current") *>
       ZIO.succeed((characters, current.copy(nodes = Seq.empty)))
-  }}
+  )
 
-  val allNodes: Parser[ScalaXml.Nodes] = modifyCurrent { (current: Current) => current.contentType match {
+  val allNodes: Parser[ScalaXml.Nodes] = modifyCurrent((current: Current) => current.contentType match
     case ContentType.Empty | ContentType.Characters =>
       Effects.fail(s"No nodes in $current")
 
     case ContentType.Elements | ContentType.Mixed =>
       ZIO.succeed((current.nodes, current.copy(nodes = Seq.empty)))
-  }}
+  )
 
-  private def partition(nodes: ScalaXml.Nodes): (Seq[ScalaXml.Element], Option[String]) = {
+  private def partition(nodes: ScalaXml.Nodes): (Seq[ScalaXml.Element], Option[String]) =
     val (elems, nonElems) = nodes.partition(ScalaXml.isElement)
     val characters: String = nonElems.map(ScalaXml.toString).mkString.trim
-    (elems.map(ScalaXml.asElement), if (characters.isEmpty) None else Some(characters))
-  }
+    (elems.map(ScalaXml.asElement), if characters.isEmpty then None else Some(characters))
 
   private def addErrorTrace[A](parser: Parser[A]): Parser[A] = parser.flatMapError((error: Effects.Error) =>
     ZIO.access[Has[Context]]((contextHas: Has[Context]) =>
@@ -204,12 +204,11 @@ private[xml] object Context {
   )
 
   private def modifyCurrent[A](f: Current => zio.IO[Effects.Error, (A, Current)]): Parser[A] =
-    ZIO.accessM[Has[Context]] { (contextHas: Has[Context]) =>
+    ZIO.accessM[Has[Context]]((contextHas: Has[Context]) =>
       val context: Context = contextHas.get
-      for {
-        out <- f(context.stack.head)
-        (result, newCurrent) = out
+      for
+        out: (A, Current) <- f(context.stack.head)
+        (result: A, newCurrent: Current) = out
         _ <- ZIO.succeed(context.stack = newCurrent :: context.stack.tail)
-      } yield result
-    }
-}
+      yield result
+    )

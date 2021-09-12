@@ -3,19 +3,18 @@ package org.opentorah.calendar.roman
 import org.opentorah.calendar.Calendar
 import org.opentorah.metadata.{LanguageSpec, Named, Names}
 
-trait Roman extends Calendar {
+trait Roman extends Calendar:
 
   final override def epochHours: Int = 6
 
-  final class RomanYear(number: Int) extends YearBase(number) {
+  final class RomanYear(number: Int) extends YearBase(number):
     override def firstDayNumber: Int =
       daysInNonLeapYear * (number - 1) + yearFirstDayCorrection(number) + 1
 
     override def lengthInDays: Int =
-      daysInNonLeapYear + (if (isLeapYear(number)) 1 else 0)
+      daysInNonLeapYear + (if isLeapYear(number) then 1 else 0)
 
     override def character: YearCharacter = isLeap
-  }
 
   final override type Year = RomanYear
 
@@ -23,29 +22,27 @@ trait Roman extends Calendar {
 
   override protected def areYearsPositive: Boolean = false
 
-  final class RomanYearCompanion extends YearCompanion {
-    override protected def newYear(number: Int): Year =
-      new RomanYear(number)
+  final class RomanYearCompanion extends YearCompanion:
+    override protected def newYear(number: Int): Year = RomanYear(number)
 
     override protected def characters: Seq[YearCharacter] =
       Seq(true, false)
 
-    override protected def monthNamesAndLengths(isLeap: YearCharacter): Seq[MonthNameAndLength] = {
+    override protected def monthNamesAndLengths(isLeap: YearCharacter): Seq[MonthNameAndLength] =
       Seq(
-        new MonthNameAndLength(Month.January  , 31),
-        new MonthNameAndLength(Month.February , if (isLeap) 29 else 28),
-        new MonthNameAndLength(Month.March    , 31),
-        new MonthNameAndLength(Month.April    , 30),
-        new MonthNameAndLength(Month.May      , 31),
-        new MonthNameAndLength(Month.June     , 30),
-        new MonthNameAndLength(Month.July     , 31),
-        new MonthNameAndLength(Month.August   , 31),
-        new MonthNameAndLength(Month.September, 30),
-        new MonthNameAndLength(Month.October  , 31),
-        new MonthNameAndLength(Month.November , 30),
-        new MonthNameAndLength(Month.December , 31)
+        MonthNameAndLength(Month.January  , 31),
+        MonthNameAndLength(Month.February , if isLeap then 29 else 28),
+        MonthNameAndLength(Month.March    , 31),
+        MonthNameAndLength(Month.April    , 30),
+        MonthNameAndLength(Month.May      , 31),
+        MonthNameAndLength(Month.June     , 30),
+        MonthNameAndLength(Month.July     , 31),
+        MonthNameAndLength(Month.August   , 31),
+        MonthNameAndLength(Month.September, 30),
+        MonthNameAndLength(Month.October  , 31),
+        MonthNameAndLength(Month.November , 30),
+        MonthNameAndLength(Month.December , 31)
       )
-    }
 
     override def isLeap(yearNumber: Int): Boolean = isLeapYear(yearNumber)
 
@@ -53,7 +50,6 @@ trait Roman extends Calendar {
       monthsInYear*(yearNumber - 1) + 1
 
     override def lengthInMonths(yearNumber: Int): Int = monthsInYear
-  }
 
   final override type YearCompanionType = RomanYearCompanion
   
@@ -71,15 +67,14 @@ trait Roman extends Calendar {
 
   final override type Month = RomanMonth
 
-  sealed trait RomanMonthName extends Named {
+  sealed trait RomanMonthName extends Named:
     final override def names: Names = Month.toNames(this)
-  }
 
   final override type MonthName = RomanMonthName
 
-  final class RomanMonthCompanion extends MonthCompanion {
+  final class RomanMonthCompanion extends MonthCompanion:
     override private[opentorah] def apply(yearOption: Option[Year], monthNumber: Int): Month =
-      new RomanMonth(yearOption, monthNumber)
+      RomanMonth(yearOption, monthNumber)
 
     override private[opentorah] def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / monthsInYear + 1
 
@@ -103,7 +98,6 @@ trait Roman extends Calendar {
       Seq(January, February, March, April, May, June, July, August, September, October, November, December)
 
     protected override def resourceName: String = "RomanMonth"
-  }
 
   final override type MonthCompanionType = RomanMonthCompanion
   
@@ -113,17 +107,15 @@ trait Roman extends Calendar {
 
   final override type Day = RomanDay
 
-  final override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = new RomanDay(monthOption, dayNumber)
+  final override protected def newDay(monthOption: Option[Month], dayNumber: Int): Day = RomanDay(monthOption, dayNumber)
 
-  final class RomanMoment(digits: Seq[Int]) extends MomentBase(digits) {
+  final class RomanMoment(digits: Seq[Int]) extends MomentBase(digits):
     def morningHours(value: Int): Moment = firstHalfHours(value)
 
     def afternoonHours(value: Int): Moment = secondHalfHours(value)
-  }
 
   final override type Moment = RomanMoment
 
-  final override protected def newPoint(digits: Seq[Int]): Point = new RomanMoment(digits)
+  final override protected def newPoint(digits: Seq[Int]): Point = RomanMoment(digits)
 
-  final override def inToString(number: Int)(implicit spec: LanguageSpec): String = number.toString
-}
+  final override def inToString(number: Int)(using spec: LanguageSpec): String = number.toString

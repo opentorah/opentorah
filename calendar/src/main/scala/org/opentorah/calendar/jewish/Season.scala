@@ -3,13 +3,12 @@ package org.opentorah.calendar.jewish
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 
 // "abstract" is here to help with the exhaustiveness check.
-sealed abstract class Season(override val name: String) extends Named {
+sealed abstract class Season(override val name: String) extends Named:
   final lazy val numberInYear: Int = Season.indexOf(this) + 1
 
   final override def names: Names = Season.toNames(this)
-}
 
-object Season extends NamedCompanion {
+object Season extends NamedCompanion:
   override type Key = Season
 
   // tkufos KH 9:3, 10:3
@@ -36,7 +35,5 @@ object Season extends NamedCompanion {
 
   final override val values: Seq[Season] = Seq(TkufasTishrei, TkufasTeves, TkufasNisan, TkufasTammuz)
 
-  trait ForYear {
+  trait ForYear:
     def seasonForYear(season: Season, year: Jewish.Year): Jewish.Moment
-  }
-}

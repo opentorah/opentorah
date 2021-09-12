@@ -9,14 +9,13 @@ final class ExternalMathJaxRunner(
 ) extends MathJaxRunner(
   mathJax,
   configuration
-) {
+):
 
   override protected def typeset(
-    options: Map[String, Any],
+    options: Map[String, Matchable],
     outputName: String,
   ): String =  node.evaluate(mathJax.nodeSnippet(
     configuration,
     options,
     outputName
   ))
-}

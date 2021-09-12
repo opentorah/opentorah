@@ -3,7 +3,7 @@ package org.opentorah.calendar.service
 import io.netty.handler.codec.http.{HttpHeaderNames, HttpHeaderValues}
 import org.opentorah.metadata.{Language, LanguageSpec}
 import org.opentorah.util.{Logging, Zhttp}
-import zhttp.http._
+import zhttp.http.*
 import zio.ZIO
 
 /*
@@ -23,7 +23,7 @@ import zio.ZIO
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends zio.App {
+object CalendarService extends zio.App:
 
   Logging.configureLogBack(useLogStash = false)
 
@@ -31,28 +31,24 @@ object CalendarService extends zio.App {
 
   private val routes = Http.collectM[Request] {
     case request @ Method.GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
-      for {
-        static <- Zhttp.staticResource("/" + path, Some(request))
-      } yield static.getOrElse(Zhttp.notFound(path))
+      Zhttp.staticResource("/" + path, Some(request))
+        .catchAll(error => ZIO.succeed(Zhttp.notFound(path + "\n" + error.getMessage)))
 
     case request @ Method.GET -> Root =>
       renderHtml(Renderer.renderRoot(getLocation(request), getLanguage(request)))
 
     case request@ Method.GET -> Root / kindStr =>
-      renderHtml(renderer(kindStr, request).renderLanding)
+      renderHtml(Renderer.renderLanding(kindStr, getLocation(request), getLanguage(request)))
 
     case request@ Method.GET -> Root / kindStr / yearStr =>
-      renderHtml(renderer(kindStr, request).renderYear(yearStr))
+      renderHtml(Renderer.renderYear(kindStr, getLocation(request), getLanguage(request), yearStr))
 
     case request @ Method.GET -> Root / kindStr / yearStr / monthStr =>
-      renderHtml(renderer(kindStr, request).renderMonth(yearStr, monthStr))
+      renderHtml(Renderer.renderMonth(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr))
 
     case request@ Method.GET -> Root / kindStr / yearStr / monthStr / dayStr =>
-      renderHtml(renderer(kindStr, request).renderDay(yearStr, monthStr, dayStr))
+      renderHtml(Renderer.renderDay(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr, dayStr))
   }
-
-  private def renderer(kindStr: String, request: Request): Renderer =
-    Renderer.renderer(kindStr, getLocation(request), getLanguage(request))
 
   private def getLanguage(request: Request): LanguageSpec = Zhttp.queryParameter(request, "lang")
     .map(Language.getForName)
@@ -60,7 +56,7 @@ object CalendarService extends zio.App {
 
   private def getLocation(request: Request): Location = Zhttp.queryParameter(request, "inHolyLand")
     .map(value => value == "true")
-    .map(if (_) Location.HolyLand else Location.Diaspora)
+    .map(if _ then Location.HolyLand else Location.Diaspora)
     .getOrElse(Location.Diaspora)
 
   def renderHtml(content: String): ResponseM[Any, Nothing] = ZIO.succeed(Response.http(
@@ -72,4 +68,3 @@ object CalendarService extends zio.App {
     port = scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090),
     routes
   )
-}

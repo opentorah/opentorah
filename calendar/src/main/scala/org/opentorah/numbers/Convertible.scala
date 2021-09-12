@@ -5,7 +5,7 @@ package org.opentorah.numbers
   *
   * @tparam T  type of the number to convert to/from
   */
-trait Convertible[T] {
+trait Convertible[T]:
   def signum(value: T): Int
   def abs(value: T): T
   def plus(value: T, that: T): T
@@ -13,12 +13,11 @@ trait Convertible[T] {
   def div(digit: Int, denominator: BigInt): T
   def round(value: T): Int
   def wholeAndFraction(value: T): (Int, T)
-}
 
-object Convertible {
-  def apply[T](implicit ev: Convertible[T]): Convertible[T] = ev
+object Convertible:
+  def apply[T](using ev: Convertible[T]): Convertible[T] = ev
 
-  implicit val bigRationalConvertible: Convertible[BigRational] = new Convertible[BigRational] {
+  given Convertible[BigRational] with
     override def signum(value: BigRational): Int = value.signum
     override def abs(value: BigRational): BigRational = value.abs
     override def plus(value: BigRational, that: BigRational): BigRational = value + that
@@ -26,18 +25,14 @@ object Convertible {
     override def div(digit: Int, denominator: BigInt): BigRational = BigRational(digit, denominator)
     override def round(value: BigRational): Int = value.round
     override def wholeAndFraction(value: BigRational): (Int, BigRational) = (value.whole, value.fraction)
-  }
 
-  implicit val doubleConvertible: Convertible[Double] = new Convertible[Double] {
+  given Convertible[Double] with
     override def signum(value: Double): Int = math.signum(value).toInt
     override def abs(value: Double): Double = math.abs(value)
     override def plus(value: Double, that: Double): Double = value + that
     override def mult(value: Double, n: Int): Double = value * n
     override def div(digit: Int, denominator: BigInt): Double = digit.toDouble/denominator.bigInteger.longValueExact
     override def round(value: Double): Int = math.round(value).toInt
-    override def wholeAndFraction(value: Double): (Int, Double) =  {
+    override def wholeAndFraction(value: Double): (Int, Double) = 
       val whole = math.floor(value).toInt
       (whole, value - whole)
-    }
-  }
-}

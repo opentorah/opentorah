@@ -5,7 +5,7 @@ import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import Angles.{Position, Rotation}
 
 // KH 11:9
-sealed abstract class Zodiac extends Named {
+sealed abstract class Zodiac extends Named:
   final override def names: Names = Zodiac.toNames(this)
 
   final lazy val start: Position = Position(0) + Zodiac.size*Zodiac.indexOf(this)
@@ -14,13 +14,11 @@ sealed abstract class Zodiac extends Named {
 
   final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
-  final def at(angle: Rotation): Position = {
+  final def at(angle: Rotation): Position =
     require(!angle.isNegative && (angle <= Zodiac.size))
     start + angle
-  }
-}
 
-object Zodiac extends NamedCompanion {
+object Zodiac extends NamedCompanion:
   override type Key = Zodiac
 
   case object Aries       extends Zodiac
@@ -40,21 +38,18 @@ object Zodiac extends NamedCompanion {
     Aries, Taurus, Gemini, Cancer, Leo, Virgo,
     Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
 
-  private val (size: Rotation, halfSize: Rotation) = {
+  private val (size: Rotation, halfSize: Rotation) =
     require(Angles.headRange % numberOfValues == 0)
     val sizeInDegrees: Int = Angles.headRange / numberOfValues
     require(sizeInDegrees % 2 == 0)
     (Rotation(sizeInDegrees), Rotation(sizeInDegrees / 2))
-  }
 
-  def fromAngle(angle: Position): (Zodiac, Rotation) = {
+  def fromAngle(angle: Position): (Zodiac, Rotation) =
     val zodiac: Zodiac = inZodiac(angle)
     (zodiac, angle - zodiac.start)
-  }
 
   def inZodiac(angle: Position): Zodiac =
     values.find(_.contains(angle)).get
 
   def in(angle: Position, zodiacs: Set[Zodiac]):Boolean =
     zodiacs.exists(_.contains(angle))
-}

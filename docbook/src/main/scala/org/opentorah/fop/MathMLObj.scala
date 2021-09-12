@@ -7,14 +7,14 @@ import org.opentorah.xml.{Dom, Sax}
 import org.xml.sax.{Attributes, Locator}
 import java.awt.geom.Point2D
 
-final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.Obj(parent) {
+final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.Obj(parent):
 
   private var fontSize: Option[Float] = None
 
   override protected def createPropertyList(
     pList: PropertyList,
     foEventHandler: FOEventHandler
-  ): PropertyList = {
+  ): PropertyList =
     val commonFont = pList.getFontProps
 
     fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.points2Millipoints).toFloat)
@@ -22,20 +22,18 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
     // fonts: commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName)
 
     super.createPropertyList(pList, foEventHandler)
-  }
 
   override def processNode(
     elementName: String,
     locator: Locator,
     attlist: Attributes,
     propertyList: PropertyList
-  ): Unit = {
+  ): Unit =
     super.processNode(elementName, locator, Sax.sortAttributes(attlist), propertyList)
 
     createBasicDocument()
 
     Sizes.fontSizeAttribute.optional.withValue(fontSize).set(Dom)(getDOMDocument.getDocumentElement)
-  }
 
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
   // - one here in getSizes() and another one in PreloaderMathML -
@@ -61,13 +59,10 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
   override def getDimension(view: Point2D): Point2D = getSizes.getPoint
 
   override def getIntrinsicAlignmentAdjust: Length = getSizes.getIntrinsicAlignmentAdjust
-}
 
-object MathMLObj {
-  class Obj(parent: FONode) extends XMLObj(parent) {
+object MathMLObj:
+  class Obj(parent: FONode) extends XMLObj(parent):
 
     override def getNamespaceURI: String = MathML.namespace.uri
 
     override def getNormalNamespacePrefix: String = MathML.namespace.getPrefix.getOrElse("")
-  }
-}

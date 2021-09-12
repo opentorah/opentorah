@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import io.netty.handler.codec.http.HttpHeaderNames
-import zhttp.http.{HTTP_CHARSET, Header, HttpData, RHttpApp, Request, Response, Status}
+import zhttp.http.{HTTP_CHARSET, Header, HttpData, RHttpApp, Request, Response, ResponseM, Status}
 import zhttp.service.{EventLoopGroup, Server}
 import zhttp.service.server.ServerChannelFactory
 import zio.blocking.Blocking
@@ -12,9 +12,7 @@ import java.io.{File, FileNotFoundException, InputStream}
 import java.net.{URL, URLConnection}
 import java.time.Instant
 
-object Zhttp {
-
-  type BResponse = ZIO[Blocking, Throwable, Option[Response[Blocking, Throwable]]]
+object Zhttp:
 
   def textData(text: String): HttpData.CompleteData = HttpData.CompleteData(Chunk.fromArray(textBytes(text)))
 
@@ -31,7 +29,7 @@ object Zhttp {
     port: Int,
     routes: RHttpApp[zio.ZEnv],
     nThreads: Int = 0
-  ): zio.URIO[zio.ZEnv, zio.ExitCode] = {
+  ): zio.URIO[zio.ZEnv, zio.ExitCode] =
     val server =
       // Note: To be accessible when running in a docker container the server
       // must bind to all IPs, not just 127.0.0.1;
@@ -50,7 +48,7 @@ object Zhttp {
       .provideCustomLayer(ServerChannelFactory.auto ++ EventLoopGroup.auto(nThreads))
       .mapError(err => zio.console.putStrLn(s"Execution failed with: $err")) // TODO use logging
       .exitCode
-  }
+  end start
 
   // Inspired by https://github.com/http4s/http4s/blob/main/core/jvm/src/main/scala/org/http4s/StaticFile.scala
 
@@ -58,20 +56,18 @@ object Zhttp {
     name: String,
     request: Option[Request] = None,
     classloader: Option[ClassLoader] = None
-  ): BResponse = {
+  ): ResponseM[Blocking, Throwable] =
     val loader: ClassLoader = classloader.getOrElse(getClass.getClassLoader)
     val normalizedName: String = name.split("/").filter(_.nonEmpty).mkString("/") // TODO Files.splitUrl
-    for {
-      resource <- Effects.attempt(Option(loader.getResource(normalizedName)))
-      result <- resource.fold[BResponse](ZIO.succeed(None))(staticFile(_, request))
-    } yield result
-  }
+    for
+      resourceOpt <- Effects.attempt(Option(loader.getResource(normalizedName)))
+      result <- if resourceOpt.isEmpty then Effects.fail(s"No such resource: $normalizedName") else staticFile(resourceOpt.get, request)
+    yield result
 
-  // TODO fail with descriptive messages
-  def staticFile(url: URL, request: Option[Request]): BResponse = {
-    for {
-      isDirectory: Boolean <- Effects.attempt((url.getProtocol == "file") && new File(url.getFile).isDirectory)
-      // TODO if isDirectory: ZIO.succeed(None)
+  def staticFile(url: URL, request: Option[Request]): ResponseM[Blocking, Throwable] =
+    for
+      isDirectory: Boolean <- Effects.attempt((url.getProtocol == "file") && File(url.getFile).isDirectory)
+      _ <- Effects.check(!isDirectory, s"Is a directory: $url")
 
       urlConnection: URLConnection <- Effects.attempt(url.openConnection)
 
@@ -80,28 +76,22 @@ object Zhttp {
       ifModifiedSince: Option[Instant] = request.flatMap(_.getHeaderValue(HttpHeaderNames.IF_MODIFIED_SINCE)).map(Instant.parse)
       expired: Boolean = ifModifiedSince.fold(true)(_.isBefore(lastModified))
 
-      response <- if (!expired) {
-        for {
+      result <- if !expired then
+        for
           _ <- Effects.attempt(urlConnection.getInputStream.close()).catchAll(_ => ZIO.succeed(()))
-        } yield Response.http(status = Status.NOT_MODIFIED)
-      } else {
-        for {
+        yield Response.http(status = Status.NOT_MODIFIED)
+      else
+        for
           contentLength: Long <- Effects.attempt(urlConnection.getContentLengthLong)
           inputStream: InputStream <- Effects.attempt(urlConnection.getInputStream)
-        } yield Response.http(
+        yield Response.http(
           headers = List(
             Header.custom(HttpHeaderNames.LAST_MODIFIED.toString, lastModified.toString),
-            if (contentLength >= 0) Header.contentLength(contentLength) else Header.transferEncodingChunked
+            if contentLength >= 0 then Header.contentLength(contentLength) else Header.transferEncodingChunked
           ) ++ nameToContentType(url.getPath).map(Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, _)).toList,
           content = HttpData.fromStream(ZStream.fromInputStream(inputStream))
         )
-      }
-
-      result = Some(response)
-    } yield result
-  }.catchSome {
-    case _: FileNotFoundException => ZIO.succeed(None)
-  }
+    yield result
 
   private def nameToContentType(name: String): Option[String] = Files.nameAndExtension(name)._2.map {
     case "js"   => "application/javascript" // Note: without this, browser does not process scripts
@@ -110,4 +100,3 @@ object Zhttp {
     case "jpeg" => "image/jpeg"
     case _      => ""
   }
-}

@@ -2,8 +2,8 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.Rotation
 
-object MoonLatitude {
-  final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation] {
+object MoonLatitude:
+  final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation]:
     // KH 16:11
     final override val values: Map[Rotation, Rotation] = Map(
       row( 0, 0,  0),
@@ -19,17 +19,14 @@ object MoonLatitude {
     )
 
     // KH 16:13-15
-    final override def calculate(moonLatitudeCourse: Rotation): Rotation = {
+    final override def calculate(moonLatitudeCourse: Rotation): Rotation =
       def forCanonical(argument: Rotation): Rotation = interpolate(argument.canonical)
       val angle: Rotation = moonLatitudeCourse.canonical
       // canonical angle is always >= Rotation(0)
-      if (angle <= Rotation( 90)) forCanonical(angle                ) else // KH 16:11
-      if (angle <= Rotation(180)) forCanonical(Rotation(180) - angle) else // KH 16:13
-      if (angle <= Rotation(270)) forCanonical(angle - Rotation(180)) else // KH 16:14
+      if angle <= Rotation( 90) then forCanonical(angle                ) else // KH 16:11
+      if angle <= Rotation(180) then forCanonical(Rotation(180) - angle) else // KH 16:13
+      if angle <= Rotation(270) then forCanonical(angle - Rotation(180)) else // KH 16:14
                                   forCanonical(Rotation(360) - angle)      // KH 16:15
-    }
-  }
 
   private def row(argumentDegrees: Int, valueDegrees: Int, valueMinutes: Int): (Rotation, Rotation) =
     Rotation(argumentDegrees) -> Rotation(valueDegrees, valueMinutes)
-}

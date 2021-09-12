@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import java.io.File
 
-object Catalog extends Dialect with Doctype {
+object Catalog extends Dialect, Doctype:
   override val namespace: Namespace = Namespace(uri = "urn:oasis:names:tc:entity:xmlns:xml:catalog", prefix = null)
 
   override val mimeType: String = "application/xml"
@@ -48,7 +48,6 @@ object Catalog extends Dialect with Doctype {
   def nextCatalogSystem: ScalaXml.Element =
     nextCatalog("/etc/xml/catalog")
 
-  def dtd(substitutions: Map[String, String]): String = substitutions.toSeq.map {
-    case (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
-  }.mkString
-}
+  def dtd(substitutions: Map[String, String]): String = substitutions.toSeq.map(
+    (name: String, value: String) => s"""<!ENTITY $name "$value">\n"""
+  ).mkString

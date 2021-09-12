@@ -11,14 +11,14 @@ import java.io.File
 abstract class MathJaxRunner(
   mathJax: MathJax,
   val configuration: MathJaxConfiguration
-) {
+):
 
-  final def typeset(mathMLDocument: Document): SVGDocument = {
+  final def typeset(mathMLDocument: Document): SVGDocument =
     val element: Element = mathMLDocument.getDocumentElement
 
     val input: Input = MathFilter.inputAttribute.get(Dom)(element)
     val math: String =
-      if (input == Input.MathML) MathML.prettyPrinter.render(Dom)(element)
+      if input == Input.MathML then MathML.prettyPrinter.render(Dom)(element)
       else MathFilter.unwrap(element)
 
     val fontSize: Float = Sizes.fontSizeAttribute.required.get(Dom)(element)
@@ -43,15 +43,13 @@ abstract class MathJaxRunner(
     Sizes.fontSizeAttribute.required.withValue(fontSize).set(Dom)(result.getDocumentElement)
 
     result
-  }
 
   protected def typeset(
-    options: Map[String, Any],
+    options: Map[String, Matchable],
     outputName: String,
   ): String
-}
 
-object MathJaxRunner {
+object MathJaxRunner:
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[MathJaxRunner])
 
@@ -78,14 +76,12 @@ object MathJaxRunner {
     j2v8: Option[J2V8],
     mathJax: MathJax,
     configuration: MathJaxConfiguration
-  ): MathJaxRunner = {
+  ): MathJaxRunner =
     // Make sure MathJax is installed
     node.npmInstall(mathJax.packageName, overwriteMathJax)
 
     // If J2V8 is configured to be used, is available and actually loads - we use it;
     // otherwise each typesetting is done by calling Node in a separate process.
     val useJ2V8: Boolean = j2v8.isDefined && j2v8.get.load()
-    if (useJ2V8) new J2V8MathJaxRunner(node, mathJax, configuration)
-    else new ExternalMathJaxRunner(node,mathJax,  configuration)
-  }
-}
+    if useJ2V8 then J2V8MathJaxRunner(node, mathJax, configuration)
+    else ExternalMathJaxRunner(node,mathJax,  configuration)

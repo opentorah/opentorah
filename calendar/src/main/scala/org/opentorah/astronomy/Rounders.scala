@@ -2,7 +2,7 @@ package org.opentorah.astronomy
 
 import org.opentorah.angles.Angles.{Position, Rotation}
 
-trait Rounders {
+trait Rounders:
   def sunCourse: Rotation => Rotation
 
   def sunLongitudeTrue: Position => Position
@@ -30,11 +30,10 @@ trait Rounders {
   def geographicCorrection: Rotation => Rotation
 
   def arcOfSighting: Rotation => Rotation
-}
 
 
-object Rounders {
-  object Text extends Rounders {
+object Rounders:
+  object Text extends Rounders:
     final override def sunCourse: Rotation => Rotation = _.roundToDegrees // KH 13:9
     final override def sunLongitudeTrue: Position => Position = _.roundToMinutes // KH 13:10
     final override def moonAnomalyTrue: Position => Position = _.roundToDegrees // KH 15:8
@@ -49,9 +48,8 @@ object Rounders {
     final override def moonLongitude3Correction: Rotation => Rotation = _.roundToMinutes // KH 13:10
     final override def geographicCorrection: Rotation => Rotation = _.roundToMinutes // KH 13:10
     final override def arcOfSighting: Rotation => Rotation = _.roundToMinutes // KH 13:10
-  }
 
-  object Identity extends Rounders {
+  object Identity extends Rounders:
     final override def sunCourse: Rotation => Rotation = identity
     final override def sunLongitudeTrue: Position => Position = identity
     final override def moonAnomalyTrue: Position => Position = identity
@@ -66,5 +64,3 @@ object Rounders {
     final override def moonLongitude3Correction: Rotation => Rotation = identity
     final override def geographicCorrection: Rotation => Rotation = identity
     final override def arcOfSighting: Rotation => Rotation = identity
-  }
-}

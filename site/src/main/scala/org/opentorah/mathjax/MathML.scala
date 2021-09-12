@@ -2,7 +2,7 @@ package org.opentorah.mathjax
 
 import org.opentorah.xml.{Attribute, Dialect, Namespace, PrettyPrinter}
 
-object MathML extends Dialect {
+object MathML extends Dialect:
 
   override val namespace: Namespace = Namespace(uri = "http://www.w3.org/1998/Math/MathML", prefix = "mathml")
 
@@ -17,18 +17,16 @@ object MathML extends Dialect {
    *
    * Note: this attribute is always used within its native MathML.namespace, so I set its namespace to Top.
    */
-  final class DisplayAttribute extends Attribute[Boolean]("display", namespace = Namespace.No, default = false) {
+  final class DisplayAttribute extends Attribute[Boolean]("display", namespace = Namespace.No, default = false):
     private val inline: String = "inline"
     private val block: String = "block"
     private val values: Set[String] = Set(inline, block)
 
-    override def fromString(value: String): Boolean = {
+    override def fromString(value: String): Boolean =
       require(values.contains(value))
       value == inline
-    }
 
-    override def toString(value: Boolean): String = if (value) inline else block
-  }
+    override def toString(value: Boolean): String = if value then inline else block
 
   @SerialVersionUID(1L)
   val displayAttribute: DisplayAttribute = new DisplayAttribute
@@ -36,4 +34,3 @@ object MathML extends Dialect {
   val math: String = "math"
   val mrow: String = "mrow"
   val mi  : String = "mi"
-}

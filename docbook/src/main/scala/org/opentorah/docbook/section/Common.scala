@@ -3,7 +3,7 @@ package org.opentorah.docbook.section
 import Section.Parameters
 import org.opentorah.xml.ScalaXml
 
-object Common extends CommonSection {
+object Common extends CommonSection:
   override def name: String = "common"
 
   override def parameters: Parameters = Map(
@@ -28,4 +28,3 @@ object Common extends CommonSection {
       </l:l10n>
     </l:i18n>
   )
-}

@@ -1,12 +1,12 @@
 package org.opentorah.angles
 
-import org.opentorah.numbers.{Digit, Digits, DigitsDescriptor, PeriodicNumbers}
+import org.opentorah.numbers.{Digits, DigitsDescriptor, Numbers}
 
-trait Angles extends PeriodicNumbers {
+trait Angles extends Numbers.Periodic:
 
   final override type DigitType = AnglesDigits.type
 
-  final override protected def createDigit: DigitType = AnglesDigits
+  final override protected def digitsDescriptor: DigitType = AnglesDigits
 
   trait Angle[N <: Angle[N]] extends Number[N] { this: N =>
     def degrees: Int = get(Digit.DEGREES)
@@ -38,21 +38,20 @@ trait Angles extends PeriodicNumbers {
     def toDegrees: Double = toDouble
   }
 
-  trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N] {
+  trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N]:
     final def fromRadians(value: Double, length: Int): N = fromDegrees(math.toDegrees(value), length)
 
     final def fromDegrees(value: Double, length: Int): N = fromDouble(value, length)
-  }
 
-  final class RotationAngle(digits: Digits) extends VectorNumber(digits) with Angle[RotationAngle]
+  final class RotationAngle(digits: Digits) extends VectorNumber(digits), Angle[RotationAngle]
 
   final override type Vector = RotationAngle
 
   final type Rotation = Vector
 
-  final class RotationCompanion extends VectorCompanion with AngleCompanion[Rotation]
+  final class RotationCompanion extends VectorCompanion, AngleCompanion[Rotation]
 
-  final override protected def newVector(digits: Digits): Vector = new RotationAngle(digits)
+  final override protected def newVector(digits: Digits): Vector = RotationAngle(digits)
 
   final override type VectorCompanionType = RotationCompanion
 
@@ -60,15 +59,15 @@ trait Angles extends PeriodicNumbers {
 
   final val Rotation = Vector
 
-  final class PositionAngle(digits: Digits) extends PointNumber(digits) with Angle[PositionAngle]
+  final class PositionAngle(digits: Digits) extends PointNumber(digits), Angle[PositionAngle]
 
   final override type Point = PositionAngle
 
   final type Position = Point
 
-  final class PositionCompanion extends PointCompanion with AngleCompanion[Position]
+  final class PositionCompanion extends PointCompanion, AngleCompanion[Position]
 
-  final override protected def newPoint(digits: Digits): Point = new PositionAngle(digits)
+  final override protected def newPoint(digits: Digits): Point = PositionAngle(digits)
 
   final override type PointCompanionType = PositionCompanion
 
@@ -81,6 +80,5 @@ trait Angles extends PeriodicNumbers {
   final override val maxLength: Int = 10
 
   final override def range(position: Int): Int = 60
-}
 
 object Angles extends Angles // TODO if I make Angles trait itself an object, RotationTest fails!!!

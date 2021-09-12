@@ -2,9 +2,9 @@ package org.opentorah.texts.tanach
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import Custom._
+import Custom.*
 
-final class CustomTest extends AnyFlatSpec with Matchers {
+final class CustomTest extends AnyFlatSpec, Matchers:
 
   "minimize()" should "remove redundant children" in {
     check(
@@ -17,13 +17,11 @@ final class CustomTest extends AnyFlatSpec with Matchers {
     )
   }
 
-  private def check[T](sourceMap: Map[Custom, T], expectedMap: Map[Custom, T]): Unit = {
-    val source: Of[T] = new Of(sourceMap)
-    val expectedMaximized: Map[Custom, T] = new Of(expectedMap).maximize
+  private def check[T](sourceMap: Map[Custom, T], expectedMap: Map[Custom, T]): Unit =
+    val source: Of[T] = Of[T](sourceMap)
+    val expectedMaximized: Map[Custom, T] = Of(expectedMap).maximize
 
     val minimized = source.minimize
     val maximized = source.maximize
     minimized.customs shouldBe expectedMap
     maximized shouldBe expectedMaximized
-  }
-}

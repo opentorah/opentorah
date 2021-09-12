@@ -16,14 +16,13 @@ final class SiteCommon(
   private val tei: Option[SiteTei],
   private val highlighter: Option[SiteHighlighter],
   private val mathJax: Option[SiteMathJax]
-) {
+):
   def getSocial     : SiteSocial      = social     .getOrElse(SiteSocial     .empty)
   def getTei        : SiteTei         = tei        .getOrElse(SiteTei        .empty)
   def getHighlighter: SiteHighlighter = highlighter.getOrElse(SiteHighlighter.empty)
   def getMathJax    : SiteMathJax     = mathJax    .getOrElse(SiteMathJax    .empty)
-}
 
-object SiteCommon extends Element[SiteCommon]("common") {
+object SiteCommon extends Element[SiteCommon]("common"):
   object Title  extends RawXml("title")
   object Footer extends RawXml("footer")
 
@@ -32,22 +31,22 @@ object SiteCommon extends Element[SiteCommon]("common") {
   private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
   private val emailAttribute: Attribute.Optional[String] = Attribute("email").optional
 
-  override def contentParsable: Parsable[SiteCommon] = new Parsable[SiteCommon] {
-    override def parser: Parser[SiteCommon] = for {
-      url <- urlAttribute()
-      favicon <- faviconAttribute()
-      googleAnalyticsId <- googleAnalyticsIdAttribute()
-      email <- emailAttribute()
-      title <- Title.element.optional()
-      license <- SiteLicense.optional()
-      social <- SiteSocial.optional()
-      footer <- Footer.element.optional()
-      pages <- SitePage.seq()
-      tei <- SiteTei.optional()
-      docbook <- SiteDocBook.seq()
-      highlighter <- SiteHighlighter.optional()
-      mathJax <- SiteMathJax.optional()
-    } yield new SiteCommon(
+  override def contentParsable: Parsable[SiteCommon] = new Parsable[SiteCommon]:
+    override def parser: Parser[SiteCommon] = for
+      url: Option[String] <- urlAttribute()
+      favicon: Option[String] <- faviconAttribute()
+      googleAnalyticsId: Option[String] <- googleAnalyticsIdAttribute()
+      email: Option[String] <- emailAttribute()
+      title: Option[SiteCommon.Title.Value] <- Title.element.optional()
+      license: Option[SiteLicense] <- SiteLicense.optional()
+      social: Option[SiteSocial] <- SiteSocial.optional()
+      footer: Option[SiteCommon.Footer.Value] <- Footer.element.optional()
+      pages: Seq[String] <- SitePage.seq()
+      tei: Option[SiteTei] <- SiteTei.optional()
+      docbook: Seq[SiteDocBook] <- SiteDocBook.seq()
+      highlighter: Option[SiteHighlighter] <- SiteHighlighter.optional()
+      mathJax: Option[SiteMathJax] <- SiteMathJax.optional()
+    yield SiteCommon(
       url,
       favicon,
       googleAnalyticsId,
@@ -78,5 +77,3 @@ object SiteCommon extends Element[SiteCommon]("common") {
       SiteHighlighter.optional(_.highlighter),
       SiteMathJax.optional(_.mathJax)
     )
-  }
-}
