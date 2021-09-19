@@ -206,7 +206,7 @@ final class Collector(
   override protected def buildMore: Caching.Parser[Unit] = for
       _ <- Effects.effect(logger.info("Writing references."))
       allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](
-        nodes => ZIO.foreach(EntityType.values)(entityType =>
+        nodes => ZIO.foreach(EntityType.values.toIndexedSeq)(entityType =>
           ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten) // TODO toIndexSeq?
       )
       _ <- Effects.effect(references.write(allReferences))

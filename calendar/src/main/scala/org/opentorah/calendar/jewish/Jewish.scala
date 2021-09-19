@@ -179,4 +179,4 @@ object Jewish extends Calendar:
 
   override protected def newPoint(digits: Seq[Int]): Point = JewishMoment(digits)
 
-  override def inToString(number: Int)(using spec: LanguageSpec): String = spec.toString(number)
+  override def intToString(number: Int)(using spec: LanguageSpec): String = spec.toString(number)

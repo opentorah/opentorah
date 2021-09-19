@@ -41,7 +41,7 @@ trait ToHtml[R <: Has[?]]:
 
   private def transformElement(element: ScalaXml.Element)(newElement: ScalaXml.Element): ScalaXml.Element =
     val name: String = ScalaXml.getName(element)
-    val attributes: Seq[Attribute.Value[String]] = ScalaXml.getAttributes(element)
+    val attributes: Attribute.StringValues = ScalaXml.getAttributes(element)
     if newElement eq element then ScalaXml.setAttributes(
       element = if Html.reservedElements.contains(name) then element.copy(label = addPrefix(name)) else element,
       attributes = attributes.map(transformXmlAttribute)

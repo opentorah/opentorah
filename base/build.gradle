@@ -11,9 +11,9 @@ description = 'Open Torah Base'
 apply from: '../configure.gradle'
 
 dependencies {
-  api libs.scala.xml
+  api libs.scala.xml // TODO ?
   api libs.zio.core
-  api libs.zio.streams
+  api libs.zio.streams // TODO ?
 
   implementation libs.xerces
   implementation libs.paiges
@@ -25,7 +25,7 @@ dependencies {
   compileOnly libs.logback
   compileOnly libs.logstash
   compileOnly libs.xmlresolver, libs.jing
-  compileOnly libs.saxon6  // Saxon 6 (XSLT 1.0)
+  compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
   compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
   compileOnly libs.caffeine
   compileOnly libs.zhttp

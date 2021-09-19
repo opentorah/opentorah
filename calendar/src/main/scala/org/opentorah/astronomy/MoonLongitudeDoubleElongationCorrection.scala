@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.Rotation
+import Angles.Rotation
 
 object MoonLongitudeDoubleElongationCorrection:
   // KH 15:2-3

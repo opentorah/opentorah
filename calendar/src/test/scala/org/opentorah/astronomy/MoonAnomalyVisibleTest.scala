@@ -1,8 +1,8 @@
 package org.opentorah.astronomy
 
+import Angles.Position
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.opentorah.angles.Angles.Position
 
 class MoonAnomalyVisibleTest extends AnyFlatSpec, Matchers:
 

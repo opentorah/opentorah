@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.Parser
+import org.opentorah.xml.{Parser, Parsing}
 
 abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book, NamedCompanion:
   final override type Key = Parsha
@@ -83,7 +83,7 @@ object Chumash:
           )
 
           val book: Chumash = parsha.book
-          Some(Parser.unsafeRun(Torah.processDays(
+          Some(Parsing.unsafeRun(Torah.processDays(
             book,
             combined,
             book.chapters.merge(

@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine, RemovalCause}
 import org.opentorah.util.Effects
-import org.opentorah.xml.Context
+import org.opentorah.xml.Parsing
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Has, ZIO, ZLayer}
 import java.net.URL
@@ -13,13 +13,13 @@ trait Caching:
 
 object Caching:
 
-  type Parser[+A] = ZIO[Has[Caching] & Has[Context], Effects.Error, A]
+  type Parser[+A] = ZIO[Has[Caching] & Has[Parsing], Effects.Error, A]
 
   def getCached[T <: AnyRef](url: URL, load: URL => Parser[T]): Parser[T] =
-    ZIO.accessM[Has[Caching] & Has[Context]](_.get.getCached[T](url, load))
+    ZIO.accessM[Has[Caching] & Has[Parsing]](_.get.getCached[T](url, load))
 
   def provide[A](caching: Caching, parser: Parser[A]): org.opentorah.xml.Parser[A] =
-    parser.provideSomeLayer[Has[Context]](ZLayer.succeed(caching))
+    parser.provideSomeLayer[Has[Parsing]](ZLayer.succeed(caching))
 
   private val log: Logger = LoggerFactory.getLogger(classOf[Caching.type])
 

@@ -14,8 +14,7 @@ package org.opentorah.numbers
   * @param numerator  of the number (signed)
   * @param denominator  of the number (positive)
   */
-final case class BigRational private(numerator: BigInt, denominator: BigInt)
-  extends Comparable[BigRational], Ordered[BigRational]:
+final case class BigRational private(numerator: BigInt, denominator: BigInt) extends Ordered[BigRational]:
   // Representation invariants
   require(denominator > 0)
   require(numerator.gcd(denominator) == 1)
@@ -80,7 +79,7 @@ object BigRational:
 
   final def apply(numerator: Int): BigRational = apply(numerator, 1)
 
-  final def apply(value: String): BigRational =
+  final def fromString(value: String): BigRational =
     val values = value.split('/')
     if values.length != 2 then throw ArithmeticException(s"Invalid BigRational: $value")
     apply(BigInt(values(0).trim), BigInt(values(1).trim))

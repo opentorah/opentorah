@@ -1,10 +1,11 @@
 package org.opentorah.markdown
 
-import com.vladsch.flexmark.ast.{Heading, Node}
+import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.options.{DataHolder, MutableDataSet}
+import com.vladsch.flexmark.util.ast.Node
+import com.vladsch.flexmark.util.data.{DataHolder, MutableDataSet}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{From, ScalaXml}
 import java.io.InputStreamReader

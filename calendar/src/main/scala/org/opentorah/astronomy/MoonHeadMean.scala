@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.Rotation
+import Angles.Rotation
 
 object MoonHeadMean extends Time2Rotation:
 

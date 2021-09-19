@@ -1,6 +1,6 @@
 package org.opentorah.calendar.paper
 
-import org.opentorah.angles.Angles.Rotation
+import org.opentorah.astronomy.Angles.Rotation
 import org.opentorah.astronomy.{SunLongitudeMean, Time2Rotation}
 import java.io.File
 

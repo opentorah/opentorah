@@ -19,7 +19,7 @@ trait Elements[A]:
     from: Option[From],
     nextElement: ScalaXml.Element,
     element: Element[?]
-  ): Parser[A] = Context.nested(
+  ): Parser[A] = Parsing.nested(
     from,
     nextElement,
     element.contentType,
@@ -28,7 +28,7 @@ trait Elements[A]:
 
   private def optionalParser: Parser[Option[A]] = for
     // TODO take namespace into account!
-    nextElementOpt: Option[ScalaXml.Element] <- Context.nextElement(element => elementByName(ScalaXml.getName(element)).isDefined)
+    nextElementOpt: Option[ScalaXml.Element] <- Parsing.nextElement(element => elementByName(ScalaXml.getName(element)).isDefined)
     result: Option[A] <- if nextElementOpt.isEmpty then ZIO.none else
       val nextElement: ScalaXml.Element = nextElementOpt.get
       val nextElementName:String = ScalaXml.getName(nextElement)
@@ -43,7 +43,7 @@ trait Elements[A]:
   yield result
 
   final def parse(from: From): Parser[A] = for
-    _ <- Context.checkNoLeftovers
+    _ <- Parsing.checkNoLeftovers
     nextElement: ScalaXml.Element <- from.load
     nextElementName: String = ScalaXml.getName(nextElement)
     nextElementParserOpt: Option[Element[_]] = elementByName(nextElementName)
@@ -128,7 +128,7 @@ object Elements:
       url: Option[String] <- Elements.redirectAttribute.optional()
       result: B <- url.fold(noRedirect(parser.asInstanceOf[Parser[A]]))((url: String) =>
         for
-          currentBaseUrl: Option[URL] <- Context.currentBaseUrl
+          currentBaseUrl: Option[URL] <- Parsing.currentBaseUrl
           from: URL <- Effects.effect(Files.subUrl(currentBaseUrl, url))
           result: B <- redirected(from)
         yield result

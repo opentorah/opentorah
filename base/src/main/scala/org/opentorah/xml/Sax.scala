@@ -51,7 +51,7 @@ object Sax extends XmlAttributes:
       attribute.name
     ))
 
-  override def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]] =
+  override def getAttributes(attributes: Attributes): Attribute.StringValues =
     for
       index: Int <- 0 until attributes.getLength
       prefix: Option[String] = getPrefix(attributes, index)
@@ -113,7 +113,7 @@ object Sax extends XmlAttributes:
   // even then, XMLObj.setAttributes() sets un-prefixed qualified name for namespaced attributes -
   // but somehow they are detected correctly in MathJax.typeset()...
   def sortAttributes(attributes: Attributes): Element =
-    val nonXmlns: Seq[Attribute.Value[String]] = getAttributes(attributes)
+    val nonXmlns: Attribute.StringValues = getAttributes(attributes)
     val usedNamespaces: Set[Namespace] = nonXmlns.map(_.attribute.namespace).toSet
     val declaredNamespaces: Set[Namespace] = getNamespaces(attributes).toSet
 

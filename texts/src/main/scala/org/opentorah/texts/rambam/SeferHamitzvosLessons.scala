@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Language, Name, Named, Names}
 import org.opentorah.store.Selector
-import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, Parsing, Unparser}
 
 object SeferHamitzvosLessons:
 
@@ -62,4 +62,4 @@ object SeferHamitzvosLessons:
   private object Negative extends Numbered("negative")
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(Named.load(From.resource(this), Lesson))
+  lazy val lessons: Seq[Lesson] = Parsing.unsafeRun(Named.load(From.resource(this), Lesson))

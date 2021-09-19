@@ -46,7 +46,9 @@ object Attribute:
 
   type Values = Seq[Value[?]]
 
-  def allAttributes: Parser[Seq[Value[String]]] = Context.allAttributes
+  type StringValues = Seq[Value[String]]
+
+  def allAttributes: Parser[StringValues] = Parsing.allAttributes
 
   sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A]:
     final override def unparser: Unparser[A] = Unparser(
@@ -60,7 +62,7 @@ object Attribute:
     def get(xml: XmlAttributes)(element: xml.Attributes): A
 
   private def optionalParser[T](attribute: Attribute[T]): Parser[Option[T]] =
-    Context.takeAttribute(attribute).flatMap(value =>
+    Parsing.takeAttribute(attribute).flatMap(value =>
       value.fold[Parser[Option[T]]](ZIO.none)(attribute.parseFromString(_).map(Some(_)))
     )
 

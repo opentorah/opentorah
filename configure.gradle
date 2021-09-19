@@ -16,13 +16,8 @@ dependencies {
 
   testImplementation libs.scalatest
   // for scalatest reports
-  testImplementation (libs.flexmark.core) {
-    // ancient flexmark that scalatest requires uses ancient log4j that has a vulnerability that Maven Central blocks...
-    exclude group: 'log4j', module: 'log4j'
-  }
-  testImplementation (libs.flexmark.profile.pegdown) {
-    exclude group: 'com.vladsch.flexmark', module: 'flexmark'
-  }
+  testImplementation libs.flexmark.core
+  testImplementation libs.flexmark.profile.pegdown
 
   testImplementation libs.scalacheck
   testImplementation libs.discipline.scalatest

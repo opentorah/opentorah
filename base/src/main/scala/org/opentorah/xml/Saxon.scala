@@ -17,7 +17,7 @@ sealed abstract class Saxon(name: String):
     inputSource: InputSource,
     result: javax.xml.transform.Result
   ): Unit =
-    xmlLogger.debug(
+    Xml.logger.debug(
       s"""Saxon.transform(
          |  saxon = $this,
          |  stylesheetFile = $stylesheetFile,
@@ -46,7 +46,7 @@ sealed abstract class Saxon(name: String):
   private def getTransformerFactory(resolver: Option[Resolver]): SAXTransformerFactory =
     val result: SAXTransformerFactory = newTransformerFactory
 
-    result.setErrorListener(Saxon.errorListener(xmlLogger))
+    result.setErrorListener(Saxon.errorListener(Xml.logger))
 
     // Note: To intercept all network requests, URIResolver has to be set on the transformerFactory,
     // not the transformer itself: I guess some sub-transformers get created internally ;)

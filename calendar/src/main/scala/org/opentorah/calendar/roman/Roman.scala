@@ -20,7 +20,7 @@ trait Roman extends Calendar:
 
   final override type YearCharacter = Boolean
 
-  override protected def areYearsPositive: Boolean = false
+  final override protected def areYearsPositive: Boolean = false
 
   final class RomanYearCompanion extends YearCompanion:
     override protected def newYear(number: Int): Year = RomanYear(number)
@@ -118,4 +118,4 @@ trait Roman extends Calendar:
 
   final override protected def newPoint(digits: Seq[Int]): Point = RomanMoment(digits)
 
-  final override def inToString(number: Int)(using spec: LanguageSpec): String = number.toString
+  final override def intToString(number: Int)(using spec: LanguageSpec): String = number.toString

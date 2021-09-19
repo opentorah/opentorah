@@ -34,8 +34,9 @@ object SpecialDay extends NamedCompanion:
 
   sealed trait Festival extends FestivalOrIntermediate
 
-  private object FestivalEnd extends LoadNames("Festival End")
-  private object IntermediateShabbos extends LoadNames("Intermediate Shabbos")
+  private object FestivalEnd extends LoadNames("Festival End") // TODO remove?
+  private object IntermediateShabbos extends LoadNames("Intermediate Shabbos") // TODO remove?
+
   private object Fast extends LoadNames("Public Fast")
 
   sealed abstract class Intermediate(val intermediateDayNumber: Int, val inHolyLand: Boolean)
@@ -282,5 +283,5 @@ object SpecialDay extends NamedCompanion:
     ShabbosBereishis, Chanukah, FastOfTeves,
     ParshasShekalim, ParshasZachor, ParshasParah, ParshasHachodesh, ShabbosHagodol,
     FastOfEster, Purim, ShushanPurim, Pesach1, PesachIntermediate, Pesach7, Pesach8,
-    Omer, LagBaOmer, Shavuos1, FastOfTammuz, TishaBeAv
+    Omer, LagBaOmer, Shavuos1, FastOfTammuz, TishaBeAv, ShabbosSelichos
   )

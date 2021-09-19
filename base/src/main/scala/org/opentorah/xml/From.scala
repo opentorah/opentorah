@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import java.io.File
 import java.net.URL
-import org.opentorah.util.{Effects, Files, Util}
+import org.opentorah.util.{Effects, Files, Platform}
 import zio.{IO, Task}
 
 sealed abstract class From(val name: String):
@@ -64,4 +64,4 @@ object From:
       .getOrElse(Effects.fail(s"Resource not found: $this"))
 
   def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)
-  def resource(obj: AnyRef): From = resource(obj, Util.className(obj))
+  def resource(obj: AnyRef): From = resource(obj, Platform.className(obj))

@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.Rotation
+import Angles.Rotation
 
 // KH 12:1
 object SunLongitudeMean extends Time2Rotation:

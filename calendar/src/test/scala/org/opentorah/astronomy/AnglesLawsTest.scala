@@ -1,4 +1,4 @@
-package org.opentorah.angles
+package org.opentorah.astronomy
 
 import org.opentorah.numbers.NumbersLawsTest
 

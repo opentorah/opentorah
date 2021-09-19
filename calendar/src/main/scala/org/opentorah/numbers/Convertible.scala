@@ -15,8 +15,6 @@ trait Convertible[T]:
   def wholeAndFraction(value: T): (Int, T)
 
 object Convertible:
-  def apply[T](using ev: Convertible[T]): Convertible[T] = ev
-
   given Convertible[BigRational] with
     override def signum(value: BigRational): Int = value.signum
     override def abs(value: BigRational): BigRational = value.abs

@@ -1,20 +1,19 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.Rotation
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.jewish.Jewish.{Day, Moment, Month, Year}
-import org.opentorah.numbers.Zeroable
+import org.opentorah.numbers.Math
 
 object DayOfSighting:
   val calculator: Calculator = Calculator.Text
 
   // Trying to figure out why Iyar 2 4938 is the day of sighting
-  def elongation(moment: Moment): Rotation = calculator.calculate(moment.day).elongation
+  def elongation(moment: Moment): Angles.Rotation = calculator.calculate(moment.day).elongation
 
   def dayOfSighting(month: Month): Day =
     val from: Moment = (month.firstDay - 5).toMoment
     val to: Moment = (month.firstDay + 5).toMoment
-    val result: Moment = Zeroable.findZero[Rotation](Jewish)(
+    val result: Moment = Math.findZero(Jewish, Angles)(
       elongation,
       from,
       to,

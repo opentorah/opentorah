@@ -3,7 +3,7 @@ package org.opentorah.site
 import org.opentorah.docbook.DocBook
 import org.opentorah.store.Caching
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Catalog, Element, Parsable, Parser, Resolver, Unparser}
+import org.opentorah.xml.{Attribute, Catalog, Element, Parsable, Parser, Parsing, Resolver, Unparser}
 import java.io.File
 import java.net.URL
 
@@ -72,7 +72,7 @@ final class SiteDocBook(
         (if !prefixed then Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
       val htmlContent: DocBookHtmlContent[S] = DocBookHtmlContent(documentFile, resolver)
-      val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
+      val content: String = Parsing.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
       Files.write(outputFile, content)
 
   def prettyPrint(): Unit = {

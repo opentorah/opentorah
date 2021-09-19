@@ -1,9 +1,9 @@
-package org.opentorah.angles
+package org.opentorah.astronomy
 
+import Angles.{Position, Rotation}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import Angles.{Position, Rotation}
 
 class RotationTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers:
 

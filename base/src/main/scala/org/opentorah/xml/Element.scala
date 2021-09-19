@@ -26,10 +26,10 @@ abstract class Element[A](val elementName: String) extends Elements[A]:
     )
 
 object Element:
-  def currentFromUrl: Parser[FromUrl] = Context.currentFromUrl
+  def currentFromUrl: Parser[FromUrl] = Parsing.currentFromUrl
 
   val nodes: Parsable[ScalaXml.Nodes] = new Parsable[ScalaXml.Nodes]:
-    override protected def parser: Parser[ScalaXml.Nodes] = Context.allNodes
+    override protected def parser: Parser[ScalaXml.Nodes] = Parsing.allNodes
     override def unparser: Unparser[ScalaXml.Nodes] = Unparser[ScalaXml.Nodes](content = identity)
 
 //  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {

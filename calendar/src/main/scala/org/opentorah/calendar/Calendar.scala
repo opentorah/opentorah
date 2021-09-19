@@ -63,14 +63,14 @@ trait Calendar extends Times:
     final def monthAndDay(when: MonthAndDay): Day =
       month(when.monthName).day(when.numberInMonth)
 
-    private[opentorah] final def monthForDay(day: Int): Month =
+    private[Calendar] final def monthForDay(day: Int): Month =
       require(0 < day && day <= lengthInDays)
       month(monthDescriptors.count(_.daysBefore < day))
 
-    private[opentorah] final def monthDescriptors: Seq[MonthDescriptor] =
+    private[Calendar] final def monthDescriptors: Seq[MonthDescriptor] =
       Year.monthDescriptors(character)
 
-    final override def toLanguageString(using spec: LanguageSpec): String = Calendar.this.inToString(number)
+    final override def toLanguageString(using spec: LanguageSpec): String = intToString(number)
   }
 
   type Year <: YearBase
@@ -155,7 +155,7 @@ trait Calendar extends Times:
 
     private def descriptor: MonthDescriptor = year.monthDescriptors(numberInYear - 1)
 
-    final def numberInYearToLanguageString(using spec: LanguageSpec): String = Calendar.this.inToString(numberInYear)
+    final def numberInYearToLanguageString(using spec: LanguageSpec): String = intToString(numberInYear)
   }
 
   type Month <: MonthBase
@@ -175,13 +175,13 @@ trait Calendar extends Times:
     final def apply(number: Int): Month = apply(None, number)
     private[opentorah] def apply(yearOpt: Option[Year], number: Int): Month
 
-    private[opentorah] def yearNumber(monthNumber: Int): Int
+    private[Calendar] def yearNumber(monthNumber: Int): Int
 
-    private[opentorah] final def withNumberInYear(year: Year, numberInYear: Int): Month =
+    private[Calendar] final def withNumberInYear(year: Year, numberInYear: Int): Month =
       require(0 < numberInYear && numberInYear <= year.lengthInMonths)
       apply(Some(year), year.firstMonthNumber + numberInYear - 1)
 
-    private[opentorah] def numberInYear(monthNumber: Int): Int
+    private[Calendar] def numberInYear(monthNumber: Int): Int
 
   type MonthCompanionType <: MonthCompanion
 
@@ -250,7 +250,7 @@ trait Calendar extends Times:
     final override def toLanguageString(using spec: LanguageSpec): String =
       year.toLanguageString + " " + month.name.toLanguageString + " " + numberInMonthToLanguageString
 
-    final def numberInMonthToLanguageString(using spec: LanguageSpec): String = Calendar.this.inToString(numberInMonth)
+    final def numberInMonthToLanguageString(using spec: LanguageSpec): String = intToString(numberInMonth)
   }
 
   type Day <: DayBase
@@ -258,7 +258,7 @@ trait Calendar extends Times:
   final class DayCompanion:
     def apply(number: Int): Day = newDay(None, number)
 
-    private[opentorah] def witNumberInMonth(month: Month, numberInMonth: Int): Day =
+    private[Calendar] def witNumberInMonth(month: Month, numberInMonth: Int): Day =
       require (0 < numberInMonth && numberInMonth <= month.length)
       newDay(Some(month), month.firstDayNumber + numberInMonth - 1)
 
@@ -292,17 +292,17 @@ trait Calendar extends Times:
 
     final override def toLanguageString(using spec: LanguageSpec): String =
       day.toLanguageString +
-        " " + inToString(time.hours) +
-        ":" + inToString(time.minutes) +
-        "." + inToString(time.partsWithoutMinutes) +
-        "." + inToString(time.moments)
+        " " + intToString(time.hours) +
+        ":" + intToString(time.minutes) +
+        "." + intToString(time.partsWithoutMinutes) +
+        "." + intToString(time.moments)
 
     final def toSecondLanguageString(using spec: LanguageSpec): String =
       day.toLanguageString +
-        " " + inToString(time.hours) +
-        ":" + inToString(time.minutes) +
-        ":" + inToString(time.seconds) +
-        "." + inToString(time.milliseconds)
+        " " + intToString(time.hours) +
+        ":" + intToString(time.minutes) +
+        ":" + intToString(time.seconds) +
+        "." + intToString(time.milliseconds)
   }
 
   type Moment <: MomentBase
@@ -321,5 +321,5 @@ trait Calendar extends Times:
   
   final def TimeVector: VectorCompanion = Vector
 
-  def inToString(number: Int)(using spec: LanguageSpec): String
+  def intToString(number: Int)(using spec: LanguageSpec): String
 

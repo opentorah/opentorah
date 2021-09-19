@@ -71,7 +71,7 @@ final case class PrettyPrinter(
   private final class ForModel(val xml: Xml):
 
     private def fromPreformattedElement(element: xml.Element, parent: Option[xml.Element]): Seq[String] =
-      val attributeValues: Seq[Attribute.Value[String]] = getAttributeValues(element, parent)
+      val attributeValues: Attribute.StringValues = getAttributeValues(element, parent)
       val attributes: String = if attributeValues.isEmpty then "" else attributeValues
         .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueToString.get + "\"")
         .mkString(" ", ", ", "")
@@ -91,7 +91,7 @@ final case class PrettyPrinter(
       canBreakLeft: Boolean,
       canBreakRight: Boolean
     ): Doc =
-      val attributeValues: Seq[Attribute.Value[String]] = getAttributeValues(element, parent)
+      val attributeValues: Attribute.StringValues = getAttributeValues(element, parent)
 
       val attributes: Doc =
         if attributeValues.isEmpty then Doc.empty
@@ -160,7 +160,7 @@ final case class PrettyPrinter(
     private def getName(element: xml.Element): String =
       xml.getPrefix(element).fold("")(_ + ":") + xml.getName(element)
 
-    private def getAttributeValues(element: xml.Element, parent: Option[xml.Element]): Seq[Attribute.Value[String]] =
+    private def getAttributeValues(element: xml.Element, parent: Option[xml.Element]): Attribute.StringValues =
       val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(xml.getNamespaces)
       xml.getNamespaces(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
       xml.getAttributes(element).filterNot(_.value.isEmpty)

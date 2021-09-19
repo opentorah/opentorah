@@ -17,16 +17,7 @@ dependencies {
   implementation project(':opentorah-site')
   implementation project(':opentorah-tei')
 
-  // ancient flexmark that scalatest requires uses ancient log4j that has a vulnerability that Maven Central blocks...
-  // so I can't use the bundle:
-  // compileOnly libs.bundles.markdown
-  implementation (libs.flexmark.core) {
-    exclude group: 'log4j', module: 'log4j'
-  }
-  implementation (libs.flexmark.ext.toc) {
-    exclude group: 'com.vladsch.flexmark', module: 'flexmark'
-  }
-
+  implementation libs.bundles.markdown
   implementation libs.google.cloud.storage
   implementation libs.zhttp
   implementation libs.logback

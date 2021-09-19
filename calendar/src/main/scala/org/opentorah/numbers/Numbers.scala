@@ -27,17 +27,19 @@ type Digits = Seq[Int]
  */
 trait Numbers:
 
-  // TODO is there a way to bring this into the family, so that digits from one are statically blocked from being used in another?
-  type DigitType <: DigitsDescriptor
+  open class Digit(val sign: String):
+    final def position: Int = digitDescriptors.indexOf(this.asInstanceOf[DigitType]) // TODO ordinal?
 
-  final val Digit: DigitType = digitsDescriptor
+  type DigitType <: Digit
 
-  protected def digitsDescriptor: DigitType
+  type WithValues[T] = { val values: Array[T] } // TODO move to Collections
 
-  // TODO do type arithmetics here:
-  //   type NumberExtension[N <: Number[N]] <: Number[N]
-  //   final type Point = PointNumber with NumberExtension[Point]
-  //   final type Vector = VectorNumber with NumberExtension[Vector]
+  type DigitCompanionType <: WithValues[DigitType]
+
+  def Digit: DigitCompanionType
+
+  // TODO is there any way to pull this in here instead of calling values in every derived number system?
+  protected def digitDescriptors: Array[DigitType]
 
   type Point <: PointNumber
 
@@ -64,8 +66,7 @@ trait Numbers:
    *
    * @param digits  sequence of the digits comprising this number.
    */
-  // TODO turn N from a type parameter into a type member
-  abstract class Number[N <: Number[N]](final val digits: Digits) { this: N =>
+  abstract class Number[N <: Number[N]](final val digits: Digits) extends Ordered[N] { this: N =>
 
     // at least the head digit is present
     require(digits.nonEmpty)
@@ -76,13 +77,13 @@ trait Numbers:
     def companion: NumberCompanion[N]
 
     /** Returns digit described by the [[Digit]] descriptor `digit`. */
-    final def get(digit: DigitsDescriptor.Digit): Int = get(digit.position)
+    final def get(digit: Digit): Int = get(digit.position)
 
     /** Returns digit at `position`. */
     final def get(position: Int): Int = if digits.length > position then digits(position) else 0
 
     /** Returns this number with digit described by the [[Digit]] descriptor `digit` set to `value`. */
-    final def set(digit: DigitsDescriptor.Digit, value: Int): N = set(digit.position, value)
+    final def set(digit: Digit, value: Int): N = set(digit.position, value)
 
     /** Returns this number with digit at `position` set to `value`. */
     final def set(position: Int, value: Int): N =
@@ -115,10 +116,20 @@ trait Numbers:
       Vector.fromDigits(subtract(that))
 
     /** Returns this number rounded to the digit described by the [[Digit]] descriptor `digit`. */
-    final def roundTo(digit: DigitsDescriptor.Digit): N = roundTo(digit.position)
+    final def roundTo(digit: Digit): N = roundTo(digit.position)
 
     /** Returns this number rounded to the `position`. */
-    final def roundTo(length: Int): N = companion.fromDigits(Numbers.this.roundTo(digits, length))
+    final def roundTo(length: Int): N =
+      require(length >= 0)
+
+      val result: Digits = transform(
+        digits = digits,
+        forDigit = (digit: Int, position: Int, range: Int) =>
+          if position < length then (0, digit)
+          else (if math.abs(digit) >= range / 2 then math.signum(digit) else 0, 0),
+        forHead = identity
+      )
+      companion.fromDigits(result)
 
     /** Converts this number to [[org.opentorah.numbers.BigRational]]. */
     final def toRational: BigRational = to[BigRational]
@@ -126,16 +137,36 @@ trait Numbers:
     /** Converts this number to `Double`. */
     final def toDouble: Double = to[Double]
 
-    private final def to[T: Convertible]: T = Numbers.this.to[T](digits)
+    private def to[T: Convertible](using convertible: Convertible[T]): T =
+      digits.zip(denominators.take(digits.length))
+        .map(convertible.div.tupled)
+        .reduce(convertible.plus)
 
-    /** Returns string representation of this number with `length` positions (padding/truncating as needed). */
-    final def toString(length: Int): String = Numbers.this.toString(this, length)
+    /** Convert a number to String.
+     *
+     * If length specified is bugger than the number of digits after the point in the number,
+     * missing positions are assumed to have 0s; if the length is smaller, some digits will not
+     * be shown.
+     * Signs (like 'h' for hours or '°' for degrees) are inserted after digits.
+     * If no sign is configured for a position, ',' is used - except for the last digit,
+     * where no sign is appended in such a case.
+     *
+     * @param length desired number of digits after the point
+     * @return String representation of the number
+     */
+    final def toString(length: Int): String =
+      val digits: Digits = this.digits.padTo(length+1, 0)
+      val signs: Seq[String] = digitSigns.take(length+1).padTo(length, ",").padTo(length+1, "")
+
+      // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
+      val result: Seq[String] = (digits zip signs) map((digit: Int, sign: String) => math.abs(digit).toString + sign)
+      (if isNegative then "-" else "") + result.mkString
 
     /** Returns string representation of this number. */
     override def toString: String = toString(length)
 
     /** How does `this` number compare with `that`? */
-    final def compare(that: N): Int =
+    final override def compare(that: N): Int =
       require(isComparable(that))
       zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
 
@@ -149,22 +180,17 @@ trait Numbers:
 
     protected final def add(that: Number[?]): Digits = zipWith(that, _ + _)
 
-    // used in PeriodicPoint, so needs to be less than 'protected'
-    private[numbers] final def subtract(that: Number[?]): Digits = zipWith(that, _ - _)
+    protected final def subtract(that: Number[?]): Digits = zipWith(that, _ - _)
 
-    private final def isComparable(that: N): Boolean =
-      /* TODO (this.numbers == that.numbers) && */ this.companion == that.companion
+    private def isComparable(that: N): Boolean = this.companion == that.companion
 
-    private final def zipWith(
+    private def zipWith(
       that: Number[?],
       operation: (Int, Int) => Int
     ): Digits =
       this.digits.zipAll(that.digits, 0, 0).map(operation.tupled)
   }
 
-  given numberZeroable[N <: Number[N]]: Zeroable[N] = new Zeroable[N]:
-    override def signum(value: N): Int = value.signum
-    
   trait NumberCompanion[N <: Number[N]]:
     final lazy val zero: N = apply(0)
 
@@ -174,13 +200,66 @@ trait Numbers:
 
     final def fromDouble(value: Double, length: Int): N = from[Double](value, length)
 
-    private final def from[T: Convertible](value: T, length: Int): N = fromDigits(Numbers.this.from[T](value, length))
+    // this can probably be done with digit(i) = value*denominators(i).whole%denominator(i) - but will it be less precise?
+    private def from[T: Convertible](value: T, length: Int)(using convertible: Convertible[T]): N =
+      val (digits: Digits, lastReminder /*: T*/) =
+        ranges.take(length).foldLeft((Seq.empty[Int], convertible.abs(value))) {
+          case ((acc: Digits, reminder /*: T*/), range: Int) =>
+            val (whole: Int, fraction /*: T*/) = convertible.wholeAndFraction(reminder)
+            (acc :+ whole, convertible.mult(fraction, range))
+        }
 
-    final def fromDigits(digits: Digits): N = newNumber(normalize(digits, isCanonical = isCanonical))
+      val result: Digits = (digits :+ convertible.round(lastReminder)).map(convertible.signum(value)*_)
+      fromDigits(result)
+
+    final def fromDigits(digits: Digits, isCanonical: Boolean = isCanonical): N =
+      def t(
+        digits: Digits,
+        forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
+      ): Digits = transform(
+        digits,
+        (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
+        (headDigit: Int) =>
+          if !isCanonical then headDigit
+          else headRangeOpt.fold(headDigit)((headRange: Int) => forDigit(headDigit, headRange)._2)
+      )
+
+      // fit all digits within their ranges
+      val normalDigits: Digits = t(
+        digits = if digits.isEmpty then Seq(0) else digits,
+        forDigit = (digit: Int, digitRange: Int) => (digit / digitRange, digit % digitRange)
+      )
+
+      // determine the sign of the result
+      val willBePositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
+      val sign: Int = if willBePositive then 1 else -1
+
+      // make all digits of the same sign
+      val preResult: Digits = t(
+        digits = normalDigits,
+        forDigit = (digit: Int, digitRange: Int) =>
+          if (digit == 0) || (math.signum(digit) == sign) then (0, digit) else (-sign, digit + sign * digitRange)
+      )
+
+      // drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
+      val result: Digits = preResult.head +: preResult.tail.reverse.dropWhile(_ == 0).reverse
+      newNumber(result)
 
     protected def newNumber(digits: Digits): N
 
     protected def isCanonical: Boolean
+
+    final class Interval(val from: N, val to: N):
+      require(from <= to)
+
+      override def toString: String = s"[$from..$to]"
+
+      def contains(value: N): Boolean = (from <= value) && (value <= to)
+
+      def intersect(that: Interval): Interval = Interval(
+        from = if this.from < that.from then that.from else this.from,
+        to =   if this.to   > that.to   then that.to   else this.to
+      )
 
   /** Vector from the number system. */
   abstract class VectorNumber(digits: Digits) extends Number[Vector](digits) { this: Vector =>
@@ -205,17 +284,12 @@ trait Numbers:
 
     /** Returns canonical representation of this Vector;
      * Vectors are not canonicalized by default even in the periodic number systems. */
-    final def canonical: Vector = Vector.canonical(digits)
+    final def canonical: Vector = Vector.fromDigits(digits, isCanonical = true)
   }
 
-  // TODO trait instead of the open class?
   open class VectorCompanion extends NumberCompanion[Vector]:
+    final override protected def isCanonical: Boolean = false
     final override protected def newNumber(digits: Seq[Int]): Vector = newVector(digits)
-
-    protected final override def isCanonical: Boolean = false
-
-    private[numbers] final def canonical(digits: Digits): Vector =
-      Vector.newNumber(normalize(digits, isCanonical = true))
 
   protected def newVector(digits: Seq[Int]): Vector
 
@@ -230,11 +304,9 @@ trait Numbers:
     final def -(that: Vector): Point = Point.fromDigits(subtract(that))
   }
 
-  // TODO trait instead of the open class?
   open class PointCompanion extends NumberCompanion[Point]:
-    final override protected def newNumber(digits: Seq[Int]): Point = newPoint(digits)
-
     final override protected def isCanonical: Boolean = true
+    final override protected def newNumber(digits: Seq[Int]): Point = newPoint(digits)
 
   protected def newPoint(digits: Seq[Int]): Point
 
@@ -263,88 +335,11 @@ trait Numbers:
 
     mult(BigInt(1), ranges :+ 0)
 
-  private[numbers] final def to[T: Convertible](digits: Digits): T =
-    digits.zip(denominators.take(digits.length)).map(Convertible[T].div.tupled).reduce(Convertible[T].plus)
+  private lazy val digitSigns: Seq[String] = digitDescriptors.toIndexedSeq.map(_.sign)
 
-  // this can probably be done with digit(i) = value*denominators(i).whole%denominator(i) - but will it be less precise?
-  private[numbers] final def from[T: Convertible](value: T, length: Int): Digits =
-    val (digits: Digits, lastReminder /*: T*/) =
-      ranges.take(length).foldLeft((Seq.empty[Int], Convertible[T].abs(value))) {
-        case ((acc: Digits, reminder /*: T*/), range: Int) =>
-          val (whole: Int, fraction /*: T*/) = Convertible[T].wholeAndFraction(reminder)
-          (acc :+ whole, Convertible[T].mult(fraction, range))
-      }
+  private def signum(digits: Digits): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
 
-    (digits :+ Convertible[T].round(lastReminder)).map(Convertible[T].signum(value)*_)
-
-  /** Convert a number to String.
-   *
-   * If length specified is bugger than the number of digits after the point in the number,
-   * missing positions are assumed to have 0s; if the length is smaller, some digits will not
-   * be shown.
-   * Signs (like 'h' for hours or '°' for degrees) are inserted after digits.
-   * If no sign is configured for a position, ',' is used - except for the last digit,
-   * where no sign is appended in such a case.
-   *
-   * @param number to convert to String
-   * @param length desired number of digits after the point
-   * @tparam N flavor of the number
-   * @return String representation of the number
-   */
-  private[numbers] final def toString[N <: Number[N]](number: N, length: Int): String =
-    val digits: Digits = number.digits.padTo(length+1, 0)
-    val signs: Seq[String] = Digit.signs.take(length+1).padTo(length, ",").padTo(length+1, "")
-
-    // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
-    val result: Seq[String] = (digits zip signs) map((digit: Int, sign: String) => math.abs(digit).toString + sign)
-    (if number.isNegative then "-" else "") + result.mkString
-
-  private[numbers] final def roundTo(digits: Digits, length: Int): Digits =
-    require(length >= 0)
-
-    transform(
-      digits = digits,
-      forDigit = (digit: Int, position: Int, range: Int) =>
-        if position < length then (0, digit)
-        else (if math.abs(digit) >= range / 2 then math.signum(digit) else 0, 0),
-      forHead = identity
-    )
-
-  private[numbers] final def normalize(digits: Digits, isCanonical: Boolean): Digits =
-    def t(
-      digits: Digits,
-      forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
-    ): Digits = transform(
-      digits,
-      (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
-      (headDigit: Int) =>
-        if !isCanonical then headDigit
-        else headRangeOpt.fold(headDigit)((headRange: Int) => forDigit(headDigit, headRange)._2)
-    )
-
-    // fit all digits within their ranges
-    val normalDigits: Digits = t(
-      digits = if digits.isEmpty then Seq(0) else digits,
-      forDigit = (digit: Int, digitRange: Int) => (digit / digitRange, digit % digitRange)
-    )
-
-    // determine the sign of the result
-    val willBePositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
-    val sign: Int = if willBePositive then 1 else -1
-
-    // make all digits of the same sign
-    val result: Digits = t(
-      digits = normalDigits,
-      forDigit = (digit: Int, digitRange: Int) =>
-        if (digit == 0) || (math.signum(digit) == sign) then (0, digit) else (-sign, digit + sign * digitRange)
-    )
-
-    // drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    result.head +: result.tail.reverse.dropWhile(_ == 0).reverse
-
-  private[numbers] final def signum(digits: Digits): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
-
-  private final def transform(
+  private def transform(
     digits: Digits,
     forDigit: (Int, Int, Int) => (Int, Int),
     forHead: Int => Int
@@ -356,18 +351,6 @@ trait Numbers:
     }
 
     forHead(digits.head + headCarry) +: newTail
-
-  // Ordering implicits (ignore bogus Idea warnings)
-  // TODO clean up this and the ones in Numbered
-  import scala.language.implicitConversions
-
-  given pointOrdering: Ordering[Point] = (x: Point, y: Point) => x.compare(y)
-
-  implicit def pointOrderingOps(lhs: Point): pointOrdering.OrderingOps = pointOrdering.mkOrderingOps(lhs)
-
-  given vectorOrdering: Ordering[Vector] = (x: Vector, y: Vector) => x.compare(y)
-
-  implicit def vectorOrderingOps(lhs: Vector): vectorOrdering.OrderingOps = vectorOrdering.mkOrderingOps(lhs)
 
 
 object Numbers:

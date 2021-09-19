@@ -1,6 +1,5 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles
 import Angles.{Position, Rotation}
 
 import scala.math.{abs, asin, cos, pow, round, sin, sqrt}

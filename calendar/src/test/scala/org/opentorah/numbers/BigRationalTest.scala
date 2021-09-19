@@ -37,7 +37,7 @@ final class BigRationalTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks,
   }
 
   "apply(toString)" should "be identity" in {
-    forAll(rational)(r => BigRational(r.toString) shouldBe r)
+    forAll(rational)(r => BigRational.fromString(r.toString) shouldBe r)
   }
 
   "signum() and <" should "be consistent" in {
