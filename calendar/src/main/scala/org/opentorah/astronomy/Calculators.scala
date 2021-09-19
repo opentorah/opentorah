@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.{Position, Rotation}
+import Angles.{Position, Rotation}
 import org.opentorah.numbers.BigRational
 
 trait Calculators:

@@ -1,6 +1,5 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import Angles.{Position, Rotation}
 

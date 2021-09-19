@@ -19,7 +19,7 @@ object Xerces:
 
     if xincludeAware then
       saxParserFactory.setNamespaceAware(true) // needed for XIncludeAware to kick in
-      saxParserFactory.setXIncludeAware(true) // TODO cannot resolve symbol in IDE...
+      saxParserFactory.setXIncludeAware(true)
       // suppress adding `xml:base` on include:
       // constant `org.apache.xerces.parsers.XIncludeAwareParserConfiguration.XINCLUDE_FIXUP_BASE_URIS` is protected...
       saxParserFactory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false)
@@ -30,7 +30,7 @@ object Xerces:
     )
 
     resolver.foreach(resolver => result.setEntityResolver(resolver))
-    result.setErrorHandler(errorHandler(xmlLogger))
+    result.setErrorHandler(errorHandler(Xml.logger))
 
     result
 

@@ -1,11 +1,11 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{Effects, Util}
+import org.opentorah.util.{Effects, Platform}
 import org.opentorah.xml.{Elements, From, Parser}
 import zio.IO
 
 trait Named:
-  def name: String = Util.className(this)
+  def name: String = Platform.className(this)
 
   override def toString: String = name
 

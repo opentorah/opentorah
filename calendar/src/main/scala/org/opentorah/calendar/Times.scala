@@ -1,14 +1,26 @@
 package org.opentorah.calendar
 
-import org.opentorah.numbers.{Digits, DigitsDescriptor, Numbers}
+import org.opentorah.numbers.{Digits, Numbers}
 
 trait Times extends Numbers.NonPeriodic:
+
+  enum TimesDigit(override val sign: String) extends Digit(sign):
+    case DAYS extends TimesDigit("d")
+    case HOURS extends TimesDigit("h")
+    case PARTS extends TimesDigit("p")
+    case MOMENTS extends TimesDigit("m")
+
+  final override type DigitType = TimesDigit
+  
+  final override type DigitCompanionType = TimesDigit.type
+
+  final override def Digit: DigitCompanionType = TimesDigit
+
+  final override protected def digitDescriptors: Array[TimesDigit] = TimesDigit.values
 
   import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
   trait Time[N <: Time[N]] extends Number[N] { this: N =>
-    private def Digit: TimesDigits.type = TimesDigits
-
     final def days: Int = get(Digit.DAYS)
 
     final def days(value: Int): N = set(Digit.DAYS, value)
@@ -78,10 +90,6 @@ trait Times extends Numbers.NonPeriodic:
     case 0 => Times.hoursPerDay
     case 1 => Times.partsPerHour
     case 2 => Times.momentsPerPart
-
-  final override type DigitType = TimesDigits.type
-
-  final override protected def digitsDescriptor: DigitType = TimesDigits
 
 object Times:
   final val hoursPerDay: Int = 24

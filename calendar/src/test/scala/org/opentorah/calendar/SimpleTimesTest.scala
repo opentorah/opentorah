@@ -8,7 +8,7 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 final class SimpleTimesTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers:
 
-  private def Digit: TimesDigits.type = TimesDigits
+  private def Digit: SimpleTimes.DigitCompanionType = SimpleTimes.Digit
 
   "isZero()/isPositive()/isNegative()/signum()/abs()/unary_-()" should "be correct" in {
     Vector(0).isZero shouldBe true

@@ -7,7 +7,7 @@ import scala.jdk.CollectionConverters.SeqHasAsJava
 
 final class Resolver(catalogFile: File) extends URIResolver, EntityResolver:
 
-  xmlLogger.info(s"Resolver(catalogFile = $catalogFile)")
+  Xml.logger.info(s"Resolver(catalogFile = $catalogFile)")
 
   private val parentResolver: org.xmlresolver.Resolver =
     val configuration: org.xmlresolver.XMLResolverConfiguration = org.xmlresolver.XMLResolverConfiguration()
@@ -48,11 +48,11 @@ final class Resolver(catalogFile: File) extends URIResolver, EntityResolver:
 
     result.fold(
       if ignoreUnresolved then
-        xmlLogger.debug(s"$parameters\n  unresolved")
+        Xml.logger.debug(s"$parameters\n  unresolved")
       else
-        xmlLogger.error(s"$parameters\n  unresolved")
+        Xml.logger.error(s"$parameters\n  unresolved")
     )(result =>
-      xmlLogger.debug(s"$parameters\n  resolved to: ${id(result)}")
+      Xml.logger.debug(s"$parameters\n  resolved to: ${id(result)}")
     )
 
     result.getOrElse(null.asInstanceOf[R])

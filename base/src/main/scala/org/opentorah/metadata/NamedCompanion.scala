@@ -1,12 +1,9 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.Util
-import org.opentorah.xml.{From, Parser}
+import org.opentorah.util.Platform
+import org.opentorah.xml.{From, Parser, Parsing}
 
 trait NamedCompanion:
-  // TODO try pushing
-  //     final override def names: Names = toNames(this)
-  // into the base class of the Key...
   type Key <: Named
 
   def values: Seq[Key]
@@ -17,7 +14,7 @@ trait NamedCompanion:
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
   // - not final so that it can be overridden in Tanach :)
-  lazy val toNames: Map[Key, Names] = Parser.unsafeRun(Named.load[Key, Names](
+  lazy val toNames: Map[Key, Names] = Parsing.unsafeRun(Named.load[Key, Names](
     from = From.resource(this, resourceName),
     content = Names.NamesMetadata,
     keys = values,
@@ -26,7 +23,7 @@ trait NamedCompanion:
 
   protected def resourceName: String = what
 
-  private def what: String = Util.className(this)
+  private def what: String = Platform.className(this)
 
   final def forDefaultName(name: String): Option[Key] = values.find(_.name == name)
 

@@ -1,6 +1,5 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles
 import org.opentorah.calendar.{Week, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
 import org.opentorah.numbers.BigRational

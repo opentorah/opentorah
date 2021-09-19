@@ -1,9 +1,9 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.{Angles, Exactify, Interval}
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.numbers.DigitsDescriptor
+import org.opentorah.numbers.Math
 import Angles.{Digit, Rotation}
+import Rotation.Interval
 
 object Time2Rotation:
   type Days = Int
@@ -50,7 +50,7 @@ trait Time2Rotation:
     val rational = vector.toRational
     calculate(rational.whole) + Rotation.fromRational(rational.fraction*one.toRational, 6)
 
-  protected def precision(days: Days): DigitsDescriptor.Digit = Digit.SECONDS
+  protected def precision(days: Days): Angles.Digit = Digit.SECONDS
 
   final def calculateExact(days: Int): Rotation = rambamValue*days
 
@@ -69,9 +69,14 @@ trait Time2Rotation:
     val small = if !one.isZero then one else ten
     val big = value(days)
     val mult = days
-    val exactificator = Exactify(small, if !one.isZero then mult else mult/10, Angles.Digit.SECONDS.position, big)
+    val exactificator = Math.Exactify(Angles)(
+      small,
+      if !one.isZero then mult else mult/10,
+      Angles.Digit.SECONDS.position,
+      big
+    )
     val (fit, fitLength) = exactificator.findFit
     val expanded = exactificator.expand(fit, fitLength, 6)
     println(s"$expanded (6)    $small * $mult -> $big: $fit ($fitLength)")
-    expanded
+    expanded.asInstanceOf[Angles.Rotation.Interval] // TODO yuck...
 

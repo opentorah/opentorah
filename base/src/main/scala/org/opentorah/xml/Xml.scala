@@ -1,8 +1,10 @@
 package org.opentorah.xml
 
+import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{InputSource, XMLFilter}
 import java.io.StringReader
 import java.net.URL
+import zio.URIO
 
 // This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
 trait Xml extends XmlAttributes:
@@ -43,6 +45,7 @@ trait Xml extends XmlAttributes:
   def getPrefix(element: Element): Option[String]
 
   def getChildren(element: Element): Nodes
+  def setChildren(element: Element, children: Nodes): Element
 
   final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
@@ -50,7 +53,26 @@ trait Xml extends XmlAttributes:
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(value => f(value))
 
+  final class Transform[R](transform: Element => URIO[R, Element]):
+    val one: Element => URIO[R, Element] = element => for
+      newElement: Element <- transform(element)
+      children: Nodes <- URIO.foreach(getChildren(newElement))(
+        (node: Node) => if !isElement(node) then URIO.succeed(node) else one(asElement(node))
+      )
+    yield setChildren(newElement, children)
+
+    val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
+
+  def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match
+    case Nil => Nil
+    case n :: Nil => Seq(n)
+    case n :: n1 :: ns if isElement(n) && isElement(n1) => Seq(n, mkText(separator, n)) ++ multi(n1 :: ns, separator)
+    case n :: ns => Seq(n) ++ multi(ns, separator) 
+    case n => n
+      
 object Xml:
+  val logger: Logger = LoggerFactory.getLogger("org.opentorah.xml")
+
   val header: String   = """<?xml version="1.0" encoding="UTF-8"?>"""
   val header16: String = """<?xml version="1.0" encoding="UTF-16"?>"""
 

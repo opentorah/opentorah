@@ -79,7 +79,7 @@ object Dom extends Xml:
       else attributes.getAttributeNS(namespace.getUri.orNull, name)
     )
     
-  override def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]] =
+  override def getAttributes(attributes: Attributes): Attribute.StringValues =
     val result = for attribute <- listAttributes(attributes, isXmlns = false) yield
       Attribute(
         name = attribute.getLocalName,
@@ -117,3 +117,9 @@ object Dom extends Xml:
   override def getChildren(element: Element): Nodes =
     val list: org.w3c.dom.NodeList = element.getChildNodes
     for index <- 0 until list.getLength yield list.item(index)
+
+  // TODO modifies in place...
+  override def setChildren(element: Element, children: Nodes): Element =
+    for child <- getChildren(element) do element.removeChild(child)
+    for child <- children do element.appendChild(child)
+    element

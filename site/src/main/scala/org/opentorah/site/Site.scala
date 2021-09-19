@@ -5,7 +5,7 @@ import org.opentorah.html
 import org.opentorah.store.{Caching, Directory, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Doctype, FromUrl, Parser, PrettyPrinter, ScalaXml, Xml}
+import org.opentorah.xml.{Doctype, FromUrl, Parser, Parsing, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{IO, Task, ZIO, ZLayer}
 import java.net.URL
@@ -24,7 +24,7 @@ abstract class Site[S <: Site[S]](
 
   final val caching: Caching.Simple = new Caching.Simple
 
-  final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
+  final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parsing.toTask(Caching.provide(caching, parser))
 
   final private val staticPaths: Set[String] =
     Set("assets", "css", "js", "sass", "robots.txt") ++

@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.html
-import org.opentorah.xml.{From, Parser, ScalaXml}
+import org.opentorah.xml.{From, Parser, Parsing, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import zio.{UIO, URIO, ZLayer}
@@ -10,12 +10,12 @@ final class TeiTest extends AnyFlatSpec, Matchers:
 
   "Parsing" should "work" in {
 //    println(Tei.prettyPrinter.renderWithHeader(Parser.load(From.resource(Tei, "905"))))
-    val tei: Tei = Parser.unsafeRun(Tei.parse(From.resource(Tei, "905")))
+    val tei: Tei = Parsing.unsafeRun(Tei.parse(From.resource(Tei, "905")))
 //    println(Tei.prettyPrinter.renderWithHeader(Tei.toXmlElement(tei)))
   }
 
   "Entity parsing" should "work" in {
-    val result: Entity = Parser.unsafeRun(
+    val result: Entity = Parsing.unsafeRun(
       Entity.parse(From.resource(Tei, "Баал_Шем_Тов")))
 
     result.role shouldBe Some("jew")
@@ -32,10 +32,10 @@ final class TeiTest extends AnyFlatSpec, Matchers:
         .setTarget("facsViewer")
       )
 
-    Parser.unsafeRun(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
+    Parsing.unsafeRun(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
 
   "905" should "work" in {
-    val tei: Tei = Parser.unsafeRun(Tei.parse(From.resource(Tei, "905")))
+    val tei: Tei = Parsing.unsafeRun(Tei.parse(From.resource(Tei, "905")))
     val html: ScalaXml.Element = tei2html(Tei.xmlElement(tei))
     //println(Tei.prettyPrinter.render(html))
   }

@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles.Rotation
+import Angles.Rotation
 
 object MoonAnomalyMean extends Time2Rotation:
   // KH 14:3

@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Named, NamedCompanion, Names}
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Element, From, Parsable, Parser, Parsing, Unparser}
 
 // TODO make Tanach a Store in Texts!
 object Tanach extends NamedCompanion, Stores.Pure:
@@ -16,7 +16,7 @@ object Tanach extends NamedCompanion, Stores.Pure:
 
   override def storesPure: Seq[ByBook] = Seq(new ByBook)
 
-  private val metadata: Map[Book, Parsed] = Parser.unsafeRun(
+  private val metadata: Map[Book, Parsed] = Parsing.unsafeRun(
     Named.load(
       from = From.resource(Tanach),
       content = Parsed.followRedirects
@@ -31,7 +31,7 @@ object Tanach extends NamedCompanion, Stores.Pure:
 
   private val book2chapters: Map[Book, Chapters] = Collections.mapValues(metadata)(_.chapters)
 
-  private val book2metadata: Map[Book, BookMetadata] = Collections.mapValues(metadata)(metadata => Parser.unsafeRun(metadata.resolve))
+  private val book2metadata: Map[Book, BookMetadata] = Collections.mapValues(metadata)(metadata => Parsing.unsafeRun(metadata.resolve))
 
   trait Book extends Store.NonTerminal, Stores.Pure:
     final def chapters: Chapters = book2chapters(this)

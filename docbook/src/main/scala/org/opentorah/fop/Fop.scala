@@ -2,7 +2,7 @@ package org.opentorah.fop
 
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.opentorah.util.Util
+import org.opentorah.util.Platform
 import org.opentorah.xml.{Sax, Saxon}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -69,7 +69,7 @@ object Fop:
     subject: Option[String],
     keywords: Option[String]
   ): Unit =
-    foUserAgent.setCreator(Util.applicationString)
+    foUserAgent.setCreator(Platform.applicationString)
     creationDate.foreach(creationDate =>
       val value: java.util.Date = dateFormat.parse(creationDate)
       foUserAgent.setCreationDate(value)

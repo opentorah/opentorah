@@ -1,6 +1,7 @@
 package org.opentorah.fop
 
 import org.opentorah.util.Platform
+import Platform.{Architecture, Os}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 
@@ -20,28 +21,28 @@ final class NodeDistribution(val version: String):
   override def toString: String = s"Node v$version for $os on $architecture"
 
   private val osName: String = os match
-    case Platform.Os.Windows => "win"
-    case Platform.Os.Mac     => "darwin"
-    case Platform.Os.Linux   => "linux"
-    case Platform.Os.FreeBSD => "linux"
-    case Platform.Os.SunOS   => "sunos"
-    case Platform.Os.Aix     => "aix"
+    case Os.Windows => "win"
+    case Os.Mac     => "darwin"
+    case Os.Linux   => "linux"
+    case Os.FreeBSD => "linux"
+    case Os.SunOS   => "sunos"
+    case Os.Aix     => "aix"
     case _          => throw IllegalArgumentException (s"Unsupported OS: $os")
 
-  val isWindows: Boolean = os == Platform.Os.Windows
+  val isWindows: Boolean = os == Os.Windows
 
   private val osArch: String = architecture match
-    case Platform.Architecture.x86_64  => "x64"
-    case Platform.Architecture.amd64   => "x64"
-    case Platform.Architecture.aarch64 => "x64"
-    case Platform.Architecture.ppc64   => "ppc64"
-    case Platform.Architecture.ppc64le => "ppc64le"
-    case Platform.Architecture.s390x   => "s390x"
-    case Platform.Architecture.armv6l  => "armv6l"
-    case Platform.Architecture.armv7l  => "armv7l"
-    case Platform.Architecture.armv8l  => "arm64" // *not* "armv8l"!
-    case Platform.Architecture.i686    => "x86"
-    case Platform.Architecture.nacl    => "x86"
+    case Architecture.x86_64  => "x64"
+    case Architecture.amd64   => "x64"
+    case Architecture.aarch64 => "x64"
+    case Architecture.ppc64   => "ppc64"
+    case Architecture.ppc64le => "ppc64le"
+    case Architecture.s390x   => "s390x"
+    case Architecture.armv6l  => "armv6l"
+    case Architecture.armv7l  => "armv7l"
+    case Architecture.armv8l  => "arm64" // *not* "armv8l"!
+    case Architecture.i686    => "x86"
+    case Architecture.nacl    => "x86"
 
   private val versionTokens: Array[String] = version.split('.')
   private val majorVersion: Int = versionTokens(0).toInt

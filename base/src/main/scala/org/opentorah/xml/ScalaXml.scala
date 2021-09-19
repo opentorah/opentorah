@@ -2,7 +2,7 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}
-import zio.{URIO, ZIO}
+import zio.ZIO
 
 object ScalaXml extends Xml:
 
@@ -14,18 +14,7 @@ object ScalaXml extends Xml:
   override type Text = scala.xml.Atom[?]
 
   override type Comment = scala.xml.Comment
-
-  // TODO up into the Model - after .copy(child = children) is abstracted...
-  final class Transform[R](transform: Element => URIO[R, Element]):
-    val one: Element => URIO[R, Element] = element => for
-      newElement: Element <- transform(element)
-      children: Nodes <- URIO.foreach(getChildren(newElement))(
-        (node: Node) => if !isElement(node) then URIO.succeed(node) else one(asElement(node))
-      )
-    yield newElement.copy(child = children)
-
-    val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
-
+  
   override def toString(node: Node): String = Strings.squashWhitespace(node match // TODO why the squash?
     case elem: Element => (elem.child map (_.text)).mkString(" ") // TODO hope this is not used: no tags, no attributes...
 
@@ -103,7 +92,7 @@ object ScalaXml extends Xml:
     else attributes.attribute(namespace.uri, name)
   }.map(_.text)
 
-  override def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]] = attributes.attributes.toSeq
+  override def getAttributes(attributes: Attributes): Attribute.StringValues = attributes.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
     .map(attribute =>
@@ -138,15 +127,10 @@ object ScalaXml extends Xml:
 
   override def getChildren(element: Element): Nodes = element.child
 
+  override def setChildren(element: Element, children: Nodes): Element = element.copy(child = children)
+
   // TODO up into Xml - after parsing is abstracted over Xml...
   def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
     nodes.flatMap(node => node.flatMap(_ \\ elementName).filter(isElement).map[Element](asElement))
   )(descendant => elements.parse(From.xml("descendants", descendant)))
 
-  // TODO up into Xml - after the seed situation is clarified...
-  def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match
-    case Nil => Nil
-    case n :: Nil => Seq(n)
-    case n :: n1 :: ns if isElement(n) && isElement(n1) => Seq(n, mkText(separator)) ++ multi(n1 :: ns, separator)
-    case n :: ns => Seq(n) ++ multi(ns, separator)
-    case n => n

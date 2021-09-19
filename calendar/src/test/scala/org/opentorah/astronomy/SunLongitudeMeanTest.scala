@@ -1,6 +1,5 @@
 package org.opentorah.astronomy
 
-import org.opentorah.angles.Angles
 import org.opentorah.calendar.jewish.Sun
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

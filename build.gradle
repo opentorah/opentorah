@@ -1,6 +1,7 @@
 // when on the project path, mdoc's version of FlexMark conflicts with the ScalaTest's;
 // when it is here, I do not need to introduce `mdoc` configuration - and I can
 // call it directly.
+// TODO there is no longer a need to use ancient flexmark: scalatest 2.2.10 finally moved on!
 buildscript {
   dependencies {
     classpath libs.mdoc

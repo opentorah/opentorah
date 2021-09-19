@@ -27,7 +27,7 @@ trait XmlAttributes:
 
   protected def getAttributeValueString(attribute: Attribute[?], attributes: Attributes): Option[String]
 
-  def getAttributes(attributes: Attributes): Seq[Attribute.Value[String]]
+  def getAttributes(attributes: Attributes): Attribute.StringValues
 
   final def setAttribute[T](attributeValue: Attribute.Value[T], element: Element): Element =
     attributeValue.effectiveValue
