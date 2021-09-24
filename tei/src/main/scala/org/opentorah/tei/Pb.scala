@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser, Xml}
 
 final class Pb(
   val n: String,
@@ -24,7 +24,7 @@ object Pb extends Element[Pb]("pb"):
   private val emptyAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("empty").orDefault
   private val facsAttribute: Attribute.Optional[String] = Attribute("facs").optional
 
-  override def contentType: ContentType = ContentType.Empty
+  override def contentType: Element.ContentType = Element.ContentType.Empty
 
   override def contentParsable: Parsable[Pb] = new Parsable[Pb]:
     override val parser: Parser[Pb] = for

@@ -3,7 +3,9 @@
 Modules covered: `base`, `site`, `tei` and `texts`.
 
 ## [Unreleased]
-- XML processing cleanup;
+- XML parsing and processing cleanup;
+- abstracted XML parsing over ScalaXml/DOM;
+- From and Parsing abstracted over Xml;
 - Store/Site/Collector cleanup;
 - Storification of texts;
 
@@ -103,7 +105,7 @@ Code in the 'collector' module was re-written, and 'store' module emptied out.
 ## [0.1.22] - 2020-03-08
 - XML pretty-printing using Paiges
 - TEI support enhanced
-- parsing moved for Cats to ZIO
+- parsing moved from Cats to ZIO
 - Parser error trace
 - XML support enhancements
 - moved packages to org.opentorah

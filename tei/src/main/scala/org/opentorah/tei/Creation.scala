@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser, ScalaXml}
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 final class Creation(
   val date: Date,
-  val xml: ScalaXml.Nodes
+  val xml: Element.Nodes
 )
 
 object Creation extends Element[Creation]("creation"):
@@ -12,7 +12,7 @@ object Creation extends Element[Creation]("creation"):
   override def contentParsable: Parsable[Creation] = new Parsable[Creation]:
     override def parser: Parser[Creation] = for
       date: Date <- Date.required()
-      xml: ScalaXml.Nodes <- Element.nodes()
+      xml: Element.Nodes <- Element.nodes()
     yield Creation(
       date,
       xml

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 final class TitleStmt(
   val titles: Seq[Title.Value],

@@ -1,11 +1,11 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser, ScalaXml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 final class Date(
   val when: String,
   val calendar: Option[String],
-  val xml: ScalaXml.Nodes
+  val xml: Element.Nodes
 )
 
 object Date extends Element[Date]("date"):
@@ -13,13 +13,13 @@ object Date extends Element[Date]("date"):
   private val whenAttribute: Attribute.Required[String] = Attribute("when").required
   private val calendarAttribute: Attribute.Optional[String] = Attribute("calendar").optional
 
-  override def contentType: ContentType = ContentType.Mixed
+  override def contentType: Element.ContentType = Element.ContentType.Mixed
 
   override def contentParsable: Parsable[Date] = new Parsable[Date]:
     override def parser: Parser[Date] = for
       when: String <- whenAttribute()
       calendar: Option[String] <- calendarAttribute()
-      xml: ScalaXml.Nodes <- Element.nodes()
+      xml: Element.Nodes <- Element.nodes()
     yield Date(
       when,
       calendar,

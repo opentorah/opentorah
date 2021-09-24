@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Elements, Parsable, Parser}
+import org.opentorah.xml.{Element, Elements, Parsable, Parser, Unparser}
 
 final class ProfileDesc(
   val documentAbstract: Option[Abstract.Value],

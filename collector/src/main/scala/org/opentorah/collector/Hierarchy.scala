@@ -2,17 +2,17 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Hierarchy(
-  override val fromUrl: FromUrl,
+  override val fromUrl: Element.FromUrl,
   override val names: Names,
   override val title: Title.Value,
   override val storeAbstract: Option[Abstract.Value],
   override val body: Option[Body.Value],
   val by: ByHierarchy
-) extends Hierarchical, FromUrl.With:
+) extends Hierarchical, Element.FromUrl.With:
 
   override def storesPure: Seq[ByHierarchy] = Seq(by)
 
@@ -25,7 +25,7 @@ object Hierarchy extends Element[Hierarchy]("store"):
 
   override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy]:
     override def parser: Parser[Hierarchy] = for
-      fromUrl: FromUrl <- Element.currentFromUrl
+      fromUrl: Element.FromUrl <- Element.fromUrl
       names: Names <- Names.withDefaultNameParsable()
       title: Title.Value <- Title.element.required()
       storeAbstract: Option[Abstract.Value] <- Abstract.element.optional()

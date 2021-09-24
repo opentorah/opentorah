@@ -3,12 +3,12 @@ package org.opentorah.collector
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Directory, Selector}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.UIO
 import java.net.URL
 
 final class Notes(
-  override val fromUrl: FromUrl,
+  override val fromUrl: Element.FromUrl,
   override val selector: Selector,
   override val directory: String
 ) extends Directory[Markdown, Note, Notes.All](
@@ -32,7 +32,7 @@ object Notes extends Element[Notes]("notes"):
 
   override def contentParsable: Parsable[Notes] = new Parsable[Notes]:
     override def parser: Parser[Notes] = for
-      fromUrl: FromUrl <- Element.currentFromUrl
+      fromUrl: Element.FromUrl <- Element.fromUrl
       selector: Selector <- By.selectorParser
       directory: String <- Directory.directoryAttribute()
     yield Notes(

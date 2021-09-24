@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser, ScalaXml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 final class Availability(
   val status: Option[String],
-  val xml: ScalaXml.Nodes
+  val xml: Element.Nodes
 )
 
 object Availability extends Element[Availability]("availability"):
@@ -14,7 +14,7 @@ object Availability extends Element[Availability]("availability"):
   override def contentParsable: Parsable[Availability] = new Parsable[Availability]:
     override def parser: Parser[Availability] = for
       status: Option[String] <- statusAttribute()
-      xml: ScalaXml.Nodes <- Element.nodes()
+      xml: Element.Nodes <- Element.nodes()
     yield Availability(
       status,
       xml

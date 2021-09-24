@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Text, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Text, Unparser}
 
 final class Name(val name: String, val languageSpec: LanguageSpec):
   def satisfies(spec: LanguageSpec): Boolean =
@@ -22,7 +22,7 @@ final class Name(val name: String, val languageSpec: LanguageSpec):
 object Name extends Element[Name]("name"):
   private val nAttribute: Attribute[String] = Attribute("n")
 
-  override def contentType: ContentType = ContentType.Characters
+  override def contentType: Element.ContentType = Element.ContentType.Characters
 
   override def contentParsable: Parsable[Name] = new Parsable[Name]:
     override def parser: Parser[Name] = for

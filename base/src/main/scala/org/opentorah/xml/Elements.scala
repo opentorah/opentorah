@@ -6,56 +6,17 @@ import java.net.URL
 
 trait Elements[A]:
 
-  protected def elementByName(name: String): Option[Element[?]]
+  def elementAndParser(name: String): Option[Element.AndParser[A]]
 
   protected def elementByValue(value: A): Element[?]
-
-  protected def mapParser(element: Element[?], parser: Parser[?]): Parser[A]
 
   def xmlElement(value: A): ScalaXml.Element =
     elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
-  private def nested(
-    from: Option[From],
-    nextElement: ScalaXml.Element,
-    element: Element[?]
-  ): Parser[A] = Parsing.nested(
-    from,
-    nextElement,
-    element.contentType,
-    mapParser(element, element.contentParsable())
-  )
+  private def optionalParser: Parser[Option[A]] = Parsing.optional(this)
 
-  private def optionalParser: Parser[Option[A]] = for
-    // TODO take namespace into account!
-    nextElementOpt: Option[ScalaXml.Element] <- Parsing.nextElement(element => elementByName(ScalaXml.getName(element)).isDefined)
-    result: Option[A] <- if nextElementOpt.isEmpty then ZIO.none else
-      val nextElement: ScalaXml.Element = nextElementOpt.get
-      val nextElementName:String = ScalaXml.getName(nextElement)
-      val nextElementParser: Element[?] = elementByName(nextElementName).get
-      for
-        result: A <- nested(
-          from = None,
-          nextElement,
-          element = nextElementParser
-        )
-      yield Some(result)
-  yield result
-
-  final def parse(from: From): Parser[A] = for
-    _ <- Parsing.checkNoLeftovers
-    nextElement: ScalaXml.Element <- from.load
-    nextElementName: String = ScalaXml.getName(nextElement)
-    nextElementParserOpt: Option[Element[_]] = elementByName(nextElementName)
-    result: A <- if nextElementParserOpt.isEmpty then Effects.fail(s"$this required, but '$nextElementName' found") else
-      nested(
-        Some(from),
-        nextElement,
-        nextElementParserOpt.get
-      )
-  yield result
-
-  final def parse(fromUrl: URL): Parser[A] = parse(From.url(fromUrl))
+  final def parse(from: From): Parser[A] = Parsing.required(this, from)
+  final def parse(fromUrl: URL, xml: Xml = ScalaXml): Parser[A] = parse(From.url(fromUrl, xml))
 
   final def optional: Elements.Optional[A] = Elements.Optional[A](this)
   final def required: Elements.Required[A] = Elements.Required[A](this)
@@ -70,16 +31,16 @@ trait Elements[A]:
   private def followRedirects[B](f: Parser[A] => Parser[B]): Elements.HandleRedirect[A, B] = Elements.HandleRedirect(
     this,
     noRedirect = f,
-    redirected = url => followRedirects(f).parse(From.redirect(url))
+    redirected = (from: From) => followRedirects(f).parse(from)
   )
 
-  final def orRedirect: Elements.HandleRedirect[A, Redirect.Or[A]] = Elements.HandleRedirect(
+  final def orRedirect: Elements.HandleRedirect[A, Elements.Redirect.Or[A]] = Elements.HandleRedirect(
     this,
     noRedirect = _.map(Right(_)),
-    redirected = url => ZIO.left(Redirect[A](url, this))
+    redirected = (from: From) => ZIO.left(Elements.Redirect[A](from, this))
   )
 
-  final def withRedirect(follow: Boolean): Elements.HandleRedirect[A, Redirect.Or[A]] =
+  final def withRedirect(follow: Boolean): Elements.HandleRedirect[A, Elements.Redirect.Or[A]] =
     if !follow then orRedirect else followRedirects(_.map(Right(_)))
 
 object Elements:
@@ -114,37 +75,49 @@ object Elements:
       content = value => xml(value)
     )
 
+  // TODO just use XInclude?
+  final class Redirect[A](val from: From, elements: Elements[A]):
+    def parse: Parser[A] = elements.parse(from)
+    def followRedirects: Parser[A] = elements.followRedirects.parse(from)
+    def orRedirect: Parser[Redirect.Or[A]] = elements.orRedirect.parse(from)
+    def withRedirect(follow: Boolean): Parser[Redirect.Or[A]] = elements.withRedirect(follow).parse(from)
+
+  object Redirect:
+    type Or[A] = Either[Redirect[A], A]
+
   private val redirectAttribute: Attribute[String] = Attribute("file")
 
   final class HandleRedirect[A, B](
     elements: Elements[A],
     noRedirect: Parser[A] => Parser[B],
-    redirected: URL => Parser[B]
+    redirected: From => Parser[B]
   ) extends Elements[B]:
-    override protected def elementByName(name: String): Option[Element[?]] =
-      elements.elementByName(name)
-
-    override protected def mapParser(element: Element[?], parser: Parser[?]): Parser[B] = for
-      url: Option[String] <- Elements.redirectAttribute.optional()
-      result: B <- url.fold(noRedirect(parser.asInstanceOf[Parser[A]]))((url: String) =>
-        for
-          currentBaseUrl: Option[URL] <- Parsing.currentBaseUrl
-          from: URL <- Effects.effect(Files.subUrl(currentBaseUrl, url))
-          result: B <- redirected(from)
+    override def elementAndParser(name: String): Option[Element.AndParser[B]] =
+      elements.elementAndParser(name).map(_.element).map { element =>
+        val parser = for
+          url: Option[String] <- redirectAttribute.optional()
+          result: B <- url.fold(noRedirect(element.contentParsable().asInstanceOf[Parser[A]]))((url: String) =>
+            for
+              currentBaseUrl: Option[URL] <- Parsing.currentBaseUrl
+              from: URL <- Effects.effect(Files.subUrl(currentBaseUrl, url))
+              xml: Xml <- Parsing.currentXml
+              result: B <- redirected(From.redirect(from, xml))
+            yield result
+          )
         yield result
-      )
-    yield result
+        Element.AndParser[B](element, parser)
+      }
 
     override protected def elementByValue(value: B): Element[?] = ???
 
   abstract class Union[A] extends Elements[A]:
     protected def elements: Seq[Element[? <: A]]
 
-    final override protected def elementByName(name: String): Option[Element[? <: A]] =
-      elements.find(_.elementName == name)
-
-    final override protected def mapParser(element: Element[?], parser: Parser[?]): Parser[A] =
-      parser.asInstanceOf[Parser[A]]
+    final override def elementAndParser(name: String): Option[Element.AndParser[A]] =
+      elements.find(_.elementName == name).map((element: Element[? <: A]) => Element.AndParser[A](
+        element = element,
+        parser = element.contentParsable()
+      ))
 
   final class Choices(result: Map[Element[?], Seq[?]]):
 
@@ -158,11 +131,11 @@ object Elements:
       yield results.headOption
 
   private final class Choice(elements: Seq[Element[?]]) extends Elements[(Element[?], ?)]:
-    override protected def elementByName(name: String): Option[Element[?]] =
-      elements.find(_.elementName == name)
-
-    override protected def mapParser(element: Element[?], parser: Parser[?]): Parser[(Element[?], ?)] =
-      parser.map(result => element -> result)
+    override def elementAndParser(name: String): Option[Element.AndParser[(Element[?], ?)]] =
+      elements.find(_.elementName == name).map((element: Element[?]) => Element.AndParser(
+        element = element,
+        parser = element.contentParsable().map(result => element -> result)
+      ))
 
     override protected def elementByValue(value: (Element[?], ?)): Element[?] =
       throw UnsupportedOperationException("Not supposed to happen!")

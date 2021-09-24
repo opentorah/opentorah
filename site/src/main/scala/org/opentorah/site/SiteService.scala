@@ -4,7 +4,7 @@ import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.slf4j.Logger
 import org.opentorah.util.{Effects, Files, Logging, Zhttp}
-import org.opentorah.xml.{Element, Parser, Parsing}
+import org.opentorah.xml.{Element, Parser, ScalaXml}
 import zhttp.http.*
 import zio.duration.Duration
 import zio.stream.ZStream
@@ -28,10 +28,11 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site"), zio.App:
     val siteFileUrl: URL = Files.fileInDirectory(url, "site.xml")
     val result: Parser[S] = for
       _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl"))
-      result: S <- parse(siteFileUrl)
+      // TODO abstract over Xml?
+      result: S <- parse(siteFileUrl, ScalaXml)
       _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl - done"))
     yield result
-    Parsing.toTask(result)
+    Parser.toTask(result)
 
   // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
   // with `Metadata-Flavor: Google` header;

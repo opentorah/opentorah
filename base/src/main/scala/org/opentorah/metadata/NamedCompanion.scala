@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Platform
-import org.opentorah.xml.{From, Parser, Parsing}
+import org.opentorah.xml.{From, Parser}
 
 trait NamedCompanion:
   type Key <: Named
@@ -14,8 +14,8 @@ trait NamedCompanion:
   // - public so that it can be accessed from the Key type if it isn't defined
   //   within the object derived from NamedCompanion;
   // - not final so that it can be overridden in Tanach :)
-  lazy val toNames: Map[Key, Names] = Parsing.unsafeRun(Named.load[Key, Names](
-    from = From.resource(this, resourceName),
+  lazy val toNames: Map[Key, Names] = Parser.unsafeRun(Named.load[Key, Names](
+    from = From.resourceNamed(this, resourceName),
     content = Names.NamesMetadata,
     keys = values,
     hasName = (metadata: Names, name: String) => metadata.hasName(name)

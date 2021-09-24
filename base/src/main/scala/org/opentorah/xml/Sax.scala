@@ -1,12 +1,22 @@
 package org.opentorah.xml
 
 import org.opentorah.util.{Files, Strings}
-import org.xml.sax.InputSource
+import org.xml.sax.helpers.XMLFilterImpl
+import org.xml.sax.{InputSource, Locator, SAXParseException}
 import java.io.File
 import java.net.URL
 
 // Note: declareNamespace() and setAttribute() modify in-place.
 object Sax extends XmlAttributes:
+
+  trait WarningFilter extends XMLFilterImpl:
+    private var locator: Option[Locator] = None
+
+    protected def warning(message: String): Unit = getErrorHandler.warning(SAXParseException(message, locator.orNull))
+
+    override def setDocumentLocator(locator: Locator): Unit =
+      super.setDocumentLocator(locator)
+      this.locator = Some(locator)
 
   def file2inputSource(file: File): InputSource = url2inputSource(Files.file2url(file))
   def url2inputSource(url: URL): InputSource = InputSource(url.toString)

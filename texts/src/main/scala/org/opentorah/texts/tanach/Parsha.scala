@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Named, NamedCompanion, Names, WithNumber}
 import org.opentorah.store.Store
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 sealed trait Parsha extends Store: // TODO .NonTerminal - add chapter/verse...?
   def book: Chumash
@@ -141,7 +141,7 @@ object Parsha extends NamedCompanion:
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
   object Aliyah extends Element[Torah.Numbered]("aliyah"):
-    override def contentType: ContentType = ContentType.Empty
+    override def contentType: Element.ContentType = Element.ContentType.Empty
 
     override def contentParsable: Parsable[Torah.Numbered] = new Parsable[Torah.Numbered]:
       override def parser: Parser[Torah.Numbered] = numberedParser

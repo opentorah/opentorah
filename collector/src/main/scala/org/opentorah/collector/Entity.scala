@@ -4,7 +4,7 @@ import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as 
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Caching, Directory, Store, WithSource}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Entity(
@@ -58,7 +58,7 @@ final class Entity(
           {ScalaXml.multi(separator = " ", nodes = texts.map(text => text.a(collector)(text = text.document.baseName)))}</l>}
       </p>
 
-    TeiEntity.xmlElement(entity.copy(content = entity.content :+ mentions))
+    TeiEntity.xmlElement(entity.copy(content = ScalaXml.toNodes(entity.content.scalaXml :+ mentions)))
 
 object Entity extends EntityRelated[Entity](
   elementName = _.element,
@@ -72,7 +72,7 @@ object Entity extends EntityRelated[Entity](
     entity.names.head.name
   ))
 
-  override protected def contentType: ContentType = ContentType.Elements
+  override protected def contentType: Element.ContentType = Element.ContentType.Elements
 
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
   private val mainNameAttribute: Attribute.Required[String] = Attribute("name").required

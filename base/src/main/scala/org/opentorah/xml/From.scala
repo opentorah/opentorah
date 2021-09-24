@@ -3,65 +3,64 @@ package org.opentorah.xml
 import java.io.File
 import java.net.URL
 import org.opentorah.util.{Effects, Files, Platform}
-import zio.{IO, Task}
 
-sealed abstract class From(val name: String):
-
-  def url: Option[URL]
-
-  def load: IO[Effects.Error, ScalaXml.Element]
-
-  final def loadTask: Task[ScalaXml.Element] = Effects.error2throwable(load)
+sealed abstract class From(val name: String, val xml: Xml):
 
   def isRedirect: Boolean
 
+  def url: Option[URL]
+
+  def load: Effects.IO[xml.Element]
+
+
 object From:
 
-  private final class FromXml(
+  private final class FromXml(override val xml: Xml)(
     name: String,
-    elem: ScalaXml.Element
-  ) extends From(name):
+    element: xml.Element
+  ) extends From(name, xml):
     override def isRedirect: Boolean = false
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
-    override def load: IO[Effects.Error, ScalaXml.Element] = IO.succeed(elem)
+    // Note: if xml != this.xml, this will fail *at run-time*:
+    override def load: Effects.IO[xml.Element] = zio.IO.succeed(element)
 
-  def xml(name: String, elem: ScalaXml.Element): From = new FromXml(name, elem)
+  def scalaXml(name: String, elem: ScalaXml.Element): From = xml(ScalaXml)(name, elem)
+  def xml(xml: Xml)(name: String, elem: xml.Element): From = new FromXml(xml)(name, elem)
 
   private final class FromString(
     name: String,
-    string: String
-  ) extends From(name):
+    string: String,
+    override val xml: Xml
+  ) extends From(name, xml):
     override def isRedirect: Boolean = false
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: IO[Effects.Error, ScalaXml.Element] = Effects.effect(ScalaXml.loadFromString(string))
+    override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromString(string))
 
-  def string(name: String, string: String): From = new FromString(name, string)
+  def string(name: String, string: String, xml: Xml = ScalaXml): From = new FromString(name, string, xml)
 
-  private final class FromUrl(fromUrl: URL, override val isRedirect: Boolean)
-    extends From(Files.nameAndExtension(fromUrl.getPath)._1):
+  private final class FromUrl(fromUrl: URL, override val isRedirect: Boolean, override val xml: Xml)
+    extends From(Files.nameAndExtension(fromUrl.getPath)._1, xml):
     override def toString: String = s"From.url($fromUrl, isRedirect=$isRedirect)"
     override def url: Option[URL] = Some(fromUrl)
-    override def load: IO[Effects.Error, ScalaXml.Element] = Effects.effect(ScalaXml.loadFromUrl(fromUrl))
+    override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromUrl(fromUrl))
 
-  def url(url: URL): From = new FromUrl(url, false)
+  def url(url: URL, xml: Xml): From = new FromUrl(url, false, xml)
 
-  private[xml] def redirect(url: URL): From = new FromUrl(url, true)
-
-  def file(directory: File, fileName: String): From = file(File(directory, fileName + ".xml"))
-  def file(file: File): From = url(Files.file2url(file))
+  private[xml] def redirect(url: URL, xml: Xml): From = new FromUrl(url, true, xml)
 
   private final class FromResource(
     clazz: Class[?],
-    name: String
-  ) extends From(name):
+    name: String,
+    override val xml: Xml
+  ) extends From(name, xml):
     override def isRedirect: Boolean = false
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
-    override def load: IO[Effects.Error, ScalaXml.Element] = url
-      .map(url => Effects.effect(ScalaXml.loadFromUrl(url)))
+    override def load: Effects.IO[xml.Element] = url
+      .map(url => Effects.effect(xml.loadFromUrl(url)))
       .getOrElse(Effects.fail(s"Resource not found: $this"))
 
-  def resource(obj: AnyRef, name: String): From = new FromResource(obj.getClass, name)
-  def resource(obj: AnyRef): From = resource(obj, Platform.className(obj))
+  def resourceNamed(obj: AnyRef, name: String, xml: Xml = ScalaXml): From = new FromResource(obj.getClass, name, xml)
+  def resource(obj: AnyRef, xml: Xml = ScalaXml): From = resourceNamed(obj, Platform.className(obj), xml)

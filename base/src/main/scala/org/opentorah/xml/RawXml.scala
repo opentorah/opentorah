@@ -8,27 +8,25 @@ open class RawXml(
   attributesAllowed: Boolean = false
 ):
 
-  final class Value(val content: ScalaXml.Nodes, val attributes: Attribute.Values)
-
-  def apply(content: ScalaXml.Nodes, attributes: Attribute.Values = Seq.empty): Value = Value(content, attributes)
+  final class Value(val content: Element.Nodes, val attributes: Attribute.Values = Seq.empty)
 
   object element extends Element[Value](elementName):
 
     override def toString: String = s"raw element ${RawXml.this.elementName}"
 
-    override def contentType: ContentType = ContentType.Mixed
+    override def contentType: Element.ContentType = Element.ContentType.Mixed
 
     override def contentParsable: Parsable[Value] = new Parsable[Value]:
       override def parser: Parser[Value] = for
         attributes: Attribute.Values <- if attributesAllowed then Attribute.allAttributes else ZIO.succeed(Seq.empty)
-        xml: ScalaXml.Nodes <- Element.nodes()
+        content: Element.Nodes <- Element.nodes()
       yield Value(
-        xml,
+        content,
         attributes
       )
 
       override def unparser: Unparser[Value] = Unparser(
         attributes = _.attributes,
-        content = _.content,
+        content = _.content.scalaXml,
         namespace = namespace
       )

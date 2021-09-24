@@ -11,12 +11,12 @@ object CollectorService extends SiteService[Collector]:
 
   override def contentParsable: Parsable[Collector] = new Parsable[Collector]:
     override def parser: Parser[Collector] = for
-      fromUrl <- Element.currentFromUrl
-      common <- SiteCommon.required()
-      entities <- Entities.required()
-      entityLists <- EntityLists.required()
-      notes <- Notes.required()
-      by <- ByHierarchy.followRedirects.required()
+      fromUrl: Element.FromUrl <- Element.fromUrl
+      common: SiteCommon <- SiteCommon.required()
+      entities: Entities <- Entities.required()
+      entityLists: EntityLists <- EntityLists.required()
+      notes: Notes <- Notes.required()
+      by: ByHierarchy <- ByHierarchy.followRedirects.required()
     yield Collector(
       fromUrl,
       common,

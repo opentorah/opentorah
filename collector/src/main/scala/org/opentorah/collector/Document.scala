@@ -23,8 +23,8 @@ final class Document(
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
   def getDate: ScalaXml.Text = ScalaXml.mkText(date.getOrElse(""))
-  def getDescription: ScalaXml.Nodes = description.toSeq.flatMap(_.content)
-  def getAuthors: ScalaXml.Nodes = ScalaXml.multi(authors.flatMap(_.content))
+  def getDescription: ScalaXml.Nodes = description.toSeq.flatMap(_.content.scalaXml)
+  def getAuthors: ScalaXml.Nodes = ScalaXml.multi(authors.flatMap(_.content.scalaXml))
   def getAddressee: Seq[ScalaXml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
   def getTranscribers: ScalaXml.Nodes = ScalaXml.multi(editors
     .filter(_.role.contains("transcriber"))
@@ -86,12 +86,12 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
     )
 
   override def apply(name: String, tei: Tei): Parser[Document] = for
-    pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content, Pb.elementName, Pb)
+    pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content.scalaXml, Pb.elementName, Pb)
     lang: Option[String] = tei.text.lang
     language: Option[String] = splitLang(name)._2
     _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
     persNames: Seq[EntityReference] <- ScalaXml.descendants(
-      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content).getOrElse(Seq.empty),
+      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content.scalaXml).getOrElse(Seq.empty),
       elementName = EntityType.Person.nameElement,
       elements = EntityReference
     )

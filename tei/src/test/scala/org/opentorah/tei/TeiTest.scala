@@ -8,15 +8,17 @@ import zio.{UIO, URIO, ZLayer}
 
 final class TeiTest extends AnyFlatSpec, Matchers:
 
+  def unsafeRun[A](parser: Parser[A]): A = Parser.unsafeRun(parser)
+
   "Parsing" should "work" in {
 //    println(Tei.prettyPrinter.renderWithHeader(Parser.load(From.resource(Tei, "905"))))
-    val tei: Tei = Parsing.unsafeRun(Tei.parse(From.resource(Tei, "905")))
+    val tei: Tei = unsafeRun(Tei.parse(From.resourceNamed(Tei, "905", ScalaXml)))
 //    println(Tei.prettyPrinter.renderWithHeader(Tei.toXmlElement(tei)))
   }
 
   "Entity parsing" should "work" in {
-    val result: Entity = Parsing.unsafeRun(
-      Entity.parse(From.resource(Tei, "Баал_Шем_Тов")))
+    val result: Entity = unsafeRun(
+      Entity.parse(From.resourceNamed(Tei, "Баал_Шем_Тов", ScalaXml)))
 
     result.role shouldBe Some("jew")
     result.name shouldBe "Израиль из Мезбича"
@@ -32,10 +34,10 @@ final class TeiTest extends AnyFlatSpec, Matchers:
         .setTarget("facsViewer")
       )
 
-    Parsing.unsafeRun(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
+    unsafeRun(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
 
   "905" should "work" in {
-    val tei: Tei = Parsing.unsafeRun(Tei.parse(From.resource(Tei, "905")))
+    val tei: Tei = unsafeRun(Tei.parse(From.resourceNamed(Tei, "905", ScalaXml)))
     val html: ScalaXml.Element = tei2html(Tei.xmlElement(tei))
     //println(Tei.prettyPrinter.render(html))
   }

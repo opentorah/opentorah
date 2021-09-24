@@ -2,7 +2,7 @@ package org.opentorah.docbook
 
 import org.opentorah.mathjax.{DelimitersAndInput, Input, MathJaxConfiguration, MathML}
 import org.opentorah.mathjax.MathML.displayAttribute
-import org.opentorah.xml.{Attribute, Dom, Namespace, Sax, WarningFilter}
+import org.opentorah.xml.{Attribute, Dom, Namespace, Sax}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -10,7 +10,7 @@ import org.xml.sax.helpers.AttributesImpl
 // TODO move into site module (docbook package); move bits into Input.
 final class MathFilter(
   configuration: MathJaxConfiguration
-) extends WarningFilter:
+) extends Sax.WarningFilter:
   private var elementsStack: List[String] = List.empty
   private def pushElement(localName: String): Unit = elementsStack = elementsStack :+ localName
   private def popElement(): Unit = elementsStack = elementsStack.init

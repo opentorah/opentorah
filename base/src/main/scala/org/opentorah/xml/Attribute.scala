@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Effects
-import zio.ZIO
 
 // Type-safe XML attribute get/set - for use in DOM and SAX;
 // inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends.
@@ -9,8 +8,7 @@ abstract class Attribute[T](
   val name: String,
   val namespace: Namespace,
   val default: T
-) extends Conversion[T] derives CanEqual:
-
+) derives CanEqual:
   require((name != null) && !name.contains(":"))
   require(name.nonEmpty || (namespace == Namespace.Xmlns))
   
@@ -27,6 +25,14 @@ abstract class Attribute[T](
   final def orDefault          : Attribute.OrDefault[T] = Attribute.OrDefault[T](this, setDefault = false)
   final def orDefaultSetDefault: Attribute.OrDefault[T] = Attribute.OrDefault[T](this, setDefault = true )
   final def required           : Attribute.Required [T] = Attribute.Required [T](this)
+
+  def toString(value: T): String = value.toString
+
+  final def get(value: Option[String]): Option[T] = value.filter(_.nonEmpty).map(fromString)
+
+  // TODO ZIOify! (and unify Effects.effect() and IO.succeed() - and then remove overrides of one of the methods and it itself...Z)
+  def fromString(value: String): T
+  def parseFromString(value: String): Effects.IO[T] = Effects.effect(fromString(value))
 
 object Attribute:
 
@@ -63,7 +69,7 @@ object Attribute:
 
   private def optionalParser[T](attribute: Attribute[T]): Parser[Option[T]] =
     Parsing.takeAttribute(attribute).flatMap(value =>
-      value.fold[Parser[Option[T]]](ZIO.none)(attribute.parseFromString(_).map(Some(_)))
+      value.fold[Parser[Option[T]]](zio.ZIO.none)(attribute.parseFromString(_).map(Some(_)))
     )
 
   final class Optional[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, Option[T]](attribute):
@@ -95,7 +101,10 @@ object Attribute:
     name: String,
     namespace: Namespace = Namespace.No,
     default: String = ""
-  ) extends Attribute[String](name, namespace, default), Conversion.StringConversion
+  ) extends Attribute[String](name, namespace, default):
+    final override def fromString(value: String): String = value
+
+    final override def parseFromString(value: String): Effects.IO[String] = zio.IO.succeed(value)
 
   def apply(
     name: String,
@@ -107,22 +116,35 @@ object Attribute:
     name: String,
     namespace: Namespace = Namespace.No,
     default: Boolean = false
-  ) extends Attribute[Boolean](name, namespace, default), Conversion.BooleanConversion
+  ) extends Attribute[Boolean](name, namespace, default):
+    final override def fromString(value: String): Boolean = value match
+      case "yes" => true
+      case "no"  => false
+      case value => value.toBoolean
 
   final class IntAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: Int = 0
-  ) extends Attribute[Int](name, namespace, default), Conversion.IntConversion
+  ) extends Attribute[Int](name, namespace, default):
+    final override def fromString(value: String): Int = int(value, mustBePositive = false)
 
   final class PositiveIntAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: Int = 1
-  ) extends Attribute[Int](name, namespace, default), Conversion.PositiveIntConversion
+  ) extends Attribute[Int](name, namespace, default):
+    final override def fromString(value: String): Int = int(value, mustBePositive = true)
+
+  private def int(value: String, mustBePositive: Boolean): Int =
+    val result = value.toInt
+    if mustBePositive && result <= 0 then throw IllegalArgumentException(s"Non-positive integer: $result")
+    result
 
   final class FloatAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: Float = 0.0f
-  ) extends Attribute[Float](name, namespace, default), Conversion.FloatConversion
+  ) extends Attribute[Float](name, namespace, default):
+    final override def fromString(value: String): Float = value.toFloat
+

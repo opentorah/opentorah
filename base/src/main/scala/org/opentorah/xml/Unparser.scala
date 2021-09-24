@@ -3,9 +3,9 @@ package org.opentorah.xml
 import org.opentorah.util.Collections
 
 final class Unparser[A](
-  val attributes: A => Attribute.Values   = (_: A) => Seq.empty,
-  val content   : A => Seq[ScalaXml.Node] = (_: A) => Seq.empty,
-  val namespace : Option[Namespace]       = None
+  val attributes: A => Attribute.Values = (_: A) => Seq.empty,
+  val content   : A => ScalaXml.Nodes   = (_: A) => Seq.empty,
+  val namespace : Option[Namespace]     = None
 )
 
 object Unparser:

@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.{Named, Names}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Parsing, Unparser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 
 // TODO introduce transparent (optional) selectors;
 // concentrate resolution logic in resolve();
@@ -33,4 +33,4 @@ object Selector extends Element[Selector]("selector"):
   def byName(name: String): Selector = values.find(_.names.hasName(name)).get
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
-  lazy val values: Seq[Selector] = Parsing.unsafeRun(Named.load(From.resource(this), this))
+  lazy val values: Seq[Selector] = Parser.unsafeRun(Named.load(From.resource(this), this))

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Element, Parsable, Parser}
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
 // but I made them optional so that they can be removed from the editable pre-TEI files

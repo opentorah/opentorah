@@ -3,12 +3,12 @@ package org.opentorah.collector
 import org.opentorah.store.Directory
 import org.opentorah.tei.Tei
 import org.opentorah.util.Collections
-import org.opentorah.xml.{FromUrl, Parser}
+import org.opentorah.xml.{Element, Parser, ScalaXml}
 
 import java.net.URL
 
 final class Documents(
-  override val fromUrl: FromUrl,
+  override val fromUrl: Element.FromUrl,
   directory: String,
   parts: Seq[CollectionPart]
 ) extends Directory[Tei, Document, Documents.All](
@@ -17,7 +17,7 @@ final class Documents(
   Document,
   Documents.All(_, parts)
 ):
-  override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url)
+  override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url, ScalaXml)
 
 object Documents:
 

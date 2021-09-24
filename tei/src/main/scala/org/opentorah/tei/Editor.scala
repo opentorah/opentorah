@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 final class Editor(
   val role: Option[String],
