@@ -13,7 +13,7 @@ import org.opentorah.xml.{Element, Elements, ScalaXml}
 trait Hierarchical extends Store.NonTerminal, Stores.Pure, HtmlContent[Collector]:
   def title: Title.Value
 
-  final def titleString: String = ScalaXml.toString(title.content)
+  final def titleString: String = title.content.toString
 
   def storeAbstract: Option[Abstract.Value]
 

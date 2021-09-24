@@ -2,7 +2,6 @@ package org.opentorah.metadata
 
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Parser}
-import zio.IO
 
 final class WithNumber[T](val n: Int, val what: T)
 
@@ -15,10 +14,10 @@ object WithNumber:
     what: T <- parser
   yield WithNumber[T](n, what)
 
-  def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): IO[Effects.Error, Unit] =
+  def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Effects.IO[Unit] =
     Effects.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
 
-  def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): IO[Effects.Error, Unit] = for
+  def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Effects.IO[Unit] = for
     _ <- checkConsecutive(result, what)
     _ <- Effects.check(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
   yield ()

@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import org.opentorah.metadata.Names
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Elements, FromUrl, Parser}
+import org.opentorah.xml.{Attribute, Element, Elements, Parser}
 import zio.ZIO
 import java.net.URL
 
@@ -21,7 +21,7 @@ abstract class Directory[
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends Stores, FromUrl.With:
+) extends Stores, Element.FromUrl.With:
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
@@ -56,6 +56,7 @@ abstract class Directory[
     content
   )
 
+  // TODO abstract over Xml?
   protected def loadFile(url: URL): Parser[T]
 
 object Directory:

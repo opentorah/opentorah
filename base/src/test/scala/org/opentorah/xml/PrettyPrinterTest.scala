@@ -11,14 +11,14 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
       width,
       indent = 2,
       clingyElements = Set("note")
-    ).render(ScalaXml)(Effects.unsafeRun(from.loadTask))
+    ).render(ScalaXml)(Effects.unsafeRun(Effects.error2throwable(from.load.map(_.asInstanceOf[ScalaXml.Element]))))
 
   private def check(from: From, width: Int, expected: String): Unit =
     val result = render(from, width)
     result shouldBe expected.stripMargin + "\n"
 
   private def check(xml: ScalaXml.Element, width: Int, expected: String): Unit =
-    check(From.xml("test XML", xml), width, expected)
+    check(From.scalaXml("test XML", xml), width, expected)
 
   "Chunking" should "work" in {
     check(<a>X<b/> </a>, 120, expected =

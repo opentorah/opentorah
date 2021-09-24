@@ -2,7 +2,6 @@ package org.opentorah.metadata
 
 import org.opentorah.util.{Effects, Platform}
 import org.opentorah.xml.{Elements, From, Parser}
-import zio.IO
 
 trait Named:
   def name: String = Platform.className(this)
@@ -53,7 +52,7 @@ object Named:
       _ <- checkNoUnmatchedKeys(keys.toSet -- result.keySet)
     yield result
 
-  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): IO[Effects.Error, Unit] =
+  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): Effects.IO[Unit] =
     Effects.check(unmatchedKeys.isEmpty, s"Unmatched keys: $unmatchedKeys")
 
   def find[K <: Named](

@@ -1,14 +1,14 @@
 package org.opentorah.tei
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, ContentType, Element, Parsable, Parser, ScalaXml, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class Entity(
   val id: Option[String],
   val entityType: EntityType,
   val role: Option[String],
   val names: Seq[EntityName],
-  val content: ScalaXml.Nodes // TODO rename body?
+  val content: Element.Nodes // TODO rename body?
 ):
   def name: String = names.head.name
 
@@ -19,7 +19,7 @@ final class Entity(
     entityType: EntityType = entityType,
     role: Option[String] = role,
     names: Seq[EntityName] = names,
-    content: ScalaXml.Nodes = content
+    content: Element.Nodes = content
   ): Entity = Entity(
     id,
     entityType,
@@ -35,7 +35,7 @@ object Entity extends EntityRelated[Entity](
   // TODO: with this, in Scala 3 I get 'Double definition' error:
   // override def toString: String = "Entity"
 
-  override protected def contentType: ContentType = ContentType.Elements
+  override protected def contentType: Element.ContentType = Element.ContentType.Elements
 
   private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
@@ -48,7 +48,7 @@ object Entity extends EntityRelated[Entity](
       role: Option[String] <- roleAttribute()
       names: Seq[EntityName] <- namesParsable()
       _ <- Effects.check(names.nonEmpty, s"No names in $id")
-      content: ScalaXml.Nodes <- Element.nodes()
+      content: Element.Nodes <- Element.nodes()
     yield Entity(
       id,
       entityType,

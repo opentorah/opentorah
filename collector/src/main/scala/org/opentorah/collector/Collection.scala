@@ -4,11 +4,11 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{By, Caching, Selector, Store, Stores}
-import org.opentorah.xml.{Attribute, Element, Elements, FromUrl, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Collection(
-  fromUrl: FromUrl,
+  fromUrl: Element.FromUrl,
   override val names: Names,
   val pageType: Page.Type,
   val alias: Option[String],
@@ -185,7 +185,7 @@ object Collection extends Element[Collection]("collection"):
 
     override def parser: Parser[Collection] = for
       pageType: Page.Type <- Page.typeAttribute()
-      fromUrl: FromUrl <- Element.currentFromUrl
+      fromUrl: Element.FromUrl <- Element.fromUrl
       names: Names <- namesParsable()
       title: Title.Value <- titleElement()
       storeAbstract: Option[Abstract.Value] <- abstractElement()

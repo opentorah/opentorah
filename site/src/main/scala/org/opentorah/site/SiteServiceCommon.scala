@@ -12,8 +12,8 @@ object SiteServiceCommon extends SiteService[Site.Common]:
 
   override def contentParsable: Parsable[Site.Common] = new Parsable[Site.Common]:
     override def parser: Parser[Site.Common] = for
-      fromUrl <- Element.currentFromUrl
-      common <- SiteCommon.required()
+      fromUrl: Element.FromUrl <- Element.fromUrl
+      common: SiteCommon <- SiteCommon.required()
     yield Site.Common(
       fromUrl,
       common

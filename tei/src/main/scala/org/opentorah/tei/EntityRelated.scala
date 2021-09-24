@@ -1,17 +1,17 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{ContentType, Element, Elements, Parsable}
+import org.opentorah.xml.{Element, Elements, Parsable}
 
 abstract class EntityRelated[E](
   elementName: EntityType => String,
   entityType: E => EntityType
 ) extends Elements.Union[E]:
-  protected def contentType: ContentType
+  protected def contentType: Element.ContentType
 
   protected def parsable(entityType: EntityType): Parsable[E]
 
   sealed class ForEntityType(entityType: EntityType) extends Element[E](elementName(entityType)):
-    override def contentType: ContentType = EntityRelated.this.contentType
+    override def contentType: Element.ContentType = EntityRelated.this.contentType
     override def contentParsable: Parsable[E] = EntityRelated.this.parsable(entityType)
 
   object Person       extends ForEntityType(EntityType.Person      )

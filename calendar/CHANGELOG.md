@@ -3,6 +3,7 @@
 Modules covered: `calendar` and `schedule`.
 
 ## [Unreleased]
+- more cleanup;
 
 ## [0.3.7] - 2021-08-17
 - fixed a bug with the first day of the Jewish epoch (molad BaHaRaD) having number 2 instead of 1;

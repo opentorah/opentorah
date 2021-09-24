@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.store.{Caching, Store, Stores}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Parser, Parsing}
+import org.opentorah.xml.Parser
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -11,7 +11,7 @@ final class TanachTest extends AnyFlatSpec, Matchers:
   val caching: Caching.Simple = new Caching.Simple
 
   def resolve(path: String): zio.Task[Store.Path] =
-    Parsing.toTask(Caching.provide(caching, Stores.resolve(Files.splitAndDecodeUrl(path), Tanach)))
+    Parser.toTask(Caching.provide(caching, Stores.resolve(Files.splitAndDecodeUrl(path), Tanach)))
 
   def doResolve(path: String): Store.Path = Effects.unsafeRun(resolve(path))
   def doResolveLast(path: String): Store = doResolve(path).last

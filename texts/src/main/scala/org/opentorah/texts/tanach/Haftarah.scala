@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{LanguageSpec, Named, Names, WithNumber}
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Parsing, Unparser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final case class Haftarah(override val spans: Seq[Haftarah.BookSpan])
@@ -30,7 +30,7 @@ object Haftarah extends WithBookSpans[Prophets]:
 
       override def unparser: Unparser[(String, Haftarah.Customs)] = ???
 
-  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parsing.unsafeRun(Named.load(
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(Named.load(
     from = From.resource(this),
     content = Week,
     keys = Parsha.values,

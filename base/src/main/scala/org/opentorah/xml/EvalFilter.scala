@@ -4,7 +4,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 final class EvalFilter(
   substitutions: Map[String, String]
-) extends WarningFilter:
+) extends Sax.WarningFilter:
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[EvalFilter])
 

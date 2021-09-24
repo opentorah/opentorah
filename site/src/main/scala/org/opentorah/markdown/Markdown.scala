@@ -39,7 +39,7 @@ object Markdown:
   private def parse(url: URL): Node = parser.parseReader(InputStreamReader(url.openStream()))
 
   private def render(ast: Node): ScalaXml.Element = Effects.unsafeRun(
-    From.string("flexmark", s"<div>${renderer.render(ast)}</div>").load
+    From.string("flexmark", s"<div>${renderer.render(ast)}</div>").load.map(_.asInstanceOf[ScalaXml.Element])
   )
 
   private lazy val options: DataHolder =

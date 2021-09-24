@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import org.opentorah.util.Strings
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}
-import zio.ZIO
 
 object ScalaXml extends Xml:
 
@@ -14,7 +13,7 @@ object ScalaXml extends Xml:
   override type Text = scala.xml.Atom[?]
 
   override type Comment = scala.xml.Comment
-  
+
   override def toString(node: Node): String = Strings.squashWhitespace(node match // TODO why the squash?
     case elem: Element => (elem.child map (_.text)).mkString(" ") // TODO hope this is not used: no tags, no attributes...
 
@@ -24,7 +23,7 @@ object ScalaXml extends Xml:
     case node: Node => node.text
   )
 
-  override protected def loadFromSource(
+  override protected def loadFromInputSource(
     inputSource: InputSource,
     filters: Seq[XMLFilter],
     resolver: Option[Resolver]
@@ -129,8 +128,6 @@ object ScalaXml extends Xml:
 
   override def setChildren(element: Element, children: Nodes): Element = element.copy(child = children)
 
-  // TODO up into Xml - after parsing is abstracted over Xml...
-  def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
-    nodes.flatMap(node => node.flatMap(_ \\ elementName).filter(isElement).map[Element](asElement))
-  )(descendant => elements.parse(From.xml("descendants", descendant)))
+  override protected def descendats(nodes: Nodes, elementName: String): Nodes = nodes.flatMap(node => node.flatMap(_ \\ elementName))
 
+  def toNodes(nodes: Nodes): Element.Nodes = Element.Nodes(ScalaXml)(nodes)

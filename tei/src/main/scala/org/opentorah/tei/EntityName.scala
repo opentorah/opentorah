@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Parsable, Parser, Xml}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class EntityName(
   val entityType: EntityType,
@@ -25,7 +25,7 @@ object EntityName extends EntityRelated[EntityName](
   entityType = _.entityType
 ):
 
-  override protected def contentType: ContentType = ContentType.Characters
+  override protected def contentType: Element.ContentType = Element.ContentType.Characters
 
   private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
   val refAttribute: Attribute.Optional[String] = Attribute("ref").optional

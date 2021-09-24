@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Unparser, Attribute, ContentType, Element, Parsable, Parser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 final class Language(
   val ident: String,
@@ -14,7 +14,7 @@ object Language extends Element[Language]("language"):
   private val usageAttribute: Attribute.Optional[Int] = Attribute.PositiveIntAttribute("usage").optional
   private val textParsable: Parsable[Option[String]] = org.opentorah.xml.Text().optional
 
-  override def contentType: ContentType = ContentType.Mixed
+  override def contentType: Element.ContentType = Element.ContentType.Mixed
 
   override def contentParsable: Parsable[Language] = new Parsable[Language]:
     override def parser: Parser[Language] = for

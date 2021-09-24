@@ -35,7 +35,7 @@ final case class a(
 
   def apply(element: ScalaXml.Element): ScalaXml.Element = apply(Seq(element))
 
-  def apply(xml: RawXml#Value): ScalaXml.Element = apply(xml.content)
+  def apply(xml: RawXml#Value): ScalaXml.Element = apply(xml.content.scalaXml)
 
   def apply(children: ScalaXml.Nodes): ScalaXml.Element =
     val result: ScalaXml.Element =

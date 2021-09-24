@@ -5,7 +5,7 @@ import org.opentorah.html
 import org.opentorah.store.{Caching, Directory, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Doctype, FromUrl, Parser, Parsing, PrettyPrinter, ScalaXml, Xml}
+import org.opentorah.xml.{Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{IO, Task, ZIO, ZLayer}
 import java.net.URL
@@ -14,9 +14,9 @@ import java.net.URL
 // TODO consolidate all js, css etc. files in `asset` (singular)
 // TODO fix favicon to the default `favicon.ico` and convert the Alter Rebbe picture.
 abstract class Site[S <: Site[S]](
-  override val fromUrl: FromUrl,
+  override val fromUrl: Element.FromUrl,
   val common: SiteCommon
-) extends Stores.Pure, FromUrl.With { this: S =>
+) extends Stores.Pure, Element.FromUrl.With { this: S =>
 
   final def logger: Logger = Site.logger
 
@@ -24,7 +24,7 @@ abstract class Site[S <: Site[S]](
 
   final val caching: Caching.Simple = new Caching.Simple
 
-  final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parsing.toTask(Caching.provide(caching, parser))
+  final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
 
   final private val staticPaths: Set[String] =
     Set("assets", "css", "js", "sass", "robots.txt") ++
@@ -108,10 +108,10 @@ abstract class Site[S <: Site[S]](
     Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(PublicationStmt(
-          publisher = common.url.map(url => Publisher(<ptr target={s"http://$url"}/>)),
+          publisher = common.url.map(url => Publisher.Value(ScalaXml.toNodes(<ptr target={s"http://$url"}/>))),
           availability = Some(Availability(
             status = Some("free"),
-            xml = ScalaXml.optional(common.license)(license => <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)
+            xml = ScalaXml.toNodes(ScalaXml.optional(common.license)(license => <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>))
           ))
         )),
         sourceDesc = common.getTei.sourceDesc
@@ -243,7 +243,7 @@ object Site:
   )
 
   final class Common(
-    fromUrl: FromUrl,
+    fromUrl: Element.FromUrl,
     common: SiteCommon
   ) extends Site[Common](
     fromUrl,

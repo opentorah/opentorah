@@ -3,11 +3,11 @@ package org.opentorah.collector
 import org.opentorah.site.HtmlContent
 import org.opentorah.tei.{Entity as TeiEntity}
 import org.opentorah.store.{By, Caching, Directory, Selector}
-import org.opentorah.xml.{Element, FromUrl, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
 final class Entities(
-  override val fromUrl: FromUrl,
+  override val fromUrl: Element.FromUrl,
   override val selector: Selector,
   override val directory: String
 ) extends Directory[TeiEntity, Entity, Entities.All](
@@ -17,7 +17,7 @@ final class Entities(
   Entities.All(_)
 ), By, HtmlContent [Collector]:
 
-  override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url)
+  override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
@@ -34,7 +34,7 @@ object Entities extends Element[Entities]("entities"):
 
   override def contentParsable: Parsable[Entities] = new Parsable[Entities]:
     override def parser: Parser[Entities] = for
-      fromUrl: FromUrl <- Element.currentFromUrl
+      fromUrl: Element.FromUrl <- Element.fromUrl
       selector: Selector <- By.selectorParser
       directory: String <- Directory.directoryAttribute()
     yield Entities(

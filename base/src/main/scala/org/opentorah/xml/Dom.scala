@@ -10,7 +10,7 @@ object Dom extends Xml:
   override type Text = org.w3c.dom.Text
   override type Comment = org.w3c.dom.Comment
 
-  override protected def loadFromSource(
+  override protected def loadFromInputSource(
     inputSource: InputSource,
     filters: Seq[XMLFilter],
     resolver: Option[Resolver]
@@ -123,3 +123,6 @@ object Dom extends Xml:
     for child <- getChildren(element) do element.removeChild(child)
     for child <- children do element.appendChild(child)
     element
+
+  // TODO implement!
+  override protected def descendats(nodes: Nodes, elementName: String): Nodes = ???

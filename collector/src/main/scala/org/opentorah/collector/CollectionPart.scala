@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.Title
-import org.opentorah.xml.{Unparser, Attribute, Element, Parsable, Parser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 final class CollectionPart(
   val names: Names,

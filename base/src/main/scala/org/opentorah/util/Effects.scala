@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import zio.blocking.Blocking
-import zio.{IO, Runtime, Task, ZIO}
+import zio.{Runtime, Task, ZIO}
 
 object Effects:
 
@@ -17,11 +17,13 @@ object Effects:
     case error => new Error(error)
   }
 
-  val ok: IO[Error, Unit] = ZIO.succeed(())
+  type IO[A] = zio.IO[Error, A]
+
+  val ok: IO[Unit] = ZIO.succeed(())
 
   def fail(message: String) = ZIO.fail(new Error(message))
   
-  def check(condition: Boolean, message: => String): IO[Error, Unit] =
+  def check(condition: Boolean, message: => String): IO[Unit] =
     if condition then ok else fail(message)
 
   // Note: when running with 1 cpu (on Cloud Run or in local Docker),
@@ -31,7 +33,7 @@ object Effects:
   private val blockingRuntime: Runtime[?] = Runtime.default.withExecutor(Blocking.Service.live.blockingExecutor)
   // ZIO 2:   private val blockingRuntime: Runtime[?] = Runtime.default.withExecutor(Runtime.default.platform.blockingExecutor)
 
-  def unsafeRun[E, A](io: => IO[E, A]): A =
+  def unsafeRun[E, A](io: => zio.IO[E, A]): A =
     blockingRuntime.unsafeRun[E, A](io)
 
   // Note: run effects on the blocking threadpool:
@@ -42,7 +44,7 @@ object Effects:
   def attempt[A](f: => A): Task[A] =
     Blocking.Service.live.effectBlocking(f) // ZIO 2: ZIO.attemptBlocking(f)
 
-  def effect[A](f: => A): IO[Error, A] =
+  def effect[A](f: => A): IO[A] =
     throwable2error(attempt(f))
 
   def collectAll[R, A](zios: Seq[ZIO[R, Error, A]]): ZIO[R, Error, Seq[A]] = for

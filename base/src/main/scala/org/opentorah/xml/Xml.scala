@@ -4,9 +4,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{InputSource, XMLFilter}
 import java.io.StringReader
 import java.net.URL
-import zio.URIO
+import zio.{URIO, ZIO}
 
-// This abstracts over the XML model, allowing pretty-printing of both Scala XML and DOM.
+// This abstracts over the XML model, allowing parsing and pretty-printing of both Scala XML and DOM.
 trait Xml extends XmlAttributes:
   type Node
   final type Nodes = Seq[Node]
@@ -14,16 +14,14 @@ trait Xml extends XmlAttributes:
   final override type Element = Attributes
   type Text <: Node
   type Comment <: Node
-
-  final type Predicate = Element => Boolean
-
+  
   final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
-    loadFromSource(InputSource(StringReader(string)), filters, resolver)
+    loadFromInputSource(InputSource(StringReader(string)), filters, resolver)
 
   final def loadFromUrl(url: URL, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
-    loadFromSource(Sax.url2inputSource(url), filters, resolver)
+    loadFromInputSource(Sax.url2inputSource(url), filters, resolver)
 
-  protected def loadFromSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
+  protected def loadFromInputSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
 
   def isText(node: Node): Boolean
   def asText(node: Node): Text
@@ -62,6 +60,12 @@ trait Xml extends XmlAttributes:
     yield setChildren(newElement, children)
 
     val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
+
+  def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
+    descendats(nodes, elementName).filter(isElement).map[Element](asElement)
+  )(descendant => elements.parse(From.xml(this)("descendants", descendant)))
+
+  protected def descendats(nodes: Nodes, elementName: String): Nodes
 
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match
     case Nil => Nil

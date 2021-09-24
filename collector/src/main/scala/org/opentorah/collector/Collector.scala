@@ -6,13 +6,13 @@ import org.opentorah.site.{HtmlContent, Site, SiteCommon, Viewer}
 import org.opentorah.store.{Caching, Directory, ListFile, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{FromUrl, Parser, ScalaXml}
+import org.opentorah.xml.{Element, Parser, ScalaXml}
 import zio.{UIO, ZIO}
 import java.net.URL
 
 // TODO retrieve TEI(?) references from notes.
 final class Collector(
-  fromUrl: FromUrl,
+  fromUrl: Element.FromUrl,
   common: SiteCommon,
   val entities: Entities,
   val entityLists: EntityLists,
@@ -221,11 +221,11 @@ final class Collector(
 
       errorOpts: Seq[Option[String]] <- getReferences.flatMap(ZIO.foreach(_)(value =>
         val reference: EntityReference = value.value
-        val name: ScalaXml.Nodes = reference.name
+        val name: Element.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
           if ref.contains(" ") then ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
           else entities.findByName(ref).map(_
-            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${name.text}< """))(named =>
+            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">$name< """))(named =>
               if named.entityType == reference.entityType then None
               else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: $name [$ref]")
             )
@@ -254,10 +254,10 @@ final class Collector(
     for
       entities: Seq[Entity] <- entities.stores
       fromEntities: Seq[Seq[WithSource[T]]] <- ZIO.foreach(entities)(entity =>
-        entity.teiEntity(this).flatMap(teiEntity => withSource(entity, teiEntity.content)))
+        entity.teiEntity(this).flatMap(teiEntity => withSource(entity, teiEntity.content.scalaXml)))
       fromHierarchicals: Seq[Seq[WithSource[T]]] <- ZIO.foreach(hierarchies ++ collections)(hierarchical => withSource(
         hierarchical,
-        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.content)
+        Seq(Some(hierarchical.title), hierarchical.storeAbstract, hierarchical.body).flatten.flatMap(_.content.scalaXml)
       ))
       fromDocuments: Seq[Seq[Seq[WithSource[T]]]] <- ZIO.foreach(collections)(collection =>
         collection.documents.stores.flatMap(documents => ZIO.foreach(documents)(document =>

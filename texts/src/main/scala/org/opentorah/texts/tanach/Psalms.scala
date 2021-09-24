@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Names, WithNumber}
-import org.opentorah.xml.{ContentType, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 import zio.ZIO
 
 case object Psalms extends Writings:
@@ -47,7 +47,7 @@ case object Psalms extends Writings:
   yield SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 
   private final class SpanParsable(name: String) extends Element[WithNumber[SpanParsed]](name):
-    override def contentType: ContentType = ContentType.Empty
+    override def contentType: Element.ContentType = Element.ContentType.Empty
 
     override def contentParsable: Parsable[WithNumber[SpanParsed]] = new Parsable[WithNumber[SpanParsed]]:
       override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)

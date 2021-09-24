@@ -29,12 +29,12 @@ object Report:
   ):
     override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[EntityReference]]] = collector.getReferences.map(_
       .filter(_.value.ref.isEmpty)
-      .sortBy(reference => ScalaXml.toString(reference.value.name).toLowerCase)
+      .sortBy(reference => reference.value.name.toString.toLowerCase)
     )
 
     override protected def lineToXml(reference: WithSource[EntityReference], collector: Collector): ScalaXml.Element =
       val source: String = reference.source
-      <l>{ScalaXml.toString(reference.value.name)} в {html.a(URI(source))(text = source)}</l>
+      <l>{reference.value.name.toString} в {html.a(URI(source))(text = source)}</l>
 
   object Unclears extends Report[WithSource[Unclear.Value]](
     "unclears",
@@ -45,7 +45,7 @@ object Report:
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], collector: Collector): ScalaXml.Element =
       val source: String = unclear.source
-      <l>{ScalaXml.toString(unclear.value.content)} в {html.a(URI(source))(text = source)}</l>
+      <l>{unclear.value.content.toString} в {html.a(URI(source))(text = source)}</l>
 
   object MisnamedEntities extends Report[Entity](
     "misnamed-entities",
