@@ -22,12 +22,12 @@ object EndNotes:
     private def srcId: String = id.getOrElse(s"src_note_$number")
 
     def link: ScalaXml.Element =
-      a().setFragment(contentId).setId(srcId)(element = <sup>{number}</sup>)
+      a.empty.setFragment(contentId).setId(srcId)(element = <sup>{number}</sup>)
 
     // TODO is HTML namespace here needed?
     def body: ScalaXml.Element =
       <span xmlns={Html.namespace.uri} class="endnote" id={contentId}>
-        {a().setFragment(srcId).addClass("endnote-backlink")(number.toString)}
+        {a.empty.setFragment(srcId).addClass("endnote-backlink")(number.toString)}
         {content}
       </span>
 

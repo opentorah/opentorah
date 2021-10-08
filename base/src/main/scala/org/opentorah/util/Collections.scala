@@ -21,9 +21,9 @@ object Collections:
   def concat[A, B](fs: Seq[A => Seq[B]]): A => Seq[B] = a => fs.flatMap(f => f(a))
 
   // Group consecutive elements with the same key - didn't find this in the standard library.
-  def group[T, K](list: Seq[T], key: T => K): Seq[Seq[T]] = if list.isEmpty then Nil else
-    val k = key(list.head)
-    val (ks, notks) = list.span(key(_) == k)
+  def group[T, K](list: Seq[T], key: T => K)(using CanEqual[K, K]): Seq[Seq[T]] = if list.isEmpty then Nil else
+    val k: K = key(list.head)
+    val (ks: Seq[T], notks: Seq[T]) = list.span(key(_) == k)
     Seq(ks) ++ group(notks, key)
 
   private def duplicates[T](seq: Seq[T]): Set[T] = seq.groupBy(t => t).filter((_, ts) => ts.length > 1).keySet
@@ -32,18 +32,20 @@ object Collections:
     val result = duplicates(seq)
     require(result.isEmpty, s"Duplicate $what: $result")
 
-  def removeConsecutiveDuplicatesWith[T, D](seq: Seq[T])(f: T => D): Seq[T] =
+  def removeConsecutiveDuplicatesWith[T, D](seq: Seq[T])(f: T => D)(using CanEqual[D, D]): Seq[T] =
     removeConsecutiveDuplicates[T, D](Seq.empty, seq.toList)(f)
 
   @scala.annotation.tailrec
-  private def removeConsecutiveDuplicates[T, D](result: Seq[T], seq: List[T])(f: T => D): Seq[T] = seq match
-    case x :: y :: xs =>
+  private def removeConsecutiveDuplicates[T, D](result: Seq[T], seq: List[T])(f: T => D)(using CanEqual[D, D]): Seq[T] =
+    if seq.isEmpty then result else
+    if seq.length == 1 then result :+ seq.head else
+      val x: T = seq.head
+      val y: T = seq.tail.head
       removeConsecutiveDuplicates(
         if f(x) == f(y) then result else result :+ x,
-        y :: xs
+        seq.tail
       )(f)
-    case x :: Nil => result :+ x
-    case Nil => result
+
 
   // b.intersect(a) == b?
   def contains[T](a: Set[T], b: Set[T]): Boolean = b.forall(t => a.contains(t))
@@ -61,9 +63,10 @@ object Collections:
   private def pruneSequenceOfMaps[K, A, B](
     acc: Seq[(K, Map[A, B])],
     tail: Seq[(K, Map[A, B])]
-  ): Seq[(K, Map[A, B])] = tail match
-    case Nil => acc
-    case (key, map) :: nextTail => pruneSequenceOfMaps(acc :+ (key, map -- nextTail.flatMap(_._2.keys).toSet), nextTail)
+  ): Seq[(K, Map[A, B])] = if tail.isEmpty then acc else
+    val (key: K, map: Map[A, B]) = tail.head
+    val nextTail: Seq[(K, Map[A, B])] = tail.tail
+    pruneSequenceOfMaps(acc :+ (key, map -- nextTail.flatMap(_._2.keys).toSet), nextTail)
 
   // where is this in the standard library?
   def compare(a: Option[String], b: Option[String]): Int =

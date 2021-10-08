@@ -9,11 +9,11 @@ case object Psalms extends Writings:
   // TODO override to add byDayOfMonth, byDayOfWeek, byBook
   // override protected def nonTerminalStores: Seq[Store.NonTerminal] = Seq(chapters)
 
-  final class BookMetadata(
+  final class Metadata(
     val days: Seq[Span],
     val weekDays: Seq[Span],
     val books: Seq[Span]
-  ) extends Nach.BookMetadata(Psalms)
+  ) extends Nach.Metadata(Psalms)
 
   final class Parsed(
     names: Names,
@@ -23,7 +23,7 @@ case object Psalms extends Writings:
     val books: Seq[Span]
   ) extends Nach.Parsed(Psalms, names, chapters):
 
-    override def resolve: Parser[BookMetadata] = ZIO.succeed(BookMetadata(
+    override def resolve: Parser[Metadata] = ZIO.succeed(Metadata(
       days,
       weekDays,
       books
@@ -59,4 +59,4 @@ case object Psalms extends Writings:
 
   def books: Seq[Span] = metadata.books
 
-  override def metadata: BookMetadata = Tanach.forBook(Psalms).asInstanceOf[BookMetadata]
+  private def metadata: Metadata = TanachBook.metadata(Psalms).asInstanceOf[Metadata]

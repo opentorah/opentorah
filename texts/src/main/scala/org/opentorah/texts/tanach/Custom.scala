@@ -1,21 +1,45 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{HasName, HasValues, Named, Names}
 import org.opentorah.util.Collections
 
 // Assumptions: no cycles; only Common doesn't have parent.
-sealed class Custom(val parent: Option[Custom]) extends Named:
-  final override def names: Names = Custom.toNames(this)
+enum Custom(val parent: Option[Custom], nameOverride: Option[String] = None)
+  extends Named.ByLoader[Custom](loader = Custom, nameOverride), HasName.Enum derives CanEqual:
+  lazy val children: Set[Custom] = Custom.valuesSeq.filter(_.parent.contains(this)).toSet
 
-  final lazy val children: Set[Custom] = Custom.values.filter(_.parent.contains(this)).toSet
+  def level: Int = parent.fold(0)(parent => parent.level+1)
 
-  final def level: Int = parent.fold(0)(parent => parent.level+1)
+  case Common extends Custom(None)
+    case Ashkenaz extends Custom(Some(Common))
+      case Italki extends Custom(Some(Ashkenaz))
+      case Frankfurt extends Custom(Some(Ashkenaz))
+      case Lita extends Custom(Some(Ashkenaz))
+        case ChayeyOdom extends Custom(Some(Lita), nameOverride = Some("Chayey Odom"))
+      case Hagra extends Custom(Some(Ashkenaz))
+    case Sefard extends Custom(Some(Common))
+      case Chabad extends Custom(Some(Sefard))
+      case Magreb extends Custom(Some(Sefard))
+        case Algeria extends Custom(Some(Magreb))
+        case Toshbim extends Custom(Some(Magreb))
+        case Djerba extends Custom(Some(Magreb))
+        case Morocco extends Custom(Some(Magreb))
+          case Fes extends Custom(Some(Morocco))
+      case Bavlim extends Custom(Some(Sefard))
+      case Teiman extends Custom(Some(Sefard))
+        case Baladi extends Custom(Some(Teiman))
+        case Shami extends Custom(Some(Teiman))
 
-object Custom extends NamedCompanion:
+object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
+  override val valuesSeq: Seq[Custom] = values.toIndexedSeq
 
-  override type Key = Custom
+  val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 
-  open class Of[T](val customs: Map[Custom, T], full: Boolean = true):
+  type Customs[T] = Map[Custom, T]
+
+  type Sets[T] = Map[Set[Custom], T]
+
+  open class Of[T](val customs: Customs[T], full: Boolean = true):
     if full then require(isFull)
 
     final def find(custom: Custom): Option[T] =
@@ -33,9 +57,9 @@ object Custom extends NamedCompanion:
 
     final def isFull: Boolean = all.forall(custom => find(custom).isDefined)
 
-    final def maximize: Map[Custom, T] = all.map(custom => custom -> doFind(custom)).toMap
+    final def maximize: Customs[T] = all.map(custom => custom -> doFind(custom)).toMap
 
-    final def minimize: Of[T] = new Of[T](Of.minimize(maximize))
+    final def minimize(using CanEqual[T, T]): Of[T] = new Of[T](Of.minimize(maximize))
 
     final def lift[Q, R](b: Of[Q], f: (Custom, Option[T], Option[Q]) => R): Of[R] =
       lift[Q, Option[T], Option[Q], R](b, f, _.find(_), _.find(_))
@@ -69,7 +93,7 @@ object Custom extends NamedCompanion:
       liftL[T, (T, Option[T])](other, (_: Custom, a /*: T*/, b: Option[T]) => (a, b))
 
   object Of:
-    def apply[T](customs: Map[Custom, T]): Custom.Of[T] = new Of[T](customs)
+    def apply[T](customs: Customs[T]): Custom.Of[T] = new Of[T](customs)
 
     def apply[T](value: T): Custom.Of[T] = new Of[T](Map(Common -> value))
 
@@ -93,10 +117,10 @@ object Custom extends NamedCompanion:
     // customs on the same level do not affect one another.
     private val byLevelDescending: Seq[Custom] = all.toSeq.sortBy(_.level).reverse
 
-    private def minimize[T](customs: Map[Custom, T]): Map[Custom, T] =
+    private def minimize[T](customs: Customs[T])(using CanEqual[T, T]): Customs[T] =
       // start with maximized representation: all Customs other than Common present;
-      val result: Map[Custom, T] =
-        byLevelDescending.foldLeft(customs)((customs: Map[Custom, T], custom: Custom) =>
+      val result: Customs[T] =
+        byLevelDescending.foldLeft(customs)((customs: Customs[T], custom: Custom) =>
           if custom.children.isEmpty then customs else 
             customs.get(custom).fold(customs)(value =>
               customs -- custom.children.filter(customs(_) == value)
@@ -107,38 +131,8 @@ object Custom extends NamedCompanion:
         val values: Set[T] = result.values.toSet
         if values.size != 1 then None else Some(values.head)
 
-      commonValue.fold[Map[Custom, T]](result)(commonValue => Map(Common -> commonValue))
-
-  type Sets[T] = Map[Set[Custom], T]
-
-  case object Common extends Custom(None){}
-    case object Ashkenaz extends Custom(Some(Common)){}
-      case object Italki extends Custom(Some(Ashkenaz)){}
-      case object Frankfurt extends Custom(Some(Ashkenaz)){}
-      case object Lita extends Custom(Some(Ashkenaz)){}
-        case object ChayeyOdom extends Custom(Some(Lita)) { override def name: String = "Chayey Odom" }
-      case object Hagra extends Custom(Some(Ashkenaz)){}
-    case object Sefard extends Custom(Some(Common)){}
-      case object Chabad extends Custom(Some(Sefard)){}
-      case object Magreb extends Custom(Some(Sefard)){}
-        case object Algeria extends Custom(Some(Magreb)){}
-        case object Toshbim extends Custom(Some(Magreb)){}
-        case object Djerba extends Custom(Some(Magreb)){}
-        case object Morocco extends Custom(Some(Magreb)){}
-          case object Fes extends Custom(Some(Morocco)){}
-      case object Bavlim extends Custom(Some(Sefard)){}
-      case object Teiman extends Custom(Some(Sefard)){}
-        case object Baladi extends Custom(Some(Teiman)){}
-        case object Shami extends Custom(Some(Teiman)){}
-
-  override val values: Seq[Custom] = Seq(
-    Common,
-    Ashkenaz, Italki, Frankfurt, Lita, ChayeyOdom, Hagra,
-    Sefard, Chabad,
-    Magreb, Algeria, Toshbim, Djerba, Morocco, Fes, Bavlim, Teiman, Baladi, Shami)
-
-  val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
-
+      commonValue.fold[Customs[T]](result)(commonValue => Map(Common -> commonValue))
+  
   def parse(names: String): Set[Custom] =
     val result: Seq[Custom] = names.split(',').toIndexedSeq.map(_.trim).map(getForName)
     Collections.checkNoDuplicates(result, "customs")

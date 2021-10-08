@@ -3,23 +3,25 @@ package org.opentorah.texts.tanach
 import org.opentorah.texts.tanach.Torah.Maftir
 import org.opentorah.util.Collections.mapValues
 
-final class Reading(customs: Map[Custom, Reading.ReadingCustom])
+final class Reading(customs: Custom.Customs[Reading.ReadingCustom])
   extends Custom.Of[Reading.ReadingCustom](customs):
   
-  def torah: Torah.Customs =
-    Custom.Of(mapValues(customs)(_.torah)).minimize
+  def torah: Torah.Customs = of(_.torah)
 
-  def maftirAndHaftarah: Custom.Of[Option[Reading.MaftirAndHaftarah]] =
-    Custom.Of(mapValues(customs)(_.maftirAndHaftarah)).minimize
+  def maftirAndHaftarah: Custom.Of[Option[Reading.MaftirAndHaftarah]] = of(_.maftirAndHaftarah)
 
-  def maftir: Custom.Of[Option[Maftir]] =
-    Custom.Of(mapValues(customs)(_.maftirAndHaftarah.flatMap(_.maftir))).minimize
+  def maftir: Custom.Of[Option[Maftir]] = of(_.maftirAndHaftarah.flatMap(_.maftir))
 
-  def haftarah: Custom.Of[Option[Haftarah]] =
-    Custom.Of(mapValues(customs)(_.maftirAndHaftarah.map(_.haftarah))).minimize
+  def haftarah: Custom.Of[Option[Haftarah]] = of(_.maftirAndHaftarah.map(_.haftarah))
+
+  private def of[R](f: Reading.ReadingCustom => R)(using CanEqual[R, R]): Custom.Of[R] =
+    Custom.Of(mapValues(customs)(f)).minimize
 
   def transformTorah(transformer: Torah => Torah): Reading =
-    new Reading(mapValues(customs)(reading => reading.copy(torah = transformer(reading.torah))))
+    new Reading(mapValues(customs)((readingCustom: Reading.ReadingCustom) => Reading.ReadingCustom(
+      torah = transformer(readingCustom.torah),
+      maftirAndHaftarah = readingCustom.maftirAndHaftarah
+    )))
 
   def transform[Q](
     haftarah: Custom.Of[Q],
@@ -27,32 +29,38 @@ final class Reading(customs: Map[Custom, Reading.ReadingCustom])
   ): Reading = new Reading(liftLR[Q, Reading.ReadingCustom](haftarah, transformer).customs)
 
 object Reading:
-  final case class ReadingCustom(
-    torah: Torah,
-    maftirAndHaftarah: Option[MaftirAndHaftarah]
+  // when there is no special maftir, last aliyah is the maftir
+  final class MaftirAndHaftarah(
+    val maftir: Option[Maftir],
+    val haftarah: Haftarah
+  ) derives CanEqual:
+    override def equals(other: Any): Boolean =
+      val that: MaftirAndHaftarah = other.asInstanceOf[MaftirAndHaftarah]
+      (this.maftir == that.maftir) && (this.haftarah == that.haftarah)
+
+  final class ReadingCustom(
+    val torah: Torah,
+    val maftirAndHaftarah: Option[MaftirAndHaftarah]
   ):
+    private def setMaftirAndHaftarah(maftirAndHaftarah: MaftirAndHaftarah): ReadingCustom = ReadingCustom(
+      torah = torah,
+      maftirAndHaftarah = Some(maftirAndHaftarah)
+    )
+
+    private def setHaftarah(haftarah: Haftarah): ReadingCustom =
+      setMaftirAndHaftarah(MaftirAndHaftarah(maftirAndHaftarah.get.maftir, haftarah))
+
     def addHaftarah(haftaraAddition: Option[Haftarah]): ReadingCustom =
-      haftaraAddition.fold(this)(haftaraAddition => this.addHaftarah(haftaraAddition))
+      haftaraAddition.fold(this)(haftaraAddition => addHaftarah(haftaraAddition))
 
     def addHaftarah(haftaraAddition: Haftarah): ReadingCustom =
-      copy(maftirAndHaftarah = Some(maftirAndHaftarah.get.addHaftarah(haftaraAddition)))
-
-    def replaceMaftirAndHaftarah(maftir: Maftir, haftarah: Haftarah): ReadingCustom =
-      copy(maftirAndHaftarah = Some(MaftirAndHaftarah(Some(maftir), haftarah)))
+      setHaftarah(maftirAndHaftarah.get.haftarah ++ haftaraAddition)
 
     def replaceHaftarah(haftarah: Haftarah): ReadingCustom =
-      copy(maftirAndHaftarah = Some(maftirAndHaftarah.get.replaceHaftarah(haftarah)))
+      setHaftarah(haftarah)
 
-  // when there is no special maftir, last aliyah is the maftir
-  final case class MaftirAndHaftarah(
-    maftir: Option[Maftir],
-    haftarah: Haftarah
-  ):
-    def addHaftarah(haftaraAddition: Haftarah): MaftirAndHaftarah =
-      copy(haftarah = haftarah ++ haftaraAddition)
-
-    def replaceHaftarah(haftarah: Haftarah): MaftirAndHaftarah =
-      copy(haftarah = haftarah)
+    def replaceMaftirAndHaftarah(maftir: Maftir, haftarah: Haftarah): ReadingCustom =
+      setMaftirAndHaftarah(MaftirAndHaftarah(Some(maftir), haftarah))
 
   def apply(torah: Torah): Reading = apply(Custom.Of(torah))
 
@@ -62,10 +70,8 @@ object Reading:
   def apply(torah: Torah, maftir: Option[Maftir], haftarah: Haftarah.Customs): Reading =
     apply(Custom.Of(torah), maftir = maftir, haftarah = haftarah)
 
-  def apply(torah: Torah.Customs, maftir: Option[Maftir], haftarah: Haftarah.Customs): Reading =
-    val result: Map[Custom, ReadingCustom] =
-      torah.liftLR[Haftarah, ReadingCustom](haftarah, (_: Custom, torah: Torah, haftarah: Haftarah) =>
-        ReadingCustom(torah, maftirAndHaftarah = Some(MaftirAndHaftarah(maftir, haftarah)))
-      ).customs
-
-    new Reading(result)
+  def apply(torah: Torah.Customs, maftir: Option[Maftir], haftarah: Haftarah.Customs): Reading = new Reading(
+    torah.liftLR[Haftarah, ReadingCustom](haftarah, (_: Custom, torah: Torah, haftarah: Haftarah) =>
+      ReadingCustom(torah, maftirAndHaftarah = Some(MaftirAndHaftarah(maftir, haftarah)))
+    ).customs
+  )

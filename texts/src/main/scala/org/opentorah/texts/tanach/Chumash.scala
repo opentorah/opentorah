@@ -1,23 +1,28 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
-abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book, NamedCompanion:
-  final override type Key = Parsha
+enum Chumash extends TanachBook(nameOverride = None), HasName.Enum:
+  case Genesis
+  case Exodus
+  case Leviticus
+  case Numbers
+  case Deuteronomy
 
-  final override def values: Seq[Parsha] = parshiot
+  lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
 
-  final class ByParsha extends By, Stores.Pure:
+  final class ByParsha extends By[Parsha], Stores.Pure[Parsha]:
     override def selector: Selector = Selector.byName("parsha")
     override def storesPure: Seq[Parsha] = parshiot
 
-  override def storesPure: Seq[Store.NonTerminal] = super.storesPure ++ Seq(new ByParsha)
+  // TODO what is in the super?
+  override def storesPure: Seq[Store.NonTerminal[Store]] = super.storesPure ++ Seq(new ByParsha)
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.
-  final override def names: Names = parshiot.head.names
+  override def names: Names = parshiot.head.names
 
   override def parser(names: Names, chapters: Chapters): Parser[Chumash.Parsed] = for
     weeks: Seq[Parsha.Parsed] <- Parsha.WeekParsable(this).seq()
@@ -27,16 +32,17 @@ abstract class Chumash(val parshiot: Seq[Parsha]) extends Tanach.Book, NamedComp
       "Chumash book name must be a name of the book's first parsha")
   yield Chumash.Parsed(this, names, chapters, weeks)
 
-  final override def metadata: Chumash.BookMetadata =
-    Tanach.forBook(this).asInstanceOf[Chumash.BookMetadata]
+  def metadata: Chumash.Metadata = TanachBook.metadata(this).asInstanceOf[Chumash.Metadata]
 
 object Chumash:
+  val all: Seq[Chumash] = values.toIndexedSeq
 
-  final class BookMetadata(
+  def forName(name: String): Chumash = TanachBook.getForName(name).asInstanceOf[Chumash]
+
+  final class Metadata(
     book: Chumash,
     parsha2metadata: Map[Parsha, Parsha.ParshaMetadata]
-  ) extends Tanach.BookMetadata(book):
-
+  ) extends TanachBook.Metadata(book):
     def forParsha(parsha: Parsha): Parsha.ParshaMetadata = parsha2metadata(parsha)
 
   final class Parsed(
@@ -44,10 +50,10 @@ object Chumash:
     names: Names,
     chapters: Chapters,
     weeks: Seq[Parsha.Parsed]
-  ) extends Tanach.Parsed(book, names, chapters):
+  ) extends TanachBook.Parsed(book, names, chapters):
 
-    def resolve: Parser[BookMetadata] = for
-      parsha2metadataParsed <- Named.bind[Parsha, Parsha.Parsed](
+    def resolve: Parser[Metadata] = for
+      parsha2metadataParsed <- HasName.bind[Parsha, Parsha.Parsed](
         keys = book.parshiot,
         metadatas = weeks,
         getKey = _.parsha
@@ -70,13 +76,19 @@ object Chumash:
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
-    yield BookMetadata(book, parsha2metadata)
+    yield Metadata(book, parsha2metadata)
 
     private def combineDays(
       parsha2span: Map[Parsha, Span],
       weeks: Seq[(Parsha, Custom.Sets[Seq[Torah.Numbered]])]
-    ): Seq[Option[Torah.Customs]] = weeks match
-      case (parsha, days) :: (parshaNext, daysNext) :: tail =>
+    ): Seq[Option[Torah.Customs]] =
+      if weeks.isEmpty then Seq.empty else
+      if weeks.length == 1 then
+        require(!weeks.head._1.combines)
+        Seq(None)
+      else
+        val (parsha, days) = weeks.head
+        val (parshaNext, daysNext) = weeks.tail.head
         val result: Option[Torah.Customs] = if !parsha.combines then None else 
           val combined: Custom.Sets[Seq[Torah.Numbered]] = daysNext ++ days.map((customs, value) =>
             (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
@@ -92,20 +104,4 @@ object Chumash:
             )
           )))
 
-        result +: combineDays(parsha2span, (parshaNext, daysNext) +: tail)
-
-      case (parsha, _ /*days*/) :: Nil =>
-        require(!parsha.combines)
-        Seq(None)
-
-      case Nil => Nil
-
-  case object Genesis extends Chumash(Parsha.genesis)
-  case object Exodus extends Chumash(Parsha.exodus)
-  case object Leviticus extends Chumash(Parsha.leviticus)
-  case object Numbers extends Chumash(Parsha.numbers)
-  case object Deuteronomy extends Chumash(Parsha.deuteronomy)
-
-  val all: Seq[Chumash] = Seq(Genesis, Exodus, Leviticus, Numbers, Deuteronomy)
-
-  def forName(name: String): Chumash = Tanach.getForName(name).asInstanceOf[Chumash]
+        result +: combineDays(parsha2span, (parshaNext, daysNext) +: weeks.tail.tail)

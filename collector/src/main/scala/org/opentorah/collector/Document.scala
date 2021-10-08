@@ -17,7 +17,11 @@ final class Document(
   val authors: Seq[Author.Value],
   val addressee: Option[EntityReference],
   val pbs: Seq[Pb]
-) extends Directory.Entry(name):
+) extends Directory.Entry(name) derives CanEqual:
+  override def equals(other: Any): Boolean =
+    val that: Document = other.asInstanceOf[Document]
+    this.name == that.name
+
   def baseName: String = Document.splitLang(name)._1
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
@@ -37,6 +41,10 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
 
   sealed abstract class Facet(val document: Document, val collectionFacet: Collection.Facet[?])
     extends Store.Terminal, HtmlContent[Collector]:
+    override def equals(other: Any): Boolean =
+      val that: TextFacet = other.asInstanceOf[TextFacet]
+      (this.collection == that.collection) && (this.document == that.document)
+
     // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
 
     final override def names: Names = Names(document.name)
@@ -46,7 +54,8 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
     override def htmlHeadTitle: Option[String] = None
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends Facet(document, collectionFacet):
+    extends Facet(document, collectionFacet) derives CanEqual:
+
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for
       tei: Tei <- getTei
       header: ScalaXml.Element <- collection.documentHeader(document)

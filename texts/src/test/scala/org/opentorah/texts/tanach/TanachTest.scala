@@ -20,7 +20,7 @@ final class TanachTest extends AnyFlatSpec, Matchers:
   def checkChapterLength(path: String, length: Int): Unit =
     doResolveLast(path).asInstanceOf[Chapter].length shouldBe length
   def checkVerseNumber(path: String, number: Int): Unit =
-    doResolveLast(path).asInstanceOf[VerseStore].number shouldBe number
+    doResolveLast(path).asInstanceOf[Verse].number shouldBe number
 
   "Tanach" should "load" in {
     Chumash.Genesis.chapters.length(17) shouldBe 27

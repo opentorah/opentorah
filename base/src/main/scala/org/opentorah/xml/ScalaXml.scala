@@ -65,6 +65,8 @@ object ScalaXml extends Xml:
     uri = attributes.getNamespace(attributes.prefix)
   )
 
+  private given CanEqual[scala.xml.NamespaceBinding, scala.xml.NamespaceBinding] = CanEqual.derived
+
   // Note: maybe support re-definitions of the namespace bindings - like in  scala.xml.NamespaceBinding.shadowRedefined()?
   override def getNamespaces(attributes: Attributes): Seq[Namespace] =
     @scala.annotation.tailrec

@@ -1,21 +1,18 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{NamedCompanion, Named, Names}
+import org.opentorah.metadata.{HasName, Named, Names}
 import Jewish.{Day, Year}
 import Jewish.Month.*
 
-sealed trait SpecialDay extends Named:
+sealed trait SpecialDay extends Named derives CanEqual: // all deriveds are objects; using eq
   def date(year: Year): Day
   final def correctedDate(year: Year): Day = correctDate(date(year))
   protected def correctDate(date: Day): Day = date
 
-object SpecialDay extends NamedCompanion:
+private sealed class LoadNames(name: String)
+  extends Named.ByLoader[LoadNames](loader = SpecialDay, nameOverride = Some(name)), HasName.NonEnum
 
-  type Key = LoadNames
-
-  sealed class LoadNames(override val name: String) extends Named:
-    final override def names: Names = toNames(this)
-
+object SpecialDay extends Names.Loader[LoadNames]:
   sealed trait PostponeOnShabbos extends SpecialDay:
     final override protected def correctDate(result: Day): Day = if result.isShabbos then result+1 else result
 
@@ -235,7 +232,7 @@ object SpecialDay extends NamedCompanion:
 
   def numDaysSelichos(year: Year): Int = RoshHashanah1.date(year) - SpecialDay.ShabbosSelichos.date(year-1) - 1
 
-  private def namesWithNumber(withNames: Named, number: Int): Names = withNames.names.withNumber(number)
+  private def namesWithNumber(named: Named, number: Int): Names = named.andNumber(number).names
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,
@@ -276,7 +273,7 @@ object SpecialDay extends NamedCompanion:
   def daysWithSpecialReadings(inHolyLand: Boolean): Set[SpecialDay] =
     festivals(inHolyLand) ++ daysWithSpecialReadingsNotFestivals
 
-  val values: Seq[LoadNames] = Seq(
+  val valuesSeq: Seq[LoadNames] = Seq(
     FestivalEnd, IntermediateShabbos, RoshChodesh, ErevRoshChodesh, Fast,
     RoshHashanah1, FastOfGedalia, YomKippur, Succos1,
     SuccosIntermediate, SheminiAtzeres, SimchasTorah, SheminiAtzeresAndSimchasTorahInHolyLand,

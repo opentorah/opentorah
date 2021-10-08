@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Language, LanguageSpec, Named}
+import org.opentorah.metadata.{Language, Named}
 import org.opentorah.xml.{Attribute, Parser}
 
-trait WithBookSpans[Book <: Tanach.Book]:
+trait WithBookSpans[Book <: TanachBook]:
 
   open class Spans(val spans: Seq[BookSpan]):
     final def length: Int = spans.length
@@ -20,25 +20,22 @@ trait WithBookSpans[Book <: Tanach.Book]:
 
   final type Customs = Custom.Of[Many]
 
-  final class BookSpan private(val book: Book, val span: Span, val source: Option[Named]) extends Language.ToString:
+  final class BookSpan(val book: Book, val span: Span, val source: Option[Named] = None)
+    extends Language.ToString derives CanEqual:
     require(book.chapters.contains(span), s"Book $book doesn't contain span $span")
 
-    override def toLanguageString(using spec: LanguageSpec): String =
+    override def hashCode(): Int = book.hashCode()*37 + span.hashCode() + 73
+
+    override def equals(obj: Any): Boolean =
+      val that: BookSpan = obj.asInstanceOf[BookSpan]
+      (this.book == that.book) && (this.span == that.span)
+
+    override def toLanguageString(using spec: Language.Spec): String =
       book.toLanguageString + " " + span.toLanguageString
 
     def +(next: BookSpan): BookSpan = merge(Seq(this, next))
 
     def from(source: Named): BookSpan = BookSpan(book, span, Some(source))
-
-    override def hashCode(): Int = book.hashCode()*37 + span.hashCode() + 73
-
-    override def equals(obj: Any): Boolean = obj.isInstanceOf[BookSpan] && {
-      val that: BookSpan = obj.asInstanceOf[BookSpan]
-      (this.book == that.book) && (this.span == that.span)
-    }
-
-  object BookSpan:
-    def apply(book: Book, span: Span, source: Option[Named] = None): BookSpan = new BookSpan(book, span, source)
 
   final class BookSpanParsed(val book: Option[String], val span: SpanParsed):
     def inheritFrom(ancestor: BookSpanParsed): BookSpanParsed =

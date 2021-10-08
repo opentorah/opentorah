@@ -12,7 +12,11 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends Directory.Entry(name), HtmlContent[Collector]:
+) extends Directory.Entry(name), HtmlContent[Collector] derives CanEqual:
+  override def equals(other: Any): Boolean =
+    val that: Entity = other.asInstanceOf[Entity]
+    this.name == that.name
+
   def id: String = name
 
   override def htmlHeadTitle: Option[String] = Some(mainName)

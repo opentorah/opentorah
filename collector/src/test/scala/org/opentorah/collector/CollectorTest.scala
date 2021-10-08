@@ -17,8 +17,8 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
 
     def getResponse(pathString: String): Either[Throwable, Site.Response] =
       Effects.unsafeRun(collector.getResponse(pathString).either)
-    def getContent(pathString: String): String = getResponse(pathString).right.get.content
-    def getError(pathString: String): String = getResponse(pathString).left.get.getMessage
+    def getContent(pathString: String): String = getResponse(pathString).getOrElse(fail()).content
+    def getError(pathString: String): String = getResponse(pathString).left.getOrElse(fail()).getMessage
 
     getContent("/") should include("Дела")
     getContent("/collections") should include("Архивы")

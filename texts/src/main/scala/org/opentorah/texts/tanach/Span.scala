@@ -1,13 +1,17 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Language, LanguageSpec}
+import org.opentorah.metadata.Language
 
-final case class Span(from: Verse, to: Verse) extends Language.ToString:
+final class Span(val from: ChapterAndVerse, val to: ChapterAndVerse) extends Language.ToString derives CanEqual:
   require(from <= to, s"Empty span: $from..$to")
 
-  def contains(verse: Verse): Boolean = (from <= verse) && (verse <= to)
+  override def equals(other: Any): Boolean =
+    val that: Span = other.asInstanceOf[Span]
+    (this.from == that.from) && (this.to == that.to)
 
-  override def toLanguageString(using spec: LanguageSpec): String =
+  def contains(chapterAndVerse: ChapterAndVerse): Boolean = (from <= chapterAndVerse) && (chapterAndVerse <= to)
+
+  override def toLanguageString(using spec: Language.Spec): String =
     if from.chapter != to.chapter then from.toLanguageString + "-" + to.toLanguageString
     else spec.toString(from.chapter) + ":" +
       (if from.verse == to.verse then spec.toString(from.verse)

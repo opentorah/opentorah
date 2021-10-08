@@ -5,7 +5,10 @@ import org.opentorah.util.Effects
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 // Other than on Simchas Torah, aliyot are from the same book.
-final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Spans(spans):
+// TODO de-case - and figure out why object Torah's creation becomes impossible if 'case' is removed here...
+final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Spans(spans) derives CanEqual:
+  override def equals(other: Any): Boolean = this.spans == other.asInstanceOf[Torah].spans
+
   def drop(toDrop: Set[Int]): Torah =
     def drop(what: Seq[(Torah.Aliyah, Boolean)]): Seq[Torah.Aliyah] = what match
       case (a1, d1) :: (a2, d2) :: tail =>
@@ -20,7 +23,7 @@ final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Sp
 
   def fromWithNumbers(source: Named): Torah = Torah(
     spans.zipWithIndex.map((aliyah, index) =>
-      aliyah.from(Source.AndNumber(withNames = source, number = index + 1))
+      aliyah.from(source.andNumber(number = index + 1))
     )
   )
 

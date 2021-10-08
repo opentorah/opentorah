@@ -1,7 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.metadata.{Language, LanguageSpec, Named, NamedCompanion, Numbered}
+import org.opentorah.metadata.{HasName, HasValues, Language, Named, Names, Numbered}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
@@ -17,7 +17,8 @@ trait Calendar extends Times:
 
   type YearCharacter
 
-  abstract class YearBase(final override val number: Int) extends Numbered[Year], Language.ToString { this: Year =>
+  abstract class YearBase(final override val number: Int) extends Numbered[Year], Language.ToString derives CanEqual:
+    this: Year =>
 
     def character: YearCharacter
 
@@ -70,8 +71,7 @@ trait Calendar extends Times:
     private[Calendar] final def monthDescriptors: Seq[MonthDescriptor] =
       Year.monthDescriptors(character)
 
-    final override def toLanguageString(using spec: LanguageSpec): String = intToString(number)
-  }
+    final override def toLanguageString(using spec: Language.Spec): String = intToString(number)
 
   type Year <: YearBase
 
@@ -119,7 +119,8 @@ trait Calendar extends Times:
 
   protected def createYearCompanion: YearCompanionType
 
-  open class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered[Month] { this: Month =>
+  open class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered[Month] derives CanEqual:
+    this: Month =>
 
     protected var yearOpt: Option[Year] = yearOption
 
@@ -155,12 +156,17 @@ trait Calendar extends Times:
 
     private def descriptor: MonthDescriptor = year.monthDescriptors(numberInYear - 1)
 
-    final def numberInYearToLanguageString(using spec: LanguageSpec): String = intToString(numberInYear)
-  }
+    final def numberInYearToLanguageString(using spec: Language.Spec): String = intToString(numberInYear)
 
   type Month <: MonthBase
 
-  type MonthName <: Named
+  // TODO toString once all deriveds are enums - but making them such breaks Scala 3 compiler!!!
+  open class MonthNameBase(nameOverride: Option[String])
+    extends Named.ByLoader[MonthName](loader = Month, nameOverride), HasName.NonEnum
+
+  type MonthName <: MonthNameBase
+
+  given CanEqual[MonthName, MonthName] = CanEqual.derived
 
   final class MonthNameAndLength(val name: Month.Name, val length: Int)
 
@@ -168,8 +174,9 @@ trait Calendar extends Times:
 
   final class MonthAndDay(val monthName: Month.Name, val numberInMonth: Int)
 
-  trait MonthCompanion extends NamedCompanion:
-    final override type Key = MonthName
+  abstract class MonthCompanion(resourceName: String)
+    extends Names.Loader[MonthName](resourceNameOverride = Some(resourceName)),
+      HasValues.FindByDefaultName[MonthName], HasValues.FindByName[MonthName]:
     final type Name = MonthName
 
     final def apply(number: Int): Month = apply(None, number)
@@ -189,7 +196,8 @@ trait Calendar extends Times:
 
   protected def createMonthCompanion: MonthCompanionType
 
-  open class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered[Day], Language.ToString { this: Day =>
+  open class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered[Day], Language.ToString derives CanEqual:
+    this: Day =>
 
     protected var monthOpt: Option[Month] = monthOption
 
@@ -229,7 +237,7 @@ trait Calendar extends Times:
     final def numberInWeek: Int = Day.numberInWeek(number)
 
     final def to(calendar: Calendar): calendar.Day =
-      if this.calendar == calendar then this.asInstanceOf[calendar.Day]
+      if this.calendar eq calendar then this.asInstanceOf[calendar.Day]
       else calendar.Day(number + epoch - calendar.epoch)
 
     final def name: Week.Day = Week.Day.forNumber(numberInWeek)
@@ -247,11 +255,10 @@ trait Calendar extends Times:
     // Note: Day numbering starts at 1; that is why 1 is subtracted here and added MomentBase.dayNumber:
     final def toMoment: Moment = Moment().days(number - 1)
 
-    final override def toLanguageString(using spec: LanguageSpec): String =
+    final override def toLanguageString(using spec: Language.Spec): String =
       year.toLanguageString + " " + month.name.toLanguageString + " " + numberInMonthToLanguageString
 
-    final def numberInMonthToLanguageString(using spec: LanguageSpec): String = intToString(numberInMonth)
-  }
+    final def numberInMonthToLanguageString(using spec: Language.Spec): String = intToString(numberInMonth)
 
   type Day <: DayBase
 
@@ -271,7 +278,9 @@ trait Calendar extends Times:
 
   protected def newDay(monthOpt: Option[Month], number: Int): Day
 
-  abstract class MomentBase(digits: Digits) extends TimePointBase(digits), Language.ToString { this: Moment =>
+  abstract class MomentBase(digits: Digits) extends TimePointBase(digits), Language.ToString:
+    this: Moment =>
+
     final def calendar: Calendar = Calendar.this
 
     final def day: Day = Day(dayNumber)
@@ -279,7 +288,7 @@ trait Calendar extends Times:
     // Note: Day numbering starts at 1; that is why 1 is added here and subtracted in DayBase.toMoment:
     final def dayNumber: Int = days + 1
 
-    def to(calendar: Calendar): calendar.Moment = if this.calendar == calendar then this.asInstanceOf[calendar.Moment] else
+    def to(calendar: Calendar): calendar.Moment = if this.calendar eq calendar then this.asInstanceOf[calendar.Moment] else
       // TODO this looks like Digits addition with carry, and should be implemented that way...
       val toHours: Int = hours + epochHours - calendar.epochHours
 
@@ -290,20 +299,19 @@ trait Calendar extends Times:
 
       newDay.to(calendar).toMoment.hours(newHours).parts(parts)
 
-    final override def toLanguageString(using spec: LanguageSpec): String =
+    final override def toLanguageString(using spec: Language.Spec): String =
       day.toLanguageString +
         " " + intToString(time.hours) +
         ":" + intToString(time.minutes) +
         "." + intToString(time.partsWithoutMinutes) +
         "." + intToString(time.moments)
 
-    final def toSecondLanguageString(using spec: LanguageSpec): String =
+    final def toSecondLanguageString(using spec: Language.Spec): String =
       day.toLanguageString +
         " " + intToString(time.hours) +
         ":" + intToString(time.minutes) +
         ":" + intToString(time.seconds) +
         "." + intToString(time.milliseconds)
-  }
 
   type Moment <: MomentBase
 
@@ -321,5 +329,5 @@ trait Calendar extends Times:
   
   final def TimeVector: VectorCompanion = Vector
 
-  def intToString(number: Int)(using spec: LanguageSpec): String
+  def intToString(number: Int)(using spec: Language.Spec): String
 

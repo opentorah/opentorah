@@ -15,7 +15,7 @@ final class Entities(
   "xml",
   Entity,
   Entities.All(_)
-), By, HtmlContent [Collector]:
+), By[Entity], HtmlContent[Collector]:
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
 

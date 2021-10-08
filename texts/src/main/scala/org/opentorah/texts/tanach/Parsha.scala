@@ -1,12 +1,72 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names, WithNumber}
-import org.opentorah.store.Store
+import org.opentorah.metadata.{HasName, Names, WithNumber}
+import org.opentorah.store.{Store, Stores}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
-sealed trait Parsha extends Store: // TODO .NonTerminal - add chapter/verse...?
-  def book: Chumash
+// TODO .NonTerminal - add chapter/verse
+enum Parsha(val book: Chumash, nameOverride: Option[String] = None)
+  extends Store.Terminal, HasName(nameOverride), HasName.Enum derives CanEqual:
+
+  case Bereishis       extends Parsha(Chumash.Genesis)
+  case Noach           extends Parsha(Chumash.Genesis)
+  case LechLecha       extends Parsha(Chumash.Genesis, nameOverride = Some("Lech Lecha"))
+  case Vayeira         extends Parsha(Chumash.Genesis)
+  case ChayeiSarah     extends Parsha(Chumash.Genesis, nameOverride = Some("Chayei Sarah"))
+  case Toldos          extends Parsha(Chumash.Genesis)
+  case Vayeitzei       extends Parsha(Chumash.Genesis)
+  case Vayishlach      extends Parsha(Chumash.Genesis)
+  case Vayeishev       extends Parsha(Chumash.Genesis)
+  case Mikeitz         extends Parsha(Chumash.Genesis)
+  case Vayigash        extends Parsha(Chumash.Genesis)
+  case Vayechi         extends Parsha(Chumash.Genesis)
+
+  case Shemos          extends Parsha(Chumash.Exodus)
+  case Va_eira         extends Parsha(Chumash.Exodus, nameOverride = Some("Va'eira"))
+  case Bo              extends Parsha(Chumash.Exodus)
+  case Beshalach       extends Parsha(Chumash.Exodus)
+  case Yisro           extends Parsha(Chumash.Exodus)
+  case Mishpatim       extends Parsha(Chumash.Exodus)
+  case Terumah         extends Parsha(Chumash.Exodus)
+  case Tetzaveh        extends Parsha(Chumash.Exodus)
+  case KiSisa          extends Parsha(Chumash.Exodus, nameOverride = Some("Ki Sisa"))
+  case Vayakhel        extends Parsha(Chumash.Exodus)
+  case Pekudei         extends Parsha(Chumash.Exodus)
+
+  case Vayikra         extends Parsha(Chumash.Leviticus)
+  case Tzav            extends Parsha(Chumash.Leviticus)
+  case Shemini         extends Parsha(Chumash.Leviticus)
+  case Tazria          extends Parsha(Chumash.Leviticus)
+  case Metzora         extends Parsha(Chumash.Leviticus)
+  case Acharei         extends Parsha(Chumash.Leviticus)
+  case Kedoshim        extends Parsha(Chumash.Leviticus)
+  case Emor            extends Parsha(Chumash.Leviticus)
+  case Behar           extends Parsha(Chumash.Leviticus)
+  case Bechukosai      extends Parsha(Chumash.Leviticus)
+
+  case Bemidbar        extends Parsha(Chumash.Numbers)
+  case Nasso           extends Parsha(Chumash.Numbers)
+  case Beha_aloscha    extends Parsha(Chumash.Numbers, nameOverride = Some("Beha'aloscha"))
+  case Shelach         extends Parsha(Chumash.Numbers)
+  case Korach          extends Parsha(Chumash.Numbers)
+  case Chukas          extends Parsha(Chumash.Numbers)
+  case Balak           extends Parsha(Chumash.Numbers)
+  case Pinchas         extends Parsha(Chumash.Numbers)
+  case Mattos          extends Parsha(Chumash.Numbers)
+  case Masei           extends Parsha(Chumash.Numbers)
+
+  case Devarim         extends Parsha(Chumash.Deuteronomy)
+  case Va_eschanan     extends Parsha(Chumash.Deuteronomy, nameOverride = Some("Va'eschanan"))
+  case Eikev           extends Parsha(Chumash.Deuteronomy)
+  case Re_eh           extends Parsha(Chumash.Deuteronomy, nameOverride = Some("Re'eh"))
+  case Shoftim         extends Parsha(Chumash.Deuteronomy)
+  case KiSeitzei       extends Parsha(Chumash.Deuteronomy, nameOverride = Some("Ki Seitzei"))
+  case KiSavo          extends Parsha(Chumash.Deuteronomy, nameOverride = Some("Ki Savo"))
+  case Nitzavim        extends Parsha(Chumash.Deuteronomy)
+  case Vayeilech       extends Parsha(Chumash.Deuteronomy)
+  case Haazinu         extends Parsha(Chumash.Deuteronomy)
+  case VezosHaberachah extends Parsha(Chumash.Deuteronomy, nameOverride = Some("Vezos Haberachah"))
 
   private def metadata: Parsha.ParshaMetadata = book.metadata.forParsha(this)
 
@@ -30,7 +90,23 @@ sealed trait Parsha extends Store: // TODO .NonTerminal - add chapter/verse...?
 
   final def haftarah: Haftarah.Customs = Haftarah.haftarah(this).map(_.from(this))
 
-object Parsha extends NamedCompanion:
+object Parsha extends Names.Loader[Parsha], Stores.Pure[Parsha]:
+  override protected def storesPure: Seq[Parsha] = values.toIndexedSeq
+
+  override val valuesSeq: Seq[Parsha] = values.toIndexedSeq
+
+  def forChumash(book: Chumash): Seq[Parsha] = valuesSeq.filter(_.book == book)
+
+  // Rules of combining; affect the WeeklyReading.
+  val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
+  // Reversing the priorities here currently affects only non-leap regular years with Rosh
+  // Hashanah on Thursday (and Pesach on Shabbat).
+  val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
+  val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
+  val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
+
+  val combinable: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
+    combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet
 
   final class ParshaMetadata(
     val parsha: Parsha,
@@ -92,8 +168,7 @@ object Parsha extends NamedCompanion:
         ).head
       )
 
-  final class WeekParsable(book: Chumash)
-    extends Element[Parsed]("week"):
+  final class WeekParsable(book: Chumash) extends Element[Parsed]("week"):
     override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
       override def parser: Parser[Parsed] = Parsha.parser(book)
       override def unparser: Unparser[Parsed] = ???
@@ -104,7 +179,7 @@ object Parsha extends NamedCompanion:
     aliyot: Seq[Torah.Numbered] <- Aliyah.seq()
     daysParsed: Seq[DayParsed] <- DayParsed.seq()
     maftir: SpanSemiResolved <- Maftir.required()
-    parsha: Parsha <- Named.find[Parsha](book.parshiot, names)
+    parsha: Parsha <- HasName.find[Parsha](book.parshiot, names)
   yield
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     Parsed(
@@ -117,10 +192,10 @@ object Parsha extends NamedCompanion:
       maftir
     )
 
-  private final case class DayParsed(
-    span: Torah.Numbered,
-    custom: Set[Custom],
-    isCombined: Boolean
+  private final class DayParsed(
+    val span: Torah.Numbered,
+    val custom: Set[Custom],
+    val isCombined: Boolean
   )
 
   private object DayParsed extends Element[DayParsed]("day"):
@@ -155,100 +230,3 @@ object Parsha extends NamedCompanion:
   private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)
 
   private def semiResolvedParser: Parser[SpanSemiResolved] = SpanParsed.parser.map(_.semiResolve)
-
-  override type Key = Parsha
-
-  trait GenesisParsha extends Parsha { final override def book: Chumash = Chumash.Genesis }
-
-  case object Bereishis extends GenesisParsha
-  case object Noach extends GenesisParsha
-  case object LechLecha extends GenesisParsha { override def name: String = "Lech Lecha" }
-  case object Vayeira extends GenesisParsha
-  case object ChayeiSarah extends GenesisParsha { override def name: String = "Chayei Sarah" }
-  case object Toldos extends GenesisParsha
-  case object Vayeitzei extends GenesisParsha
-  case object Vayishlach extends GenesisParsha
-  case object Vayeishev extends GenesisParsha
-  case object Mikeitz extends GenesisParsha
-  case object Vayigash extends GenesisParsha
-  case object Vayechi extends GenesisParsha
-
-  val genesis: Seq[Parsha] = Seq(Bereishis, Noach, LechLecha, Vayeira, ChayeiSarah, Toldos,
-    Vayeitzei, Vayishlach, Vayeishev, Mikeitz, Vayigash, Vayechi)
-
-  trait ExodusParsha extends Parsha { final override def book: Chumash = Chumash.Exodus }
-
-  case object Shemos extends ExodusParsha
-  case object Va_eira extends ExodusParsha { override def name: String = "Va'eira" }
-  case object Bo extends ExodusParsha
-  case object Beshalach extends ExodusParsha
-  case object Yisro extends ExodusParsha
-  case object Mishpatim extends ExodusParsha
-  case object Terumah extends ExodusParsha
-  case object Tetzaveh extends ExodusParsha
-  case object KiSisa extends ExodusParsha { override def name: String = "Ki Sisa" }
-  case object Vayakhel extends ExodusParsha
-  case object Pekudei extends ExodusParsha
-
-  val exodus: Seq[Parsha] = Seq(Shemos, Va_eira, Bo, Beshalach, Yisro, Mishpatim, Terumah,
-    Tetzaveh, KiSisa, Vayakhel, Pekudei)
-
-  trait LeviticusParsha extends Parsha { final override def book: Chumash = Chumash.Leviticus }
-
-  case object Vayikra extends LeviticusParsha
-  case object Tzav extends LeviticusParsha
-  case object Shemini extends LeviticusParsha
-  case object Tazria extends LeviticusParsha
-  case object Metzora extends LeviticusParsha
-  case object Acharei extends LeviticusParsha
-  case object Kedoshim extends LeviticusParsha
-  case object Emor extends LeviticusParsha
-  case object Behar extends LeviticusParsha
-  case object Bechukosai extends LeviticusParsha
-
-  val leviticus: Seq[Parsha] = Seq(Vayikra, Tzav, Shemini, Tazria, Metzora, Acharei, Kedoshim, Emor, Behar, Bechukosai)
-
-  trait NumbersParsha extends Parsha { final override def book: Chumash = Chumash.Numbers }
-
-  case object Bemidbar extends NumbersParsha
-  case object Nasso extends NumbersParsha
-  case object Beha_aloscha extends NumbersParsha { override def name: String = "Beha'aloscha" }
-  case object Shelach extends NumbersParsha
-  case object Korach extends NumbersParsha
-  case object Chukas extends NumbersParsha
-  case object Balak extends NumbersParsha
-  case object Pinchas extends NumbersParsha
-  case object Mattos extends NumbersParsha
-  case object Masei extends NumbersParsha
-
-  val numbers: Seq[Parsha] = Seq(Bemidbar, Nasso, Beha_aloscha, Shelach, Korach, Chukas, Balak, Pinchas, Mattos, Masei)
-
-  trait DeutoronomyParsha extends Parsha { final override def book: Chumash = Chumash.Deuteronomy }
-
-  case object Devarim extends DeutoronomyParsha
-  case object Va_eschanan extends DeutoronomyParsha { override def name: String = "Va'eschanan" }
-  case object Eikev extends DeutoronomyParsha
-  case object Re_eh extends DeutoronomyParsha { override def name: String = "Re'eh" }
-  case object Shoftim extends DeutoronomyParsha
-  case object KiSeitzei extends DeutoronomyParsha { override def name: String = "Ki Seitzei" }
-  case object KiSavo extends DeutoronomyParsha { override def name: String = "Ki Savo" }
-  case object Nitzavim extends DeutoronomyParsha
-  case object Vayeilech extends DeutoronomyParsha
-  case object Haazinu extends DeutoronomyParsha
-  case object VezosHaberachah extends DeutoronomyParsha { override def name: String = "Vezos Haberachah" }
-
-  val deuteronomy: Seq[Parsha] = Seq(Devarim, Va_eschanan, Eikev, Re_eh, Shoftim, KiSeitzei, KiSavo,
-    Nitzavim, Vayeilech, Haazinu, VezosHaberachah)
-
-  final override val values: Seq[Parsha] = genesis ++ exodus ++ leviticus ++ numbers ++ deuteronomy
-
-  // Rules of combining; affect the WeeklyReading.
-  final val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
-  // Reversing the priorities here currently affects only non-leap regular years with Rosh
-  // Hashanah on Thursday (and Pesach on Shabbat).
-  final val combinableFromVayikraToBemidbar: Seq[Parsha] = Seq(Tazria, Acharei, Behar)
-  final val combinableFromBemidbarToVa_eschanan: Seq[Parsha] = Seq(Mattos, Chukas)
-  final val combinableFromVa_eschanan: Seq[Parsha] = Seq(Nitzavim)
-
-  final val combinable: Set[Parsha] = (combinableFromBereishisToVayikra ++ combinableFromVayikraToBemidbar ++
-    combinableFromBemidbarToVa_eschanan ++ combinableFromVa_eschanan).toSet

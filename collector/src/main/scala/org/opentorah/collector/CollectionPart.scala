@@ -33,18 +33,16 @@ object CollectionPart extends Element[CollectionPart]("part"):
     result: Seq[Part],
     parts: Seq[CollectionPart],
     documents: Seq[Document]
-  ): Seq[Part] = parts match
-    case p1 :: p2 :: ds =>
-      val (partDocuments: Seq[Document], tail: Seq[Document]) = documents.span(_.baseName != p2.from)
-      splitParts(result :+ p1.take(partDocuments), p2 :: ds, tail)
-
-    case p1 :: Nil =>
-      result :+ p1.take(documents)
-
-    case Nil =>
+  ): Seq[Part] =
+    if parts.isEmpty then
       if documents.nonEmpty then
         throw IllegalArgumentException("Documents left over: " + documents.mkString(", ") + ".")
       result
+    else if parts.length == 1 then
+      result :+ parts.head.take(documents)
+    else
+      val (partDocuments: Seq[Document], tail: Seq[Document]) = documents.span(_.baseName != parts.tail.head.from)
+      splitParts(result :+ parts.head.take(partDocuments), parts.tail, tail)
 
   private val fromAttribute: Attribute.Required[String] = Attribute("from").required
 

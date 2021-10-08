@@ -37,7 +37,7 @@ object Platform:
     if result == Os.Linux && System.getProperty("java.specification.vendor").contains("Android") then Os.Android
     else result
 
-  enum Architecture:
+  enum Architecture derives CanEqual:
     case i686
     case x86_64
     case amd64

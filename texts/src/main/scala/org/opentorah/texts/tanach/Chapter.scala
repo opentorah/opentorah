@@ -4,11 +4,13 @@ import org.opentorah.metadata.WithNumber
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
-final class Chapter(override val number: Int, val length: Int) extends Store.Numbered, Store.NonTerminal, Stores.Pure:
-  final class VersesBy extends By, Stores.Numbered[VerseStore]:
+final class Chapter(override val number: Int, val length: Int)
+  extends Store.Numbered, Store.NonTerminal[Store], Stores.Pure[Store]:
+
+  final class VersesBy extends By[Store], Stores.Numbered[Verse]:
     override def selector: Selector = Selector.byName("verse")
     override def length: Int = Chapter.this.length
-    override protected def createNumberedStore(number: Int): VerseStore = VerseStore(number)
+    override protected def createNumberedStore(number: Int): Verse = Verse(number)
 
   override def storesPure: Seq[VersesBy] = Seq(new VersesBy)
 

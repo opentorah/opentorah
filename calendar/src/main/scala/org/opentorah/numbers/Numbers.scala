@@ -43,6 +43,8 @@ trait Numbers:
 
   type Point <: PointNumber
 
+  given CanEqual[Point, Point] = CanEqual.derived
+
   type PointCompanionType <: PointCompanion
 
   final val Point: PointCompanionType = createPointCompanion
@@ -50,6 +52,8 @@ trait Numbers:
   protected def createPointCompanion: PointCompanionType
 
   type Vector <: VectorNumber
+
+  given CanEqual[Vector, Vector] = CanEqual.derived
 
   type VectorCompanionType <: VectorCompanion
 
@@ -66,7 +70,8 @@ trait Numbers:
    *
    * @param digits  sequence of the digits comprising this number.
    */
-  abstract class Number[N <: Number[N]](final val digits: Digits) extends Ordered[N] { this: N =>
+  abstract class Number[N <: Number[N]](final val digits: Digits) extends Ordered[N]:
+    this: N =>
 
     // at least the head digit is present
     require(digits.nonEmpty)
@@ -111,9 +116,7 @@ trait Numbers:
     final def unary_- : N = companion.fromDigits(digits.map(-_))
 
     /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
-    final def -(that: N): Vector =
-      require(isComparable(that))
-      Vector.fromDigits(subtract(that))
+    final def -(that: N): Vector = Vector.fromDigits(subtract(that))
 
     /** Returns this number rounded to the digit described by the [[Digit]] descriptor `digit`. */
     final def roundTo(digit: Digit): N = roundTo(digit.position)
@@ -166,15 +169,10 @@ trait Numbers:
     override def toString: String = toString(length)
 
     /** How does `this` number compare with `that`? */
-    final override def compare(that: N): Int =
-      require(isComparable(that))
-      zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
+    final override def compare(that: N): Int = zipWith(that, _ compare _).find(_ != 0).getOrElse(0)
 
     /** Are the two numbers equal? */
-    final override def equals(other: Any): Boolean = other.isInstanceOf[Number[?]] && {
-      val that: N = other.asInstanceOf[N]
-      isComparable(that) && (this.compare(that) == 0)
-    }
+    final override def equals(other: Any): Boolean = this.compare(other.asInstanceOf[N]) == 0
 
     final override def hashCode: Int = digits.hashCode
 
@@ -182,14 +180,11 @@ trait Numbers:
 
     protected final def subtract(that: Number[?]): Digits = zipWith(that, _ - _)
 
-    private def isComparable(that: N): Boolean = this.companion == that.companion
-
     private def zipWith(
       that: Number[?],
       operation: (Int, Int) => Int
     ): Digits =
       this.digits.zipAll(that.digits, 0, 0).map(operation.tupled)
-  }
 
   trait NumberCompanion[N <: Number[N]]:
     final lazy val zero: N = apply(0)
@@ -262,7 +257,9 @@ trait Numbers:
       )
 
   /** Vector from the number system. */
-  abstract class VectorNumber(digits: Digits) extends Number[Vector](digits) { this: Vector =>
+  abstract class VectorNumber(digits: Digits) extends Number[Vector](digits):
+    this: Vector =>
+    
     final override def companion: VectorCompanionType = Vector
 
     /** Returns Vector resulting from adding specified Vector to this one. */
@@ -285,7 +282,6 @@ trait Numbers:
     /** Returns canonical representation of this Vector;
      * Vectors are not canonicalized by default even in the periodic number systems. */
     final def canonical: Vector = Vector.fromDigits(digits, isCanonical = true)
-  }
 
   open class VectorCompanion extends NumberCompanion[Vector]:
     final override protected def isCanonical: Boolean = false
@@ -294,7 +290,9 @@ trait Numbers:
   protected def newVector(digits: Seq[Int]): Vector
 
   /** Point from the number system. */
-  abstract class PointNumber(digits: Digits) extends Number[Point](digits) { this: Point =>
+  abstract class PointNumber(digits: Digits) extends Number[Point](digits):
+    this: Point =>
+    
     final override def companion: PointCompanionType = Point
 
     /** Returns Point resulting from adding specified Vector to this one. */
@@ -302,7 +300,6 @@ trait Numbers:
 
     /** Returns Point resulting subtracting specified Vector to this one. */
     final def -(that: Vector): Point = Point.fromDigits(subtract(that))
-  }
 
   open class PointCompanion extends NumberCompanion[Point]:
     final override protected def isCanonical: Boolean = true

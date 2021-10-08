@@ -10,7 +10,7 @@ import zio.ZIO
 final class EntityLists(
   override val selector: Selector,
   val lists: Seq[EntityList]
-) extends By, Stores.Pure, HtmlContent[Collector]:
+) extends By[EntityList], Stores.Pure[EntityList], HtmlContent[Collector]:
   
   def setUp(collector: Collector): Caching.Parser[Unit] =
     collector.entities.stores.map(allEntities =>

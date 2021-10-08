@@ -24,12 +24,12 @@ object SpecialReadings:
   private def parse[R](fromXml: Elements[R], what: String, element: ScalaXml.Element): R =
     Parser.unsafeRun(fromXml.parse(From.scalaXml(what, element)))
 
-  private def fromDay(withNames: Named, torah: Torah): Torah = torah.fromWithNumbers(withNames)
+  private def fromDay(named: Named, torah: Torah): Torah = torah.fromWithNumbers(named)
 
-  private def fromDay(withNames: Named, maftir: Maftir): Maftir = maftir.from(withNames)
+  private def fromDay(named: Named, maftir: Maftir): Maftir = maftir.from(named)
 
-  private def fromDay(withNames: Named, haftarah: Haftarah.Customs): Haftarah.Customs =
-    haftarah.map(_.from(withNames), full = false)
+  private def fromDay(named: Named, haftarah: Haftarah.Customs): Haftarah.Customs =
+    haftarah.map(_.from(named), full = false)
 
   sealed trait WeekdayReading:
     def weekday(day: Named): Reading
@@ -126,9 +126,9 @@ object SpecialReadings:
       (ashkenazSefard, hagra)
 
     def in3aliyot(day: Named): Torah = Torah.aliyot(
-      (torah.head+torah(1)+torah(2)).from(Source.AndNumbers(day, 1, 2)), // 1-5
-      (torah(3)+torah(4)           ).from(Source.AndNumber (day, 3)     ), // 6-10
-      torah(5)                      .from(Source.AndNumber (day, 4)     )  // 11-15
+      (torah.head+torah(1)+torah(2)).from(day.andNumbers(1, 2)     ), // 1-5
+      (torah(3)+torah(4)           ).from(day.andNumber (3)), // 6-10
+      torah(5)                      .from(day.andNumber (4))  // 11-15
     )
 
     private val shabbosMaftir: Maftir = torah(4)+torah(5) // 9-15

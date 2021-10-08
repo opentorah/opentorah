@@ -128,7 +128,7 @@ final class MathFilter(
     val input = delimiters.get.input
     val isInline: Option[Boolean] = checkInline(input.isInline)
     val attributes = new AttributesImpl
-    MathFilter.inputAttribute.withValue(input.withInline(isInline)).set(Sax)(attributes)
+    MathFilter.inputAttribute.withValue(Input.withInline(input, isInline)).set(Sax)(attributes)
 
     def mml(): Unit =
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,

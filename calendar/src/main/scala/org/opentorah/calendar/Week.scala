@@ -1,23 +1,19 @@
 package org.opentorah.calendar
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{HasName, Named, Names}
 
 object Week:
 
-  sealed trait Day extends Named:
-    final override def names: Names = Day.toNames(this)
+  enum Day extends Named.ByLoader[Day](loader = Day, nameOverride = None), HasName.Enum derives CanEqual:
+    case Sunday    extends Day
+    case Monday    extends Day
+    case Tuesday   extends Day
+    case Wednesday extends Day
+    case Thursday  extends Day
+    case Friday    extends Day
+    case Saturday  extends Day
 
-  object Day extends NamedCompanion:
-    override type Key = Day
-
-    case object Sunday    extends Day
-    case object Monday    extends Day
-    case object Tuesday   extends Day
-    case object Wednesday extends Day
-    case object Thursday  extends Day
-    case object Friday    extends Day
-    case object Saturday  extends Day
-
+  object Day extends Names.Loader[Day]:
     val Rishon  : Day = Sunday
     val Sheni   : Day = Monday
     val Shlishi : Day = Tuesday
@@ -26,10 +22,10 @@ object Week:
     val Shishi  : Day = Friday
     val Shabbos : Day = Saturday
 
-    override val values: Seq[Day] = Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi, Shabbos)
-
     require(values.length == length)
 
-    def forNumber(numberInWeek: Int): Day = values(numberInWeek - 1)
+    def forNumber(numberInWeek: Int): Day = fromOrdinal(numberInWeek - 1)
+
+    override val valuesSeq: Seq[Day] = values.toIndexedSeq
 
   final val length: Int = 7

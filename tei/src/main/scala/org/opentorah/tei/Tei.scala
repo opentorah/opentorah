@@ -70,7 +70,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, html.ToHtml[Has[LinksResolver]]
         require(!ScalaXml.isEmpty(children), element)
         val ref: Option[String] = EntityName.refAttribute.get(ScalaXml)(element)
 
-        if ref.isEmpty then URIO.succeed(html.a()(children))
+        if ref.isEmpty then URIO.succeed(html.a.empty(children))
         else URIO.accessM[Has[LinksResolver]](_.get.findByRef(ref.get)).map(_.
           getOrElse(html.a(ref.toSeq))
           (children)
@@ -90,7 +90,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, html.ToHtml[Has[LinksResolver]]
         val pageId: String = Pb.pageId(Pb.nAttribute.get(ScalaXml)(element))
         URIO.accessM[Has[LinksResolver]](_.get.facs(pageId)).map(_
           .getOrElse(html.a(Seq(pageId)))
-          .copy(id = Some(pageId))
+          .setId(pageId)
           (text = facsimileSymbol)
         )
 

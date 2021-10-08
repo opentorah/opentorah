@@ -59,7 +59,3 @@ object Strings:
     val sb: StringBuilder = StringBuilder(2 * bytes.length)
     for b: Byte <- bytes do sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
     sb.toString
-
-  def toInt(string: String): Option[Int] =
-    try Some(string.toInt) catch
-      case _: NumberFormatException => None

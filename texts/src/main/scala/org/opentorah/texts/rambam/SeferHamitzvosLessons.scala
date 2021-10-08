@@ -1,6 +1,6 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{Language, Name, Named, Names}
+import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
 import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, ScalaXml, Unparser}
 
@@ -8,9 +8,9 @@ object SeferHamitzvosLessons:
 
   private val nAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("n").required
 
-  final case class Lesson(
-    number: Int,
-    parts: Seq[Part]
+  final class Lesson(
+    val number: Int,
+    val parts: Seq[Part]
   )
 
   object Lesson extends Element[Lesson]("lesson"):
@@ -43,23 +43,25 @@ object SeferHamitzvosLessons:
       override def unparser: Unparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
 
   private class Numbered(elementName: String) extends Element[Positive](elementName):
-    def names: Names = Selector.byName(elementName).names
+    def selector: Selector = Selector.byName(elementName)
 
     override def contentParsable: Parsable[Positive] = new Parsable[Positive]:
       override def parser: Parser[Positive] = nAttribute().map(Positive.apply)
       override def unparser: Unparser[Positive] = nAttribute(_.number)
 
-  sealed abstract class Commandment(val number: Int) extends Part
+  sealed abstract class Commandment(val number: Int) extends Part:
+    final override def names: Names = selector.andNumber(number).names
+    def selector: Selector
 
   final case class Positive(override val number: Int) extends Commandment(number):
-    override def names: Names = Positive.names.withNumber(number)
+    override def selector: Selector = Positive.selector
 
   private object Positive extends Numbered("positive")
 
   final case class Negative(override val number: Int) extends Commandment(number):
-    override def names: Names = Negative.names.withNumber(number)
+    override def selector: Selector = Negative.selector
 
   private object Negative extends Numbered("negative")
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(Named.load(From.resource(this), Lesson))
+  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(HasName.load(From.resource(this), Lesson))

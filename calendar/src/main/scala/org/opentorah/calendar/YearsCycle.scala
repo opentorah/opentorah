@@ -19,4 +19,4 @@ trait YearsCycle:
     first + (cycleNumber - 1)*length + numberInCycle - 1
 
 object YearsCycle:
-  final case class In(cycleNumber: Int, numberInCycle: Int)
+  final case class In(cycleNumber: Int, numberInCycle: Int) derives CanEqual

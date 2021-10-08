@@ -16,7 +16,8 @@ import java.net.URL
 abstract class Site[S <: Site[S]](
   override val fromUrl: Element.FromUrl,
   val common: SiteCommon
-) extends Stores.Pure, Element.FromUrl.With { this: S =>
+) extends Stores.Pure[Store], Element.FromUrl.With:
+  this: S =>
 
   final def logger: Logger = Site.logger
 
@@ -79,7 +80,7 @@ abstract class Site[S <: Site[S]](
           Stores.resolve(path, this)
 
     result.flatMap((path: Store.Path) =>
-      if mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal] then
+      if mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal[Store]] then
         Effects.fail(s"Can not get an index of ${path.last}")
       else
         ZIO.succeed(Site.PathAndExtension(path, extension))
@@ -198,7 +199,6 @@ abstract class Site[S <: Site[S]](
   protected def directoriesToWrite: Seq[Directory[?, ?, ?]] = Seq.empty
 
   protected def buildMore: Caching.Parser[Unit] = IO.succeed(())
-}
 
 object Site:
 
@@ -248,5 +248,5 @@ object Site:
   ) extends Site[Common](
     fromUrl,
     common
-  ), Stores.Pure:
+  ), Stores.Pure[Store]:
     override def storesPure: Seq[Store] = Seq.empty

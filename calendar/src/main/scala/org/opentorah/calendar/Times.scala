@@ -20,7 +20,9 @@ trait Times extends Numbers.NonPeriodic:
 
   import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
-  trait Time[N <: Time[N]] extends Number[N] { this: N =>
+  trait Time[N <: Time[N]] extends Number[N]:
+    this: N =>
+
     final def days: Int = get(Digit.DAYS)
 
     final def days(value: Int): N = set(Digit.DAYS, value)
@@ -68,13 +70,14 @@ trait Times extends Numbers.NonPeriodic:
     final def moments: Int = get(Digit.MOMENTS)
 
     final def moments(value: Int): N = set(Digit.MOMENTS, value)
-  }
 
-  open class TimePointBase(digits: Digits) extends PointNumber(digits), Time[Point] { this: Point => }
+  open class TimePointBase(digits: Digits) extends PointNumber(digits), Time[Point]:
+    this: Point =>
 
   override type Point <: TimePointBase
 
-  final class TimeVectorBase(digits: Digits) extends VectorNumber(digits), Time[Vector] { this: Vector => }
+  final class TimeVectorBase(digits: Digits) extends VectorNumber(digits), Time[Vector]:
+    this: Vector =>
 
   final override type Vector = TimeVectorBase
 

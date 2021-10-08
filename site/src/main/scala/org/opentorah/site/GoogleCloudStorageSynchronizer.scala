@@ -133,15 +133,15 @@ final class GoogleCloudStorageSynchronizer(
 
   private def listDirectory(directoryPath: String): Map[String, File] =
     @tailrec
-    def listDirectories(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match
-      case Nil => result
-      case current :: tail =>
-        val gsignore = File(current, ".gsignore")
+    def listDirectories(result: List[File], directoriesToList: List[File]): List[File] =
+      if directoriesToList.isEmpty then result else
+        val current: File = directoriesToList.head
+        val gsignore: File = File(current, ".gsignore")
         val ignore: Set[String] = if !gsignore.exists() then Set.empty else Files.read(gsignore).toSet + ".gsignore"
         val (directories: List[File], files: List[File]) = current.listFiles.toList
           .filterNot(file => ignore.contains(file.getName))
           .partition(_.isDirectory)
-        listDirectories(result ++ directories ++ files, tail ++ directories)
+        listDirectories(result ++ directories ++ files, directoriesToList.tail ++ directories)
 
     listDirectories(List.empty, List(File(directoryPath)))
       .map(file =>
@@ -152,13 +152,12 @@ final class GoogleCloudStorageSynchronizer(
 
   private def listBucketDirectory(bucketPrefix: String): Map[String, Blob] =
     @tailrec
-    def listDirectories(result: List[Blob], directoriesToList: List[String]): List[Blob] = directoriesToList match
-      case Nil => result
-      case current :: tail =>
-        val (directories: List[Blob], files: List[Blob]) = listBucketFiles(current).partition(isDirectory)
+    def listDirectories(result: List[Blob], directoriesToList: List[String]): List[Blob] =
+      if directoriesToList.isEmpty then result else
+        val (directories: List[Blob], files: List[Blob]) = listBucketFiles(directoriesToList.head).partition(isDirectory)
         // Note: list() includes the directory being listed it seems...
         val newDirectories: List[Blob] = directories.filterNot(directory => result.exists(_.getName == directory.getName))
-        listDirectories(result ++ newDirectories ++ files, tail ++ newDirectories.map(_.getName))
+        listDirectories(result ++ newDirectories ++ files, directoriesToList.tail ++ newDirectories.map(_.getName))
 
     listDirectories(List.empty, List(bucketPrefix))
       .map(blob => blob.getName -> blob)

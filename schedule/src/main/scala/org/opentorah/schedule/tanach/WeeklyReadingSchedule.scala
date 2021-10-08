@@ -133,16 +133,18 @@ object WeeklyReadingSchedule:
 
     val combine: Set[Parsha] = combined(year, weeks)
 
-    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = toProcess match
-      case first :: second :: rest if combine.contains(first) =>
-        require(!combine.contains(second))
-        WeeklyReading(first, Some(second)) +: process(rest)
-      case first :: rest =>
-        require(!combine.contains(first))
-        WeeklyReading(first, None) +: process(rest)
-      case Nil =>  Nil
+    def process(toProcess: Seq[Parsha]): Seq[WeeklyReading] = 
+      if toProcess.isEmpty then Seq.empty else
+        val first: Parsha = toProcess.head
+        if (toProcess.length > 1) && combine.contains(first) then
+          val second: Parsha = toProcess.tail.head
+          require(!combine.contains(second))
+          WeeklyReading(first, Some(second)) +: process(toProcess.tail.tail)
+        else
+          require(!combine.contains(first))
+          WeeklyReading(first, None) +: process(toProcess.tail)
 
-    val result = process(Parsha.values.init)
+    val result: Seq[WeeklyReading] = process(Parsha.valuesSeq.init)
 
     require(result.length == weeks.length)
 
@@ -170,7 +172,7 @@ object WeeklyReadingSchedule:
         val doCombineVayakhelPekudei: Boolean =
           (combinefromBereishisToBemidbar == combinableFromBereishisToVayikra.length + combinableFromVayikraToBemidbar.length) || {
             // This tweak is required only for the Holy Land (and never for AchareiMot) for some reason?
-            val parshahBeforePesach: Parsha = Parsha.forIndex(weeksBeforePesach)
+            val parshahBeforePesach: Parsha = Parsha.fromOrdinal(weeksBeforePesach)
             !allowedBeforePesach.contains(parshahBeforePesach)
           }
 

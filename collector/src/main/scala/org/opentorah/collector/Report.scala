@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.metadata.Names
+import org.opentorah.metadata.{Named, Names}
 import org.opentorah.html
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.site.HtmlContent
@@ -9,7 +9,7 @@ import org.opentorah.util.Strings
 import org.opentorah.xml.ScalaXml
 import java.net.URI
 
-abstract class Report[T](override val name: String, val title: String) extends Store.Terminal, HtmlContent[Collector]:
+sealed abstract class Report[T](name: String, val title: String) extends Store.Terminal, HtmlContent[Collector]:
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
   final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

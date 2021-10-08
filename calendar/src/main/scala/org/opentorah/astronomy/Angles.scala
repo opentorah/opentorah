@@ -18,7 +18,8 @@ object Angles extends Numbers.Periodic:
 
   override protected def digitDescriptors: Array[AnglesDigit] = AnglesDigit.values
 
-  trait Angle[N <: Angle[N]] extends Number[N] { this: N =>
+  trait Angle[N <: Angle[N]] extends Number[N]:
+    this: N =>
     final def degrees: Int = get(Digit.DEGREES)
 
     final def degrees(value: Int): N = set(Digit.DEGREES, value)
@@ -46,7 +47,6 @@ object Angles extends Numbers.Periodic:
     final def toRadians: Double = math.toRadians(toDegrees)
 
     final def toDegrees: Double = toDouble
-  }
 
   sealed trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N]:
     final def fromRadians(value: Double, length: Int): N = fromDegrees(math.toDegrees(value), length)

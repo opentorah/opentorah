@@ -9,7 +9,7 @@ sealed abstract class Page(val pb: Pb):
 
 object Page:
 
-  sealed trait Type:
+  sealed trait Type derives CanEqual: // all deriveds are objects; using eq
     def name: String
     def apply(pb: Pb): Page
 

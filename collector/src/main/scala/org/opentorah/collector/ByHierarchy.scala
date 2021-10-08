@@ -7,7 +7,7 @@ final class ByHierarchy(
   override val fromUrl: Element.FromUrl,
   override val selector: Selector,
   val hierarchyStores: Seq[Hierarchical]
-) extends By, Stores.Pure, Element.FromUrl.With:
+) extends By[Hierarchical], Stores.Pure[Hierarchical], Element.FromUrl.With:
 
   override def storesPure: Seq[Hierarchical] = hierarchyStores
 

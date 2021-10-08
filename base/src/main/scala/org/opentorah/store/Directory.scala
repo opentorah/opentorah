@@ -1,6 +1,6 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.Names
+import org.opentorah.metadata.{Named, Names}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Element, Elements, Parser}
 import zio.ZIO
@@ -21,7 +21,7 @@ abstract class Directory[
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends Stores, Element.FromUrl.With:
+) extends Stores[M], Element.FromUrl.With:
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
@@ -67,7 +67,7 @@ object Directory:
     final def findByName(name: String): Option[M] = name2entry.get(name)
 
   abstract class Entry(
-    override val name: String
+    val name: String
   ) extends Store.Terminal:
     final override val names: Names = Names(name)
 

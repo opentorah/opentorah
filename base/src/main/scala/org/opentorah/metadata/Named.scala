@@ -3,74 +3,55 @@ package org.opentorah.metadata
 import org.opentorah.util.{Effects, Platform}
 import org.opentorah.xml.{Elements, From, Parser}
 
+// TODO rename HasNames
 trait Named:
-  def name: String = Platform.className(this)
-
-  override def toString: String = name
-
   def names: Names
 
   final def structureName: String = names.doFind(Language.English.toSpec).name
 
   def merge(that: Named): Named =
-    require(this == that)
+    require(this eq that)
     this
 
-  final def toLanguageString(using spec: LanguageSpec): String = names.toLanguageString(using spec)
+  final def toLanguageString(using spec: Language.Spec): String = names.toLanguageString(using spec)
+
+  // TODO introduce NamesDecorator
+
+  final def andNumber(number: Int): Named =
+    new Named.Numbers(this, number, number):
+      override protected def suffix(languageSpec: Language.Spec): String =
+        languageSpec.toString(number)
+
+  final def andNumbers(from: Int, to: Int): Named = if to == from then andNumber(from) else
+    new Named.Numbers(this, from, to):
+      override protected def suffix(languageSpec: Language.Spec): String =
+        languageSpec.toString(this.from) + "-" + languageSpec.toString(this.to)
 
 object Named:
 
-  def load[K <: Named, M](
-    from: From,
-    content: Elements[M],
-    keys: Seq[K],
-    hasName: (M, String) => Boolean
-  ): Parser[Map[K, M]] = for
-    metadatas: Seq[M] <- load[M](from, content)
-    result: Seq[(K, M)] <- Effects.collectAll(metadatas.map(metadata =>
-      find(
-        keys,
-        metadata,
-        hasName
-      ).map(_ -> metadata)
+  abstract class ByLoader[Key <: ByLoader[Key]](loader: Names.Loader[Key], nameOverride: Option[String])
+    extends Named, HasName(nameOverride):
+    final override def names: Names = loader.toNames(this.asInstanceOf[Key]) // TODO play with self-type to remove the cast...
+
+  private sealed abstract class Numbers(
+    val  named: Named,
+    val from: Int,
+    val to: Int
+  ) extends Named:
+    require(from > 0)
+    require(to >= from)
+
+    final override def names: Names = new Names(for name <- named.names.names yield Name(
+      name = name.name + " " + suffix(name.languageSpec),
+      languageSpec = name.languageSpec
     ))
-    _ <- checkNoUnmatchedKeys(keys.toSet -- result.map(_._1).toSet)
-  yield result.toMap
 
-  def load[M](
-    from: From,
-    content: Elements[M]
-  ): Parser[Seq[M]] = content.wrappedSeq(from.name).parse(from)
+    protected def suffix(languageSpec: Language.Spec): String
 
-  def bind[K <: Named, M](
-    keys: Seq[K],
-    metadatas: Seq[M],
-    getKey: M => K
-  ): Parser[Map[K, M]] =
-    val result: Map[K, M] = metadatas.map(metadata => getKey(metadata) -> metadata).toMap
-    for
-      _ <- checkNoUnmatchedKeys(keys.toSet -- result.keySet)
-    yield result
+    override def merge(other: Named): Named =
+      require(other.isInstanceOf[Numbers])
+      val that: Numbers = other.asInstanceOf[Numbers]
+      require(this.named eq that.named)
+      require(this.to+1 == that.from)
+      this.named.andNumbers(this.from, that.to)
 
-  private def checkNoUnmatchedKeys[K](unmatchedKeys: Set[K]): Effects.IO[Unit] =
-    Effects.check(unmatchedKeys.isEmpty, s"Unmatched keys: $unmatchedKeys")
-
-  def find[K <: Named](
-    keys: Seq[K],
-    names: Names
-  ): Parser[K] = find(
-    keys = keys,
-    metadata = names,
-    hasName = (names: Names, name: String) => names.hasName(name)
-  )
-
-  private def find[K <: Named, M](
-    keys: Seq[K],
-    metadata: M,
-    hasName: (M, String) => Boolean
-  ): Parser[K] =
-    val result: Seq[K] = keys.filter(key => hasName(metadata, key.name))
-    for
-      _ <- Effects.check(result.nonEmpty, s"Unmatched metadata: $metadata")
-      _ <- Effects.check(result.length == 1, s"Metadata matched multiple keys: $metadata")
-    yield result.head
