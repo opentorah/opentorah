@@ -4,6 +4,7 @@ import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.slf4j.Logger
 import org.opentorah.util.{Effects, Files, Logging, Zhttp}
+import Zhttp.given
 import org.opentorah.xml.{Element, Parser, ScalaXml}
 import zhttp.http.*
 import zio.duration.Duration

@@ -2,8 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.xml.{Attribute, Parser}
 
-final case class VerseParsed(chapter: Option[Int], verse: Option[Int]):
-
+final class VerseParsed(val chapter: Option[Int], val verse: Option[Int]):
   def inheritFrom(ancestor: VerseParsed): VerseParsed =
     require(this.chapter.isEmpty || ancestor.chapter.isEmpty)
     require(this.verse.isEmpty || ancestor.verse.isEmpty)
@@ -17,7 +16,7 @@ final case class VerseParsed(chapter: Option[Int], verse: Option[Int]):
     if chapter.isDefined then this
     else VerseParsed(chapter = Some(defaultChapter), verse = verse)
 
-  def resolve: Verse = Verse(chapter.get, verse.getOrElse(1))
+  def resolve: ChapterAndVerse = ChapterAndVerse(chapter.get, verse.getOrElse(1))
 
 object VerseParsed:
 

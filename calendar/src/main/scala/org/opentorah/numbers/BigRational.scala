@@ -14,10 +14,17 @@ package org.opentorah.numbers
   * @param numerator  of the number (signed)
   * @param denominator  of the number (positive)
   */
-final case class BigRational private(numerator: BigInt, denominator: BigInt) extends Ordered[BigRational]:
+final class BigRational private(val numerator: BigInt, val denominator: BigInt)
+  extends Ordered[BigRational] derives CanEqual:
   // Representation invariants
   require(denominator > 0)
   require(numerator.gcd(denominator) == 1)
+
+  override def toString: String = s"$numerator/$denominator"
+
+  override def compare(that: BigRational): Int = (this - that).signum
+
+  override def equals(other: Any): Boolean = compare(other.asInstanceOf[BigRational]) == 0
 
   def signum: Int = numerator.signum
 
@@ -52,10 +59,6 @@ final case class BigRational private(numerator: BigInt, denominator: BigInt) ext
   def fraction: BigRational = this - BigRational(whole)
 
   def round: Int = whole + (if fraction.abs <= BigRational.oneHalf then 0 else fraction.signum)
-
-  override def toString: String = s"$numerator/$denominator"
-
-  override def compare(that: BigRational): Int = (this - that).signum
 
   def toDouble: Double = numerator.toDouble / denominator.toDouble
 

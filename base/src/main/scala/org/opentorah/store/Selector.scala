@@ -1,6 +1,6 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.{Named, Names}
+import org.opentorah.metadata.{HasName, Named, Names}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 
 // TODO introduce transparent (optional) selectors;
@@ -9,8 +9,7 @@ import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 final class Selector(
   override val names: Names,
   val title: Option[String]
-) extends Named:
-  override def name: String = names.name
+) extends Named
 
 object Selector extends Element[Selector]("selector"):
 
@@ -33,4 +32,4 @@ object Selector extends Element[Selector]("selector"):
   def byName(name: String): Selector = values.find(_.names.hasName(name)).get
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
-  lazy val values: Seq[Selector] = Parser.unsafeRun(Named.load(From.resource(this), this))
+  lazy val values: Seq[Selector] = Parser.unsafeRun(HasName.load(From.resource(this), this))

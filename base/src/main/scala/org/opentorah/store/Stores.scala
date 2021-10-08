@@ -9,31 +9,42 @@ import zio.ZIO
 // - StoreAlias;
 // - move store package into site project;
 // - push Hierarchy etc. into site by *not* keeping the path maps but calculating them on the fly;
-trait Stores:
-  def findByName(name: String): Caching.Parser[Option[Store]] =
+trait Stores[+T <: Store]:
+  def findByName(name: String): Caching.Parser[Option[T]] =
     stores.map(_.find(_.names.hasName(name)))
 
-  def stores: Caching.Parser[Seq[Store]]
+  def stores: Caching.Parser[Seq[T]]
 
   // TODO add indexOf(), Comparable...
 
 object Stores:
 
   // TODO maybe pre-calculate a lazy map from all names to stores?
-  trait Pure extends Stores:
-    final override def stores: Caching.Parser[Seq[Store]] = ZIO.succeed(storesPure)
+  trait Pure[+T <: Store] extends Stores[T]:
+    final override def stores: Caching.Parser[Seq[T]] = ZIO.succeed(storesPure)
     
-    protected def storesPure: Seq[Store]
+    protected def storesPure: Seq[T]
 
-  trait Numbered[T <: Store.Numbered] extends Pure:
+    private def get(name: String, result: Option[T]): T =
+      require(result.isDefined, s"Unknown $this: $name")
+      result.get
+
+    final def indexOf(store: Store): Int = storesPure.indexWhere(store eq _, 0)
+
+    final def distance(from: Store, to: Store): Int = indexOf(to) - indexOf(from)
+
+    //final val ordering: Ordering[Key] = (x: Key, y: Key) => distance(x, y)
+  
+  // TODO override indexOf()
+  trait Numbered[+T <: Store.Numbered] extends Pure[T]:
     final override def findByName(name: String): Parser[Option[T]] = ZIO.succeed(
-      Strings.toInt(name).flatMap(number =>
+      name.toIntOption.flatMap(number =>
         if number < minNumber || number > maxNumber then None
         else Some(createNumberedStore(number))
       )
     )
 
-    override def storesPure: Seq[Store] =
+    override def storesPure: Seq[T] =
       minNumber.to(maxNumber).map(createNumberedStore)
 
     final  def maxNumber: Int = minNumber + length - 1
@@ -59,7 +70,7 @@ object Stores:
   // derived from Throwable (and then I can type all lines in the 'for's :))
   def resolve(
     path: Seq[String],
-    current: Stores
+    current: Stores[Store]
   ): Caching.Parser[Store.Path] =
     // TODO handle empty paths smoother: include starting Store?
     require(path.nonEmpty)
@@ -67,15 +78,14 @@ object Stores:
 
   private def resolve(
     path: Seq[String],
-    current: Stores,
+    current: Stores[Store],
     acc: Store.Path
   ): Caching.Parser[Store.Path] =
     if path.isEmpty then ZIO.succeed(acc.reverse) else
       val head: String = path.head
       val tail: Seq[String] = path.tail
-      current.findByName(head).flatMap {
-        case Some(next: Stores) => resolve(tail, next, next +: acc)
-        case Some(next) if tail.isEmpty => ZIO.succeed((next +: acc).reverse)
-        case Some(next) => Effects.fail(s"Can not apply '$tail' to $next")
-        case None       => Effects.fail(s"Did not find '$head' in $current")
-      }
+      current.findByName(head).flatMap { _.fold(Effects.fail(s"Did not find '$head' in $current")) {
+        case next: Stores[Store] => resolve(tail, next, next +: acc)
+        case next if tail.isEmpty => ZIO.succeed((next +: acc).reverse)
+        case next => Effects.fail(s"Can not apply '$tail' to $next")
+      }}

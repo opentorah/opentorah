@@ -9,6 +9,8 @@ import zio.{URIO, ZIO}
 // This abstracts over the XML model, allowing parsing and pretty-printing of both Scala XML and DOM.
 trait Xml extends XmlAttributes:
   type Node
+  given CanEqual[scala.collection.immutable.Nil.type, Nodes] = CanEqual.derived // Note: just for case matching of Nil agains Nodes...
+
   final type Nodes = Seq[Node]
   override type Attributes <: Node
   final override type Element = Attributes

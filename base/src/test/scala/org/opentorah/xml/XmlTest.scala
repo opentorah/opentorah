@@ -99,7 +99,7 @@ final class XmlTest extends AnyFlatSpec, Matchers:
   "Attribute.get()" should "work" in {
     Attribute("id").optional.get(ScalaXml)(<x id="2"/>) shouldBe Some("2")
     Attribute("id", Xml.namespace).optional.get(ScalaXml)(<x xml:id="3"/>) shouldBe Some("3")
-    Dom.getAttributes(loadResource(Dom, "namespace")) shouldBe Seq.empty
+    Dom.getAttributes(loadResource(Dom, "namespace")) shouldBe empty
   }
 
   private val teiNamespace: Namespace = Namespace(prefix = "tei", uri = "http://www.tei-c.org/ns/1.0")

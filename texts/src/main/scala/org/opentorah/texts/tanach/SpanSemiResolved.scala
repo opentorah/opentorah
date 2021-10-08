@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-final case class SpanSemiResolved(from: Verse, to: Option[Verse]):
-  def setTo(value: Verse): Span =
+final class SpanSemiResolved(val from: ChapterAndVerse, val to: Option[ChapterAndVerse]):
+  def setTo(value: ChapterAndVerse): Span =
     require(to.isEmpty || to.contains(value), "Wrong explicit 'to'")
     Span(from, value)
 
@@ -11,7 +11,7 @@ object SpanSemiResolved:
     span: Span,
     chapters: Chapters
   ): Seq[Span] =
-    val tos: Seq[Verse] = spans.tail.map(_.from).map(chapters.prev(_).get) :+ span.to
+    val tos: Seq[ChapterAndVerse] = spans.tail.map(_.from).map(chapters.prev(_).get) :+ span.to
     val result = spans.zip(tos).map((s, to) => s.setTo(to))
     require(chapters.cover(result, span))
     result

@@ -4,13 +4,27 @@ import org.opentorah.util.Files
 import org.opentorah.xml.{RawXml, ScalaXml}
 import java.net.URI
 
-final case class a(
+final class a(
   uri: Option[URI] = None,
   target: Option[String] = None,
   id: Option[String] = None,
   classes: Seq[String] = Seq.empty,
   declareNamespace: Boolean = false
 ):
+  private def copy(
+    uri: Option[URI] = uri,
+    target: Option[String] = target,
+    id: Option[String] = id,
+    classes: Seq[String] = classes,
+    declareNamespace: Boolean = declareNamespace
+  ): a = new a(
+    uri,
+    target,
+    id,
+    classes,
+    declareNamespace
+  )
+
   def setId(value: String): a = copy(id = Some(value))
 
   def setTarget(value: Option[String]): a = value.fold(this)(setTarget)
@@ -51,4 +65,6 @@ final case class a(
 object a:
   def apply(path: Seq[String]): a = apply(URI(null, null, Files.mkUrl(path), null))
 
-  def apply(uri: URI): a = a(uri = Some(uri))
+  def apply(uri: URI): a = new a(uri = Some(uri))
+  
+  def empty: a = new a()

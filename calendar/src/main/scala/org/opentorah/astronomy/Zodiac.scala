@@ -1,41 +1,36 @@
 package org.opentorah.astronomy
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{HasName, Named, Names}
 import Angles.{Position, Rotation}
 
 // KH 11:9
-sealed abstract class Zodiac extends Named:
-  final override def names: Names = Zodiac.toNames(this)
+enum Zodiac extends Named.ByLoader[Zodiac](loader = Zodiac, nameOverride = None), HasName.Enum derives CanEqual:
+  lazy val start: Position = Position(0) + Zodiac.size*ordinal
+  lazy val end: Position = start + Zodiac.size
+  lazy val middle: Position = start + Zodiac.halfSize
 
-  final lazy val start: Position = Position(0) + Zodiac.size*Zodiac.indexOf(this)
-  final lazy val end: Position = start + Zodiac.size
-  final lazy val middle: Position = start + Zodiac.halfSize
+  def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
 
-  final def contains(angle: Position): Boolean = (start <= angle) && (angle < end)
-
-  final def at(angle: Rotation): Position =
+  def at(angle: Rotation): Position =
     require(!angle.isNegative && (angle <= Zodiac.size))
     start + angle
 
-object Zodiac extends NamedCompanion:
-  override type Key = Zodiac
+  case Aries
+  case Taurus
+  case Gemini
+  case Cancer
+  case Leo
+  case Virgo
+  case Libra
+  case Scorpio
+  case Sagittarius
+  case Capricorn
+  case Aquarius
+  case Pisces
 
-  case object Aries       extends Zodiac
-  case object Taurus      extends Zodiac
-  case object Gemini      extends Zodiac
-  case object Cancer      extends Zodiac
-  case object Leo         extends Zodiac
-  case object Virgo       extends Zodiac
-  case object Libra       extends Zodiac
-  case object Scorpio     extends Zodiac
-  case object Sagittarius extends Zodiac
-  case object Capricorn   extends Zodiac
-  case object Aquarius    extends Zodiac
-  case object Pisces      extends Zodiac
+object Zodiac extends Names.Loader[Zodiac]:
 
-  final override val values: Seq[Zodiac] = Seq(
-    Aries, Taurus, Gemini, Cancer, Leo, Virgo,
-    Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces)
+  final override val valuesSeq: Seq[Zodiac] = values.toIndexedSeq
 
   private val (size: Rotation, halfSize: Rotation) =
     require(Angles.headRange % numberOfValues == 0)
@@ -48,7 +43,7 @@ object Zodiac extends NamedCompanion:
     (zodiac, angle - zodiac.start)
 
   def inZodiac(angle: Position): Zodiac =
-    values.find(_.contains(angle)).get
+    valuesSeq.find(_.contains(angle)).get
 
   def in(angle: Position, zodiacs: Set[Zodiac]):Boolean =
     zodiacs.exists(_.contains(angle))

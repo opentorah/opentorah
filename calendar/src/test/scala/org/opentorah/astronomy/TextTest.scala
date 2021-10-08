@@ -25,9 +25,9 @@ class TextTest extends AnyFunSpec, Matchers:
 
     describe("Laws 7-9") {
       it("zodiac") {
-        Zodiac.values.length shouldBe 12
+        Zodiac.valuesSeq.length shouldBe 12
         Zodiac.Aries.start shouldBe Position(0)
-        Zodiac.values.init.zip(Zodiac.values.tail).foreach((prev: Zodiac, next: Zodiac) =>
+        Zodiac.valuesSeq.init.zip(Zodiac.valuesSeq.tail).foreach((prev: Zodiac, next: Zodiac) =>
             (prev.start + Rotation(30)) shouldBe prev.end
             next.start shouldBe prev.end
         )

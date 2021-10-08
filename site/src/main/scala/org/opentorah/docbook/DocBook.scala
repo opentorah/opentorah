@@ -87,7 +87,7 @@ object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
       case "biblioref" =>
         require(ScalaXml.isEmpty(children), element)
         val linkend: String = linkendAttribute.get(ScalaXml)(element)
-        URIO.succeed(html.a().setFragment(linkend)(linkend))
+        URIO.succeed(html.a.empty.setFragment(linkend)(linkend))
 
       //      case "graphic" =>
       //        // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.

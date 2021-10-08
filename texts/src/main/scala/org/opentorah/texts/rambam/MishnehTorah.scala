@@ -1,6 +1,6 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{Language, Name, Named, Names}
+import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
@@ -57,9 +57,7 @@ object MishnehTorah:
     def part: Part
 
   final class NumberedChapter(override val part: Part, number: Int) extends Chapter:
-    override def names: Names = chapterNames.withNumber(number)
-
-  private def chapterNames: Names = Selector.byName("chapter").names
+    override def names: Names = Selector.byName("chapter").andNumber(number).names
 
   final class NamedChapter(override val names: Names) extends Chapter:
     private var part_ : Option[PartWithNamedChapters] = None
@@ -97,6 +95,6 @@ object MishnehTorah:
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] =
-    val result: Seq[Book] = Parser.unsafeRun(Named.load(From.resource(this), Book))
+    val result: Seq[Book] = Parser.unsafeRun(HasName.load(From.resource(this), Book))
     require(result.map(_.number) == (0 to 14))
     result

@@ -4,9 +4,11 @@ import Section.Parameters
 import org.opentorah.docbook.DocBook
 import org.opentorah.xml.{ScalaXml, Xsl}
 
-trait Section:
+trait Section derives CanEqual:
 
   def name: String
+
+  final override def equals(other: Any): Boolean = this.name == other.asInstanceOf[Section].name
 
   def parameters: Parameters
 

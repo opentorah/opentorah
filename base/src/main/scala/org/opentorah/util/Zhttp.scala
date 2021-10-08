@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import io.netty.handler.codec.http.HttpHeaderNames
-import zhttp.http.{HTTP_CHARSET, Header, HttpData, RHttpApp, Request, Response, ResponseM, Status}
+import zhttp.http.{HTTP_CHARSET, Header, HttpData, Method, Path, RHttpApp, Request, Response, ResponseM, Status}
 import zhttp.service.{EventLoopGroup, Server}
 import zhttp.service.server.ServerChannelFactory
 import zio.blocking.Blocking
@@ -13,6 +13,10 @@ import java.net.{URL, URLConnection}
 import java.time.Instant
 
 object Zhttp:
+
+  given CanEqual[Method, Method] = CanEqual.derived
+  given CanEqual[Path, Path] = CanEqual.derived
+  given CanEqual[Status, Status] = CanEqual.derived
 
   def textData(text: String): HttpData.CompleteData = HttpData.CompleteData(Chunk.fromArray(textBytes(text)))
 

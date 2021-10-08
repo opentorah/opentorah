@@ -5,7 +5,7 @@ import org.opentorah.calendar.Week
 
 object NewYear:
 
-  sealed class Delay(val days: Int)
+  sealed class Delay(val days: Int) derives CanEqual // all deriveds are objects; using eq
 
   object Delay:
     case object No extends Delay(0)

@@ -5,7 +5,7 @@ import org.opentorah.store.{By, Selector, Stores}
 import org.opentorah.xml.{Parser, ScalaXml}
 import zio.ZIO
 
-object Reports extends By, Stores.Pure, HtmlContent[Collector]:
+object Reports extends By[Report[?]], Stores.Pure[Report[?]], HtmlContent[Collector]:
   override def selector: Selector = Selector.byName("report")
 
   private val reports: Seq[Report[?]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)

@@ -1,23 +1,24 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{LanguageSpec, Named, Names, WithNumber}
+import org.opentorah.metadata.{HasName, Language, Names, WithNumber}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
-final case class Haftarah(override val spans: Seq[Haftarah.BookSpan])
-  extends Haftarah.Spans(spans)
+// TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
+final case class Haftarah(override val spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) derives CanEqual:
+  override def equals(other: Any): Boolean = this.spans == other.asInstanceOf[Haftarah].spans
 
 object Haftarah extends WithBookSpans[Prophets]:
   override type Many = Haftarah
 
-  def toLanguageString(spans: Seq[BookSpan])(using spec: LanguageSpec): String =
+  def toLanguageString(spans: Seq[BookSpan])(using spec: Language.Spec): String =
     Collections.group(spans, (span: BookSpan) => span.book)
       .map(bookSpans =>
         bookSpans.head.book.toLanguageString + " " + bookSpans.map(_.span.toLanguageString).mkString(", ")
       ).mkString("; ")
 
-  override protected def getBook(name: String): Prophets = Prophets.forName(name)
+  override protected def getBook(name: String): Prophets = TanachBook.getForName(name).asInstanceOf[Prophets]
 
   object Week extends Element[(String, Customs)]("week"):
     private val elementParser = Haftarah.parser(full = true)
@@ -30,10 +31,10 @@ object Haftarah extends WithBookSpans[Prophets]:
 
       override def unparser: Unparser[(String, Haftarah.Customs)] = ???
 
-  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(Named.load(
+  lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(Parser.unsafeRun(HasName.load(
     from = From.resource(this),
     content = Week,
-    keys = Parsha.values,
+    keys = Parsha.valuesSeq,
     hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
   )))(_._2)
 

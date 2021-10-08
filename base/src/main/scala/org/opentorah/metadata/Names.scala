@@ -1,7 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.util.{Collections, Effects, Platform}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class Names(val names: Seq[Name]) extends Language.ToString:
@@ -13,36 +13,30 @@ final class Names(val names: Seq[Name]) extends Language.ToString:
   def isEmpty: Boolean = names.isEmpty
 
   def getDefaultName: Option[String] =
-    if (names.length == 1) && (names.head.languageSpec == LanguageSpec.empty) then Some(names.head.name) else None
+    if (names.length == 1) && names.head.languageSpec.isEmpty then Some(names.head.name) else None
 
   def find(name: String): Option[Name] = names.find(_.name == name)
 
   def hasName(name: String): Boolean = find(name).isDefined
 
-  def find(spec: LanguageSpec): Option[Name] = names.find(_.satisfies(spec))
+  def find(spec: Language.Spec): Option[Name] = names.find(_.satisfies(spec))
 
-  def doFind(spec: LanguageSpec): Name =
+  def doFind(spec: Language.Spec): Name =
     find(spec)
       .orElse(find(spec.dropFlavour))
       .orElse(find(spec.dropFlavour.dropIsTransliterated))
       .orElse(find(spec.dropFlavour.dropIsTransliterated.dropLanguage))
       .get
 
-  def name: String = doFind(LanguageSpec.empty).name
+  def name: String = doFind(Language.Spec.empty).name
 
-  override def toLanguageString(using spec: LanguageSpec): String = doFind(spec).name
+  override def toLanguageString(using spec: Language.Spec): String = doFind(spec).name
 
   def isDisjoint(other: Names): Boolean = names.forall(name => !other.hasName(name.name))
 
-  def withNumber(number: Int): Names = transform(_.withNumber(number))
-  
-  def withNumbers(from: Int, to: Int): Names = transform(_.withNumbers(from, to))
-
-  def transform(transformer: Name => Name): Names = new Names(names.map(transformer))
-
 object Names:
   // TODO create a mix-in for Named that overrides names as a val with this as a value?
-  def apply(name: String): Names = new Names(Seq(Name(name, LanguageSpec.empty)))
+  def apply(name: String): Names = new Names(Seq(Name(name, Language.Spec.empty)))
 
   def checkDisjoint(nameses: Seq[Names]): Unit =
     for
@@ -53,8 +47,8 @@ object Names:
 
   // TODO If I ever figure out how to work with Custom using Cats typeclasses, something similar
   // should work here too :)
-  def combine(one: Names, other: Names, combiner: (LanguageSpec, String, String) => String): Names =
-    val specs: Set[LanguageSpec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
+  def combine(one: Names, other: Names, combiner: (Language.Spec, String, String) => String): Names =
+    val specs: Set[Language.Spec] = one.names.map(_.languageSpec).toSet ++ other.names.map(_.languageSpec)
     val result: Set[Name] = specs.map(spec =>
       Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec))
     new Names(result.toSeq)
@@ -63,7 +57,7 @@ object Names:
 
   def parser(isDefaultNameAllowed: Boolean): Parser[Names] = for
     n <- if !isDefaultNameAllowed then ZIO.none else defaultNameAttribute.optional()
-    defaultName = n.map(Name(_, LanguageSpec.empty))
+    defaultName = n.map(Name(_, Language.Spec.empty))
     nonDefaultNames <- Name.seq()
     _ <- Effects.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
   yield
@@ -86,3 +80,16 @@ object Names:
 
   object NamesMetadata extends Element[Names]("names"):
     override def contentParsable: Parsable[Names] = withoutDefaultNameParsable
+
+  abstract class Loader[Key <: HasName](resourceNameOverride: Option[String] = None) extends HasValues[Key]:
+    // This is:
+    // - lazy to allow correct initialization: the code uses values(),
+    //   Language metadata file references Language instances by name :)
+    // - public so that it can be accessed from the Key type;
+    // - not final so that it can be overridden in Tanach :)
+    lazy val toNames: Map[Key, Names] = Parser.unsafeRun(HasName.load[Key, Names](
+      from = From.resourceNamed(this, resourceNameOverride.getOrElse(Platform.className(this))),
+      content = Names.NamesMetadata,
+      keys = valuesSeq,
+      hasName = (metadata: Names, name: String) => metadata.hasName(name)
+    ))

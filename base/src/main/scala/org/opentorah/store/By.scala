@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Parser, Unparser}
 
 // TODO wrap a Store by a By!
-trait By extends Store.NonTerminal:
+trait By[+T <: Store] extends Store.NonTerminal[T]:
 
   def selector: Selector
 
@@ -15,4 +15,4 @@ object By:
 
   val selectorParser: Parser[Selector] = selectorAttribute().map(Selector.byName)
 
-  def selectorUnparser[T <: By]: Unparser[T] = selectorAttribute(_.selector.name)
+  def selectorUnparser[T <: By[_]]: Unparser[T] = selectorAttribute(_.selector.names.name)

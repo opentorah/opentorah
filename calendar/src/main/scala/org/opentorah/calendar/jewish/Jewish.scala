@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.calendar.{Calendar, Week}
-import org.opentorah.metadata.{LanguageSpec, Named, Names}
+import org.opentorah.metadata.{Language, Named, Names}
 
 object Jewish extends Calendar:
 
@@ -99,7 +99,7 @@ object Jewish extends Calendar:
 
   object JewishYearCompanion:
     // KH 8:6
-    enum Kind:
+    enum Kind derives CanEqual:
       case Short
       case Regular
       case Full
@@ -113,12 +113,11 @@ object Jewish extends Calendar:
 
   final override type Month = JewishMonth
 
-  sealed trait JewishMonthName extends Named:
-    final override def names: Names = Month.toNames(this)
+  sealed class JewishMonthName(nameOverride: Option[String] = None) extends MonthNameBase(nameOverride)
 
   override type MonthName = JewishMonthName
 
-  final class JewishMonthCompanion extends MonthCompanion:
+  object JewishMonthName extends MonthCompanion(resourceName = "JewishMonth"):
     private[opentorah] override def apply(yearOption: Option[Year], monthNumber: Int): Month =
       JewishMonth(yearOption, monthNumber)
 
@@ -138,17 +137,15 @@ object Jewish extends Calendar:
     case object Tammuz     extends JewishMonthName
     case object Av         extends JewishMonthName
     case object Elul       extends JewishMonthName
-    case object AdarI      extends JewishMonthName { override def name: String = "Adar I"}
-    case object AdarII     extends JewishMonthName { override def name: String = "Adar II"}
+    case object AdarI      extends JewishMonthName(nameOverride = Some("Adar I"))
+    case object AdarII     extends JewishMonthName(nameOverride = Some("Adar II"))
 
-    override val values: Seq[Key] =
+    override val valuesSeq: Seq[Name] =
       Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
+  
+  override type MonthCompanionType = JewishMonthName.type
 
-    protected override def resourceName: String = "JewishMonth"
-
-  override type MonthCompanionType = JewishMonthCompanion
-
-  override protected def createMonthCompanion: MonthCompanionType = new JewishMonthCompanion
+  override protected def createMonthCompanion: MonthCompanionType = JewishMonthName
 
   final class JewishDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber):
     def isShabbos: Boolean = is(Week.Day.Shabbos)
@@ -179,4 +176,4 @@ object Jewish extends Calendar:
 
   override protected def newPoint(digits: Seq[Int]): Point = JewishMoment(digits)
 
-  override def intToString(number: Int)(using spec: LanguageSpec): String = spec.toString(number)
+  override def intToString(number: Int)(using spec: Language.Spec): String = spec.toString(number)

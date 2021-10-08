@@ -4,18 +4,41 @@ import org.opentorah.util.{Files, Strings}
 import org.typelevel.paiges.Doc
 import java.io.File
 
-final case class PrettyPrinter(
-  width: Int = 120,
-  indent: Int = 2,
-  encodeXmlSpecials: Boolean = true,
-  doNotStackElements: Set[String] = Set.empty,
-  alwaysStackElements: Set[String] = Set.empty,
-  nestElements: Set[String] = Set.empty,
-  clingyElements: Set[String] = Set.empty,
-  allowEmptyElements: Boolean = true,
-  keepEmptyElements: Set[String] = Set.empty,
-  preformattedElements: Set[String] = Set.empty
+final class PrettyPrinter(
+  val width: Int = 120,
+  val indent: Int = 2,
+  val encodeXmlSpecials: Boolean = true,
+  val doNotStackElements: Set[String] = Set.empty,
+  val alwaysStackElements: Set[String] = Set.empty,
+  val nestElements: Set[String] = Set.empty,
+  val clingyElements: Set[String] = Set.empty,
+  val allowEmptyElements: Boolean = true,
+  val keepEmptyElements: Set[String] = Set.empty,
+  val preformattedElements: Set[String] = Set.empty
 ):
+  def copy(
+    width: Int = width,
+    indent: Int = indent,
+    encodeXmlSpecials: Boolean = encodeXmlSpecials,
+    doNotStackElements: Set[String] = doNotStackElements,
+    alwaysStackElements: Set[String] = alwaysStackElements,
+    nestElements: Set[String] = nestElements,
+    clingyElements: Set[String] = clingyElements,
+    allowEmptyElements: Boolean = allowEmptyElements,
+    keepEmptyElements: Set[String] = keepEmptyElements,
+    preformattedElements: Set[String] = preformattedElements
+  ): PrettyPrinter = new PrettyPrinter(
+    width,
+    indent,
+    encodeXmlSpecials,
+    doNotStackElements,
+    alwaysStackElements,
+    nestElements,
+    clingyElements,
+    allowEmptyElements,
+    keepEmptyElements,
+    preformattedElements
+  )
 
   def render(
     xml: Xml,
@@ -67,7 +90,7 @@ final case class PrettyPrinter(
   )
 
   // Note: methods below all need access to xml: Xml, often - for the types of parameters, so parameter 'xml'
-  // must come first, and thus can not be implicit; it is cleaner to scope them in a class with 'xml' a constructor parameter.
+  // must come first, and thus can not be given; it is cleaner to scope them in a class with 'xml' a constructor parameter.
   private final class ForModel(val xml: Xml):
 
     private def fromPreformattedElement(element: xml.Element, parent: Option[xml.Element]): Seq[String] =
@@ -280,10 +303,8 @@ object PrettyPrinter:
     )
 
   @scala.annotation.tailrec
-  def listXmlFiles(result: List[File], directoriesToList: List[File]): List[File] = directoriesToList match
-    case Nil => result
-    case current :: tail =>
-      val (directories: List[File], files: List[File]) = current.listFiles.toList.partition(_.isDirectory)
-      listXmlFiles(result ++ files.filter(isXml), tail ++ directories)
+  def listXmlFiles(result: List[File], directoriesToList: List[File]): List[File] = if directoriesToList.isEmpty then result else
+    val (directories: List[File], files: List[File]) = directoriesToList.head.listFiles.toList.partition(_.isDirectory)
+    listXmlFiles(result ++ files.filter(isXml), directoriesToList.tail ++ directories)
 
   private def isXml(file: File): Boolean = Files.nameAndExtension(file.getName)._2.contains("xml")

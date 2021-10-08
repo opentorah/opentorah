@@ -1,39 +1,28 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{Named, NamedCompanion, Names}
+import org.opentorah.metadata.{HasName, Named, Names}
 
-// "abstract" is here to help with the exhaustiveness check.
-sealed abstract class Season(override val name: String) extends Named:
-  final lazy val numberInYear: Int = Season.indexOf(this) + 1
-
-  final override def names: Names = Season.toNames(this)
-
-object Season extends NamedCompanion:
-  override type Key = Season
+enum Season(name: String)
+  extends Named.ByLoader[Season](loader = Season, nameOverride = Some(name)), HasName.Enum derives CanEqual:
+  lazy val numberInYear: Int = ordinal + 1
 
   // tkufos KH 9:3, 10:3
+  case TkufasNisan extends Season("Spring Equinox") // sun enters Tele (Aries)
+  case TkufasTammuz extends Season("Summer Solstice") // sun enters Sarton (Cancer)
+  case TkufasTishrei extends Season("Autumnal Equinox") // sun enters Moznaim (Libra)
+  case TkufasTeves extends Season("Winter Solstice") // sun enters Gdi (Capricorn)
 
-  // sun enters Tele (Aries)
-  case object TkufasNisan extends Season("Spring Equinox")
-  final def SpringEquinox: Season = TkufasNisan
-  final def VernalEquinox: Season = SpringEquinox
+object Season extends Names.Loader[Season]:
+  def SpringEquinox: Season = TkufasNisan
+  def VernalEquinox: Season = SpringEquinox
+  def SummerSolstice: Season = TkufasTammuz
+  def EstivalSolstice: Season = SummerSolstice
+  def AutumnalEquinox: Season = TkufasTishrei
+  def FallEquinox: Season = AutumnalEquinox
+  def WinterSolstice: Season = TkufasTeves
+  def SouthernSolstice: Season = WinterSolstice
 
-  // sun enters Sarton (Cancer)
-  case object TkufasTammuz extends Season("Summer Solstice")
-  final def SummerSolstice: Season = TkufasTammuz
-  final def EstivalSolstice: Season = SummerSolstice
-
-  // sun enters Moznaim (Libra)
-  case object TkufasTishrei extends Season("Autumnal Equinox")
-  final def AutumnalEquinox: Season = TkufasTishrei
-  final def FallEquinox: Season = AutumnalEquinox
-
-  // sun enters Gdi (Capricorn)
-  case object TkufasTeves extends Season("Winter Solstice")
-  final def WinterSolstice: Season = TkufasTeves
-  final def SouthernSolstice: Season = WinterSolstice
-
-  final override val values: Seq[Season] = Seq(TkufasTishrei, TkufasTeves, TkufasNisan, TkufasTammuz)
+  override val valuesSeq: Seq[Season] = values.toIndexedSeq
 
   trait ForYear:
     def seasonForYear(season: Season, year: Jewish.Year): Jewish.Moment

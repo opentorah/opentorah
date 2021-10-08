@@ -1,8 +1,9 @@
 package org.opentorah.calendar.service
 
 import io.netty.handler.codec.http.{HttpHeaderNames, HttpHeaderValues}
-import org.opentorah.metadata.{Language, LanguageSpec}
+import org.opentorah.metadata.Language
 import org.opentorah.util.{Logging, Zhttp}
+import Zhttp.given
 import zhttp.http.*
 import zio.ZIO
 
@@ -50,14 +51,12 @@ object CalendarService extends zio.App:
       renderHtml(Renderer.renderDay(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr, dayStr))
   }
 
-  private def getLanguage(request: Request): LanguageSpec = Zhttp.queryParameter(request, "lang")
+  private def getLanguage(request: Request): Language.Spec = Zhttp.queryParameter(request, "lang")
     .map(Language.getForName)
     .getOrElse(Language.English).toSpec
 
-  private def getLocation(request: Request): Location = Zhttp.queryParameter(request, "inHolyLand")
-    .map(value => value == "true")
-    .map(if _ then Location.HolyLand else Location.Diaspora)
-    .getOrElse(Location.Diaspora)
+  private def getLocation(request: Request): Renderer.Location =
+    Renderer.getLocation(Zhttp.queryParameter(request, "inHolyLand"))
 
   def renderHtml(content: String): ResponseM[Any, Nothing] = ZIO.succeed(Response.http(
     headers = List(Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, HttpHeaderValues.TEXT_HTML)), // TODO UTF-8?

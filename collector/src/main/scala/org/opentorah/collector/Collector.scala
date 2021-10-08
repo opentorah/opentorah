@@ -103,7 +103,7 @@ final class Collector(
     case _: EntityList              => Some(Viewer.Names     )
     case _: Entities                => Some(Viewer.Names     )
     case _: Entity                  => Some(Viewer.Names     )
-    case Reports                    => Some(Viewer.Names     )
+    case _: Reports.type            => Some(Viewer.Names     )
     case _                          => defaultViewer
 
   override protected def navigationLinks(htmlContent: HtmlContent[Collector]): Caching.Parser[Seq[ScalaXml.Element]] = htmlContent match
@@ -159,7 +159,7 @@ final class Collector(
     case entity         : Entity           => Seq(entities, entity)
     case notes          : Notes            => Seq(notes)
     case note           : Note             => Seq(notes, note)
-    case Reports                           => Seq(Reports)
+    case _              : Reports.type     => Seq(Reports)
     case report         : Report[?]        => Seq(Reports, report)
   
   override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
@@ -167,9 +167,8 @@ final class Collector(
   override protected def storesPure: Seq[Store] =
     Seq(Index.Flat, Index.Tree, entityLists, entities, notes, Reports, by)
 
-  override def findByName(name: String): Caching.Parser[Option[Store]] = alias2collectionAlias.get(name) match
-    case Some(result) => ZIO.some(result)
-    case None => super.findByName(name)
+  override def findByName(name: String): Caching.Parser[Option[Store]] =
+    alias2collectionAlias.get(name).fold(super.findByName(name))(result => ZIO.some(result))
 
   override protected def linkResolver(htmlContent: HtmlContent[Collector]): LinksResolver =
     val textFacet: Option[Document.TextFacet] = htmlContent match

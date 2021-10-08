@@ -1,11 +1,14 @@
 package org.opentorah.texts.tanach
 
-trait Writings extends Nach
+import org.opentorah.metadata.HasName
 
+open class Writings(nameOverride: Option[String] = None) extends Nach(nameOverride), HasName.NonEnum
+
+// TODO make enum (including Psalms)!
 object Writings:
   case object Proverbs extends Writings
   case object Job extends Writings
-  case object SongOfSongs extends Writings { override def name: String = "Song of Songs" }
+  case object SongOfSongs extends Writings(nameOverride = Some("Song of Songs"))
   case object Ruth extends Writings
   case object Lamentations extends Writings
   case object Ecclesiastes extends Writings
@@ -13,8 +16,8 @@ object Writings:
   case object Daniel extends Writings
   case object Ezra extends Writings
   case object Nehemiah extends Writings
-  case object ChroniclesI extends Writings { override def name: String = "I Chronicles" }
-  case object ChroniclesII extends Writings { override def name: String = "II Chronicles" }
+  case object ChroniclesI extends Writings(nameOverride = Some("I Chronicles"))
+  case object ChroniclesII extends Writings(nameOverride = Some("II Chronicles"))
 
   val all: Seq[Writings] = Seq(Psalms, Proverbs, Job, SongOfSongs, Ruth, Lamentations, Ecclesiastes,
     Esther, Daniel, Ezra, Nehemiah, ChroniclesI, ChroniclesII)

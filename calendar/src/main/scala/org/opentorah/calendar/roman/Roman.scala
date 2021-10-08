@@ -1,7 +1,7 @@
 package org.opentorah.calendar.roman
 
 import org.opentorah.calendar.Calendar
-import org.opentorah.metadata.{LanguageSpec, Named, Names}
+import org.opentorah.metadata.{Language, Named, Names}
 
 trait Roman extends Calendar:
 
@@ -67,12 +67,11 @@ trait Roman extends Calendar:
 
   final override type Month = RomanMonth
 
-  sealed trait RomanMonthName extends Named:
-    final override def names: Names = Month.toNames(this)
+  sealed class RomanMonthName(nameOverride: Option[String] = None) extends MonthNameBase(nameOverride)
 
   final override type MonthName = RomanMonthName
 
-  final class RomanMonthCompanion extends MonthCompanion:
+  object RomanMonthName extends MonthCompanion(resourceName = "RomanMonth"):
     override private[opentorah] def apply(yearOption: Option[Year], monthNumber: Int): Month =
       RomanMonth(yearOption, monthNumber)
 
@@ -94,14 +93,12 @@ trait Roman extends Calendar:
     case object November  extends RomanMonthName
     case object December  extends RomanMonthName
 
-    override val values: Seq[Key] =
+    override val valuesSeq: Seq[Name] =
       Seq(January, February, March, April, May, June, July, August, September, October, November, December)
-
-    protected override def resourceName: String = "RomanMonth"
-
-  final override type MonthCompanionType = RomanMonthCompanion
   
-  final override protected def createMonthCompanion: MonthCompanionType = new RomanMonthCompanion
+  final override type MonthCompanionType = RomanMonthName.type
+  
+  final override protected def createMonthCompanion: MonthCompanionType = RomanMonthName
 
   final class RomanDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber)
 
@@ -118,4 +115,4 @@ trait Roman extends Calendar:
 
   final override protected def newPoint(digits: Seq[Int]): Point = RomanMoment(digits)
 
-  final override def intToString(number: Int)(using spec: LanguageSpec): String = number.toString
+  final override def intToString(number: Int)(using spec: Language.Spec): String = number.toString

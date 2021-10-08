@@ -91,6 +91,9 @@ final class Parsing private:
   // TODO maybe take namespace into account?
   // TODO handle repeated attributes?
   private def takeAttribute(attribute: Attribute[?]): Option[String] =
+    // TODO Attribute is (and must be!) invariant in T, but here we need to compare
+    given CanEqual[Attribute[?], Attribute[String]] = CanEqual.derived
+
     val current: Current = stack.head
     val (take: Attribute.StringValues, leave: Attribute.StringValues) =
       current.attributes.partition((candidate: Attribute.Value[String]) => attribute == candidate.attribute)

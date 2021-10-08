@@ -17,7 +17,14 @@ final class Collection(
   override val body: Option[Body.Value],
   val directory: String,
   val parts: Seq[CollectionPart]
-) extends Hierarchical:
+) extends Hierarchical derives CanEqual:
+
+  // TODO unless Hierarchy is accepted here (and not just Collection), Collector.store2path initialization fails.
+  // Why isn't it blocked by the missing CanEqual?
+  override def equals(other: Any): Boolean = other.isInstanceOf[Collection] && {
+    val that: Collection = other.asInstanceOf[Collection]
+    this.directory == that.directory
+  }
 
   val documents: Documents = Documents(
     fromUrl,
@@ -45,10 +52,7 @@ final class Collection(
 
   // With no facet, "document" is assumed
   override def findByName(name: String): Caching.Parser[Option[Store]] =
-    textFacet.findByName(name).flatMap {
-      case Some(result) => ZIO.some(result) // TODO ZIO.someOrElseM?
-      case None => super.findByName(name)
-    }
+    textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(result => ZIO.some(result))) // TODO ZIO.someOrElseM?
 
   override protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element] =
     for
@@ -143,7 +147,7 @@ object Collection extends Element[Collection]("collection"):
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store.NonTerminal, Stores.Pure, HtmlContent[Collector]:
+  final class Alias(val collection: Collection) extends Store.NonTerminal[Store], Stores.Pure[Store], HtmlContent[Collector]:
     def alias: String = collection.alias.get
 
     override val names: Names = Names(alias)
@@ -154,12 +158,12 @@ object Collection extends Element[Collection]("collection"):
     override def htmlBodyTitle: Option[ScalaXml.Nodes] = collection.htmlBodyTitle
     override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(collector)
 
-  sealed abstract class Facet[DF <: Document.Facet](val collection: Collection) extends By:
+  sealed abstract class Facet[DF <: Document.Facet](val collection: Collection) extends By[DF]:
 
     final override def findByName(name: String): Caching.Parser[Option[DF]] =
       collection.documents.findByName(name).map(_.map(of))
 
-    override def stores: Caching.Parser[Seq[Store]] =
+    override def stores: Caching.Parser[Seq[DF]] =
       collection.documents.stores.map(_.map(of))
 
     final def getTei(document: Document): Caching.Parser[Tei] =

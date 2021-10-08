@@ -13,6 +13,7 @@ class BigRationalLawsTest extends AnyFunSuite, FunSuiteDiscipline, Checkers:
   import BigRationalTest.*
 
   // we discard zero denominators, so we need a higher maxDiscardedFactor than the default 5.0:
+  // TODO this is the last implicit (as opposed to given) remaining in the code; eventually ScalaTest/Check/whatever will update...
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
     PropertyCheckConfiguration(maxDiscardedFactor = PosZDouble(70.0))
 

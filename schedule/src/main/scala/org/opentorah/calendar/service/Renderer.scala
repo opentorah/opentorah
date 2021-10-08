@@ -4,13 +4,14 @@ import org.opentorah.calendar.{Calendar, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.html
-import org.opentorah.metadata.{Language, LanguageSpec, Named, Numbered}
+import org.opentorah.metadata.{Language, Named, Numbered}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Psalms, Reading, Span, Torah}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{PrettyPrinter, ScalaXml}
+import Renderer.Location
 
 // TODO there was supposed to be a way to avoid passing context parameters everywhere...
 sealed abstract class Renderer:
@@ -36,30 +37,30 @@ sealed abstract class Renderer:
   private def monthUrl(month: calendar.Month): Seq[String] =
     Seq(name, month.year.number.toString, month.numberInYear.toString)
 
-  private def monthNameUrl(month: calendar.Month)(using location: Location, spec: LanguageSpec): Seq[String] =
+  private def monthNameUrl(month: calendar.Month)(using location: Location, spec: Language.Spec): Seq[String] =
     Seq(name, month.year.number.toString, month.name.toLanguageString)
 
   private def dayUrl(day: calendar.Day): Seq[String] =
     Seq(name, day.year.number.toString, day.month.numberInYear.toString, day.numberInMonth.toString)
 
-  private def yearLink(year: calendar.Year, text: Option[String] = None)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def yearLink(year: calendar.Year, text: Option[String] = None)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     navLink(yearUrl(year), text.getOrElse(year.toLanguageString))
 
-  private def monthLink(month: calendar.Month)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def monthLink(month: calendar.Month)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     navLink(monthUrl(month), month.numberInYearToLanguageString)
 
-  private def monthNameLink(month: calendar.Month, text: Option[String] = None)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def monthNameLink(month: calendar.Month, text: Option[String] = None)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     navLink(monthNameUrl(month), text.getOrElse(month.name.toLanguageString))
 
-  private def dayLink(day: calendar.Day, text: Option[String] = None)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def dayLink(day: calendar.Day, text: Option[String] = None)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     navLink(dayUrl(day), text.getOrElse(day.numberInMonthToLanguageString))
 
-  private def navLink(url: Seq[String], text: String)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def navLink(url: Seq[String], text: String)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     html.a(url).setQuery(suffix).addClass("nav")(text)
 
-  private def suffix(using location: Location, spec: LanguageSpec): String = Renderer.suffix(location, spec)
+  private def suffix(using location: Location, spec: Language.Spec): String = Renderer.suffix(location, spec)
 
-  private def dayLinks(day: calendar.Day)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def dayLinks(day: calendar.Day)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     <span>
     {yearLink(day.year)}
     {monthNameLink(day.month)}
@@ -68,12 +69,12 @@ sealed abstract class Renderer:
     {dayLink(day+1, text = Some(">"))}
     </span>
 
-  def renderLanding(using location: Location, spec: LanguageSpec): String = renderHtml(
+  def renderLanding(using location: Location, spec: Language.Spec): String = renderHtml(
     Seq(name),
     dayLinks(Gregorian.now.to(calendar).day)
   )
 
-  def renderYear(yearStr: String)(using location: Location, spec: LanguageSpec): String =
+  def renderYear(yearStr: String)(using location: Location, spec: Language.Spec): String =
     val year: calendar.Year = getYear(yearStr)
     renderHtml(
       yearUrl(year),
@@ -95,9 +96,9 @@ sealed abstract class Renderer:
       </div>
     )
 
-  protected def renderYearInformation(year: calendar.Year)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] = Seq.empty
+  protected def renderYearInformation(year: calendar.Year)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] = Seq.empty
 
-  def renderMonth(yearStr: String, monthStr: String)(using location: Location, spec: LanguageSpec): String =
+  def renderMonth(yearStr: String, monthStr: String)(using location: Location, spec: Language.Spec): String =
     val month: calendar.Month = getMonth(yearStr, monthStr)
     renderHtml(monthNameUrl(month),
       <div>
@@ -113,7 +114,7 @@ sealed abstract class Renderer:
       </div>
     )
 
-  def renderDay(yearStr: String, monthStr: String, dayStr: String)(using location: Location, spec: LanguageSpec): String =
+  def renderDay(yearStr: String, monthStr: String, dayStr: String)(using location: Location, spec: Language.Spec): String =
     val day: calendar.Day = getMonth(yearStr, monthStr).day(dayStr.toInt)
     val jewishDay: Jewish.Day = jewish(day)
 
@@ -126,8 +127,8 @@ sealed abstract class Renderer:
       <div>
       <div>{this .dayLinks(thisDay )} {thisDay .name.toLanguageString}</div>
       <div>{other.dayLinks(otherDay)} {otherDay.name.toLanguageString}</div>
-      <div>{daySchedule.dayNames.map((withNames: Named) =>
-        <span class="name">{withNames.names.doFind(spec).name}</span>)}</div>
+      <div>{daySchedule.dayNames.map((named: Named) =>
+        <span class="name">{named.names.doFind(spec).name}</span>)}</div>
       {renderOptionalReading("Morning", daySchedule.morning)}
       {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
       {if !jewishDay.isShabbosMevarchim then Seq.empty[ScalaXml.Element] else renderShabbosMevarchim(jewishDay.month.next)}
@@ -141,7 +142,7 @@ sealed abstract class Renderer:
       </div>
     )
 
-  private def renderShabbosMevarchim(month: Jewish.Month)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] = Seq(
+  private def renderShabbosMevarchim(month: Jewish.Month)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] = Seq(
     <span class="subheading">Shabbos Mevarchim</span>,
     <table><tr>
       <td>{month.name.toLanguageString}</td>
@@ -151,7 +152,7 @@ sealed abstract class Renderer:
     </tr></table>
   )
 
-  private def renderChitas(chitas: Chitas)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def renderChitas(chitas: Chitas)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     def renderFragment(fragment: Torah.Fragment): Seq[ScalaXml.Element] = Seq(
       <td><span>{fragment.toLanguageString}</span></td>,
       <td>{renderSource(fragment.source)}</td>
@@ -162,7 +163,7 @@ sealed abstract class Renderer:
       {chitas.second.fold(Seq.empty[ScalaXml.Element])(fragment => Seq(<tr>{renderFragment(fragment)}</tr>))}
     </tbody></table>
 
-  private def renderTehillim(day: Jewish.Day)(using location: Location, spec: LanguageSpec): ScalaXml.Element =
+  private def renderTehillim(day: Jewish.Day)(using location: Location, spec: Language.Spec): ScalaXml.Element =
     val forDayOfMonth: Span =
       if (day.numberInMonth == 29) && day.month.length == 29 then Span(Psalms.days(29-1).from, Psalms.days(30-1).to)
       else Psalms.days(day.numberInMonth-1)
@@ -175,7 +176,7 @@ sealed abstract class Renderer:
       <tr><td>for day of week</td><td><span>{forDayOfWeek.toLanguageString}</span></td></tr>
     </table>
 
-  private def renderRambam(schedule: RambamSchedule)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] = Seq(
+  private def renderRambam(schedule: RambamSchedule)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] = Seq(
     <span class="subheading">3 chapters</span>,
     <table>
       <tr><td>Cycle</td><td>Lesson</td></tr>
@@ -211,13 +212,13 @@ sealed abstract class Renderer:
     </table>
   )
 
-  private def renderRambamChapter(chapter: MishnehTorah.Chapter)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] = Seq(
+  private def renderRambamChapter(chapter: MishnehTorah.Chapter)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] = Seq(
     <td>{chapter.part.book.toLanguageString}</td>,
     <td>{chapter.part.toLanguageString}</td>,
     <td>{chapter.toLanguageString}</td>
   )
 
-  private def renderOptionalReading(name: String, reading: Option[Reading])(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  private def renderOptionalReading(name: String, reading: Option[Reading])(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     reading.fold(Seq.empty[ScalaXml.Element])(reading => Seq(<div>
       <span class="heading">{name}</span>
       {
@@ -240,7 +241,7 @@ sealed abstract class Renderer:
       }
     </div>))
 
-  private def renderTorah(torah: Torah)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  private def renderTorah(torah: Torah)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     torah.spans.zipWithIndex map((fragment, index) =>
       <tr>
         <td>{spec.toString(index + 1)}</td>
@@ -249,7 +250,7 @@ sealed abstract class Renderer:
       </tr>
     )
 
-  private def renderMaftir(maftir: Option[Torah.Maftir])(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  private def renderMaftir(maftir: Option[Torah.Maftir])(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     Seq(maftir.fold(<tr><td>None</td></tr>)(maftir =>
       <tr>
         <td>{maftir.toLanguageString}</td>
@@ -257,9 +258,11 @@ sealed abstract class Renderer:
       </tr>
     ))
 
-  private def renderHaftarah(haftarah: Option[Haftarah])(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  private def renderHaftarah(haftarah: Option[Haftarah])(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     haftarah.fold(Seq(<tr><td>None</td></tr>))(haftarah =>
       val spans = haftarah.spans
+      // TODO sources should be more precise than just Named: eq equality is not right in the general case...
+      given CanEqual[Named, Named] = CanEqual.derived
       val parts: Seq[Seq[Haftarah.BookSpan]] =
         Collections.group[Haftarah.BookSpan, Option[Named]](spans, span => span.source)
       parts.map((part: Seq[Haftarah.BookSpan]) =>
@@ -269,18 +272,18 @@ sealed abstract class Renderer:
         </tr>
       ))
 
-  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah])(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah])(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     renderMaftir(maftirAndHaftarah.flatMap(_.maftir)) ++
       renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
-  private def renderSource(source: Option[Named])(using location: Location, spec: LanguageSpec): String =
+  private def renderSource(source: Option[Named])(using location: Location, spec: Language.Spec): String =
     source.fold[String]("")(_.toLanguageString)
 
   private def renderCustoms[T](
     what: String,
     customs: Custom.Of[T],
     renderer: T => Seq[ScalaXml.Element]
-  )(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+  )(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
     <span class="subheading">{what}</span> +:
     customs.customs.toSeq.map((custom: Custom, valueForCustom /*: T*/) =>
       <table class="custom">
@@ -289,10 +292,18 @@ sealed abstract class Renderer:
       </table>
     )
 
-  private def renderHtml(url: Seq[String], content: ScalaXml.Element)(using location: Location, spec: LanguageSpec): String =
+  private def renderHtml(url: Seq[String], content: ScalaXml.Element)(using location: Location, spec: Language.Spec): String =
     Renderer.renderHtml(url, content, location, spec)
 
 object Renderer:
+  enum Location(val name: String, val inHolyLand: Boolean) derives CanEqual:
+    case HolyLand extends Location("Holy Land", true)
+    case Diaspora extends Location("Diaspora", false)
+
+  def getLocation(parameter: Option[String]): Location =
+    val holyLand: Boolean = parameter.map(value => value == "true").getOrElse(true)
+    if holyLand then Location.HolyLand else Location.Diaspora
+  
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
 
   object JewishRenderer extends Renderer:
@@ -302,7 +313,7 @@ object Renderer:
 
     override protected def jewish(day: calendar.Day): Jewish.Day = day.asInstanceOf[Jewish.Day]
 
-    override protected def renderYearInformation(yearRaw: calendar.Year)(using location: Location, spec: LanguageSpec): Seq[ScalaXml.Element] =
+    override protected def renderYearInformation(yearRaw: calendar.Year)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
       val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
       val delay = year.newYearDelay
 
@@ -339,7 +350,7 @@ object Renderer:
 
         <table>
           <tr><td>Tkufa</td><td>Shmuel</td><td>Rav Ada"</td></tr>
-          {Season.values.map { season =>
+          {Season.valuesSeq.map { season =>
           <tr>
             <td>{season.toLanguageString}</td>
             <td>{tkufa(Sun.Shmuel, season)}</td>
@@ -350,7 +361,7 @@ object Renderer:
       val festivalDays: Seq[(SpecialDay, Jewish.Day)] =
         SpecialDay.daysWithSpecialReadings(location == Location.HolyLand)
           .map(specialDay => specialDay -> specialDay.correctedDate(year))
-          .toSeq.sortBy(_._2)(Numbered.numberedOrdering[Jewish.Day])
+          .toSeq.sortBy(_._2)
 
       val festivals: ScalaXml.Element =
         <table>
@@ -379,7 +390,7 @@ object Renderer:
     override val other: Renderer = JewishRenderer
     override protected def jewish(day: calendar.Day): Jewish.Day = day.to(Jewish)
 
-  def renderRoot(location: Location, spec: LanguageSpec): String = renderHtml(
+  def renderRoot(location: Location, spec: Language.Spec): String = renderHtml(
     url = Seq.empty,
     content =
       <div>
@@ -390,16 +401,16 @@ object Renderer:
     spec = spec
   )
 
-  def renderLanding(kindStr: String, location: Location, spec: LanguageSpec): String =
+  def renderLanding(kindStr: String, location: Location, spec: Language.Spec): String =
     renderer(kindStr).renderLanding(using location, spec)
 
-  def renderYear(kindStr: String, location: Location, spec: LanguageSpec, yearStr: String): String =
+  def renderYear(kindStr: String, location: Location, spec: Language.Spec, yearStr: String): String =
     renderer(kindStr).renderYear(yearStr)(using location, spec)
 
-  def renderMonth(kindStr: String, location: Location, spec: LanguageSpec, yearStr: String, monthStr: String): String =
+  def renderMonth(kindStr: String, location: Location, spec: Language.Spec, yearStr: String, monthStr: String): String =
     renderer(kindStr).renderMonth(yearStr, monthStr)(using location, spec)
 
-  def renderDay(kindStr: String, location: Location, spec: LanguageSpec, yearStr: String, monthStr: String, dayStr: String): String =
+  def renderDay(kindStr: String, location: Location, spec: Language.Spec, yearStr: String, monthStr: String, dayStr: String): String =
     renderer(kindStr).renderDay(yearStr, monthStr, dayStr)(using location, spec)
 
   private def renderer(kindStr: String): Renderer = Seq(JewishRenderer, GregorianRenderer)
@@ -410,9 +421,9 @@ object Renderer:
     url: Seq[String],
     content: ScalaXml.Element,
     location: Location,
-    spec: LanguageSpec
+    spec: Language.Spec
   ): String =
-    val languages: Seq[ScalaXml.Element] = Language.values.map(_.toSpec).map(spec1 =>
+    val languages: Seq[ScalaXml.Element] = Language.valuesSeq.map(_.toSpec).map(spec1 =>
       val languageName = spec1.languageName
       if spec1.language == spec.language then <span class="picker">{languageName}</span>
       else html.a(url).setQuery(suffix(location, spec1)).addClass("picker")(text = languageName)
@@ -438,8 +449,8 @@ object Renderer:
 
     PrettyPrinter.default.render(ScalaXml)(result)
 
-  private def direction(spec: LanguageSpec): String =
+  private def direction(spec: Language.Spec): String =
     if spec.language.contains(Language.Hebrew) then "rtl" else "ltr" // TODO add a method to Language...
 
-  private def suffix(location: Location, spec: LanguageSpec): String =
+  private def suffix(location: Location, spec: Language.Spec): String =
     s"inHolyLand=${location.inHolyLand}&lang=${spec.languageName}"

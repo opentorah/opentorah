@@ -10,7 +10,7 @@ import org.opentorah.xml.{Element, Elements, ScalaXml}
 // push Hierarchical/ByHierarchy into Site;
 // push up Collector-specific stuff (if any);
 // do 'texts' site!
-trait Hierarchical extends Store.NonTerminal, Stores.Pure, HtmlContent[Collector]:
+trait Hierarchical extends Store.NonTerminal[Store], Stores.Pure[Store], HtmlContent[Collector]:
   def title: Title.Value
 
   final def titleString: String = title.content.toString

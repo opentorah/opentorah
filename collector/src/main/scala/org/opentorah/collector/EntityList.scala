@@ -14,7 +14,7 @@ final class EntityList(
   val entityType: EntityType,
   val role: Option[String],
   val title: Title.Value,
-) extends Store.NonTerminal, Stores.Pure, HtmlContent[Collector], Element.FromUrl.With:
+) extends Store.NonTerminal[Entity], Stores.Pure[Entity], HtmlContent[Collector], Element.FromUrl.With:
   private var entities: Seq[Entity] = Seq.empty
 
   def setEntities(value: Seq[Entity]): Unit =

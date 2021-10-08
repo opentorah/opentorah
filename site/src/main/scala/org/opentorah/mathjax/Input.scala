@@ -1,30 +1,16 @@
 package org.opentorah.mathjax
 
-sealed trait Input:
-  def name: String
-  def isInline: Option[Boolean]
-  def withInline(isInline: Option[Boolean]): Input = this
+enum Input(
+  val name: String,
+  val isInline: Option[Boolean]
+) derives CanEqual:
+  case Tex       extends Input(name = "TeX"       , isInline = Some(false))
+  case TexInline extends Input(name = "inline-TeX", isInline = Some(true))
+  case AsciiMath extends Input(name = "AsciiMath" , isInline = None) // same for both
+  case MathML    extends Input(name = "MathML"    , isInline = None) // accepts both
 
 object Input:
-
-  case object Tex extends Input:
-    override val name: String = "TeX"
-    override def isInline: Option[Boolean] = Some(false)
-    override def withInline(isInline: Option[Boolean]): Input =
-      if isInline.contains(true) then TexInline else this
-
-  case object TexInline extends Input:
-    override val name: String = "inline-TeX"
-    override def isInline: Option[Boolean] = Some(true)
-    override def withInline(isInline: Option[Boolean]): Input =
-      if isInline.contains(false) then Tex else this
-
-  case object AsciiMath extends Input:
-    override val name: String = "AsciiMath"
-    override def isInline: Option[Boolean] = None // same for both
-
-  case object MathML extends Input:
-    override val name: String = "MathML"
-    override def isInline: Option[Boolean] = None // accepts both
-
-  val values: Set[Input] = Set(Tex, TexInline, AsciiMath, MathML)
+  def withInline(input: Input, isInline: Option[Boolean]): Input = input match
+    case Tex       if isInline == TexInline.isInline => TexInline
+    case TexInline if isInline == Tex      .isInline => Tex
+    case _ => input

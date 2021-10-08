@@ -16,7 +16,7 @@ final class Notes(
   "md",
   Note,
   Notes.All(_),
-), By, HtmlContent[Collector]:
+), By[Note], HtmlContent[Collector]:
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 

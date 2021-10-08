@@ -1,44 +1,44 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.store.{By, Selector, Stores}
+import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.xml.Parser
 
-final class Chapters(chapters: Seq[Int]) extends By, Stores.Numbered[Chapter]:
+final class Chapters(chapters: Seq[Int]) extends By[Chapter], Stores.Numbered[Chapter]:
   override def selector: Selector = Selector.byName("chapter")
   override def length: Int = chapters.length
   override protected def createNumberedStore(number: Int): Chapter = Chapter(number, length(number))
 
   def length(chapter: Int): Int = chapters(chapter-1)
 
-  def next(verse: Verse): Option[Verse] =
-    require(contains(verse))
-    if verse.verse < length(verse.chapter) then
-      Some(Verse(verse.chapter, verse.verse+1))
-    else if verse.chapter+1 <= chapters.length then
-      Some(Verse(verse.chapter+1, 1))
+  def next(chapterAndVerse: ChapterAndVerse): Option[ChapterAndVerse] =
+    require(contains(chapterAndVerse))
+    if chapterAndVerse.verse < length(chapterAndVerse.chapter) then
+      Some(ChapterAndVerse(chapterAndVerse.chapter, chapterAndVerse.verse+1))
+    else if chapterAndVerse.chapter+1 <= chapters.length then
+      Some(ChapterAndVerse(chapterAndVerse.chapter+1, 1))
     else
       None
 
-  def prev(verse: Verse): Option[Verse] =
-    require(contains(verse))
-    if verse.verse > 1 then
-      Some(Verse(verse.chapter, verse.verse-1))
-    else if verse.chapter-1 >= 1 then
-      Some(Verse(verse.chapter-1, length(verse.chapter-1)))
+  def prev(chapterAndVerse: ChapterAndVerse): Option[ChapterAndVerse] =
+    require(contains(chapterAndVerse))
+    if chapterAndVerse.verse > 1 then
+      Some(ChapterAndVerse(chapterAndVerse.chapter, chapterAndVerse.verse-1))
+    else if chapterAndVerse.chapter-1 >= 1 then
+      Some(ChapterAndVerse(chapterAndVerse.chapter-1, length(chapterAndVerse.chapter-1)))
     else
       None
 
-  def first: Verse = Verse(1, 1)
+  def first: ChapterAndVerse = ChapterAndVerse(1, 1)
 
-  def last: Verse = Verse(chapters.length, length(chapters.length))
+  def last: ChapterAndVerse = ChapterAndVerse(chapters.length, length(chapters.length))
 
   def full: Span = Span(first, last)
 
   def contains(span: Span): Boolean = contains(span.from) && contains(span.to)
 
-  def contains(verse: Verse): Boolean =
-    (verse.chapter <= chapters.length) && (verse.verse <= length(verse.chapter))
+  def contains(chapterAndVerse: ChapterAndVerse): Boolean =
+    (chapterAndVerse.chapter <= chapters.length) && (chapterAndVerse.verse <= length(chapterAndVerse.chapter))
 
   def consecutive(first: Span, second: Span): Boolean =
     require(contains(first))

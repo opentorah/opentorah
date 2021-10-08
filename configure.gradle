@@ -30,13 +30,13 @@ tasks.withType(ScalaCompile) {
     additionalParameters = [
       '-new-syntax',
       '-feature',
-      //'-source:future'
-      //'-language:strictEquality',
-//      "-deprecation",
-//      "-unchecked",
-//      "-Xsemanticdb",
-//      "-Ysafe-init",
-//      "-explain",
+      '-language:strictEquality',
+      //'-source:future',
+      //'-deprecation',
+      //'-unchecked',
+      //'-Xsemanticdb',
+      //'-Ysafe-init',
+      //'-explain',
     ]
   }
 }

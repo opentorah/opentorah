@@ -8,12 +8,12 @@ abstract class Attribute[T](
   val name: String,
   val namespace: Namespace,
   val default: T
-) derives CanEqual:
+)(using CanEqual[T, T]) derives CanEqual:
   require((name != null) && !name.contains(":"))
   require(name.nonEmpty || (namespace == Namespace.Xmlns))
   
   final override def equals(other: Any): Boolean =
-    val that = other.asInstanceOf[Attribute[?]]
+    val that: Attribute[T] = other.asInstanceOf[Attribute[T]]
     (name == that.name) && (namespace.getUri == that.namespace.getUri)
 
   final override def toString: String = s"$qName"
@@ -72,7 +72,7 @@ object Attribute:
       value.fold[Parser[Option[T]]](zio.ZIO.none)(attribute.parseFromString(_).map(Some(_)))
     )
 
-  final class Optional[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, Option[T]](attribute):
+  final class Optional[T](attribute: Attribute[T], setDefault: Boolean)(using CanEqual[T, T]) extends Parsable[T, Option[T]](attribute):
     override protected def parser: Parser[Option[T]] = optionalParser(attribute)
     override def withValue(value: Option[T]): Value[T] = Attribute.Value[T](this, value)
     override def effectiveValue(value: Option[T]): Option[T] =
@@ -81,7 +81,7 @@ object Attribute:
 
     override def get(xml: XmlAttributes)(element: xml.Attributes): Option[T] = xml.getAttribute(attribute, element)
 
-  final class OrDefault[T](attribute: Attribute[T], setDefault: Boolean) extends Parsable[T, T](attribute):
+  final class OrDefault[T](attribute: Attribute[T], setDefault: Boolean)(using CanEqual[T, T]) extends Parsable[T, T](attribute):
     override protected def parser: Parser[T] = optionalParser(attribute).map(_.getOrElse(attribute.default))
     override def withValue(value: T): Attribute.Value[T] = Attribute.Value[T](this, Option(value))
     override def effectiveValue(value: Option[T]): Option[T] =
