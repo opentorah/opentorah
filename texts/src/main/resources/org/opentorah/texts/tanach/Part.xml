@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Part>
+    <names>
+        <name lang="en" n="Tanach" transliterated="true"/>
+        <name lang="ru" n="Танах" transliterated="true"/>
+    </names>
+    <names>
+        <name lang="en" n="Nach" transliterated="true"/>
+        <name lang="ru" n="Нах" transliterated="true"/>
+    </names>
+    <names>
+        <name lang="en" n="Chumash" transliterated="true"/>
+        <name lang="ru" n="Хумаш" transliterated="true"/>
+        <name lang="en" n="Pentateuch"/>
+        <name lang="ru" n="Пятикнижие"/>
+    </names>
+    <names>
+        <name lang="en" n="Prophets"/>
+        <name lang="ru" n="Пророки"/>
+    </names>
+    <names>
+        <name lang="en" n="Early Prophets"/>
+        <name lang="ru" n="Ранние Пророки"/>
+    </names>
+    <names>
+        <name lang="en" n="Late Prophets"/>
+        <name lang="ru" n="Поздние Пророки"/>
+    </names>
+    <names>
+        <name lang="en" n="Trei Asar" transliterated="true"/>
+        <name lang="he" n="תרי עשר"/>
+        <name lang="ru" n="Двенадцать"/>
+    </names>
+    <names>
+        <name lang="en" n="Writings"/>
+        <name lang="ru" n="Писания"/>
+    </names>
+</Part>

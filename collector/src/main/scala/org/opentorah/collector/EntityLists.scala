@@ -2,15 +2,15 @@ package org.opentorah.collector
 
 import org.opentorah.tei.Tei
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Selector, Stores}
+import org.opentorah.store.{By, Caching, Stores}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class EntityLists(
-  override val selector: Selector,
+  selectorName: String,
   val lists: Seq[EntityList]
-) extends By[EntityList], Stores.Pure[EntityList], HtmlContent[Collector]:
+) extends By.WithSelector[EntityList](selectorName), Stores.Pure[EntityList], HtmlContent[Collector]:
   
   def setUp(collector: Collector): Caching.Parser[Unit] =
     collector.entities.stores.map(allEntities =>
@@ -51,10 +51,10 @@ object EntityLists extends Element[EntityLists]("entityLists"):
 
   override def contentParsable: Parsable[EntityLists] = new Parsable[EntityLists]:
     override def parser: Parser[EntityLists] = for
-      selector: Selector <- By.selectorParser
+      selectorName: String <- By.selectorParser
       lists: Seq[EntityList] <- EntityList.seq()
     yield EntityLists(
-      selector,
+      selectorName,
       lists
     )
 

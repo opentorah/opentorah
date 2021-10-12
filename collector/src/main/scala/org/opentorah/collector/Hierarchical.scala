@@ -3,14 +3,14 @@ package org.opentorah.collector
 import org.opentorah.metadata.Language
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Store, Stores}
+import org.opentorah.store.{Caching, Store}
 import org.opentorah.xml.{Element, Elements, ScalaXml}
 
 // TODO abstract store2path into Site;
 // push Hierarchical/ByHierarchy into Site;
 // push up Collector-specific stuff (if any);
 // do 'texts' site!
-trait Hierarchical extends Store.NonTerminal[Store], Stores.Pure[Store], HtmlContent[Collector]:
+trait Hierarchical extends Store.Pure[Store], HtmlContent[Collector]:
   def title: Title.Value
 
   final def titleString: String = title.content.toString

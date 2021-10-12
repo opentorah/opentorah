@@ -2,9 +2,9 @@ package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish.{Day, Moment, Month, TimeVector, Year}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Moon, NewYear, Season, Sun}
-import Week.Day.*
 import org.opentorah.calendar.roman.Gregorian
-import org.opentorah.metadata.Language
+import org.opentorah.metadata.{Language, Week}
+import Week.Day.*
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 

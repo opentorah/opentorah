@@ -82,12 +82,9 @@ object Names:
     override def contentParsable: Parsable[Names] = withoutDefaultNameParsable
 
   abstract class Loader[Key <: HasName](resourceNameOverride: Option[String] = None) extends HasValues[Key]:
-    // This is:
-    // - lazy to allow correct initialization: the code uses values(),
-    //   Language metadata file references Language instances by name :)
-    // - public so that it can be accessed from the Key type;
-    // - not final so that it can be overridden in Tanach :)
-    lazy val toNames: Map[Key, Names] = Parser.unsafeRun(HasName.load[Key, Names](
+    // This is lazy to allow correct initialization:
+    // Language metadata file references Language instances by name :)
+    final lazy val toNames: Map[Key, Names] = Parser.unsafeRun(HasName.load[Key, Names](
       from = From.resourceNamed(this, resourceNameOverride.getOrElse(Platform.className(this))),
       content = Names.NamesMetadata,
       keys = valuesSeq,

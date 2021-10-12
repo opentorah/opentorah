@@ -1,13 +1,13 @@
 package org.opentorah.collector
 
-import org.opentorah.store.{By, Selector, Stores}
+import org.opentorah.store.{By, Stores}
 import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 
 final class ByHierarchy(
   override val fromUrl: Element.FromUrl,
-  override val selector: Selector,
+  selectorName: String,
   val hierarchyStores: Seq[Hierarchical]
-) extends By[Hierarchical], Stores.Pure[Hierarchical], Element.FromUrl.With:
+) extends By.WithSelector[Hierarchical](selectorName), Stores.Pure[Hierarchical], Element.FromUrl.With:
 
   override def storesPure: Seq[Hierarchical] = hierarchyStores
 
@@ -38,11 +38,11 @@ object ByHierarchy extends Element[ByHierarchy]("by"):
   override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy]:
     override def parser: Parser[ByHierarchy] = for
       fromUrl: Element.FromUrl <- Element.fromUrl
-      selector: Selector <- By.selectorParser
+      selectorName: String <- By.selectorParser
       hierarchyStores: Seq[Hierarchical] <- Hierarchical.followRedirects.seq()
     yield ByHierarchy(
       fromUrl,
-      selector,
+      selectorName,
       hierarchyStores
     )
 

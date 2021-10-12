@@ -1,25 +1,111 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Named, Names}
-import org.opentorah.store.{Store, Stores}
+import org.opentorah.metadata.{HasName, HasValues, Named, Names}
+import org.opentorah.store.{By, Store}
 
-// TODO maybe make Chapters.By and TanachBook.By more explicit? Stores.by(Selector)?
-// TODO add names for Tanach and its parts (Nach, Writings, TreiAsar) and corresponding Stores
-// TODO make Tanach a Store in Texts!
-object Tanach extends Stores.Pure[Store]:
-  override def storesPure: Seq[Store] = Seq(TanachBook)
+object Tanach extends Store.Pure[Store]:
+  override def names: Names = All.names
 
-  enum Part(nameOverride: Option[String] = None)
-    extends Named.ByLoader[Part](loader = Part, nameOverride), HasName.Enum:
+  // Part markers
+  trait Chumash extends ChumashBook {}
+  trait Nach extends NachBook {}
+    trait Prophets extends Nach {}
+      trait EarlyProphets extends Prophets {}
+      trait LateProphets extends Prophets {}
+        trait TreiAsar extends LateProphets {}
+    trait Writings extends Nach {}
+      trait Psalms extends Writings, PsalmsBook {}
 
-    case All
-    case Chumash
-    case Nach
-    case Prophets
-    case EarlyProphets extends Part(nameOverride = Some("Early Prophets"))
-    case LateProphets extends Part(nameOverride = Some("Late Prophets"))
-    case TreiAsar extends Part(nameOverride = Some("Trei Asar"))
-    case Writings
+  // Books
+  enum Book(nameOverride: Option[String] = None) extends TanachBook, HasName(nameOverride), HasName.Enum derives CanEqual:
+    case Genesis extends Book, Chumash
+    case Exodus extends Book, Chumash
+    case Leviticus extends Book, Chumash
+    case Numbers extends Book, Chumash
+    case Deuteronomy extends Book, Chumash
 
-  object Part extends Names.Loader[Part]:
-    override val valuesSeq: Seq[Part] = values.toIndexedSeq
+    case Joshua extends Book, EarlyProphets
+    case Judges extends Book, EarlyProphets
+    case SamuelI extends Book(nameOverride = Some("I Samuel")), EarlyProphets
+    case SamuelII extends Book(nameOverride = Some("II Samuel")), EarlyProphets
+    case KingsI extends Book(nameOverride = Some("I Kings")), EarlyProphets
+    case KingsII extends Book(nameOverride = Some("II Kings")), EarlyProphets
+
+    case Isaiah extends Book, LateProphets
+    case Jeremiah extends Book, LateProphets
+    case Ezekiel extends Book, LateProphets
+
+    case Hosea extends Book, TreiAsar
+    case Joel extends Book, TreiAsar
+    case Amos extends Book, TreiAsar
+    case Obadiah extends Book, TreiAsar
+    case Jonah extends Book, TreiAsar
+    case Micah extends Book, TreiAsar
+    case Nahum extends Book, TreiAsar
+    case Habakkuk extends Book, TreiAsar
+    case Zephaniah extends Book, TreiAsar
+    case Haggai extends Book, TreiAsar
+    case Zechariah extends Book, TreiAsar
+    case Malachi extends Book, TreiAsar
+
+    case Psalms extends Book, Psalms
+    case Proverbs extends Book, Writings
+    case Job extends Book, Writings
+    case SongOfSongs extends Book(nameOverride = Some("Song of Songs")), Writings
+    case Ruth extends Book, Writings
+    case Lamentations extends Book, Writings
+    case Ecclesiastes extends Book, Writings
+    case Esther extends Book, Writings
+    case Daniel extends Book, Writings
+    case Ezra extends Book, Writings
+    case Nehemiah extends Book, Writings
+    case ChroniclesI extends Book(nameOverride = Some("I Chronicles")), Writings
+    case ChroniclesII extends Book(nameOverride = Some("II Chronicles")), Writings
+
+  object Book extends HasValues.FindByName[Book]:
+    override def valuesSeq: Seq[Book] = values.toIndexedSeq
+
+  // Parts
+  sealed class Part[T <: TanachBook](
+    clazz: Class[T],
+    nameOverride: Option[String] = None,
+  ) extends Named.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Store.Pure[Store]:
+    protected def byBook: By[TanachBook] = new By.Pure[TanachBook](selectorName = "book", storesPure = Book.valuesSeq.filter(clazz.isInstance))
+
+    override def storesPure: Seq[Store] = Seq(byBook)
+
+    final def forName(name: String): T = Book.getForName(name).asInstanceOf[T]
+
+  private object All extends Part(classOf[TanachBook], nameOverride = Some("Tanach"))
+
+  object Chumash extends Part(classOf[Chumash]):
+    def Genesis: Chumash = Book.Genesis
+    def Exodus: Chumash = Book.Exodus
+    def Leviticus: Chumash = Book.Leviticus
+    def Numbers: Chumash = Book.Numbers
+    def Deuteronomy: Chumash = Book.Deuteronomy
+
+  object Nach extends Part(classOf[Nach])
+
+  object Prophets extends Part(classOf[Prophets]):
+    override def storesPure: Seq[Store] = Seq(
+      byBook,
+      new By.Pure[Store](selectorName = "part", storesPure = Seq(EarlyProphets, LateProphets,TreiAsar))
+    )
+
+  object EarlyProphets extends Part(classOf[EarlyProphets], nameOverride = Some("Early Prophets"))
+  object LateProphets extends Part(classOf[LateProphets], nameOverride = Some("Late Prophets"))
+  object TreiAsar extends Part(classOf[TreiAsar], nameOverride = Some("Trei Asar"))
+  object Writings extends Part(classOf[Writings])
+
+  def Psalms: Psalms = Book.Psalms
+
+  private object Part extends Names.Loader[Part[?]]:
+    override def valuesSeq: Seq[Part[?]] = Seq(All, Chumash, Nach, Prophets, EarlyProphets, LateProphets, TreiAsar, Writings)
+
+  // Stores
+  // TODO when I have aliases, install them for Chumash and Psalm here (and higher?)
+  override def storesPure: Seq[Store] = Seq(
+    new By.Pure[TanachBook](selectorName = "book", storesPure = Book.valuesSeq),
+    new By.Pure[Store](selectorName = "part", storesPure = Seq(Chumash, Prophets, Writings))
+  )

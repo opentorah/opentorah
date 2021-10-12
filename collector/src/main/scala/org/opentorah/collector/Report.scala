@@ -60,3 +60,5 @@ object Report:
       <l>{entity.a(collector)(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
 
     private def getExpectedId(entity: Entity): String = Strings.spacesToUnderscores(entity.mainName)
+
+  val reports: Seq[Report[?]] = Seq(Report.NoRefs, Report.MisnamedEntities, Report.Unclears)

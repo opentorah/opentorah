@@ -1,17 +1,15 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.{HasName, Named, Names}
+import org.opentorah.metadata.{HasName, HasValues, Named, Names}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 
-// TODO introduce transparent (optional) selectors;
-// concentrate resolution logic in resolve();
-// rename the other resolve() ;)
+// TODO introduce transparent (optional) selectors.
 final class Selector(
   override val names: Names,
-  val title: Option[String]
+  val title: Option[String] // TODO replace with plural? Eliminate?
 ) extends Named
 
-object Selector extends Element[Selector]("selector"):
+object Selector extends Element[Selector]("selector"), HasValues.FindByName[Selector]:
 
   private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional
 
@@ -29,7 +27,7 @@ object Selector extends Element[Selector]("selector"):
       titleAttribute(_.title)
     )
 
-  def byName(name: String): Selector = values.find(_.names.hasName(name)).get
+  def valuesSeq: Seq[Selector] = values.toIndexedSeq
 
   // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
   lazy val values: Seq[Selector] = Parser.unsafeRun(HasName.load(From.resource(this), this))

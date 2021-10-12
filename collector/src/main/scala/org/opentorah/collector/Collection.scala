@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Selector, Store, Stores}
+import org.opentorah.store.{By, Caching, Selector, Store}
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
@@ -147,7 +147,7 @@ object Collection extends Element[Collection]("collection"):
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store.NonTerminal[Store], Stores.Pure[Store], HtmlContent[Collector]:
+  final class Alias(val collection: Collection) extends Store.Pure[Store], HtmlContent[Collector]:
     def alias: String = collection.alias.get
 
     override val names: Names = Names(alias)
@@ -172,11 +172,11 @@ object Collection extends Element[Collection]("collection"):
     def of(document: Document): DF
 
   final class TextFacet(collection: Collection) extends Facet[Document.TextFacet](collection):
-    override def selector: Selector = Selector.byName("document")
+    override def selector: Selector = Selector.getForName("document")
     override def of(document: Document): Document.TextFacet = Document.TextFacet(document, this)
 
   final class FacsimileFacet(collection: Collection) extends Facet[Document.FacsimileFacet](collection):
-    override def selector: Selector = Selector.byName("facsimile")
+    override def selector: Selector = Selector.getForName("facsimile")
     override def of(document: Document): Document.FacsimileFacet = Document.FacsimileFacet(document, this)
 
   override def contentParsable: Parsable[Collection] = new Parsable[Collection]:

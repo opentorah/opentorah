@@ -1,52 +1,43 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Names}
-import org.opentorah.store.{By, Selector, Store, Stores}
+import org.opentorah.store.By
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
-enum Chumash extends TanachBook(nameOverride = None), HasName.Enum:
-  case Genesis
-  case Exodus
-  case Leviticus
-  case Numbers
-  case Deuteronomy
-
+trait ChumashBook extends TanachBook:
   lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
 
-  final class ByParsha extends By[Parsha], Stores.Pure[Parsha]:
-    override def selector: Selector = Selector.byName("parsha")
-    override def storesPure: Seq[Parsha] = parshiot
-
-  // TODO what is in the super?
-  override def storesPure: Seq[Store.NonTerminal[Store]] = super.storesPure ++ Seq(new ByParsha)
+  override def storesPure: Seq[By[?]] = Seq(
+    chapters.byChapter,
+    new By.Pure[Parsha](selectorName = "parsha", storesPure = parshiot)
+  )
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.
   override def names: Names = parshiot.head.names
 
-  override def parser(names: Names, chapters: Chapters): Parser[Chumash.Parsed] = for
-    weeks: Seq[Parsha.Parsed] <- Parsha.WeekParsable(this).seq()
+  override def parser(names: Names, chapters: Chapters): Parser[ChumashBook.Parsed] =
+    ChumashBook.parser(this, names, chapters)
+
+  def metadata: ChumashBook.Metadata = TanachBook.metadata(this).asInstanceOf[ChumashBook.Metadata]
+
+object ChumashBook:
+  def parser(book: ChumashBook, names: Names, chapters: Chapters): Parser[Parsed] = for
+    weeks: Seq[Parsha.Parsed] <- Parsha.WeekParsable(book).seq()
     _ <- Effects.check(names.getDefaultName.isDefined,
       "Only default name is allowed for a Chumash book")
     _ <- Effects.check(weeks.head.names.hasName(names.getDefaultName.get),
       "Chumash book name must be a name of the book's first parsha")
-  yield Chumash.Parsed(this, names, chapters, weeks)
-
-  def metadata: Chumash.Metadata = TanachBook.metadata(this).asInstanceOf[Chumash.Metadata]
-
-object Chumash:
-  val all: Seq[Chumash] = values.toIndexedSeq
-
-  def forName(name: String): Chumash = TanachBook.getForName(name).asInstanceOf[Chumash]
-
+  yield Parsed(book, names, chapters, weeks)
+  
   final class Metadata(
-    book: Chumash,
+    book: ChumashBook,
     parsha2metadata: Map[Parsha, Parsha.ParshaMetadata]
   ) extends TanachBook.Metadata(book):
     def forParsha(parsha: Parsha): Parsha.ParshaMetadata = parsha2metadata(parsha)
 
   final class Parsed(
-    book: Chumash,
+    book: ChumashBook,
     names: Names,
     chapters: Chapters,
     weeks: Seq[Parsha.Parsed]
@@ -94,7 +85,7 @@ object Chumash:
             (customs, value ++ daysNext.getOrElse(customs, Seq.empty))
           )
 
-          val book: Chumash = parsha.book
+          val book: Tanach.Chumash = parsha.book
           Some(Parser.unsafeRun(Torah.processDays(
             book,
             combined,

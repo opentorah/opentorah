@@ -1,11 +1,10 @@
 package org.opentorah.schedule.tanach
 
-import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Month}
 import org.opentorah.calendar.jewish.Jewish.Month.*
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay.*
-import org.opentorah.metadata.Named
+import org.opentorah.metadata.{Named, Week}
 import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
 
 object Readings:

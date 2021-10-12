@@ -1,8 +1,9 @@
 package org.opentorah.astronomy
 
-import org.opentorah.calendar.{Week, YearsCycle}
+import org.opentorah.calendar.YearsCycle
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
 import org.opentorah.numbers.BigRational
+import org.opentorah.metadata.Week
 import Angles.{Position, Rotation, headRange, range}
 import Jewish.{Day, Month, Year}
 import org.scalatest.funspec.AnyFunSpec

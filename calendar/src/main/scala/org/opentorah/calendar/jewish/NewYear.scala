@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import Jewish.{Day, Moment, TimeVector}
-import org.opentorah.calendar.Week
+import org.opentorah.metadata.Week
 
 object NewYear:
 

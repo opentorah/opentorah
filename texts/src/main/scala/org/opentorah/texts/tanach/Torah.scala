@@ -3,6 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{Named, WithNumber}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
 // TODO de-case - and figure out why object Torah's creation becomes impossible if 'case' is removed here...
@@ -36,7 +37,7 @@ object Torah extends WithBookSpans[Chumash]:
 
   type Maftir = BookSpan
 
-  override protected def getBook(name: String): Chumash = Chumash.forName(name)
+  override protected def getBook(name: String): Chumash = Tanach.Chumash.forName(name)
 
   def aliyot(spans: BookSpan*): Torah = Torah(spans)
 
