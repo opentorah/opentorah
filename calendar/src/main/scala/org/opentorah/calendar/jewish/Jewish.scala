@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.{Calendar, Week}
-import org.opentorah.metadata.{Language, Named, Names}
+import org.opentorah.calendar.Calendar
+import org.opentorah.metadata.{Language, Named, Names, Week}
 
 object Jewish extends Calendar:
 
@@ -55,6 +55,7 @@ object Jewish extends Calendar:
 
     // KH 8:5-6
     override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] =
+      // TODO remove {}?
       character match { case (isLeap: Boolean, kind: Kind) =>
         Seq(
           MonthNameAndLength(Month.Tishrei   , 30),

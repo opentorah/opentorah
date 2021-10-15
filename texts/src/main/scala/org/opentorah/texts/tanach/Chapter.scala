@@ -4,17 +4,15 @@ import org.opentorah.metadata.WithNumber
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
-final class Chapter(override val number: Int, val length: Int)
-  extends Store.Numbered, Store.NonTerminal[Store], Stores.Pure[Store]:
-
-  final class VersesBy extends By[Store], Stores.Numbered[Verse]:
-    override def selector: Selector = Selector.byName("verse")
-    override def length: Int = Chapter.this.length
-    override protected def createNumberedStore(number: Int): Verse = Verse(number)
-
-  override def storesPure: Seq[VersesBy] = Seq(new VersesBy)
+abstract class Chapter(override val number: Int, from: Int, to: Int) extends Store.Numbered, Store.Bys:
+  def length: Int = to - from + 1
+  override def storesPure: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
 
 object Chapter extends Element[WithNumber[Int]]("chapter"):
+
+  final class ByVerse(override val minNumber: Int, override val maxNumber: Int) extends By.Numbered[Verse]("verse"):
+    override protected def createNumberedStore(number: Int): Verse = new Verse(number):
+      override def oneOf: Stores.Numbered[Verse] = ByVerse.this
 
   private val lengthAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("length").required
 

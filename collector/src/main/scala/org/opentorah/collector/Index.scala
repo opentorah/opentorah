@@ -8,7 +8,7 @@ import zio.ZIO
 
 sealed abstract class Index(name: String, selectorName: String) extends Store.Terminal, HtmlContent[Collector]:
   final override def names: Names = Names(name)
-  final override def htmlHeadTitle: Option[String] = Some(Selector.byName(selectorName).title.get)
+  final override def htmlHeadTitle: Option[String] = Some(Selector.getForName(selectorName).title.get)
   final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
 object Index:

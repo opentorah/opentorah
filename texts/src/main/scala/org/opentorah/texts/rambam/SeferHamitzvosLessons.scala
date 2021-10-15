@@ -43,7 +43,7 @@ object SeferHamitzvosLessons:
       override def unparser: Unparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
 
   private class Numbered(elementName: String) extends Element[Positive](elementName):
-    def selector: Selector = Selector.byName(elementName)
+    def selector: Selector = Selector.getForName(elementName)
 
     override def contentParsable: Parsable[Positive] = new Parsable[Positive]:
       override def parser: Parser[Positive] = nAttribute().map(Positive.apply)

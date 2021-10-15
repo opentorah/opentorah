@@ -4,29 +4,29 @@ import org.opentorah.metadata.Names
 import org.opentorah.xml.Parser
 import zio.ZIO
 
-abstract class Nach(nameOverride: Option[String]) extends TanachBook(nameOverride):
-  final override def names: Names = TanachBook.toNames(this)
+trait NachBook extends TanachBook:
+  final override def names: Names = TanachBook.names(this)
 
-  override def parser(names: Names, chapters: Chapters): Parser[Nach.Parsed] = ZIO.succeed(Nach.Parsed(
-    this,
+  override def parser(names: Names, chapters: Chapters): Parser[NachBook.Parsed] =
+    NachBook.parser(this, names, chapters)
+
+object NachBook:
+
+  def parser(book: NachBook, names: Names, chapters: Chapters): Parser[Parsed] = ZIO.succeed(Parsed(
+    book,
     names,
     chapters
   ))
 
-object Nach:
-
   open class Metadata(
-    book: Nach
+    book: NachBook
   ) extends TanachBook.Metadata(book)
 
   open class Parsed(
-    book: Nach,
+    book: NachBook,
     names: Names,
     chapters: Chapters
   ) extends TanachBook.Parsed(book, names, chapters):
-
     override def resolve: Parser[Metadata] = ZIO.succeed(Metadata(
       book
     ))
-
-  val all: Seq[TanachBook] = Prophets.values.toIndexedSeq ++ Writings.all

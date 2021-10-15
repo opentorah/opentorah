@@ -8,6 +8,7 @@
 
     <book>
         <name lang="en" n="Joshua"/>
+        <name lang="ru" n="Ехошуа" transliterated="true"/>
         <name lang="he" n="יהושע"/>
 
         <chapter n="1" length="18"/>

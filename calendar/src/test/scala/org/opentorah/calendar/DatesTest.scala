@@ -2,9 +2,10 @@ package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.{Jewish, NewYear, YearType}
 import org.opentorah.calendar.jewish.SpecialDay.*
+import org.opentorah.calendar.roman.Gregorian
+import org.opentorah.metadata.Week
 import Jewish.{Day, Month, TimeVector, Year}
 import Jewish.Month.*
-import org.opentorah.calendar.roman.Gregorian
 import Gregorian.Month.*
 import Week.Day.*
 import org.scalatest.flatspec.AnyFlatSpec

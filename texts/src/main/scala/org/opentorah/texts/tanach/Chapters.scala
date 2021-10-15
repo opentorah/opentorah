@@ -4,11 +4,7 @@ import org.opentorah.metadata.WithNumber
 import org.opentorah.store.{By, Selector, Store, Stores}
 import org.opentorah.xml.Parser
 
-final class Chapters(chapters: Seq[Int]) extends By[Chapter], Stores.Numbered[Chapter]:
-  override def selector: Selector = Selector.byName("chapter")
-  override def length: Int = chapters.length
-  override protected def createNumberedStore(number: Int): Chapter = Chapter(number, length(number))
-
+final class Chapters(chapters: Seq[Int]):
   def length(chapter: Int): Int = chapters(chapter-1)
 
   def next(chapterAndVerse: ChapterAndVerse): Option[ChapterAndVerse] =
@@ -57,7 +53,31 @@ final class Chapters(chapters: Seq[Int]) extends By[Chapter], Stores.Numbered[Ch
     require(contains(span))
     consecutive(spans) && (spans.head.from == span.from) && (spans.last.to == span.to)
 
+  def byChapter: By[Chapter] = byChapter(full)
+
+  def byChapter(span: Span): By[Chapter] = Chapters.ByChapter(span, this)
+
 object Chapters:
+
+  final class ByChapter(span: Span, chapters: Chapters) extends By.Numbered[Chapter]("chapter"):
+    override def minNumber: Int = span.from.chapter
+    override def maxNumber: Int = span.to.chapter
+
+    override protected def createNumberedStore(number: Int): Chapter = new Chapter(
+      number,
+      from = if number == minNumber then span.from.verse else 1,
+      to =   if number == maxNumber then span.to.verse   else chapters.length(number)
+    ):
+      override def oneOf: Stores.Numbered[Chapter] = ByChapter.this
+
+  class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends By.Numbered[Store.Numbered](selectorName):
+    override def minNumber: Int = 1
+    override def length: Int = spans.length
+    override protected def createNumberedStore(number: Int): Store.Numbered = ForSpan(number)
+
+    private class ForSpan(override val number: Int) extends Store.Numbered, Store.Bys:
+      override def oneOf: Stores.Numbered[Store.Numbered] = BySpan.this
+      override def storesPure: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
 
   val parser: Parser[Chapters] = for
     chapters: Seq[WithNumber[Int]] <- Chapter.seq()

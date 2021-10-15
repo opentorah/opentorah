@@ -18,7 +18,7 @@ pluginManagement {
 enableFeaturePreview('VERSION_CATALOGS')
 enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
-final String scalaVersion       = '3.1.1-RC1-bin-20211008-0a89c6f-NIGHTLY'
+final String scalaVersion       = '3.1.1-RC1-bin-20211011-1ed25ce-NIGHTLY'
 final String scalaVersionMajor  = '3'
 final String scalaLibrary       = 'org.scala-lang:scala3-library_3'
 

@@ -2,6 +2,7 @@ package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.{Jewish, NewYear}
 import org.opentorah.calendar.roman.{Gregorian, Julian}
+import org.opentorah.metadata.Week
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

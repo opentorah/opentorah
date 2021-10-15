@@ -1,30 +1,21 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.store.{Caching, Store, Stores}
-import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.Parser
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
+import org.opentorah.texts.TestBase
 
-final class TanachTest extends AnyFlatSpec, Matchers:
-  // TODO is such setup needed only for tests - or should I abstract it?
-  val caching: Caching.Simple = new Caching.Simple
-
-  def resolve(path: String): zio.Task[Store.Path] =
-    Parser.toTask(Caching.provide(caching, Stores.resolve(Files.splitAndDecodeUrl(path), Tanach)))
-
-  def doResolve(path: String): Store.Path = Effects.unsafeRun(resolve(path))
-  def doResolveLast(path: String): Store = doResolve(path).last
-  def checkName(path: String, name: String): Unit =
-    doResolveLast(path).names.hasName(name) shouldBe true
+final class TanachTest extends TestBase(Tanach):
+  // TODO put into common base class in tanach package if I am going to make - say - separate PsalmsTest:
   def checkChapterLength(path: String, length: Int): Unit =
     doResolveLast(path).asInstanceOf[Chapter].length shouldBe length
   def checkVerseNumber(path: String, number: Int): Unit =
     doResolveLast(path).asInstanceOf[Verse].number shouldBe number
 
   "Tanach" should "load" in {
-    Chumash.Genesis.chapters.length(17) shouldBe 27
+    Tanach.Chumash.Genesis.chapters.length(17) shouldBe 27
     Parsha.Vayikra.aliyot.spans(2).span.from.verse shouldBe 10
+  }
+
+  it should "load Part names" in {
+    checkName("/", "Танах")
   }
 
   it should "contain /book/Genesis" in {
@@ -45,9 +36,48 @@ final class TanachTest extends AnyFlatSpec, Matchers:
 
   it should "contain /book/Exodus/chapter/1/verse/3" in {
     checkVerseNumber("/book/Exodus/chapter/1/verse/3", 3)
-    checkVerseNumber("/book/Exodus/chapter/2/verse/5", 5)
+  }
+
+  it should "contain /book/Exodus/chapter/א/verse/ג" in {
+    checkVerseNumber("/book/Exodus/chapter/א/verse/ג", 3)
   }
 
   it should "contain /book/Бытие/parsha/Noach" in {
     checkName("/book/Бытие/parsha/Noach", "Ноах")
+  }
+
+  it should "contain /book/Бытие/parsha/Бытие/chapter/1/verse/1" in {
+    checkVerseNumber("/book/Бытие/parsha/Бытие/chapter/1/verse/1", 1)
+  }
+
+  it should "contain /part/Prophets" in {
+    checkName("/part/Prophets", "Пророки")
+  }
+
+  it should "contain /part/Prophets/book/Joshua" in {
+    checkName("/part/Prophets/book/Joshua", "Ехошуа")
+  }
+
+  it should "contain /part/Prophets/part/Early Prophets/book/Joshua" in {
+    checkName("/part/Prophets/part/Early Prophets/book/Joshua", "Ехошуа")
+  }
+
+  it should "contain /book/Psalms/chapter/119/verse/150" in {
+    checkName("/book/Psalms/chapter/119/verse/150", "150")
+  }
+
+  it should "contain /book/Psalms/book/5/chapter/119/verse/150" in {
+    checkName("/book/Psalms/book/5/chapter/119/verse/150", "150")
+  }
+
+  it should "contain /book/Psalms/day/26/chapter/119/verse/150" in {
+    checkName("/book/Psalms/day/26/chapter/119/verse/150", "150")
+  }
+
+  it should "contain /book/Psalms/day of the week/6/chapter/119/verse/150" in {
+    checkName("/book/Psalms/day of the week/6/chapter/119/verse/150", "150")
+  }
+
+  it should "contain /book/Psalms/day of the week/Friday/chapter/119/verse/150" in {
+    checkName("/book/Psalms/day of the week/Friday/chapter/119/verse/150", "150")
   }

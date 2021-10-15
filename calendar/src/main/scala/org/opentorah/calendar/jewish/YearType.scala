@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.calendar.Week
+import org.opentorah.metadata.Week
 import Jewish.Year
 
 final case class YearType

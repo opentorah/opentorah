@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Store, Stores}
+import org.opentorah.store.{Caching, Store}
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -14,7 +14,7 @@ final class EntityList(
   val entityType: EntityType,
   val role: Option[String],
   val title: Title.Value,
-) extends Store.NonTerminal[Entity], Stores.Pure[Entity], HtmlContent[Collector], Element.FromUrl.With:
+) extends Store.Pure[Entity], HtmlContent[Collector], Element.FromUrl.With:
   private var entities: Seq[Entity] = Seq.empty
 
   def setEntities(value: Seq[Entity]): Unit =

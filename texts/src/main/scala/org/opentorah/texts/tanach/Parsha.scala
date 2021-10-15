@@ -1,13 +1,13 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Names, WithNumber}
-import org.opentorah.store.{Store, Stores}
+import org.opentorah.store.{By, Store, Stores}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import Tanach.Chumash
 
-// TODO .NonTerminal - add chapter/verse
 enum Parsha(val book: Chumash, nameOverride: Option[String] = None)
-  extends Store.Terminal, HasName(nameOverride), HasName.Enum derives CanEqual:
+  extends HasName(nameOverride), HasName.Enum, Store.Bys derives CanEqual:
 
   case Bereishis       extends Parsha(Chumash.Genesis)
   case Noach           extends Parsha(Chumash.Genesis)
@@ -90,12 +90,16 @@ enum Parsha(val book: Chumash, nameOverride: Option[String] = None)
 
   final def haftarah: Haftarah.Customs = Haftarah.haftarah(this).map(_.from(this))
 
+  override def storesPure: Seq[By[?]] = Seq(
+    Chapters.ByChapter(span, book.chapters)
+  )
+
 object Parsha extends Names.Loader[Parsha], Stores.Pure[Parsha]:
   override protected def storesPure: Seq[Parsha] = values.toIndexedSeq
 
   override val valuesSeq: Seq[Parsha] = values.toIndexedSeq
 
-  def forChumash(book: Chumash): Seq[Parsha] = valuesSeq.filter(_.book == book)
+  def forChumash(book: ChumashBook): Seq[Parsha] = valuesSeq.filter(_.book == book)
 
   // Rules of combining; affect the WeeklyReading.
   val combinableFromBereishisToVayikra: Seq[Parsha] = Seq(Vayakhel)
@@ -168,12 +172,12 @@ object Parsha extends Names.Loader[Parsha], Stores.Pure[Parsha]:
         ).head
       )
 
-  final class WeekParsable(book: Chumash) extends Element[Parsed]("week"):
+  final class WeekParsable(book: ChumashBook) extends Element[Parsed]("week"):
     override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
       override def parser: Parser[Parsed] = Parsha.parser(book)
       override def unparser: Unparser[Parsed] = ???
 
-  private def parser(book: Chumash): Parser[Parsed] = for
+  private def parser(book: ChumashBook): Parser[Parsed] = for
     names: Names <- Names.withoutDefaultNameParsable()
     span: SpanSemiResolved <- semiResolvedParser
     aliyot: Seq[Torah.Numbered] <- Aliyah.seq()

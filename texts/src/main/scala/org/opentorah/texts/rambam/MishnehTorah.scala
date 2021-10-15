@@ -5,9 +5,14 @@ import org.opentorah.store.Selector
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
 
+// TODO parse the names of the book itself! (and probably do the same for Tanach?)
 object MishnehTorah:
 
-  final class Book(val number: Int, override val names: Names, val parts: Seq[Part]) extends Named
+  final class Book(
+    val number: Int,
+    override val names: Names,
+    val parts: Seq[Part]
+  ) extends Named
 
   sealed abstract class Part(
     val number: Int,
@@ -57,7 +62,7 @@ object MishnehTorah:
     def part: Part
 
   final class NumberedChapter(override val part: Part, number: Int) extends Chapter:
-    override def names: Names = Selector.byName("chapter").andNumber(number).names
+    override def names: Names = Selector.getForName("chapter").andNumber(number).names
 
   final class NamedChapter(override val names: Names) extends Chapter:
     private var part_ : Option[PartWithNamedChapters] = None

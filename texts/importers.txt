@@ -4,10 +4,9 @@ import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 import scala.xml.factory.XMLLoader
 import scala.xml.{Elem, XML}
 
-object TagSoupXmlLoader {
+object TagSoupXmlLoader:
   def get(): XMLLoader[Elem] =
     XML.withSAXParser(SAXFactoryImpl().newSAXParser())
-}
 
 
 join paragraphs split by a note

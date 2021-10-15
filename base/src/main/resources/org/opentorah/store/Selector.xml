@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Selector>
+  <selector>
+    <name n="language" lang="en"/>
+    <name n="язык" lang="ru"/>
+  </selector>
   <selector title="Имена">
     <name n="names" lang="en"/>
     <name n="имена" lang="ru"/>
@@ -7,10 +11,6 @@
   <selector title="Имена">
     <name n="name" lang="en"/>
     <name n="имя" lang="ru"/>
-  </selector>
-  <selector>
-    <name n="note" lang="en"/>
-    <name n="заметка" lang="ru"/>
   </selector>
   <selector>
     <name n="книга" lang="ru"/>
@@ -37,6 +37,7 @@
   <selector>
     <name n="стих" lang="ru"/>
     <name n="verse" lang="en"/>
+    <name n="פסוק" lang="he"/>
   </selector>
   <selector title="Архивы">
     <name n="архив" lang="ru"/>
@@ -61,6 +62,18 @@
   <selector>
     <name n="year" lang="en"/>
     <name n="год" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="day" lang="en"/>
+    <name n="день" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="day" lang="en"/>
+    <name n="день" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="day of the week" lang="en"/>
+    <name n="день недели" lang="ru"/>
   </selector>
   <selector title="Дела">
     <name n="дело" lang="ru"/>
@@ -88,12 +101,12 @@
     <name n="facs" lang="en"/>
   </selector>
   <selector>
-    <name n="language" lang="en"/>
-    <name n="язык" lang="ru"/>
-  </selector>
-  <selector>
     <name n="page" lang="en"/>
     <name n="страница" lang="ru"/>
+  </selector>
+  <selector>
+    <name n="note" lang="en"/>
+    <name n="заметка" lang="ru"/>
   </selector>
   <selector title="Отчеты">
     <name n="report" lang="en"/>

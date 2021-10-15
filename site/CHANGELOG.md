@@ -7,7 +7,7 @@ Modules covered: `base`, `site`, `tei` and `texts`.
 - abstracted XML parsing over ScalaXml/DOM;
 - From and Parsing abstracted over Xml;
 - Store/Site/Collector cleanup;
-- Storification of texts;
+- Tanach cleaned up and Storified;
 
 ## [0.2.6] - 2021-08-17
 - added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;

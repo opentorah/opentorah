@@ -9,7 +9,7 @@ import zio.ZIO
 final case class Haftarah(override val spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) derives CanEqual:
   override def equals(other: Any): Boolean = this.spans == other.asInstanceOf[Haftarah].spans
 
-object Haftarah extends WithBookSpans[Prophets]:
+object Haftarah extends WithBookSpans[Tanach.Prophets]:
   override type Many = Haftarah
 
   def toLanguageString(spans: Seq[BookSpan])(using spec: Language.Spec): String =
@@ -18,7 +18,7 @@ object Haftarah extends WithBookSpans[Prophets]:
         bookSpans.head.book.toLanguageString + " " + bookSpans.map(_.span.toLanguageString).mkString(", ")
       ).mkString("; ")
 
-  override protected def getBook(name: String): Prophets = TanachBook.getForName(name).asInstanceOf[Prophets]
+  override protected def getBook(name: String): Tanach.Prophets = Tanach.Prophets.forName(name)
 
   object Week extends Element[(String, Customs)]("week"):
     private val elementParser = Haftarah.parser(full = true)
