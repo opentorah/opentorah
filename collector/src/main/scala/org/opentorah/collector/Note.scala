@@ -2,18 +2,18 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Directory}
+import org.opentorah.store.{Caching, Directory, Store}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Note(
   override val name: String,
   val title: Option[String]
-) extends Directory.Entry(name), HtmlContent[Collector]:
+) extends Directory.Entry(name), HtmlContent.DefaultViewer[Collector]:
 
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
+  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
 
 object Note extends Element[Note]("note"), Directory.EntryMaker[Markdown, Note]:
 

@@ -14,7 +14,7 @@ final class EntityList(
   val entityType: EntityType,
   val role: Option[String],
   val title: Title.Value,
-) extends Store.Pure[Entity], HtmlContent[Collector], Element.FromUrl.With:
+) extends Store.Pure[Entity], HtmlContent.ApparatusViewer[Collector], Element.FromUrl.With:
   private var entities: Seq[Entity] = Seq.empty
 
   def setEntities(value: Seq[Entity]): Unit =
@@ -27,9 +27,9 @@ final class EntityList(
   override def htmlHeadTitle: Option[String] = Some(title.content.toString)
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = Some(title.content.scalaXml)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = ZIO.succeed(
+  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = ZIO.succeed(
     <list>
-      {getEntities.map(entity => Entity.line(entity, collector))}
+      {for entity <- getEntities yield Entity.line(entity, collector)}
     </list>
   )
 

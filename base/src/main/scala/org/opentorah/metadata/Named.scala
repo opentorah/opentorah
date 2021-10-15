@@ -7,8 +7,6 @@ import org.opentorah.xml.{Elements, From, Parser}
 trait Named:
   def names: Names
 
-  final def structureName: String = names.doFind(Language.English.toSpec).name
-
   def merge(that: Named): Named =
     require(this eq that)
     this

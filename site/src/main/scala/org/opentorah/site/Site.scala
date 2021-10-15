@@ -21,8 +21,6 @@ abstract class Site[S <: Site[S]](
 
   final def logger: Logger = Site.logger
 
-  def defaultViewer: Option[Viewer] = None
-
   final val caching: Caching.Simple = new Caching.Simple
 
   final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
@@ -37,9 +35,8 @@ abstract class Site[S <: Site[S]](
     getResponse(Files.splitAndDecodeUrl(pathString))
 
   final def getResponse(path: Seq[String]): Task[Site.Response] = toTask(
-    resolve(path).flatMap {
-      case Site.PathAndExtension(path, extension) => content(path.last, extension)
-    }
+    resolve(path).flatMap((pathAndExtension: Site.PathAndExtension) =>
+      content(pathAndExtension.path, pathAndExtension.extension))
   )
 
   protected val allowedExtensions: Set[String] = Set("html", "xml")
@@ -49,9 +46,7 @@ abstract class Site[S <: Site[S]](
 
   // TODO verify the extension?
   def resolveUrl(url: Seq[String]): Caching.Parser[Option[Store.Path]] =
-    resolve(url).map {
-      case Site.PathAndExtension(path, extension) => Some(path)
-    }.orElse(ZIO.none)
+    resolve(url).map((pathAndExtension: Site.PathAndExtension) => Some(pathAndExtension.path)).orElse(ZIO.none)
 
   // Store.Path returned is nonEmpty.
   final protected def resolve(pathRaw: Seq[String]): Caching.Parser[Site.PathAndExtension] =
@@ -92,18 +87,18 @@ abstract class Site[S <: Site[S]](
 
   protected def index: Option[Store.Path] = None
 
-  protected def content(store: Store, extension: Option[String]): Caching.Parser[Site.Response] = ???
+  protected def content(path: Store.Path, extension: Option[String]): Caching.Parser[Site.Response]
 
-  final def renderHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[String] = for
-    content: ScalaXml.Element <- resolveLinksInHtmlContent(htmlContent)
+  final def renderHtmlContent(path: Store.Path, htmlContent: HtmlContent[S]): Caching.Parser[String] = for
+    content: ScalaXml.Element <- resolveLinksInHtmlContent(path, htmlContent)
     siteNavigationLinks: Seq[ScalaXml.Element] <- getNavigationLinks
-    htmlContentNavigationLinks: Seq[ScalaXml.Element] <- navigationLinks(htmlContent)
+    htmlContentNavigationLinks: Seq[ScalaXml.Element] <- navigationLinks(path, htmlContent)
   yield Site.prettyPrinter.render(ScalaXml, doctype = Some(html.Html))(HtmlTheme.toHtml(
-      htmlContent,
-      navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks,
-      content = content,
-      site = this
-    ))
+    htmlContent,
+    navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks,
+    content = content,
+    site = this
+  ))
 
   final protected def renderTeiContent(tei: Tei): String = Tei.prettyPrinter.renderWithHeader(ScalaXml)(
     Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
@@ -138,38 +133,30 @@ abstract class Site[S <: Site[S]](
       )
 
   private def resolveNavigationalLink(url: String): Caching.Parser[ScalaXml.Element] = // TODO html.a!
-    resolveUrl(url).map(pathOpt =>
+    resolveUrl(url).map((pathOpt: Option[Store.Path]) =>
       val path: Store.Path = pathOpt.get
-      a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
+      HtmlContent.a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
     )
 
-  final protected def resolveLinksInHtmlContent(htmlContent: HtmlContent[S]): Caching.Parser[ScalaXml.Element] =
-    htmlContent.content(this).flatMap(content =>
+  final protected def resolveLinksInHtmlContent(
+    path: Store.Path,
+    htmlContent: HtmlContent[S]
+  ): Caching.Parser[ScalaXml.Element] = for
+    content <- htmlContent.content(path, this)
+    result <-
       if ScalaXml.getNamespace(content) == DocBook.namespace.default then
         DocBook.toHtml(content).provideLayer(ZLayer.succeed(()))
       else
         Tei    .toHtml(content).provideLayer(ZLayer.succeed(linkResolver(htmlContent)))
-    )
+  yield result
 
   protected def linkResolver(htmlContent: HtmlContent[S]): LinksResolver = LinksResolver.empty
 
-  final def a(htmlContent: HtmlContent[S]): html.a = a(path(htmlContent))
-
-  final def a(path: Store.Path): html.a = html
-    .a(path.map(_.structureName))
-    .setTarget((path.last match
-      case htmlContent: HtmlContent[?] => viewer(htmlContent.asInstanceOf[HtmlContent[S]])
-      case _ => defaultViewer
-    ).map(_.name))
-
-  protected def path(htmlContent: HtmlContent[S]): Store.Path = ???
-
-  def style(htmlContent: HtmlContent[S]): String = "main"
-
-  def viewer(htmlContent: HtmlContent[S]): Option[Viewer] = defaultViewer
-
   // TODO split into prev, next, up and more?
-  protected def navigationLinks(htmlContent: HtmlContent[S]): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed (Seq.empty)
+  protected def navigationLinks(
+    path: Store.Path,
+    htmlContent: HtmlContent[S]
+  ): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed (Seq.empty)
 
   final def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
     caching.logEnabled = false
@@ -204,9 +191,9 @@ object Site:
 
   final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  final case class PathAndExtension(
-    path: Store.Path,
-    extension: Option[String]
+  final class PathAndExtension(
+    val path: Store.Path,
+    val extension: Option[String]
   )
 
   final class Response(
@@ -250,3 +237,5 @@ object Site:
     common
   ), Stores.Pure[Store]:
     override def storesPure: Seq[Store] = Seq.empty
+    override def content(path: Store.Path, extension: Option[String]): Caching.Parser[Response] = ???
+

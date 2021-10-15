@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
 import org.opentorah.tei.{Entity as TeiEntity}
-import org.opentorah.store.{By, Caching, Directory}
+import org.opentorah.store.{By, Caching, Directory, Store}
 import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
@@ -15,16 +15,16 @@ final class Entities(
   "xml",
   Entity,
   Entities.All(_)
-), By.WithSelector[Entity](selectorName), HtmlContent[Collector]:
+), By.WithSelector[Entity](selectorName), HtmlContent.ApparatusViewer[Collector]:
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
+  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
     <list>
-      {Entity.sort(allEntities).map(entity => Entity.line(entity, collector))}
+      {for entity <- Entity.sort(allEntities) yield Entity.line(entity, collector)}
     </list>
   )
 

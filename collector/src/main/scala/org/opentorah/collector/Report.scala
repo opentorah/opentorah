@@ -9,13 +9,14 @@ import org.opentorah.util.Strings
 import org.opentorah.xml.ScalaXml
 import java.net.URI
 
-sealed abstract class Report[T](name: String, val title: String) extends Store.Terminal, HtmlContent[Collector]:
+// Reports is ApparatusViewer, but Report - DefaultViewer (Hierarchy)?!
+sealed abstract class Report[T](name: String, val title: String) extends Store.Terminal, HtmlContent.DefaultViewer[Collector]:
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
   final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  final override def content(collector: Collector): Caching.Parser[ScalaXml.Element] =
-    lines(collector).map(lines => <div>{lines.map(line => lineToXml(line, collector))}</div>)
+  final override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
+    lines(collector).map(lines => <div>{for line <- lines yield lineToXml(line, collector)}</div>)
 
   protected def lines(collector: Collector): Caching.Parser[Seq[T]]
 
@@ -57,7 +58,7 @@ object Report:
     )
 
     override protected def lineToXml(entity: Entity, collector: Collector): ScalaXml.Element =
-      <l>{entity.a(collector)(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
+      <l>{HtmlContent.a(collector.entityPath(entity))(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
 
     private def getExpectedId(entity: Entity): String = Strings.spacesToUnderscores(entity.mainName)
 

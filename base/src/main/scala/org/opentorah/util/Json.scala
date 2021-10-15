@@ -9,13 +9,12 @@ object Json:
     "[" + list.map(from).mkString(", ") + "]"
 
   private def from(value: Matchable): String = value match
-    // with value: Map[String, Matchable] I get:
-    //   non-variable type argument String in type pattern scala.collection.immutable.Map[String,Matchable]
-    //   (the underlying of Map[String,Matchable]) is unchecked since it is eliminated by erasure
     case value: Map[?, ?] => fromMap(value.asInstanceOf[Map[String, Matchable]])
     case value: List[?] => fromList(value.asInstanceOf[List[Matchable]])
     case value: String => "\"" + Strings.escape(value) + "\""
     case other => other.toString
 
   def optionToJs(value: Option[String]): String =
-    value.fold("null")(value => s"'$value'")
+    value.fold("null")(stringToJs)
+    
+  def stringToJs(value: String): String = s"'$value'"

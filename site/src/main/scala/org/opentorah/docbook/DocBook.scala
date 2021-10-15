@@ -27,17 +27,18 @@ object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
 
   val version: String = "5.0"
 
-  def data(dataDirectory: File): Seq[ScalaXml.Element] = Seq(
+  def data(dataDirectory: File): Seq[ScalaXml.Element] =
+    for dataSystemId <- Seq(
     "data:",
     "data:/",
     "urn:docbook:data:/",
     "urn:docbook:data:",
     "urn:docbook:data/",
     "http://opentorah.org/docbook/data/"
-  ).map(dataSystemId => Catalog.rewriteSystem(
+  ) yield Catalog.rewriteSystem(
     rewritePrefix = Files.file2url(dataDirectory).toString,
     systemIdStartString = dataSystemId
-  ))
+  )
 
   def dtdLink(dtdFile: File): ScalaXml.Element =
     Catalog.public(publicId = DocBook.dtdId, uri = Files.file2url(dtdFile).toString)

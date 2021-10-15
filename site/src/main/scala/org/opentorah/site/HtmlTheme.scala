@@ -27,7 +27,7 @@ object HtmlTheme:
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         {ScalaXml.optional(htmlContent.htmlHeadTitle)(title => <title>{title}</title>)}
-        <link rel="stylesheet" href={s"/css/${site.style(htmlContent)}.css"}/>
+        <link rel="stylesheet" href={s"/css/${htmlContent.style}.css"}/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
         {ScalaXml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
         {if !isHighlighterEnabled then Seq.empty else common.getHighlighter.head}
@@ -38,7 +38,7 @@ object HtmlTheme:
         <header class="site-header" role="banner">
           <div class="wrapper">
             {ScalaXml.optional(common.title)(title => <a class="site-title" rel="author"
-               target={site.defaultViewer.map(_.name).orNull} href="/">{title.content}</a>)}
+               target={HtmlContent.hierarchyViewer} href="/">{title.content}</a>)}
             <nav class="site-nav">
               <input type="checkbox" id="nav-trigger" class="nav-trigger" />
               <label for="nav-trigger">
@@ -90,7 +90,7 @@ object HtmlTheme:
       </body>
       <script type='module'>
         import loadWindow from '/js/window.js';
-        loadWindow({Json.optionToJs(site.viewer(htmlContent).map(_.name))}, {Json.optionToJs(common.googleAnalyticsId)});</script>
+        loadWindow({Json.stringToJs(htmlContent.viewer)}, {Json.optionToJs(common.googleAnalyticsId)});</script>
     </html>
 
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
