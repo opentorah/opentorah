@@ -1,11 +1,13 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.{Named, Names}
+import org.opentorah.metadata.{Language, Named, Names}
 
 sealed trait Store extends Named
 
 object Store:
   type Path = Seq[Store]
+
+  def structureNames(path: Path): Seq[String] = path.map(_.names.doFind(Language.English.toSpec).name)
 
   trait Terminal extends Store
 

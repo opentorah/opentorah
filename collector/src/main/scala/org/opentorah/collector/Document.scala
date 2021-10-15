@@ -54,23 +54,25 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
     override def htmlHeadTitle: Option[String] = None
 
   final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends Facet(document, collectionFacet) derives CanEqual:
+    extends Facet(document, collectionFacet), HtmlContent.TextViewer[Collector] derives CanEqual:
 
-    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for
+    override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
       tei: Tei <- getTei
       header: ScalaXml.Element <- collection.documentHeader(document)
+      nodes: ScalaXml.Nodes = tei.text.body.content.scalaXml
     yield
       <div>
         {header}
-        {tei.text.body.content}
+        {nodes}
       </div>
 
   final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
-    extends Facet(document, collectionFacet):
-    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.documentHeader(document).map(header =>
+    extends Facet(document, collectionFacet), HtmlContent.FacsimileViewer[Collector]:
+    override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
+      for header <- collection.documentHeader(document) yield
       <div class="facsimileWrapper">
         {header}
-        <div class={Viewer.Facsimile.name}>
+        <div class={HtmlContent.facsimileViewer}>
           <div class="facsimileScroller">{
             val text: TextFacet = collection.textFacet.of(document)
             val facsimileUrl: String = collection.facsimileUrl(collector)
@@ -79,7 +81,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
             for page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing) yield
               val n: String = page.pb.n
               val pageId: String = Pb.pageId(n)
-              text.a(collector).setFragment(pageId)(
+              HtmlContent.a(collector.textFacetPath(text)).setFragment(pageId)(
                 <figure>
                   <img
                   id={pageId}
@@ -92,7 +94,6 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
             }</div>
         </div>
       </div>
-    )
 
   override def apply(name: String, tei: Tei): Parser[Document] = for
     pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content.scalaXml, Pb.elementName, Pb)

@@ -17,7 +17,7 @@ final class Collection(
   override val body: Option[Body.Value],
   val directory: String,
   val parts: Seq[CollectionPart]
-) extends Hierarchical derives CanEqual:
+) extends Hierarchical, HtmlContent.Wide derives CanEqual:
 
   // TODO unless Hierarchy is accepted here (and not just Collection), Collector.store2path initialization fails.
   // Why isn't it blocked by the missing CanEqual?
@@ -35,7 +35,7 @@ final class Collection(
   override def getBy: Option[ByHierarchy] = None
 
   def facsimileUrl(collector: Collector): String =
-    val pathStr: String = collector.store2path(this).map(_.structureName).mkString("/")
+    val pathStr: String = Store.structureNames(collector.store2path(this)).mkString("/")
     collector.common.getTei.facsimilesUrl.getOrElse("/") + pathStr  + "/"
 
   def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =
@@ -47,14 +47,14 @@ final class Collection(
   val textFacet     : Collection.TextFacet      = Collection.TextFacet     (this)
   val facsimileFacet: Collection.FacsimileFacet = Collection.FacsimileFacet(this)
 
-  override def storesPure: Seq[Store/*TODO Collection.Facet[?]*/] =
+  override def storesPure: Seq[Collection.Facet[?]] =
     Seq(textFacet, facsimileFacet)
 
   // With no facet, "document" is assumed
   override def findByName(name: String): Caching.Parser[Option[Store]] =
-    textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(result => ZIO.some(result))) // TODO ZIO.someOrElseM?
+    textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(ZIO.some)) // TODO ZIO.someOrElseM?
 
-  override protected def innerContent(collector: Collector): Caching.Parser[ScalaXml.Element] =
+  override protected def innerContent(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
     for
       directory: Documents.All <- documents.getDirectory
       columns: Seq[Collection.Column] = Seq(
@@ -65,14 +65,14 @@ final class Collection(
         languageColumn(collector),
 
         Collection.Column("Документ", "document", (document: Document) =>
-          ZIO.succeed(textFacet.of(document).a(collector)(text = document.baseName))
+          ZIO.succeed(HtmlContent.a(collector.textFacetPath(textFacet.of(document)))(text = document.baseName))
         ),
 
         Collection.Column("Страницы", "pages", (document: Document) =>
           val text: Document.TextFacet = textFacet.of(document)
           val pages: Seq[Page] = document.pages(pageType)
           def forPage(page: Page) =
-            page.pb.addAttributes(text.a(collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))  
+            page.pb.addAttributes(HtmlContent.a(collector.textFacetPath(text)).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))
           val nodes = for page <- pages yield forPage(page)  
           ZIO.succeed(ScalaXml.multi(separator = " ", nodes = nodes))
         ),
@@ -99,7 +99,7 @@ final class Collection(
 
       <div>
         <table class="collection-index">
-          {<tr>{columns.map(column => <th class={column.cssClass}>{column.heading}</th>)}</tr>}
+          {<tr>{for column <- columns yield <th class={column.cssClass}>{column.heading}</th>}</tr>}
           {rows.flatten}
         </table>
 
@@ -115,6 +115,7 @@ final class Collection(
     Collection.transcribersColumn
   )
 
+  // TODO add Hierarchical.pathHeaderHorizontal() to the Document header...
   def documentHeader(document: Document): Caching.Parser[ScalaXml.Element] =
     ZIO.foreach(documentHeaderColumns)(column =>
       column.value(document).map(value =>
@@ -129,7 +130,9 @@ final class Collection(
     Collection.Column("Язык", "language", (document: Document) =>
       translations(document).map(documentTranslations =>
         Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-          Seq(ScalaXml.mkText(" "), textFacet.of(translation).a(collector)(text = translation.lang))))
+          Seq(ScalaXml.mkText(" "), HtmlContent.a(collector.textFacetPath(textFacet.of(translation)))(text = translation.lang))
+        )
+      )
     )
 
 object Collection extends Element[Collection]("collection"):
@@ -147,7 +150,7 @@ object Collection extends Element[Collection]("collection"):
   val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
   val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
 
-  final class Alias(val collection: Collection) extends Store.Pure[Store], HtmlContent[Collector]:
+  final class Alias(val collection: Collection) extends Store.Pure[Store], HtmlContent.HierarchyViewer[Collector], HtmlContent.Wide:
     def alias: String = collection.alias.get
 
     override val names: Names = Names(alias)
@@ -156,7 +159,7 @@ object Collection extends Element[Collection]("collection"):
     override def storesPure: Seq[Store] = collection.storesPure
     override def htmlHeadTitle: Option[String] = collection.htmlHeadTitle
     override def htmlBodyTitle: Option[ScalaXml.Nodes] = collection.htmlBodyTitle
-    override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(collector)
+    override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = collection.content(path, collector)
 
   sealed abstract class Facet[DF <: Document.Facet](val collection: Collection) extends By[DF]:
 

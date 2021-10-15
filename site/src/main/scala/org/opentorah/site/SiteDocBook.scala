@@ -72,7 +72,8 @@ final class SiteDocBook(
         (if !prefixed then Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
       val htmlContent: DocBookHtmlContent[S] = DocBookHtmlContent(documentFile, resolver)
-      val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(htmlContent)))
+      // TODO supply real Store.Path, not Seq.empty!
+      val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(Seq.empty, htmlContent)))
       Files.write(outputFile, content)
 
   def prettyPrint(): Unit = {

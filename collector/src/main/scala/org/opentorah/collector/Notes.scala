@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.markdown.Markdown
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Caching, Directory}
+import org.opentorah.store.{By, Caching, Directory, Store}
 import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.UIO
 import java.net.URL
@@ -16,15 +16,15 @@ final class Notes(
   "md",
   Note,
   Notes.All(_),
-), By.WithSelector[Note](selectorName), HtmlContent[Collector]:
+), By.WithSelector[Note](selectorName), HtmlContent.DefaultViewer[Collector]:
 
   override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(notes =>
-    <div>{notes.sortBy(_.title).map(note => <l>{note.a(collector)(text = note.title.getOrElse("NO TITLE"))}</l>)}</div>)
+  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(notes =>
+    <div>{for note <- notes.sortBy(_.title) yield <l>{HtmlContent.a(path :+ note)(text = note.title.getOrElse("NO TITLE"))}</l>}</div>)
 
 object Notes extends Element[Notes]("notes"):
 

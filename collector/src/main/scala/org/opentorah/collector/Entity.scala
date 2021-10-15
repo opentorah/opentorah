@@ -12,7 +12,7 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends Directory.Entry(name), HtmlContent[Collector] derives CanEqual:
+) extends Directory.Entry(name), HtmlContent.ApparatusViewer[Collector] derives CanEqual:
   override def equals(other: Any): Boolean =
     val that: Entity = other.asInstanceOf[Entity]
     this.name == that.name
@@ -23,7 +23,7 @@ final class Entity(
 
   def teiEntity(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
 
-  override def content(collector: Collector): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
     entity: TeiEntity <- teiEntity(collector)
     references: Seq[WithSource[EntityReference]] <- collector.getReferences
     sources: Seq[Store] <- ZIO.foreach(
@@ -48,18 +48,21 @@ final class Entity(
       yield collection -> Collections.removeConsecutiveDuplicatesWith(texts.get)(_.document.name)
         .sortBy(_.document.name)
 
+    // TODO submerge Document contribution in Document...
     val mentions: ScalaXml.Element =
       <p class="mentions">
-        {a(collector)(text = "[...]")}
+        {HtmlContent.a(path)(text = "[...]")}
         {if fromEntities.isEmpty then Seq.empty else
         <l>
           <em>{collector.entityLists.selector.title.get}:</em>
-          {ScalaXml.multi(nodes = fromEntities.map(fromEntity => fromEntity.a(collector)(fromEntity.mainName)))}
+          {ScalaXml.multi(nodes = for fromEntity <- fromEntities yield Entity.line(fromEntity, collector))}
         </l>
         }
         {for (collection: Collection, texts: Seq[Document.TextFacet]) <- byCollection yield
         <l>{collection.pathHeaderHorizontal(collector)}:
-          {ScalaXml.multi(separator = " ", nodes = texts.map(text => text.a(collector)(text = text.document.baseName)))}</l>}
+          {ScalaXml.multi(separator = " ", nodes =
+          for text: Document.TextFacet <- texts yield HtmlContent.a(collector.textFacetPath(text))(text = text.document.baseName))
+        }</l>}
       </p>
 
     TeiEntity.xmlElement(entity.copy(content = ScalaXml.toNodes(entity.content.scalaXml :+ mentions)))
@@ -99,7 +102,8 @@ object Entity extends EntityRelated[Entity](
       mainNameAttribute(_.mainName)
     )
 
+  // TODO move into the Entity class?
   def line(entity: Entity, collector: Collector): ScalaXml.Element =
-    <l>{entity.a(collector)(text = entity.mainName)}</l>
+    <l>{HtmlContent.a(collector.entityPath(entity))(text = entity.mainName)}</l>
 
   def sort(entities: Seq[Entity]): Seq[Entity] = entities.sortBy(_.name)

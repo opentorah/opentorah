@@ -1,6 +1,7 @@
 package org.opentorah.collector
 
-import org.opentorah.store.{By, Stores}
+import org.opentorah.site.HtmlContent
+import org.opentorah.store.{By, Store, Stores}
 import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
 
 final class ByHierarchy(
@@ -12,26 +13,33 @@ final class ByHierarchy(
   override def storesPure: Seq[Hierarchical] = hierarchyStores
 
   // TODO generate hierarchy root index and reference it from the summary.
-  def oneLevelIndex(collector: Collector): ScalaXml.Element =
+  // TODO use path and path :+ hierarchical to avoid calling Collector for the path
+  def oneLevelIndex(path: Store.Path, collector: Collector): ScalaXml.Element =
     <p>
       <l>{Hierarchical.displayName(this)}:</l>
-      <ul>{hierarchyStores.map(store => <li>{store.a(collector)(text = store.displayTitle)}</li>)}</ul>
+      <ul>{for
+        hierarchical <- hierarchyStores
+      yield
+        <li>{HtmlContent.a(collector.hierarchicalPath(hierarchical))(text = hierarchical.displayTitle)}</li>
+      }</ul>
     </p>
 
-  def treeIndex(collector: Collector): ScalaXml.Element =
+  def treeIndex(path: Store.Path, collector: Collector): ScalaXml.Element =
     <div class="tree-index">
       <ul>
         <li><em>{Hierarchical.displayName(this)}</em></li>
         <li>
-          <ul>{hierarchyStores.map(store =>
+          <ul>{for hierarchical <- hierarchyStores yield
             <li>
-              {store.a(collector)(text = store.displayTitle)}
-              {store.getBy.toSeq.map(_.treeIndex(collector))}
+              {HtmlContent.a(collector.hierarchicalPath(hierarchical))(text = hierarchical.displayTitle)}
+              {hierarchical.getBy.toSeq.map(_.treeIndex(path :+ hierarchical, collector))}
             </li>
-          )}</ul>
+          }</ul>
         </li>
       </ul>
     </div>
+
+  // TODO factor out private def forHierarchical(hierachical) with its link and title.
 
 object ByHierarchy extends Element[ByHierarchy]("by"):
 
