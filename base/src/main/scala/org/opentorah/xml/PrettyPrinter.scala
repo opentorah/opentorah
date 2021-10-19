@@ -276,35 +276,10 @@ final class PrettyPrinter(
 
 object PrettyPrinter:
 
-  trait Recognizer:
-    def recognize(xml: Xml)(element: xml.Element): (PrettyPrinter, Option[Doctype])
-
   // The only way I found to not let Paiges screw up indentation in the <pre><code>..</code></pre> blocks
   // is to give it the whole block as one unbreakable text, and for that I need to hide newlines from it -
   // and then restore them in render()...
   // Also, element start and end tags must not be separated from the children by newlines...
-  val hiddenNewline: String = "\\n"
+  private val hiddenNewline: String = "\\n"
 
   val default: PrettyPrinter = new PrettyPrinter
-
-  def prettyPrint(roots: List[File], xml: Xml, recognizer: Recognizer): Unit =
-    val (directories: List[File], files: List[File]) = roots.partition(_.isDirectory)
-    val xmlFiles: List[File] = files.filter(isXml) ++ listXmlFiles(List.empty, directories)
-    xmlFiles.foreach(file =>
-      // Note: Scala XML ignores XML comments when parsing a file
-      // (see https://github.com/scala/scala-xml/issues/508);
-      // using Dom instead; use Dom to keep them...
-      val element: xml.Element = xml.loadFromUrl(Files.file2url(file))
-      val (prettyPrinter, doctype) = recognizer.recognize(xml)(element)
-      Files.write(
-        file = file,
-        content = prettyPrinter.render(xml, addXmlHeader = true, doctype)(element)
-      )
-    )
-
-  @scala.annotation.tailrec
-  def listXmlFiles(result: List[File], directoriesToList: List[File]): List[File] = if directoriesToList.isEmpty then result else
-    val (directories: List[File], files: List[File]) = directoriesToList.head.listFiles.toList.partition(_.isDirectory)
-    listXmlFiles(result ++ files.filter(isXml), directoriesToList.tail ++ directories)
-
-  private def isXml(file: File): Boolean = Files.nameAndExtension(file.getName)._2.contains("xml")

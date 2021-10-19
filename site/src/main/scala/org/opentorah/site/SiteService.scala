@@ -116,7 +116,7 @@ abstract class SiteService[S <: Site[S]] extends Element[S]("site"), zio.App:
         if site.isStatic(path) then Zhttp.staticFile(
           url = Files.pathUnder(Files.string2url(siteUrl), pathString),
           request = Some(request)
-        ) else site.getResponse(path).map(siteResponse =>
+        ) else site.getResponse(pathString).map(siteResponse =>
           val bytes: Array[Byte] = Zhttp.textBytes(siteResponse.content)
 
           Response.http(

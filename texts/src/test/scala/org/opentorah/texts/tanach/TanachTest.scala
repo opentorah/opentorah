@@ -1,13 +1,15 @@
 package org.opentorah.texts.tanach
 
+import org.opentorah.store.Path
 import org.opentorah.texts.TestBase
+import org.opentorah.xml.Caching
 
 final class TanachTest extends TestBase(Tanach):
   // TODO put into common base class in tanach package if I am going to make - say - separate PsalmsTest:
   def checkChapterLength(path: String, length: Int): Unit =
-    doResolveLast(path).asInstanceOf[Chapter].length shouldBe length
+    resolveLast(path).asInstanceOf[Chapter].length shouldBe length
   def checkVerseNumber(path: String, number: Int): Unit =
-    doResolveLast(path).asInstanceOf[Verse].number shouldBe number
+    resolveLast(path).asInstanceOf[Verse].number shouldBe number
 
   "Tanach" should "load" in {
     Tanach.Chumash.Genesis.chapters.length(17) shouldBe 27
@@ -80,4 +82,12 @@ final class TanachTest extends TestBase(Tanach):
 
   it should "contain /book/Psalms/day of the week/Friday/chapter/119/verse/150" in {
     checkName("/book/Psalms/day of the week/Friday/chapter/119/verse/150", "150")
+  }
+
+  it should "be walkable" in {
+    val paths: Seq[Path] = Caching.unsafeRun(caching, Tanach.getPaths(
+      include = _.isInstanceOf[TanachBook],
+      stop = _.isInstanceOf[TanachBook]
+    ))
+    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
   }

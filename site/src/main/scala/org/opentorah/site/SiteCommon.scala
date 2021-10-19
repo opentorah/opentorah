@@ -1,8 +1,10 @@
 package org.opentorah.site
 
+import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, RawXml, Unparser}
 
 final class SiteCommon(
+  val names: Names,
   val url: Option[String],
   val favicon: Option[String],
   val googleAnalyticsId: Option[String],
@@ -33,6 +35,7 @@ object SiteCommon extends Element[SiteCommon]("common"):
 
   override def contentParsable: Parsable[SiteCommon] = new Parsable[SiteCommon]:
     override def parser: Parser[SiteCommon] = for
+      names: Names <- Names.withDefaultNameParsable()
       url: Option[String] <- urlAttribute()
       favicon: Option[String] <- faviconAttribute()
       googleAnalyticsId: Option[String] <- googleAnalyticsIdAttribute()
@@ -47,6 +50,7 @@ object SiteCommon extends Element[SiteCommon]("common"):
       highlighter: Option[SiteHighlighter] <- SiteHighlighter.optional()
       mathJax: Option[SiteMathJax] <- SiteMathJax.optional()
     yield SiteCommon(
+      names,
       url,
       favicon,
       googleAnalyticsId,
@@ -63,6 +67,7 @@ object SiteCommon extends Element[SiteCommon]("common"):
     )
 
     override def unparser: Unparser[SiteCommon] = Unparser.concat[SiteCommon](
+      Names.withDefaultNameParsable(_.names),
       urlAttribute(_.url),
       faviconAttribute(_.favicon),
       googleAnalyticsIdAttribute(_.googleAnalyticsId),

@@ -1,22 +1,22 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.{Language, Named, Names}
+import org.opentorah.metadata.{Language, Named}
+import org.opentorah.xml.Caching
+import zio.ZIO
 
-sealed trait Store extends Named
+trait Store extends Named:
 
-object Store:
-  type Path = Seq[Store]
-
-  def structureNames(path: Path): Seq[String] = path.map(_.names.doFind(Language.English.toSpec).name)
-
-  trait Terminal extends Store
-
-  trait NonTerminal[+T <: Store] extends Store, Stores[T]
-
-  trait Pure[+T <: Store] extends NonTerminal[T], Stores.Pure[T]
-
-  trait Bys extends Pure[By[?]]
-
-  trait Numbered extends Store, org.opentorah.metadata.Numbered[Numbered]:
-    def oneOf: Stores.Numbered[Numbered]
-    final override def names: Names = oneOf.number2names(number)
+  final def getPaths(
+    path: Path = Seq.empty,
+    include: Store => Boolean,
+    stop: Store => Boolean
+  ): Caching.Parser[Seq[Path]] =
+    val selfPath: Path = path :+ this
+    val self: Seq[Path] = if include(this) then Seq(selfPath) else Seq.empty
+    this match
+      case stores: Stores[?] if !stop(this) =>
+        for
+          stores: Seq[Store] <- stores.stores
+          results: Seq[Seq[Path]] <- ZIO.foreach(stores)(_.getPaths(selfPath, include, stop))
+        yield self ++ results.flatten
+      case _ => ZIO.succeed(self)

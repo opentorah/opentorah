@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import org.opentorah.metadata.{Named, Names}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Element, Elements, Parser}
+import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parser}
 import zio.ZIO
 import java.net.URL
 
@@ -46,13 +46,13 @@ abstract class Directory[
   final def getDirectory: Caching.Parser[W] = listFile.get
 
   final def getFile(entry: M): Caching.Parser[T] = getFile(entry.name)
+  private def getFile(name: String): Caching.Parser[T] = Caching.getCachedByUrl[T](fileUrl(name), loadFile)
 
-  private def getFile(name: String): Caching.Parser[T] = Caching.getCached[T](fileUrl(name), loadFile)
-
-  private def fileUrl(name: String): URL = Files.fileInDirectory(directoryUrl, name + "." + fileExtension)
+  final def fileUrl(entry: M): URL = fileUrl(entry.name)
+  final def fileUrl(name: String): URL = Files.fileInDirectory(directoryUrl, name + "." + fileExtension)
 
   final def writeFile(entry: M, content: String): Unit = Files.write(
-    file = Files.url2file(fileUrl(entry.name)),
+    file = Files.url2file(fileUrl(entry)),
     content
   )
 
@@ -68,7 +68,7 @@ object Directory:
 
   abstract class Entry(
     val name: String
-  ) extends Store.Terminal:
+  ) extends Terminal:
     final override val names: Names = Names(name)
 
   trait EntryMaker[T, M <: Entry] extends Elements[M]:

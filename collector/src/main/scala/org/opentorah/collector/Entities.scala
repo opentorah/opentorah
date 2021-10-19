@@ -2,27 +2,30 @@ package org.opentorah.collector
 
 import org.opentorah.site.HtmlContent
 import org.opentorah.tei.{Entity as TeiEntity}
-import org.opentorah.store.{By, Caching, Directory, Store}
-import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.store.{By, Directory, Path}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
 final class Entities(
   override val fromUrl: Element.FromUrl,
   selectorName: String,
   override val directory: String
-) extends Directory[TeiEntity, Entity, Entities.All](
-  directory,
-  "xml",
-  Entity,
-  Entities.All(_)
-), By.WithSelector[Entity](selectorName), HtmlContent.ApparatusViewer[Collector]:
+) extends
+  Directory[TeiEntity, Entity, Entities.All](
+    directory,
+    "xml",
+    Entity,
+    Entities.All(_)
+  ),
+  By.WithSelector[Entity](selectorName),
+  HtmlContent.ApparatusViewer[Collector]:
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
+  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
     <list>
       {for entity <- Entity.sort(allEntities) yield Entity.line(entity, collector)}
     </list>

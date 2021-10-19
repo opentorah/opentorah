@@ -1,11 +1,11 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, HasValues, Names}
-import org.opentorah.store.{By, Store}
+import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Element, From, Parsable, Parser, ScalaXml, Unparser}
 
-trait TanachBook extends HasName, Store.Bys derives CanEqual: // all deriveds are objects; using eq
+trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
 
   private[tanach] final def chapters: Chapters = TanachBook.chapters(this)
 

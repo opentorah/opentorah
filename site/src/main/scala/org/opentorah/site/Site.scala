@@ -2,12 +2,14 @@ package org.opentorah.site
 
 import org.opentorah.docbook.DocBook
 import org.opentorah.html
-import org.opentorah.store.{Caching, Directory, Store, Stores}
+import org.opentorah.metadata.Names
+import org.opentorah.store.{Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
+import org.opentorah.xml.{Caching, Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{IO, Task, ZIO, ZLayer}
+import java.io.File
 import java.net.URL
 
 // TODO add static site server/generator.
@@ -16,8 +18,10 @@ import java.net.URL
 abstract class Site[S <: Site[S]](
   override val fromUrl: Element.FromUrl,
   val common: SiteCommon
-) extends Stores.Pure[Store], Element.FromUrl.With:
+) extends Pure[Store], Element.FromUrl.With:
   this: S =>
+
+  final override def names: Names = common.names
 
   final def logger: Logger = Site.logger
 
@@ -26,8 +30,7 @@ abstract class Site[S <: Site[S]](
   final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
 
   final private val staticPaths: Set[String] =
-    Set("assets", "css", "js", "sass", "robots.txt") ++
-    common.favicon.toSet
+    Set("assets", "css", "js", "sass", "robots.txt") ++ common.favicon.toSet
 
   final def isStatic(path: Seq[String]): Boolean = path.headOption.exists(staticPaths.contains)
 
@@ -35,21 +38,21 @@ abstract class Site[S <: Site[S]](
     getResponse(Files.splitAndDecodeUrl(pathString))
 
   final def getResponse(path: Seq[String]): Task[Site.Response] = toTask(
-    resolve(path).flatMap((pathAndExtension: Site.PathAndExtension) =>
+    resolveRaw(path).flatMap((pathAndExtension: Site.PathAndExtension) =>
       content(pathAndExtension.path, pathAndExtension.extension))
   )
 
   protected val allowedExtensions: Set[String] = Set("html", "xml")
 
-  final def resolveUrl(url: String): Caching.Parser[Option[Store.Path]] =
+  // TODO verify the extension?
+  def resolveUrl(url: String): Caching.Parser[Option[Path]] =
     resolveUrl(Files.splitAndDecodeUrl(url))
 
-  // TODO verify the extension?
-  def resolveUrl(url: Seq[String]): Caching.Parser[Option[Store.Path]] =
-    resolve(url).map((pathAndExtension: Site.PathAndExtension) => Some(pathAndExtension.path)).orElse(ZIO.none)
+  def resolveUrl(url: Seq[String]): Caching.Parser[Option[Path]] =
+    resolveRaw(url).map((pathAndExtension: Site.PathAndExtension) => Some(pathAndExtension.path)).orElse(ZIO.none)
 
   // Store.Path returned is nonEmpty.
-  final protected def resolve(pathRaw: Seq[String]): Caching.Parser[Site.PathAndExtension] =
+  private def resolveRaw(pathRaw: Seq[String]): Caching.Parser[Site.PathAndExtension] =
     val (path: Seq[String], mustBeNonTerminal: Boolean, extension: Option[String]) =
       if pathRaw.isEmpty then (pathRaw, false, None) else
         val last: String = pathRaw.last
@@ -61,38 +64,47 @@ abstract class Site[S <: Site[S]](
           else
             (name, extension)
 
-        if indexCandidate == "index" then
-          (pathRaw.init                  , true , extensionRequested)
-        else
-          (pathRaw.init :+ indexCandidate, false, extensionRequested)
+        val (path: Seq[String], mustBeNonTerminal: Boolean) =
+          if indexCandidate == "index" then
+            (pathRaw.init                  , true )
+          else
+            (pathRaw.init :+ indexCandidate, false)
 
-    val result: Caching.Parser[Store.Path] =
-      if path.isEmpty && index.nonEmpty then ZIO.succeed(index.get) else
-        (if initializeResolveDone then Effects.ok else
+        (path, mustBeNonTerminal, extensionRequested)
+
+    val result: Caching.Parser[Path] =
+      if path.isEmpty && index.nonEmpty then ZIO.succeed(index.get) else for
+        _ <- if initializeResolveDone then Effects.ok else
           initializeResolveDone = true
           initializeResolve
-        ) *>
-          Stores.resolve(path, this)
+        result <- resolve(path)
+      yield result
 
-    result.flatMap((path: Store.Path) =>
-      if mustBeNonTerminal && !path.last.isInstanceOf[Store.NonTerminal[Store]] then
+    result.flatMap((path: Path) =>
+      if mustBeNonTerminal && !path.last.isInstanceOf[Stores[?]] then
         Effects.fail(s"Can not get an index of ${path.last}")
       else
         ZIO.succeed(Site.PathAndExtension(path, extension))
     )
 
+  final def a(path: Path): html.a = html
+    .a(Path.structureNames(shortenPath(path)))
+    .setTarget(path.last.asInstanceOf[HtmlContent[?]].viewer)
+
+  protected def shortenPath(path: Path): Path = path
+
   private var initializeResolveDone: Boolean = false
 
   protected def initializeResolve: Caching.Parser[Unit] = Effects.ok
 
-  protected def index: Option[Store.Path] = None
+  protected def index: Option[Path] = None
 
-  protected def content(path: Store.Path, extension: Option[String]): Caching.Parser[Site.Response]
+  protected def content(path: Path, extension: Option[String]): Caching.Parser[Site.Response]
 
-  final def renderHtmlContent(path: Store.Path, htmlContent: HtmlContent[S]): Caching.Parser[String] = for
+  final def renderHtmlContent(path: Path, htmlContent: HtmlContent[S]): Caching.Parser[String] = for
     content: ScalaXml.Element <- resolveLinksInHtmlContent(path, htmlContent)
     siteNavigationLinks: Seq[ScalaXml.Element] <- getNavigationLinks
-    htmlContentNavigationLinks: Seq[ScalaXml.Element] <- navigationLinks(path, htmlContent)
+    htmlContentNavigationLinks: Seq[ScalaXml.Element] <- htmlContent.navigationLinks(path, this)
   yield Site.prettyPrinter.render(ScalaXml, doctype = Some(html.Html))(HtmlTheme.toHtml(
     htmlContent,
     navigationLinks = siteNavigationLinks ++ htmlContentNavigationLinks,
@@ -123,8 +135,8 @@ abstract class Site[S <: Site[S]](
     )))
   )
 
+  // TODO use the cache:
   private var navigationLinks: Option[Seq[ScalaXml.Element]] = None
-
   private def getNavigationLinks: Caching.Parser[Seq[ScalaXml.Element]] =
     if navigationLinks.isDefined then ZIO.succeed(navigationLinks.get) else
       ZIO.foreach(common.pages)(resolveNavigationalLink).map(result =>
@@ -133,13 +145,13 @@ abstract class Site[S <: Site[S]](
       )
 
   private def resolveNavigationalLink(url: String): Caching.Parser[ScalaXml.Element] = // TODO html.a!
-    resolveUrl(url).map((pathOpt: Option[Store.Path]) =>
-      val path: Store.Path = pathOpt.get
-      HtmlContent.a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
+    resolveUrl(url).map((pathOpt: Option[Path]) =>
+      val path: Path = pathOpt.get
+      a(path)(text = path.last.asInstanceOf[HtmlContent[S]].htmlHeadTitle.getOrElse("NO TITLE"))
     )
 
   final protected def resolveLinksInHtmlContent(
-    path: Store.Path,
+    path: Path,
     htmlContent: HtmlContent[S]
   ): Caching.Parser[ScalaXml.Element] = for
     content <- htmlContent.content(path, this)
@@ -147,43 +159,50 @@ abstract class Site[S <: Site[S]](
       if ScalaXml.getNamespace(content) == DocBook.namespace.default then
         DocBook.toHtml(content).provideLayer(ZLayer.succeed(()))
       else
-        Tei    .toHtml(content).provideLayer(ZLayer.succeed(linkResolver(htmlContent)))
+        Tei    .toHtml(content).provideLayer(ZLayer.succeed(linkResolver(path, htmlContent)))
   yield result
 
-  protected def linkResolver(htmlContent: HtmlContent[S]): LinksResolver = LinksResolver.empty
-
-  // TODO split into prev, next, up and more?
-  protected def navigationLinks(
-    path: Store.Path,
-    htmlContent: HtmlContent[S]
-  ): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed (Seq.empty)
+  protected def linkResolver(path: Path, htmlContent: HtmlContent[S]): LinksResolver = LinksResolver.empty
 
   final def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
     caching.logEnabled = false
 
-    (if !withPrettyPrint then Effects.ok else Effects.effect(prettyPrint(ScalaXml))) *>
-    Effects.effect(Site.logger.info("Writing site lists.")) *>
-    ZIO.foreach_(directoriesToWrite)(_.writeDirectory()) *>
-    ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this))) *>
-    buildMore
+    for
+    _ <- if !withPrettyPrint then Effects.ok else prettyPrint
+    _ <- Effects.effect(Site.logger.info("Writing site lists."))
+      directoriesToWrite: Seq[Directory[?, ?, ?]] <- directoriesToWrite
+    _ <- ZIO.foreach_(directoriesToWrite)(_.writeDirectory())
+    _ <- ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this)))
+    result <- buildMore
+    yield result
   }
 
-  final private def prettyPrint(xml: Xml): Unit =
+  final private def prettyPrint: Caching.Parser[Unit] =
     Site.logger.info("Pretty-printing site.")
-    PrettyPrinter.prettyPrint(
-      roots = prettyPrintRoots.toList.map(Files.url2file),
-      xml,
-      recognizer = new PrettyPrinter.Recognizer:
-        override def recognize(model: Xml)(element: model.Element): (PrettyPrinter, Option[Doctype]) =
-          if model.getName(element) == "TEI" then
-            (Tei.prettyPrinter, None)
-          else
-            (Site.storePrettyPrinter, None)
+
+    // Note: Scala XML ignores XML comments when parsing a file
+    // (see https://github.com/scala/scala-xml/issues/508);
+    // use Dom to keep them...
+    val xml: Xml = ScalaXml
+
+    for
+      prettyPrintTei <- prettyPrintTei
+      prettyPrintStores <- prettyPrintStores
+    yield
+      for url <- prettyPrintTei    do prettyPrint(url, Tei.prettyPrinter      , doctype = None, xml)
+      for url <- prettyPrintStores do prettyPrint(url, Site.storePrettyPrinter, doctype = None, xml)
+
+  private def prettyPrint(url: URL, prettyPrinter: PrettyPrinter, doctype: Option[Doctype], xml: Xml): Unit =
+    Files.write(
+      file = Files.url2file(url),
+      content = prettyPrinter.renderWithHeader(xml, doctype)(xml.loadFromUrl(url))
     )
 
-  protected def prettyPrintRoots: Seq[URL] = Seq.empty
+  protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 
-  protected def directoriesToWrite: Seq[Directory[?, ?, ?]] = Seq.empty
+  protected def prettyPrintStores: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
+
+  protected def directoriesToWrite: Caching.Parser[Seq[Directory[?, ?, ?]]] = ZIO.succeed(Seq.empty)
 
   protected def buildMore: Caching.Parser[Unit] = IO.succeed(())
 
@@ -192,7 +211,7 @@ object Site:
   final val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   final class PathAndExtension(
-    val path: Store.Path,
+    val path: Path,
     val extension: Option[String]
   )
 
@@ -235,7 +254,7 @@ object Site:
   ) extends Site[Common](
     fromUrl,
     common
-  ), Stores.Pure[Store]:
+  ), Pure[?]:
     override def storesPure: Seq[Store] = Seq.empty
-    override def content(path: Store.Path, extension: Option[String]): Caching.Parser[Response] = ???
+    override def content(path: Path, extension: Option[String]): Caching.Parser[Response] = ???
 

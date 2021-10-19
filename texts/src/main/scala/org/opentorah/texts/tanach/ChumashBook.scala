@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Names}
-import org.opentorah.store.By
+import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.Parser
 
@@ -10,7 +10,8 @@ trait ChumashBook extends TanachBook:
 
   override def storesPure: Seq[By[?]] = Seq(
     chapters.byChapter,
-    new By.Pure[Parsha](selectorName = "parsha", storesPure = parshiot)
+    new By.WithSelector[Parsha](selectorName = "parsha")
+      with Pure.With[Parsha](storesPure = parshiot)
   )
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.

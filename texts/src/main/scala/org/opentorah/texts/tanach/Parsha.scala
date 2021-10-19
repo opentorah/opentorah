@@ -1,13 +1,15 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Names, WithNumber}
-import org.opentorah.store.{By, Store, Stores}
+import org.opentorah.metadata.{HasName, HasValues, Names, WithNumber}
+import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 import Tanach.Chumash
 
-enum Parsha(val book: Chumash, nameOverride: Option[String] = None)
-  extends HasName(nameOverride), HasName.Enum, Store.Bys derives CanEqual:
+enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
+  HasName(nameOverride),
+  HasName.Enum,
+  Pure[?] derives CanEqual:
 
   case Bereishis       extends Parsha(Chumash.Genesis)
   case Noach           extends Parsha(Chumash.Genesis)
@@ -94,9 +96,7 @@ enum Parsha(val book: Chumash, nameOverride: Option[String] = None)
     Chapters.ByChapter(span, book.chapters)
   )
 
-object Parsha extends Names.Loader[Parsha], Stores.Pure[Parsha]:
-  override protected def storesPure: Seq[Parsha] = values.toIndexedSeq
-
+object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
   override val valuesSeq: Seq[Parsha] = values.toIndexedSeq
 
   def forChumash(book: ChumashBook): Seq[Parsha] = valuesSeq.filter(_.book == book)

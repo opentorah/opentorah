@@ -8,6 +8,13 @@ trait HasValues[+T]:
 
 object HasValues:
 
+  trait Distance[T <: AnyRef] extends HasValues[T]:
+    final def indexOf(value: T): Int = valuesSeq.indexWhere(value eq _, 0)
+
+    final def distance(from: T, to: T): Int = indexOf(to) - indexOf(from)
+
+    //final val ordering: Ordering[Key] = (x: Key, y: Key) => distance(x, y)
+
   trait FindByDefaultName[+T <: HasName] extends HasValues[T]:
     final def getForDefaultName(name: String): T = get(name, forDefaultName(name), this)
     final def forDefaultName(name: String): Option[T] = valuesSeq.find(_.name == name)
