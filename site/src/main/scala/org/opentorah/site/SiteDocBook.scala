@@ -1,9 +1,8 @@
 package org.opentorah.site
 
 import org.opentorah.docbook.DocBook
-import org.opentorah.store.Caching
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Catalog, Element, Parsable, Parser, Resolver, Unparser}
+import org.opentorah.xml.{Attribute, Caching, Catalog, Element, Parsable, Parser, Resolver, Unparser}
 import java.io.File
 import java.net.URL
 
@@ -73,7 +72,7 @@ final class SiteDocBook(
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
       val htmlContent: DocBookHtmlContent[S] = DocBookHtmlContent(documentFile, resolver)
       // TODO supply real Store.Path, not Seq.empty!
-      val content: String = Parser.unsafeRun[String](Caching.provide(site.caching, site.renderHtmlContent(Seq.empty, htmlContent)))
+      val content: String = Caching.unsafeRun[String](site.caching, site.renderHtmlContent(Seq.empty, htmlContent))
       Files.write(outputFile, content)
 
   def prettyPrint(): Unit = {

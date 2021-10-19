@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Element, Elements, PrettyPrinter, ScalaXml}
+import org.opentorah.xml.{Caching, Element, Elements, PrettyPrinter, ScalaXml}
 import java.net.URL
 
 final class ListFile[M, W <: AnyRef](
@@ -15,7 +15,7 @@ final class ListFile[M, W <: AnyRef](
     content = PrettyPrinter.default.renderWithHeader(ScalaXml)(list.xmlElement(entries))
   )
 
-  def get: Caching.Parser[W] = Caching.getCached[W](
+  def get: Caching.Parser[W] = Caching.getCachedByUrl[W](
     url,
     load = (url: URL) => list.parse(url).map(wrapper)
   )

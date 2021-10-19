@@ -1,11 +1,13 @@
 package org.opentorah.collector
 
+import org.opentorah.html
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Directory, Store}
+import org.opentorah.store.{Directory, Path, Terminal}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
+import zio.ZIO
 
 final class Document(
   override val name: String,
@@ -37,63 +39,19 @@ final class Document(
 
   def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
 
+  def textFacetLink(collectionPath: Path, collector: Collector): html.a =
+    facetLink(collectionPath, collectionPath.last.asInstanceOf[Collection].textFacet, collector)
+
+  def facetLink(collectionPath: Path, collectionFacet: Collection.CollectionFacet[?], collector: Collector): html.a =
+    collector.a(facetPath(collectionPath, collectionFacet))
+
+  def facetPath(
+    collectionPath: Path,
+    collectionFacet: Collection.CollectionFacet[?],
+  ): Path =
+    collectionPath ++ Seq(collectionFacet, collectionFacet.of(this))
+
 object Document extends Element[Document]("document"), Directory.EntryMaker[Tei, Document]:
-
-  sealed abstract class Facet(val document: Document, val collectionFacet: Collection.Facet[?])
-    extends Store.Terminal, HtmlContent[Collector]:
-    override def equals(other: Any): Boolean =
-      val that: TextFacet = other.asInstanceOf[TextFacet]
-      (this.collection == that.collection) && (this.document == that.document)
-
-    // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
-
-    final override def names: Names = Names(document.name)
-    final def collection: Collection = collectionFacet.collection
-    final def getTei: Caching.Parser[Tei] = collectionFacet.getTei(document)
-
-    override def htmlHeadTitle: Option[String] = None
-
-  final class TextFacet(document: Document, collectionFacet: Collection.TextFacet)
-    extends Facet(document, collectionFacet), HtmlContent.TextViewer[Collector] derives CanEqual:
-
-    override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
-      tei: Tei <- getTei
-      header: ScalaXml.Element <- collection.documentHeader(document)
-      nodes: ScalaXml.Nodes = tei.text.body.content.scalaXml
-    yield
-      <div>
-        {header}
-        {nodes}
-      </div>
-
-  final class FacsimileFacet(document: Document, collectionFacet: Collection.FacsimileFacet)
-    extends Facet(document, collectionFacet), HtmlContent.FacsimileViewer[Collector]:
-    override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
-      for header <- collection.documentHeader(document) yield
-      <div class="facsimileWrapper">
-        {header}
-        <div class={HtmlContent.facsimileViewer}>
-          <div class="facsimileScroller">{
-            val text: TextFacet = collection.textFacet.of(document)
-            val facsimileUrl: String = collection.facsimileUrl(collector)
-            // TODO generate lists of images and check for missing ones and orphans
-
-            for page: Page <- document.pages(collection.pageType).filterNot(_.pb.isMissing) yield
-              val n: String = page.pb.n
-              val pageId: String = Pb.pageId(n)
-              HtmlContent.a(collector.textFacetPath(text)).setFragment(pageId)(
-                <figure>
-                  <img
-                  id={pageId}
-                  alt={s"facsimile for page $n"}
-                  src={page.pb.facs.getOrElse(s"$facsimileUrl$n.jpg")}
-                  />
-                  <figcaption>{n}</figcaption>
-                </figure>
-              )
-            }</div>
-        </div>
-      </div>
 
   override def apply(name: String, tei: Tei): Parser[Document] = for
     pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content.scalaXml, Pb.elementName, Pb)

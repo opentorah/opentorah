@@ -2,9 +2,9 @@ package org.opentorah.collector
 
 import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as TeiEntity}
 import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Caching, Directory, Store, WithSource}
+import org.opentorah.store.{Directory, Path, Store, WithSource}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Entity(
@@ -12,7 +12,10 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends Directory.Entry(name), HtmlContent.ApparatusViewer[Collector] derives CanEqual:
+) extends 
+  Directory.Entry(name),
+  HtmlContent.ApparatusViewer[Collector] derives CanEqual:
+  
   override def equals(other: Any): Boolean =
     val that: Entity = other.asInstanceOf[Entity]
     this.name == that.name
@@ -21,49 +24,51 @@ final class Entity(
 
   override def htmlHeadTitle: Option[String] = Some(mainName)
 
-  def teiEntity(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
+  def getTei(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
 
-  override def content(path: Store.Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
-    entity: TeiEntity <- teiEntity(collector)
+  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
+    entity: TeiEntity <- getTei(collector)
     references: Seq[WithSource[EntityReference]] <- collector.getReferences
     sources: Seq[Store] <- ZIO.foreach(
       references.filter(_.value.ref.contains(id))
-    )(withSource => collector.resolveUrl(withSource.source).map(_.get.last))
+    )((withSource: WithSource[EntityReference]) => collector.resolveUrl(withSource.source).map(_.get.last))
+    collectionPaths: Seq[Path] <- collector.collectionPaths
   yield
 
     val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
       sources.filter(_.isInstanceOf[Entity]).map(_.asInstanceOf[Entity])
     )(_.id).sortBy(_.mainName)
 
-    val fromDocuments: Map[Collection, Seq[Document.TextFacet]] = sources
-      .filter(_.isInstanceOf[Document.TextFacet])
-      .map(_.asInstanceOf[Document.TextFacet])
+    val fromDocuments: Map[Collection, Seq[TextFacet]] = sources
+      .filter(_.isInstanceOf[TextFacet]).map(_.asInstanceOf[TextFacet])
       .groupBy(_.collection)
 
-    val byCollection: Seq[(Collection, Seq[Document.TextFacet])] =
+    val byCollection: Seq[(Collection, (Path, Seq[TextFacet]))] =
       for
-        collection: Collection <- collector.collections
-        texts: Option[Seq[Document.TextFacet]] = fromDocuments.get(collection)
-        if texts.isDefined
-      yield collection -> Collections.removeConsecutiveDuplicatesWith(texts.get)(_.document.name)
-        .sortBy(_.document.name)
+        path: Path <- collectionPaths
+        collection: Collection = path.last.asInstanceOf[Collection]
+        textsOpt: Option[Seq[TextFacet]] = fromDocuments.get(collection)
+        if textsOpt.isDefined
+        texts: Seq[TextFacet] = Collections.removeConsecutiveDuplicatesWith(textsOpt.get)(_.document.name).sortBy(_.document.name)
+      yield collection -> (path, texts)
 
     // TODO submerge Document contribution in Document...
     val mentions: ScalaXml.Element =
       <p class="mentions">
-        {HtmlContent.a(path)(text = "[...]")}
         {if fromEntities.isEmpty then Seq.empty else
         <l>
           <em>{collector.entityLists.selector.title.get}:</em>
-          {ScalaXml.multi(nodes = for fromEntity <- fromEntities yield Entity.line(fromEntity, collector))}
+          {ScalaXml.multi(nodes = for fromEntity <- fromEntities yield Entity.reference(fromEntity, collector))}
         </l>
         }
-        {for (collection: Collection, texts: Seq[Document.TextFacet]) <- byCollection yield
-        <l>{collection.pathHeaderHorizontal(collector)}:
-          {ScalaXml.multi(separator = " ", nodes =
-          for text: Document.TextFacet <- texts yield HtmlContent.a(collector.textFacetPath(text))(text = text.document.baseName))
-        }</l>}
-      </p>
+        {for (collection: Collection, (collectionPath: Path, texts: Seq[TextFacet])) <- byCollection yield
+          <l>{
+            collection.pathHeaderHorizontal(collectionPath)
+          }: {ScalaXml.multi(separator = " ", nodes =
+            for text: TextFacet <- texts yield
+              text.document.textFacetLink(collectionPath, collector)(text = text.document.baseName))
+          }</l>
+        }</p>
 
     TeiEntity.xmlElement(entity.copy(content = ScalaXml.toNodes(entity.content.scalaXml :+ mentions)))
 
@@ -104,6 +109,9 @@ object Entity extends EntityRelated[Entity](
 
   // TODO move into the Entity class?
   def line(entity: Entity, collector: Collector): ScalaXml.Element =
-    <l>{HtmlContent.a(collector.entityPath(entity))(text = entity.mainName)}</l>
+    <l>{reference(entity, collector)}</l>
+
+  private def reference(entity: Entity, collector: Collector) =
+    collector.a(collector.entityPath(entity))(entity.mainName)
 
   def sort(entities: Seq[Entity]): Seq[Entity] = entities.sortBy(_.name)

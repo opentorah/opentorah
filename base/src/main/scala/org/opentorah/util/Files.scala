@@ -72,8 +72,9 @@ object Files:
 
   def splitUrl(urlRaw: String): Seq[String] =
     val url: String = if urlRaw.isEmpty then "/" else urlRaw
-    require(url.startsWith("/"))
-    url.substring(1).split("/").toIndexedSeq.filterNot(_.isBlank)
+    val startsWithSlash: Boolean = url.startsWith("/")
+    // TODO? require(startsWithSlash)
+    (if startsWithSlash then url.substring(1) else url).split("/").toIndexedSeq.filterNot(_.isBlank)
 
   def splitAndDecodeUrl(url: String): Seq[String] = splitUrl(url).map(urlDecode)
 

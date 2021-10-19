@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.WithNumber
-import org.opentorah.store.{By, Selector, Store, Stores}
+import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
 import org.opentorah.xml.Parser
 
 final class Chapters(chapters: Seq[Int]):
@@ -59,7 +59,9 @@ final class Chapters(chapters: Seq[Int]):
 
 object Chapters:
 
-  final class ByChapter(span: Span, chapters: Chapters) extends By.Numbered[Chapter]("chapter"):
+  final class ByChapter(span: Span, chapters: Chapters) extends
+    By.WithSelector[Chapter]("chapter"),
+    NumberedStores[Chapter]:
     override def minNumber: Int = span.from.chapter
     override def maxNumber: Int = span.to.chapter
 
@@ -68,15 +70,19 @@ object Chapters:
       from = if number == minNumber then span.from.verse else 1,
       to =   if number == maxNumber then span.to.verse   else chapters.length(number)
     ):
-      override def oneOf: Stores.Numbered[Chapter] = ByChapter.this
+      override def oneOf: NumberedStores[Chapter] = ByChapter.this
 
-  class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends By.Numbered[Store.Numbered](selectorName):
+  class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends
+    By.WithSelector[NumberedStore](selectorName),
+    NumberedStores[NumberedStore]:
     override def minNumber: Int = 1
     override def length: Int = spans.length
-    override protected def createNumberedStore(number: Int): Store.Numbered = ForSpan(number)
+    override protected def createNumberedStore(number: Int): NumberedStore = ForSpan(number)
 
-    private class ForSpan(override val number: Int) extends Store.Numbered, Store.Bys:
-      override def oneOf: Stores.Numbered[Store.Numbered] = BySpan.this
+    private class ForSpan(override val number: Int) extends
+      NumberedStore,
+      Pure[?]:
+      override def oneOf: NumberedStores[NumberedStore] = BySpan.this
       override def storesPure: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
 
   val parser: Parser[Chapters] = for

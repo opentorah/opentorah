@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.docbook.DocBook
-import org.opentorah.store.Store
+import org.opentorah.store.{Path, Store}
 import org.opentorah.xml.{Parser, Resolver, ScalaXml}
 import zio.ZIO
 import java.io.File
@@ -15,5 +15,5 @@ final class DocBookHtmlContent[S <: Site[S]](
   override def htmlHeadTitle: Option[String] = None // TODO
 
   // TODO Caching.Parser?
-  override def content(path: Store.Path, site: S): Parser[ScalaXml.Element] =
+  override def content(path: Path, site: S): Parser[ScalaXml.Element] =
     ZIO.succeed(DocBook.loadFromFile(inputFile, Some(resolver))) // TODO real Parser

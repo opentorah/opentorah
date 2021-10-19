@@ -1,7 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.site.Site
+import org.opentorah.store.Path
 import org.opentorah.util.Effects
+import org.opentorah.xml.{Caching, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,12 +11,14 @@ import java.io.File
 
 final class CollectorTest extends AnyFlatSpec, Matchers:
 
-  "Collector smoke tests" should "work" in {
-    val localStorePath: String = "/home/dub/OpenTorah/alter-rebbe.org/"
-    val isLocal: Boolean = File(localStorePath).exists()
-    val siteUrl: String = if isLocal then s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
-    val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
+  // Collector
+  val localStorePath: String = "/home/dub/OpenTorah/alter-rebbe.org/"
+  val isLocal: Boolean = File(localStorePath).exists()
+  val siteUrl: String = if isLocal then s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
+  val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
+  collector.caching.logEnabled = false
 
+  "Collector smoke tests" should "work" in {
     def getResponse(pathString: String): Either[Throwable, Site.Response] =
       Effects.unsafeRun(collector.getResponse(pathString).either)
     def getContent(pathString: String): String = getResponse(pathString).getOrElse(fail()).content
@@ -50,4 +54,12 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
     getError  ("/rgada/facsimile/029.xml") should include("non-HTML content")
 
     getContent("/archive/rgada/category/VII/inventory/2/case/3140/document/001") should include("100 рублей")
+  }
+
+  "Store.getPath()" should "work" in {
+    val reportPaths: Seq[Path] = Caching.unsafeRun(new Caching.Simple, Reports.getPaths(
+      include = _.isInstanceOf[Report[?]],
+      stop = _.isInstanceOf[Report[?]]
+    ))
+    println(reportPaths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
   }

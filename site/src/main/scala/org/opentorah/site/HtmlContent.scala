@@ -1,26 +1,25 @@
 package org.opentorah.site
 
 import org.opentorah.html
-import org.opentorah.store.{Caching, Store}
-import org.opentorah.xml.ScalaXml
+import org.opentorah.store.Path
+import org.opentorah.xml.{Caching, ScalaXml}
 
-// TODO this should be part of the Store!
+// TODO should this be a part of the Store?
 trait HtmlContent[S <: Site[S]]:
   def htmlHeadTitle: Option[String]
 
   def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
-  def content(path: Store.Path, site: S): Caching.Parser[ScalaXml.Element]
+  def content(path: Path, site: S): Caching.Parser[ScalaXml.Element]
+
+  // TODO split into prev, next, up and more?
+  def navigationLinks(path: Path, site: S): Caching.Parser[Seq[ScalaXml.Element]] = zio.ZIO.succeed (Seq.empty)
 
   def style: String = "main"
 
   def viewer: String
 
 object HtmlContent:
-  final def a(path: Store.Path): html.a = html
-    .a(Store.structureNames(path))
-    .setTarget(path.last.asInstanceOf[HtmlContent[?]].viewer)
-
   trait Wide:
     self: HtmlContent[?] =>
     final override def style: String = "wide"

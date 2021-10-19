@@ -38,7 +38,7 @@ object HtmlTheme:
         <header class="site-header" role="banner">
           <div class="wrapper">
             {ScalaXml.optional(common.title)(title => <a class="site-title" rel="author"
-               target={HtmlContent.hierarchyViewer} href="/">{title.content}</a>)}
+               target={HtmlContent.hierarchyViewer} href="/">{title.content.scalaXml}</a>)}
             <nav class="site-nav">
               <input type="checkbox" id="nav-trigger" class="nav-trigger" />
               <label for="nav-trigger">
@@ -83,7 +83,7 @@ object HtmlTheme:
                     </li>
                 }</ul>
               </div>
-              {ScalaXml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.content}</div>)}
+              {ScalaXml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.content.scalaXml}</div>)}
             </div>
           </div>
         </footer>
