@@ -97,7 +97,8 @@ if (project.name != 'docs') {
         library(MavenPublication) {
           from components.java
           artifact sourcesJar
-          artifact scaladocJar
+          // TODO something is still not quite right with the ScalaDoc support for Scala 3 in Gradle; disabling for now
+          //artifact scaladocJar
           artifact javadocJar
 
           pom {
