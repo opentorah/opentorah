@@ -1,8 +1,9 @@
 # Changelog
 
-Modules covered: `calendar` and `schedule`.
-
 ## [Unreleased]
+
+## [0.4.0] - 2021-11-03
+- Scala 3;
 - more cleanup;
 
 ## [0.3.7] - 2021-08-17

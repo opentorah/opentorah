@@ -1,6 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.docbook.DocBook
+import org.opentorah.store.Context
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Caching, Catalog, Element, Parsable, Parser, Resolver, Unparser}
 import java.io.File
@@ -15,7 +16,8 @@ final class SiteDocBook(
 ):
   private def logger = Site.logger
 
-  def process[S <: Site[S]](site: Site[S]): Unit =
+  def process(context: Context): Unit =
+    val site: Site = context.asInstanceOf[Site]
     val baseUrl: URL = site.fromUrl.url
     val documentFiles: Seq[File] = documents.map(Files.subFile(baseUrl, _))
     val outputDirectoryFile: File = Files.subFile(baseUrl, outputDirectory)
@@ -70,9 +72,9 @@ final class SiteDocBook(
       val outputFile: File = Files.file(outputDirectoryFile,
         (if !prefixed then Seq.empty else Seq(documentName)) ++ Seq("html", "index.html"))
       logger.warn(s"processing '$documentName'\n  from '$documentFile'\n  to   '$outputFile'.")
-      val htmlContent: DocBookHtmlContent[S] = DocBookHtmlContent(documentFile, resolver)
+      val store: DocBook = DocBook(documentFile, resolver)
       // TODO supply real Store.Path, not Seq.empty!
-      val content: String = Caching.unsafeRun[String](site.caching, site.renderHtmlContent(Seq.empty, htmlContent))
+      val content: String = Caching.unsafeRun[String](site.caching, site.render(Seq(store)))
       Files.write(outputFile, content)
 
   def prettyPrint(): Unit = {
@@ -90,13 +92,12 @@ final class SiteDocBook(
   }
 
 object SiteDocBook extends Element[SiteDocBook]("docbook"):
-
-  private val documentsAttribute: Attribute.Required[String] = Attribute("documents").required
-  private val outputDirectoryAttribute: Attribute.Required[String] = Attribute("outputDirectory").required
-  private val buildDirectoryAttribute: Attribute.Required[String] = Attribute("buildDirectory").required
-  private val dataGeneratorClassAttribute: Attribute.Optional[String] = Attribute("dataGeneratorClass").optional
-
   override def contentParsable: Parsable[SiteDocBook] = new Parsable[SiteDocBook]:
+    private val documentsAttribute: Attribute.Required[String] = Attribute("documents").required
+    private val outputDirectoryAttribute: Attribute.Required[String] = Attribute("outputDirectory").required
+    private val buildDirectoryAttribute: Attribute.Required[String] = Attribute("buildDirectory").required
+    private val dataGeneratorClassAttribute: Attribute.Optional[String] = Attribute("dataGeneratorClass").optional
+  
     override def parser: Parser[SiteDocBook] = for
       documents: Seq[String] <- documentsAttribute().map(_.split(",").toList)
       outputDirectory: String <- outputDirectoryAttribute()

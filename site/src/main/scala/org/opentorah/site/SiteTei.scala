@@ -16,9 +16,9 @@ object SiteTei extends Element[SiteTei]("tei"):
     calendarDesc = None
   )
 
-  private val facsimilesUrlAttribute: Attribute.Optional[String] = Attribute("facsimilesUrl").optional
-
   override def contentParsable: Parsable[SiteTei] = new Parsable[SiteTei]:
+    private val facsimilesUrlAttribute: Attribute.Optional[String] = Attribute("facsimilesUrl").optional
+
     override def parser: Parser[SiteTei] = for
       facsimilesUrl: Option[String] <- facsimilesUrlAttribute()
       sourceDesc: Option[SourceDesc.Value] <- SourceDesc.element.optional()

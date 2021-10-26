@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.store.Path
+import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Hierarchy(
@@ -24,8 +24,9 @@ final class Hierarchy(
 
   override def getBy: Option[ByHierarchy] = Some(by)
 
-  override protected def innerContent(path: Path, collector: Collector): Parser[ScalaXml.Element] =
-    ZIO.succeed(by.oneLevelIndex(path :+ by, collector))
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+    pathShortener: Path.Shortener <- context.pathShortener
+  yield by.oneLevelIndex(path :+ by, pathShortener)
 
 object Hierarchy extends Element[Hierarchy]("store"):
   override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy]:

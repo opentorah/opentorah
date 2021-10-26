@@ -2,7 +2,7 @@ package org.opentorah.docbook
 
 import org.opentorah.docbook.section.{CommonSection, DocBook2, NonOverridableParameters, Sections, Variant}
 import org.opentorah.fop.{Fop, FopPlugin, JEuclidFopPlugin, MathJaxFopPlugin, MathJaxRunner}
-import org.opentorah.mathjax.{MathJax, MathJaxConfiguration}
+import org.opentorah.mathjax.{MathFilter, MathJax, MathJaxConfiguration}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Catalog, EvalFilter, PrettyPrinter, Resolver, Sax, Saxon, ScalaXml, XInclude, Xml}
 import java.io.{File, FileWriter}

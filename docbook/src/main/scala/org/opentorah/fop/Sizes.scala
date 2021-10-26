@@ -3,7 +3,7 @@ package org.opentorah.fop
 import org.apache.fop.datatypes.Length
 import org.apache.fop.fo.properties.FixedLength
 import org.apache.xmlgraphics.image.loader.ImageSize
-import org.opentorah.docbook.MathFilter
+import org.opentorah.mathjax.MathFilter
 import org.opentorah.xml.{Attribute, Dom}
 import org.w3c.dom.svg.SVGDocument
 import java.awt.Dimension

@@ -3,8 +3,7 @@ package org.opentorah.collector
 import org.opentorah.html
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Path, Selector, Store}
+import org.opentorah.store.{By, Context, Path, Selector, Store, Style}
 import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
@@ -24,7 +23,7 @@ final class Collection(
   description,
   body
 ),
-HtmlContent.Wide derives CanEqual:
+Style.Wide derives CanEqual:
 
   override def equals(other: Any): Boolean =
     val that: Collection = other.asInstanceOf[Collection]
@@ -61,7 +60,8 @@ HtmlContent.Wide derives CanEqual:
   override def findByName(name: String): Caching.Parser[Option[Store]] =
     textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(ZIO.some)) // TODO ZIO.someOrElseM?
 
-  override protected def innerContent(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+    pathShortener: Path.Shortener <- context.pathShortener
     directory: Documents.All <- documents.getDirectory
     columns: Seq[Collection.Column] = Seq(
       Collection.descriptionColumn,
@@ -72,18 +72,19 @@ HtmlContent.Wide derives CanEqual:
       Collection.Column("Язык", "language", (document: Document) =>
         translations(document).map(documentTranslations =>
           Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-            Seq(ScalaXml.mkText(" "), translation.textFacetLink(path, collector)(text = translation.lang))
+            Seq(ScalaXml.mkText(" "), translation.textFacetLink(path, pathShortener)(text = translation.lang))
           )
         )
       ),
 
       Collection.PureColumn("Документ", "document", (document: Document) =>
-        document.textFacetLink(path, collector)(text = document.baseName)
+        document.textFacetLink(path, pathShortener)(text = document.baseName)
       ),
 
       Collection.PureColumn("Страницы", "pages", (document: Document) =>
-        ScalaXml.multi(separator = " ", nodes = for page <- document.pages(pageType)
-          yield page.pb.addAttributes(document.textFacetLink(path, collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName)))
+        ScalaXml.multi(separator = " ", nodes = for page: Page <- document.pages(pageType)
+          yield page.reference(document, path, pathShortener)
+        )
       ),
 
       Collection.transcribersColumn
@@ -91,9 +92,12 @@ HtmlContent.Wide derives CanEqual:
 
     rows: Seq[ScalaXml.Nodes] <- ZIO.foreach(directory.parts)(part =>
       ZIO.foreach(part.documents)(document =>
-        ZIO.foreach(columns)(column =>
-          column.value(document).map(value => <td class={column.cssClass}>{value}</td>)
-        ).map(cells => <tr>{cells}</tr>)
+        for
+          cells <- ZIO.foreach(columns)(column =>
+            for value: ScalaXml.Nodes <- column.value(document)
+            yield <td class={column.cssClass}>{value}</td>
+          )
+        yield <tr>{cells}</tr>
       )
         .map(documentRows => part.title.fold[ScalaXml.Nodes](Seq.empty)(title =>
           <tr><td colspan={columns.length.toString}><span class="part-title">{title.content.scalaXml}</span></td></tr>

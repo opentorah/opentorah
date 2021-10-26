@@ -11,7 +11,7 @@ final class SiteCommon(
   val email: Option[String],
   val title: Option[SiteCommon.Title.Value],
   val license: Option[SiteLicense],
-  private val social: Option[SiteSocial],
+  val social: Option[SiteSocial],
   val footer: Option[SiteCommon.Footer.Value],
   val pages: Seq[String],
   val docbook: Seq[SiteDocBook],
@@ -28,12 +28,12 @@ object SiteCommon extends Element[SiteCommon]("common"):
   object Title  extends RawXml("title")
   object Footer extends RawXml("footer")
 
-  private val urlAttribute: Attribute.Optional[String] = Attribute("url").optional
-  private val faviconAttribute: Attribute.Optional[String] = Attribute("favicon").optional
-  private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
-  private val emailAttribute: Attribute.Optional[String] = Attribute("email").optional
-
   override def contentParsable: Parsable[SiteCommon] = new Parsable[SiteCommon]:
+    private val urlAttribute: Attribute.Optional[String] = Attribute("url").optional
+    private val faviconAttribute: Attribute.Optional[String] = Attribute("favicon").optional
+    private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
+    private val emailAttribute: Attribute.Optional[String] = Attribute("email").optional
+  
     override def parser: Parser[SiteCommon] = for
       names: Names <- Names.withDefaultNameParsable()
       url: Option[String] <- urlAttribute()

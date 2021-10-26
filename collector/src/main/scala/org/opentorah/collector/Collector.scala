@@ -1,15 +1,14 @@
 package org.opentorah.collector
 
 import org.opentorah.html
-import org.opentorah.site.{HtmlContent, Site, SiteCommon, SiteService}
-import org.opentorah.store.{Alias, Directory, ListFile, Path, Store, WithSource}
+import org.opentorah.site.{Site, SiteCommon, SiteService}
+import org.opentorah.store.{Alias, Directory, Context, ListFile, Path, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear, Entity as TeiEntity}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.{UIO, ZIO}
 import java.net.URL
 
-// TODO retrieve TEI(?) references from notes.
 final class Collector(
   fromUrl: Element.FromUrl,
   common: SiteCommon,
@@ -18,7 +17,7 @@ final class Collector(
   val notes: Notes,
   val by: ByHierarchy,
   val aliases: Seq[Alias]
-) extends Site[Collector](
+) extends Site(
   fromUrl,
   common
 ):
@@ -27,39 +26,33 @@ final class Collector(
     load = by.getPaths(include = _.isInstanceOf[Collection], stop = _.isInstanceOf[Collection])
   )
 
-  def entityPath(entity: Entity): Path = Seq(entities, entity)
-
-  def entityListPath(entityList: EntityList): Path = Seq(entityLists, entityList)
+  override def path(store: Store): Path = store match
+    case entity: Entity => Seq(entities, entity)
+    case entityList: EntityList => Seq(entityLists, entityList)
 
   private def findEntityByName[T](name: String, action: Option[Entity] => T): Caching.Parser[T] =
     entities.findByName(name).map(action)
 
-  def collectionPath(path: Path): Path =
-    val collectionIndex: Int = path.indexWhere(_.isInstanceOf[Collection])
-    require(collectionIndex > 0)
-    path.take(collectionIndex+1)
-
-  // TODO get rid of the unsafeRun() here, shortenPath() - and a() - need to become Caching.Parsers...
-  private def store2alias: Map[Store, Alias] = Caching.unsafeRun(caching, Caching.getCached(
+  private def store2alias: Caching.Parser[Map[Store, Alias]] = Caching.getCached(
     key = "store2alias",
     load = ZIO.foreach(aliases)((alias: Alias) =>
       for toPath: Path <- resolve(alias.to) yield toPath.last -> alias
     ).map(_.toMap)
-  ))
+  )
 
-  override protected def shortenPath(path: Path): Path =
-    def useAliases(path: Path): Path =
+  override def pathShortener: Caching.Parser[Path.Shortener] =
+    def useAliases(path: Path, store2alias: Map[Store, Alias]): Path =
       val aliasedIndex: Int = path.indexWhere(store2alias.contains)
       if aliasedIndex < 0 then path else store2alias(path(aliasedIndex)) +: path.drop(aliasedIndex+1)
 
-    def skipTextFacet(path: Path): Path =
-      if
-        (path.length >= 2) &&
-        path.last.isInstanceOf[TextFacet] &&
-        path.init.last.isInstanceOf[CollectionFacet]
-      then path.init.init :+ path.last else path
+    def skipTextFacet(path: Path): Path = if
+      (path.length >= 2) &&
+      path.last.isInstanceOf[TextFacet] &&
+      path.init.last.isInstanceOf[CollectionFacet]
+    then path.init.init :+ path.last else path
 
-    useAliases(skipTextFacet(path))
+    for store2alias <- store2alias
+    yield (path: Path) => useAliases(skipTextFacet(path), store2alias)
 
   override protected def index: Option[Path] = Some(Seq(Index.Flat))
 
@@ -90,23 +83,24 @@ final class Collector(
     case textFacet: TextFacet if extension.nonEmpty && extension.contains("xml") =>
       for
         tei: Tei <- textFacet.getTei
-        content: String = renderTeiContent(tei)
+        content: String = renderTei(tei)
       yield Site.Response(content, Tei.mimeType)
 
-    case htmlContent: HtmlContent[?] =>
+    case store: Store =>
       if extension.nonEmpty && !extension.contains("html") then
-        Effects.fail(s"Can't provide non-HTML content '${extension.get}' of $htmlContent")
+        Effects.fail(s"Can't provide non-HTML content '${extension.get}' of $store")
       else
-        for content: String <- renderHtmlContent(path, htmlContent.asInstanceOf[HtmlContent[Collector]])
+        for content: String <- render(path)
         yield Site.Response(content, html.Html.mimeType)
-
-    case _ => Effects.fail(s"Can't provide content of $path")
-
+  
   override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
 
-  override protected def linkResolver(path: Path, htmlContent: HtmlContent[Collector]): LinksResolver =
-    val facsUrl: Option[Path] = htmlContent match
-      case textFacet: TextFacet => Some(textFacet.document.facetPath(collectionPath(path), textFacet.collection.facsimileFacet))
+  override protected def linkResolver(
+    path: Path,
+    pathShortener: Path.Shortener
+  ): LinksResolver =
+    val facsUrl: Option[Path] = path.last match
+      case textFacet: TextFacet => Some(textFacet.document.facetPath(Collector.collectionPath(path), textFacet.collection.facsimileFacet))
       case _ => None
 
     new LinksResolver:
@@ -116,7 +110,7 @@ final class Collector(
         modifier: html.a => html.a = identity,
       ): UIO[Option[html.a]] = toTask(pathFinder.map(pathOpt =>
         if pathOpt.isEmpty then logger.warn(error)
-        pathOpt.map((path: Path) => modifier(a(path)))
+        pathOpt.map((path: Path) => modifier(Path.a(path, pathShortener)))
       )).orDie
 
       override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
@@ -125,7 +119,7 @@ final class Collector(
       )
 
       override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
-        pathFinder = findEntityByName(ref, _.map(entityPath)),
+        pathFinder = findEntityByName(ref, _.map(Collector.this.path)),
         error = s"did not find reference: $ref"
       )
 
@@ -179,6 +173,7 @@ final class Collector(
       _ <- Effects.effect(unclears.write(allUnclears))
     yield ()
 
+  // TODO retrieve TEI(?) references from notes.
   private def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] =
     def forPaths[S, R](
       getter: Caching.Parser[Seq[Path]],
@@ -188,8 +183,9 @@ final class Collector(
       paths: Seq[Path] <- getter
       result: Seq[Seq[WithSource[T]]] <- ZIO.foreach(paths)((path: Path) =>
         for
-          from: R <- retriever(path.last.asInstanceOf[S])
-          source: String = Files.mkUrl(Path.structureNames(shortenPath(path)))
+          from: R <- retriever(Path.last[S](path))
+          pathShortener: Path.Shortener <- pathShortener
+          source: String = Files.mkUrl(Path.structureNames(pathShortener(path)))
           nodes: ScalaXml.Nodes = extractor(from)
           found: Seq[T] <- finder(nodes)
         yield found.map(new WithSource[T](source, _))
@@ -246,17 +242,15 @@ final class Collector(
 
   private def verifyLinks(getter: Caching.Parser[Seq[Path]]): Caching.Parser[Unit] = for
     paths: Seq[Path] <- getter
-    _ <- ZIO.foreach_(paths)((path: Path) =>
-      // TODO separate verification from actual resolution
-      resolveLinksInHtmlContent(path, path.last.asInstanceOf[HtmlContent[Collector]])
-    )
+    // TODO separate verification from actual resolution
+    _ <- ZIO.foreach_(paths)(resolveLinks)
   yield ()
 
   override protected def prettyPrintTei: Caching.Parser[Seq[URL]] = for
     entityPaths <- entityPaths
     textFacetPaths <- textFacetPaths
   yield
-    entityPaths.map(path => entities.fileUrl(path.last.asInstanceOf[Entity].name)) ++
+    entityPaths.map(path => entities.fileUrl(Path.last[Entity](path).name)) ++
     textFacetPaths.map(_.last.asInstanceOf[TextFacet])
       .map(textFacet => textFacet.collection.documents.fileUrl(textFacet.document))
 
@@ -267,6 +261,12 @@ final class Collector(
     hierarchyPaths.map(_.last.asInstanceOf[Element.FromUrl.With].fromUrl).filterNot(_.inline).map(_.url)
 
 object Collector extends SiteService[Collector]:
+  // TODO I sacrificed type-safety: HtmlContent lost type parameter S <: Site[S] and got merged into Store;
+  // this was done so that I don't have to add this parameter to Store and friends...
+  // Lift appropriate methods into HtmlContext and minimize the use of this...
+  def get(context: Context): Collector = context.asInstanceOf[Collector]
+
+  def collectionPath(path: Path): Path = Path.takeTo(path, classOf[Collection])
 
   override def projectId: String = "alter-rebbe-2"
 

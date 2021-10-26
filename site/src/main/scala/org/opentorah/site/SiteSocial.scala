@@ -7,8 +7,8 @@ final class SiteSocial(
   val twitter: Option[String]
 ):
   def list: Seq[(SiteSocial.Service, String)] = Seq(
-    optional(SiteSocial.GitHub , github ),
-    optional(SiteSocial.Twitter, twitter)
+    optional(SiteSocial.Service.GitHub , github ),
+    optional(SiteSocial.Service.Twitter, twitter)
   ).flatten
 
   private def optional(service:SiteSocial.Service, username: Option[String]): Option[(SiteSocial.Service, String)] =
@@ -16,19 +16,19 @@ final class SiteSocial(
 
 object SiteSocial extends Element[SiteSocial]("social"):
 
-  sealed class Service(val serviceUrl: String, val iconUrl: String)
-  object GitHub  extends Service(serviceUrl = "https://github.com"     , iconUrl = "/assets/icons.svg#github" )
-  object Twitter extends Service(serviceUrl = "https://www.twitter.com", iconUrl = "/assets/icons.svg#twitter")
+  enum Service(val serviceUrl: String, val iconUrl: String):
+    case GitHub  extends Service(serviceUrl = "https://github.com"     , iconUrl = "/assets/icons.svg#github" )
+    case Twitter extends Service(serviceUrl = "https://www.twitter.com", iconUrl = "/assets/icons.svg#twitter")
 
   val empty: SiteSocial = SiteSocial(
     github = None,
     twitter = None
   )
 
-  private val githubAttribute : Attribute.Optional[String] = Attribute("github" ).optional
-  private val twitterAttribute: Attribute.Optional[String] = Attribute("twitter").optional
-
   override def contentParsable: Parsable[SiteSocial] = new Parsable[SiteSocial]:
+    private val githubAttribute : Attribute.Optional[String] = Attribute("github" ).optional
+    private val twitterAttribute: Attribute.Optional[String] = Attribute("twitter").optional
+
     override def parser: Parser[SiteSocial] = for
       github : Option[String]  <- githubAttribute ()
       twitter: Option[String] <- twitterAttribute()

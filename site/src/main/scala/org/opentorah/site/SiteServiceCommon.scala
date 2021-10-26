@@ -2,6 +2,7 @@ package org.opentorah.site
 
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
+// TODO eliminate
 // TODO if I ever figure out how to call nested Scala object from a Gradle build file,
 // this (together with Site.Common) could move into SiteService companion object...
 object SiteServiceCommon extends SiteService[Site.Common]:

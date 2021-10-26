@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - switched from http4s to zhttp;
 - switched to Scala 3 and its syntax!
 - ScalaTest 2.2.10 uses current FlexMark;
-- using Scala 3 multiversal ("strict") equality.
+- using Scala 3 multiversal ("strict") equality;
+- moved "store" package into the "site" module;
+- merged "schedule" module into "texts";
+- merged "tei" module into "site".
 
 ## [0.2.6] - 2021-08-17
 - consolidated 'util', 'xml' and 'metadata' modules into 'base';

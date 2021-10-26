@@ -1,31 +1,33 @@
 package org.opentorah.collector
 
-import org.opentorah.site.HtmlContent
-import org.opentorah.store.Path
+import org.opentorah.store.{Context, Path, Viewer}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.{Caching, ScalaXml}
 
 final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends
   Facet(document, collectionFacet),
-  HtmlContent.TextViewer[Collector] derives CanEqual:
+  Viewer.Text derives CanEqual:
 
   override def equals(other: Any): Boolean =
     val that: TextFacet = other.asInstanceOf[TextFacet]
     (this.collection == that.collection) && (this.document == that.document)
 
-  override protected def wrapperCssClass: String = "textWrapper"
+  override def wrapperCssClass: String = "textWrapper"
 
-  override protected def innerContent(path: Path, collector: Collector): Caching.Parser[ScalaXml.Nodes] = for
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
     tei: Tei <- getTei
   yield
-    tei.text.body.content.scalaXml
+    <div>
+      {tei.text.body.content.scalaXml}
+    </div>
 
   override protected def moreNavigationLinks(
     collectionPath: Path,
-    collector: Collector
+    context: Context
   ): Caching.Parser[Seq[ScalaXml.Element]] = for
     translations <- collection.translations(document)
+    pathShortener: Path.Shortener <- context.pathShortener
   yield
-    Seq(document.facetLink(collectionPath, collection.facsimileFacet, collector)(text = Tei.facsimileSymbol)) ++
+    Seq(document.facetLink(collectionPath, collection.facsimileFacet, pathShortener)(text = Tei.facsimileSymbol)) ++
     (for translation <- if document.isTranslation then Seq.empty else translations
-     yield translation.textFacetLink(collectionPath, collector)(s"[${translation.lang}]"))
+     yield translation.textFacetLink(collectionPath, pathShortener)(s"[${translation.lang}]"))

@@ -1,11 +1,27 @@
 package org.opentorah.docbook
 
 import org.opentorah.html
+import org.opentorah.metadata.Names
+import org.opentorah.store.{Context, Path, Viewer}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Catalog, Dialect, Doctype, Dom, Namespace, PrettyPrinter, Resolver, ScalaXml}
+import org.opentorah.xml.{Attribute, Catalog, Dialect, Doctype, Dom, Namespace, Parser, PrettyPrinter, Resolver, ScalaXml}
 import zio.{Has, URIO}
 import java.io.File
 import java.net.URI
+import zio.ZIO
+
+// TODO dissolve into Site: introduce [Pre]Content and subsume this and Markdown into it.
+final class DocBook(
+  inputFile: File,
+  resolver: Resolver
+) extends Viewer.Default:
+  override def names: Names = ??? // TODO
+  override def htmlHeadTitle: Option[String] = None // TODO
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = None // TODO
+
+  // TODO Caching.Parser?
+  override def content(path: Path, context: Context): Parser[ScalaXml.Element] =
+    ZIO.succeed(DocBook.loadFromFile(inputFile, Some(resolver))) // TODO real Parser
 
 object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
 

@@ -8,7 +8,6 @@ plugins {
 }
 
 description = 'Jewish Calendar Dates'
-version = calendarProjectVersion
 
 ext.dataGeneratorClassName = 'org.opentorah.calendar.paper.Tables'
 // using direct transformation:  ext.isMathJaxEnabled = true

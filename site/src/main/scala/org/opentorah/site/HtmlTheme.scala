@@ -1,23 +1,38 @@
 package org.opentorah.site
 
 import org.opentorah.html.Html
+import org.opentorah.store.{Context, Path, Store, Viewer}
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, ScalaXml, XLink}
+import org.opentorah.xml.{Attribute, Caching, ScalaXml, XLink}
 
 object HtmlTheme:
 
-  // TODO put scripts on the bottom of body, libraries in the head?
+  def fullContent(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+    val store: Store = path.last
+    for
+      header: Option[ScalaXml.Element] <- store.header(path, context)
+      content: ScalaXml.Element <- store.content(path, context)
+    yield
+      <div class={store.wrapperCssClass}>
+        {ScalaXml.optional(header)((header: ScalaXml.Element) =>
+        header)}
+        {ScalaXml.optional(store.htmlBodyTitle)((title: ScalaXml.Nodes) =>
+        <header class="post-header">
+          <h1 class="post-title">{title}</h1>
+        </header>)}
+        <div class="post-content">
+          {content}
+        </div>
+      </div>
+      
   // TODO copy SEO stuff from Minima...
-  // TODO remove post-related stuff
-  // TODO conditionalize (and update) the tag character
   // TODO consolidate css, js etc. under 'asset'
-  def toHtml[S <: Site[S]](
-    htmlContent: HtmlContent[S],
+  def toHtml(
+    store: Store,
     navigationLinks: Seq[ScalaXml.Element], // normally, <a>s
     content: ScalaXml.Element,
-    site: S
+    common: SiteCommon
   ): ScalaXml.Element =
-    val common: SiteCommon = site.common
     val isMathJaxEnabled    : Boolean = common.getMathJax    .isEnabled && HtmlTheme.isMathPresent(content)
     val isHighlighterEnabled: Boolean = common.getHighlighter.isEnabled && HtmlTheme.isCodePresent(content)
 
@@ -26,19 +41,18 @@ object HtmlTheme:
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        {ScalaXml.optional(htmlContent.htmlHeadTitle)(title => <title>{title}</title>)}
-        <link rel="stylesheet" href={s"/css/${htmlContent.style}.css"}/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
-        {ScalaXml.optional(common.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
-        {if !isHighlighterEnabled then Seq.empty else common.getHighlighter.head}
+        {ScalaXml.optional(store.htmlHeadTitle)(title =>
+        <title>{title}</title>)}
+        <link rel="stylesheet" href={s"/css/${store.style}.css"}/>
+        {ScalaXml.optional(common.favicon)(favicon =>
+        <link rel="icon" href={s"/$favicon"}/>)}
+        {ScalaXml.conditional(isHighlighterEnabled)(common.getHighlighter.head)}
       </head>
       <body>
-        {if !isMathJaxEnabled     then Seq.empty else common.getMathJax    .body}
-        {if !isHighlighterEnabled then Seq.empty else common.getHighlighter.body}
         <header class="site-header" role="banner">
           <div class="wrapper">
-            {ScalaXml.optional(common.title)(title => <a class="site-title" rel="author"
-               target={HtmlContent.hierarchyViewer} href="/">{title.content.scalaXml}</a>)}
+            {ScalaXml.optional(common.title)(title =>
+            <a class="site-title" rel="author" target={Viewer.hierarchy} href="/">{title.content.scalaXml}</a>)}
             <nav class="site-nav">
               <input type="checkbox" id="nav-trigger" class="nav-trigger" />
               <label for="nav-trigger">
@@ -55,8 +69,7 @@ object HtmlTheme:
         <main class="page-content" aria-label="Content">
           <div class="wrapper">
             <article class="post">
-              {ScalaXml.optional(htmlContent.htmlBodyTitle)(title => <header class="post-header"><h1 class="post-title">{title}</h1></header>)}
-              <div class="post-content">{content}</div>
+              {content}
             </article>
           </div>
         </main>
@@ -66,8 +79,10 @@ object HtmlTheme:
             <div class="footer-col-wrapper">
               <div class="footer-col footer-col-1">
                 <ul class="contact-list">
-                  {ScalaXml.optional(common.url)(url => <li class="p-name">{url}</li>)}
-                  {ScalaXml.optional(common.email)(email => <li><a class="u-email" href={s"mailto:$email"}>{email}</a></li>)}
+                  {ScalaXml.optional(common.url)(url =>
+                  <li class="p-name">{url}</li>)}
+                  {ScalaXml.optional(common.email)(email =>
+                  <li><a class="u-email" href={s"mailto:$email"}>{email}</a></li>)}
                 </ul>
               </div>
               <div class="footer-col footer-col-2">
@@ -83,17 +98,22 @@ object HtmlTheme:
                     </li>
                 }</ul>
               </div>
-              {ScalaXml.optional(common.footer)(footer => <div class="footer-col footer-col-3">{footer.content.scalaXml}</div>)}
+              {ScalaXml.optional(common.footer)(footer =>
+              <div class="footer-col footer-col-3">{footer.content.scalaXml}</div>)}
             </div>
           </div>
         </footer>
       </body>
       <script type='module'>
         import loadWindow from '/js/window.js';
-        loadWindow({Json.stringToJs(htmlContent.viewer)}, {Json.optionToJs(common.googleAnalyticsId)});</script>
+        loadWindow({Json.stringToJs(store.viewer)}, {Json.optionToJs(common.googleAnalyticsId)});
+      </script>
+      {ScalaXml.conditional(isMathJaxEnabled    )(common.getMathJax    .body)}
+      {ScalaXml.conditional(isHighlighterEnabled)(common.getHighlighter.body)}
     </html>
 
   private val pageLinkClass: Attribute.Value[String] = Html.classAttribute.required.withValue("page-link")
 
+  // TODO implement and move into mathjax and highlighter correspondingly:
   private def isMathPresent(content: ScalaXml.Element): Boolean = true // TODO
   private def isCodePresent(content: ScalaXml.Element): Boolean = true // TODO

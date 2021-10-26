@@ -8,11 +8,10 @@ final class SiteLicense(
 )
 
 object SiteLicense extends Element[SiteLicense]("license"):
-
-  private val nameAttribute: Attribute.Required[String] = Attribute("name").required
-  private val urlAttribute: Attribute.Required[String] = Attribute("url").required
-
   override def contentParsable: Parsable[SiteLicense] = new Parsable[SiteLicense]:
+    private val nameAttribute: Attribute.Required[String] = Attribute("name").required
+    private val urlAttribute: Attribute.Required[String] = Attribute("url").required
+  
     override def parser: Parser[SiteLicense] = for
       name: String <- nameAttribute()
       url: String <- urlAttribute()

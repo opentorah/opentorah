@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2021-11-03
+- Scala 3;
+- Store/Site/Collector cleanup;
+- no unsafeRun() in Site/Collector;
+- merged HtmlContent into Store;
+- codified pre-title Store header.
+
 ## [0.2.6] - 2021-08-17
 - use the 'site' module;
 - code highlighting using `highlightjs`;

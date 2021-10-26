@@ -21,9 +21,10 @@ trait ToHtml[R <: Has[?]]:
       // TODO do we need HTML namespace here?
       <div xmlns={Html.namespace.uri} class="html">
         {mainDiv}
+        {ScalaXml.conditional(endNotesDone.nonEmpty)(
         <div xmlns={Html.namespace.uri} class="endnotes">
           {endNotesDone}
-        </div>
+        </div>)}
       </div>
 
     result.provideSomeLayer[R](EndNotes.empty)
