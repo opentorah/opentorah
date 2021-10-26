@@ -4,7 +4,7 @@ import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Path, Pure, Store}
-import org.opentorah.xml.{Caching, Element, Elements, ScalaXml}
+import org.opentorah.xml.{Caching, Element, Elements, Parsable, ScalaXml}
 
 // TODO push Hierarchical/ByHierarchy into Site;
 // TODO push up Collector-specific stuff (if any);
@@ -13,7 +13,7 @@ abstract class Hierarchical(
   override val fromUrl: Element.FromUrl,
   override val names: Names,
   val title: Title.Value,
-  val storeAbstract: Option[Abstract.Value],
+  val description: Option[Abstract.Value],
   val body: Option[Body.Value],
 ) extends
   Element.FromUrl.With,
@@ -22,11 +22,12 @@ abstract class Hierarchical(
 
   final def titleString: String = title.content.toString
 
-  final def storeAbstractXmlElement: Seq[ScalaXml.Element] = storeAbstract.toSeq.map(Abstract.element.xmlElement)
-
   final override def htmlHeadTitle: Option[String] = Some(titleString)
+  final override def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
+
+  final def descriptionNodes: ScalaXml.Nodes = description.toSeq.map(Abstract.element.xmlElement)
 
   final def pathHeaderHorizontal(path: Path): String =
     @scala.annotation.tailrec
@@ -72,7 +73,7 @@ abstract class Hierarchical(
             {Hierarchical.displayName(this)}:
             {title.content.scalaXml}
           </head>
-          {storeAbstractXmlElement}
+          {descriptionNodes}
           {body.toSeq.map(_.content.scalaXml)}
         </div>
         {inner}
@@ -89,6 +90,11 @@ object Hierarchical extends Elements.Union[Hierarchical]:
   override protected def elementByValue(value: Hierarchical): Element[?] = value match
     case _: Hierarchy  => Hierarchy
     case _: Collection => Collection
+
+  val namesParsable: Parsable[Names] = Names.withDefaultNameParsable
+  val titleElement: Elements.Required[Title.Value] = Title.element.required
+  val descriptionElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
+  val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
 
   // TODO move
   def displayName(store: Store): String = store.names.doFind(Language.Russian.toSpec).name

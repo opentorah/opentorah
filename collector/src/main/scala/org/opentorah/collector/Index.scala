@@ -24,6 +24,6 @@ object Index:
             val collection: Collection = path.last.asInstanceOf[Collection]
             <li>
               {collector.a(path)(text = collection.pathHeaderHorizontal(path) + ": " + collection.titleString)}
-              {collection.storeAbstractXmlElement}
+              {collection.descriptionNodes}
             </li>
         }</ul>

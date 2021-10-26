@@ -9,8 +9,11 @@ import org.opentorah.util.Strings
 import org.opentorah.xml.{Caching, ScalaXml}
 import java.net.URI
 
-// Reports is ApparatusViewer, but Report - DefaultViewer (Hierarchy)?!
-sealed abstract class Report[T](name: String, val title: String) extends Terminal, HtmlContent.DefaultViewer[Collector]:
+// TODO Reports is ApparatusViewer, but Report - DefaultViewer (Hierarchy)?!
+sealed abstract class Report[T](name: String, val title: String) extends
+  Terminal,
+  HtmlContent.DefaultViewer[Collector]:
+  
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
   final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

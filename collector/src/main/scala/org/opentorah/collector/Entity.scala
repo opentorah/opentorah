@@ -23,6 +23,7 @@ final class Entity(
   def id: String = name
 
   override def htmlHeadTitle: Option[String] = Some(mainName)
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
   def getTei(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
 

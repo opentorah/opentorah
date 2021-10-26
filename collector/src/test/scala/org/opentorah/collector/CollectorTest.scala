@@ -14,8 +14,8 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
   // Collector
   val localStorePath: String = "/home/dub/OpenTorah/alter-rebbe.org/"
   val isLocal: Boolean = File(localStorePath).exists()
-  val siteUrl: String = if isLocal then s"file:$localStorePath" else s"http://${CollectorService.bucketName}/"
-  val collector: Collector = Effects.unsafeRun(CollectorService.readSite(siteUrl))
+  val siteUrl: String = if isLocal then s"file:$localStorePath" else s"http://${Collector.bucketName}/"
+  val collector: Collector = Effects.unsafeRun(Collector.readSite(siteUrl))
   collector.caching.logEnabled = false
 
   "Collector smoke tests" should "work" in {
@@ -61,5 +61,5 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
       include = _.isInstanceOf[Report[?]],
       stop = _.isInstanceOf[Report[?]]
     ))
-    println(reportPaths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
+    // TODO assert something meaningful: println(reportPaths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
   }

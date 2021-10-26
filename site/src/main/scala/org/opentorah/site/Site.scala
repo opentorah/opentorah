@@ -168,17 +168,33 @@ abstract class Site[S <: Site[S]](
     caching.logEnabled = false
 
     for
-    _ <- if !withPrettyPrint then Effects.ok else prettyPrint
-    _ <- Effects.effect(Site.logger.info("Writing site lists."))
-      directoriesToWrite: Seq[Directory[?, ?, ?]] <- directoriesToWrite
-    _ <- ZIO.foreach_(directoriesToWrite)(_.writeDirectory())
-    _ <- ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this)))
-    result <- buildMore
-    yield result
+      _ <- writeDirectories
+      _ <- innerBuild
+      _ <- verify
+      _ <- processDocbook
+      _ <- if !withPrettyPrint then Effects.ok else prettyPrint
+    yield ()
   }
 
-  final private def prettyPrint: Caching.Parser[Unit] =
-    Site.logger.info("Pretty-printing site.")
+  private def writeDirectories: Caching.Parser[Unit] =
+    logger.info("Writing site lists.")
+
+    for
+      directoriesToWrite: Seq[Directory[?, ?, ?]] <- directoriesToWrite
+      _ <- ZIO.foreach_(directoriesToWrite)(_.writeDirectory())
+    yield ()
+
+  protected def directoriesToWrite: Caching.Parser[Seq[Directory[?, ?, ?]]] = ZIO.succeed(Seq.empty)
+
+  protected def innerBuild: Caching.Parser[Unit] = Effects.ok
+
+  protected def verify: Caching.Parser[Unit] = Effects.ok
+
+  private def processDocbook: Caching.Parser[Unit] =
+    ZIO.foreach_(common.docbook)(docbook => ZIO.succeed(docbook.process(this)))
+
+  private def prettyPrint: Caching.Parser[Unit] =
+    logger.info("Pretty-printing site.")
 
     // Note: Scala XML ignores XML comments when parsing a file
     // (see https://github.com/scala/scala-xml/issues/508);
@@ -201,10 +217,6 @@ abstract class Site[S <: Site[S]](
   protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 
   protected def prettyPrintStores: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
-
-  protected def directoriesToWrite: Caching.Parser[Seq[Directory[?, ?, ?]]] = ZIO.succeed(Seq.empty)
-
-  protected def buildMore: Caching.Parser[Unit] = IO.succeed(())
 
 object Site:
 

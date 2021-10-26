@@ -8,7 +8,7 @@ import org.opentorah.xml.{Caching, ScalaXml}
 trait HtmlContent[S <: Site[S]]:
   def htmlHeadTitle: Option[String]
 
-  def htmlBodyTitle: Option[ScalaXml.Nodes] = None
+  def htmlBodyTitle: Option[ScalaXml.Nodes]
 
   def content(path: Path, site: S): Caching.Parser[ScalaXml.Element]
 

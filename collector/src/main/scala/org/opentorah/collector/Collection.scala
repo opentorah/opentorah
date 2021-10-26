@@ -12,7 +12,7 @@ final class Collection(
   fromUrl: Element.FromUrl,
   names: Names,
   title: Title.Value,
-  storeAbstract: Option[Abstract.Value],
+  description: Option[Abstract.Value],
   body: Option[Body.Value],
   val pageType: Page.Type,
   val directory: String,
@@ -21,7 +21,7 @@ final class Collection(
   fromUrl,
   names,
   title,
-  storeAbstract,
+  description,
   body
 ),
 HtmlContent.Wide derives CanEqual:
@@ -45,11 +45,17 @@ HtmlContent.Wide derives CanEqual:
   def translations(document: Document): Caching.Parser[Seq[Document]] =
     documents.getDirectory.map(_.translations.getOrElse(document.baseName, Seq.empty))
 
-  val textFacet     : Collection.CollectionTextFacet      = Collection.CollectionTextFacet     (this)
-  val facsimileFacet: Collection.CollectionFacsimileFacet = Collection.CollectionFacsimileFacet(this)
+  val textFacet: CollectionFacet = new CollectionFacet(this):
+    override def selector: Selector = Selector.getForName("document")
+    override def of(document: Document): TextFacet = TextFacet(document, this)
+    override def isText: Boolean = true
 
-  override def storesPure: Seq[Collection.CollectionFacet[?]] =
-    Seq(textFacet, facsimileFacet)
+  val facsimileFacet: CollectionFacet = new CollectionFacet(this):
+    override def selector: Selector = Selector.getForName("facsimile")
+    override def of(document: Document): FacsimileFacet = FacsimileFacet(document, this)
+    override def isText: Boolean = false
+
+  override def storesPure: Seq[CollectionFacet] = Seq(textFacet, facsimileFacet)
 
   // With no facet, "document" is assumed
   override def findByName(name: String): Caching.Parser[Option[Store]] =
@@ -71,13 +77,13 @@ HtmlContent.Wide derives CanEqual:
         )
       ),
 
-      Collection.Column("Документ", "document", (document: Document) =>
-        ZIO.succeed(document.textFacetLink(path, collector)(text = document.baseName))
+      Collection.PureColumn("Документ", "document", (document: Document) =>
+        document.textFacetLink(path, collector)(text = document.baseName)
       ),
 
-      Collection.Column("Страницы", "pages", (document: Document) =>
-        ZIO.succeed(ScalaXml.multi(separator = " ", nodes = for page <- document.pages(pageType)
-          yield page.pb.addAttributes(document.textFacetLink(path, collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName))))
+      Collection.PureColumn("Страницы", "pages", (document: Document) =>
+        ScalaXml.multi(separator = " ", nodes = for page <- document.pages(pageType)
+          yield page.pb.addAttributes(document.textFacetLink(path, collector).setFragment(Pb.pageId(page.pb.n))(text = page.displayName)))
       ),
 
       Collection.transcribersColumn
@@ -120,65 +126,47 @@ HtmlContent.Wide derives CanEqual:
   )
 
   def documentHeader(document: Document): Caching.Parser[ScalaXml.Element] =
-    ZIO.foreach(documentHeaderColumns)(column =>
-      column.value(document).map(value =>
-        <tr>
-          <td class="heading">{column.heading}</td>
-          <td class="value">{value}</td>
-        </tr>
-      )
-    ).map(rows => <table class="document-header">{rows}</table>)
+    ZIO.foreach(documentHeaderColumns)(column => column.value(document).map(value =>
+      <tr>
+        <td class="heading">{column.heading}</td>
+        <td class="value">{value}</td>
+      </tr>
+    )).map(rows => <table class="document-header">{rows}</table>)
 
 object Collection extends Element[Collection]("collection"):
 
-  final class Column(
+  private class Column(
     val heading: String,
     val cssClass: String,
     val value: Document => Caching.Parser[ScalaXml.Nodes]
   ):
     override def toString: String = heading
 
-  val descriptionColumn : Column = Column("Описание"   , "description", document => ZIO.succeed(document.getDescription ))
-  val dateColumn        : Column = Column("Дата"       , "date"       , document => ZIO.succeed(document.getDate        ))
-  val authorsColumn     : Column = Column("Кто"        , "author"     , document => ZIO.succeed(document.getAuthors     ))
-  val addresseeColumn   : Column = Column("Кому"       , "addressee"  , document => ZIO.succeed(document.getAddressee   ))
-  val transcribersColumn: Column = Column("Расшифровка", "transcriber", document => ZIO.succeed(document.getTranscribers))
+  private class PureColumn(
+    heading: String,
+    cssClass: String,
+    value: Document => ScalaXml.Nodes
+  ) extends Column(
+    heading,
+    cssClass,
+    document => ZIO.succeed(value(document))
+  )
 
-  // TODO drop DF?
-  sealed abstract class CollectionFacet[DF <: Facet](val collection: Collection) extends By[DF]:
-
-    final override def findByName(name: String): Caching.Parser[Option[DF]] =
-      collection.documents.findByName(name).map(_.map(of))
-
-    override def stores: Caching.Parser[Seq[DF]] =
-      collection.documents.stores.map(_.map(of))
-
-    final def getTei(document: Document): Caching.Parser[Tei] =
-      collection.documents.getFile(document)
-
-    def of(document: Document): DF
-
-  final class CollectionTextFacet(collection: Collection) extends CollectionFacet[TextFacet](collection):
-    override def selector: Selector = Selector.getForName("document")
-    override def of(document: Document): TextFacet = TextFacet(document, this)
-
-  final class CollectionFacsimileFacet(collection: Collection) extends CollectionFacet[FacsimileFacet](collection):
-    override def selector: Selector = Selector.getForName("facsimile")
-    override def of(document: Document): FacsimileFacet = FacsimileFacet(document, this)
+  private val descriptionColumn : Column = PureColumn("Описание"   , "description", _.getDescription )
+  private val dateColumn        : Column = PureColumn("Дата"       , "date"       , _.getDate        )
+  private val authorsColumn     : Column = PureColumn("Кто"        , "author"     , _.getAuthors     )
+  private val addresseeColumn   : Column = PureColumn("Кому"       , "addressee"  , _.getAddressee   )
+  private val transcribersColumn: Column = PureColumn("Расшифровка", "transcriber", _.getTranscribers)
 
   override def contentParsable: Parsable[Collection] = new Parsable[Collection]:
-    private val namesParsable: Parsable[Names] = Names.withDefaultNameParsable
-    private val titleElement: Elements.Required[Title.Value] = Title.element.required
-    private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
-    private val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
 
     override def parser: Parser[Collection] = for
       fromUrl: Element.FromUrl <- Element.fromUrl
-      names: Names <- namesParsable()
-      title: Title.Value <- titleElement()
-      storeAbstract: Option[Abstract.Value] <- abstractElement()
-      body: Option[Body.Value] <- bodyElement()
+      names: Names <- Hierarchical.namesParsable()
+      title: Title.Value <- Hierarchical.titleElement()
+      description: Option[Abstract.Value] <- Hierarchical.descriptionElement()
+      body: Option[Body.Value] <- Hierarchical.bodyElement()
       pageType: Page.Type <- Page.typeAttribute()
       directory: String <- directoryAttribute()
       parts: Seq[CollectionPart] <- CollectionPart.seq()
@@ -186,7 +174,7 @@ object Collection extends Element[Collection]("collection"):
       fromUrl,
       names,
       title,
-      storeAbstract,
+      description,
       body,
       pageType,
       directory,
@@ -194,10 +182,10 @@ object Collection extends Element[Collection]("collection"):
     )
 
     override def unparser: Unparser[Collection] = Unparser.concat(
-      namesParsable(_.names),
-      titleElement(_.title),
-      abstractElement(_.storeAbstract),
-      bodyElement(_.body),
+      Hierarchical.namesParsable(_.names),
+      Hierarchical.titleElement(_.title),
+      Hierarchical.descriptionElement(_.description),
+      Hierarchical.bodyElement(_.body),
       Page.typeAttribute(_.pageType),
       directoryAttribute(_.directory),
       CollectionPart.seq(_.parts)
