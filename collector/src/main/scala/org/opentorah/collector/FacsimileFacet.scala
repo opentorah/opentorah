@@ -6,7 +6,7 @@ import org.opentorah.tei.Pb
 import org.opentorah.xml.{Caching, ScalaXml}
 import zio.ZIO
 
-final class FacsimileFacet(document: Document, collectionFacet: Collection.CollectionFacsimileFacet) extends
+final class FacsimileFacet(document: Document, collectionFacet: CollectionFacet) extends
   Facet(document, collectionFacet),
   HtmlContent.FacsimileViewer[Collector]:
 

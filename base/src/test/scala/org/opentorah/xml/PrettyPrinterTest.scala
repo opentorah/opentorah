@@ -11,7 +11,7 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
       width,
       indent = 2,
       clingyElements = Set("note")
-    ).render(ScalaXml)(Effects.unsafeRun(Effects.error2throwable(from.load.map(_.asInstanceOf[ScalaXml.Element]))))
+    ).render(ScalaXml)(Effects.unsafeRun(from.load.map(_.asInstanceOf[ScalaXml.Element])))
 
   private def check(from: From, width: Int, expected: String): Unit =
     val result = render(from, width)

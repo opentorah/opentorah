@@ -6,7 +6,7 @@ import org.opentorah.store.{Path, Terminal}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.{Caching, ScalaXml}
 
-abstract class Facet(val document: Document, val collectionFacet: Collection.CollectionFacet[?]) extends
+abstract class Facet(val document: Document, val collectionFacet: CollectionFacet) extends
   Terminal,
   HtmlContent[Collector]:
 
@@ -17,6 +17,7 @@ abstract class Facet(val document: Document, val collectionFacet: Collection.Col
   final def getTei: Caching.Parser[Tei] = collectionFacet.getTei(document)
 
   override def htmlHeadTitle: Option[String] = None
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
   final override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
     val collectionPath: Path = collector.collectionPath(path)

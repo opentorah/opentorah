@@ -5,7 +5,7 @@ import org.opentorah.store.Path
 import org.opentorah.tei.Tei
 import org.opentorah.xml.{Caching, ScalaXml}
 
-final class TextFacet(document: Document, collectionFacet: Collection.CollectionTextFacet) extends
+final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends
   Facet(document, collectionFacet),
   HtmlContent.TextViewer[Collector] derives CanEqual:
 

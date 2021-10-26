@@ -42,12 +42,12 @@ final class Document(
   def textFacetLink(collectionPath: Path, collector: Collector): html.a =
     facetLink(collectionPath, collectionPath.last.asInstanceOf[Collection].textFacet, collector)
 
-  def facetLink(collectionPath: Path, collectionFacet: Collection.CollectionFacet[?], collector: Collector): html.a =
+  def facetLink(collectionPath: Path, collectionFacet: CollectionFacet, collector: Collector): html.a =
     collector.a(facetPath(collectionPath, collectionFacet))
 
   def facetPath(
     collectionPath: Path,
-    collectionFacet: Collection.CollectionFacet[?],
+    collectionFacet: CollectionFacet,
   ): Path =
     collectionPath ++ Seq(collectionFacet, collectionFacet.of(this))
 

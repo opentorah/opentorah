@@ -13,6 +13,7 @@ final class DocBookHtmlContent[S <: Site[S]](
 ) extends org.opentorah.site.HtmlContent.DefaultViewer[S]:
 
   override def htmlHeadTitle: Option[String] = None // TODO
+  override def htmlBodyTitle: Option[ScalaXml.Nodes] = None // TODO
 
   // TODO Caching.Parser?
   override def content(path: Path, site: S): Parser[ScalaXml.Element] =

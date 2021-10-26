@@ -10,16 +10,16 @@ final class Note(
   override val name: String,
   val title: Option[String]
 ) extends Directory.Entry(name), HtmlContent.DefaultViewer[Collector]:
-
   override def htmlHeadTitle: Option[String] = title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
-  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = collector.notes.getFile(this).map(_.content)
+  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
+    collector.notes.getFile(this).map(_.content)
 
 object Note extends Element[Note]("note"), Directory.EntryMaker[Markdown, Note]:
 
   override def apply(name: String, markdown: Markdown): Parser[Note] = ZIO.succeed(new Note(
-    name,
-    markdown.title
+    name = name,
+    title = markdown.title
   ))
 
   private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional

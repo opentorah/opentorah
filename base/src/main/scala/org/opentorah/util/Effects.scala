@@ -8,9 +8,6 @@ object Effects:
   class Error(message: String, cause: Throwable) extends Throwable(message, cause):
     def this(message: String) = this(message, null)
     def this(cause: Throwable) = this(null, cause)
-  
-  def error2throwable[R, A](zio: ZIO[R, Error, A]): ZIO[R, Throwable, A] =
-    zio.mapError(IllegalArgumentException(_))
 
   private def throwable2error[R, A](zio: ZIO[R, Throwable, A]): ZIO[R, Error, A] = zio.mapError {
     case error: Error => error

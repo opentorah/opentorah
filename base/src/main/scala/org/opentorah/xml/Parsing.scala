@@ -34,8 +34,12 @@ final class Parsing private:
 
   private var stack: List[Current] = List.empty
 
+  // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))?
   private def addErrorTrace[A](error: Effects.Error): Effects.Error =
-    new Effects.Error(error.getMessage + "\n" + stack.flatMap(_.from).map(_.url))
+    new Effects.Error(
+      message = error.getMessage + "\n" + stack.flatMap(_.from).map(_.url),
+      cause = error.getCause
+    )
 
   private def modifyCurrent[A](newCurrent: Current): Unit =
     stack = newCurrent :: stack.tail
@@ -159,8 +163,9 @@ private[xml] object Parsing:
 
   def empty: Parsing = new Parsing
 
+  // TODO generalize access() and use it here...
   def addErrorTrace(error: Effects.Error): zio.URIO[Has[Parsing], Effects.Error] =
-    ZIO.access[Has[Parsing]](_.get.addErrorTrace(error)) // TODO generalize access() and use it here...
+    ZIO.access[Has[Parsing]](_.get.addErrorTrace(error))
 
   def optional[A](elements: Elements[A]): Parser[Option[A]] = for
     // TODO take namespace into account!
