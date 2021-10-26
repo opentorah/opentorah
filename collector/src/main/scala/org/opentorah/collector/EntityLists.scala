@@ -1,8 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import org.opentorah.site.HtmlContent
-import org.opentorah.store.{By, Path, Pure}
+import org.opentorah.store.{By, Context, Path, Pure, Viewer}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -13,15 +12,15 @@ final class EntityLists(
 ) extends
   By.WithSelector[EntityList](selectorName),
   Pure[EntityList],
-  HtmlContent.ApparatusViewer[Collector]:
+  Viewer.Apparatus:
   
-  def setUp(collector: Collector): Caching.Parser[Unit] =
-    collector.entities.stores.map(allEntities =>
-      for list <- lists do list.setEntities(
-        allEntities.filter(entity =>
-          (entity.entityType == list.entityType) &&
-          (entity.role       == list.role      )
-        )
+  def setUp(collector: Collector): Caching.Parser[Unit] = for
+    entities: Seq[Entity] <- collector.entities.stores
+  yield
+    for list <- lists do list.setEntities(
+      entities.filter(entity =>
+        (entity.entityType == list.entityType) &&
+        (entity.role       == list.role      )
       )
     )
 
@@ -30,30 +29,31 @@ final class EntityLists(
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = ZIO.succeed {
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
     val nonEmptyLists: Seq[EntityList] = lists.filter(_.getEntities.nonEmpty)
+    for pathShortener: Path.Shortener <- context.pathShortener yield
     <div>
       <p>{for list <- nonEmptyLists yield
         // TODO why is it path and entityListPath(list)?
         <l>
-          {collector.a(path).setFragment(list.names.name)(xml = list.title)}
-          {collector.a(collector.entityListPath(list))(EntityLists.expand)}
+          {a(path, pathShortener).setFragment(list.names.name)(xml = list.title)}
+          {a(context.path(list), pathShortener)(EntityLists.expand)}
         </l>
       }</p>
       {for list <- nonEmptyLists yield
       <list id={list.names.name}>
         <head xmlns={Tei.namespace.uri}>
           {list.title.content.scalaXml}
-          {collector.a(collector.entityListPath(list))(EntityLists.expand)}
+          {a(context.path(list), pathShortener)(EntityLists.expand)}
         </head>
-        {for entity <- list.getEntities yield Entity.line(entity, collector)}
+        {for entity <- list.getEntities yield entity.line(context, pathShortener)}
       </list>
     }</div>
-  }
+
 
 object EntityLists extends Element[EntityLists]("entityLists"):
-
-  val expand: String = "\uF065"
+  // TODO gather all arrows and other symbols in one place
+  val expand: String = "⇗"
 
   override def contentParsable: Parsable[EntityLists] = new Parsable[EntityLists]:
     override def parser: Parser[EntityLists] = for

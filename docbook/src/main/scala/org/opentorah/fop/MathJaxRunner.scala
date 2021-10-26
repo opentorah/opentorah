@@ -1,7 +1,6 @@
 package org.opentorah.fop
 
-import org.opentorah.docbook.MathFilter
-import org.opentorah.mathjax.{Input, MathJax, MathJaxConfiguration, MathML, Output}
+import org.opentorah.mathjax.{Input, MathFilter, MathJax, MathJaxConfiguration, MathML, Output}
 import org.opentorah.xml.Dom
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.svg.SVGDocument

@@ -13,14 +13,14 @@ We are moving towards making the site dynamic, so that we can add:
 - organization `opentorah.org` was auto-created; 
 
 To set `dub@opentorah.org` as a default account and `alter-rebbe-2` as a default project:
-```
+```shell
   $ gcloud auth login dub@opentorah.org
   $ gcloud config set account dub@opentorah.org
   $ gcloud config set project alter-rebbe-2
 ```
 
 To set Application Default Credentials that Cloud Code in the IDE needs:
-```
+```shell
   $ gcloud auth login --update-adc
 ```
 
@@ -64,39 +64,32 @@ once they moved out; current tool for things like that is `git-filter-repo`.
 ### Image Processing Commands ###
 
 To extract images from PDF files:
-```
+```shell
   $ ls -1 *.pdf | xargs -I {} pdfimages -j {} {}
   $ rename '.pdf-000' '' *
 ```
 
 To cut facsimiles:
-```
+```shell
   $ convert xxx.jpeg -crop 2x1+120@ x-%d.jpeg
 ```
 
 To compress facsimiles:
-```
+```shell
   $ mogrify -path out -quality 80% -format jpg *.tif
 ```
 
 To sync with the bucket:
-```
+```shell
   $ gsutil -m rsync -r -d <path-to-local-copy-of-the-bucket> gs://facsimiles.alter-rebbe.org
 ```
 
 ## JIB ##
 
-Everything is Dockerized nowadays. To make docker work locally,
-[I had to](https://linuxconfig.org/how-to-install-docker-on-fedora-31)
-revert back to cgroup v1:
-```
-  $ sudo dnf install -y grubby
-  $ sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
-  $ sudo reboot
-```
+Everything is Dockerized nowadays.
 
 I store my Docker image (`gcr.io/alter-rebbe-2/collector`) in the GCP's Container Registry:
-```
+```shell
   $ gcloud auth configure-docker
   $ gcloud components install docker-credential-gcr
   $ gcloud services enable containerregistry.googleapis.com
@@ -112,14 +105,14 @@ and use it to deploy the service to Cloud Run or run it locally.
 Service configuration is in the `service.yaml` file.
 
 Turns out, for ZIO effects and unsafeRuns to work in the CPU-constrained environment,
-care needs to be taken witn the thread-pools.
+care needs to be taken with the thread-pools.
 
 ## Cloud Run ##
 
 I use [Cloud Run](https://cloud.google.com/run#key-features)
 ([Unofficial FAQ](https://github.com/ahmetb/cloud-run-faq)).
 
-```
+```shell
  $ gcloud services enable run.googleapis.com
  $ gcloud config set run/platform managed
  $ gcloud config set run/region us-east4
@@ -128,7 +121,7 @@ I use [Cloud Run](https://cloud.google.com/run#key-features)
 Historically:
 
 To add a domain mapping:
-```
+```shell
   $ gcloud beta run domain-mappings create
     --service collector
     --domain app.alter-rebbe.org
@@ -148,17 +141,18 @@ but if I do - it runs locally too!
 ## Service Account ##
 
 Created service account `cloud-run-deploy` and its key:
-```
+```shell
   $ gcloud iam service-accounts create cloud-run-deploy
   $ gcloud iam service-accounts keys create ./key.json --iam-account cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com
 ```
 
-For local use, added the key to `~/.gradle/gradle.properties` as a `gcloudServiceAccountKey_alter_rebbe_2` property,
+For local use, added the key to `~/.gradle/gradle.properties` as a `gcloudServiceAccountKey` property,
 with a backslash after each line of the key except the last one, and with backslash-n replaced with backslash-backslash-n :)
+(Lost the key during switch to desktop in October 2021; generated a new one.)
 
 Granted the service account the roles for the Container Registry and Cloud Run
 (see https://cloud.google.com/run/docs/reference/iam/roles#gcloud):
-```
+```shell
   $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
     --member "serviceAccount:cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com" --role "roles/storage.admin"
   $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
@@ -168,18 +162,18 @@ Granted the service account the roles for the Container Registry and Cloud Run
 ```
 
 Granted the user account the role needed for service account impersonation:
-```
+```shell
   $ gcloud projects add-iam-policy-binding alter-rebbe-2 \
     --member "user:dub@opentorah.org" --role "roles/iam.serviceAccountTokenCreator"
 ```
 
 Logged into the service account:
-```
+```shell
   $ gcloud auth activate-service-account --key-file=/home/dub/.gradle/gcloudServiceAccountKey-alter-rebbe-2.json
 ```
 
 To set it as a default account:
-```
+```shell
   $ gcloud config set account cloud-run-deploy@alter-rebbe-2.iam.gserviceaccount.com
 ```
 
@@ -198,7 +192,7 @@ under the request's entry.
 
 ### Keeping the service warm ###
 
-```
+```shell
   $ gcloud services enable cloudscheduler.googleapis.com
   $ gcloud scheduler jobs create http collector-service-warmer
       --description "Keep the Collector Service warm"
@@ -231,6 +225,6 @@ If this works out, I won't need the CRON job anymore.
   work with Cloud Run? Should I use it?
 - [ ] use [Tips](https://cloud.google.com/run/docs/tips/java) to configure memory size;
   I see Cache evictions under memory pressure locally and do not see OOM even with 128MB;
-  lemme configur the thing in Cloud Run with 256 and see if it holds up...
+  lemme configure the thing in Cloud Run with 256 and see if it holds up...
 - [ ] update this write-up;  
   

@@ -1,8 +1,7 @@
 package org.opentorah.collector
 
-import org.opentorah.site.HtmlContent
-import org.opentorah.tei.{Entity as TeiEntity}
-import org.opentorah.store.{By, Directory, Path}
+import org.opentorah.tei.Entity as TeiEntity
+import org.opentorah.store.{By, Directory, Context, Store, Path, Viewer}
 import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
@@ -18,18 +17,20 @@ final class Entities(
     Entities.All(_)
   ),
   By.WithSelector[Entity](selectorName),
-  HtmlContent.ApparatusViewer[Collector]:
+  Viewer.Apparatus:
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
 
-  override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] = stores.map(allEntities =>
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+    allEntities: Seq[Entity] <- stores
+    pathShortener: Path.Shortener <- context.pathShortener
+  yield
     <list>
-      {for entity <- Entity.sort(allEntities) yield Entity.line(entity, collector)}
+      {for entity: Entity <- Entity.sort(allEntities) yield entity.line(context, pathShortener)}
     </list>
-  )
 
 object Entities extends Element[Entities]("entities"):
 

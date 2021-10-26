@@ -51,7 +51,11 @@ trait Xml extends XmlAttributes:
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
 
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
-    option.fold[Nodes](Seq.empty)(value => f(value))
+    option.fold[Nodes](Seq.empty)(f)
+
+  // TODO use more:)
+  final def conditional(condition: Boolean)(f: => Nodes): Nodes =
+    if (!condition) then Seq.empty else f
 
   final class Transform[R](transform: Element => URIO[R, Element]):
     val one: Element => URIO[R, Element] = element => for

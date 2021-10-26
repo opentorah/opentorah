@@ -2,8 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
-import org.opentorah.site.HtmlContent
-import org.opentorah.store.{Path, Pure, Store}
+import org.opentorah.store.{Context, Path, Pure, Store, Viewer}
 import org.opentorah.xml.{Caching, Element, Elements, Parsable, ScalaXml}
 
 // TODO push Hierarchical/ByHierarchy into Site;
@@ -18,7 +17,7 @@ abstract class Hierarchical(
 ) extends
   Element.FromUrl.With,
   Pure[Store],
-  HtmlContent.HierarchyViewer[Collector]:
+  Viewer.Hierarchy:
 
   final def titleString: String = title.content.toString
 
@@ -29,6 +28,9 @@ abstract class Hierarchical(
 
   final def descriptionNodes: ScalaXml.Nodes = description.toSeq.map(Abstract.element.xmlElement)
 
+  final def reference(path: Path, pathShortener: Path.Shortener): ScalaXml.Element =
+    a(path, pathShortener)(text = displayTitle)
+    
   final def pathHeaderHorizontal(path: Path): String =
     @scala.annotation.tailrec
     def pathHeaderHorizontal(path: Path, result: Seq[String]): Seq[String] =
@@ -39,7 +41,7 @@ abstract class Hierarchical(
 
     pathHeaderHorizontal(path, Seq.empty).mkString(", ")
 
-  final def pathHeaderVertical(path: Path, collector: Collector): Seq[ScalaXml.Element] =
+  final def pathHeaderVertical(path: Path, pathShortener: Path.Shortener): Seq[ScalaXml.Element] =
     @scala.annotation.tailrec
     def pathHeaderVertical(
       path: Path,
@@ -52,7 +54,7 @@ abstract class Hierarchical(
       val line: ScalaXml.Element =
         <l>
           {Hierarchical.displayName(pathTail.head)}
-          {collector.a(pathNew)(text = Hierarchical.displayName(hierarchical))}:
+          {a(pathNew, pathShortener)(text = Hierarchical.displayName(hierarchical))}:
           {hierarchical.title.content.scalaXml}
         </l>
       pathHeaderVertical(
@@ -63,26 +65,22 @@ abstract class Hierarchical(
 
     pathHeaderVertical(path = Seq.empty, pathTail = path, result = Seq.empty)
 
-  final override def content(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element] =
-    innerContent(path, collector).map(inner =>
-      <div>
-        <div class="store-header">
-          {pathHeaderVertical(path.dropRight(2), collector)}
-          <head xmlns={Tei.namespace.uri}>
-            {Hierarchical.displayName(path.init.last)}
-            {Hierarchical.displayName(this)}:
-            {title.content.scalaXml}
-          </head>
-          {descriptionNodes}
-          {body.toSeq.map(_.content.scalaXml)}
-        </div>
-        {inner}
-      </div>
-    )
+  final override def header(path: Path, context: Context): Caching.Parser[Option[ScalaXml.Element]] = for
+    pathShortener: Path.Shortener <- context.pathShortener
+  yield Some(
+    <div class="store-header">
+      {pathHeaderVertical(path.dropRight(2), pathShortener)}
+      <head xmlns={Tei.namespace.uri}>
+        {Hierarchical.displayName(path.init.last)}
+        {Hierarchical.displayName(this)}:
+        {title.content.scalaXml}
+      </head>
+      {descriptionNodes}
+      {body.toSeq.map(_.content.scalaXml)}
+    </div>
+  )
 
   def getBy: Option[ByHierarchy]
-
-  protected def innerContent(path: Path, collector: Collector): Caching.Parser[ScalaXml.Element]
 
 object Hierarchical extends Elements.Union[Hierarchical]:
   protected def elements: Seq[Element[? <: Hierarchical]] = Seq(Hierarchy, Collection)

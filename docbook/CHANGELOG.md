@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2021-11-03
+- Scala 3;
+
 ## [0.8.3] - 2021-08-17
 - **note:** `mathJax.isEnabled` renamed `mathJax.enabled`;
 - **note:** `isJEuclidEnabled` renamed `jEuclidEnabled`;

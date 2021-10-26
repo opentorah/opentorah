@@ -7,15 +7,22 @@ plugins {
   id 'org.opentorah.docbook'
 }
 
-description = 'Jewish Texts'
+description = 'Jewish Texts, Readings and Learning Schedules'
 
 ext.documents = ['dream', 'typesetting']
 apply from: '../configure.gradle'
 
-dependencies {
-  api project(':opentorah-tei')
+//jib {
+//  to { image = 'gcr.io/calendar/calendar' }
+//  container { mainClass = 'org.opentorah.calendar.service.CalendarService' }
+//}
 
+dependencies {
+  implementation project(':opentorah-site')
+  implementation project(':opentorah-calendar')
   implementation project(':opentorah-base')
 
   testImplementation libs.caffeine
+  implementation libs.zhttp
+  implementation libs.logback
 }

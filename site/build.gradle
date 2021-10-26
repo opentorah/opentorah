@@ -12,7 +12,6 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-base')
-  compileOnly project(':opentorah-tei')
 
   compileOnly libs.google.cloud.storage
   compileOnly libs.bundles.markdown

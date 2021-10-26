@@ -19,10 +19,10 @@ object SiteHighlighter extends Element[SiteHighlighter]("highlighter"):
     usePrism = false
   )
 
-  val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
-  val usePrismAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("usePrism").orDefault
-
   override def contentParsable: Parsable[SiteHighlighter] = new Parsable[SiteHighlighter]:
+    private val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
+    private val usePrismAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("usePrism").orDefault
+  
     override def parser: Parser[SiteHighlighter] = for
       isEnabled: Boolean <- isEnabledAttribute()
       usePrism: Boolean <- usePrismAttribute()

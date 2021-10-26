@@ -15,7 +15,6 @@ apply from: '../configure.gradle'
 dependencies {
   implementation project(':opentorah-base')
   implementation project(':opentorah-site')
-  implementation project(':opentorah-tei')
 
   implementation libs.bundles.markdown
   implementation libs.google.cloud.storage

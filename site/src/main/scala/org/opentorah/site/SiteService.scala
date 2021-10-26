@@ -1,11 +1,12 @@
 package org.opentorah.site
 
+import org.opentorah.sync.GoogleCloudStorageSynchronizer
+import org.opentorah.util.{Effects, Files, Logging, Zhttp}
+import org.opentorah.xml.{Element, Parser, ScalaXml}
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.slf4j.Logger
-import org.opentorah.util.{Effects, Files, Logging, Zhttp}
 import Zhttp.given
-import org.opentorah.xml.{Element, Parser, ScalaXml}
 import zhttp.http.*
 import zio.duration.Duration
 import zio.stream.ZStream
@@ -14,7 +15,7 @@ import zio.blocking.Blocking
 import java.io.File
 import java.net.URL
 
-abstract class SiteService[S <: Site[S]] extends Element[S]("site"), zio.App:
+abstract class SiteService[S <: Site] extends Element[S]("site"), zio.App:
 
   // This is supposed to be set when running in Cloud Run
   private val serviceName: Option[String] = Option(System.getenv("K_SERVICE"))

@@ -3,7 +3,6 @@ package org.opentorah.collector
 import org.opentorah.html
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
-import org.opentorah.site.HtmlContent
 import org.opentorah.store.{Directory, Path, Terminal}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
@@ -39,11 +38,11 @@ final class Document(
 
   def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
 
-  def textFacetLink(collectionPath: Path, collector: Collector): html.a =
-    facetLink(collectionPath, collectionPath.last.asInstanceOf[Collection].textFacet, collector)
+  def textFacetLink(collectionPath: Path, pathShortener: Path.Shortener): html.a =
+    facetLink(collectionPath, Path.last[Collection](collectionPath).textFacet, pathShortener)
 
-  def facetLink(collectionPath: Path, collectionFacet: CollectionFacet, collector: Collector): html.a =
-    collector.a(facetPath(collectionPath, collectionFacet))
+  def facetLink(collectionPath: Path, collectionFacet: CollectionFacet, pathShortener: Path.Shortener): html.a =
+    Path.a(facetPath(collectionPath, collectionFacet), pathShortener)
 
   def facetPath(
     collectionPath: Path,

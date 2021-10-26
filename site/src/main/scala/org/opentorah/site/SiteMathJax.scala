@@ -32,11 +32,11 @@ object SiteMathJax extends Element[SiteMathJax]("mathJax"):
     isEnabled = false,
     useV3 = true
   )
-
-  val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
-  val useV3Attribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("useV3").orDefault
-
+  
   override def contentParsable: Parsable[SiteMathJax] = new Parsable[SiteMathJax]:
+    private val isEnabledAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isEnabled").orDefault
+    private val useV3Attribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("useV3").orDefault
+  
     override def parser: Parser[SiteMathJax] = for
       isEnabled: Boolean <- isEnabledAttribute()
       useV3: Boolean <- useV3Attribute()

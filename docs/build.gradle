@@ -16,7 +16,6 @@ site.dependsOn(compileSass)
 
 dependencies {
   implementation project(':opentorah-site')
-  implementation project(':opentorah-tei')
   implementation project(':opentorah-base')
 
   implementation project(':opentorah-calendar')

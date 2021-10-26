@@ -1,13 +1,23 @@
 # Changelog
 
-Modules covered: `base`, `site`, `tei` and `texts`.
+Modules covered: `base`, `site` and `texts`.
 
 ## [Unreleased]
+
+## [0.4.0] - 2021-11-03
+- Scala 3;
 - XML parsing and processing cleanup;
 - abstracted XML parsing over ScalaXml/DOM;
 - From and Parsing abstracted over Xml;
 - Store/Site/Collector cleanup;
 - Tanach cleaned up and Storified;
+- Store Alias and Path walking;
+- no unsafeRun() in Site/Collector;
+- merged HtmlContent into Store;
+- codified pre-title Store header;
+- moved "store" package into the "site" module;
+- merged "schedule" module into "texts";
+- merged "tei" module into "site".
 
 ## [0.2.6] - 2021-08-17
 - added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;

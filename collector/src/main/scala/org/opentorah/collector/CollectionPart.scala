@@ -9,6 +9,7 @@ final class CollectionPart(
   val from: String,
   val title: Title.Value
 ):
+  // TODO ZIOify
   def take(documents: Seq[Document]): CollectionPart.Part =
     if documents.isEmpty then throw IllegalArgumentException("No documents for Part!")
     if documents.head.baseName != from then throw IllegalArgumentException("Incorrect 'from' document")
