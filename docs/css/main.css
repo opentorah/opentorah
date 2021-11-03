@@ -1,153 +1,10 @@
-/**
- * Reset some basic elements
- */
-body, h1, h2, h3, h4, h5, h6,
-p, blockquote, pre, hr,
-dl, dd, ol, ul, figure {
-  margin: 0;
-  padding: 0;
+@charset "UTF-8";
+.footer-col-wrapper:after, .wrapper:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
-/**
- * Basic styling
- */
-body {
-  font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  color: #111;
-  background-color: #fdfdfd;
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-feature-settings: "kern" 1;
-  -moz-font-feature-settings: "kern" 1;
-  -o-font-feature-settings: "kern" 1;
-  font-feature-settings: "kern" 1;
-  font-kerning: normal;
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
-/**
- * Set `margin-bottom` to maintain vertical rhythm
- */
-h1, h2, h3, h4, h5, h6,
-p, blockquote, pre,
-ul, ol, dl, figure,
-biblioentry,
-title,
-para {
-  margin-bottom: 15px;
-}
-
-/**
- * `main` element
- */
-main {
-  display: block;
-  /* Default value of `display` of `main` element is 'inline' in IE 11. */
-}
-
-/**
- * Images
- */
-img {
-  max-width: 100%;
-  vertical-align: middle;
-}
-
-/**
- * Figures
- */
-figure > img {
-  display: block;
-}
-
-figcaption {
-  font-size: 14px;
-}
-
-/**
- * Lists
- */
-ul, ol {
-  margin-left: 30px;
-}
-
-li > ul,
-li > ol {
-  margin-bottom: 0;
-}
-
-/**
- * Headings
- */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 400;
-}
-
-/**
- * Links
- */
-a {
-  color: #2a7ae2;
-  text-decoration: none;
-}
-a:visited {
-  color: #1756a9;
-}
-a:hover {
-  color: #111;
-  text-decoration: underline;
-}
-.social-media-list a:hover {
-  text-decoration: none;
-}
-.social-media-list a:hover .username {
-  text-decoration: underline;
-}
-
-/**
- * Blockquotes
- */
-blockquote {
-  color: #828282;
-  border-left: 4px solid #e8e8e8;
-  padding-left: 15px;
-  font-size: 18px;
-  letter-spacing: -1px;
-  font-style: italic;
-}
-blockquote > :last-child {
-  margin-bottom: 0;
-}
-
-/**
- * Code formatting
- */
-pre,
-code {
-  font-size: 15px;
-  border: 1px solid #e8e8e8;
-  border-radius: 3px;
-  background-color: #eef;
-}
-
-code {
-  padding: 1px 5px;
-}
-
-pre {
-  padding: 8px 12px;
-  overflow-x: auto;
-}
-pre > code {
-  border: 0;
-  padding-right: 0;
-  padding-left: 0;
-}
-
-/**
- * Wrapper
- */
 .wrapper {
   max-width: -webkit-calc(800px - (30px * 2));
   max-width: calc(800px - (30px * 2));
@@ -165,18 +22,6 @@ pre > code {
   }
 }
 
-/**
- * Clearfix
- */
-.footer-col-wrapper:after, .wrapper:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/**
- * Icons
- */
 .svg-icon {
   width: 16px;
   height: 16px;
@@ -186,39 +31,6 @@ pre > code {
   vertical-align: text-top;
 }
 
-.social-media-list li + li {
-  padding-top: 5px;
-}
-
-/**
- * Tables
- */
-table {
-  margin-bottom: 30px;
-  width: 100%;
-  text-align: left;
-  color: #3f3f3f;
-  border-collapse: collapse;
-  border: 1px solid #e8e8e8;
-}
-table tr:nth-child(even) {
-  background-color: #f7f7f7;
-}
-table th, table td {
-  padding: 10px 15px;
-}
-table th {
-  background-color: #f0f0f0;
-  border: 1px solid #dedede;
-  border-bottom-color: #c9c9c9;
-}
-table td {
-  border: 1px solid #e8e8e8;
-}
-
-/**
- * Site header
- */
 .site-header {
   border-top: 5px solid #424242;
   border-bottom: 1px solid #e8e8e8;
@@ -303,9 +115,6 @@ table td {
   }
 }
 
-/**
- * Site footer
- */
 .site-footer {
   border-top: 1px solid #e8e8e8;
   padding: 30px 0;
@@ -316,10 +125,20 @@ table td {
   margin-bottom: 15px;
 }
 
-.contact-list,
-.social-media-list {
+.contact-list, .social-media-list {
   list-style: none;
   margin-left: 0;
+}
+
+.social-media-list li + li {
+  padding-top: 5px;
+}
+
+social-media-list a:hover {
+  text-decoration: none;
+}
+social-media-list a:hover .username {
+  text-decoration: underline;
 }
 
 .footer-col-wrapper {
@@ -334,6 +153,13 @@ table td {
   padding-left: 15px;
 }
 
+@media screen and (max-width: 600px) {
+  .footer-col {
+    float: none;
+    width: -webkit-calc(100% - (30px / 2));
+    width: calc(100% - (30px / 2));
+  }
+}
 .footer-col-1 {
   width: -webkit-calc(35% - (30px / 2));
   width: calc(35% - (30px / 2));
@@ -361,16 +187,6 @@ table td {
     width: calc(100% - (30px / 2));
   }
 }
-@media screen and (max-width: 600px) {
-  .footer-col {
-    float: none;
-    width: -webkit-calc(100% - (30px / 2));
-    width: calc(100% - (30px / 2));
-  }
-}
-/**
- * Page content
- */
 .page-content {
   padding: 30px 0;
   flex: 1;
@@ -402,164 +218,990 @@ table td {
   font-size: 24px;
 }
 
-/**
- * Posts
- */
 .post-header {
   margin-bottom: 30px;
-}
-
-.post-title {
-  font-size: 42px;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-@media screen and (max-width: 800px) {
-  .post-title {
-    font-size: 36px;
-  }
 }
 
 .post-content {
   margin-bottom: 30px;
 }
-.post-content h2 {
+
+.tooltip {
+  visibility: hidden;
+  border: solid 1px;
+  border-radius: 6px;
+  padding: 5px 5px 0px 5px;
+  background: #fdfdfd;
+  color: #111;
+  z-index: 1;
+  position: absolute;
+}
+
+*:hover > .tooltip {
+  visibility: visible;
+}
+
+/* render Arabic, Persian, Ottoman, Hebrew and Yiddish as rtl */
+[lang=ar], [lang=ota], [lang=fa], [lang=he], [lang=yi], [lang*=-Arab-AR] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* render Latin and some other scripts as ltr */
+[lang=en], [lang=fr], [lang=de], [lang=it], [lang=ru], [lang=pl], [lang*=ar-Latn-], [lang*=ota-Latn-] {
+  direction: ltr;
+  text-align: left;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, tei-p, para, blockquote, pre, hr, dl, dd, ol, ul, figure {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  color: #111;
+  background-color: #fdfdfd;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-feature-settings: "kern" 1;
+  -moz-font-feature-settings: "kern" 1;
+  -o-font-feature-settings: "kern" 1;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6, p, tei-p, para, blockquote, pre, ul, ol, dl, figure, div.footnotes, glossentry, biblioentry {
+  margin-bottom: 15px;
+}
+
+main {
+  display: block;
+  /* Default value of `display` of `main` element is 'inline' in IE 11. */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+}
+
+.post-title,
+book > db-title,
+book > info > db-title,
+.store-header > tei-head {
+  font-size: 42px;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-indent: -0.5em;
+}
+@media screen and (max-width: 800px) {
+  .post-title,
+book > db-title,
+book > info > db-title,
+.store-header > tei-head {
+    font-size: 36px;
+  }
+}
+
+h2,
+tei-div > tei-head {
   font-size: 32px;
 }
 @media screen and (max-width: 800px) {
-  .post-content h2 {
+  h2,
+tei-div > tei-head {
     font-size: 28px;
   }
 }
-.post-content h3 {
+
+preface > db-title,
+part > db-title,
+glossary > db-title,
+bibliography > db-title {
+  font-size: 170%;
+}
+
+chapter > db-title,
+glossdiv > db-title,
+bibliodiv > db-title {
+  font-size: 165%;
+}
+
+h3,
+tei-div > tei-div > tei-head,
+section > db-title {
   font-size: 26px;
 }
 @media screen and (max-width: 800px) {
-  .post-content h3 {
+  h3,
+tei-div > tei-div > tei-head,
+section > db-title {
     font-size: 22px;
   }
 }
-.post-content h4 {
+
+h4,
+tei-div > tei-div > tei-div > tei-head,
+section > section > db-title {
   font-size: 20px;
 }
 @media screen and (max-width: 800px) {
-  .post-content h4 {
+  h4,
+tei-div > tei-div > tei-div > tei-head,
+section > section > db-title {
     font-size: 18px;
   }
 }
 
-book {
-  display: block;
-}
-
-info {
-  display: block;
-}
-
-author {
-  display: block;
-}
-
-para {
-  display: block;
-  margin-top: 1em;
-}
-
-book > title {
-  font-size: 200%;
-  display: block;
-}
-
-preface > title {
-  font-size: 170%;
-  display: block;
-}
-
-part > title {
-  font-size: 170%;
-  display: block;
-}
-
-chapter > title {
-  font-size: 170%;
-  display: block;
-}
-
-section > title {
-  font-size: 170%;
+tei-div > tei-head {
   text-indent: -0.5em;
 }
 
-section > section > title {
-  display: block;
-  font-size: 155%;
-}
-
-section > section > section > title {
-  font-size: 140%;
-  display: block;
-}
-
-section > section > section > section > title {
-  font-size: 130%;
-  display: block;
-}
-
-section > section > section > section > section > title {
+/*tei|*/
+listBibl > tei-head {
   font-size: 120%;
-  display: block;
+  font-weight: bold;
 }
 
-section > section > section > section > section > section title {
-  font-size: 110%;
-  display: block;
-}
-
-biblioentry {
-  display: block;
-}
-
-biblioentry > author {
+/* TEI title */
+TEI tei-title {
   display: inline;
 }
 
-biblioentry > authorgroup > author {
+TEI tei-title[level=a] {
+  quotes: "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”";
+}
+
+TEI tei-title[level=a]:before {
+  content: open-quote;
+}
+
+TEI tei-title[level=a]:after {
+  content: close-quote;
+}
+
+TEI tei-title[level=a][next]:after {
+  content: "" !important;
+}
+
+TEI tei-title[level=a][prev]:before {
+  content: "" !important;
+}
+
+tei-title[level=m] {
+  font-style: italic;
+}
+
+tei-head, db-title, book, info, author, glossentry, biblioentry {
+  display: block;
+}
+
+/*db|*/
+img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+figure {
+  display: inline-block;
+}
+
+figure > img {
+  display: block;
+  vertical-align: top;
+}
+
+figcaption {
+  font-size: 14px;
+}
+
+figure > tei-head {
+  display: block;
+  margin: 1.5em auto 1.5em auto;
+  padding: 0.5em 1.5em 1.5em 1.5em;
+  border: 1px solid black;
+  border-radius: 15px;
+  width: 85%;
+  position: relative;
+  background: white;
+  /* reset text-indent for note with <l> ancestors. */
+  text-indent: 0;
+  font-family: Georgia, serif;
+  font-size: 85%;
+  text-align: justify;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+p, tei-p, para {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+span.footnote para {
   display: inline;
 }
 
-biblioentry > title {
+*[rendition~="#center"] tei-p {
+  text-align: center;
+}
+
+a {
+  color: #2a7ae2;
+  text-decoration: none;
+}
+a:visited {
+  color: #1756a9;
+}
+a:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+a:not([href]) {
+  color: #6da4eb;
+}
+
+a[missing=true][empty=true] {
+  color: orange;
+}
+
+a[missing=true]:not([empty=true]) {
+  color: red;
+}
+
+a.footnote-link, a.footnote-backlink {
+  color: red;
+}
+
+.footnote-link {
+  vertical-align: super;
+  font-size: smaller;
+  line-height: 0;
+}
+
+hr.footnotes-line {
+  margin-top: 2em;
+}
+
+.footnote + .footnote {
+  padding-left: 0.5em;
+}
+
+blockquote {
+  color: #828282;
+  border-left: 4px solid #e8e8e8;
+  padding-left: 15px;
+  font-size: 18px;
+  letter-spacing: -1px;
+  font-style: italic;
+}
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+pre, code {
+  font-size: 15px;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+  background-color: #eef;
+}
+
+code {
+  padding: 1px 5px;
+}
+
+pre {
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+pre > code {
+  border: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+table {
+  margin-bottom: 30px;
+  width: auto;
+  text-align: left;
+  color: #3f3f3f;
+  border-collapse: collapse;
+  border: 1px solid #e8e8e8;
+}
+table tei-head {
+  text-align: center;
+}
+table tr:nth-child(even) {
+  background-color: #f7f7f7;
+}
+table th, table td {
+  padding: 10px 15px;
+}
+table th,
+table tr.row[role=label] td.cell,
+table thead td.entry {
+  font-weight: bold;
+  background-color: #f0f0f0;
+  border: 1px solid #dedede;
+  border-bottom-color: #c9c9c9;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+table td {
+  border: 1px solid #e8e8e8;
+  vertical-align: text-top;
+}
+
+table[rendition=borderless] {
+  border: none;
+}
+table[rendition=borderless] tr.row {
+  background-color: #fdfdfd;
+}
+table[rendition=borderless] tr.row td.cell {
+  border: none;
+}
+
+ul, ol, list, listBibl, simplelist, itemizedlist {
+  display: block;
+}
+
+/*tei|*/
+item, listBibl > bibl, listitem, member {
+  display: list-item;
+  margin-left: 1em;
+}
+
+li > ul, li > ol {
+  margin-bottom: 0;
+}
+
+/*tei|*/
+item > list, item > listBibl {
+  margin-bottom: 0;
+}
+
+/*db|*/
+listitem > itemizedlist, listitem > simplelist {
+  margin-bottom: 0;
+}
+
+/*text*/
+/*tei|*/
+list, list[type=simple], list[type=ordered], listBibl, simplelist {
+  list-style-type: none;
+}
+
+/*text*/
+/*tei|*/
+list[type=bulleted] {
+  list-style-type: disc;
+}
+
+/*text*/
+/*tei|*/
+list[type=ordered] {
+  counter-reset: items 0;
+}
+
+/*text*/
+/*tei|*/
+list[type=ordered] > item:before {
+  counter-increment: items 1;
+  content: counter(items, decimal) ". ";
+}
+
+/*text*/
+/*tei|*/
+list[type=ordered] > item {
+  margin-left: 0;
+}
+
+/*tei|*/
+item > list[type=ordered] {
+  margin-left: 1em;
+}
+
+/*text*/
+/*tei|*/
+list[type=gloss] {
+  list-style-type: none;
+}
+
+/*tei|*/
+list[type=gloss] > label {
+  display: block;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  font-weight: bold;
+}
+
+/*tei|*/
+list[type=gloss] > item {
+  margin-left: 2em;
+}
+
+/*tei|*/
+listBibl {
+  margin-left: 0.5em;
+  margin-top: 0.5em;
+}
+
+/*tei|*/
+listBibl > bibl {
+  margin-left: 0.5em;
+}
+
+/*db|*/
+biblioentry author {
+  display: inline;
+}
+
+/*db|*/
+biblioentry > db-title {
   display: inline;
   font-style: italic;
 }
 
-itemizedlist {
+/*db|*/
+biblioentry[xreflabel]:before {
+  content: "[" attr(xreflabel) "]";
+}
+
+/*db|*/
+glossterm {
+  display: inline;
+  font-style: italic;
+}
+
+/*db|*/
+glossdef {
+  text-indent: 1em;
+}
+
+/* a */
+ab {
   display: block;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  padding-inline-start: 40px;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
-listitem {
-  display: list-item;
-  text-align: -webkit-match-parent;
+abstract {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
-a.footnote {
+add {
+  background-color: #ffcdcd;
+}
+
+add[place=above] {
+  vertical-align: super;
+}
+
+add[place=inline]:before {
+  content: "«";
+}
+
+add[place=inline]:after {
+  content: "»";
+}
+
+add[place=below] {
+  vertical-align: sub;
+}
+
+additional {
+  display: block;
+}
+
+additions {
+  display: block;
+}
+
+additions:before {
+  content: "Significant additions within the document: ";
+}
+
+addrLine {
+  display: block;
+}
+
+address[rend~=block], addresss[rendition~="#block"] {
+  display: block;
+}
+
+app note {
+  display: none;
+}
+
+argument {
+  display: block;
+}
+
+att {
+  font-family: Courier, monospace;
+}
+
+att:before {
+  content: "@";
+}
+
+/* b */
+back {
+  display: block;
+}
+
+bibl[rend~=block], bibl[rendition~="#block"] {
+  display: block;
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+biblFull {
+  display: block;
+}
+
+birth {
+  display: block;
+}
+
+birth:before {
+  content: "Birth: ";
+}
+
+/* c */
+caption {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+case[value]:before {
+  font-weight: bold;
+  content: attr(value) " ";
+}
+
+cb {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+cb:before {
+  content: "[column break]";
+}
+
+/* Choice elements */
+choice abbr + expan:before,
+choice expan + abbr:before,
+choice sic + corr:before,
+choice corr + sic:before,
+choice orig + reg:before,
+choice reg + orig:before {
+  content: " (";
+}
+
+choice abbr + expan:after,
+choice expan + abbr:after,
+choice sic + corr:after,
+choice corr + sic:after,
+choice orig + reg:after,
+choice reg + orig:after {
+  content: ")";
+}
+
+corr {
+  background-color: #aaffaa;
+}
+
+/* d */
+date[when]:empty:before {
+  content: attr(when);
+}
+
+del[rend=overstrike] {
+  text-decoration: red line-through;
+}
+
+/* e */
+emph {
+  font-style: italic;
+}
+
+emph[rend=underline] {
+  font-style: normal;
+  text-decoration: underline;
+}
+
+emph[rend=big] {
+  font-style: normal;
+  font-size: larger;
+}
+
+emph[rend=superscript] {
+  vertical-align: super;
+  line-height: 0;
+}
+
+epigraph {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+explicit {
+  font-style: italic;
+}
+
+/* f */
+fw[type=pageNum] {
+  background-color: lightgray;
+  border-radius: 1em;
+}
+
+/* g */
+gap {
   color: red;
 }
 
-div.endnotes {
-  padding-top: 2em;
+gap[reason=lost]:before {
+  content: "[";
 }
 
-.endnote + .endnote {
-  padding-left: 1em;
+gap[reason=lost]:after {
+  content: attr(content) "]";
 }
 
-a.endnote-backlink {
-  color: red;
+gap[reason=illegible]:after {
+  content: attr(content);
+}
+
+gi {
+  font-family: Courier, monospace;
+}
+
+gi:before {
+  content: "<";
+}
+
+gi:after {
+  content: ">";
+}
+
+/* h */
+div.textpart {
+  display: none;
+}
+
+hi[rend~=caps] {
+  font-weight: bold;
+}
+
+hi[rend~=italic] {
+  font-style: italic;
+}
+
+hi[rend=underline] {
+  text-decoration: underline;
+}
+
+hi[rend=big] {
+  font-size: larger;
+}
+
+hi[rend=superscript] {
+  vertical-align: super;
+  line-height: 0;
+}
+
+ident {
+  font-family: Courier, monospace;
+}
+
+incipit {
+  font-style: italic;
+}
+
+/* j */
+/* l */
+/* LMD: I use it without namespace to augment HTML :) */
+l {
+  display: block;
+  width: auto;
+}
+
+l[lineno]:before {
+  content: attr(lineno);
+  position: absolute;
+  left: 2em;
+}
+
+lb:after {
+  content: "\a";
+  white-space: pre;
+}
+
+lg {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+/* m */
+/* n */
+note[type=gloss] {
+  background-color: gainsboro;
+}
+
+/* o */
+ovar {
+  font-style: italic;
+}
+
+origPlace {
+  font-weight: bold;
+}
+
+origPlace:before {
+  font-weight: bold;
+  content: "Place of Origin: ";
+}
+
+/* p */
+availability > tei-p:first-child {
+  margin-top: 0em;
+}
+
+postscript {
+  display: block;
+  margin-top: 2em;
+}
+
+/* q */
+q {
+  quotes: "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”";
+}
+
+q:before {
+  content: "";
+}
+
+q:after {
+  content: "";
+}
+
+q[next]:after {
+  content: "" !important;
+}
+
+q[prev]:before {
+  content: "" !important;
+}
+
+quote {
+  font-style: italic;
+}
+
+/* r */
+app rdg {
+  /*perhaps choice */
+  display: none;
+}
+
+re {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+remarks {
+  font-weight: bold;
+}
+
+remarks:before {
+  font-weight: bold;
+  content: "remarks: ";
+}
+
+/* s */
+salute {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+scriptNote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+seal {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+seal:before {
+  font-weight: bold;
+  content: "Seal: ";
+}
+
+sealDesc {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+secFol:before {
+  font-weight: bold;
+  content: "Second Folio: ";
+}
+
+secl > *:first-child:before {
+  content: "\a[";
+  white-space: pre;
+}
+
+secl > *:last-child:after {
+  content: "]\a\a";
+  white-space: pre;
+}
+
+seg {
+  outline: 0px solid transparent;
+}
+
+sense {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+setting {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+sic {
+  text-decoration: #aaffaa underline;
+}
+
+soCalled {
+  quotes: "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”" "‘" "’" "“" "”";
+}
+
+soCalled:before {
+  content: open-quote;
+}
+
+soCalled:after {
+  content: close-quote;
+}
+
+soCalled[next]:after {
+  content: "" !important;
+}
+
+soCalled[prev]:before {
+  content: "" !important;
+}
+
+space:before {
+  font-weight: bold;
+  content: "";
+}
+
+span[n]:before {
+  content: attr(n);
+}
+
+stamp {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+stamp:before {
+  font-weight: bold;
+  content: "Stamped: ";
+}
+
+supplied {
+  background-color: #aaffaa;
+}
+
+supplied:before {
+  content: "[";
+}
+
+supplied:after {
+  content: "]";
+}
+
+surplus > *:first-child:before {
+  content: "\a[";
+  white-space: pre;
+}
+
+surplus > *:last-child:after {
+  content: "]\a\a";
+  white-space: pre;
+}
+
+/* t */
+TEI {
+  display: block;
+}
+
+teiHeader {
+  display: none;
+}
+
+TEI > text {
+  display: block;
+  line-height: 1.5;
+}
+
+/* u */
+u:before {
+  content: "-";
+}
+
+unclear {
+  background-color: #aaffaa;
+}
+
+view {
+  font-style: italic;
+}
+
+wit {
+  display: inline;
+}
+
+listPerson > tei-head, listPlace > tei-head, listOrg > tei-head {
+  font-size: 32px;
+  text-indent: -0.5em;
+}
+
+person, place, org, personGrp {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+person > a.persName, place > a.placeName, org > a.orgName {
+  display: block;
+  font-size: 24px;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -27,7 +27,9 @@ trait Named:
 
 object Named:
 
-  abstract class ByLoader[Key <: ByLoader[Key]](loader: Names.Loader[Key], nameOverride: Option[String])
+  // Note: Calendar.Month is used as a Names.Loader, but this gets called during its initialization,
+  // so loader parameter end up being null... Introduced thunk:
+  abstract class ByLoader[Key <: ByLoader[Key]](loader: => Names.Loader[Key], nameOverride: Option[String])
     extends Named, HasName(nameOverride):
     final override def names: Names = loader.toNames(this.asInstanceOf[Key]) // TODO play with self-type to remove the cast...
 

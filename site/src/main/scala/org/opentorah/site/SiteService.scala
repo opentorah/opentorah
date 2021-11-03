@@ -2,11 +2,13 @@ package org.opentorah.site
 
 import org.opentorah.sync.GoogleCloudStorageSynchronizer
 import org.opentorah.util.{Effects, Files, Logging, Zhttp}
-import org.opentorah.xml.{Element, Parser, ScalaXml}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.slf4j.Logger
 import Zhttp.given
+import org.opentorah.store.{Path, Pure, Store}
+import org.opentorah.tei.LinksResolver
 import zhttp.http.*
 import zio.duration.Duration
 import zio.stream.ZStream
@@ -89,7 +91,6 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.App:
     Zhttp.start(port, routes(siteUrl))
 
   private def routes(siteUrl: String): RHttpApp[ServiceEnvironment] =
-    // TODO move near the SiteReader
     var cachedSite: Option[S] = None
     def getSite: Task[S] = cachedSite.map(Task.succeed(_)).getOrElse(readSite(siteUrl).map(result =>
       cachedSite = Some(result)
@@ -190,3 +191,24 @@ object SiteService:
     if millis < 1000 then s"$millis ms" else
       val seconds: Float = Math.round(millis.toFloat/100).toFloat/10
       s"$seconds s"
+
+// Note: this is on the top level and not nested in the companion object,
+// *and* is not the companion object since in those cases Scala compiler does not generate static main()...
+object SiteServiceCommon extends SiteService[Site]:
+  override def projectId: String = "???"
+  override def bucketName: String = "???"
+
+  override def contentParsable: Parsable[Site] = new Parsable[Site]:
+    override def unparser: Unparser[Site] = Unparser.concat[Site](
+      SiteCommon.required(_.common),
+    )
+
+    override def parser: Parser[Site] = for
+      fromUrl: Element.FromUrl <- Element.fromUrl
+      common: SiteCommon <- SiteCommon.required()
+    yield new Site(fromUrl, common) with Pure[?]:
+      override def storesPure: Seq[Store] = Seq.empty
+      override def content(path: Path, extension: Option[String]): Caching.Parser[Site.Response] = ???
+      override def pathShortener: Caching.Parser[Path.Shortener] = ZIO.succeed(identity)
+      override def path(store: Store): Path = Seq.empty
+      override protected def linkResolver(path: Path, pathShortener: Path.Shortener): LinksResolver = LinksResolver.empty

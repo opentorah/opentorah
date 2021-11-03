@@ -27,7 +27,7 @@ final class PrettyPrinter(
     allowEmptyElements: Boolean = allowEmptyElements,
     keepEmptyElements: Set[String] = keepEmptyElements,
     preformattedElements: Set[String] = preformattedElements
-  ): PrettyPrinter = new PrettyPrinter(
+  ): PrettyPrinter = PrettyPrinter(
     width,
     indent,
     encodeXmlSpecials,

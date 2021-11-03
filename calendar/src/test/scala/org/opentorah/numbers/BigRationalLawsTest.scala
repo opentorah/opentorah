@@ -1,9 +1,9 @@
 package org.opentorah.numbers
 
 import cats.Eq
-import org.scalatest.funsuite.AnyFunSuite
 import algebra.ring.{AdditiveMonoid, Field}
 import algebra.laws.RingLaws
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalacheck.Arbitrary
 import org.scalactic.anyvals.PosZDouble
 import org.scalatestplus.scalacheck.Checkers

@@ -32,7 +32,8 @@ trait Store extends Named:
 
   def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
-  def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = ???
+  def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+    throw IllegalAccessException(s"Called unimplemented Store.content($path, $context)  on $this")
   
   def style: String = Style.default
 

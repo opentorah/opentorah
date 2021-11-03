@@ -26,7 +26,7 @@ object From:
     override def load: Effects.IO[xml.Element] = zio.IO.succeed(element)
 
   def scalaXml(name: String, elem: ScalaXml.Element): From = xml(ScalaXml)(name, elem)
-  def xml(xml: Xml)(name: String, elem: xml.Element): From = new FromXml(xml)(name, elem)
+  def xml(xml: Xml)(name: String, elem: xml.Element): From = FromXml(xml)(name, elem)
 
   private final class FromString(
     name: String,
@@ -38,7 +38,7 @@ object From:
     override def url: Option[URL] = None
     override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromString(string))
 
-  def string(name: String, string: String, xml: Xml = ScalaXml): From = new FromString(name, string, xml)
+  def string(name: String, string: String, xml: Xml = ScalaXml): From = FromString(name, string, xml)
 
   private final class FromUrl(fromUrl: URL, override val isRedirect: Boolean, override val xml: Xml)
     extends From(Files.nameAndExtension(fromUrl.getPath)._1, xml):
@@ -46,9 +46,9 @@ object From:
     override def url: Option[URL] = Some(fromUrl)
     override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromUrl(fromUrl))
 
-  def url(url: URL, xml: Xml): From = new FromUrl(url, false, xml)
+  def url(url: URL, xml: Xml): From = FromUrl(url, false, xml)
 
-  private[xml] def redirect(url: URL, xml: Xml): From = new FromUrl(url, true, xml)
+  private[xml] def redirect(url: URL, xml: Xml): From = FromUrl(url, true, xml)
 
   private final class FromResource(
     clazz: Class[?],
@@ -62,5 +62,5 @@ object From:
       .map(url => Effects.effect(xml.loadFromUrl(url)))
       .getOrElse(Effects.fail(s"Resource not found: $this"))
 
-  def resourceNamed(obj: AnyRef, name: String, xml: Xml = ScalaXml): From = new FromResource(obj.getClass, name, xml)
+  def resourceNamed(obj: AnyRef, name: String, xml: Xml = ScalaXml): From = FromResource(obj.getClass, name, xml)
   def resource(obj: AnyRef, xml: Xml = ScalaXml): From = resourceNamed(obj, Platform.className(obj), xml)

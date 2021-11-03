@@ -25,6 +25,8 @@ dependencies {
 
   implementation libs.xmlresolver, libs.jing
   implementation libs.saxon10
+
+  implementation libs.zhttp
 }
 
 task buildAndPrettyPrintSite(type: JavaExec) {
@@ -36,3 +38,11 @@ task buildAndPrettyPrintSite(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
 }
 site.dependsOn(buildAndPrettyPrintSite)
+
+task serveSite(type: JavaExec) {
+  group = 'publishing'
+
+  mainClass = 'org.opentorah.site.SiteServiceCommon'
+  args = ['serveSite', "file://$projectDir/"]
+  classpath = sourceSets.main.runtimeClasspath
+}

@@ -36,7 +36,7 @@ final class Parsing private:
 
   // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))?
   private def addErrorTrace[A](error: Effects.Error): Effects.Error =
-    new Effects.Error(
+    Effects.Error(
       message = error.getMessage + "\n" + stack.flatMap(_.from).map(_.url),
       cause = error.getCause
     )

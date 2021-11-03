@@ -126,11 +126,11 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
 
       def digit(digits: List[Char], multiplier: Int): Unit = if remainder.nonEmpty then
         val n: Int = digits.indexOf(remainder.head)
-        if (n >= 0) then addAndDrop(multiplier*(n+1), 1)
+        if n >= 0 then addAndDrop(multiplier*(n+1), 1)
 
       if remainder.length > 1 && remainder.charAt(1) == '׳' then
         val n: Int = units.indexOf(remainder.head)
-        if (n < 0) then failed = true
+        if n < 0 then failed = true
         addAndDrop(1000*(n+1), 2)
 
       if remainder.startsWith("תת") then addAndDrop(800, 2)
@@ -138,8 +138,8 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
 
       digit(hundreds, 100)
 
-      if (remainder == "טו") then addAndDrop(15, 2)
-      else if (remainder == "טז") then addAndDrop(16, 2)
+      if remainder == "טו" then addAndDrop(15, 2)
+      else if remainder == "טז" then addAndDrop(16, 2)
       else
         digit(decades, 10)
         digit(units, 1)

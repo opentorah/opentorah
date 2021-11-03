@@ -67,7 +67,7 @@ final class Layout(
 
   // src/main/xsl/
   val stylesheetDirectory: File = sourceDirectory("xsl")
-  def stylesheetFile(name: String) = File(stylesheetDirectory, name)
+  def stylesheetFile(name: String): File = File(stylesheetDirectory, name)
   def customStylesheet(commonSection: CommonSection): String = commonSection.name + "-custom.xsl"
   def customStylesheet(variant: Variant): String = variant.fullName + "-custom.xsl"
   def paramsStylesheet(variant: Variant): String = variant.fullName + "-params.xsl"

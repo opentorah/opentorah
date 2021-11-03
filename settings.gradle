@@ -8,20 +8,20 @@ pluginManagement {
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'com.github.maiflai.scalatest' version '0.31'
     id 'com.google.cloud.tools.jib' version '3.1.4'
-    id 'org.podval.tools.cloudrun' version '0.2.0'
-    id 'com.gradle.plugin-publish' version '0.16.0'
-    id 'org.opentorah.docbook' version docBookPluginVersion
+    id 'org.podval.tools.cloudrun' version '0.3.0'
+    id 'com.gradle.plugin-publish' version '0.18.0'
     id 'io.miret.etienne.sass' version '1.1.2'
+    id 'org.opentorah.docbook' version docBookPluginVersion
   }
 }
 
 enableFeaturePreview('VERSION_CATALOGS')
-enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
+//enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
 final String scalaVersion       = '3.1.1-RC1'
 final String scalaVersionMajor  = '3'
 
-// TODO update to 2.0.0-M4 and fix the issues with Blocking etc. - once zhttp is updated...
+// TODO update to 2.0.0-M5 and fix the issues with Blocking etc. - once zhttp is updated...
 final String zioVersion = '1.0.12'
 
 final String flexmarkVersion = '0.62.2'
@@ -44,7 +44,7 @@ dependencyResolutionManagement {
     alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
 
     // XML
-    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.1.0')
+    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.1.6')
     alias('jing').to('org.relaxng:jing:20181222')
     alias('xerces' ).to('xerces:xercesImpl:2.12.1')
     alias('saxon10').to('net.sf.saxon:Saxon-HE:10.6')
@@ -53,7 +53,7 @@ dependencyResolutionManagement {
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.1.9')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.2.1')
 
     // J2V8
     alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
@@ -62,9 +62,15 @@ dependencyResolutionManagement {
     alias('zio-core'   ).to("dev.zio:zio_$scalaVersionMajor:$zioVersion")
     alias('zio-streams').to("dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     alias('zio-test'   ).to("dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    alias('zio-prelude').to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC7")
+    alias('zio-prelude').to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC8")
 
+    // TODO upgrade to cats 2.7.0 and move to:
+    //import cats.kernel.CommutativeGroup
+    //import cats.kernel.laws.CommutativeGroupLaws
+    //import cats.kernel.laws.discipline.GroupTests
     alias('cats-core'  ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
+    alias('cats-laws'  ).to("org.typelevel:cats-laws_$scalaVersionMajor:2.6.1")
+    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // ZHTTP
     alias('zhttp').to("io.d11:zhttp_$scalaVersionMajor:1.0.0.0-RC17")
@@ -76,7 +82,7 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.4')
+    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.5')
 
     // FOP
     alias('fop-core'   ).to('org.apache.xmlgraphics:fop:2.6')
@@ -87,12 +93,12 @@ dependencyResolutionManagement {
     //final String jaiVersion = '1.1.3'
 
     // Playwright
-    alias('playwright').to('com.microsoft.playwright:playwright:1.16.1')
+    alias('playwright').to('com.microsoft.playwright:playwright:1.17.2')
 
     // Logging
     alias('slf4j'   ).to('org.slf4j:slf4j-api:1.7.32')
     alias('logback' ).to('ch.qos.logback:logback-classic:1.2.6')
-    alias('logstash').to('net.logstash.logback:logstash-logback-encoder:6.6')
+    alias('logstash').to('net.logstash.logback:logstash-logback-encoder:7.0.1')
 
     // flexmark
     alias('flexmark-core'           ).to("com.vladsch.flexmark:flexmark:$flexmarkVersion")
@@ -105,7 +111,6 @@ dependencyResolutionManagement {
     alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.10")
     alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
     alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
-    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
 
     // Documentation
     alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.24")

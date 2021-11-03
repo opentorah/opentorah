@@ -97,7 +97,7 @@ object SiteDocBook extends Element[SiteDocBook]("docbook"):
     private val outputDirectoryAttribute: Attribute.Required[String] = Attribute("outputDirectory").required
     private val buildDirectoryAttribute: Attribute.Required[String] = Attribute("buildDirectory").required
     private val dataGeneratorClassAttribute: Attribute.Optional[String] = Attribute("dataGeneratorClass").optional
-  
+
     override def parser: Parser[SiteDocBook] = for
       documents: Seq[String] <- documentsAttribute().map(_.split(",").toList)
       outputDirectory: String <- outputDirectoryAttribute()

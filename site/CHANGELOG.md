@@ -3,6 +3,9 @@
 Modules covered: `base`, `site` and `texts`.
 
 ## [Unreleased]
+- Doctype cleanup;
+- ToHtml cleanup: levels of notes;
+- DocBook direct;
 
 ## [0.4.0] - 2021-11-03
 - Scala 3;

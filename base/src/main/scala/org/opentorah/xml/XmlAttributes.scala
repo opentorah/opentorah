@@ -38,9 +38,15 @@ trait XmlAttributes:
 
   def setAttributes(attributes: Attribute.Values, element: Element): Element
 
+  // TODO rework addAttribute[s]:
+  
+  final def addAttribute(attribute: Attribute.Value[_], element: Element): Element =
+    addAttributes(Seq(attribute), element)
+    
   final def addAttributes(attributes: Attribute.Values, element: Element): Element =
     val existing: Attribute.Values = getAttributes(element)
     val toAdd: Attribute.Values = attributes
       .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
 
     setAttributes(existing ++ toAdd, element)
+

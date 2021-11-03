@@ -21,7 +21,7 @@ spec:
           limits:
             cpu: "1"
 #           MaxHeapSize is never less than 126Mb, so "ergonomic" 1/4 starts at 512Mi:
-            memory: "1024Mi"
+            memory: "512Mi"
 #        env:
 #        - name: "JAVA_TOOL_OPTIONS"
 #          value: "-XX:+PrintFlagsFinal"

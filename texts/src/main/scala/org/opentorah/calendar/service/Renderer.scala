@@ -302,7 +302,7 @@ object Renderer:
     case Diaspora extends Location("Diaspora", false)
 
   def getLocation(parameter: Option[String]): Location =
-    val holyLand: Boolean = parameter.map(value => value == "true").getOrElse(true)
+    val holyLand: Boolean = parameter.forall(_ == "true")
     if holyLand then Location.HolyLand else Location.Diaspora
   
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
