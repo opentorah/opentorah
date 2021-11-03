@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
   <common
+    n="OpenTorah Papers"
     url="www.opentorah.org"
     favicon="favicon.ico"
     email="dub@opentorah.org"
+    isStatic="true"
   >
     <title>the Open Torah Project</title>
     <license
@@ -15,7 +17,7 @@
       twitter="theopentorah"
     />
     <footer>
-      documents related to early Chabad history<br/>
+      OpenTorah Papers<br/>
       🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
       <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
     </footer>

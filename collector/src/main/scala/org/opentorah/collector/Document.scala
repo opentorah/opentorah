@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.html
 import org.opentorah.metadata.Names
-import org.opentorah.tei.{Abstract, Author, Editor, EntityReference, EntityType, Pb, Tei}
+import org.opentorah.tei.{Abstract, Author, Date, Editor, EntityReference, EntityType, Pb, Tei}
 import org.opentorah.store.{Directory, Path, Terminal}
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
@@ -14,7 +14,7 @@ final class Document(
   val lang: String,
   val editors: Seq[Editor],
   val description: Option[Abstract.Value],
-  val date: Option[String],
+  val date: Option[Date],
   val authors: Seq[Author.Value],
   val addressee: Option[EntityReference],
   val pbs: Seq[Pb]
@@ -27,7 +27,7 @@ final class Document(
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
-  def getDate: ScalaXml.Text = ScalaXml.mkText(date.getOrElse(""))
+  def getDate: Seq[ScalaXml.Element] = date.toSeq.map(Date.xmlElement)
   def getDescription: ScalaXml.Nodes = description.toSeq.flatMap(_.content.scalaXml)
   def getAuthors: ScalaXml.Nodes = ScalaXml.multi(authors.flatMap(_.content.scalaXml))
   def getAddressee: Seq[ScalaXml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
@@ -68,10 +68,16 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
     lang = lang.get,
     editors = tei.teiHeader.fileDesc.titleStmt.editors,
     description = tei.teiHeader.profileDesc.flatMap(_.documentAbstract),
-    date = tei.teiHeader.profileDesc.flatMap(_.creation.map(_.date)).map(_.when),
+    date = tei.teiHeader.profileDesc.flatMap(_.creation).map(_.date).map(forDisplay),
     authors = tei.teiHeader.fileDesc.titleStmt.authors,
     addressee = persNames.find(_.role.contains("addressee")),
     pbs = pbs
+  )
+
+  def forDisplay(date: Date): Date = Date(
+    when = date.when,
+    calendar = date.calendar,
+    xml = Element.Nodes(ScalaXml)(Seq(ScalaXml.mkText(date.when)))
   )
 
   private def splitLang(name: String): (String, Option[String]) =
@@ -81,7 +87,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
 
   private val isTranslationAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isTranslation").orDefault
   private val langAttribute: Attribute.Required[String] = Attribute("lang").required
-  private val dateAttribute: Attribute.Optional[String] = Attribute("date").optional
+  private val dateElement: Elements.Optional[Date] = Date.optional
   private val editorsElement: Elements.Sequence[Editor] = Editor.seq
   private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
   private val authorsElement: Elements.Sequence[Author.Value] = Author.element.seq
@@ -95,7 +101,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
       lang: String <- langAttribute()
       editors: Seq[Editor] <- editorsElement()
       description: Option[Abstract.Value] <- abstractElement()
-      date: Option[String] <- dateAttribute()
+      date: Option[Date] <- dateElement()
       authors: Seq[Author.Value] <- authorsElement()
       addressee: Option[EntityReference] <- addresseeElement()
       pbs: Seq[Pb] <- pbsElement()
@@ -117,7 +123,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
       langAttribute(_.lang),
       editorsElement(_.editors),
       abstractElement(_.description),
-      dateAttribute(_.date),
+      dateElement(_.date),
       authorsElement(_.authors),
       addresseeElement(_.addressee),
       pbsElement(_.pbs)

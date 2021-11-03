@@ -8,8 +8,7 @@ import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, Prof
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Caching, Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
-import zio.{IO, Task, ZIO, ZLayer}
-import java.io.File
+import zio.{Task, ZIO, ZLayer}
 import java.net.URL
 
 // TODO add static site server/generator.
@@ -31,7 +30,8 @@ abstract class Site(
   final private val staticPaths: Set[String] =
     Set("assets", "css", "js", "sass", "robots.txt") ++ common.favicon.toSet
 
-  final def isStatic(path: Seq[String]): Boolean = path.headOption.exists(staticPaths.contains)
+  final def isStatic(path: Seq[String]): Boolean =
+    common.isStatic.contains(true) || path.headOption.exists(staticPaths.contains)
 
   final def getResponse(pathString: String): Task[Site.Response] =
     getResponse(Files.splitAndDecodeUrl(pathString))
@@ -115,9 +115,9 @@ abstract class Site(
     fullContent: ScalaXml.Element <- HtmlTheme.fullContent(path, this)
     result: ScalaXml.Element <-
       // TODO
-//      if ScalaXml.getNamespace(content) == DocBook.namespace.default then
-//        DocBook.toHtml(fullContent).provideLayer(ZLayer.succeed(()))
-//      else
+      if path.last.isInstanceOf[DocBook]/*ScalaXml.getNamespace(fullContent) == DocBook.namespace.default*/ then
+        DocBook.toHtml(fullContent).provideLayer(ZLayer.succeed(()))
+      else
         Tei    .toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path, pathShortener)))
   yield result
 
@@ -261,22 +261,3 @@ object Site:
     keepEmptyElements = Set("br", "meta", "link", "img", "data"),
     preformattedElements = Set("pre")
   )
-
-  // TODO eliminate
-  final class Common(
-    fromUrl: Element.FromUrl,
-    common: SiteCommon
-  ) extends Site(
-    fromUrl,
-    common
-  ), Pure[?]:
-    override def storesPure: Seq[Store] = Seq.empty
-    override def content(path: Path, extension: Option[String]): Caching.Parser[Response] = ???
-    override def pathShortener: Caching.Parser[Path.Shortener] = ZIO.succeed(identity)
-    override def path(store: Store): Path = Seq.empty
-    override protected def linkResolver(
-      path: Path,
-      pathShortener: Path.Shortener
-    ): LinksResolver =
-      LinksResolver.empty
-

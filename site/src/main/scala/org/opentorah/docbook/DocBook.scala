@@ -31,15 +31,17 @@ object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
 
   val dtdId: String = "-//OASIS//DTD DocBook XML V5.0//EN"
 
-  val dtdUri: String = "https://docbook.org/xml/5.0/dtd/docbook.dtd"
-  // was: "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"
-
   override val doctype: String = doctypeString("article")
-
-  def doctypeString(rootElementName: String): String = s"""<!DOCTYPE $rootElementName PUBLIC "$dtdId" "$dtdUri">"""
 
   def doctype(rootElementName: String): Doctype = new Doctype:
     override def doctype: String = doctypeString(rootElementName)
+   
+  private def doctypeString(rootElementName: String): String = Doctype.string(
+    rootElementName,
+    dtdId,
+    dtdUri = "https://docbook.org/xml/5.0/dtd/docbook.dtd"
+    // was: "http://www.oasis-open.org/docbook/xml/5.0/dtd/docbook.dtd"
+  )
 
   val version: String = "5.0"
 
@@ -83,44 +85,42 @@ object DocBook extends Dialect, Doctype, html.ToHtml[Has[Unit]]:
     val string: String = DocBook.prettyPrinter.renderWithHeader(Dom)(element)
     ScalaXml.loadFromString(string)
 
-  // TODO put endnotes below the component that has them
-  override protected def isEndNote(element: ScalaXml.Element): Boolean = ScalaXml.getName(element) == "footnote"
+  override protected def isFootnote(element: ScalaXml.Element): Boolean = ScalaXml.getName(element) == "footnote"
+
+  private val footnotesContainers: Set[String] = Set("chapter")
+
+  override protected def isFootnotesContainer(element: ScalaXml.Element): Boolean =
+    footnotesContainers.contains(ScalaXml.getName(element))
 
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
   private val linkendAttribute: Attribute.Required[String] = Attribute("linkend").required
 
-  override protected def elementTransform(element: ScalaXml.Element): URIO[Has[Unit], ScalaXml.Element] =
+  override protected def elementToHtml(
+    element: ScalaXml.Element
+  ): URIO[Has[Unit], (ScalaXml.Element, ScalaXml.Nodes)] =
+    val name: String = ScalaXml.getName(element)
     val children: ScalaXml.Nodes = ScalaXml.getChildren(element)
 
-    ScalaXml.getName(element) match
+    name match
       // TODO link, olink, xref, anchor
 
       case "ulink" =>
         require(!ScalaXml.isEmpty(children), element)
-        URIO.succeed(html.a(URI(urlAttribute.get(ScalaXml)(element)))(children))
+        succeed(html.a(URI(urlAttribute.get(ScalaXml)(element)))(children))
 
       // TODO look up the reference in the bibliography entry itself
       // TODO add chunk name for chunked mode
       case "biblioref" =>
         require(ScalaXml.isEmpty(children), element)
         val linkend: String = linkendAttribute.get(ScalaXml)(element)
-        URIO.succeed(html.a.empty.setFragment(linkend)(linkend))
+        succeed(<a href={s"#$linkend"}>{linkend}</a>)
 
-      //      case "graphic" =>
-      //        // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
-      //        require(Xml.isEmpty(children), element)
-      //        URIO.succeed(<img src={urlAttribute.get(element)}/>)
+      // TODO img analogue
 
       // TODO tgroups etc.; colspan analogue?
-      case "informaltable" =>
-        URIO.succeed(<table>{children}</table>)
 
-      case "row" =>
-        URIO.succeed(<tr>{children}</tr>)
+      case "informaltable" => succeed(<table>{children}</table>)
+      case "row"           => succeed(<tr>{children}</tr>)
+      case "entry"         => succeed(<td>{children}</td>)
 
-      case "entry" =>
-        //URIO.succeed(<td colspan={colsAttribute.get(element).orNull}>{children}</td>)
-        URIO.succeed(<td>{children}</td>)
-
-      case _ =>
-        URIO.succeed(element)
+      case _ => succeed(element)

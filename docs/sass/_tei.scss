@@ -1,0 +1,418 @@
+/* a */
+ab {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+abstract {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+add {
+  background-color: #ffcdcd;
+}
+add[place=above] {
+  vertical-align: super;
+}
+add[place=inline]:before {
+  content: "«";
+}
+add[place=inline]:after {
+  content: "»";
+}
+add[place=below] {
+  vertical-align: sub;
+}
+additional {
+  display: block;
+}
+additions {
+  display: block;
+}
+additions:before {
+  content: "Significant additions within the document: ";
+}
+addrLine {
+  display: block;
+}
+address[rend~="block"], addresss[rendition~="#block"] {
+  display: block;
+}
+app note {
+  display: none;
+}
+argument {
+  display: block;
+}
+att {
+  font-family: Courier,monospace;
+}
+att:before {
+  content: "@";
+}
+/* b */
+back {
+  display: block;
+}
+bibl[rend~="block"], bibl[rendition~="#block"] {
+  display: block;
+  padding-left: 2em;
+  text-indent: -2em;
+}
+biblFull {
+  display: block;
+}
+birth {
+  display: block;
+}
+birth:before {
+  content: "Birth: ";
+}
+/* c */
+caption {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+case[value]:before {
+  font-weight: bold;
+  content: attr(value) " ";
+}
+cb {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+cb:before {
+  content: "[column break]";
+}
+/* Choice elements */
+choice abbr + expan:before,
+choice expan + abbr:before,
+choice sic + corr:before,
+choice corr + sic:before,
+choice orig + reg:before,
+choice reg + orig:before {
+  content: " (";
+}
+choice abbr + expan:after,
+choice expan + abbr:after,
+choice sic + corr:after,
+choice corr + sic:after,
+choice orig + reg:after,
+choice reg + orig:after {
+  content: ")";
+}
+corr {
+  background-color: #aaffaa;
+}
+/* d */
+date[when]:empty:before {
+  content: attr(when);
+}
+del[rend='overstrike'] {
+  text-decoration: red line-through;
+}
+/* e */
+// TODO merge em and hi!
+emph {
+  font-style: italic;
+}
+emph[rend='underline'] {
+  font-style: normal;
+  text-decoration: underline;
+}
+emph[rend='big'] {
+  font-style: normal;
+  font-size: larger;
+}
+emph[rend='superscript'] {
+  vertical-align: super;
+  // do not let superscript alter line spacing
+  line-height: 0;
+}
+epigraph {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+explicit {
+  font-style: italic;
+}
+/* f */
+fw[type='pageNum'] {
+  background-color: lightgray;
+  border-radius: 1em;
+}
+/* g */
+gap {
+  color: red;
+}
+gap[reason='lost']:before {
+  content:'[';
+}
+gap[reason='lost']:after {
+  content: attr(content) ']';
+}
+gap[reason='illegible']:after {
+  content: attr(content);
+}
+gi {
+  font-family: Courier,monospace;
+}
+gi:before {
+  content: "<";
+}
+gi:after {
+  content: ">";
+}
+/* h */
+div.textpart { // TODO WTF?
+  display: none;
+}
+
+hi[rend~="caps"] {
+  font-weight:bold;
+}
+hi[rend~="italic"] {
+  font-style: italic;
+}
+hi[rend='underline'] {
+  text-decoration: underline;
+}
+hi[rend='big'] {
+  font-size: larger;
+}
+hi[rend='superscript'] {
+  vertical-align: super;
+  // do not let superscript alter line spacing
+  line-height: 0;
+}
+ident {
+  font-family: Courier,monospace;
+}
+incipit {
+  font-style: italic;
+}
+/* j */
+/* l */
+/* LMD: I use it without namespace to augment HTML :) */
+l {
+  display: block;
+  width: auto;
+}
+l[lineno]:before {
+  content: attr(lineno);
+  position: absolute;
+  left: 2em;
+}
+lb:after {
+  content: '\a';
+  white-space: pre;
+}
+lg {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+/* m */
+/* n */
+note[type='gloss'] {
+  background-color: gainsboro;
+}
+/* o */
+ovar {
+  font-style: italic;
+}
+origPlace {
+  font-weight: bold;
+}
+origPlace:before {
+  font-weight: bold;
+  content: "Place of Origin: ";
+}
+/* p */
+availability > tei-p:first-child {
+  margin-top: 0em;
+}
+postscript {
+  display: block;
+  margin-top: 2em;
+}
+/* q */
+q {
+  quotes: "\201c" "\201d" "\2018" "\2019" "\201c" "\201d" "\2018" "\2019" "\201c" "\201d" "\2018" "\2019" "\201c" "\201d";
+}
+q:before {
+  content: "";
+}
+q:after {
+  content: "";
+}
+q[next]:after {
+  content: "" !important;
+}
+q[prev]:before {
+  content: "" !important;
+}
+quote {
+  font-style:italic;
+}
+/* r */
+app rdg {
+  /*perhaps choice */
+  display:none;
+}
+re {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+remarks {
+  font-weight: bold;
+}
+remarks:before {
+  font-weight: bold;
+  content: "remarks: ";
+}
+/* s */
+salute {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+scriptNote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+seal {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+seal:before {
+  font-weight: bold;
+  content: "Seal: ";
+}
+sealDesc {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+secFol:before {
+  font-weight: bold;
+  content: "Second Folio: ";
+}
+secl>*:first-child:before {
+  content: "\a[";
+  white-space: pre;
+}
+secl>*:last-child:after {
+  content: "]\a\a";
+  white-space: pre;
+}
+seg {
+  outline: 0px solid transparent;
+}
+sense {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+setting {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+sic {
+  text-decoration: #aaffaa underline;
+}
+soCalled {
+  quotes: "\201c" "\201d" "\2018" "\2019" "\201c" "\201d" "\2018" "\2019" "\201c" "\201d" "\2018" "\2019" "\201c" "\201d";
+}
+soCalled:before {
+  content: open-quote;
+}
+soCalled:after {
+  content: close-quote;
+}
+soCalled[next]:after {
+  content: "" !important;
+}
+soCalled[prev]:before {
+  content: "" !important;
+}
+space:before {
+  font-weight: bold;
+  content: "";
+}
+span[n]:before {
+  content: attr(n);
+}
+stamp {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+stamp:before {
+  font-weight: bold;
+  content: "Stamped: ";
+}
+supplied {
+  background-color: #aaffaa;
+}
+supplied:before {
+  content: '[';
+}
+supplied:after {
+  content: ']';
+}
+surplus>*:first-child:before {
+  content: "\a[";
+  white-space: pre;
+}
+surplus>*:last-child:after {
+  content: "]\a\a";
+  white-space: pre;
+}
+/* t */
+TEI {
+  display: block;
+}
+teiHeader {
+  display: none;
+}
+TEI > text {
+  display: block;
+  line-height: 1.5;
+}
+/* u */
+u:before {
+  content: "-";
+}
+unclear {
+  background-color: #aaffaa;
+}
+view {
+  font-style: italic;
+}
+wit {
+  display: inline;
+}
+
+// Entities, entity lists, entity names.
+listPerson > tei-head, listPlace > tei-head, listOrg > tei-head {
+  font-size: 32px;
+  text-indent: -0.5em;
+}
+person, place, org, personGrp {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+person > a.persName, place > a.placeName, org > a.orgName {
+  display: block;
+  font-size: 24px;
+}

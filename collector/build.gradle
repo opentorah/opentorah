@@ -14,6 +14,7 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-base')
+  implementation project(':opentorah-calendar')
   implementation project(':opentorah-site')
 
   implementation libs.bundles.markdown
@@ -31,9 +32,9 @@ jib.container.mainClass = 'org.opentorah.collector.Collector'
 cloudRun.region = 'us-east4'
 deploy.dependsOn(cloudRunDeploy)
 
-task cloudRunLocalFromLocalStore(type: org.podval.tools.cloudrun.CloudRunPlugin.RunLocalTask)
+task cloudRunLocalFromLocalStore(type: org.podval.tools.cloudrun.RunLocalTask)
 cloudRunLocalFromLocalStore.additionalOptions = [
   // --volume?
-  '--mount', 'type=bind,source=/home/dub/OpenTorah/alter-rebbe.org/,target=/mnt/store/',
+  '--volume', '/home/dub/OpenTorah/alter-rebbe.org/:/mnt/store/:Z',
   '--env'  , 'STORE=file:///mnt/store/'
 ]

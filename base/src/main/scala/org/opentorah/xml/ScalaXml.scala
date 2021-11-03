@@ -59,6 +59,7 @@ object ScalaXml extends Xml:
 
   override def getName(element: Element): String = element.label
   override def getPrefix(element: Element): Option[String] = Option(element.prefix)
+  def rename(element: Element, name: String): Element = element.copy(label = name) // TODO into Xml...
 
   override def getNamespace(attributes: Attributes): Namespace = Namespace(
     prefix = attributes.prefix,

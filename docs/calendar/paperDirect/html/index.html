@@ -5,22 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="/css/main.css"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity=
-    "sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
     <link rel="icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism.css"/>
   </head>
   <body>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script>MathJax = { "tex":{ "processEscapes":true, "inlineMath":[["$", "$"]], "displayMath":[["$$", "$$"]] }
-    };</script>
-    <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <header class="site-header" role="banner">
       <div class="wrapper">
-        <a class="site-title" rel="author" href="/">the Open Torah Project</a>
+        <a class="site-title" rel="author" target="hierarchyViewer" href="/">the Open Torah Project</a>
         <nav class="site-nav">
           <input type="checkbox" id="nav-trigger" class="nav-trigger"></input>
           <label for="nav-trigger"><span class="menu-icon"><svg viewBox="0 0 18 15" width="18px" height="15px"><path d=
@@ -33,15 +24,15 @@
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
         <article class="post">
-          <div class="post-content">
-            <div xmlns="http://www.w3.org/1999/xhtml" class="html">
+          <div>
+            <div class="post-content">
               <book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
                 <info>
-                  <title>Rambam on Calendar</title>
+                  <db-title>Rambam on Calendar</db-title>
                   <author><personname>Leonid Dubinsky</personname></author>
                 </info>
                 <preface version="5.0" id="introduction">
-                  <title>Introduction</title>
+                  <db-title>Introduction</db-title>
                   <para>Latest version of this paper and the code used to produce it are available from
                   http://www.opentorah.org/.</para>
                   <para>In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two
@@ -123,9 +114,9 @@
                   </itemizedlist></para>
                 </preface>
                 <part id="remarks">
-                  <title>Part I: Some Remarks</title>
+                  <db-title>Part I: Some Remarks</db-title>
                   <chapter version="5.0" id="new-year-corrections">
-                    <title>New Year corrections</title>
+                    <db-title>New Year corrections</db-title>
                     <itemizedlist>
                       <listitem><para>are there meaningful names for the corrections?</para></listitem>
                       <listitem><para>are corrections explained by the desire to not have Yom Kippur on Sunday
@@ -154,7 +145,7 @@
                     difference in historic periods...</para>
                   </chapter>
                   <chapter version="5.0" id="solar-theory">
-                    <title>Solar Theory</title>
+                    <db-title>Solar Theory</db-title>
                     <para>In his "Laws of the Snctification of the Moon", Chapter 12, Law 1, Rambam states:</para>
                     <para>The mean rate of movement of the sun in one day (that is, twenty-four hours) is fifty-nine
                     minutes and eight seconds, in symbols - 59′8″. It follows that its movement in ten days is nine
@@ -183,7 +174,7 @@
                     in a regular year is three hundred forty-eight degrees, fifty-five minutes and fifteen seconds, in
                     symbols - 348°55′15″.</para>
                     <para>In table format:</para>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" id=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0" id=
                     "slm-printed"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
                     "http://www.w3.org/2001/XInclude" cols="2">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
@@ -223,7 +214,7 @@
                     </tgroup></table>
                     <para>Now let's see if the printed values can be recovered by multiplying the value for one day by
                     the number of days (and discarding full circles as appropriate):</para>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" id=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0" id=
                     "slm-reconstructed-1"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
                     "http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
@@ -277,7 +268,7 @@
                         </tr>
                       </tbody>
                     </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" id=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0" id=
                     "slm-reconstructed-10"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
                     "http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
@@ -313,7 +304,7 @@
                         </tr>
                       </tbody>
                     </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" id=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0" id=
                     "slm-reconstructed-100"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
                     "http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
@@ -343,7 +334,7 @@
                         </tr>
                       </tbody>
                     </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all" version="5.0" id=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0" id=
                     "slm-reconstructed-1000"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
                     "http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
@@ -368,13 +359,13 @@
                       </tbody>
                     </tgroup></table>
                     <section id="solar-model">
-                      <title>Model (TODO)</title>
+                      <db-title>Model (TODO)</db-title>
                       <para>Figure out from the text directions of Sun's movements and what are the position angles from
                       (look at the parallax correction stuff: subtract mean apogee from the mean Sun...).</para>
                       <para>TODO diagrams for the correction in Moznaim's Rambam.</para>
                     </section>
                     <section id="exactification">
-                      <title>Exactification (TODO)</title>
+                      <db-title>Exactification (TODO)</db-title>
                       <para>It is not clear how Rambam arrived at the values he gives. When value of the movement in one
                       day given by Rambam is multiplied by 29, 100 etc., the result is smaller than that of Rambam. The
                       following table compares printed and calculated values: TODO</para>
@@ -404,7 +395,7 @@
                       and almagestValue.</para>
                     </section>
                     <section id="solar-movement-29">
-                      <title>Angular movement for 29 days (TODO)</title>
+                      <db-title>Angular movement for 29 days (TODO)</db-title>
                       <para>Are Rambam's values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not
                       2*v(10)+9*v(1), nor 29*vexact(1)? For any tables other than SunLongitudeMean?</para>
                       <para>Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give
@@ -413,36 +404,36 @@
                       days, and 10000 days which we use to calculate the exact value that Rambam used! TODO!</para>
                     </section>
                     <section id="zeros">
-                      <title>Zeros (TODO)</title>
+                      <db-title>Zeros (TODO)</db-title>
                       <para>Math.findZero(): Finish and test the code; use two separate lengths (precisions)?</para>
                     </section>
                     <section id="sun-precise">
-                      <title>Sun for a precise time (TODO)</title>
+                      <db-title>Sun for a precise time (TODO)</db-title>
                       <para>make possible calculations for a Moment, not just a Day (at least for the sun);</para>
                     </section>
                     <section id="sun-creation">
-                      <title>Sun at Creation (TODO)</title>
+                      <db-title>Sun at Creation (TODO)</db-title>
                       <para>Where and when was the Sun created? (Birchat Hachamo is on a different opinion.) Does it let
                       us get more precise values of Sun's angular velocities?</para>
                     </section>
                     <section id="true-seasons">
-                      <title>True seasons (TODO)</title>
+                      <db-title>True seasons (TODO)</db-title>
                       <para>calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is
                       approximately two days before the mean one; add a test.</para>
                       <para>SeasonsAstronomical.seasonForYear: should this always be Nisan?</para>
                     </section>
                     <section id="year-lengths">
-                      <title>Year lengths (TODO)</title>
+                      <db-title>Year lengths (TODO)</db-title>
                       <para>Convert each year length mentioned in the fixed calendar to angular speed.</para>
                       <para>What year length does value for mean anomaly velocity given by Moznaim correspond?</para>
                     </section>
                     <section id="interesting">
-                      <title>Interesting</title>
+                      <db-title>Interesting</db-title>
                       <para>TODO От Корица: интересный линк на тему благословения на солнце и в конце обсуждение
                       концепции Рамбама в астрономии - https://www.yeshiva.org.il/midrash/11088</para>
                     </section>
                     <section id="interesting2">
-                      <title>Check statements of Nove Kadosh / Ibn Ezra</title>
+                      <db-title>Check statements of Nove Kadosh / Ibn Ezra</db-title>
                       <para>TODO От Корица: ודבר זה הלכה למשה מסיני הוא, שבזמן שיש סנהדרין קובעין על הראייה ובזמן שאין
                       שם סנהדרין קובעין על חשבון זה שאנו מחשבין בו היום ואין נזקקין לראייה, אלא פעמים שיהיה יום שקובעין
                       בו בחשבון זה הוא יום הראייה או קודם לו ביום או אחריו ביום, וזה שיהיה אחר הראייה ביום פלא הוא
@@ -466,7 +457,7 @@
                     </section>
                   </chapter>
                   <chapter version="5.0" id="lunar-theory">
-                    <title>Lunar Theory</title>
+                    <db-title>Lunar Theory</db-title>
                     <para>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second,
                     giving "true"? Why is the second "mean"? Because of the effects of the sun?</para>
                     <para>Note: From what and in which direction are the angles measured?</para>
@@ -505,7 +496,7 @@
                     <para>TODO Range of e - graph. Range of possible values for each based on the range of e. This is
                     transcription error: one letter; extra word... Probable correct values.</para>
                     <para>This is how different sources treat the often misprinted values:</para>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
                     "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                         <td class="entry">Edition</td>
@@ -534,7 +525,7 @@
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry"><a href="#Kapach" class="biblioref" linkend="Kapach">Kapach</a><a href=
-                          "#_note_1" id="src_note_1" class="footnote"><sup>1</sup></a></td>
+                          "#footnote_1" class="footnote-link" id="footnote_src_1">1</a></td>
                           <td class="entry">incorrect</td>
                           <td class="entry">corrected in the notes</td>
                           <td class="entry">corrected in the notes</td>
@@ -558,8 +549,8 @@
                           <td class="entry">not given</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry"><a href="#Losh" class="biblioref" linkend="Losh">Losh</a><a href="#_note_2"
-                          id="src_note_2" class="footnote"><sup>2</sup></a></td>
+                          <td class="entry"><a href="#Losh" class="biblioref" linkend="Losh">Losh</a><a href=
+                          "#footnote_2" class="footnote-link" id="footnote_src_2">2</a></td>
                           <td class="entry">incorrect</td>
                           <td class="entry">incorrect</td>
                           <td class="entry">incorrect</td>
@@ -567,34 +558,39 @@
                       </tbody>
                     </tgroup></table>
                     <section id="moon-questions">
-                      <title>Questions</title>
+                      <db-title>Questions</db-title>
                       <section>
-                        <title>Moznaim Rambam, KH 13:2f4</title>
+                        <db-title>Moznaim Rambam, KH 13:2f4</db-title>
                         <para>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</para>
                       </section>
                       <section>
-                        <title>Moon's mean period from astronomical models</title>
+                        <db-title>Moon's mean period from astronomical models</db-title>
                         <para>Angular speed of the moon = 360 / (1/tropical month + 1/solar year). Moon.meanLunarPeriod
                         - what is it called? Tropical?</para>
                       </section>
-                      <section><title>14:5 Moon Longitude Adjustment for Time of Seeing</title> See notes in Moznaim
-                      Rambam Sun longitude: mean or true? In 3rd and 7th lines, most editions incorrectly have
-                      15.</section>
                       <section>
-                        <title>TODO Moznaim Rambam, KH 15:1f2</title>
+                        <db-title>14:5 Moon Longitude Adjustment for Time of Seeing</db-title>
+                        <para>See notes in Moznaim Rambam Sun longitude: mean or true? In 3rd and 7th lines, most
+                        editions incorrectly have 15.</para>
+                      </section>
+                      <section>
+                        <db-title>TODO Moznaim Rambam, KH 15:1f2</db-title>
                         <para>double elongation = distance between moon's mean and apogee Moon longitude adjustment for
                         double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits; encode the
                         limits</para>
                       </section>
-                      <section><title>MoonSightable.forSightingLimits</title> is that what Rambam is saying?</section>
                       <section>
-                        <title>Distance between mean and true new moon</title>
+                        <db-title>MoonSightable.forSightingLimits</db-title>
+                        <para>is that what Rambam is saying?</para>
+                      </section>
+                      <section>
+                        <db-title>Distance between mean and true new moon</db-title>
                         <para>KH 5:1-2 says that the distance is no more than a day. Calculate this difference for all
                         months; Rambam's epoch - two days after molad?! (Petya Ofman).</para>
                         <para>How to find the day of sighting given a month?</para>
                       </section>
                       <section>
-                        <title>Differences between arithmetic and observational calendars</title>
+                        <db-title>Differences between arithmetic and observational calendars</db-title>
                         <para>
                           <itemizedlist>
                             <listitem><para>основан не на среднем движении солнца и луны, поэтому к молад надо делать
@@ -612,22 +608,44 @@
                         </para>
                       </section>
                       <section>
-                        <title>TimeToRotation.calculate()</title>
+                        <db-title>TimeToRotation.calculate()</db-title>
                         <para>without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH
                         15:8-9 (see test); see if variations in this algorithms are logical: e.g., for 600, add for 1000
                         and subtract 4*for 100? see if the end result is stable when Rambam's "real" value is used with
                         straight multiplication and rounding (abstract away the calculation mechaninsm).</para>
                       </section>
-                      <section><title>TODO Example in 15:8-9</title> moonAnomalyTrue - printing error in standard
-                      editions, 180 instead of 108; still 108°21′46″, which doesn't round to 108°21...
-                      moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.</section>
-                      <section><title>TODO Example 17:13-14</title> "this longitude is in Taurus" - but longitude3
-                      isn't, so I get 1/6 instead of 1/5...</section>
-                      <section><title>TODO crescent calculations: KH 18-19!</title></section>
+                      <section>
+                        <db-title>TODO Example in 15:8-9</db-title>
+                        <para>moonAnomalyTrue - printing error in standard editions, 180 instead of 108; still
+                        108°21′46″, which doesn't round to 108°21... moonLongitudeTrueRaw - printing error in standard
+                        editions, 33 instead of 35.</para>
+                      </section>
+                      <section>
+                        <db-title>TODO Example 17:13-14</db-title>
+                        <para>"this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of
+                        1/5...</para>
+                      </section>
+                      <section><db-title>TODO crescent calculations: KH 18-19!</db-title></section>
                     </section>
+                    <hr class="footnotes-line"></hr>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
+                      <span class="footnote" id="footnote_1">
+                        <a href="#footnote_src_1" class="footnote-backlink">1</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">It is not
+                        clear how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic
+                        editions.</para>
+                      </span>
+                      <span class="footnote" id="footnote_2">
+                        <a href="#footnote_src_2" class="footnote-backlink">2</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Reprints
+                        the text and does not correct any of the misprints - surpising for a textbook on the subject
+                        (even introductory). TODO: Link to the scans of the appropriate pages - with the stuff
+                        highlighted.</para>
+                      </span>
+                    </div>
                   </chapter>
                   <chapter version="5.0" id="leap-years-cycle">
-                    <title>Meton's cycle</title>
+                    <db-title>Meton's cycle</db-title>
                     <para>Show why 19-years cycle is the best. Calculate optimal distribution of the leap years.</para>
                     <para>- 1:2 Solar year is ~11 days longer than the lunar (see chapter 6); when discrepancy
                     accumulates to ~30 days, year is made leap. - 4:1-2 Leap year - additional Adar; Pesach (15th of
@@ -651,11 +669,11 @@
                     is possible that true Sun calculations are needed to answer those questions...</para>
                   </chapter>
                   <chapter version="5.0" id="rambam-summary">
-                    <title>Rambam: Summary</title>
+                    <db-title>Rambam: Summary</db-title>
                     <section id="rambam-summary-general">
-                      <title>General</title>
+                      <db-title>General</db-title>
                       <section id="rambam-summary-chapter-1">
-                        <title>Chapter 1: Introduction.</title>
+                        <db-title>Chapter 1: Introduction.</db-title>
                         <simplelist>
                           <member>Law 1: Month is lunar; year is solar.</member>
                           <member>Law 2: Solar year is ~11 days longer than the lunar; when discrepancy accumulates to
@@ -669,15 +687,15 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-2">
-                        <title>Chapter 2: Court procedure.</title>
+                        <db-title>Chapter 2: Court procedure.</db-title>
                         <simplelist><member>Laws 1-10: Court procedure.</member></simplelist>
                       </section>
                       <section id="rambam-summary-chapter-3">
-                        <title>Chapter 3: Court procedure.</title>
+                        <db-title>Chapter 3: Court procedure.</db-title>
                         <simplelist><member>Laws 1-19: Court procedure; messengers.</member></simplelist>
                       </section>
                       <section id="rambam-summary-chapter-4">
-                        <title>Chapter 4: Leap Year.</title>
+                        <db-title>Chapter 4: Leap Year.</db-title>
                         <simplelist>
                           <member>Laws 1-2: Leap year - additional Adar; Pesach (15th of Nisan) must in the spring: not
                           before the day of vernal equinox (Sun enters Aries, see 9:3) and before the next summer
@@ -689,9 +707,9 @@
                       </section>
                     </section>
                     <section id="rambam-summary-arithmetic">
-                      <title>Arithmetic calendar.</title>
+                      <db-title>Arithmetic calendar.</db-title>
                       <section id="rambam-summary-chapter-5">
-                        <title>Chapter 5: Introduction.</title>
+                        <db-title>Chapter 5: Introduction.</db-title>
                         <simplelist>
                           <member>Laws 1-2: Introduction; discrepancy with observations: -1…+1 day (+1 - very
                           rare).</member>
@@ -703,7 +721,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-6">
-                        <title>Chapter 6: Conjunction. Lunar month and year. Leap year cycle.</title>
+                        <db-title>Chapter 6: Conjunction. Lunar month and year. Leap year cycle.</db-title>
                         <simplelist>
                           <member>Law 1: "Molad" - approximate conjunction (Sun. Moon and Earth on the same
                           line).</member>
@@ -727,7 +745,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-7">
-                        <title>Chapter 7: New Year corrections.</title>
+                        <db-title>Chapter 7: New Year corrections.</db-title>
                         <simplelist>
                           <member>Law 1: Rosh Hashono gets pushed off from Sunday, Wednesday, Friday.</member>
                           <member>Law 2: Gets pushed off if molad is after noon (Molad Zoken).</member>
@@ -739,7 +757,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-8">
-                        <title>Chapter 8: TODO</title>
+                        <db-title>Chapter 8: TODO</db-title>
                         <simplelist>
                           <member>Law 1: -> 6.3</member>
                           <member>Law 2: Month - 29 or 30 days.</member>
@@ -749,7 +767,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-9">
-                        <title>Chapter 9: Seasons.</title>
+                        <db-title>Chapter 9: Seasons.</db-title>
                         <simplelist>
                           <member>Law 2: 1/4 of the year between seasons (91d 7.5h).</member>
                           <member>Law 3: Nisan (Spring) - Aries; Tammuz - Cancer; Tishrei - Libra; Teves - Cap.? Vernal
@@ -763,7 +781,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-10">
-                        <title>Chapter 10: More precise length of the year. Seasons.</title>
+                        <db-title>Chapter 10: More precise length of the year. Seasons.</db-title>
                         <simplelist>
                           <member>Law 1: More precise length of a solar year. Moments.</member>
                           <member>Law 2: Seasons for this year length.</member>
@@ -780,9 +798,10 @@
                       </section>
                     </section>
                     <section id="rambam-summary-astronomical">
-                      <title>Atronomical Calculations.</title>
+                      <db-title>Atronomical Calculations.</db-title>
                       <section id="rambam-summary-chapter-11">
-                        <title>Chapter 11. Approximation. Angles. Mean and true motions. Epoch and location.</title>
+                        <db-title>Chapter 11. Approximation. Angles. Mean and true motions. Epoch and
+                        location.</db-title>
                         <simplelist>
                           <member>Laws 1-4: Visibility calculations are deep. Fixed calendar can be appreciated even by
                           school children in 3 or 4 days.</member>
@@ -799,7 +818,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-12">
-                        <title>Chapter 12: Sun and its apogee.</title>
+                        <db-title>Chapter 12: Sun and its apogee.</db-title>
                         <simplelist>
                           <member>Law 1: Movement of the Sun. Moznaim Note 6: calculations may be accurate only on the
                           first day of the month; Note 7. 59′8.33″ Yale, p.99; Neugeb., p. 388ff</member>
@@ -808,7 +827,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-13">
-                        <title>Chapter 13: True position of the sun. True seasons.</title>
+                        <db-title>Chapter 13: True position of the sun. True seasons.</db-title>
                         <simplelist>
                           <member>Laws 1-3: Tue position of the Sun.</member>
                           <member>Law 4: Course correction table.</member>
@@ -817,7 +836,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-14">
-                        <title>Chapter 14</title>
+                        <db-title>Chapter 14</db-title>
                         <simplelist>
                           <member>Law 1: Moon: epicycle and deferent; movement as seen from Earth. See Moznaim
                           notes!</member>
@@ -828,7 +847,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-15">
-                        <title>Chapter 15</title>
+                        <db-title>Chapter 15</db-title>
                         <simplelist>
                           <member>Laws 1-2: Double elongation and its limits. See Moznaim notes!</member>
                           <member>Laws 3-5: Course correction table.</member>
@@ -837,7 +856,7 @@
                         </simplelist>
                       </section>
                       <section id="rambam-summary-chapter-16">
-                        <title>Chapter 16</title>
+                        <db-title>Chapter 16</db-title>
                         <simplelist>
                           <member>Laws 1-4: Head movement, table and rules.</member>
                           <member>Law 5: Example.</member>
@@ -845,47 +864,47 @@
                           <member>Law 19: Example.</member>
                         </simplelist>
                       </section>
-                      <section id="rambam-summary-chapter-17"><title>Chapter 17 (TODO)</title></section>
-                      <section id="rambam-summary-chapter-18"><title>Chapter 18 (TODO)</title></section>
-                      <section id="rambam-summary-chapter-19"><title>Chapter 19 (TODO)</title></section>
+                      <section id="rambam-summary-chapter-17"><db-title>Chapter 17 (TODO)</db-title></section>
+                      <section id="rambam-summary-chapter-18"><db-title>Chapter 18 (TODO)</db-title></section>
+                      <section id="rambam-summary-chapter-19"><db-title>Chapter 19 (TODO)</db-title></section>
                     </section>
                   </chapter>
                 </part>
                 <part id="rambam">
-                  <title>Part II: The Text</title>
+                  <db-title>Part II: The Text</db-title>
                   <partintro>
                     <para>Laws of the Sanctification of the Moon</para>
                     <para>There is one positive commandment: to calculate, to know, and to establish on which day each
                     month of the year begins. Explanation of this commandment is in these chapters.</para>
                   </partintro>
                   <chapter version="5.0" id="KH1">
-                    <title>Chapter 1</title>
+                    <db-title>Chapter 1</db-title>
                     <section role="NotInToc" id="KH1-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>The months of the year are lunar months, as it is said: "[...] the burnt offering of the
-                      month in its month"<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_3" id="src_note_3" class=
-                      "footnote"><sup>3</sup></a> and it is said: "This month shall be for you the head of the months"<a
-                      xmlns="http://www.w3.org/1999/xhtml" href="#_note_4" id="src_note_4" class="footnote"><sup
-                      >4</sup></a>. This is what the sages said: "The Holy One, blessed be He, showed to Moshe, in a
-                      prophetic vision, the image of the Moon, and said to him: '[When] you see [the Moon] like this -
-                      sanctify [it].'"<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_5" id="src_note_5" class=
-                      "footnote"><sup>5</sup></a></para>
+                      month in its month"<a xmlns="http://www.w3.org/1999/xhtml" href="#footnote_3" class=
+                      "footnote-link" id="footnote_src_3">1</a> and it is said: "This month shall be for you the head of
+                      the months"<a xmlns="http://www.w3.org/1999/xhtml" href="#footnote_4" class="footnote-link" id=
+                      "footnote_src_4">2</a>. This is what the sages said: "The Holy One, blessed be He, showed to
+                      Moshe, in a prophetic vision, the image of the Moon, and said to him: '[When] you see [the Moon]
+                      like this - sanctify [it].'"<a xmlns="http://www.w3.org/1999/xhtml" href="#footnote_5" class=
+                      "footnote-link" id="footnote_src_5">3</a></para>
                       <para>But the years that we reckon are solar years, as it is said: "Keep the month of aviv
-                      [spring]".<a xmlns="http://www.w3.org/1999/xhtml" href="#_note_6" id="src_note_6" class="footnote"
-                      ><sup>6</sup></a></para>
+                      [spring]".<a xmlns="http://www.w3.org/1999/xhtml" href="#footnote_6" class="footnote-link" id=
+                      "footnote_src_6">4</a></para>
                     </section>
                     <section role="NotInToc" id="KH1-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>By how much is the solar year longer than the lunar year? By approximately 11 days.
                       Therefore, when this excess accumulates to around 30 days, or a little less, or a little more, a
                       month is added and the year is made to have 13 months - which is called a "pregnant" year. [This
                       is done] because it is impossible to have a year of 12 months and some days, as it is said: "for
                       the months of the year" - you count the months of the year, but not the days of the year.<a xmlns=
-                      "http://www.w3.org/1999/xhtml" href="#_note_7" id="src_note_7" class="footnote"><sup>7</sup></a>
+                      "http://www.w3.org/1999/xhtml" href="#footnote_7" class="footnote-link" id="footnote_src_7">5</a>
                       </para>
                     </section>
                     <section role="NotInToc" id="KH1-3">
-                      <title>Law 3</title>
+                      <db-title>Law 3</db-title>
                       <para>Each month, the moon becomes hidden for about two days, or a little less or more: about one
                       day before its conjunction with the sun at the end of the month, and about one day after its
                       conjunction with the sun, and in the evening it is sightet in the west. The night when it is
@@ -896,7 +915,7 @@
                       or not, since lunar month is never longer than 30 days.</para>
                     </section>
                     <section role="NotInToc" id="KH1-4">
-                      <title>Law 4</title>
+                      <db-title>Law 4</db-title>
                       <para>Month of 29 days, [when] the moon was sighted on the 30th night, is called "lacking". If the
                       moon was not sighted, and the previous month has 30 days, it is called "pregnant" month, or "full"
                       month. The moon sighted on the 30th night is called "moon sighted on time". If it is sighted on
@@ -904,7 +923,7 @@
                       pregnancy".</para>
                     </section>
                     <section role="NotInToc" id="KH1-5">
-                      <title>Law 5</title>
+                      <db-title>Law 5</db-title>
                       <para>Sighting of the moon is not up to an individual, unlike determination of the Shabbos, where
                       one counts 6 days and observes Shabbos on the 7th, but is given to the court. Only when the court
                       sanctifies and establishes the day as the beginning of the [new] month does it become the
@@ -912,7 +931,7 @@
                       entrusted to you.</para>
                     </section>
                     <section role="NotInToc" id="KH1-6">
-                      <title>Law 6</title>
+                      <db-title>Law 6</db-title>
                       <para>The court calculates, like the astronomers who know positions of the planets and their
                       movements, and look into it until they know if it is possible for the moon to be sighted on time -
                       that is, on the 30th night - or not. If they determined that it is possible for it to be sighted,
@@ -925,7 +944,7 @@
                       not the real moon.</para>
                     </section>
                     <section role="NotInToc" id="KH1-7">
-                      <title>Law 7</title>
+                      <db-title>Law 7</db-title>
                       <para>It is a positive commandment of the Torah for the court to calculate and to know whether the
                       moon can be sighted or not, and to examine the witnesses before the month is sanctified, and to
                       send [messengers] to notify the rest of the people which day is the beginning of the month, so
@@ -933,7 +952,7 @@
                       convocations" and as it is said : "keep this statute in its time".</para>
                     </section>
                     <section role="NotInToc" id="KH1-8">
-                      <title>Law 8</title>
+                      <db-title>Law 8</db-title>
                       <para>Calculation and establishment of the months and declaration of "pregnant" years is done only
                       in the Land of Israel, as it is said: "For out of Zion will come forth Torah, and the word of G-d
                       - from Yerushalaim". But, if there was a man great in wisdom, and ordained in the Land of Israel,
@@ -943,93 +962,129 @@
                       greater than him - he is prohibited to establish and to proclaim outside of the Land, and if he
                       transgressed and did establish or did proclaim, it is as if he didn't do a thing.</para>
                     </section>
+                    <hr class="footnotes-line"></hr>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
+                      <span class="footnote" id="footnote_3">
+                        <a href="#footnote_src_3" class="footnote-backlink">1</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Bamidbar
+                        28:14</para>
+                      </span>
+                      <span class="footnote" id="footnote_4">
+                        <a href="#footnote_src_4" class="footnote-backlink">2</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Shemos
+                        12:2</para>
+                      </span>
+                      <span class="footnote" id="footnote_5">
+                        <a href="#footnote_src_5" class="footnote-backlink">3</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Rosh
+                        Hashanah 20b;<a xmlns="http://www.w3.org/1999/xhtml" href="#footnote_8" class="footnote-link"
+                        id="footnote_src_8">1</a> Menachot 29a</para>
+                      </span>
+                      <span class="footnote" id="footnote_6">
+                        <a href="#footnote_src_6" class="footnote-backlink">4</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Dvarim
+                        16</para>
+                      </span>
+                      <span class="footnote" id="footnote_7">
+                        <a href="#footnote_src_7" class="footnote-backlink">5</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Megilla
+                        5a; Nazir 7a</para>
+                      </span>
+                    </div>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
+                      <span class="footnote" id="footnote_8">
+                        <a href="#footnote_src_8" class="footnote-backlink">1</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is a
+                        test footnote of the second level; TODO REMOVE!</para>
+                      </span>
+                    </div>
                   </chapter>
                   <chapter version="5.0" id="KH4">
-                    <title>Chapter 4</title>
+                    <db-title>Chapter 4</db-title>
                     <section role="NotInToc" id="KH4-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH4-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>TODO</para>
                     </section>
                   </chapter>
                   <chapter version="5.0" id="KH11">
-                    <title>Chapter 11</title>
+                    <db-title>Chapter 11</db-title>
                     <section role="NotInToc" id="KH11-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-3">
-                      <title>Law 3</title>
+                      <db-title>Law 3</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-4">
-                      <title>Law 4</title>
+                      <db-title>Law 4</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-5">
-                      <title>Law 5</title>
+                      <db-title>Law 5</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-6">
-                      <title>Law 6</title>
+                      <db-title>Law 6</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-7">
-                      <title>Law 7</title>
+                      <db-title>Law 7</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-8">
-                      <title>Law 8</title>
+                      <db-title>Law 8</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-9">
-                      <title>Law 9</title>
+                      <db-title>Law 9</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-10">
-                      <title>Law 10</title>
+                      <db-title>Law 10</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-11">
-                      <title>Law 11</title>
+                      <db-title>Law 11</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-12">
-                      <title>Law 12</title>
+                      <db-title>Law 12</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-13">
-                      <title>Law 13</title>
+                      <db-title>Law 13</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-14">
-                      <title>Law 14</title>
+                      <db-title>Law 14</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-15">
-                      <title>Law 15</title>
+                      <db-title>Law 15</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-16">
-                      <title>Law 16</title>
+                      <db-title>Law 16</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH11-17">
-                      <title>Law 17</title>
+                      <db-title>Law 17</db-title>
                       <para>TODO</para>
                     </section>
                   </chapter>
                   <chapter version="5.0" id="KH12">
-                    <title>Chapter 12</title>
+                    <db-title>Chapter 12</db-title>
                     <section role="NotInToc" id="KH12-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>The mean rate of movement of the sun in one day (that is, twenty-four hours) is fifty-nine
                       minutes and eight seconds, in symbols - 59′8″. It follows that its movement in ten days is nine
                       degrees fifty-one minutes and twenty-three seconds, in symbols - 9°51′23″. It also follows that
@@ -1058,7 +1113,7 @@
                       and fifteen seconds, in symbols - 348°55′15″.</para>
                     </section>
                     <section role="NotInToc" id="KH12-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>There is a point on the Sun's orbit (and on orbits of the other seven planets) such that
                       when the planet is there it is highest above Earth. This point of the Sun's orbit (and so for
                       other planets, except for the moon) rotates with constant speed. Its movement every seventy years
@@ -1120,16 +1175,16 @@
                     </section>
                   </chapter>
                   <chapter version="5.0" id="KH13">
-                    <title>Chapter 13</title>
+                    <db-title>Chapter 13</db-title>
                     <section role="NotInToc" id="KH13-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>If you want to find out true position of the Sun for any day that you want, first calculate
                       its mean position for that day the way we explained, and calculate position of the Sun's apogee.
                       Subtract position of the Sun's apogee from the Sun's mean position; what is left is called
                       <glossterm>maslul of the Sun</glossterm>.</para>
                     </section>
                     <section role="NotInToc" id="KH13-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>See how many degrees is the maslul of the Sun; if maslul was less than one hundred and
                       eighty degrees, subtract parallax correction from the position of the mean Sun; if maslul was more
                       than one hundred and eighty degrees up to three hundred and sixty, add parallax correction to the
@@ -1137,12 +1192,12 @@
                       position.</para>
                     </section>
                     <section role="NotInToc" id="KH13-3">
-                      <title>Law 3</title>
+                      <db-title>Law 3</db-title>
                       <para>Know that if maslul is exactly one hundred and eighty or exactly three hundred and sixty, it
                       doesn't have parallax correction; rather, the mean position is the true position</para>
                     </section>
                     <section role="NotInToc" id="KH13-4">
-                      <title>Law 4</title>
+                      <db-title>Law 4</db-title>
                       <para>And what is the value of the parallax correction? If maslul will be ten degrees, its
                       parallax correction will be twenty seconds; and if it will be twenty degrees, its parallax
                       correction will be fourty minutes; and if it will be thirty degrees, its parallax correction will
@@ -1166,7 +1221,7 @@
                       rather Sun's mean position is its true position.</para>
                     </section>
                     <section role="NotInToc" id="KH13-5">
-                      <title>Law 5</title>
+                      <db-title>Law 5</db-title>
                       <para>If maslul was more that one hundred and eighty degrees, subtract it from three hundred and
                       sixty degrees and find out its parallax correction. For example, if maslul was two hundred
                       degrees, subtract it from three hundred and suxty, and one hundred and sixty degrees will be left.
@@ -1174,37 +1229,37 @@
                       minutes, and so is the parallax correction for two hundred - fourty two minutes.</para>
                     </section>
                     <section role="NotInToc" id="KH13-6">
-                      <title>Law 6</title>
+                      <db-title>Law 6</db-title>
                       <para>Also, if the maslul was three hindred degrees, subtract it from three hundred and sixty -
                       and sixty will remain. And you already know that parallax correction for sixty degrees [is] one
                       degree and fouty one minutes, and so is the parallax correction for three hundred degrees. And the
                       same way - for every number.</para>
                     </section>
                     <section role="NotInToc" id="KH13-7">
-                      <title>Law 7</title>
+                      <db-title>Law 7</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH13-8">
-                      <title>Law 8</title>
+                      <db-title>Law 8</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH13-9">
-                      <title>Law 9</title>
+                      <db-title>Law 9</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH13-10">
-                      <title>Law 10</title>
+                      <db-title>Law 10</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH13-11">
-                      <title>Law 11</title>
+                      <db-title>Law 11</db-title>
                       <para>TODO</para>
                     </section>
                   </chapter>
                   <chapter version="5.0" id="KH14">
-                    <title>Chapter 14</title>
+                    <db-title>Chapter 14</db-title>
                     <section role="NotInToc" id="KH14-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>The moon has two mean movements. The moon itself rotates on a small circle that does not
                       surround all of the Earth. Moon's movement on that small circle is called <glossterm linkend=
                       "mla-term">mean lunar anomaly</glossterm> (אמצע המסלול). The small circle (epicycle TODO link to
@@ -1213,20 +1268,20 @@
                       movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח).</para>
                     </section>
                     <section role="NotInToc" id="KH14-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>Movement in mean lunar longitude in one day is 13°10′35″<a xmlns=
-                      "http://www.w3.org/1999/xhtml" href="#_note_8" id="src_note_8" class="footnote"><sup
-                      >8</sup></a>.</para>
+                      "http://www.w3.org/1999/xhtml" href="#footnote_9" class="footnote-link" id="footnote_src_9"
+                      >1</a>.</para>
                       <para>For longer periods, (remainder) of the movement in mean lunar longitude is:</para>
                       <para>And in this way you can calculate it for any number of days and years that you want.</para>
                     </section>
                     <section role="NotInToc" id="KH14-3">
-                      <title>Law 3</title>
+                      <db-title>Law 3</db-title>
                       <para>Movement in mean lunar anomaly in one day is 13°3′54″.</para>
                       <para>For longer periods, (remainder) of the movement in mean lunar anomaly is:</para>
                     </section>
                     <section role="NotInToc" id="KH14-4">
-                      <title>Law 4</title>
+                      <db-title>Law 4</db-title>
                       <para>In the beginning of the night to Thursday that is the epoch (TODO measured from what?
                       Chapter 11?) [TODO: link to definition] for these calculations, mean lunar longitude was 1°14′43″
                       into the constellation of Ram. And mean lunar anomaly on the epoch was 84°28′42″. Now that you
@@ -1235,28 +1290,28 @@
                       mean solar longitude. TODO: reference</para>
                     </section>
                     <section role="NotInToc" id="KH14-5">
-                      <title>Law 5</title>
+                      <db-title>Law 5</db-title>
                       <para>After you calculate mean lunar longitude at the beginning of the night that you want,
                       contemplate the sun (TODO: longitude?) and figure out which constellation (zodiac) is it in<a
-                      xmlns="http://www.w3.org/1999/xhtml" href="#_note_9" id="src_note_9" class="footnote"><sup
-                      >9</sup></a>. [This is the correction of the mean lunar longitude depending on the mean solar
-                      longitude:]</para>
+                      xmlns="http://www.w3.org/1999/xhtml" href="#footnote_10" class="footnote-link" id=
+                      "footnote_src_10">2</a>. [This is the correction of the mean lunar longitude depending on the mean
+                      solar longitude:]</para>
                     </section>
                     <section role="NotInToc" id="KH14-6">
-                      <title>Law 6</title>
-                      <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                      <db-title>Law 6</db-title>
+                      <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
                       "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
                         <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">Solar Longitude on the Zodiac</td>
                           <td class="entry">from</td>
-                          <td class="entry">to, not including<a href="#_note_10" id="src_note_10" class="footnote"><sup
-                          >10</sup></a></td>
+                          <td class="entry">to, not including<a href="#footnote_11" class="footnote-link" id=
+                          "footnote_src_11">3</a></td>
                           <td class="entry">Lunar longitude correction</td>
                         </tr></thead>
                         <tbody>
                           <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                            <td class="entry">middle of Pisces-middle of Taurus<a href="#_note_11" id="src_note_11"
-                            class="footnote"><sup>11</sup></a></td>
+                            <td class="entry">middle of Pisces-middle of Taurus<a href="#footnote_12" class=
+                            "footnote-link" id="footnote_src_12">4</a></td>
                             <td class="entry">315°</td>
                             <td class="entry">15°</td>
                             <td class="entry">0°</td>
@@ -1310,11 +1365,34 @@
                       are calculating it for. And this is what is called <glossterm>mean lunar longitude at observation
                       time</glossterm>.</para>
                     </section>
+                    <hr class="footnotes-line"></hr>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
+                      <span class="footnote" id="footnote_9">
+                        <a href="#footnote_src_9" class="footnote-backlink">1</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        part of Law 1.</para>
+                      </span>
+                      <span class="footnote" id="footnote_10">
+                        <a href="#footnote_src_10" class="footnote-backlink">2</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        part of Law 4.</para>
+                      </span>
+                      <span class="footnote" id="footnote_11">
+                        <a href="#footnote_src_11" class="footnote-backlink">3</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">My
+                        understanding of the word usage in the original.</para>
+                      </span>
+                      <span class="footnote" id="footnote_12">
+                        <a href="#footnote_src_12" class="footnote-backlink">4</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">See
+                        Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)</para>
+                      </span>
+                    </div>
                   </chapter>
                   <chapter version="5.0" id="KH15">
-                    <title>Chapter 15</title>
+                    <db-title>Chapter 15</db-title>
                     <section role="NotInToc" id="KH15-1">
-                      <title>Law 1</title>
+                      <db-title>Law 1</db-title>
                       <para>To find <glossterm linkend="tll-term">true lunar longitude</glossterm> on a specific day:
                       First, calculate mean lunar longitude during observation time of the desired night. Also,
                       calculate mean lunar anomaly and mean solar longitude for the same time. Then, subtract mean solar
@@ -1322,17 +1400,17 @@
                       linkend="dd-term">doubled distance</glossterm> .</para>
                     </section>
                     <section role="NotInToc" id="KH15-2">
-                      <title>Law 2</title>
+                      <db-title>Law 2</db-title>
                       <para>We already stipulated that all the calculations in these chapters are for one purpose only:
                       to know if the moon is visible. And it is not possible for this double distance during the night
                       of observation when the moon is indeed visible to be outside of the interval from 5° to 62°. It
                       cannot be more - nor less.</para>
                     </section>
                     <section role="NotInToc" id="KH15-3">
-                      <title>Law 3</title>
+                      <db-title>Law 3</db-title>
                       <para>A correction that depends on the doubled distance is added to the mean lunar anomaly, giving
                       <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון):</para>
-                      <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" frame="all"><tgroup xmlns=
+                      <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
                       "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="2">
                         <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">doubled distance</td>
@@ -1383,7 +1461,7 @@
                       </tgroup></table>
                     </section>
                     <section role="NotInToc" id="KH15-4">
-                      <title>Law 4</title>
+                      <db-title>Law 4</db-title>
                       <para id="l15-4">Then, see how many degrees is corrected lunar anomaly. If it is less than 180°,
                       subtract visible anomaly of this corrected anomaly from the mean lunar longitude the observation
                       time. And if corrected lunar anomaly is more than 180° but less than 360°, add visible anomaly of
@@ -1392,33 +1470,41 @@
                       time</glossterm>.</para>
                     </section>
                     <section role="NotInToc" id="KH15-5">
-                      <title>Law 5</title>
+                      <db-title>Law 5</db-title>
                       <para>If the corrected anomaly is 180° or 360°, there is no visible anomaly, so mean lunar
                       longitude at observation time is also true longitude.<a xmlns="http://www.w3.org/1999/xhtml" href=
-                      "#_note_12" id="src_note_12" class="footnote"><sup>12</sup></a></para>
+                      "#footnote_13" class="footnote-link" id="footnote_src_13">1</a></para>
                     </section>
                     <section role="NotInToc" id="KH15-6">
-                      <title>Law 6</title>
+                      <db-title>Law 6</db-title>
                       <para>What is the value of the visible anomaly for a given value of the corrected anomaly?</para>
                     </section>
                     <section role="NotInToc" id="KH15-7">
-                      <title>Law 7</title>
+                      <db-title>Law 7</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH15-8">
-                      <title>Law 8</title>
+                      <db-title>Law 8</db-title>
                       <para>TODO</para>
                     </section>
                     <section role="NotInToc" id="KH15-9">
-                      <title>Law 9</title>
+                      <db-title>Law 9</db-title>
                       <para>TODO</para>
                     </section>
+                    <hr class="footnotes-line"></hr>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
+                      <span class="footnote" id="footnote_13">
+                        <a href="#footnote_src_13" class="footnote-backlink">1</a>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        Law 5.</para>
+                      </span>
+                    </div>
                   </chapter>
                 </part>
                 <glossary version="5.0" id="glossary">
-                  <title>Glossary</title>
+                  <db-title>Glossary</db-title>
                   <glossdiv>
-                    <title>Astronomical terms</title>
+                    <db-title>Astronomical terms</db-title>
                     <glossentry id="gva-hashemesh">
                       <glossterm>Sun's apogee</glossterm>
                       <glossdef><para>Point on the orbit of the Sun where it is highest above the Earth.</para>
@@ -1440,27 +1526,28 @@
                   </glossdiv>
                 </glossary>
                 <bibliography version="5.0" id="bibliography">
+                  <db-title>Bibliography</db-title>
                   <bibliodiv>
-                    <title>Laws of Sanctification of the Moon by Rambam</title>
+                    <db-title>Laws of Sanctification of the Moon by Rambam</db-title>
                     <biblioentry id="Vilno" xreflabel="Vilno">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <publisher><publishername>Widow and Brothers Romm</publishername></publisher>
                     </biblioentry>
                     <biblioentry id="LaAm" xreflabel="Rambam LaAm">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <edition>Rambam LaAm</edition>
                     </biblioentry>
                     <biblioentry id="Eshkol" xreflabel="Eshkol">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <publisher><publishername>Eshkol</publishername></publisher>
                       <pubdate>1987</pubdate>
                     </biblioentry>
                     <biblioentry id="Kapach" xreflabel="Kapach">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <editor><personname>
                         <honorific>Rabbi</honorific>
                         <surname>Kapach</surname>
@@ -1468,7 +1555,7 @@
                     </biblioentry>
                     <biblioentry id="Frenkel" xreflabel="Frenkel">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <editor><personname>
                         <honorific>Rabbi</honorific>
                         <surname>Frenkel</surname>
@@ -1476,7 +1563,7 @@
                     </biblioentry>
                     <biblioentry id="Bluming" xreflabel="Bluming">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <edition>Rambam HaAruch</edition>
                       <editor><personname>
                         <honorific>Rabbi</honorific>
@@ -1487,7 +1574,7 @@
                     </biblioentry>
                     <biblioentry id="Hazak" xreflabel="Hazak">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <edition>HaSholem</edition>
                       <pubdate>2010</pubdate>
                     </biblioentry>
@@ -1501,15 +1588,15 @@
                         <firstname>Julian</firstname>
                         <surname>Obermann</surname>
                       </personname></editor>
-                      <title>Mishne Torah</title>
-                      <title>Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica
-                      Series, Vol. 11)</title>
+                      <db-title>Mishne Torah</db-title>
+                      <db-title>Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica
+                      Series, Vol. 11)</db-title>
                       <publisher><publishername>Yale</publishername></publisher>
                       <pubdate>1967</pubdate>
                     </biblioentry>
                     <biblioentry id="Touger" xreflabel="Touger">
                       <author><personname>Rambam</personname></author>
-                      <title>Mishne Torah</title>
+                      <db-title>Mishne Torah</db-title>
                       <editor><personname>
                         <honorific>Rabbi</honorific>
                         <surname>Touger</surname>
@@ -1518,9 +1605,9 @@
                     <biblioentry id="HazonIsh"><author><personname>Hazon Ish</personname></author></biblioentry>
                   </bibliodiv>
                   <bibliodiv>
-                    <title>Jewish Writings on Calendar</title>
+                    <db-title>Jewish Writings on Calendar</db-title>
                     <biblioentry id="Losh" xreflabel="Losh">
-                      <title>Sefer HaTchunah LeMatchil</title>
+                      <db-title>Sefer HaTchunah LeMatchil</db-title>
                       <author><personname>
                         <firstname>Yosef Yitzchok</firstname>
                         <surname>Losh</surname>
@@ -1528,7 +1615,7 @@
                       <pubdate>1988</pubdate>
                     </biblioentry>
                     <biblioentry id="Keller" xreflabel="Keller">
-                      <title>Tchunat HaShamaim</title>
+                      <db-title>Tchunat HaShamaim</db-title>
                       <author><personname>
                         <firstname>Yosef Yitzchok</firstname>
                         <surname>Keller</surname>
@@ -1536,7 +1623,7 @@
                       <pubdate>1988</pubdate>
                     </biblioentry>
                     <biblioentry id="Glitzenshtein" xreflabel="Glitzenshtein">
-                      <title>Kidush HaChodesh LeHaRambam</title>
+                      <db-title>Kidush HaChodesh LeHaRambam</db-title>
                       <author><personname>
                         <firstname>Menachem Mendel</firstname>
                         <surname>Glitzenshtein</surname>
@@ -1544,7 +1631,7 @@
                       <pubdate>1993</pubdate>
                     </biblioentry>
                     <biblioentry id="Tzikuni" xreflabel="Tzikuni">
-                      <title>הזון שמים (Hazon Shamaim)</title>
+                      <db-title>הזון שמים (Hazon Shamaim)</db-title>
                       <author><personname>
                         <firstname>Eitan</firstname>
                         <surname>Tzikuni</surname>
@@ -1552,14 +1639,14 @@
                       <pubdate>2001</pubdate>
                     </biblioentry>
                     <biblioentry>
-                      <title>Hazon Ish and the sine tables</title>
-                      <biblioid class="uri">http://www.biu.ac.il/JH/Parasha/pekudey/lev.html</biblioid>
+                      <db-title>Hazon Ish and the sine tables</db-title>
+                      <biblioid db-class="uri">http://www.biu.ac.il/JH/Parasha/pekudey/lev.html</biblioid>
                     </biblioentry>
                   </bibliodiv>
                   <bibliodiv>
-                    <title>Greeks on Astronomy</title>
+                    <db-title>Greeks on Astronomy</db-title>
                     <biblioentry id="Neugebauer" xreflabel="Neugebauer">
-                      <title>The Exact Sciences in Antiquity</title>
+                      <db-title>The Exact Sciences in Antiquity</db-title>
                       <author><personname>
                         <firstname>Otto</firstname>
                         <surname>Neugebauer</surname>
@@ -1567,20 +1654,20 @@
                       <edition>2nd</edition>
                       <publisher><publishername>Dover Publications</publishername></publisher>
                       <pubdate>1969</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0486223329</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0486223329</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Astronomy and History Selected Essays</title>
+                      <db-title>Astronomy and History Selected Essays</db-title>
                       <author><personname>
                         <firstname>Otto</firstname>
                         <surname>Neugebauer</surname>
                       </personname></author>
                       <publisher><publishername>Springer</publishername></publisher>
                       <pubdate>August 8, 1983</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0387908447</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0387908447</biblioid>
                     </biblioentry>
                     <biblioentry id="Crowe" xreflabel="Crowe">
-                      <title>Theories of the World from Antiquity to the Copernican Revolution</title>
+                      <db-title>Theories of the World from Antiquity to the Copernican Revolution</db-title>
                       <author><personname>
                         <firstname>Michael</firstname>
                         <othername>J.</othername>
@@ -1589,40 +1676,40 @@
                       <edition>2nd</edition>
                       <publisher><publishername>Dover Publications</publishername></publisher>
                       <pubdate>2001</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0486414442</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0486414442</biblioid>
                     </biblioentry>
                     <biblioentry id="Evans" xreflabel="Evans">
-                      <title>The History &amp; Practice of Ancient Astronomy</title>
+                      <db-title>The History &amp; Practice of Ancient Astronomy</db-title>
                       <author><personname>
                         <firstname>James</firstname>
                         <surname>Evans</surname>
                       </personname></author>
                       <publisher><publishername>Oxford University Press</publishername></publisher>
                       <pubdate>1998</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0195095391</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0195095391</biblioid>
                     </biblioentry>
                     <biblioentry id="Thurston" xreflabel="Thurston">
-                      <title>Early Astronomy</title>
+                      <db-title>Early Astronomy</db-title>
                       <author><personname>
                         <firstname>Hugh</firstname>
                         <surname>Thurston</surname>
                       </personname></author>
                       <publisher><publishername>Springer Verlag</publishername></publisher>
                       <pubdate>1996</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0387948228</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0387948228</biblioid>
                     </biblioentry>
                     <biblioentry id="Almagest" xreflabel="Almagest">
-                      <title>Ptolemy's Almagest</title>
+                      <db-title>Ptolemy's Almagest</db-title>
                       <author role="translator"><personname>
                         <firstname>G. J.</firstname>
                         <surname>Toomer</surname>
                       </personname></author>
                       <publisher><publishername>Princeton University Press</publishername></publisher>
                       <pubdate>1998</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0691002606</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0691002606</biblioid>
                     </biblioentry>
                     <biblioentry id="Campanus" xreflabel="Campanus">
-                      <title>Campanus of Novara &amp; Medieval Planetary Theory</title>
+                      <db-title>Campanus of Novara &amp; Medieval Planetary Theory</db-title>
                       <authorgroup>
                         <author><personname>
                           <firstname>G. J.</firstname>
@@ -1637,26 +1724,26 @@
                       </authorgroup>
                       <publisher><publishername>University of Wisconsin Press</publishername></publisher>
                       <pubdate>1972</pubdate>
-                      <biblioid class="uri">http://isbn.nu/029905960X</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/029905960X</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Ancient Planetary Model Animations</title>
-                      <biblioid class="uri">http://people.sc.fsu.edu/~dduke/models</biblioid>
+                      <db-title>Ancient Planetary Model Animations</db-title>
+                      <biblioid db-class="uri">http://people.sc.fsu.edu/~dduke/models</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>A Modern Almagest: An updated version of Ptolemy's Almagest</title>
-                      <biblioid class="uri">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
+                      <db-title>A Modern Almagest: An updated version of Ptolemy's Almagest</db-title>
+                      <biblioid db-class="uri">http://farside.ph.utexas.edu/Books/Syntaxis/Syntaxis.html</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Summary of Ptolemaic Astronomy</title>
-                      <biblioid class="uri"
+                      <db-title>Summary of Ptolemaic Astronomy</db-title>
+                      <biblioid db-class="uri"
                       >http://www.clas.ufl.edu/users/ufhatch/HIS-SCI-STUDY-GUIDE/0034_summaryPtolemiacAstron.html</biblioid>
                     </biblioentry>
                   </bibliodiv>
                   <bibliodiv>
-                    <title>Contemporary Models</title>
+                    <db-title>Contemporary Models</db-title>
                     <biblioentry id="Meeus" xreflabel="Meeus">
-                      <title>Astronomical Algorithms</title>
+                      <db-title>Astronomical Algorithms</db-title>
                       <author><personname>
                         <firstname>Jean</firstname>
                         <surname>Meeus</surname>
@@ -1664,10 +1751,10 @@
                       <edition>2nd</edition>
                       <publisher><publishername>Willmann-Bell</publishername></publisher>
                       <pubdate>1998</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0943396611</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0943396611</biblioid>
                     </biblioentry>
                     <biblioentry id="Montenbruck" xreflabel="Montenbruck">
-                      <title>Astronomy on the Personal Computer</title>
+                      <db-title>Astronomy on the Personal Computer</db-title>
                       <authorgroup>
                         <author><personname>
                           <firstname>Oliver</firstname>
@@ -1681,10 +1768,10 @@
                       <edition>4th</edition>
                       <publisher><publishername>Springer Verlag</publishername></publisher>
                       <pubdate>2000</pubdate>
-                      <biblioid class="uri">http://isbn.nu/3540672214</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/3540672214</biblioid>
                     </biblioentry>
                     <biblioentry id="Dershowitz" xreflabel="Dershowitz">
-                      <title>Calendrical Calculations</title>
+                      <db-title>Calendrical Calculations</db-title>
                       <authorgroup>
                         <author><personname>
                           <firstname>Nachum</firstname>
@@ -1699,10 +1786,10 @@
                       <edition>3rd</edition>
                       <publisher><publishername>Cambridge University Press</publishername></publisher>
                       <pubdate>2008</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0521702386</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0521702386</biblioid>
                     </biblioentry>
                     <biblioentry id="Dermott" xreflabel="Dermott">
-                      <title>Solar System Dynamics</title>
+                      <db-title>Solar System Dynamics</db-title>
                       <authorgroup>
                         <author><personname>
                           <firstname>S.</firstname>
@@ -1717,177 +1804,114 @@
                       </authorgroup>
                       <publisher><publishername>Cambridge University Press</publishername></publisher>
                       <pubdate>2000</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0521575974</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0521575974</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>How to compute planetary positions</title>
-                      <biblioid class="uri">http://stjarnhimlen.se/comp/ppcomp.html</biblioid>
+                      <db-title>How to compute planetary positions</db-title>
+                      <biblioid db-class="uri">http://stjarnhimlen.se/comp/ppcomp.html</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Sky View</title>
-                      <biblioid class="uri">http://www.sky-view.co.il/</biblioid>
+                      <db-title>Sky View</db-title>
+                      <biblioid db-class="uri">http://www.sky-view.co.il/</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Israeli New Moon Society</title>
-                      <biblioid class="uri">https://sites.google.com/site/moonsoc/</biblioid>
+                      <db-title>Israeli New Moon Society</db-title>
+                      <biblioid db-class="uri">https://sites.google.com/site/moonsoc/</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>EarthTools</title>
-                      <biblioid class="uri">http://www.earthtools.org/webservices.htm#usage</biblioid>
+                      <db-title>EarthTools</db-title>
+                      <biblioid db-class="uri">http://www.earthtools.org/webservices.htm#usage</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>NOAA Solar Calculator</title>
-                      <biblioid class="uri">http://www.esrl.noaa.gov/gmd/grad/solcalc/</biblioid>
+                      <db-title>NOAA Solar Calculator</db-title>
+                      <biblioid db-class="uri">http://www.esrl.noaa.gov/gmd/grad/solcalc/</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Naval Oceanography Portal</title>
-                      <biblioid class="uri">http://aa.usno.navy.mil/data/index.php</biblioid>
+                      <db-title>Naval Oceanography Portal</db-title>
+                      <biblioid db-class="uri">http://aa.usno.navy.mil/data/index.php</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>Zmanim</title>
-                      <biblioid class="uri">http://www.myzmanim.com/search.aspx</biblioid>
+                      <db-title>Zmanim</db-title>
+                      <biblioid db-class="uri">http://www.myzmanim.com/search.aspx</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>MikvahCalendar</title>
-                      <biblioid class="uri">https://www.mikvahcalendar.com/</biblioid>
+                      <db-title>MikvahCalendar</db-title>
+                      <biblioid db-class="uri">https://www.mikvahcalendar.com/</biblioid>
                     </biblioentry>
                   </bibliodiv>
                   <bibliodiv>
-                    <title>On Jewish Calendar</title>
+                    <db-title>On Jewish Calendar</db-title>
                     <biblioentry>
-                      <title>Understanding the Jewish Calendar</title>
+                      <db-title>Understanding the Jewish Calendar</db-title>
                       <author><personname>
                         <firstname>Nathan</firstname>
                         <surname>Bushwick</surname>
                       </personname></author>
                       <publisher><publishername>Moznaim</publishername></publisher>
                       <pubdate>February 1, 1989</pubdate>
-                      <biblioid class="uri">http://isbn.nu/0940118173</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0940118173</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>The Hebrew Calendar</title>
+                      <db-title>The Hebrew Calendar</db-title>
                       <author><personname>
                         <honorific>Dr</honorific>
                         <firstname>Irv</firstname>
                         <surname>Bromberg</surname>
                       </personname></author>
                       <publisher><publishername>University of Toronto, Canada</publishername></publisher>
-                      <biblioid class="uri">http://www.sym454.org/hebrew</biblioid>
+                      <biblioid db-class="uri">http://www.sym454.org/hebrew</biblioid>
                     </biblioentry>
                     <biblioentry id="Feldman" xreflabel="Feldman">
                       <author><personname>
                         <firstname>W. M.</firstname>
                         <surname>Feldman</surname>
                       </personname></author>
-                      <title>Rabbinical Mathematics and Astronomy</title>
+                      <db-title>Rabbinical Mathematics and Astronomy</db-title>
                       <seriesvolnums>Judaic Studies Library; No. Shp4</seriesvolnums>
                       <publisher><publishername>Intellectbooks</publishername></publisher>
                       <pubdate>January 1, 1931</pubdate>
                       <edition>3</edition>
-                      <biblioid class="uri">http://isbn.nu/0872030261</biblioid>
+                      <biblioid db-class="uri">http://isbn.nu/0872030261</biblioid>
                     </biblioentry>
                     <biblioentry>
                       <author><personname>Belenkiy</personname></author>
-                      <biblioid class="uri">http://u.cs.biu.ac.il/~belenka/calendar.html</biblioid>
+                      <biblioid db-class="uri">http://u.cs.biu.ac.il/~belenka/calendar.html</biblioid>
                     </biblioentry>
                     <biblioentry>
                       <author><personname>Bromberg</personname></author>
-                      <biblioid class="uri">http://individual.utoronto.ca/kalendis/</biblioid>
+                      <biblioid db-class="uri">http://individual.utoronto.ca/kalendis/</biblioid>
                     </biblioentry>
                     <biblioentry>
                       <author><personname>
                         <firstname>Remy</firstname>
                         <surname>Landau</surname>
                       </personname></author>
-                      <title>Hebrew Calendar Science and Myths</title>
-                      <biblioid class="uri">http://hebrewcalendar.tripod.com/</biblioid>
+                      <db-title>Hebrew Calendar Science and Myths</db-title>
+                      <biblioid db-class="uri">http://hebrewcalendar.tripod.com/</biblioid>
                     </biblioentry>
                     <biblioentry>
                       <author><personname>
                         <firstname>Sacha</firstname>
                         <surname>Stern</surname>
                       </personname></author>
-                      <title>Calendar and Community: A History of the Jewish Calendar, 2nd Century BCE to 10th Century
-                      CE</title>
+                      <db-title>Calendar and Community: A History of the Jewish Calendar, 2nd Century BCE to 10th
+                      Century CE</db-title>
                     </biblioentry>
                     <biblioentry>
-                      <title>A primitive rabbinic calendar text from the Cairo Genizah</title>
+                      <db-title>A primitive rabbinic calendar text from the Cairo Genizah</db-title>
                       <author><personname>
                         <firstname>Sacha</firstname>
                         <surname>Stern</surname>
                       </personname></author>
-                      <biblioid class="uri">https://www.jjs-online.net/archives/fulltext/3259</biblioid>
+                      <biblioid db-class="uri">https://www.jjs-online.net/archives/fulltext/3259</biblioid>
                     </biblioentry>
                     <biblioentry>
-                      <title>The Reality of Epicycles and Eccentrics Denied</title>
-                      <biblioid class="uri">http://homepages.wmich.edu/~mcgrew/maimonides.htm</biblioid>
+                      <db-title>The Reality of Epicycles and Eccentrics Denied</db-title>
+                      <biblioid db-class="uri">http://homepages.wmich.edu/~mcgrew/maimonides.htm</biblioid>
                     </biblioentry>
                   </bibliodiv>
                 </bibliography>
               </book>
-              <div class="endnotes">
-                <span class="endnote" id="_note_1">
-                  <a href="#src_note_1" class="endnote-backlink">1</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">It is not clear
-                  how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic editions.</para>
-                </span>
-                <span class="endnote" id="_note_2">
-                  <a href="#src_note_2" class="endnote-backlink">2</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Reprints the
-                  text and does not correct any of the misprints - surpising for a textbook on the subject (even
-                  introductory). TODO: Link to the scans of the appropriate pages - with the stuff highlighted.</para>
-                </span>
-                <span class="endnote" id="_note_3">
-                  <a href="#src_note_3" class="endnote-backlink">3</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Bamidbar
-                  28:14</para>
-                </span>
-                <span class="endnote" id="_note_4">
-                  <a href="#src_note_4" class="endnote-backlink">4</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Shemos
-                  12:2</para>
-                </span>
-                <span class="endnote" id="_note_5">
-                  <a href="#src_note_5" class="endnote-backlink">5</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Rosh Hashanah
-                  20b; Menachot 29a</para>
-                </span>
-                <span class="endnote" id="_note_6">
-                  <a href="#src_note_6" class="endnote-backlink">6</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Dvarim
-                  16</para>
-                </span>
-                <span class="endnote" id="_note_7">
-                  <a href="#src_note_7" class="endnote-backlink">7</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Megilla 5a;
-                  Nazir 7a</para>
-                </span>
-                <span class="endnote" id="_note_8">
-                  <a href="#src_note_8" class="endnote-backlink">8</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is part of
-                  Law 1.</para>
-                </span>
-                <span class="endnote" id="_note_9">
-                  <a href="#src_note_9" class="endnote-backlink">9</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is part of
-                  Law 4.</para>
-                </span>
-                <span class="endnote" id="_note_10">
-                  <a href="#src_note_10" class="endnote-backlink">10</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">My
-                  understanding of the word usage in the original.</para>
-                </span>
-                <span class="endnote" id="_note_11">
-                  <a href="#src_note_11" class="endnote-backlink">11</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">See Chapter 11,
-                  Law 7 on the start of Jewish Zodiac. (TODO reference)</para>
-                </span>
-                <span class="endnote" id="_note_12">
-                  <a href="#src_note_12" class="endnote-backlink">12</a>
-                  <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is Law
-                  5.</para>
-                </span>
-              </div>
             </div>
           </div>
         </article>
@@ -1917,12 +1941,18 @@
               </a></li>
             </ul>
           </div>
-          <div class="footer-col footer-col-3">documents related to early Chabad history<br/> 🄯 <a href=
-          "http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a> <a href=
-          "http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a></div>
+          <div class="footer-col footer-col-3">OpenTorah Papers<br/> 🄯 <a href="http://www.opentorah.org/" target=
+          "collectionViewer">the Open Torah Project</a> <a href="http://creativecommons.org/licenses/by/4.0/" target=
+          "collectionViewer">CC BY 4.0</a></div>
         </div>
       </div>
     </footer>
   </body>
-  <script type="module">import loadWindow from '/js/window.js'; loadWindow(null, null);</script>
+  <script type="module">import loadWindow from '/js/window.js'; loadWindow('hierarchyViewer', null);</script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>MathJax = { "tex":{ "processEscapes":true, "inlineMath":[["$", "$"]], "displayMath":[["$$", "$$"]] }
+  };</script>
+  <script id="MathJax-script" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </html>

@@ -173,33 +173,28 @@
     </section>
     <section>
       <title>Moon's mean period from astronomical models</title>
-      <para>
-        Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
-        Moon.meanLunarPeriod - what is it called? Tropical?
-      </para>
+      <para>Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+        Moon.meanLunarPeriod - what is it called? Tropical?</para>
     </section>
     <section>
       <title>14:5 Moon Longitude Adjustment for Time of Seeing</title>
-      See notes in Moznaim Rambam
+      <para>See notes in Moznaim Rambam
       Sun longitude: mean or true?
-      In 3rd and 7th lines, most editions incorrectly have 15.
+      In 3rd and 7th lines, most editions incorrectly have 15.</para>
     </section>
     <section>
       <title>TODO Moznaim Rambam, KH 15:1f2</title>
-      <para>
-        double elongation = distance between moon's mean and apogee
+      <para>double elongation = distance between moon's mean and apogee
         Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
-        encode the limits
-      </para>
+        encode the limits</para>
     </section>
     <section>
       <title>MoonSightable.forSightingLimits</title>
-      is that what Rambam is saying?
+      <para>is that what Rambam is saying?</para>
     </section>
     <section>
       <title>Distance between mean and true new moon</title>
-      <para>
-        KH 5:1-2 says that the distance is no more than a day.
+      <para>KH 5:1-2 says that the distance is no more than a day.
         Calculate this difference for all months; Rambam's epoch - two days after molad?! (Petya Ofman).</para>
       <para>How to find the day of sighting given a month?</para>
     </section>
@@ -229,13 +224,13 @@
     </section>
     <section>
       <title>TODO Example in 15:8-9</title>
-      moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
+      <para>moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
       still 108°21′46″, which doesn't round to 108°21...
-      moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.
+        moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.</para>
     </section>
     <section>
       <title>TODO Example 17:13-14</title>
-      "this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
+      <para>"this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...</para>
     </section>
     <section>
       <title>TODO crescent calculations: KH 18-19!</title>

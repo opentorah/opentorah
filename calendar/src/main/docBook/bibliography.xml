@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bibliography xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="bibliography">
+  <title>Bibliography</title>
+
   <bibliodiv>
     <title>Laws of Sanctification of the Moon by Rambam</title>
     <biblioentry xml:id="Vilno" xreflabel="Vilno">

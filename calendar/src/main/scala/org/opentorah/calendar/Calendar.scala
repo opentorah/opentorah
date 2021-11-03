@@ -256,7 +256,9 @@ trait Calendar extends Times:
     final def toMoment: Moment = Moment().days(number - 1)
 
     final override def toLanguageString(using spec: Language.Spec): String =
-      year.toLanguageString + " " + month.name.toLanguageString + " " + numberInMonthToLanguageString
+      year.toLanguageString + " " +
+      month.name.toLanguageString + " " +
+      numberInMonthToLanguageString
 
     final def numberInMonthToLanguageString(using spec: Language.Spec): String = intToString(numberInMonth)
 

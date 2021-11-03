@@ -53,19 +53,8 @@ trait Xml extends XmlAttributes:
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(f)
 
-  // TODO use more:)
   final def conditional(condition: Boolean)(f: => Nodes): Nodes =
-    if (!condition) then Seq.empty else f
-
-  final class Transform[R](transform: Element => URIO[R, Element]):
-    val one: Element => URIO[R, Element] = element => for
-      newElement: Element <- transform(element)
-      children: Nodes <- URIO.foreach(getChildren(newElement))(
-        (node: Node) => if !isElement(node) then URIO.succeed(node) else one(asElement(node))
-      )
-    yield setChildren(newElement, children)
-
-    val all: Seq[Element] => URIO[R, Seq[Element]] = URIO.foreach(_)(one)
+    if !condition then Seq.empty else f
 
   def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
     descendats(nodes, elementName).filter(isElement).map[Element](asElement)

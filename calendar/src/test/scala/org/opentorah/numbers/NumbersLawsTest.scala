@@ -1,6 +1,10 @@
 package org.opentorah.numbers
 
 import cats.Eq
+//import cats.kernel.CommutativeGroup
+//import cats.kernel.laws.CommutativeGroupLaws
+//import cats.kernel.laws.discipline.GroupTests
+/////import cats.laws.discipline.
 import org.scalatest.funsuite.AnyFunSuite
 import algebra.CommutativeGroup
 import algebra.laws.GroupLaws

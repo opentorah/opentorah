@@ -67,7 +67,7 @@ object Angles extends Numbers.Periodic:
 
   override protected def createVectorCompanion: VectorCompanionType = new RotationCompanion
 
-  val Rotation = Vector
+  val Rotation: RotationCompanion = Vector
 
   final class PositionAngle(digits: Digits) extends PointNumber(digits), Angle[PositionAngle]
 
@@ -83,7 +83,7 @@ object Angles extends Numbers.Periodic:
 
   override protected def createPointCompanion: PointCompanionType = new PositionCompanion
 
-  val Position = Point
+  val Position: PositionCompanion = Point
 
   override def headRange: Int = 360
 

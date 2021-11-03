@@ -9,9 +9,8 @@ final class Date(
 )
 
 object Date extends Element[Date]("date"):
-
-  private val whenAttribute: Attribute.Required[String] = Attribute("when").required
-  private val calendarAttribute: Attribute.Optional[String] = Attribute("calendar").optional
+  val whenAttribute: Attribute.Required[String] = Attribute("when").required
+  val calendarAttribute: Attribute.Optional[String] = Attribute("calendar").optional
 
   override def contentType: Element.ContentType = Element.ContentType.Mixed
 

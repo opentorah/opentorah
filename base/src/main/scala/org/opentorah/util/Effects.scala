@@ -18,7 +18,7 @@ object Effects:
 
   val ok: IO[Unit] = ZIO.succeed(())
 
-  def fail(message: String) = ZIO.fail(new Error(message))
+  def fail(message: String): IO[Nothing] = ZIO.fail(new Error(message))
   
   def check(condition: Boolean, message: => String): IO[Unit] =
     if condition then ok else fail(message)

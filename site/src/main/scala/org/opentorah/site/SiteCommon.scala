@@ -17,7 +17,8 @@ final class SiteCommon(
   val docbook: Seq[SiteDocBook],
   private val tei: Option[SiteTei],
   private val highlighter: Option[SiteHighlighter],
-  private val mathJax: Option[SiteMathJax]
+  private val mathJax: Option[SiteMathJax],
+  val isStatic: Option[Boolean]                    
 ):
   def getSocial     : SiteSocial      = social     .getOrElse(SiteSocial     .empty)
   def getTei        : SiteTei         = tei        .getOrElse(SiteTei        .empty)
@@ -33,6 +34,7 @@ object SiteCommon extends Element[SiteCommon]("common"):
     private val faviconAttribute: Attribute.Optional[String] = Attribute("favicon").optional
     private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
     private val emailAttribute: Attribute.Optional[String] = Attribute("email").optional
+    private val isStaticAttribute: Attribute.Optional[Boolean] = new Attribute.BooleanAttribute("isStatic").optional
   
     override def parser: Parser[SiteCommon] = for
       names: Names <- Names.withDefaultNameParsable()
@@ -49,6 +51,7 @@ object SiteCommon extends Element[SiteCommon]("common"):
       docbook: Seq[SiteDocBook] <- SiteDocBook.seq()
       highlighter: Option[SiteHighlighter] <- SiteHighlighter.optional()
       mathJax: Option[SiteMathJax] <- SiteMathJax.optional()
+      isStatic: Option[Boolean] <- isStaticAttribute()
     yield SiteCommon(
       names,
       url,
@@ -63,7 +66,8 @@ object SiteCommon extends Element[SiteCommon]("common"):
       docbook,
       tei,
       highlighter,
-      mathJax
+      mathJax,
+      isStatic
     )
 
     override def unparser: Unparser[SiteCommon] = Unparser.concat[SiteCommon](
@@ -80,5 +84,6 @@ object SiteCommon extends Element[SiteCommon]("common"):
       SiteDocBook.seq(_.docbook),
       SiteTei.optional(_.tei),
       SiteHighlighter.optional(_.highlighter),
-      SiteMathJax.optional(_.mathJax)
+      SiteMathJax.optional(_.mathJax),
+      isStaticAttribute(_.isStatic)
     )

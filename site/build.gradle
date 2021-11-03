@@ -11,6 +11,7 @@ description = 'Open Torah Site'
 apply from: '../configure.gradle'
 
 dependencies {
+  implementation project(':opentorah-calendar')
   implementation project(':opentorah-base')
 
   compileOnly libs.google.cloud.storage

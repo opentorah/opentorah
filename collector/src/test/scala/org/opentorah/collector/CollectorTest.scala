@@ -41,7 +41,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
     getContent("/dubnov") should include("Вмешательство")
     getContent("/dubnov/index") should include("Вмешательство")
     getContent("/dubnov/index.html") should include("Вмешательство")
-    getContent("/rgada") should include("новые - Елена Волк")
+    getContent("/rgada") should include("Ф.З. Швайгер; новые - Елена")
     getContent("/rgada/029") should include("о сѣктѣ каролиновъ")
     getError  ("/rgada/029/index") should include("get an index")
     getContent("/rgada/029.html") should include("о сѣктѣ каролиновъ")
