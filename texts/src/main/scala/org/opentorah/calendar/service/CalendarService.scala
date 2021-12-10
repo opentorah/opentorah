@@ -5,7 +5,7 @@ import org.opentorah.metadata.Language
 import org.opentorah.util.{Logging, Zhttp}
 import Zhttp.given
 import zhttp.http.*
-import zio.ZIO
+import zio.{UIO, ZIO}
 
 /*
   There is currently no need for the polished, public UI.
@@ -30,24 +30,24 @@ object CalendarService extends zio.App:
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
-  private val routes = Http.collectM[Request] {
-    case request @ Method.GET -> Root / path if staticResourceExtensions.exists(path.endsWith) =>
+  private val routes = Http.collectZIO[Request] {
+    case request @ Method.GET -> !! / path if staticResourceExtensions.exists(path.endsWith) =>
       Zhttp.staticResource("/" + path, Some(request))
         .catchAll(error => ZIO.succeed(Zhttp.notFound(path + "\n" + error.getMessage)))
 
-    case request @ Method.GET -> Root =>
+    case request @ Method.GET -> !! =>
       renderHtml(Renderer.renderRoot(getLocation(request), getLanguage(request)))
 
-    case request@ Method.GET -> Root / kindStr =>
+    case request@ Method.GET -> !! / kindStr =>
       renderHtml(Renderer.renderLanding(kindStr, getLocation(request), getLanguage(request)))
 
-    case request@ Method.GET -> Root / kindStr / yearStr =>
+    case request@ Method.GET -> !! / kindStr / yearStr =>
       renderHtml(Renderer.renderYear(kindStr, getLocation(request), getLanguage(request), yearStr))
 
-    case request @ Method.GET -> Root / kindStr / yearStr / monthStr =>
+    case request @ Method.GET -> !! / kindStr / yearStr / monthStr =>
       renderHtml(Renderer.renderMonth(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr))
 
-    case request@ Method.GET -> Root / kindStr / yearStr / monthStr / dayStr =>
+    case request@ Method.GET -> !! / kindStr / yearStr / monthStr / dayStr =>
       renderHtml(Renderer.renderDay(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr, dayStr))
   }
 
@@ -58,12 +58,12 @@ object CalendarService extends zio.App:
   private def getLocation(request: Request): Renderer.Location =
     Renderer.getLocation(Zhttp.queryParameter(request, "inHolyLand"))
 
-  def renderHtml(content: String): ResponseM[Any, Nothing] = ZIO.succeed(Response.http(
-    headers = List(Header.custom(HttpHeaderNames.CONTENT_TYPE.toString, HttpHeaderValues.TEXT_HTML)), // TODO UTF-8?
-    content = Zhttp.textData(content)
+  def renderHtml(content: String): UIO[Response] = ZIO.succeed(Response(
+    headers = Headers.contentType(HeaderValues.textHtml), // TODO UTF-8?
+    data = Zhttp.textData(content)
   ))
 
-  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, zio.ExitCode] = Zhttp.start(
+  override def run(args: List[String]): zio.URIO[zio.ZEnv, zio.ExitCode] = Zhttp.start(
     port = scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090),
     routes
   )

@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.html
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.store.{By, Context, Path, Selector, Store, Style}
+import org.opentorah.store.{By, Context, Path, Selector, Store}
 import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
@@ -22,12 +22,13 @@ final class Collection(
   title,
   description,
   body
-),
-Style.Wide derives CanEqual:
+) derives CanEqual:
 
   override def equals(other: Any): Boolean =
     val that: Collection = other.asInstanceOf[Collection]
     this.directory == that.directory
+
+  override def style: String = "wide"
 
   val documents: Documents = Documents(
     this,

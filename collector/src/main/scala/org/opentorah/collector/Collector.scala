@@ -1,8 +1,8 @@
 package org.opentorah.collector
 
-import org.opentorah.html
+import org.opentorah.html.{Html, A}
 import org.opentorah.site.{Site, SiteCommon, SiteService}
-import org.opentorah.store.{Alias, Directory, Context, ListFile, Path, Store, WithSource}
+import org.opentorah.store.{Alias, Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, LinksResolver, Tei, Unclear, Entity as TeiEntity}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
@@ -91,8 +91,8 @@ final class Collector(
         Effects.fail(s"Can't provide non-HTML content '${extension.get}' of $store")
       else
         for content: String <- render(path)
-        yield Site.Response(content, html.Html.mimeType)
-  
+        yield Site.Response(content, Html.mimeType)
+
   override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
 
   override protected def linkResolver(
@@ -107,23 +107,23 @@ final class Collector(
       def toUIO(
         pathFinder: Caching.Parser[Option[Path]],
         error: => String,
-        modifier: html.a => html.a = identity,
-      ): UIO[Option[html.a]] = toTask(pathFinder.map(pathOpt =>
+        modifier: A => A = identity,
+      ): UIO[Option[A]] = toTask(pathFinder.map(pathOpt =>
         if pathOpt.isEmpty then logger.warn(error)
         pathOpt.map((path: Path) => modifier(Path.a(path, pathShortener)))
       )).orDie
 
-      override def resolve(url: Seq[String]): UIO[Option[html.a]] = toUIO(
+      override def resolve(url: Seq[String]): UIO[Option[A]] = toUIO(
         pathFinder = Collector.this.resolveUrl(url),
         error = s"did not resolve: $url"
       )
 
-      override def findByRef(ref: String): UIO[Option[html.a]] = toUIO(
+      override def findByRef(ref: String): UIO[Option[A]] = toUIO(
         pathFinder = findEntityByName(ref, _.map(Collector.this.path)),
         error = s"did not find reference: $ref"
       )
 
-      override def facs(pageId: String): UIO[Option[html.a]] = toUIO(
+      override def facs(pageId: String): UIO[Option[A]] = toUIO(
         pathFinder = ZIO.succeed(facsUrl),
         error = s"did not get facsimile: $pageId",
         modifier = _.setFragment(pageId)
@@ -243,7 +243,7 @@ final class Collector(
   private def verifyLinks(getter: Caching.Parser[Seq[Path]]): Caching.Parser[Unit] = for
     paths: Seq[Path] <- getter
     // TODO separate verification from actual resolution
-    _ <- ZIO.foreach_(paths)(resolveLinks)
+    _ <- ZIO.foreachDiscard(paths)(resolveLinks)
   yield ()
 
   override protected def prettyPrintTei: Caching.Parser[Seq[URL]] = for

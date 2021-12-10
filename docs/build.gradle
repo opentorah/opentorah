@@ -2,6 +2,29 @@ plugins {
   id 'io.miret.etienne.sass'
   id 'java-library'
   id 'scala'
+  id 'org.opentorah.docbook'
+}
+
+description = 'OpenTorah Documentation'
+
+apply from: '../configure.gradle'
+
+dependencies {
+  implementation project(':opentorah-core')
+
+  implementation libs.caffeine
+
+  implementation libs.logback
+  implementation libs.logstash
+
+  implementation libs.bundles.xmlresolver
+  implementation libs.saxon6
+  implementation libs.saxon10
+  implementation libs.bundles.fop
+
+  implementation libs.zhttp
+
+  runtimeOnly libs.mdoc
 }
 
 compileSass {
@@ -12,32 +35,111 @@ compileSass {
   sourceDir = project.file("$projectDir/sass")
   outputDir = project.file("$projectDir/css")
 }
-site.dependsOn(compileSass)
 
-dependencies {
-  implementation project(':opentorah-site')
-  implementation project(':opentorah-base')
+docBook {
+  documents = ['calendar', 'dream', 'typesetting']
 
-  implementation project(':opentorah-calendar')
+  mathJax {
+    enabled = true
+  }
 
-  implementation libs.logback
-  implementation libs.logstash
+  dataGeneratorClass = 'org.opentorah.calendar.paper.Tables'
 
-  implementation libs.xmlresolver, libs.jing
-  implementation libs.saxon10
+//  outputFormats = ["html", "pdf", "epub2"]
+  outputFormats = ["html"]
 
-  implementation libs.zhttp
+  substitutions = [
+    "project.version": project.version
+  ]
+
+  parameters.common = [
+    "part.autolabel"       : "0",       // was only in calendar paper
+    "chapter.autolabel"    : "0",       // was only in calendar paper
+    "section.autolabel.max.depth": "6"  // was only in the non-calendar papers
+//    "punct.honorific": "" // Remove trailing period after honorific
+  ]
+
+  parameters.htmlCommon = [
+    // Include page number in cross-references
+    "insert.xref.page.number": "yes"  // was only in the non-calendar papers
+  ]
+
+  parameters.pdf = [
+    "title.font.family"    : "DejaVu Sans",
+    "body.font.family"     : "DejaVu Sans",
+    "sans.font.family"     : "DejaVu Sans",
+    "monospace.font.family": "DejaVu Sans Mono",
+    "symbol.font.family"   : "DejaVu Sans",
+    "body.font.master"     : "12",
+    "footnote.font.size"   : "10",  // was only in the non-calendar papers
+
+    // Suppress content indent
+    "body.start.indent"    : "0pt",  // was only in the non-calendar papers
+
+    // Some space for the list labels
+    "orderedlist.label.width": "2em"  // was only in the non-calendar papers
+  ]
+}
+
+final String mdocOutputDirectory = "$buildDir/docs/mdoc"
+task mdoc(type: JavaExec) {
+  group = 'publishing'
+  description = 'Process and publish mdoc documentation'
+
+  mainClass = 'mdoc.Main'
+  args = [
+    '--in', "$projectDir/src/main/mdoc",
+    '--out', mdocOutputDirectory,
+    '--classpath', sourceSets.main.runtimeClasspath.asPath
+  ]
+  classpath = sourceSets.main.runtimeClasspath
+}
+mdoc.dependsOn(classes)
+mdoc.doFirst {
+  // clean
+  project.delete(mdocOutputDirectory)
+}
+mdoc.doLast {
+  // publish
+  project.sync {
+    from mdocOutputDirectory
+    into "$projectDir/docs"
+  }
+}
+
+processDocBook.doLast {
+  project.sync {
+    from processDocBook.outputDirectory
+    into "$projectDir/paper"
+  }
 }
 
 task buildAndPrettyPrintSite(type: JavaExec) {
   group = 'publishing'
-  dependsOn(compileSass)
 
   mainClass = 'org.opentorah.site.SiteServiceCommon'
   args = ['buildAndPrettyPrintSite', projectDir]
   classpath = sourceSets.main.runtimeClasspath
 }
+buildAndPrettyPrintSite.dependsOn(compileSass)
+buildAndPrettyPrintSite.doLast {
+  project.sync {
+    // TODO once plugin gets updated, "out" appendage needs to go away
+    from new File(processDocBook.outputDirectory, "out")
+    into "$projectDir/paper"
+  }
+}
+
+task site {
+  description = 'Generate project website'
+  group = 'publishing'
+}
+site.dependsOn(processDocBook)
 site.dependsOn(buildAndPrettyPrintSite)
+// TODO sync of the DocBook plugin output in processDocBook.doLast wipes out the output of the direct DocBook processing
+// done as a part of buildAndPrettyPrintSite, so:
+buildAndPrettyPrintSite.mustRunAfter(processDocBook)
+site.dependsOn(mdoc)
 
 task serveSite(type: JavaExec) {
   group = 'publishing'

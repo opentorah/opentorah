@@ -20,8 +20,10 @@ spec:
         resources:
           limits:
             cpu: "1"
+#           TODO used to work with 512Mi;
+#           now with 2G, references-generated blows the memory and OOM killer kills the container (in Docker - code 137)
 #           MaxHeapSize is never less than 126Mb, so "ergonomic" 1/4 starts at 512Mi:
-            memory: "512Mi"
+            memory: "3000Mi"
 #        env:
 #        - name: "JAVA_TOOL_OPTIONS"
 #          value: "-XX:+PrintFlagsFinal"

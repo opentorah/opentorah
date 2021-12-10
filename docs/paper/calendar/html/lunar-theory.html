@@ -1,0 +1,238 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   
+      <title>Lunar Theory</title>
+      <link rel="stylesheet" type="text/css" href="css/docBook.css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+      <link rel="home" href="index.html" title="Rambam on Calendar">
+      <link rel="up" href="remarks.html" title="Part I: Some Remarks">
+      <link rel="prev" href="interesting2.html" title="Check statements of Nove Kadosh / Ibn Ezra">
+      <link rel="next" href="moon-questions.html" title="Questions"><script type="text/javascript">window.MathJax={ "MathML":{ }, "HTML-CSS":{ }, "extensions":["tex2jax.js", "mml2jax.js",
+  "asciimath2jax.js", "MathMenu.js", "MathZoom.js"], "PreviewHTML":{ }, "jax":["input/TeX", "input/AsciiMath",
+  "input/MathML", "output/CommonHTML", "output/HTML-CSS", "output/NativeMML", "output/SVG"], "SVG":{ "font":"TeX" },
+  "AsciiMath":{ }, "TeX":{ "extensions":["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"] },
+  "asciimath2jax":{ "delimiters":[["`", "`"]] }, "mml2jax":{ }, "PlainSource":{ }, "NativeMML":{ }, "CommonHTML":{ },
+  "tex2jax":{ "processEscapes":true, "inlineMath":[["$", "$"]], "displayMath":[["$$", "$$"]] } };</script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=MML_HTMLorMML"></script></head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Lunar Theory</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="interesting2.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Part I: Some Remarks</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="moon-questions.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="lunar-theory"></a>Lunar Theory
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
+                    Why is the second "mean"? Because of the effects of the sun?
+         </p>
+         <p>Note: From what and in which direction are the angles measured?</p>
+         <p>Anomaly (and head?): opposite direction!</p>
+         <p>TODO MoonHeadMean rambamValue and almagestValue</p>
+         <p>
+                    Rambam uses &#8216;nimzes&#8217; instead of &#8216;nimzo&#8217; for 10000 days. Also, Rambam says
+                    "'ordered' year"; it was rendered as 254 in accordance with Law 12:1.
+                  
+         </p>
+         <p>
+                    Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+                    Also, this value is actually given in Law 4.
+                  
+         </p>
+         <p>14: 5,6 TODO: Compare with 11:9, about Dli... Something is off!</p>
+         <p>
+                    15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)).
+                    Rambam does not describe the model behind this correction.
+                    Because the models Rambam did describe until now are the same
+                    as Almagest's models
+                    (including numerical parameters), and because this correction
+                    is determined by the (doubled)
+                    sun-moon elongation, just like Almagest's "improved" model of
+                    the moon ("the crank"),
+                    I assume that that model was used to calculate this correction.
+                    TODO: describe the model!
+                  
+         </p>
+         <p>
+                    TODO: Derive the formula! Make the diagram!
+                    TODO: How come the fact that sun and moon move in different
+                    plains does not affect this calculation?
+                  
+         </p>
+         <p>
+                    It seems that Rambam treats "the crank" as just a calculation
+                    device - otherwise,
+                    table giving visible anomaly from the corrected anomaly should
+                    take into account changes in the
+                    earth-moon distance depending on the elongation - and it does not!
+                    Maybe that is why he does not describe the model behind this correction.
+                    And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
+                    needs to be calculated correctly.
+                    TODO: How does Almagest calculate visible anomaly?
+                  
+         </p>
+         <p>Law 4,5,6: True Lunar Longitude.
+                    Formulae:
+                    $$ \tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right) $$
+            
+                    $R$ - radius of the big circle;
+                    $r$ - radius of the small circle;
+                    $\epsilon = R/r$.
+                    A little trigonometry, and we get:
+                    visible anomaly = arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e))
+                    and:
+                    e = ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly)
+                  
+         </p>
+         <p>TODO: Make the diagram! Here?</p>
+         <p>
+                    It is clear that values for 150&deg; and 170&deg; are misprinted: they are bigger than the one before them
+                    when they should be smaller. Value for 120&deg; is also misprinted, but it is less obvious.
+                  
+         </p>
+         <p>
+                    Calculations show that for the precision up to a minute,
+                    it is sufficient to know e to up to the second
+                    digit after the dot.
+                    Below, a column giving the value of e was added to the table.
+                    Look at the value of e, and the misprints become obvious:
+                    value of e for them is way out of range it is in
+                    for the rest of them.
+                  
+         </p>
+         <p>
+                    TODO Range of e - graph. Range of possible values for each based on the range of e.
+                    This is transcription error: one letter; extra word... Probable correct values.
+                  
+         </p>
+         <p>
+                    This is how different sources treat the often misprinted values:
+                  
+         </p>
+         <div class="informaltable">
+            <table class="informaltable" border="1">
+               <colgroup>
+                  <col>
+                  <col>
+                  <col>
+                  <col>
+               </colgroup>
+               <thead>
+                  <tr>
+                     <th>Edition</th>
+                     <th>120&deg;</th>
+                     <th>150&deg;</th>
+                     <th>170&deg;</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Vilno">Vilno</a></td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Eshkol">Eshkol</a></td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#LaAm">Rambam LaAm</a></td>
+                     <td>corrected in the notes</td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Kapach">Kapach</a><a href="#ftn.d0e557" class="footnote" name="d0e557"><sup class="footnote">[a]</sup></a>
+                                      
+                     </td>
+                     <td>incorrect</td>
+                     <td>corrected in the notes</td>
+                     <td>corrected in the notes</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Bluming">Bluming</a></td>
+                     <td>incorrect</td>
+                     <td>corrected in the notes</td>
+                     <td>corrected in the notes</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Frenkel">Frenkel</a></td>
+                     <td>correct and noted</td>
+                     <td>correct and noted</td>
+                     <td>correct and noted</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Keller">Keller</a></td>
+                     <td>not given</td>
+                     <td>not given</td>
+                     <td>not given</td>
+                  </tr>
+                  <tr>
+                     <td><a class="biblioref" href="bibliography.html#Losh">Losh</a><a href="#ftn.d0e597" class="footnote" name="d0e597"><sup class="footnote">[b]</sup></a>
+                                      
+                     </td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                     <td>incorrect</td>
+                  </tr>
+               </tbody>
+               <tbody class="footnotes">
+                  <tr>
+                     <td colspan="4">
+                        <div id="ftn.d0e557" class="footnote">
+                           <p><a href="#d0e557" class="para"><sup class="para">[a] </sup></a>
+                                                  It is not clear how did authoritative Yemenite texts acquire the same misprints
+                                                  as in the ashkenazic editions.
+                                                
+                           </p>
+                        </div>
+                        <div id="ftn.d0e597" class="footnote">
+                           <p><a href="#d0e597" class="para"><sup class="para">[b] </sup></a>
+                                                  Reprints the text and does not correct any of the misprints - surpising for a textbook
+                                                  on the subject (even introductory).
+                                                  TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
+                                                
+                           </p>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="interesting2.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="remarks.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="moon-questions.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Check statements of Nove Kadosh / Ibn Ezra&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Questions</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -3,7 +3,7 @@ package org.opentorah.calendar.service
 import org.opentorah.calendar.{Calendar, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.calendar.roman.Gregorian
-import org.opentorah.html
+import org.opentorah.html.A
 import org.opentorah.metadata.{Language, Named, Numbered}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
@@ -57,7 +57,7 @@ sealed abstract class Renderer:
     navLink(dayUrl(day), text.getOrElse(day.numberInMonthToLanguageString))
 
   private def navLink(url: Seq[String], text: String)(using location: Location, spec: Language.Spec): ScalaXml.Element =
-    html.a(url).setQuery(suffix).addClass("nav")(text)
+    A(url).setQuery(suffix).addClass("nav")(text)
 
   private def suffix(using location: Location, spec: Language.Spec): String = Renderer.suffix(location, spec)
 
@@ -395,8 +395,8 @@ object Renderer:
     url = Seq.empty,
     content =
       <div>
-        <div>{html.a(Seq(JewishRenderer.name))(text = "jewish")}</div>,
-        <div>{html.a(Seq(GregorianRenderer.name))(text = "gregorian")}</div>
+        <div>{A(Seq(JewishRenderer.name))(text = "jewish")}</div>,
+        <div>{A(Seq(GregorianRenderer.name))(text = "gregorian")}</div>
       </div>,
     location = location,
     spec = spec
@@ -427,12 +427,12 @@ object Renderer:
     val languages: Seq[ScalaXml.Element] = Language.valuesSeq.map(_.toSpec).map(spec1 =>
       val languageName = spec1.languageName
       if spec1.language == spec.language then <span class="picker">{languageName}</span>
-      else html.a(url).setQuery(suffix(location, spec1)).addClass("picker")(text = languageName)
+      else A(url).setQuery(suffix(location, spec1)).addClass("picker")(text = languageName)
     )
 
     val locations: Seq[ScalaXml.Element] = Seq(Location.HolyLand, Location.Diaspora).map(location1 =>
       if location1 == location then <span class="picker">{location1.name}</span>
-      else html.a(url).setQuery(suffix(location1, spec)).addClass("picker")(text = location1.name)
+      else A(url).setQuery(suffix(location1, spec)).addClass("picker")(text = location1.name)
     )
 
     //        title("Reading Schedule")?

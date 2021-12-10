@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.{Named, Names}
-import org.opentorah.html
+import org.opentorah.html.A
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.store.{Context, Path, Terminal, Viewer, WithSource}
 import org.opentorah.util.Strings
@@ -40,7 +40,7 @@ object Report:
 
     override protected def lineToXml(reference: WithSource[EntityReference], context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
       val source: String = reference.source
-      <l>{reference.value.name.toString} в {html.a(URI(source))(text = source)}</l>
+      <l>{reference.value.name.toString} в {A(URI(source))(text = source)}</l>
 
   object Unclears extends Report[WithSource[Unclear.Value]](
     "unclears",
@@ -51,7 +51,7 @@ object Report:
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
       val source: String = unclear.source
-      <l>{unclear.value.content.toString} в {html.a(URI(source))(text = source)}</l>
+      <l>{unclear.value.content.toString} в {A(URI(source))(text = source)}</l>
 
   object MisnamedEntities extends Report[Entity](
     "misnamed-entities",

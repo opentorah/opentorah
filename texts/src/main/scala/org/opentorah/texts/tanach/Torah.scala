@@ -13,7 +13,8 @@ final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Sp
   def drop(toDrop: Set[Int]): Torah =
     def drop(what: Seq[(Torah.Aliyah, Boolean)]): Seq[Torah.Aliyah] = what match
       case (a1, d1) :: (a2, d2) :: tail =>
-        if d2 then drop((a1+a2, d1) +: tail)
+        if d2
+        then drop((a1+a2, d1) +: tail)
         else a1 +: drop((a2, d2) +: tail)
       case (a1, _) :: Nil =>
         Seq(a1)

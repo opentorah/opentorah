@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH15">
+  <title>Chapter 15</title>
+
+  <section xml:id="KH15-1" role="NotInToc">
+    <title>Law 1</title>
+
+    <para>
+      To find <glossterm linkend="tll-term">true lunar longitude</glossterm> on a specific day:
+      First, calculate mean lunar longitude during observation time of the desired night.
+      Also, calculate mean lunar anomaly and mean solar longitude for the same time.
+      Then, subtract mean solar longitude from the mean lunar longitude and double the result.
+      This value is called <glossterm linkend="dd-term">doubled distance</glossterm> .
+    </para>
+  </section>
+
+  <section xml:id="KH15-2" role="NotInToc">
+    <title>Law 2</title>
+
+    <para>
+      We already stipulated that all the calculations in these chapters are for one purpose only:
+      to know if the moon is visible. And it is not possible for this double distance during the night of
+      observation when the moon is indeed visible to be outside the interval from 5° to 62°.
+      It cannot be more - nor less.
+    </para>
+  </section>
+
+  <section xml:id="KH15-3" role="NotInToc">
+    <title>Law 3</title>
+    <para> A correction that depends on the doubled distance is added to the mean lunar
+      anomaly, giving  <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון): </para>
+
+    <informaltable frame="all">
+      <tgroup cols="2">
+        <thead>
+          <row>
+            <entry>doubled distance</entry>
+            <entry>correction of the mean anomaly</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>~5°</entry>
+            <entry>0°</entry>
+          </row>
+          <row>
+            <entry>6°-11°</entry>
+            <entry>1°</entry>
+          </row>
+          <row>
+            <entry>12°-18°</entry>
+            <entry>2°</entry>
+          </row>
+          <row>
+            <entry>19°-24°</entry>
+            <entry>3°</entry>
+          </row>
+          <row>
+            <entry>25°-31°</entry>
+            <entry>4°</entry>
+          </row>
+          <row>
+            <entry>32°-38°</entry>
+            <entry>5°</entry>
+          </row>
+          <row>
+            <entry>39°-45°</entry>
+            <entry>6°</entry>
+          </row>
+          <row>
+            <entry>46°-51°</entry>
+            <entry>7°</entry>
+          </row>
+          <row>
+            <entry>52°-59°</entry>
+            <entry>8°</entry>
+          </row>
+          <row>
+            <entry>60°-63°</entry>
+            <entry>9°</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </section>
+
+  <section xml:id="KH15-4" role="NotInToc">
+    <title>Law 4</title>
+
+    <para xml:id="l15-4"> Then, see how many degrees is corrected lunar anomaly. If it
+      is less than 180°, subtract visible anomaly of this corrected anomaly from the
+      mean lunar longitude the observation time. And if corrected lunar anomaly is
+      more than 180° but less than 360°, add visible anomaly of this corrected anomaly
+      to the mean lunar longitude the observation time. And mean lunar longitude after
+      you add to it or subtract from it is the
+      <glossterm>true lunar longitude at the observation time</glossterm>.
+    </para>
+  </section>
+
+  <section xml:id="KH15-5" role="NotInToc">
+    <title>Law 5</title>
+    <para>
+      If the corrected anomaly is 180° or 360°, there is no visible anomaly,
+      so mean lunar longitude at observation time is also true longitude.<footnote><para>This is Law 5.</para></footnote>
+    </para>
+  </section>
+
+  <section xml:id="KH15-6" role="NotInToc">
+    <title>Law 6</title>
+    <para>
+      What is the value of the visible
+      anomaly for a given value of the corrected anomaly?
+    </para>
+  </section>
+
+  <section xml:id="KH15-7" role="NotInToc">
+    <title>Law 7</title>
+    <para>TODO</para>
+  </section>
+
+  <section xml:id="KH15-8" role="NotInToc">
+    <title>Law 8</title>
+    <para>TODO</para>
+  </section>
+
+  <section xml:id="KH15-9" role="NotInToc">
+    <title>Law 9</title>
+    <para>TODO</para>
+  </section>
+</chapter>

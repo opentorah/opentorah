@@ -8,23 +8,19 @@ plugins {
   id 'com.gradle.plugin-publish'
 }
 
-version = docBookProjectVersion
 description = 'Gradle DocBook Plugin'
 
 apply from: '../configure.gradle'
 
 dependencies {
-  implementation project(':opentorah-base')
-  implementation project(':opentorah-site')
+  implementation project(':opentorah-core')
 
-  implementation libs.xmlresolver
-  runtimeOnly libs.jing
+  implementation libs.bundles.xmlresolver
   implementation libs.saxon6
   implementation libs.saxon10
-  implementation libs.fop.core, libs.fop.hyph, libs.batik.transcoder, libs.batik.extension
+  implementation libs.bundles.fop
 
   // JEuclid
-  // TODO drop support for JEuclid
   implementation libs.fop.jeuclid
 
   // J2V8 integration
@@ -36,7 +32,6 @@ dependencies {
   //
   // For reasons that are not clear to me, if I declare this dependency as compileOnly (as I think it should be),
   // tests fail...
-  // TODO drop support for J2V8
   implementation libs.j2v8
 
   // Needed to compile classes using Gradle, but does not become a dependency:

@@ -1,15 +1,18 @@
-// the following properties of the project determine how will it be configured:
-// if project/src/docs exists, it is processed with mdoc;
-// if project.document or project.documents exist, it is configured as a paper, and:
-//   project.dataGeneratorClassName, if present, is used to configure the data generator (bye default it is not configured)
-//   isMathJaxEnabled, if present, determines if MathJax support is enabled (by default it is not);
-// all projects are configured as a library (except for the docs one).
-
-final String projectBaseName = project.name.substring('opentorah-'.length())
-
 // Scala
 dependencies {
   implementation libs.scala.library
+
+ zinc libs.zinc
+  // force recent version of log4j with the vulnerability fixed
+  constraints {
+    zinc("org.apache.logging.log4j:log4j-core") {
+      version {
+        strictly("[2.17.1, 3[")
+        prefer("2.17.1")
+      }
+      because("CVE-2021-44228, CVE-2021-45046, CVE-2021-45105: Log4j vulnerable to remote code execution and other critical security vulnerabilities")
+    }
+  }
 
   compileOnly     libs.slf4j
   testRuntimeOnly libs.logback
@@ -26,7 +29,7 @@ dependencies {
 
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.with {
-    //targetCompatibility = '1.8'
+    targetCompatibility = '' // TODO remove when https://youtrack.jetbrains.com/issue/SCL-18813 is fixed
     additionalParameters = [
       '-new-syntax',
       '-feature',
@@ -41,7 +44,7 @@ tasks.withType(ScalaCompile) {
   }
 }
 
-// library
+// library: all projects are configured as a library (except for the docs one)
 if (project.name != 'docs') {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
@@ -143,109 +146,15 @@ if (project.name != 'docs') {
     sign publishing.publications.library
   }
 
-  task uploadLibrary
-  uploadLibrary.description('Upload artifacts')
-  uploadLibrary.group('publishing')
+  task uploadLibrary {
+    group = 'publishing'
+    description = 'Upload artifacts'
+  }
   uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
 
+  task upload {
+    description = 'Upload artifacts and plugins'
+    group = 'publishing'
+  }
   upload.dependsOn(uploadLibrary)
-
-  // mdoc
-  final String inputDirectory = "$projectDir/src/docs"
-
-  if (file(inputDirectory).exists()) {
-    final String outputDirectory = "$buildDir/docs/mdoc"
-    final String publishDirectory = "$rootDir/docs/$projectBaseName/docs"
-
-    task mdoc
-    mdoc.description = 'Process and publish mdoc documentation'
-    mdoc.group = 'publishing'
-    mdoc.dependsOn classes
-    site.dependsOn mdoc
-
-    mdoc.doLast {
-      // clean
-      project.delete(outputDirectory)
-
-      // process
-      final String[] args = [
-        '--in', inputDirectory,
-        '--out', outputDirectory,
-        '--classpath', sourceSets.main.runtimeClasspath.asPath
-      ]
-      mdocRunner.main(args)
-
-      // publish
-      project.sync {
-        from outputDirectory
-        into publishDirectory
-      }
-    }
-  }
-}
-
-// paper
-if (project.hasProperty('document') || project.hasProperty('documents')) {
-  final String dataGeneratorClassName = project.hasProperty('dataGeneratorClassName') ? project.dataGeneratorClassName : ''
-  final boolean isMathJaxEnabled = project.hasProperty('isMathJaxEnabled') ? project.isMathJaxEnabled : false
-
-  final String projectVersion = project.version
-  final String documentName = projectBaseName
-
-  docBook {
-    if (!project.hasProperty('documents')) {
-      document = documentName
-    } else {
-      documents = project.documents
-    }
-
-    dataGeneratorClass = dataGeneratorClassName
-
-//    outputFormats = ["html", "pdf", "epub2"]
-    outputFormats = ["html"]
-
-    substitutions = [
-      "project.version": projectVersion
-    ]
-
-    parameters.common = [
-      "part.autolabel"       : "0",       // was only in calendar paper
-      "chapter.autolabel"    : "0",       // was only in calendar paper
-      "section.autolabel.max.depth": "6"  // was only in the non-calendar papers
-//      "punct.honorific": "" // Remove trailing period after honorific
-    ]
-
-    parameters.htmlCommon = [
-      // Include page number in cross-references
-      "insert.xref.page.number": "yes"  // was only in the non-calendar papers
-    ]
-
-    parameters.pdf = [
-      "title.font.family"    : "DejaVu Sans",
-      "body.font.family"     : "DejaVu Sans",
-      "sans.font.family"     : "DejaVu Sans",
-      "monospace.font.family": "DejaVu Sans Mono",
-      "symbol.font.family"   : "DejaVu Sans",
-      "body.font.master"     : "12",
-      "footnote.font.size"   : "10",  // was only in the non-calendar papers
-
-      // Suppress content indent
-      "body.start.indent"    : "0pt",  // was only in the non-calendar papers
-
-      // Some space for the list labels
-      "orderedlist.label.width": "2em"  // was only in the non-calendar papers
-    ]
-
-    mathJax {
-      enabled = isMathJaxEnabled
-    }
-  }
-
-  site.dependsOn processDocBook
-  site.doLast {
-    project.sync {
-      from processDocBook.outputDirectory
-      into "$rootDir/docs/$projectBaseName/paper"
-    }
-  }
 }

@@ -75,10 +75,9 @@ object SpecialReadings:
         haftarah: Haftarah,
         addition: Option[Haftarah]
       ): Reading.ReadingCustom =
-        if allowReplace && (custom != Custom.Fes) then
-          reading.replaceHaftarah(haftarah)
-        else
-          reading.addHaftarah(addition)
+        if allowReplace && (custom != Custom.Fes)
+        then reading.replaceHaftarah(haftarah)
+        else reading.addHaftarah(addition)
 
       transformMaftirAndHaftarah(
         day,
@@ -153,10 +152,9 @@ object SpecialReadings:
         haftarah: Haftarah,
         addition: Option[Haftarah]
       ): Reading.ReadingCustom =
-        if allowReplace && (!isMonthElul || (custom == Custom.Chabad)) then
-          reading.replaceMaftirAndHaftarah(fromDay(day, shabbosMaftir), haftarah)
-        else
-          reading.addHaftarah(addition)
+        if allowReplace && (!isMonthElul || (custom == Custom.Chabad))
+        then reading.replaceMaftirAndHaftarah(fromDay(day, shabbosMaftir), haftarah)
+        else reading.addHaftarah(addition)
 
       transformMaftirAndHaftarah(
         day,

@@ -1,0 +1,55 @@
+plugins {
+  id 'java-library'
+  id 'scala'
+  id 'com.github.maiflai.scalatest'
+  id 'maven-publish'
+  id 'signing'
+}
+
+description = 'Open Torah Core'
+
+apply from: '../configure.gradle'
+
+dependencies {
+  api libs.scala.xml
+  api libs.zio.core
+  api libs.zio.streams // TODO ?
+
+  implementation libs.xerces
+  implementation libs.paiges
+
+  // Optional dependencies:
+  // - are declared here as 'compileOnly';
+  // - need to be supplied as 'runtimeOnly' ('implementation'?) where needed.
+
+  compileOnly libs.caffeine
+
+  compileOnly libs.bundles.xmlresolver
+  compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
+  compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
+
+  compileOnly libs.zhttp
+  compileOnly libs.logback
+  compileOnly libs.logstash
+
+  compileOnly libs.google.cloud.storage
+  compileOnly libs.bundles.markdown
+
+  compileOnly libs.playwright
+
+  compileOnly libs.bundles.fop
+  compileOnly libs.j2v8
+  compileOnly libs.fop.jeuclid
+
+  // Needed to compile classes using Gradle, but does not become a dependency:
+  compileOnly gradleApi()
+
+  testImplementation libs.zio.test
+  testImplementation libs.zio.prelude
+  testImplementation libs.cats.core
+  testImplementation libs.cats.laws
+
+  testRuntimeOnly libs.saxon10
+}
+
+
