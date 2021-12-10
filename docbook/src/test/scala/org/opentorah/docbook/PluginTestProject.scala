@@ -15,7 +15,13 @@ class PluginTestProject private(
 ):
   projectDir.mkdirs()
 
+  def destroy(): Unit = Files.deleteFiles(projectDir)
+
   val layout: Layout = Layout.forRoot(projectDir)
+
+  def indexHtml: String = Files.read(
+    Files.file(layout.out, PluginTestProject.documentName, "html", "index.html")
+  ).mkString("\n")
 
   def write(): Unit =
     val documentName: String = "test"
@@ -35,12 +41,12 @@ class PluginTestProject private(
       ).mkString(",\n")
 
       s"""
-         |  substitutions = [
-         |    $contents
-         |  ]
+         |      substitutions = [
+         |        $contents
+         |      ]
          |""".stripMargin
 
-    val outputFormats: String = if isPdfEnabled then """ "html", "pdf" """ else """ "html" """
+    val outputFormats: String = if isPdfEnabled then "'html', 'pdf'" else "'html'"
 
     Files.write(
       file = File(projectDir, "build.gradle"),
@@ -56,39 +62,30 @@ class PluginTestProject private(
           |}
           |
           |docBook {
-          |  document = "$documentName"
-          |  outputFormats = [$outputFormats]
-          |$substitutionsFormatted
-          |
-          |  mathJax {
-          |    enabled = $isMathJaxEnabled
+          |  math {
+          |    mathJaxEnabled = $isMathJaxEnabled
           |    useJ2V8 = $useJ2V8
+          |  }
+          |
+          |  documents {
+          |    $documentName {
+          |      output = [$outputFormats]
+          |      $substitutionsFormatted
+          |    }
           |  }
           |}
           |""".stripMargin
     )
 
     Files.write(
-      file = layout.forDocument(prefixed = false, documentName).inputFile,
+      file = File(layout.input, PluginTestProject.documentName + ".xml"),
       replace = false,
       content = document
     )
 
-  def destroy(): Unit = Files.deleteFiles(projectDir)
-
   def run(logInfo: Boolean = false): String = getRunner(logInfo).build.getOutput
 
   def fail(): String = getRunner(logInfo = false).buildAndFail.getOutput
-
-  def indexHtml: String = saxonOutputFile(section.Html)
-
-  def fo: String = saxonOutputFile(section.Pdf)
-
-  private def saxonOutputFile(docBook2: org.opentorah.docbook.section.DocBook2): String =
-    Files.read(
-      layout.forDocument(prefixed = false, PluginTestProject.documentName)
-        .saxonOutputFile(docBook2.defaultVariant)
-    ).mkString("\n")
 
   private def getRunner(logInfo: Boolean): GradleRunner =
     val result = GradleRunner.create.withProjectDir(projectDir)
@@ -107,11 +104,10 @@ object PluginTestProject:
     isMathJaxEnabled: Boolean = false,
     useJ2V8: Boolean = false
   ): PluginTestProject =
-    val layout: Layout = Layout.forCurrent
-
+    val root: File = File(".").getAbsoluteFile.getParentFile
     val result: PluginTestProject = new PluginTestProject(
-      projectDir = Files.file(layout.buildDir, Seq(prefix, name)),
-      pluginRootDir = layout.projectDir.getParentFile,
+      projectDir = Files.file(root, "build", prefix, name),
+      pluginRootDir = root.getParentFile,
       document,
       substitutions,
       isPdfEnabled,

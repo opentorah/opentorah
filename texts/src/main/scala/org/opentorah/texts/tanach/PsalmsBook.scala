@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Names, Week, WithNumber}
+import org.opentorah.calendar.Week
+import org.opentorah.metadata.{Names, WithNumber}
 import org.opentorah.store.{By, Store}
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 import zio.ZIO

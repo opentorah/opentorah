@@ -5,7 +5,7 @@ steps:
 # is obsolete; for a while I used custom builder that I had to build myself for each Gradle update:
 #  - name: 'gcr.io/calendar-service-1/gradle:5.1.1-jdk-8'
 # https://github.com/GoogleCloudPlatform/cloud-builders/pull/452
-# was supposed to make official Gradle images available on GCB; it is now August of 2019, and - nothing.
+# was supposed to make official Gradle images available on GCB; it is now August 2019, and - nothing.
 # gavingolden explained how to run Gradle version set in the wrapper (although Gradle distribution gets downloaded every time):
 # https://github.com/GoogleCloudPlatform/cloud-builders/pull/452#issuecomment-485148016.
 # That's what I do now.

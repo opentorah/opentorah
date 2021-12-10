@@ -5,35 +5,34 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.39.0'
-    id 'com.github.maiflai.scalatest' version '0.31'
-    id 'com.google.cloud.tools.jib' version '3.1.4'
-    id 'org.podval.tools.cloudrun' version '0.3.0'
-    id 'com.gradle.plugin-publish' version '0.18.0'
-    id 'io.miret.etienne.sass' version '1.1.2'
-    id 'org.opentorah.docbook' version docBookPluginVersion
+    id 'com.github.ben-manes.versions' version '0.41.0'
+    id 'com.github.maiflai.scalatest'  version '0.32'
+    id 'com.google.cloud.tools.jib'    version '3.2.0'
+    id 'org.podval.tools.cloudrun'     version '0.3.0'
+    id 'com.gradle.plugin-publish'     version '0.20.0'
+    id 'io.miret.etienne.sass'         version '1.1.2'
+    id 'org.opentorah.docbook'         version docBookPluginVersion
   }
 }
 
 enableFeaturePreview('VERSION_CATALOGS')
 //enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
 
-final String scalaVersion       = '3.1.1-RC1'
-final String scalaVersionMajor  = '3'
-
-// TODO update to 2.0.0-M5 and fix the issues with Blocking etc. - once zhttp is updated...
-final String zioVersion = '1.0.12'
-
-final String flexmarkVersion = '0.62.2'
-
-final String batikVersion    = '1.14'
+final String scalaVersion      = '3.1.1-RC2'
+final String scalaVersionMajor = '3'
+final String zioVersion        = '2.0.0-RC1'
+final String flexmarkVersion   = '0.62.2'
+final String batikVersion      = '1.14'
 
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
+    maven {
+      url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+    }
   }
 
-  // Yes,I know about 'libs.versions.toml', but:
+  // Yes, I know about 'libs.versions.toml', but:
   // - I do not want to use yet another configuration language;
   // - it doesn't allow me to interpolate 'scalaVersionMajor';
   // - this way all the both plugin and dependency versions are in the same file.
@@ -41,42 +40,53 @@ dependencyResolutionManagement {
     // Scala
     alias('scala-library').to("org.scala-lang:scala3-library_3:$scalaVersion")
     alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.1")
-    alias('zinc').to("org.scala-sbt:zinc_$scalaVersionMajor:1.4.0-M5")
+
+    // Zinc brings in log4j:
+    // 1.3.5-1.5.7 - 2.11.2
+    // 1.5.8       - 2.15.0
+    // 1.5.9       - 2.16.0
+    // 1.6.0       - 2.17.0
+    // Because of the log4j vulnerability, Gradle plugin publishing plugin rejects log4j before 2.17.0
+    // (it doesn't care that this is just a zinc configuration dependency...).
+    // Gradle doesn't yet support Zinc later than 1.3.5
+    // (also, current latest Zinc - 1.6.0 - uses log4j 1.17.0 which it still doesn't like),
+    // so I am forcing log4j version with constraint in configure.gradle...
+    alias('zinc'         ).to("org.scala-sbt:zinc_2.12:1.3.5")
 
     // XML
-    alias('xmlresolver').to('org.xmlresolver:xmlresolver:3.1.6')
-    alias('jing').to('org.relaxng:jing:20181222')
-    alias('xerces' ).to('xerces:xercesImpl:2.12.1')
-    alias('saxon10').to('net.sf.saxon:Saxon-HE:10.6')
-    alias('saxon6' ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
+    alias('xmlresolver' ).to('org.xmlresolver:xmlresolver:4.1.0')
+    alias('jing'        ).to('org.relaxng:jing:20181222')
+    bundle('xmlresolver', ['xmlresolver', 'jing'])
+    alias('xerces'      ).to('xerces:xercesImpl:2.12.1')
+    alias('saxon10'     ).to('net.sf.saxon:Saxon-HE:10.6')
+    alias('saxon6'      ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
     // tagsoup     = "1.2.1" TODO use org.jsoup?
     // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.2.1')
+    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.3.0')
 
-    // J2V8
-    alias('j2v8').to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
+    // TODO drop support for JEuclid
+    alias('fop-jeuclid' ).to('de.rototor.jeuclid:jeuclid-fop:3.1.14')
+
+    // TODO drop support for J2V8
+    alias('j2v8'        ).to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
-    alias('zio-core'   ).to("dev.zio:zio_$scalaVersionMajor:$zioVersion")
-    alias('zio-streams').to("dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
-    alias('zio-test'   ).to("dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    alias('zio-prelude').to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC8")
+    alias('zio-core'    ).to("dev.zio:zio_$scalaVersionMajor:$zioVersion")
+    alias('zio-streams' ).to("dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
+    alias('zio-test'    ).to("dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
+    alias('zhttp'       ).to("io.d11:zhttp_$scalaVersionMajor:2.0.0-RC1")
+    alias('zio-prelude' ).to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC9")
 
-    // TODO upgrade to cats 2.7.0 and move to:
-    //import cats.kernel.CommutativeGroup
-    //import cats.kernel.laws.CommutativeGroupLaws
-    //import cats.kernel.laws.discipline.GroupTests
-    alias('cats-core'  ).to("org.typelevel:cats-core_$scalaVersionMajor:2.6.1")
-    alias('cats-laws'  ).to("org.typelevel:cats-laws_$scalaVersionMajor:2.6.1")
-    alias('algebraLaws').to("org.typelevel:algebra-laws_$scalaVersionMajor:2.2.3")
-
-    // ZHTTP
-    alias('zhttp').to("io.d11:zhttp_$scalaVersionMajor:1.0.0.0-RC17")
+    // Algebra
+    alias('cats-core'   ).to("org.typelevel:cats-core_$scalaVersionMajor:2.7.0")
+    alias('cats-laws'   ).to("org.typelevel:cats-laws_$scalaVersionMajor:2.7.0")
+    alias('algebraLaws' ).to("org.typelevel:algebra-laws_$scalaVersionMajor:2.7.0")
+    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
 
     // Paiges
-    alias('paiges').to("org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
+    alias('paiges'      ).to("org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
 
     // Caching
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
@@ -85,22 +95,23 @@ dependencyResolutionManagement {
     alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.5')
 
     // FOP
-    alias('fop-core'   ).to('org.apache.xmlgraphics:fop:2.6')
-    alias('fop-hyph'   ).to('net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
-    alias('fop-jeuclid').to('de.rototor.jeuclid:jeuclid-fop:3.1.14')
+    alias('fop-core'        ).to('org.apache.xmlgraphics:fop:2.6')
+    alias('fop-hyph'        ).to('net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
     alias('batik-transcoder').to("org.apache.xmlgraphics:batik-transcoder:$batikVersion")
     alias('batik-extension' ).to("org.apache.xmlgraphics:batik-extension:$batikVersion")
     //final String jaiVersion = '1.1.3'
+    // TODO split runtime-only out of it
+    bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
-    // Playwright
+    // PDF Generation
     alias('playwright').to('com.microsoft.playwright:playwright:1.17.2')
 
     // Logging
-    alias('slf4j'   ).to('org.slf4j:slf4j-api:1.7.32')
-    alias('logback' ).to('ch.qos.logback:logback-classic:1.2.6')
+    alias('slf4j'   ).to('org.slf4j:slf4j-api:1.7.33')
+    alias('logback' ).to('ch.qos.logback:logback-classic:1.2.10')
     alias('logstash').to('net.logstash.logback:logstash-logback-encoder:7.0.1')
 
-    // flexmark
+    // Flexmark
     alias('flexmark-core'           ).to("com.vladsch.flexmark:flexmark:$flexmarkVersion")
     alias('flexmark-profile-pegdown').to("com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion")
     alias('flexmark-ext-toc'        ).to("com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion")
@@ -109,7 +120,6 @@ dependencyResolutionManagement {
     // Testing
     alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
     alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.10")
-    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
     alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
 
     // Documentation
@@ -119,17 +129,11 @@ dependencyResolutionManagement {
 
 rootProject.name = 'opentorah'
 
-include ':base'
-project(':base'     ).name = 'opentorah-base'
-
-include ':site'
-project(':site'     ).name = 'opentorah-site'
+include ':core'
+project(':core'     ).name = 'opentorah-core'
 
 include ':texts'
 project(':texts'    ).name = 'opentorah-texts'
-
-include ':calendar'
-project(':calendar' ).name = 'opentorah-calendar'
 
 include ':collector'
 project(':collector').name = 'opentorah-collector'

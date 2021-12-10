@@ -1,8 +1,8 @@
 package org.opentorah.schedule.tanach
 
+import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.SpecialDay.{Pesach1, Shavuos1, TishaBeAv}
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
-import org.opentorah.metadata.Week
 import org.opentorah.texts.tanach.{Parsha, WeeklyReading}
 import org.opentorah.texts.tanach.Parsha.*
 import org.opentorah.util.Collections

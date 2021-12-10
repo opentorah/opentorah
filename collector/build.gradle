@@ -13,15 +13,16 @@ description = 'Archive Collector'
 apply from: '../configure.gradle'
 
 dependencies {
-  implementation project(':opentorah-base')
-  implementation project(':opentorah-calendar')
-  implementation project(':opentorah-site')
+  implementation project(':opentorah-core')
 
-  implementation libs.bundles.markdown
-  implementation libs.google.cloud.storage
+  implementation libs.caffeine
+
   implementation libs.zhttp
   implementation libs.logback
   implementation libs.logstash
+
+  implementation libs.google.cloud.storage
+  implementation libs.bundles.markdown
 
   testImplementation libs.podvalRun
 }
@@ -30,7 +31,6 @@ jib.from.image = 'adoptopenjdk:11'
 jib.container.mainClass = 'org.opentorah.collector.Collector'
 
 cloudRun.region = 'us-east4'
-deploy.dependsOn(cloudRunDeploy)
 
 task cloudRunLocalFromLocalStore(type: org.podval.tools.cloudrun.RunLocalTask)
 cloudRunLocalFromLocalStore.additionalOptions = [

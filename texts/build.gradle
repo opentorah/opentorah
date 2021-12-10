@@ -4,12 +4,10 @@ plugins {
   id 'com.github.maiflai.scalatest'
   id 'maven-publish'
   id 'signing'
-  id 'org.opentorah.docbook'
 }
 
 description = 'Jewish Texts, Readings and Learning Schedules'
 
-ext.documents = ['dream', 'typesetting']
 apply from: '../configure.gradle'
 
 //jib {
@@ -18,9 +16,7 @@ apply from: '../configure.gradle'
 //}
 
 dependencies {
-  implementation project(':opentorah-site')
-  implementation project(':opentorah-calendar')
-  implementation project(':opentorah-base')
+  implementation project(':opentorah-core')
 
   testImplementation libs.caffeine
   implementation libs.zhttp

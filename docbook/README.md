@@ -8,7 +8,7 @@ for [Maven](https://maven.apache.org/index.html):
 [docbkx-tools](https://github.com/mimil/docbkx-tools).
 This is my attempt to implement a plugin for [Gradle](https://gradle.org/)
 inspired by the ideas pioneered by the Maven plugin. More information about requirements,
-motivation and chosen approach can be found in a
+motivation and chosen approach can be found in my
 [blog post](http://dub.podval.org/2019/05/06/publishing-papers-on-web-2.html).
 
 Plugin supports typesetting mathematics using [MathJax](https://www.mathjax.org/).
@@ -17,28 +17,71 @@ To make this possible, integration with [Node.js](https://nodejs.org/en/) was de
 ## Summary ##
 
 Plugin uses [Saxon](https://www.saxonica.com/html/documentation/about/whatis.html)
-with DocBook [XSLT stylesheets](https://docbook.org/tools/) to process a DocBook document(s)
+with DocBook [XSLT stylesheets](https://docbook.org/tools/) to process DocBook documents
 (and includes) into HTML, EPUB, EPUB3 and PDF. Processing using DocBook
 [XSLT 2.0 stylesheets](https://github.com/docbook/xslt20-stylesheets) is supported for HTML
 only ("HTML2"). For PDF, DocBook is first processed into
 [XSL-FO](https://www.xml.com/articles/2017/01/01/what-is-xsl-fo/), which is post-processed by
 [Apache FOP](https://xmlgraphics.apache.org/fop/). For PDF,
 [JEuclid](http://jeuclid.sourceforge.net/) or MathJax FOP plugin can be enabled to process mathematics.
-Document name(s) and the list of the output formats are configurable; variants with different settings
+Document name(s) and output formats are configurable; variants with different settings
 for the same output format are supported.
 
-XSL parameters can be configured in the `Gradle` build file using `parameters` map.
-There are sections (and customization files) for each output format, for variants of a format,
-for all HTML-like formats (`htmlCommon`), and for all formats (`common`) (only `html2` applies to `html2`).
-Parameters set in a more general section can be overridden in a more specific one.
+Plugin can be configured using a Gradle DSL extension `docBook`.
 
-Values configured as `substitutions` are available within the DocBook documents by
+Documents to be processed are listed in the `documents` block: `documents { thesis {...} game {...} }`.
+
+Formats and format variants are configured in the `formats` block: `formats { pdf { parameters = ... variants { narrow {...} } } }`.
+
+Output formats can be configured:
+- for all documents: `output = ["html", "pdf"]`
+- for document: `documents { thesis { output = ["html-wide] } }`
+If a document doesn't have output formats configured, those configured for all documents apply to it.
+
+XSLT stylesheet parameters can be configured for:
+- all formats: `common { all { parameters = ["part.autolabel": "0"] } }`
+- all HTML-based formats (HTML, EPUB2, EPUB3, but not HTML2): `common { html { parameters = ["insert.xref.page.number": "yes"] } }`
+- format: `formats { pdf { parameters = ["title.font.family": "DejaVu Sans"] } }`
+- format variant: `formats { pdf { variants { wide { parameters = ["body.start.indent": "0pt"] } } } }`
+- document: `documents { thesis { parameters = ["body.font.master": "12"] } }`
+
+Parameters set in a more specific context override the values set in a more general one in the above order.
+
+Values configured as substitutions are available within the DocBook documents by
 their names. This mechanism can be used to insert things like processing date or the
-version of the document into the output.    
+version of the document into the output. Substitutions can be configured for:
+- globally: `globalSubstitutions = ["project.version": project.version]`
+- all documents: `substitutions = ["author": "Me"]`
+- document: `documents { thesis { substitutions = ["title": "My Thesis"] } }`
 
+If a document doesn't have substitutions configured, those configured for all documents apply to it.
+Globally configured substitutions apply to all documents (even if a document has substitutions configured).
+The split between global and all-documents substitutions is there to support configuring DocBook functionality
+outside the Gradle build file (in a separate configuration file).
+
+For each document, a data generator class can be configured: `documents { thesis { dataGeneratorClass = "my.thesis.Tables" } }`.
 If a data generator class is configured, its `main()` method will be executed with
 a directory path as a parameter. References in DocBook documents that are prefixed
 with `data:` are resolved to files in that directory.
+
+For each document, images directory can be configured: `documents { thesis { imagesDirectory = "myImages" } }`.
+Images from that directory will be made available during processing.
+By default, images directory is assumed to be `src/main/images`.
+
+There are additional settings that can be configured:
+- fonts to embed in the EPUB output: `epubEmbeddedFonts = ["Arial", "Roman"]` (should be OpenType or WOFF);
+- version of the DocBook XSLT stylesheets to use: `xslt1version = "1.79.1" xslt2version = "2.5.0"`;
+- mathematics processing configuration: `math = {...}`.
+
+Those settings can be configured for:
+- all documents;
+- format;
+- format variant;
+- each document.
+Settings configured in a more specific context override the ones configured in a more general one.
+(It was tempting to use the `parameters` mechanism for those settings, but since they are not passed
+directly to the XSLT processor, I did not.)
+(Mathematics processing configuration can also be configured in the site configuration file.)
 
 For each output format or its variant, plugin uses three XSL files: main, `-custom` and `-params`.
 Main and `-params` files are overwritten by the plugin at each run; `-custom` stylesheet
@@ -50,38 +93,23 @@ Main file imports appropriate official DocBook XSLT stylesheet,
 needs to be imported after plugin sets the values of the parameters; since import
 elements must come before all others, plugin sets the parameters in a separate `-param`
 XSL file that is imported before `-custom`.) 
-Customizations shared between formats are in `common-custom` and `htmlCommon-custom`.
+Customizations shared between formats are in `common-custom` and `common-html-custom`.
 
 Plugin generates an XML catalog `catalog.xml` and a DTD with all the configured substitutions,
 both of which are overwritten at each run; main catalog chains into `catalog-custom.xml`,
 which can be used for customizations: additional URI nicknames, entities, etc.
 
-If they do not exist, plugin generates the following files:
-- `-custom` XSL
-- `catalog-custom.xml`
-- FOP configuration file
-- CSS stylesheet used for HTML and EPUB
-- input document :)  
-
 For DocBook processing, plugin uses the main XSL file for a format and `catalog.xml`, which can
 also be configured in an XML editor to replicate the setup that plugin uses in an environment
 more suitable than a code editor or an IDE for authoring DocBook.      
 
-Plugin assumes that images referenced in the DocBook files are in the `images` directory, and sets the 
-`img.src.path` XSL parameter accordingly. Images should be referenced *without* the `images/` prefix!
+Plugin sets `img.src.path` XSL parameter in accordance to the images directory configured.
+Images should be referenced *without* the `images/` prefix!
 
 Plugin sets some XSL parameters to reasonable default values, which can be seen in the `-param` XSL files
 and overridden in the `-custom` ones. Parameters that plugin sets in the main XSL file (`base.dir`, `img.src.path`)
 can not be overridden. Plugin also adds some reasonable customizations to the `-custom` XSL files when
 generating them. They can be tweaked/disabled as desired.
-
-To prevent generated XSL files (other than the `-custom`) from being checked in, a `.gitignore`
-file can be added to the `src/main/xsl` and/or `src/main/xml` directory:
-```git
-*
-!*-custom.xml
-!.gitignore
-```
 
 Plugin adds to the project Gradle task `processDocBook` that writes configuration files,
 substitutions DTD and XML catalog, generates data (if configured),
@@ -112,7 +140,7 @@ its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);
 - [Sten Roger Sandvik](https://github.com/srs) for [Gradle Node plugin](https://github.com/srs/gradle-node-plugin)
   which served as inspiration for the Node support code;
 - [Ian Bull](https://github.com/irbull) for [J2V8](https://github.com/eclipsesource/J2V8);
-- [Stuart Johnston](https://github.com/sgjohnston) for inspiring variants functionality.
+- [Stuart Johnston](https://github.com/sgjohnston) for inspiring the variants functionality.
 
 
 ## Applying to a Gradle project ##
@@ -122,7 +150,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id 'org.opentorah.docbook' version '0.8.1'
+  id 'org.opentorah.docbook' version '0.10.0'
 }
 ```
 
@@ -160,90 +188,66 @@ Plugin adds to the project an extension that can be configured using `docBook` c
 
 ```groovy
 docBook {
+  output = ["html", "pdf"]
+  globalSubstitutions = ["version": project.version]
+  substitutions = ["author": "Me"]
   xslt1version = '1.79.1'
-  xslt2version = '2.4.3'
-  // by default, latest versions of the DocBook XSLT stylesheets are used ("+");
-  // above properties can be used to set a specific version 
+  xslt2version = '2.5.0'
+  epubEmbeddedFonts = ["Arial", "Roman"]
+  math = {/* ... */}
 
-  document = 'paper'
-  documents = [ 'paper', 'paper2' ]
   // .xml extension is assumed
-  // for `documents`, final (and intermediate, if any) output is placed under a subdirectory
-  // with the same name as the document;
-  // if both `document` and `documents` are configured, and one of the `documents` is named
-  // the same as one of the configured output formats, effect is undefined :)
-
-  dataGeneratorClass = 'org.sample.stuff.paper.DataGenerator'
-  // by default, no data is generated (`dataGeneratorClass` is empty)
-
-  outputFormats = ["html", "pdf", "epub2", "epub3", "html2"]
-  // by default, all supported formats except html2 are generated;
-  // this property can be overridden on the command line using `-PdocBook.outputFormats="epub3, html"`
-
-
-  // there is a parameter section for each format,
-  // for HTML-using ones (`htmlCommon`), and for all formats (`common`):
-  parameters = [
-    "common": [
-      "toc.section.depth" : "4"            
-    ],
-    "htmlCommon": [
-      "use.id.as.filename": "yes"
-    ],
-    "pdf" : [
-      "symbol.font.family": "DejaVu Sans",
-      "body.font.master"  : "12"
-    ],
-    "pdf-letter" : [
-      "paper.type": "USletter"
-    ],
-    "pdf-a4" : [
-      "paper.type": "A4"
-    ]
-    // if variants are used and one of the `documents` is named the same as one of the configured variants, effect is undefined :)
-  ]
-
-  substitutions = [
-    "version": project.version       
-  ]
-  // names get replaced with configured values in DocBook documents
-
-  cssFile = "main"
-  // defaults to "docBook"; .css extension is assumed 
-
-  epubEmbeddedFonts = [ "Liberation Sans" ]
-  // embedded fonts should be OpenType or WOFF!
-
-  mathJax {
-    enabled = true
-    // MathML processing for PDF is disabled by default
-
-    useJ2V8 = true
-    // use of native J2V8 bindings is disabled by default and
-    // likely only works on (some distributions of) Linux  
-
-    font = "TeX"
-
-    extensions = [ ]
-
-    // delimiters for non-MathML math to be processes by MathJax:
-    texDelimiter = '$$'
-    texInlineDelimiter = '$'
-    asciiMathDelimiter = '`'
+  documents {
+    thesis {
+      output = ["pdf-letter", "pdf-a4"]
+      substitutions = ["title": "My Thesis"]
+      dataGeneratorClass = "my.thesis.Tables"
+      epubEmbeddedFonts = ["Liberation Sans"]
+    }
+    paper {
+      xslt1version = '1.78.1'
+    }
+    paper2 {
+      output = ["html2"]
+      math = {/* ... */}
+    } 
   }
-
-  jEuclidEnabled = false
-  // no more than one of `jEuclidEnabled` and `mathJax.enabled` can be `true` 
+  
+  common {
+    all {
+      parameters = ["toc.section.depth" : "4"]
+    }
+    html {
+      parameters = ["use.id.as.filename": "yes"]
+    }
+  }
+  
+  formats {
+    pdf {
+      parameters = [
+        "symbol.font.family": "DejaVu Sans",
+        "body.font.master"  : "12"
+      ]
+      math = {/* ... */}
+      variants {
+        letter {
+          parameters = ["paper.type": "USletter"]
+        }
+        a4 {
+          parameters = ["paper.type": "A4"]
+          math = {/* ... */}
+        }
+      }
+    }
+    html2 {
+      parameters = ["use.id.as.filename": "yes"]
+    }
+  }
 }
-
-docBook.parameters.html2 = [
-  "use.id.as.filename": "yes"
-]
-
 ```
 
-Default variant of an output format (e.g., `pdf`) is processed only if there are no named variants configured for the
-same output format (e.g. `pdf-a4`).
+If there is only one variant of a particular format configured for a document, the output is placed in the
+directory named after the format, not after the variant.
 
 ## Substitutions ##
 
@@ -272,7 +276,6 @@ and XML catalog, making it possible to reproduce entities substitution in an XML
 Special substitutions -  `author`, `title`, `subject`, `keywords`, `creationDate` - are set as the PDF
 document's metadata properties (if they are configured); `creationDate` is expected to be formatted as
 `(new java.util.Date()).toString()` is.
-
 
 Both substitutions and parameters are also accessible in the CSS files, for instance:  
 ```css
@@ -311,11 +314,38 @@ either server-side MathJax or JEuclid for PDF. JEuclid typesets in document's fo
 MathJax delivers better quality and is under active development; JEuclid is not.
 JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
 
+Mathematics processing is configured using `math` block (values below are the defaults):
+```groovy
+math {
+  // no more than one of `jEuclidEnabled` and `mathJaxEenabled` can be `true` 
+  jEuclidEnabled      = false
+  mathJaxEnabled      = false
+  nodeVersion         = "14.1.0"
+  useMathJaxV3        = false
+  useJ2V8             = false
+  font                = "TeX"
+  mathJaxExtensions   = []
+  texExtensions       = ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
+  processEscapes      = true
+  texDelimiters       = ['$$-$$']
+  texInlineDelimiters = ['$-$']
+  asciiMathDelimiters = ['`-`']
+}
+```
+
+Settings can be overridden in a more specific context:
+```groovy
+math {
+  texDelimiters       = ['$$-$$, \\[-\\]']
+  texInlineDelimiters = ['$-$, \\(-\\)']
+}
+```
+
 ## Data ##
 
 Data generation class doesn't have to reside in the same project where DocBook plugin is configured;
 in such a case, its artifact needs to be added as a `runtimeOnly` dependency of the main sourceset.
-If it is produced by another module of the same multi-module project, `processDocBook` task should depend
+If it is produced by another module of the same multimodule project, `processDocBook` task should depend
 on the `assemble` task of that module. 
 
 ## Oxygen ##
@@ -327,7 +357,6 @@ Plugin's setup should be reproducible in an XML editor like [Oxygen](https://www
 - use main format-specific XSL file from `src/main/xsl` (e.g., `html.xsl`) to configure transformation scenario; 
 - define `img.src.path` parameter as `../images`.
 
-
 ## Directory Layout ##
 
 Overview of the directory layout used by the plugin:
@@ -336,74 +365,56 @@ Overview of the directory layout used by the plugin:
    src/main/
      css/docBook.css
      docBook/<documentName>.xml
-     fop/fop.xconf
+     fop/fop.xconf                   // optional customization
      images/
      xsl/
-       html.xsl
-       html-custom.xsl
-       html-param.xsl
+       html-custom.xsl               // optional customization
        ...
      xml/
-       catalog.xml
-       catalog-custom.xml
-       substitutions.dtd  
+       catalog-custom.xml            // optional customization
 
-   build/docBook/
-     epub2/<documentName>.epub
-     epub3/<documentName>.epub
-     html/
-       css/
-       images/
-       index.html
-     pdf/<documentName>.pdf
-     <documents 1>/
-       epub2/<documents 1>.epub
-       epub3/<documents 1>.epub
+   build/docBook/out/
+     <document 1>/
+       epub2/<document 1>.epub
+       epub3/<document 1>.epub
        html/...
        pdf/<documents 1>.pdf
-     pdf-<variant 1>/
+       pdf-<variant 1>/
+         ...
        ...
      ...  
-
-   build/docBookTmp/
-     data/
-     epub/
-     pdf/
+   build/docBook/tmp/
      <document 1>/
+       fop/fop.xconf
+       xsl/
+       xml/
        data/
-       epub/
-       pdf/
-     pdf-<variant 1>/
-       ...
-     ...  
+       out/
+         epub/
+         pdf/
+         pdf-<variant 1>/
+         ...
 ```
-
 
 ### Sources ###
 
 Sources (under `src/main`) contain:
-- DocBook document to be processed - `docBook/<documentName>.xml`;
-- additional DocBook sources included by the main document - in `docBook/`;
+- DocBook documents to be processed - `docBook/<documentName>.xml`;
 - images used in the DocBook files - in `images/`;
 - CSS stylesheet that is used for HTML and EPUB - in `css/docBook.css`;
 - additional CSS files imported by the main one - in `css/`  
 - DocBook XSLT customizations (specific to the output format or a variant) - in `xsl/html.xsl` and the like;
 - FOP configuration - in `fop/fop.xconf`;
 - XML catalog and substitutions DTD - in `xml/catalog.xml`, `xml/catalog-custom.xml` and `xml/substitutions.dtd`;
-
-Plugin will create CSS stylesheet, XSL customizations, XML catalog customization and FOP configuration file if
-they are not present.  
+ 
 
 ### Output ###
 
-Final output of the plugin is deposited under `build/docBook`,
-in a separate directory for each output format:
-- chunked HTML - in `epub/html`
+Final output of the plugin is deposited under `build/docBook/out`,
+in a separate directory for each document and output format:
+- chunked HTML - in `html/index.html`
 - PDF - in `pdf/<documentName>.pdf`;
 - EPUB file - in `epub/<documentName>.epub`.
-
-For documents listed in the `documents` property, final output can be found under a subdirectory
-with the same name as the document.
 
 For HTML and EPUB, CSS stylesheets and images are included in the output.
 For `html2`, main output file will be called `index.html` *only* if main input file has `xml:id="index"`
@@ -412,16 +423,7 @@ on the root element *and* `use.id.as.filename` parameter is set (plugin sets it 
 
 ### Build ###
 
-Plugin unpacks official DocBook XSLT 1.0 stylesheets under `build/docBookXsl/` and XSLT 2.0 stylesheets
-under `build/docBookXsl2/`.
-References to the stylesheets are resolved to the local copies, suppressing retrieval of the stylesheets for each build.
-Gradle will retrieve them once when resolving dependency added by the plugin - and cache the JAR;
-unpacking after each `clean` is cheap.
-
-Data generated by the data generator resides under `build/data`. References to the generated data
-encountered in the DocBook documents are resolved to files in that directory. 
-
-For output formats that require post-processing or packing, intermediate output is under `build/docBookTmp`.
+For output formats that require post-processing or packing, intermediate output is under `build/docBook/tmp/.../out`.
 For documents listed in the `documents` property, intermediate output is placed under a subdirectory with
 the same name as the document.
 
@@ -442,22 +444,27 @@ Following features of the Maven Gradle plugin are not supported:
 - resolve XSL files based on the type of processing 
 - expressions in `<?eval?>`
 - access to the project and its properties in `<?eval?>`
-- multiple documents with different parameters
 
 ## Future ##
 
-I should look into alternative ways of integrating with Node:
-[GraalVM](https://www.graalvm.org/) and
-[Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme).
+### Configuration ###
+- [ ] document the XML configuration format;
+- [ ] add DSL for the site configuration?
+- [ ] remove DSL for the DocBook configuration?
+- [ ] clean up configuration format(s) some more;
 
-Dyno?
+### DocBook Direct ###
+- [ ] bring direct (not using XSLT) transformation of DocBook into HTML, EPUB and PDF to a usable state.
 
-Support for J2V8 should probably be dropped...
-
-## Unlikely Future ##
-
-Here are some issues and potential enhancements that probably won't happen:)
-
+### Mathematics ###
+- [ ] Look into alternative ways of integrating with Node:
+  - [GraalVM](https://www.graalvm.org/)
+  - [Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme)
+  - Dyno
+- [ ] look at the current J2V8 and drop support for it if it is not usable
+- [ ] drop JEuclid support
+  
+### Code Highlighting ###
 - [ ] add DocBook code highlighting to the pipeline;
 
 ### HTML2 ###

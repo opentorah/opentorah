@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.html
+import org.opentorah.html.A
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Date, Editor, EntityReference, EntityType, Pb, Tei}
 import org.opentorah.store.{Directory, Path, Terminal}
@@ -38,10 +38,10 @@ final class Document(
 
   def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
 
-  def textFacetLink(collectionPath: Path, pathShortener: Path.Shortener): html.a =
+  def textFacetLink(collectionPath: Path, pathShortener: Path.Shortener): A =
     facetLink(collectionPath, Path.last[Collection](collectionPath).textFacet, pathShortener)
 
-  def facetLink(collectionPath: Path, collectionFacet: CollectionFacet, pathShortener: Path.Shortener): html.a =
+  def facetLink(collectionPath: Path, collectionFacet: CollectionFacet, pathShortener: Path.Shortener): A =
     Path.a(facetPath(collectionPath, collectionFacet), pathShortener)
 
   def facetPath(

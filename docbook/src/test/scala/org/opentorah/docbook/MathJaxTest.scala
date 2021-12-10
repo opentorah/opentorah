@@ -1,6 +1,7 @@
 package org.opentorah.docbook
 
-import org.opentorah.fop.{MathJaxRunner, Svg}
+import org.opentorah.fop.Svg
+import org.opentorah.math.MathJaxRunner
 import org.opentorah.xml.{ScalaXml, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

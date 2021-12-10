@@ -2,38 +2,34 @@
 <site>
   <common
     n="OpenTorah Papers"
-    url="www.opentorah.org"
-    favicon="favicon.ico"
-    email="dub@opentorah.org"
     isStatic="true"
   >
-    <title>the Open Torah Project</title>
+    <html
+      url="www.opentorah.org"
+      favicon="favicon.ico"
+      email="dub@opentorah.org"
+    >
+      <title>the Open Torah Project</title>
+      <social
+        github="opentorah"
+        twitter="theopentorah"
+      />
+      <footer>
+        OpenTorah Papers<br/>
+        🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
+        <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
+      </footer>
+      <highlighter
+        isEnabled="true"
+        usePrism="true"
+      />
+    </html>
     <license
       name="Creative Commons Attribution 4.0 International License"
       url="http://creativecommons.org/licenses/by/4.0/"
     />
-    <social
-      github="opentorah"
-      twitter="theopentorah"
-    />
-    <footer>
-      OpenTorah Papers<br/>
-      🄯 <a href="http://www.opentorah.org/" target="collectionViewer">the Open Torah Project</a>
-      <a href="http://creativecommons.org/licenses/by/4.0/" target="collectionViewer">CC BY 4.0</a>
-    </footer>
-    <docbook
-      documents="../calendar/src/main/docBook/calendar.xml"
-      outputDirectory="./calendar/paperDirect"
-      buildDirectory="../calendar/build/"
-      dataGeneratorClass="org.opentorah.calendar.paper.Tables"
-    />
-    <highlighter
-      isEnabled="true"
-      usePrism="true"
-    />
-    <mathJax
-      isEnabled="true"
-      useV3="true"
-    />
+    <!-- TODO ScalaXml parser doesn't support includes yet, and I want to keep this separate for now
+    so that I could configure DocBook plugin with it - so I use my own redirects... -->
+    <docbook file="docbook.xml"/>
   </common>
 </site>
