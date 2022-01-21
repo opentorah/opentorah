@@ -1,4 +1,4 @@
-package org.opentorah.util
+package org.opentorah.files
 
 import org.opentorah.util.Files
 import java.io.File

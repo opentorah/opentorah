@@ -1,6 +1,6 @@
 package org.opentorah.math
 
-import org.opentorah.util.Platform
+import org.opentorah.platform.{Exec, Os}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
@@ -28,7 +28,7 @@ final class Node(
 
   def evaluate(script: String): String = node(Seq("--print", script))
 
-  private def node(args: Seq[String]): String = Platform.exec(
+  private def node(args: Seq[String]): String = Exec(
     command = nodeExec,
     args,
     cwd = None,
@@ -41,7 +41,7 @@ final class Node(
       nodeModules.mkdirs()
       npm(Seq("install", "--no-save", "--silent", module))
 
-  private def npm(args: Seq[String]): String = Platform.exec(
+  private def npm(args: Seq[String]): String = Exec(
     command = npmExec,
     args,
     // in local mode, npm puts packages into node_modules under the current working directory
@@ -50,18 +50,17 @@ final class Node(
   )
 
 object Node:
-  
+
   // TODO unify with ProcessContext's logger
   private val logger: Logger = LoggerFactory.getLogger(classOf[Node])
 
   def fromOs(nodeModulesParent: File): Option[Node] =
-    if Platform.getOs == Platform.Os.Windows then None else
+    if Os.get == Os.Windows then None else
       for
-        nodeExec <- Platform.which("node")
-        npmExec <- Platform.which("npm")
+        nodeExec <- Exec.which("node")
+        npmExec  <- Exec.which("npm")
       yield Node(
         nodeModulesParent,
         nodeExec,
         npmExec
       )
-

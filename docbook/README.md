@@ -151,7 +151,7 @@ on the Gradle Plugin Portal. To apply it to a Gradle project:
 
 ```groovy
 plugins {
-  id 'org.opentorah.docbook' version '0.10.0'
+  id 'org.opentorah.docbook' version '0.10.1'
 }
 ```
 

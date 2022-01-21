@@ -3,7 +3,7 @@ package org.opentorah.numbers
 import cats.Eq
 import cats.kernel.CommutativeGroup
 import cats.kernel.laws.discipline.CommutativeGroupTests
-import org.opentorah.util.Platform
+import org.opentorah.platform.Platform
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatestplus.scalacheck.Checkers

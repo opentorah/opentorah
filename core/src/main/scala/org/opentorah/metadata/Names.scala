@@ -1,6 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{Collections, Effects, Platform}
+import org.opentorah.platform.Platform
+import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 import zio.ZIO
 

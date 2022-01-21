@@ -1,4 +1,4 @@
-package org.opentorah.util
+package org.opentorah.build
 
 final class Repository(
   val url: String,

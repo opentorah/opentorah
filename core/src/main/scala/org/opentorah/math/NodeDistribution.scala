@@ -1,7 +1,8 @@
 package org.opentorah.math
 
-import org.opentorah.util.{Distribution, Platform, Repository}
-import Platform.{Architecture, Os}
+import org.opentorah.platform.{Architecture, Os}
+import org.opentorah.build.{Distribution, Repository}
+import org.opentorah.util.Strings
 import java.io.File
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
@@ -12,8 +13,8 @@ import java.io.File
 
 // Describes Node distribution's packaging and structure.
 final class NodeDistribution(version: String) extends Distribution[Node](version):
-  private val os: Platform.Os = Platform.getOs
-  private val architecture: Platform.Architecture = Platform.getArch
+  private val os: Os = Os.get
+  private val architecture: Architecture = Architecture.get
 
   override def toString: String = s"Node v$version for $os on $architecture"
 
@@ -68,7 +69,7 @@ final class NodeDistribution(version: String) extends Distribution[Node](version
   override protected def extension: Option[String] = Some(if isZip then "zip" else "tar.gz")
   override protected def isZip: Boolean = isWindows && hasWindowsZip
   override protected def archiveSubdirectoryPath: Seq[String] = Seq(
-    s"$artifactId-v$version${Distribution.prefix("-", classifier)}"
+    s"$artifactId-v$version${Strings.prefix("-", classifier)}"
   )
 
   def getBin(root: File): File = if hasBinSubdirectory then File(root, "bin") else root

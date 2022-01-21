@@ -1,10 +1,11 @@
-package org.opentorah.site
+package org.opentorah.files
 
 import com.google.api.gax.paging.Page
 import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions}
 import com.google.common.hash.Hashing
+import org.opentorah.service.Credentials
 import org.opentorah.util.{Files, Strings}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
@@ -27,14 +28,12 @@ final class GoogleCloudStorageSynchronizer(
 
   private def log(message: String): Unit = logger.info(message)
 
-  private val credentials: ServiceAccountCredentials = ServiceAccountCredentials
-    .fromStream(Strings.string2stream(serviceAccountKey))
-    .asInstanceOf[ServiceAccountCredentials]
-
   private val storage: Storage = StorageOptions.newBuilder()
-    .setCredentials(credentials)
+    .setCredentials(Credentials.fromString(serviceAccountKey))
     .build()
     .getService
+
+  private def isDirectory(blob: Blob): Boolean = blob.getName.endsWith("/")
 
   def sync(): Unit =
     log(s"Synchronizing $directoryPath to $bucketName/$bucketPrefix" + (if dryRun then " (dry run)" else ""))
@@ -46,7 +45,6 @@ final class GoogleCloudStorageSynchronizer(
     log(s"Listing blobs in $bucketName/$bucketPrefix")
     val blobs: Map[String, Blob] = listBucketDirectory(bucketPrefix)
     log(s"Found ${blobs.size} blobs")
-
 
     val toDelete: List[Blob] = blobs.values.toList
       .filter(blob => !files.contains(blob.getName))
@@ -177,6 +175,3 @@ final class GoogleCloudStorageSynchronizer(
         Storage.BlobListOption.prefix(bucketPrefix)
       )
     )
-
-  private def isDirectory(blob: Blob): Boolean = blob.getName.endsWith("/")
-

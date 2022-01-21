@@ -1,11 +1,10 @@
-package org.opentorah.util
+package org.opentorah.build
 
-import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
-import org.gradle.api.artifacts.{Configuration, Dependency}
-import org.gradle.api.file.CopySpec
-import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.{Project, Task}
+import org.gradle.api.artifacts.{Configuration, Dependency}
+import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
+import org.gradle.api.file.CopySpec
+import org.gradle.api.tasks.SourceSet
 import org.gradle.process.JavaExecSpec
 import org.slf4j.Logger
 import java.io.File
@@ -96,6 +95,13 @@ object GradleBuildContext:
 
   private def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
 
+  // TODO switch DocBook to use getMainSourceSet()
   private def mainSourceSet(project: Project): Option[SourceSet] =
-    Option(project.getConvention.findPlugin(classOf[JavaPluginConvention]))
+    Option(project.getConvention.findPlugin(classOf[org.gradle.api.plugins.JavaPluginConvention]))
       .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
+
+  def getMainSourceSet(project: Project): SourceSet = project
+    .getExtensions
+    .getByType(classOf[org.gradle.api.plugins.JavaPluginExtension])
+    .getSourceSets
+    .getByName(SourceSet.MAIN_SOURCE_SET_NAME)

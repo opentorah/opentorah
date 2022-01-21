@@ -11,6 +11,8 @@ description = 'Open Torah Core'
 apply from: '../configure.gradle'
 
 dependencies {
+  implementation project(':opentorah-util')
+
   api libs.scala.xml
   api libs.zio.core
   api libs.zio.streams // TODO ?
@@ -31,10 +33,7 @@ dependencies {
   compileOnly libs.saxon11 // Saxon 11 (XSLT 2.0)
 
   compileOnly libs.zhttp
-  compileOnly libs.logback
-  compileOnly libs.logstash
 
-  compileOnly libs.google.cloud.storage
   compileOnly libs.bundles.markdown
 
   compileOnly libs.playwright
@@ -43,11 +42,12 @@ dependencies {
   compileOnly libs.j2v8
   compileOnly libs.fop.jeuclid
 
+  // TODO move into docbook module?
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
 
   testImplementation libs.zio.test
-  testImplementation libs.zio.prelude
+  //testImplementation libs.zio.prelude
   testImplementation libs.cats.core
   testImplementation libs.cats.laws
 

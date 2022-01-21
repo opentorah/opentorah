@@ -1,8 +1,10 @@
 package org.opentorah.docbook
 
+import org.opentorah.build.BuildContext
 import org.opentorah.fop.Fop
 import org.opentorah.math.MathConfiguration
-import org.opentorah.util.{BuildContext, Copy, Files}
+import org.opentorah.files.Copy
+import org.opentorah.util.Files
 import org.opentorah.xml.{Resolver, Sax, Saxon, ScalaXml, Xsl}
 import java.io.File
 

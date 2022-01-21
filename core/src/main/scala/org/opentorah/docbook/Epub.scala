@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.util.Zip
+import org.opentorah.files.Zip
 import org.opentorah.xml.ScalaXml
 import java.io.File
 

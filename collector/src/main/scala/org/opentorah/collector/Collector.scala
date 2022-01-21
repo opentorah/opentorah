@@ -58,11 +58,12 @@ final class Collector(
 
   override protected def storesPure: Seq[Store] =
     Seq(Index.Flat, Index.Tree, entityLists, entities, notes, Reports, by) ++ aliases
-
-  def enityReferences: URL = Files.subdirectory(fromUrl.url, "names-references")
+  
+  def enityReferencesUrl: URL = Files.subdirectory(fromUrl.url, "names-references")
 
   private var references: Seq[WithSource[EntityReference]] = Seq.empty
 
+  // TODO move into the report
   private val noRefs: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "noRefs-generated.xml"),
     name = "references",
@@ -70,6 +71,7 @@ final class Collector(
   )
   def getNoRefs: Caching.Parser[Seq[WithSource[EntityReference]]] = noRefs.get
 
+  // TODO move into the report
   private val unclears: ListFile[WithSource[Unclear.Value], Seq[WithSource[Unclear.Value]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "unclears-generated.xml"),
     name = "unclears",
@@ -168,10 +170,12 @@ final class Collector(
           .map(_.flatten) // TODO toIndexSeq?
       )
       _ <- Effects.effect({references = allReferences})
+      // TODO move into the report
       _ <- Effects.effect(noRefs.write(allReferences
         .filter(_.value.ref.isEmpty)
         .sortBy(reference => reference.value.name.toString.toLowerCase)
       ))
+      // TODO move into the Entities
       allEntities: Seq[Entity] <- entities.stores
       _ <- ZIO.foreachDiscard(allEntities)((entity: Entity) => Effects.effect(entity.writeReferences(allReferences, this)))
     yield ()
