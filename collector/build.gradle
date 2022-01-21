@@ -31,10 +31,10 @@ jib.from.image = 'adoptopenjdk:11'
 jib.container.mainClass = 'org.opentorah.collector.Collector'
 
 cloudRun.region = 'us-east4'
+cloudRun.serviceAccountKeyProperty ='cloud-run-deploy_alter-rebbe-2'
 
 task cloudRunLocalFromLocalStore(type: org.podval.tools.cloudrun.RunLocalTask)
 cloudRunLocalFromLocalStore.additionalOptions = [
-  // --volume?
   '--volume', '/home/dub/OpenTorah/alter-rebbe.org/:/mnt/store/:Z',
-  '--env'  , 'STORE=file:///mnt/store/'
+  '--env'   , 'STORE=file:///mnt/store/'
 ]

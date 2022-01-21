@@ -125,16 +125,16 @@ final class DatesTest extends AnyFlatSpec, Matchers:
   "Festivals" should "not fall on the proscribed days" in {
     val data = Table[Year => Day, Seq[Week.Day]](
       ("specialDay", "notOn"),
-      (RoshHashanah1.date, Seq(Rishon, Rvii, Shishi)),
-      (YomKippur.date, Seq(Shlishi, Rishon, Shishi)),
-      (Purim.date, Seq(Shabbos, Sheni, Rvii)),
-      (Pesach1.date, Seq(Sheni, Rvii, Shishi)),
-      (Shavuos1.date, Seq(Shlishi, Chamishi, Shabbos)),
+      (RoshHashanah1 .date, Seq(Rishon, Rvii, Shishi)),
+      (YomKippur     .date, Seq(Shlishi, Rishon, Shishi)),
+      (Purim         .date, Seq(Shabbos, Sheni, Rvii)),
+      (Pesach1       .date, Seq(Sheni, Rvii, Shishi)),
+      (Shavuos1      .date, Seq(Shlishi, Chamishi, Shabbos)),
       (HoshanahRabbah.date, Seq(Shlishi, Chamishi, Shabbos)),
-      (Chanukah1.date, Seq(Shlishi)),
-      (FastOfEster.date, Seq(Rishon, Shlishi, Shishi)),
-      (FastOfTammuz.date, Seq(Sheni, Rvii, Shishi)),
-      (TishaBeAv.date, Seq(Sheni, Rvii, Shishi))
+      (Chanukah1     .date, Seq(Shlishi)),
+      (FastOfEster   .date, Seq(Rishon, Shlishi, Shishi)),
+      (FastOfTammuz  .date, Seq(Sheni, Rvii, Shishi)),
+      (TishaBeAv     .date, Seq(Sheni, Rvii, Shishi))
     )
     yearsWithDelaysEnabled foreach(year =>
       forAll(data)(
@@ -158,22 +158,22 @@ final class DatesTest extends AnyFlatSpec, Matchers:
   "Roshei Chodoshim" should "fall on allowed days" in {
     val data = Table(
       ("month", "days"),
-      (Nisan, Seq(Rishon, Shlishi, Chamishi, Shabbos)),
-      (Iyar, Seq(Sheni, Shlishi, Chamishi, Shabbos)),
-      (Sivan, Seq(Rishon, Shlishi, Rvii, Shishi)),
-      (Tammuz, Seq(Rishon, Shlishi, Chamishi, Shishi)),
-      (Av, Seq(Sheni, Rvii, Shishi, Shabbos)),
-      (Elul, Seq(Rishon, Sheni, Rvii, Shishi)),
-      (Tishrei, Seq(Sheni, Shlishi, Chamishi, Shabbos)),
+      (Nisan     , Seq(Rishon, Shlishi, Chamishi, Shabbos)),
+      (Iyar      , Seq(Sheni, Shlishi, Chamishi, Shabbos)),
+      (Sivan     , Seq(Rishon, Shlishi, Rvii, Shishi)),
+      (Tammuz    , Seq(Rishon, Shlishi, Chamishi, Shishi)),
+      (Av        , Seq(Sheni, Rvii, Shishi, Shabbos)),
+      (Elul      , Seq(Rishon, Sheni, Rvii, Shishi)),
+      (Tishrei   , Seq(Sheni, Shlishi, Chamishi, Shabbos)),
       // see Taz 2, Magen Avraham 2:
       (Marheshvan, Seq(Sheni, Rvii, Chamishi, Shabbos)),
-      (Kislev, Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi)),
-      (Teves, Seq(Rishon, Sheni, Shlishi, Rvii, Shishi)),
-      (Shvat, Seq(Sheni, Shlishi, Rvii, Chamishi, Shabbos)),
+      (Kislev    , Seq(Rishon, Sheni, Shlishi, Rvii, Chamishi, Shishi)),
+      (Teves     , Seq(Rishon, Sheni, Shlishi, Rvii, Shishi)),
+      (Shvat     , Seq(Sheni, Shlishi, Rvii, Chamishi, Shabbos)),
       // see Ramo:
-      (Adar, Seq(Shabbos, Sheni, Rvii, Shishi)),
-      (AdarI, Seq(Sheni, Rvii, Chamishi, Shabbos)), // => Parshas Shekalim never falls on Rosh Chodesh!
-      (AdarII, Seq(Sheni, Rvii, Shishi, Shabbos))
+      (Adar      , Seq(Shabbos, Sheni, Rvii, Shishi)),
+      (AdarI     , Seq(Sheni, Rvii, Chamishi, Shabbos)), // => Parshas Shekalim never falls on Rosh Chodesh!
+      (AdarII    , Seq(Sheni, Rvii, Shishi, Shabbos))
     )
     yearsWithDelaysEnabled foreach(year =>
       forAll(data)(

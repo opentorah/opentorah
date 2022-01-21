@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, WithNumber}
+import org.opentorah.metadata.Named
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 import Tanach.Chumash

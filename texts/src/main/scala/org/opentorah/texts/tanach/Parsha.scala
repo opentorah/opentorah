@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, HasValues, Names, WithNumber}
+import org.opentorah.metadata.{HasName, HasValues, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}

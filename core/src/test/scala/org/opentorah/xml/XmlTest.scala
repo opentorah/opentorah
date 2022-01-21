@@ -42,6 +42,65 @@ final class XmlTest extends AnyFlatSpec, Matchers:
     loadResource(Dom     , "1")
   }
 
+  "My enhancements to scala-xml" should "be present" in {
+    def roundtrip(xml: String): Unit = scala.xml.XML.loadString(xml).toString shouldBe xml
+
+    roundtrip("<a><!-- comment --> suffix</a>")
+    roundtrip("<a>prefix <!-- comment -->   <!-- comment2 --> suffix</a>")
+    roundtrip("<a>prefix <b><!-- comment --></b> suffix</a>")
+    roundtrip("<a>prefix <b><!-- multi-\nline\n comment --></b> suffix</a>")
+    roundtrip("""<a>prefix <b><!-- multi-
+                |line
+                | comment --></b> suffix</a>""".stripMargin)
+
+    roundtrip("<a><![CDATA[ cdata ]]> suffix</a>")
+    roundtrip("<a>prefix <![CDATA[ cdata ]]> suffix</a>")
+    roundtrip("<a>prefix <b><![CDATA[ cdata section]]></b> suffix</a>")
+    roundtrip("""<a>prefix <b><![CDATA[
+                | multi-
+                | line    cdata
+                |    section]]>   </b> suffix</a>""".stripMargin)
+
+    // confirm that processing instructions were always processed correctly
+    roundtrip("<a><?target content ?> suffix</a>")
+    roundtrip("<a>prefix <?target content ?> suffix</a>")
+    roundtrip("<a>prefix <b><?target content?> </b> suffix</a>")
+
+    def roundtripNodes(xml: String): Unit = scala.xml.XML.loadStringNodes(xml).map(_.toString).mkString("") shouldBe xml
+    roundtripNodes("<!-- prolog --><a>text</a>")
+    roundtripNodes("<!-- prolog --><?target content ?><!-- comment2 --><a>text</a>")
+    roundtripNodes("""<!-- prolog
+                     |    --><?target content ?><!--
+                     |  comment2 --><a>text</a>""".stripMargin)
+
+    roundtripNodes("<a>text</a><!-- epilogue -->")
+    roundtripNodes("<a>text</a><!-- epilogue --><?target content ?><!-- comment2 -->")
+
+    // Note: at least with the JDK's Xerces, whitespace in the prolog and epilogue gets lost in parsing:
+    // the parser does not fire any white-space related events, so:
+    // does not work: roundtripNodes("<!-- c -->  <a/>")
+    // does not work: roundtripNodes("<a/> <!-- epilogue -->")
+
+    def roundtripNS(namespaceAware: Boolean, xml: String): Unit = {
+      val parserFactory: javax.xml.parsers.SAXParserFactory = javax.xml.parsers.SAXParserFactory.newInstance()
+      parserFactory.setNamespaceAware(namespaceAware)
+      parserFactory.setXIncludeAware(namespaceAware)
+
+      scala.xml.XML.withSAXParser(parserFactory.newSAXParser()).loadString(xml).toString() shouldBe xml
+    }
+
+    roundtripNS(namespaceAware = false, """<book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>""")
+    roundtripNS(namespaceAware = true , """<book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"/>""")
+    roundtripNS(namespaceAware = true , """<book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"><svg xmlns:svg="http://www.w3.org/2000/svg"/></book>""")
+  }
+
+  "My enhancements to scala-xml" should "be usable" in {
+    val result: ScalaXml.Element = loadResource(ScalaXml, "comments")
+    result.toString.contains("<!-- Test Comment -->") shouldBe true
+    // TODO test comments in prolog/epilog
+    // TODO test namespace-aware
+  }
+
   private final class X(
     val fromUrl: Element.FromUrl,
     val name: String

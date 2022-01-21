@@ -14,6 +14,10 @@ trait Layout:
   final def tmp: File = Files.file(build, "tmp")
   final def out: File = Files.file(build, Layout.outDirectory)
 
+  def documentTmp(documentName: String): File = Files.file(tmp, documentName)
+  def dtd(documentName: String): File = Files.file(documentTmp(documentName), "substitutions.dtd")
+  def data(documentName: String): File = Files.file(documentTmp(documentName), "data")
+
   final def customCatalog: File = Files.file(src, Layout.catalogDirectory, "catalog-custom.xml")
 
   final def customStylesheetSrc(name: String): File = Files.file(src, Layout.xslDirectory, name + "-custom.xsl")

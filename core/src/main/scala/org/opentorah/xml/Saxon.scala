@@ -15,9 +15,9 @@ import javax.xml.transform.stream.StreamResult
 //   so that the DocBook 1.0 stylesheets can now be executed with a modern Saxon release.
 //   Note that the specification is not identical with the Saxon 6.5.5 original,
 //   but it serves the purpose in supporting DocBook."
-// I am not sure what I can do to set up DocBook XSLT 1 processing with Saxon 10
+// I am not sure what I can do to set up DocBook XSLT 1 processing with Saxon 10 // TODO try 11!
 // (it didn't work out of the box for me), but I'd love to get rid of the Saxon 6, since it:
-// - produces unmodifiable DOM - unlike Saxon 10,
+// - produces unmodifiable DOM - unlike Saxon 10+,
 // - carries within it obsolete org.w3c.dom classes (Level 2), which cause IDE to highlight
 //   as errors uses of the (Level 3) method org.w3c.dom.Node.getTextContent()...
 sealed abstract class Saxon(name: String):
@@ -45,14 +45,14 @@ sealed abstract class Saxon(name: String):
 
     val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer)(
       stylesheetFile => transformerFactory.newTransformer(SAXSource(
-        Xerces.getXMLReader(filters = Seq.empty, resolver, xincludeAware = true, logger), // no need to filter stylesheets
+        Xerces.getXMLReader(filters = Seq.empty, resolver, xincludeAware = true, addXmlBase = false, logger), // no need to filter stylesheets
         Sax.file2inputSource(stylesheetFile)
       ))
     )
 
     transformer.transform(
       SAXSource(
-        Xerces.getXMLReader(filters, resolver, xincludeAware = true, logger),
+        Xerces.getXMLReader(filters, resolver, xincludeAware = true, addXmlBase = true, logger),
         inputSource
       ),
       result
@@ -90,12 +90,12 @@ object Saxon:
     override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
 
-  object Saxon10 extends Saxon("Saxon 10"):
+  object Saxon11 extends Saxon("Saxon 11"):
     override protected def newTransformerFactory: SAXTransformerFactory = net.sf.saxon.TransformerFactoryImpl()
     override protected def styleParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS
     override protected def sourceParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS
 
-  def errorListener(logger: Logger): ErrorListener = new ErrorListener:
+  private def errorListener(logger: Logger): ErrorListener = new ErrorListener:
     override def warning   (exception: TransformerException): Unit = logger.warn (message(exception))
     override def error     (exception: TransformerException): Unit = logger.error(message(exception))
     override def fatalError(exception: TransformerException): Unit = logger.error(message(exception))

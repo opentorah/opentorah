@@ -2,7 +2,7 @@
 dependencies {
   implementation libs.scala.library
 
- zinc libs.zinc
+  zinc libs.zinc
   // force recent version of log4j with the vulnerability fixed
   constraints {
     zinc("org.apache.logging.log4j:log4j-core") {
@@ -25,6 +25,13 @@ dependencies {
   testImplementation libs.scalacheck
   testImplementation libs.discipline.scalatest
   testImplementation libs.algebraLaws
+}
+
+// with switch to ZIO2.0 (?) the tests started hanging if run in parallel...
+// TODO this is not the end of the story; am I going to run into ZIO's
+// blocking thread-pool size in production?!
+test {
+  maxParallelForks = 1
 }
 
 tasks.withType(ScalaCompile) {

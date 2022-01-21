@@ -1,8 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Entity as TeiEntity
-import org.opentorah.store.{By, Directory, Context, Store, Path, Viewer}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.store.{By, Context, Directory, Path, Store, Viewer}
+import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
 
 final class Entities(
@@ -19,7 +19,7 @@ final class Entities(
   By.WithSelector[Entity](selectorName),
   Viewer.Apparatus:
 
-  override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(url, ScalaXml)
+  override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(From.url(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

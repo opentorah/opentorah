@@ -15,20 +15,12 @@ object HtmlOneDirect extends DirectFormat:
   override def parameters: Map[String, String] = Map.empty
 
   final override def process(
-    resolver: Resolver,
-    inputFile: File,
+    xml: ScalaXml.Element,
     parameters: Parameters,
     math: MathConfiguration,
     siteHtml: SiteHtml,
     processOutputFile: File
   ): Unit =
-    // TODO Scala XML does not work with XInclude-aware parsers
-    // (see https://github.com/scala/scala-xml/issues/506),
-    // but DocBook uses XInclude to assemble the document,
-    // so I parse to Dom, pretty-print combined document to String and re-parse it with ScalaXml:
-    val dom: Dom.Element = Dom.loadFromUrl(Files.file2url(inputFile), resolver = Some(resolver))
-    val xml: ScalaXml.Element = ScalaXml.loadFromString(DocBook.prettyPrinter.renderWithHeader(Dom)(dom))
-
   // TODO extract from DocBook:
     val headTitle: Option[String] = None
     val bodyTitle: Option[ScalaXml.Nodes] = None

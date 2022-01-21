@@ -28,7 +28,7 @@ In addition to the main website www.opentorah.org, the project maintains:
 - [code](https://github.com/opentorah/opentorah/tree/master/collector) that generates and serves the www.alter-rebbe.org website;
 - [code](https://github.com/opentorah/opentorah/tree/master/texts) for working with specific Jewish texts and
   for calculating Torah reading/learning schedules;
-- [code](https://github.com/opentorah/opentorah/tree/master/core/src/main/scala/calendar) implementing Rambam's calculations
+- [code](https://github.com/opentorah/opentorah/tree/master/core/src/main/scala/org/opentorah/calendar) implementing Rambam's calculations
   with dates, time intervals and angles and related algorithms.
 
 ## DocBook ##

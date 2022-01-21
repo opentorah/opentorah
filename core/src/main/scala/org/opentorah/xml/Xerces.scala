@@ -14,16 +14,18 @@ object Xerces:
     filters: Seq[XMLFilter],
     resolver: Option[Resolver],
     xincludeAware: Boolean,
-    logger: Logger              
+    addXmlBase: Boolean,
+    logger: Logger
   ): XMLReader =
     val saxParserFactory: SAXParserFactory = org.apache.xerces.jaxp.SAXParserFactoryImpl()
 
     if xincludeAware then
       saxParserFactory.setNamespaceAware(true) // needed for XIncludeAware to kick in
       saxParserFactory.setXIncludeAware(true)
-      // suppress adding `xml:base` on include:
-      // constant `org.apache.xerces.parsers.XIncludeAwareParserConfiguration.XINCLUDE_FIXUP_BASE_URIS` is protected...
-      saxParserFactory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false)
+      if !addXmlBase then saxParserFactory.setFeature(
+        org.apache.xerces.impl.Constants.XERCES_FEATURE_PREFIX + org.apache.xerces.impl.Constants.XINCLUDE_FIXUP_BASE_URIS_FEATURE,
+        false
+      )
 
     val result: XMLReader = filters.foldLeft(saxParserFactory.newSAXParser.getXMLReader)((parent, filter) =>
       filter.setParent(parent)

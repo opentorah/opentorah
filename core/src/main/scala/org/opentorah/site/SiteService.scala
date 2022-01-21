@@ -4,14 +4,14 @@ import org.opentorah.docbook.DocBookConfiguration
 import org.opentorah.store.{Path, Pure, Store}
 import org.opentorah.tei.LinksResolver
 import org.opentorah.util.{Effects, Files, Logging, Strings, Zhttp}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser}
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import io.netty.handler.codec.http.HttpHeaderNames
 import org.slf4j.Logger
 import Zhttp.given
 import zhttp.http.*
 import zio.stream.ZStream
-import zio.{Chunk, Duration, RIO, Task, UIO, ZEnv, ZIO}
+import zio.{Chunk, Duration, RIO, Task, UIO, ZIO}
 import java.io.File
 import java.net.URL
 
@@ -22,7 +22,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
 
   Logging.configureLogBack(useLogStash = serviceName.isDefined)
 
-  final override type Environment = ZEnv
+  final override type Environment = zio.ZEnv
 
   final def readSite(url: String): Task[S] = readSite(Files.string2url(url))
 
@@ -31,7 +31,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
     val result: Parser[S] = for
       _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl"))
       // TODO abstract over Xml?
-      result: S <- parse(siteFileUrl, ScalaXml)
+      result: S <- parse(From.url(siteFileUrl))
       _ <- Effects.effect(logger.info(s"Reading site from $siteFileUrl - done"))
     yield result
     Parser.toTask(result)
@@ -44,7 +44,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
   // TODO does this belong in the base class?
   protected def bucketName: String
 
-  final override def run: ZIO[Environment with zio.ZIOAppArgs, Any, Any] = for
+  final override def run: ZIO[Environment & zio.ZIOAppArgs, Any, Any] = for
     args: Chunk[String] <- getArgs
     result: Any <- run(args)
   yield result
@@ -120,7 +120,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
     )
 
     def get(request: Request): UIO[Response] =//TODO generalize from UIO
-      val pathString: String = request.url.path.asString
+      val pathString: String = request.url.path.toString
       val path: Seq[String] = Files.splitAndDecodeUrl(pathString)
 
       getSite.flatMap(site =>
@@ -159,7 +159,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
           case _                   => (false, "---")
 
       val durationStr: String = SiteService.formatDuration(duration)
-      val message: String = s"$code $durationStr ${request.url.path.asString}"
+      val message: String = s"$code $durationStr ${request.url.path.toString}"
 
       if isWarning then
         warning(request, message)
@@ -182,7 +182,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
   private final def logger: Logger = Site.logger
 
   private def log(request: Option[Request], message: String, severity: String): Unit =
-    val trace: Option[String] = request.flatMap(_.getHeaderValue("X-Cloud-Trace-Context")).map(_.split("/")(0))
+    val trace: Option[String] = request.flatMap(_.headerValue("X-Cloud-Trace-Context")).map(_.split("/")(0))
 
     val arguments: Seq[StructuredArgument] =
       Seq(StructuredArguments.keyValue("severity", severity)) ++

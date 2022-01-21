@@ -19,7 +19,7 @@ dependencies {
 
   implementation libs.bundles.xmlresolver
   implementation libs.saxon6
-  implementation libs.saxon10
+  implementation libs.saxon11
   implementation libs.bundles.fop
 
   implementation libs.zhttp
@@ -37,47 +37,8 @@ compileSass {
 }
 
 docBook {
-  documents = ['calendar', 'dream', 'typesetting']
-
-  mathJax {
-    enabled = true
-  }
-
-  dataGeneratorClass = 'org.opentorah.calendar.paper.Tables'
-
-//  outputFormats = ["html", "pdf", "epub2"]
-  outputFormats = ["html"]
-
-  substitutions = [
+  globalSubstitutions = [
     "project.version": project.version
-  ]
-
-  parameters.common = [
-    "part.autolabel"       : "0",       // was only in calendar paper
-    "chapter.autolabel"    : "0",       // was only in calendar paper
-    "section.autolabel.max.depth": "6"  // was only in the non-calendar papers
-//    "punct.honorific": "" // Remove trailing period after honorific
-  ]
-
-  parameters.htmlCommon = [
-    // Include page number in cross-references
-    "insert.xref.page.number": "yes"  // was only in the non-calendar papers
-  ]
-
-  parameters.pdf = [
-    "title.font.family"    : "DejaVu Sans",
-    "body.font.family"     : "DejaVu Sans",
-    "sans.font.family"     : "DejaVu Sans",
-    "monospace.font.family": "DejaVu Sans Mono",
-    "symbol.font.family"   : "DejaVu Sans",
-    "body.font.master"     : "12",
-    "footnote.font.size"   : "10",  // was only in the non-calendar papers
-
-    // Suppress content indent
-    "body.start.indent"    : "0pt",  // was only in the non-calendar papers
-
-    // Some space for the list labels
-    "orderedlist.label.width": "2em"  // was only in the non-calendar papers
   ]
 }
 
@@ -124,8 +85,7 @@ task buildAndPrettyPrintSite(type: JavaExec) {
 buildAndPrettyPrintSite.dependsOn(compileSass)
 buildAndPrettyPrintSite.doLast {
   project.sync {
-    // TODO once plugin gets updated, "out" appendage needs to go away
-    from new File(processDocBook.outputDirectory, "out")
+    from processDocBook.outputDirectory
     into "$projectDir/paper"
   }
 }
@@ -134,11 +94,9 @@ task site {
   description = 'Generate project website'
   group = 'publishing'
 }
-site.dependsOn(processDocBook)
+//site.dependsOn(processDocBook)
 site.dependsOn(buildAndPrettyPrintSite)
-// TODO sync of the DocBook plugin output in processDocBook.doLast wipes out the output of the direct DocBook processing
-// done as a part of buildAndPrettyPrintSite, so:
-buildAndPrettyPrintSite.mustRunAfter(processDocBook)
+//buildAndPrettyPrintSite.mustRunAfter(processDocBook)
 site.dependsOn(mdoc)
 
 task serveSite(type: JavaExec) {

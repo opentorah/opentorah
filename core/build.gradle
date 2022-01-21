@@ -18,6 +18,8 @@ dependencies {
   implementation libs.xerces
   implementation libs.paiges
 
+  implementation libs.zmanim
+
   // Optional dependencies:
   // - are declared here as 'compileOnly';
   // - need to be supplied as 'runtimeOnly' ('implementation'?) where needed.
@@ -26,7 +28,7 @@ dependencies {
 
   compileOnly libs.bundles.xmlresolver
   compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
-  compileOnly libs.saxon10 // Saxon 10 (XSLT 2.0)
+  compileOnly libs.saxon11 // Saxon 11 (XSLT 2.0)
 
   compileOnly libs.zhttp
   compileOnly libs.logback
@@ -49,7 +51,6 @@ dependencies {
   testImplementation libs.cats.core
   testImplementation libs.cats.laws
 
-  testRuntimeOnly libs.saxon10
+  testRuntimeOnly libs.saxon11
+  testRuntimeOnly libs.bundles.xmlresolver
 }
-
-

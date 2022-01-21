@@ -5,24 +5,24 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.41.0'
+    id 'com.github.ben-manes.versions' version '0.42.0'
     id 'com.github.maiflai.scalatest'  version '0.32'
-    id 'com.google.cloud.tools.jib'    version '3.2.0'
-    id 'org.podval.tools.cloudrun'     version '0.3.0'
+    id 'com.google.cloud.tools.jib'    version '3.2.1'
+    id 'org.podval.tools.cloudrun'     version '0.3.1'
     id 'com.gradle.plugin-publish'     version '0.20.0'
-    id 'io.miret.etienne.sass'         version '1.1.2'
+    id 'io.miret.etienne.sass'         version '1.2.0'
     id 'org.opentorah.docbook'         version docBookPluginVersion
   }
 }
 
-enableFeaturePreview('VERSION_CATALOGS')
-//enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS') // doesn't work with project names like 'opentorah-XXX' :(
-
-final String scalaVersion      = '3.1.1-RC2'
+final String scalaVersion      = '3.1.3-RC2'
 final String scalaVersionMajor = '3'
-final String zioVersion        = '2.0.0-RC1'
-final String flexmarkVersion   = '0.62.2'
+final String flexmarkVersion   = '0.64.0'
 final String batikVersion      = '1.14'
+
+final String zioVersion        = '2.0.0-RC2' // '2.0.0-RC4'   -RC5
+final String zhttpVersion      = '2.0.0-RC4' // '2.0.0-RC6'
+final String zioPreludeVersion = '1.0.0-RC10'// '1.0.0-RC12'  -RC13
 
 dependencyResolutionManagement {
   repositories {
@@ -35,11 +35,11 @@ dependencyResolutionManagement {
   // Yes, I know about 'libs.versions.toml', but:
   // - I do not want to use yet another configuration language;
   // - it doesn't allow me to interpolate 'scalaVersionMajor';
-  // - this way all the both plugin and dependency versions are in the same file.
+  // - this way both plugin and dependency versions are in the same file.
   versionCatalogs {libs {
     // Scala
-    alias('scala-library').to("org.scala-lang:scala3-library_3:$scalaVersion")
-    alias('scala-xml'    ).to("org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.0.1")
+    library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
+    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.1.0")
 
     // Zinc brings in log4j:
     // 1.3.5-1.5.7 - 2.11.2
@@ -51,79 +51,83 @@ dependencyResolutionManagement {
     // Gradle doesn't yet support Zinc later than 1.3.5
     // (also, current latest Zinc - 1.6.0 - uses log4j 1.17.0 which it still doesn't like),
     // so I am forcing log4j version with constraint in configure.gradle...
-    alias('zinc'         ).to("org.scala-sbt:zinc_2.12:1.3.5")
+    library('zinc'         , "org.scala-sbt:zinc_2.12:1.3.5")
 
     // XML
-    alias('xmlresolver' ).to('org.xmlresolver:xmlresolver:4.1.0')
-    alias('jing'        ).to('org.relaxng:jing:20181222')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.3.0')
+    library('jing'         , 'org.relaxng:jing:20181222')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
-    alias('xerces'      ).to('xerces:xercesImpl:2.12.1')
-    alias('saxon10'     ).to('net.sf.saxon:Saxon-HE:10.6')
-    alias('saxon6'      ).to('saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
+    library('xerces'       , 'xerces:xercesImpl:2.12.2')
+    library('saxon11'      , 'net.sf.saxon:Saxon-HE:11.3')
+    library('saxon6'       , 'saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
     // tagsoup     = "1.2.1" TODO use org.jsoup?
-    // xmlApis     = "1.4.01"
 
     // Google Cloud
-    alias('google.cloud.storage').to('com.google.cloud:google-cloud-storage:2.3.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.6.1')
 
     // TODO drop support for JEuclid
-    alias('fop-jeuclid' ).to('de.rototor.jeuclid:jeuclid-fop:3.1.14')
+    library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
 
     // TODO drop support for J2V8
-    alias('j2v8'        ).to('com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
+    library('j2v8'         , 'com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0')
 
     // ZIO
-    alias('zio-core'    ).to("dev.zio:zio_$scalaVersionMajor:$zioVersion")
-    alias('zio-streams' ).to("dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
-    alias('zio-test'    ).to("dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    alias('zhttp'       ).to("io.d11:zhttp_$scalaVersionMajor:2.0.0-RC1")
-    alias('zio-prelude' ).to("dev.zio:zio-prelude_$scalaVersionMajor:1.0.0-RC9")
+    library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
+    library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
+    library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
+    library('zio-prelude'  , "dev.zio:zio-prelude_$scalaVersionMajor:$zioPreludeVersion")
+    library('zhttp'        , "io.d11:zhttp_$scalaVersionMajor:$zhttpVersion")
 
     // Algebra
-    alias('cats-core'   ).to("org.typelevel:cats-core_$scalaVersionMajor:2.7.0")
-    alias('cats-laws'   ).to("org.typelevel:cats-laws_$scalaVersionMajor:2.7.0")
-    alias('algebraLaws' ).to("org.typelevel:algebra-laws_$scalaVersionMajor:2.7.0")
-    alias('discipline-scalatest').to("org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
+    library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:2.7.0")
+    library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:2.7.0")
+    library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:2.7.0")
+    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
 
     // Paiges
-    alias('paiges'      ).to("org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
+    library('paiges'       , "org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
 
     // Caching
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    alias('caffeine').to('com.github.ben-manes.caffeine:caffeine:3.0.5')
+    library('caffeine', 'com.github.ben-manes.caffeine:caffeine:3.0.6')
 
     // FOP
-    alias('fop-core'        ).to('org.apache.xmlgraphics:fop:2.6')
-    alias('fop-hyph'        ).to('net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
-    alias('batik-transcoder').to("org.apache.xmlgraphics:batik-transcoder:$batikVersion")
-    alias('batik-extension' ).to("org.apache.xmlgraphics:batik-extension:$batikVersion")
+
+    library('fop-core'        , 'org.apache.xmlgraphics:fop:2.7')
+    library('fop-hyph'        , 'net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
+    library('batik-transcoder', "org.apache.xmlgraphics:batik-transcoder:$batikVersion")
+    library('batik-extension' , "org.apache.xmlgraphics:batik-extension:$batikVersion")
     //final String jaiVersion = '1.1.3'
     // TODO split runtime-only out of it
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
     // PDF Generation
-    alias('playwright').to('com.microsoft.playwright:playwright:1.17.2')
+    library('playwright', 'com.microsoft.playwright:playwright:1.21.0')
 
     // Logging
-    alias('slf4j'   ).to('org.slf4j:slf4j-api:1.7.33')
-    alias('logback' ).to('ch.qos.logback:logback-classic:1.2.10')
-    alias('logstash').to('net.logstash.logback:logstash-logback-encoder:7.0.1')
+    library('slf4j'   , 'org.slf4j:slf4j-api:1.7.36')
+    library('logback' , 'ch.qos.logback:logback-classic:1.2.11')
+    library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.1.1')
 
     // Flexmark
-    alias('flexmark-core'           ).to("com.vladsch.flexmark:flexmark:$flexmarkVersion")
-    alias('flexmark-profile-pegdown').to("com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion")
-    alias('flexmark-ext-toc'        ).to("com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion")
+    library('flexmark-core'           , "com.vladsch.flexmark:flexmark:$flexmarkVersion")
+    library('flexmark-profile-pegdown', "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion")
+    library('flexmark-ext-toc'        , "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion")
     bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])
 
+    // Zmanim
+    library('zmanim', 'com.kosherjava:zmanim:2.3.0')
+
     // Testing
-    alias('podvalRun').to('org.podval.tools:org.podval.tools.run:0.1.4')
-    alias('scalatest').to("org.scalatest:scalatest_$scalaVersionMajor:3.2.10")
-    alias('scalacheck').to("org.scalacheck:scalacheck_$scalaVersionMajor:1.15.4")
+
+    library('podvalRun' , 'org.podval.tools:org.podval.tools.run:0.1.4')
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.12-RC2")
+    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.16.0")
 
     // Documentation
-    alias('mdoc').to("org.scalameta:mdoc_$scalaVersionMajor:2.2.24")
+    library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.2")
   }}
 }
 

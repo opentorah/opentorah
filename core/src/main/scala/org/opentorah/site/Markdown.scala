@@ -1,4 +1,4 @@
-package org.opentorah.markdown
+package org.opentorah.site
 
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.ext.toc.TocExtension

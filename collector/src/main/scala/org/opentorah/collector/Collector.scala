@@ -59,12 +59,16 @@ final class Collector(
   override protected def storesPure: Seq[Store] =
     Seq(Index.Flat, Index.Tree, entityLists, entities, notes, Reports, by) ++ aliases
 
-  private val references: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
-    url = Files.fileInDirectory(fromUrl.url, "references-generated.xml"),
+  def enityReferences: URL = Files.subdirectory(fromUrl.url, "names-references")
+
+  private var references: Seq[WithSource[EntityReference]] = Seq.empty
+
+  private val noRefs: ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
+    url = Files.fileInDirectory(fromUrl.url, "noRefs-generated.xml"),
     name = "references",
     value = EntityReference
   )
-  def getReferences: Caching.Parser[Seq[WithSource[EntityReference]]] = references.get
+  def getNoRefs: Caching.Parser[Seq[WithSource[EntityReference]]] = noRefs.get
 
   private val unclears: ListFile[WithSource[Unclear.Value], Seq[WithSource[Unclear.Value]]] = WithSource(
     url = Files.fileInDirectory(fromUrl.url, "unclears-generated.xml"),
@@ -157,11 +161,19 @@ final class Collector(
   private def writeReferences: Caching.Parser[Unit] =
     logger.info("Writing references.")
     for
-      allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](
-        nodes => ZIO.foreach(EntityType.values.toIndexedSeq)(entityType =>
-          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)).map(_.flatten) // TODO toIndexSeq?
+      allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](nodes =>
+        ZIO.foreach(EntityType.values.toIndexedSeq)(entityType =>
+          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)
+        )
+          .map(_.flatten) // TODO toIndexSeq?
       )
-      _ <- Effects.effect(references.write(allReferences))
+      _ <- Effects.effect({references = allReferences})
+      _ <- Effects.effect(noRefs.write(allReferences
+        .filter(_.value.ref.isEmpty)
+        .sortBy(reference => reference.value.name.toString.toLowerCase)
+      ))
+      allEntities: Seq[Entity] <- entities.stores
+      _ <- ZIO.foreachDiscard(allEntities)((entity: Entity) => Effects.effect(entity.writeReferences(allReferences, this)))
     yield ()
 
   private def writeUnclears: Caching.Parser[Unit] =
@@ -170,7 +182,7 @@ final class Collector(
       allUnclears: Seq[WithSource[Unclear.Value]] <- allWithSource[Unclear.Value](
         nodes => ScalaXml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
-      _ <- Effects.effect(unclears.write(allUnclears))
+      _ <- Effects.effect(unclears.write(allUnclears.sortBy(_.source)))
     yield ()
 
   // TODO retrieve TEI(?) references from notes.
@@ -217,7 +229,7 @@ final class Collector(
   override protected def verify: Caching.Parser[Unit] =
     logger.info("Verifying site.")
     for
-      errorOpts: Seq[Option[String]] <- getReferences.flatMap(ZIO.foreach(_)(value =>
+      errorOpts: Seq[Option[String]] <- ZIO.foreach(references)(value =>
         val reference: EntityReference = value.value
         val name: Element.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
@@ -229,7 +241,7 @@ final class Collector(
             )
           )
         )
-      ))
+      )
       errors: Seq[String] = errorOpts.flatten
       _ <- Effects.check(errors.isEmpty, errors.mkString("\n"))
 

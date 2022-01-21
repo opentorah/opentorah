@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Language, Names, WithNumber}
+import org.opentorah.metadata.{HasName, Language, Names}
 import org.opentorah.util.{Collections, Effects}
 import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO

@@ -1,7 +1,7 @@
 package org.opentorah.util
 
 import io.netty.handler.codec.http.HttpHeaderNames
-import zhttp.http.{HTTP_CHARSET, Headers, HeaderValues, HttpData, Method, Path, RHttpApp, Request, Response, Status}
+import zhttp.http.{Headers, HeaderValues, HTTP_CHARSET, HttpData, Method, Path, Request, Response, RHttpApp, Status}
 import zhttp.service.{EventLoopGroup, Server}
 import zhttp.service.server.ServerChannelFactory
 import zio.stream.ZStream
@@ -36,11 +36,12 @@ object Zhttp:
     // Note: To be accessible when running in a docker container the server
     // must bind to all IPs, not just 127.0.0.1;
     // with http4s, I had to supply a "host" string "0.0.0.0",
-    // but with zhhtp there seems to be no way to do it - and no need :)
+    // but with zhttp there seems to be no way to do it - and no need :)
       Server.port(port) ++
-        //Server.paranoidLeakDetection ++ // Paranoid leak detection (affects performance)
-        Server.app(routes)
+      //Server.paranoidLeakDetection ++ // Paranoid leak detection (affects performance)
+      Server.app(routes)
 
+    // TODO better with       .flatMap(start => ZManaged.succeed(println(s"Server started on port: ${start.port}")))?
     server.make.use(_ =>
       // Waiting for the server to start
       // TODO use logging
@@ -75,7 +76,7 @@ object Zhttp:
 
       lastModifiedMilliseconds: Long <- ZIO.attemptBlocking(urlConnection.getLastModified)
       lastModified: Instant = Instant.ofEpochSecond(lastModifiedMilliseconds / 1000)
-      ifModifiedSince: Option[Instant] = request.flatMap(_.getHeaderValue(HttpHeaderNames.IF_MODIFIED_SINCE)).map(Instant.parse)
+      ifModifiedSince: Option[Instant] = request.flatMap(_.headerValue(HttpHeaderNames.IF_MODIFIED_SINCE)).map(Instant.parse)
       expired: Boolean = ifModifiedSince.fold(true)(_.isBefore(lastModified))
 
       result <- if !expired then
@@ -96,9 +97,9 @@ object Zhttp:
     yield result
 
   private def nameToContentType(name: String): Option[String] = Files.nameAndExtension(name)._2.map {
-    case "js" => "application/javascript" // Note: without this, browser does not process scripts
-    case "svg" => "image/svg+xml" // Note: without this, browser does not process SVG
-    case "jpg" => "image/jpeg"
+    case "js"   => "application/javascript" // Note: without this, browser does not process scripts
+    case "svg"  => "image/svg+xml"          // Note: without this, browser does not process SVG
+    case "jpg"  => "image/jpeg"
     case "jpeg" => "image/jpeg"
-    case _ => ""
+    case _      => ""
   }

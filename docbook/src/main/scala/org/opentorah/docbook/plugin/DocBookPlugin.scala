@@ -9,7 +9,7 @@ import org.opentorah.fop.FopFonts
 import org.opentorah.html.SiteHtml
 import org.opentorah.math.{Delimiters, MathConfiguration}
 import org.opentorah.util.{BuildContext, GradleBuildContext}
-import org.opentorah.xml.Parser
+import org.opentorah.xml.{From, Parser}
 import java.io.File
 import javax.inject.Inject
 import scala.jdk.CollectionConverters.*
@@ -28,11 +28,13 @@ final class DocBookPlugin extends Plugin[Project]:
 
   override def apply(project: Project): Unit =
     //context.info(Platform.applicationString)
-    project.getTasks.create("processDocBook"     , classOf[DocBookPlugin.ProcessDocBookTask     ])
-    project.getTasks.create("listFopFonts"       , classOf[DocBookPlugin.ListFopFontsTask       ])
-    project.getTasks.create("deleteFopFontsCache", classOf[DocBookPlugin.DeleteFopFontsCacheTask])
 
-    project.getExtensions.create("docBook"       , classOf[DocBookPlugin.Extension              ])
+    project.getExtensions.create("docBook", classOf[DocBookPlugin.Extension])
+
+    project.getTasks.create("installDocBookDependencies", classOf[DocBookPlugin.InstallDocBookDependenciesTask])
+    project.getTasks.create("processDocBook"            , classOf[DocBookPlugin.ProcessDocBookTask            ])
+    project.getTasks.create("listFopFonts"              , classOf[DocBookPlugin.ListFopFontsTask              ])
+    project.getTasks.create("deleteFopFontsCache"       , classOf[DocBookPlugin.DeleteFopFontsCacheTask       ])
 
 object DocBookPlugin:
 
@@ -92,16 +94,16 @@ object DocBookPlugin:
         val configurationFile: File = File(layout.root, optional(getConfiguration).getOrElse("docbook.xml"))
         val configuration: DocBookConfiguration = if !configurationFile.exists() then configurationFromExtension else
           if !configurationFromExtension.isEmpty
-          then context.warn(s"DocBook: configuration file will be used; configuration in the extension will be ignored.")
+          then context.warn(s"DocBook: configuration file will be used and configuration in the extension ignored.")
 
           context.info(s"DocBook: reading configuration from file: $configurationFile")
-          Parser.unsafeRun(DocBookConfiguration.parse(configurationFile))
+          Parser.unsafeRun(DocBookConfiguration.parse(From.file(configurationFile)))
 
         val htmlConfigurationFile: File = File(layout.root, optional(getHtmlConfiguration).getOrElse("html.xml"))
         val siteHtml: SiteHtml =
           if !htmlConfigurationFile.exists()
           then SiteHtml.empty
-          else Parser.unsafeRun(SiteHtml.parse(htmlConfigurationFile))
+          else Parser.unsafeRun(SiteHtml.parse(From.file(htmlConfigurationFile)))
 
         processor = Some(configuration.toProcessor(
           layout = layout,
@@ -230,6 +232,7 @@ object DocBookPlugin:
     setGroup("publishing")
     // Register inputs and outputs
     // Note: deleting output directories (with Files.deleteRecursively(directory)) makes the task not up-to-date.
+    // TODO - really?!
     private val layout: Layout = Layout.forGradleProject(getProject)
     Set(layout.src            ).foreach(getInputs .dir)
     Set(layout.tmp, layout.out).foreach(getOutputs.dir)

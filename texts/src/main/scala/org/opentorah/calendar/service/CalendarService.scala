@@ -24,7 +24,7 @@ import zio.{UIO, ZIO}
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends zio.App:
+object CalendarService extends zio.ZIOAppDefault:
 
   Logging.configureLogBack(useLogStash = false)
 
@@ -63,7 +63,7 @@ object CalendarService extends zio.App:
     data = Zhttp.textData(content)
   ))
 
-  override def run(args: List[String]): zio.URIO[zio.ZEnv, zio.ExitCode] = Zhttp.start(
+  override def run: zio.URIO[zio.ZEnv, zio.ExitCode] = Zhttp.start(
     port = scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090),
     routes
   )

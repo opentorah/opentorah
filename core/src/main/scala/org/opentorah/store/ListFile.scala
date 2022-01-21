@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Caching, Element, Elements, PrettyPrinter, ScalaXml}
+import org.opentorah.xml.{Caching, Element, Elements, From, PrettyPrinter, ScalaXml}
 import java.net.URL
 
 final class ListFile[M, W <: AnyRef](
@@ -17,7 +17,7 @@ final class ListFile[M, W <: AnyRef](
 
   def get: Caching.Parser[W] = Caching.getCachedByUrl[W](
     url,
-    load = (url: URL) => list.parse(url).map(wrapper)
+    load = (url: URL) => list.parse(From.url(url)).map(wrapper)
   )
 
   private def list: Element[Seq[M]] = entry.wrappedSeq(name)

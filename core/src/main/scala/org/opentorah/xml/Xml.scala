@@ -16,14 +16,17 @@ trait Xml extends XmlAttributes:
   final override type Element = Attributes
   type Text <: Node
   type Comment <: Node
-  
+
+  // TODO just take XMLReader - but see transform()...
+
   final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
     loadFromInputSource(InputSource(StringReader(string)), filters, resolver)
 
   final def loadFromUrl(url: URL, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
     loadFromInputSource(Sax.url2inputSource(url), filters, resolver)
 
-  protected def loadFromInputSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
+  protected def loadFromInputSource     (source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
+  protected def loadNodesFromInputSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Nodes
 
   def isText(node: Node): Boolean
   def asText(node: Node): Text
@@ -31,6 +34,8 @@ trait Xml extends XmlAttributes:
 
   // Note: seed is the node used (for DOM) to get at the document so that a new node can be created.
   def mkText(text: String, seed: Node): Text
+
+  def isComment(node: Node): Boolean
   def mkComment(text: String, seed: Node): Comment
 
   final def isWhitespace(node: Node): Boolean = isText(node) && getText(asText(node)).trim.isEmpty
@@ -50,6 +55,10 @@ trait Xml extends XmlAttributes:
   final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
 
+  final def allBases(element: Element): Seq[String] =
+    getAttribute(Xml.baseAttribute, element).toSeq ++
+    getChildren(element).filter(isElement).map(asElement).flatMap(allBases)
+
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(f)
 
@@ -66,9 +75,9 @@ trait Xml extends XmlAttributes:
     case Nil => Nil
     case n :: Nil => Seq(n)
     case n :: n1 :: ns if isElement(n) && isElement(n1) => Seq(n, mkText(separator, n)) ++ multi(n1 :: ns, separator)
-    case n :: ns => Seq(n) ++ multi(ns, separator) 
+    case n :: ns => Seq(n) ++ multi(ns, separator)
     case n => n
-      
+
 object Xml:
   val logger: Logger = LoggerFactory.getLogger("org.opentorah.xml") // TODO eliminate
 
@@ -79,3 +88,4 @@ object Xml:
 
   val idAttribute: Attribute[String] = Attribute("id", namespace)
   val langAttribute: Attribute[String] = Attribute("lang", namespace)
+  val baseAttribute: Attribute[String] = Attribute("base", namespace)

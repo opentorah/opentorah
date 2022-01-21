@@ -45,10 +45,14 @@ object Caching:
       getCached[T](url, load(url))
 
     def getCached[T <: AnyRef](key: AnyRef, load: => Caching.Parser[T]): Caching.Parser[T] =
-      Option[AnyRef](cache.getIfPresent(key)).map(_.asInstanceOf[T]).map(ZIO.succeed).getOrElse(
-        load.map(result =>
-          cache.put(key, result)
-          if logEnabled then log.info(s"CACHED ${result.getClass.getSimpleName} $key")
-          result
+      Option[AnyRef](cache.getIfPresent(key))
+        .map(_.asInstanceOf[T])
+        .map(ZIO.succeed)
+        .getOrElse(
+          for
+            _ <- ZIO.succeed(if logEnabled then log.info(s"LOADING $key"))
+            result <- load
+            _ <- ZIO.succeed(cache.put(key, result))
+            _ <- ZIO.succeed(if logEnabled then log.info(s"CACHED  ${result.getClass.getSimpleName} $key"))
+          yield result
         )
-      )

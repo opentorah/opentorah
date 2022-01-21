@@ -27,7 +27,9 @@ private[tanach] object TanachBook:
 
       override def unparser: Unparser[Parsed] = ???
 
-  private val book2parsed: Map[TanachBook, Parsed] = Parser.unsafeRun(
+  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
+  // ... but it started manifesting only with the switch to ZIO 2.0!
+  private lazy val book2parsed: Map[TanachBook, Parsed] = Parser.unsafeRun(
     HasName.load(
       from = From.resource(Tanach),
       content = Parsed.followRedirects
@@ -42,7 +44,9 @@ private[tanach] object TanachBook:
 
   private def chapters(book: TanachBook): Chapters = book2parsed(book).chapters
 
-  private val book2metadata: Map[TanachBook, Metadata] = Collections.mapValues(book2parsed)(metadata => Parser.unsafeRun(metadata.resolve))
+  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
+  // ... but it started manifesting only with the switch to ZIO 2.0!
+  private lazy val book2metadata: Map[TanachBook, Metadata] = Collections.mapValues(book2parsed)(metadata => Parser.unsafeRun(metadata.resolve))
 
   def metadata(book: TanachBook): Metadata = book2metadata(book)
 
@@ -56,4 +60,3 @@ private[tanach] object TanachBook:
     val chapters: Chapters
   ):
     def resolve: Parser[Metadata]
-

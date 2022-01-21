@@ -1,25 +1,37 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as TeiEntity}
-import org.opentorah.store.{Directory, Context, Path, Store, Viewer, WithSource}
-import org.opentorah.util.Collections
+import org.opentorah.store.{Context, Directory, ListFile, Path, Store, Viewer, WithSource}
+import org.opentorah.util.{Collections, Files}
 import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
+import java.net.URL
 
 final class Entity(
   val entityType: EntityType,
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends 
+) extends
   Directory.Entry(name),
   Viewer.Apparatus derives CanEqual:
-  
+
   override def equals(other: Any): Boolean =
     val that: Entity = other.asInstanceOf[Entity]
     this.name == that.name
 
   def id: String = name
+
+  private def references(referencesRootUrl: URL): ListFile[WithSource[EntityReference], Seq[WithSource[EntityReference]]] = WithSource(
+    url = Files.fileInDirectory(referencesRootUrl, s"$id.xml"),
+    name = "references",
+    value = EntityReference
+  )
+
+  def writeReferences(allReferences: Seq[WithSource[EntityReference]], collector: Collector): Unit =
+    references(collector.enityReferences).write(
+      allReferences.filter(_.value.ref.contains(id)).sortBy(_.source)
+    )
 
   override def htmlHeadTitle: Option[String] = Some(mainName)
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = None
@@ -37,10 +49,9 @@ final class Entity(
     val collector: Collector = Collector.get(context)
     for
       entity: TeiEntity <- getTei(collector)
-      references: Seq[WithSource[EntityReference]] <- collector.getReferences
-      sources: Seq[Store] <- ZIO.foreach(
-        references.filter(_.value.ref.contains(id))
-      )((withSource: WithSource[EntityReference]) => collector.resolveUrl(withSource.source).map(_.get.last))
+      references: Seq[WithSource[EntityReference]] <- references(collector.enityReferences).get
+      sources: Seq[Store] <- ZIO.foreach(references)((withSource: WithSource[EntityReference]) =>
+        collector.resolveUrl(withSource.source).map(_.get.last))
       collectionPaths: Seq[Path] <- collector.collectionPaths
       pathShortener: Path.Shortener <- context.pathShortener
     yield

@@ -18,7 +18,7 @@ final class DocBookConfiguration(
 ):
   def isEmpty: Boolean =
     output.isEmpty &&
-    math.isEmpty &&
+    (math.isEmpty || math.get.isEmpty) &&
     substitutions.isEmpty &&
     epubEmbeddedFonts.isEmpty &&
     documents.isEmpty &&

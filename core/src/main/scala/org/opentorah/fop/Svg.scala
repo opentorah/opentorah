@@ -4,7 +4,6 @@ import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.fop.util.UnclosableInputStream
 import org.opentorah.xml.{Dialect, Namespace, PrettyPrinter, Xerces}
 import org.w3c.dom.svg.SVGDocument
-
 import java.io.{InputStream, StringBufferInputStream}
 
 object Svg extends Dialect:
@@ -19,7 +18,7 @@ object Svg extends Dialect:
     // org.apache.batik.dom.util.SAXDocumentFactory sets up a default SAXParserFactory
     // in a class initializer, so the default should at least implement properties it sets up.
     // And of course it uses the magical service discovery stuff, so depending on the classpath (yuck!),
-    // this default can turn out to be Saxon's internal "aelfred" parser, which does not.
+    // this default can turn out to be Saxon's internal "aelfred" parser, which does not. // TODO is this still needed for 11?
     // And although the actual parser used can be supplied as a constructor parameter (and I do supply it),
     // by then alarming stacktrace already escaped into the logs...
     // I need to make sure that SAXDocumentFactory chooses Xerces as its default saxFactory.

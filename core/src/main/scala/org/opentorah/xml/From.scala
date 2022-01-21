@@ -46,7 +46,8 @@ object From:
     override def url: Option[URL] = Some(fromUrl)
     override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromUrl(fromUrl))
 
-  def url(url: URL, xml: Xml): From = FromUrl(url, false, xml)
+  def url(url: URL, xml: Xml = ScalaXml): From = FromUrl(url, false, xml)
+  def file(file: File, xml: Xml = ScalaXml): From = FromUrl(Files.file2url(file), false, xml)
 
   private[xml] def redirect(url: URL, xml: Xml): From = FromUrl(url, true, xml)
 

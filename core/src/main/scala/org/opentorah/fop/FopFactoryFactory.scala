@@ -19,7 +19,7 @@ import java.net.URI
    I had to create a FopFactoryConfigProxy class (see below) that forwards all methods except getImageManager,
    where it supplies a fresh instance of ImageImplRegistry to each factory.
  */
-object FopFactoryFactory:
+private object FopFactoryFactory:
 
   @throws(classOf[SAXException])
   @throws(classOf[IOException])
@@ -54,7 +54,6 @@ object FopFactoryFactory:
     )
 
     override def getImageManager: ImageManager = imageManager
-    
     override def isAccessibilityEnabled: Boolean = delegate.isAccessibilityEnabled
     override def isKeepEmptyTags: Boolean = delegate.isKeepEmptyTags
     override def getLayoutManagerMakerOverride: org.apache.fop.layoutmgr.LayoutManagerMaker = delegate.getLayoutManagerMakerOverride

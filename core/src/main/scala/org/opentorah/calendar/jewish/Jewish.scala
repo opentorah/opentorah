@@ -15,8 +15,6 @@ object Jewish extends Calendar:
   def epochDayNumberInWeek: Int = 2
 
   final class JewishYear(number: Int) extends YearBase(number):
-    require(0 <= number)
-
     def newMoon: Moment = month(1).newMoon
 
     def newYearDelay: NewYear.Delay = newYearDelay(newMoon)
@@ -41,8 +39,6 @@ object Jewish extends Calendar:
 
   override type YearCharacter = (Boolean, Year.Kind)
 
-  override protected def areYearsPositive: Boolean = true
-
   final class JewishYearCompanion extends YearCompanion:
     type Kind = JewishYearCompanion.Kind
 
@@ -54,29 +50,26 @@ object Jewish extends Calendar:
       for isLeap: Boolean <- Seq(true, false); kind <- Kind.values yield (isLeap, kind)
 
     // KH 8:5-6
-    override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] =
-      // TODO remove {}?
-      character match { case (isLeap: Boolean, kind: Kind) =>
+    override protected def monthNamesAndLengths(character: YearCharacter): Seq[MonthNameAndLength] = character match
+      case (isLeap: Boolean, kind: Kind) =>
         Seq(
           MonthNameAndLength(Month.Tishrei   , 30),
           MonthNameAndLength(Month.Marheshvan, if kind == Kind.Full  then 30 else 29),
           MonthNameAndLength(Month.Kislev    , if kind == Kind.Short then 29 else 30),
           MonthNameAndLength(Month.Teves     , 29),
           MonthNameAndLength(Month.Shvat     , 30)
-        ) ++
-          (if !isLeap then
-            Seq(MonthNameAndLength(Month.Adar, 29))
-          else
-            Seq(MonthNameAndLength(Month.AdarI, 30), MonthNameAndLength(Month.AdarII, 29))) ++
-          Seq(
-            MonthNameAndLength(Month.Nisan , 30),
-            MonthNameAndLength(Month.Iyar  , 29),
-            MonthNameAndLength(Month.Sivan , 30),
-            MonthNameAndLength(Month.Tammuz, 29),
-            MonthNameAndLength(Month.Av    , 30),
-            MonthNameAndLength(Month.Elul  , 29)
-          )
-      }
+        ) ++ (
+          if !isLeap
+          then Seq(MonthNameAndLength(Month.Adar , 29))
+          else Seq(MonthNameAndLength(Month.AdarI, 30), MonthNameAndLength(Month.AdarII, 29))
+        ) ++ Seq(
+          MonthNameAndLength(Month.Nisan , 30),
+          MonthNameAndLength(Month.Iyar  , 29),
+          MonthNameAndLength(Month.Sivan , 30),
+          MonthNameAndLength(Month.Tammuz, 29),
+          MonthNameAndLength(Month.Av    , 30),
+          MonthNameAndLength(Month.Elul  , 29)
+        )
 
     override def isLeap(yearNumber: Int): Boolean = LeapYearsCycle.isLeapYear(yearNumber)
 
@@ -104,7 +97,7 @@ object Jewish extends Calendar:
       case Short
       case Regular
       case Full
-  
+
   override type YearCompanionType = JewishYearCompanion
 
   override protected def createYearCompanion: YearCompanionType = new JewishYearCompanion
@@ -143,7 +136,7 @@ object Jewish extends Calendar:
 
     override val valuesSeq: Seq[Name] =
       Seq(Tishrei, Marheshvan, Kislev, Teves, Shvat, Adar, Nisan, Iyar, Sivan, Tammuz, Av, Elul, AdarI, AdarII)
-  
+
   override type MonthCompanionType = JewishMonthName.type
 
   override protected def createMonthCompanion: MonthCompanionType = JewishMonthName
@@ -160,9 +153,9 @@ object Jewish extends Calendar:
 
     def isShabbosMevarchim: Boolean = isShabbos && (shabbosAfter.month != this.month)
 
-    def shabbosAfter: Day = next.next(Week.Day.Shabbos)
+    def shabbosAfter: Day = next.nextDay(Week.Day.Shabbos)
 
-    def shabbosBefore: Day = prev.prev(Week.Day.Shabbos)
+    def shabbosBefore: Day = prev.prevDay(Week.Day.Shabbos)
 
   override type Day = JewishDay
 

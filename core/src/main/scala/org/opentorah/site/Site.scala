@@ -10,6 +10,7 @@ import org.opentorah.util.{BuildContext, Effects, Files}
 import org.opentorah.xml.{Caching, Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
+import java.io.File
 import java.net.URL
 
 // TODO add static site server/generator.
@@ -206,21 +207,21 @@ abstract class Site(
   private def prettyPrint: Caching.Parser[Unit] =
     logger.info("Pretty-printing site.")
 
-    // Note: Scala XML ignores XML comments when parsing a file
-    // (see https://github.com/scala/scala-xml/issues/508);
-    // use Dom to keep them...
     val xml: Xml = ScalaXml
 
     for
-      prettyPrintTei     <- prettyPrintTei
-      prettyPrintStores  <- prettyPrintStores
-      prettyPrintDocBook = docBookProcessor.map(_.inputFiles)
+      prettyPrintTei    : Seq[URL]  <- prettyPrintTei
+      prettyPrintStores : Seq[URL]  <- prettyPrintStores
+      prettyPrintDocBook: Seq[File] = docBookProcessor.map(_.prettyPrintDocBook).getOrElse(Seq.empty)
     yield
       prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None, xml)
       prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None, xml)
-      // TODO prettyPrintDocBook files from `prettyPrintDocBook` and their includes
-      // (when PrettyPrinter keeps empty lines and stacks mixed content).
-      // I need to be able to read a file with includes and enumerate the baseUris...
+      // TODO prettyPrintDocBook when:
+      // I can retain DocType!
+      //  PrettyPrinter keeps empty lines
+      //  PrettyPrinter stacks mixed content
+      //prettyPrint(prettyPrintDocBook.map(Files.file2url), DocBook.prettyPrinter, doctype = None, xml)
+
 
   private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype], xml: Xml): Unit =
     for url <- urls do Files.write(

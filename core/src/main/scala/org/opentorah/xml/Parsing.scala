@@ -71,7 +71,8 @@ final class Parsing private:
   ): Effects.IO[Unit] =
     val contentType: Element.ContentType = nextElement.elementAndParser.element.contentType
     val xmlElement: nextElement.xml.Element = nextElement.xmlElement
-    val nodes: nextElement.xml.Nodes = nextElement.xml.getChildren(xmlElement)
+    // Note: skip comments.
+    val nodes: nextElement.xml.Nodes = nextElement.xml.getChildren(xmlElement).filterNot(nextElement.xml.isComment)
     val (elements: Seq[nextElement.xml.Element], characters: Option[String]) = partition(nextElement.xml)(nodes)
 
     Effects.check(contentType.elementsAllowed  || elements.isEmpty  , s"Spurious elements: $elements") *>
@@ -156,7 +157,6 @@ final class Parsing private:
     val characters: String = nonElems.map(xml.toString).mkString.trim
     (elems.map(xml.asElement), if characters.isEmpty then None else Some(characters))
 
-
 private[xml] object Parsing:
 
   private final class NextElement[A](val xml: Xml)(val xmlElement: xml.Element, val elementAndParser: Element.AndParser[A])
@@ -216,6 +216,6 @@ private[xml] object Parsing:
 
   def checkEmpty: Parser[Unit] = access(_.checkEmpty)
 
-  private def access[T](f: Parsing => T): Parser[T] = ZIO.service.map(f)
+  private def access[T](f: Parsing => T): Parser[T] = ZIO.service[Parsing].map(f)
 
-  private def accessZIO[T](f: Parsing => Parser[T]): Parser[T] = ZIO.service.flatMap(f)
+  private def accessZIO[T](f: Parsing => Parser[T]): Parser[T] = ZIO.service[Parsing].flatMap(f)

@@ -72,7 +72,7 @@ sealed abstract class Renderer:
 
   def renderLanding(using location: Location, spec: Language.Spec): String = renderHtml(
     Seq(name),
-    dayLinks(Gregorian.now.to(calendar).day)
+    dayLinks(Gregorian.fromLocalDateTime(java.time.LocalDateTime.now()).to(calendar).day)
   )
 
   def renderYear(yearStr: String)(using location: Location, spec: Language.Spec): String =
@@ -304,7 +304,7 @@ object Renderer:
   def getLocation(parameter: Option[String]): Location =
     val holyLand: Boolean = parameter.forall(_ == "true")
     if holyLand then Location.HolyLand else Location.Diaspora
-  
+
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
 
   object JewishRenderer extends Renderer:
