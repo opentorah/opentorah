@@ -1,7 +1,7 @@
 package org.opentorah.calendar.service
 
 import org.opentorah.calendar.{Calendar, YearsCycle}
-import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Season, Shemittah, SpecialDay, Sun, YearType}
+import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, NewYear, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.html.A
 import org.opentorah.metadata.{Language, Named, Numbered}
@@ -301,10 +301,6 @@ object Renderer:
     case HolyLand extends Location("Holy Land", true)
     case Diaspora extends Location("Diaspora", false)
 
-  def getLocation(parameter: Option[String]): Location =
-    val holyLand: Boolean = parameter.forall(_ == "true")
-    if holyLand then Location.HolyLand else Location.Diaspora
-
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
 
   object JewishRenderer extends Renderer:
@@ -316,7 +312,7 @@ object Renderer:
 
     override protected def renderYearInformation(yearRaw: calendar.Year)(using location: Location, spec: Language.Spec): Seq[ScalaXml.Element] =
       val year: Jewish.Year = yearRaw.asInstanceOf[Jewish.Year]
-      val delay = year.newYearDelay
+      val delay: NewYear.Delay = year.newYearDelay
 
       val numbers: ScalaXml.Element =
         <table>

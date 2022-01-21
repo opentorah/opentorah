@@ -1,7 +1,7 @@
-package org.opentorah.util
+package org.opentorah.build
 
 import org.gradle.api.Project
-import org.opentorah.util.{Logging, Repository}
+import org.opentorah.util.Logging
 import org.slf4j.Logger
 import java.io.File
 

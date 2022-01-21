@@ -1,8 +1,9 @@
 package org.opentorah.docbook
 
+import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
-import org.opentorah.util.{BuildContext, Distribution, Files}
+import org.opentorah.util.Files
 import org.opentorah.xml.{Dom, Resolver, ScalaXml}
 import java.io.File
 

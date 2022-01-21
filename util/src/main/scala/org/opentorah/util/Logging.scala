@@ -1,7 +1,6 @@
 package org.opentorah.util
 
 import org.slf4j.{Logger, LoggerFactory}
-import ch.qos.logback.classic.Level
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
 object Logging:
@@ -28,12 +27,12 @@ object Logging:
       rootLogger.detachAndStopAllAppenders()
       rootLogger.addAppender(consoleAppender)
 
-    rootLogger.setLevel(Level.INFO)
+    rootLogger.setLevel(ch.qos.logback.classic.Level.INFO)
 
   def setInfo(logger: Logger): Unit = logger match
-    case logger: ch.qos.logback.classic.Logger => logger.setLevel(Level.INFO)
+    case logger: ch.qos.logback.classic.Logger => logger.setLevel(ch.qos.logback.classic.Level.INFO)
     case _ =>
 
   def setWarn(logger: Logger): Unit = logger match
-    case logger: ch.qos.logback.classic.Logger => logger.setLevel(Level.WARN)
+    case logger: ch.qos.logback.classic.Logger => logger.setLevel(ch.qos.logback.classic.Level.WARN)
     case _ =>

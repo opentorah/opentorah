@@ -1,5 +1,6 @@
-package org.opentorah.util
+package org.opentorah.build
 
+import org.opentorah.util.{Files, Strings}
 import java.io.File
 
 abstract class Distribution[T](version: String):
@@ -19,10 +20,10 @@ abstract class Distribution[T](version: String):
   protected def fixup(installation: T): Unit = {}
 
   final protected def dependencyNotation: String =
-    s"$groupId:$artifactId:$version${Distribution.prefix(":", classifier)}${Distribution.prefix("@", extension)}"
+    s"$groupId:$artifactId:$version${Strings.prefix(":", classifier)}${Strings.prefix("@", extension)}"
 
   private def fileName: String =
-    s"$artifactId-$version${Distribution.prefix("-", classifier)}${Distribution.prefix(".", extension)}"
+    s"$artifactId-$version${Strings.prefix("-", classifier)}${Strings.prefix(".", extension)}"
 
   final def getInstallation(context: BuildContext): Option[T] =
     val into: File = Files.file(context.frameworks, cacheDirectory, fileName)
@@ -47,8 +48,3 @@ abstract class Distribution[T](version: String):
         require(exists(result))
         result
       )
-
-object Distribution:
-  // TODO move into Strings
-  def prefix(prefix: String, what: Option[String]): String = what.fold("")(string => prefix + string)
-

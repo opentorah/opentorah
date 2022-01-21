@@ -1,6 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{Effects, Platform}
+import org.opentorah.platform.Platform
+import org.opentorah.util.Effects
 import org.opentorah.xml.{Elements, From, Parser}
 
 trait HasName(nameOverride: Option[String]):

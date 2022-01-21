@@ -3,12 +3,12 @@ package org.opentorah.docbook.plugin
 import org.gradle.api.{Action, DefaultTask, NamedDomainObjectContainer, Plugin, Project, Task}
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Internal, Nested, TaskAction}
+import org.opentorah.build.{BuildContext, GradleBuildContext}
 import org.opentorah.docbook.{CommonConfiguration, DocBookConfiguration, DocBookProcessor, DocumentConfiguration,
   FormatConfiguration, Layout, VariantConfiguration}
 import org.opentorah.fop.FopFonts
 import org.opentorah.html.SiteHtml
 import org.opentorah.math.{Delimiters, MathConfiguration}
-import org.opentorah.util.{BuildContext, GradleBuildContext}
 import org.opentorah.xml.{From, Parser}
 import java.io.File
 import javax.inject.Inject

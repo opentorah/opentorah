@@ -1,7 +1,7 @@
 package org.opentorah.fop
 
 import org.apache.fop.apps.{FOUserAgent, FopFactory}
-import org.opentorah.util.Platform
+import org.opentorah.platform.Platform
 import org.opentorah.xml.{Sax, Saxon, ScalaXml}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.{BufferedOutputStream, File, FileOutputStream, OutputStream}

@@ -1,8 +1,9 @@
 package org.opentorah.xml
 
+import org.opentorah.platform.Platform
+import org.opentorah.util.{Effects, Files}
 import java.io.File
 import java.net.URL
-import org.opentorah.util.{Effects, Files, Platform}
 
 sealed abstract class From(val name: String, val xml: Xml):
 

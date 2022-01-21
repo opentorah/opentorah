@@ -1,7 +1,8 @@
 package org.opentorah.math
 
+import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.fop.FopPlugin
-import org.opentorah.util.{BuildContext, Distribution, Strings}
+import org.opentorah.util.Strings
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
 // Note: yes, all the PDF-only fields look weird in the Site configuration;

@@ -1,12 +1,12 @@
 package org.opentorah.math
 
-import org.opentorah.util.{Distribution, Platform}
-import Platform.{Architecture, Os}
+import org.opentorah.platform.{Architecture, Os}
+import org.opentorah.build.Distribution
 import java.io.File
 
 final class J2V8Distribution(version: String) extends Distribution[J2V8](version):
-  private val os: Platform.Os = Platform.getOs
-  private val architecture: Platform.Architecture = Platform.getArch
+  private val os: Os = Os.get
+  private val architecture: Architecture = Architecture.get
 
   override def toString: String = s"J2V8 for $os on $architecture ($dependencyNotation!$libraryName)"
 
@@ -39,7 +39,7 @@ final class J2V8Distribution(version: String) extends Distribution[J2V8](version
 
 object J2V8Distribution:
 
-  def forOs: Option[J2V8Distribution] = Platform.getOs match
+  def forOs: Option[J2V8Distribution] = Os.get match
     case Os.Windows | Os.Mac => Some(J2V8Distribution("4.6.0"))
     // Note: native library needs to be compatible with the Java code used by the plugin (see build.gradle),
     // so it should probably be 4.6.0 even for Linux, but version of Node in it doesn't work with mathjax-node:

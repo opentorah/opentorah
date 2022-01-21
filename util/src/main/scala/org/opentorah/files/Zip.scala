@@ -1,4 +1,4 @@
-package org.opentorah.util
+package org.opentorah.files
 
 import java.io.{File, FileInputStream, FileOutputStream}
 import java.nio.file.Files

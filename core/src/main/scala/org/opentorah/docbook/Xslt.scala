@@ -1,6 +1,6 @@
 package org.opentorah.docbook
 
-import org.opentorah.util.Distribution
+import org.opentorah.build.Distribution
 import java.io.File
 
 sealed abstract class Xslt(version: String) extends Distribution[File](version):

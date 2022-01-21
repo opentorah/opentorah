@@ -53,6 +53,8 @@ object Strings:
     if from.startsWith(prefix) then from.substring(prefix.length)
     else throw IllegalArgumentException(s"String '$from' doesn't start with '$prefix'")
 
+  def prefix(prefix: String, what: Option[String]): String = what.fold("")(string => prefix + string)
+
   private val hexDigits: Array[Char] = "0123456789abcdef".toCharArray
 
   def bytes2hex(bytes: Seq[Byte]): String =

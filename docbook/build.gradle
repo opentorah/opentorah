@@ -14,11 +14,14 @@ apply from: '../configure.gradle'
 
 dependencies {
   implementation project(':opentorah-core')
+  implementation project(':opentorah-util')
 
   implementation libs.bundles.xmlresolver
   implementation libs.saxon6
   implementation libs.saxon11
   implementation libs.bundles.fop
+
+//  implementation libs.graalvm.sdk
 
   // JEuclid
   implementation libs.fop.jeuclid

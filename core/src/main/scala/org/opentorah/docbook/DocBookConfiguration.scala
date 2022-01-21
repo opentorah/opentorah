@@ -1,8 +1,9 @@
 package org.opentorah.docbook
 
+import org.opentorah.build.BuildContext
 import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
-import org.opentorah.util.{BuildContext, Strings}
+import org.opentorah.util.Strings
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
 
 final class DocBookConfiguration(

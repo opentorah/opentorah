@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{Effects, Platform}
+import org.opentorah.util.Effects
 import org.opentorah.xml.{Elements, From, Parser}
 
 // TODO rename HasNames
@@ -54,4 +54,3 @@ object Named:
       require(this.named eq that.named)
       require(this.to+1 == that.from)
       this.named.andNumbers(this.from, that.to)
-

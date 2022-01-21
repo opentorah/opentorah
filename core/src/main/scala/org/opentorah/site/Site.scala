@@ -1,12 +1,13 @@
 package org.opentorah.site
 
+import org.opentorah.build.BuildContext
 import org.opentorah.docbook.{DocBook, DocBookProcessor, Layout}
 import org.opentorah.html.Html
 import org.opentorah.math.MathConfiguration
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores, Viewer}
 import org.opentorah.tei.{Availability, Language, LangUsage, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
-import org.opentorah.util.{BuildContext, Effects, Files}
+import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Caching, Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}

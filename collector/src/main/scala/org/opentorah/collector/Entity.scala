@@ -29,7 +29,7 @@ final class Entity(
   )
 
   def writeReferences(allReferences: Seq[WithSource[EntityReference]], collector: Collector): Unit =
-    references(collector.enityReferences).write(
+    references(collector.enityReferencesUrl).write(
       allReferences.filter(_.value.ref.contains(id)).sortBy(_.source)
     )
 
@@ -49,7 +49,8 @@ final class Entity(
     val collector: Collector = Collector.get(context)
     for
       entity: TeiEntity <- getTei(collector)
-      references: Seq[WithSource[EntityReference]] <- references(collector.enityReferences).get
+
+      references: Seq[WithSource[EntityReference]] <- references(collector.enityReferencesUrl).get
       sources: Seq[Store] <- ZIO.foreach(references)((withSource: WithSource[EntityReference]) =>
         collector.resolveUrl(withSource.source).map(_.get.last))
       collectionPaths: Seq[Path] <- collector.collectionPaths

@@ -1,11 +1,11 @@
 package org.opentorah.calendar.service
 
-import io.netty.handler.codec.http.{HttpHeaderNames, HttpHeaderValues}
 import org.opentorah.metadata.Language
-import org.opentorah.util.{Logging, Zhttp}
-import Zhttp.given
-import zhttp.http.*
-import zio.{UIO, ZIO}
+import org.opentorah.service.ServiceApp
+import ServiceApp.given
+import org.slf4j.{Logger, LoggerFactory}
+import zhttp.http.{!!, /, Headers, HeaderValues, Http, HttpData, Method, Request, Response, *} // TODO remove '*'
+import zio.ZIO
 
 /*
   There is currently no need for the polished, public UI.
@@ -24,16 +24,16 @@ import zio.{UIO, ZIO}
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends zio.ZIOAppDefault:
-
-  Logging.configureLogBack(useLogStash = false)
+object CalendarService extends ServiceApp:
+  override protected def projectId: String = "???"
+  override protected def portDefault: Int = 8090
+  override protected def run(args: zio.Chunk[String]): ZIO[Any, Throwable, Any] = serve(routes)
 
   private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
 
-  private val routes = Http.collectZIO[Request] {
+  private def routes = Http.collectZIO[Request] {
     case request @ Method.GET -> !! / path if staticResourceExtensions.exists(path.endsWith) =>
-      Zhttp.staticResource("/" + path, Some(request))
-        .catchAll(error => ZIO.succeed(Zhttp.notFound(path + "\n" + error.getMessage)))
+      ServiceApp.orNotFound(path, ServiceApp.staticResource("/" + path, Some(request)))
 
     case request @ Method.GET -> !! =>
       renderHtml(Renderer.renderRoot(getLocation(request), getLanguage(request)))
@@ -51,19 +51,16 @@ object CalendarService extends zio.ZIOAppDefault:
       renderHtml(Renderer.renderDay(kindStr, getLocation(request), getLanguage(request), yearStr, monthStr, dayStr))
   }
 
-  private def getLanguage(request: Request): Language.Spec = Zhttp.queryParameter(request, "lang")
+  private def getLanguage(request: Request): Language.Spec = ServiceApp.queryParameter(request, "lang")
     .map(Language.getForName)
     .getOrElse(Language.English).toSpec
 
   private def getLocation(request: Request): Renderer.Location =
-    Renderer.getLocation(Zhttp.queryParameter(request, "inHolyLand"))
+    val parameter = ServiceApp.queryParameter(request, "inHolyLand")
+    val holyLand: Boolean = parameter.forall(_ == "true")
+    if holyLand then Renderer.Location.HolyLand else Renderer.Location.Diaspora
 
-  def renderHtml(content: String): UIO[Response] = ZIO.succeed(Response(
+  def renderHtml(content: String): zio.UIO[Response] = ZIO.succeed(Response(
     headers = Headers.contentType(HeaderValues.textHtml), // TODO UTF-8?
-    data = Zhttp.textData(content)
+    data = HttpData.fromString(content)
   ))
-
-  override def run: zio.URIO[zio.ZEnv, zio.ExitCode] = Zhttp.start(
-    port = scala.util.Properties.envOrNone("PORT").map(_.toInt).getOrElse(8090),
-    routes
-  )
