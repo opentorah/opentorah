@@ -8,19 +8,22 @@ trait Roman extends Calendar:
   final override def epochHours: Int = 6
 
   final class RomanYear(number: Int) extends YearBase(number):
+
     override def firstDayNumber: Int =
-      daysInNonLeapYear * (number - 1) + yearFirstDayCorrection(number) + 1
+      val correctionForLeapYears: Int = if number > 0
+        then   numberOfLeapYears( number-1)
+        else - numberOfLeapYears(-number  ) - 1 // year 0 is leap
+
+      Calendar.fullDaysInSolarYear * (number - 1) + correctionForLeapYears + 1
 
     override def lengthInDays: Int =
-      daysInNonLeapYear + (if isLeapYear(number) then 1 else 0)
+      Calendar.fullDaysInSolarYear + (if isLeap then 1 else 0)
 
     override def character: YearCharacter = isLeap
 
   final override type Year = RomanYear
 
   final override type YearCharacter = Boolean
-
-  final override protected def areYearsPositive: Boolean = false
 
   final class RomanYearCompanion extends YearCompanion:
     override protected def newYear(number: Int): Year = RomanYear(number)
@@ -52,14 +55,12 @@ trait Roman extends Calendar:
     override def lengthInMonths(yearNumber: Int): Int = monthsInYear
 
   final override type YearCompanionType = RomanYearCompanion
-  
+
   final override protected def createYearCompanion: YearCompanionType = new RomanYearCompanion
 
   private val monthsInYear: Int = 12
 
-  private val daysInNonLeapYear: Int = 365
-
-  protected def yearFirstDayCorrection(yearNumber: Int): Int
+  protected def numberOfLeapYears(yearNumber: Int /* non-negative */): Int
 
   protected def isLeapYear(yearNumber: Int): Boolean
 
@@ -75,7 +76,9 @@ trait Roman extends Calendar:
     override private[opentorah] def apply(yearOption: Option[Year], monthNumber: Int): Month =
       RomanMonth(yearOption, monthNumber)
 
-    override private[opentorah] def yearNumber(monthNumber: Int): Int = (monthNumber - 1) / monthsInYear + 1
+    override private[opentorah] def yearNumber(monthNumber: Int): Int = if monthNumber > 0
+      then (monthNumber - 1) / monthsInYear + 1
+      else  monthNumber      / monthsInYear
 
     override private[opentorah] def numberInYear(monthNumber: Int): Int =
       monthNumber - Year.firstMonth(yearNumber(monthNumber)) + 1
@@ -95,9 +98,9 @@ trait Roman extends Calendar:
 
     override val valuesSeq: Seq[Name] =
       Seq(January, February, March, April, May, June, July, August, September, October, November, December)
-  
+
   final override type MonthCompanionType = RomanMonthName.type
-  
+
   final override protected def createMonthCompanion: MonthCompanionType = RomanMonthName
 
   final class RomanDay(monthOption: Option[Month], dayNumber: Int) extends DayBase(monthOption, dayNumber)

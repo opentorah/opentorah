@@ -27,8 +27,37 @@ object ScalaXml extends Xml:
     inputSource: InputSource,
     filters: Seq[XMLFilter],
     resolver: Option[Resolver]
-  ): Element =
+  ): Element = load(
+    inputSource,
+    filters,
+    resolver
+  ).rootElem.asInstanceOf[Element]
 
+  override protected def loadNodesFromInputSource(
+    inputSource: InputSource,
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ): Nodes =
+    val result = load(
+      inputSource,
+      filters,
+      resolver
+    )
+
+    result.prolog ++ (result.rootElem :: result.epilogue)
+
+  // TODO I'd like the following code to look this way: scala.xml.XML.withSAXParser(...).load(inputSource), but:
+  // - I need to filter the input, and XMLFilter only works with XMLReader, not SAXParser;
+  // - that is why I call getXMLReader() on the newly created SAXParse in Xerces;
+  // - XMLLoader uses SAXParser, not XMLReader;
+  // - there is no going back from the XMLReader to SAXParser... (?)
+  // So: file a pull request that will change XMLLoader from using SAXParser to XMLReader,
+  // which by default should be obtained from the SAXParser :)
+  private def load(
+    inputSource: InputSource,
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ):  scala.xml.parsing.FactoryAdapter =
     val adapter: scala.xml.parsing.FactoryAdapter = scala.xml.parsing.NoBindingFactoryAdapter()
     adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
 
@@ -39,15 +68,17 @@ object ScalaXml extends Xml:
       filters,
       resolver,
       xincludeAware = false,
+      addXmlBase = false,
       logger = Xml.logger // TODO globalize
     )
     xmlReader.setContentHandler(adapter)
     xmlReader.setDTDHandler(adapter)
+    xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", adapter)
 
     xmlReader.parse(inputSource)
 
     adapter.scopeStack = adapter.scopeStack.tail
-    adapter.rootElem.asInstanceOf[Element]
+    adapter
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
@@ -56,7 +87,8 @@ object ScalaXml extends Xml:
   override def mkText(text: String, seed: Node): Text = mkText(text)
   def mkText(text: String): Text = scala.xml.Text(text)
 
-  def mkComment(text: String, seed: Node): Comment = mkComment(text)
+  override def isComment(node: Node): Boolean = node.isInstanceOf[Comment]
+  override def mkComment(text: String, seed: Node): Comment = mkComment(text)
   // TODO add spaces for everything, not just ScalaXml?
   def mkComment(text: String): Comment = scala.xml.Comment(s" $text ")
 
@@ -92,6 +124,12 @@ object ScalaXml extends Xml:
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
     element.copy(scope = scala.xml.NamespaceBinding(namespace.getPrefix.orNull, namespace.getUri.get, element.scope))
+
+  // TODO move up in the hierarchy
+  def removeNamespace(nodes: Seq[Node]): Seq[Node] = nodes.map(removeNamespace)
+  def removeNamespace(node: Node): Node = if !isElement(node) then node else
+    val element = asElement(node)
+    element.copy(scope = scala.xml.TopScope, child = removeNamespace(getChildren(element)))
 
   override protected def getAttributeValueString(attribute: Attribute[?], attributes: Attributes): Option[String] = {
     val name: String = attribute.name

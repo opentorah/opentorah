@@ -3,8 +3,9 @@
 <!--    <output format="pdf"/>-->
 <!--    <output format="epub2"/>-->
     <document name="calendar" dataGeneratorClass="org.opentorah.calendar.paper.Tables">
-      <output format="html-mathJax"/>
+      <output format="html"/>
       <output format="htmlOneDirect-mathJax"/>
+      <math mathJaxEnabled="true"/>
     </document>
     <document name="dream"/>
     <document name="typesetting"/>
@@ -16,7 +17,7 @@
     </common>
     <common name="html">
 <!--        // Include page number in cross-references-->
-        <parameter name="insert.xref.page.number" value="yes"/>          <!-- was only in non-calendar papers -->
+      <parameter name="insert.xref.page.number" value="yes"/>          <!-- was only in non-calendar papers -->
     </common>
     <format name="pdf">
       <parameter name="title.font.family" value="DejaVu Sans"/>
@@ -30,21 +31,10 @@
       <parameter name="body.start.indent" value="0pt"/>                  <!-- was only in non-calendar papers -->
 <!--        // Some space for the list labels-->
       <parameter name="orderedlist.label.width" value="2em"/>            <!-- was only in non-calendar papers -->
-      <variant name="mathJax">
-        <math mathJaxEnabled="true"/>
-      </variant>
-    </format>
-    <format name="html">
-      <variant name="mathJax">
-        <math mathJaxEnabled="true"/>
-      </variant>
     </format>
     <format name="htmlOneDirect">
       <variant name="mathJax">
-        <math
-          mathJaxEnabled="true"
-          useMathJaxV3="true"
-        />
+        <math useMathJaxV3="true"/>
       </variant>
     </format>
 </docbook>

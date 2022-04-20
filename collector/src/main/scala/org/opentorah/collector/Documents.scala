@@ -4,8 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.Directory
 import org.opentorah.tei.Tei
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, Parser, ScalaXml}
-
+import org.opentorah.xml.{Element, From, Parser}
 import java.net.URL
 
 final class Documents(
@@ -22,7 +21,7 @@ final class Documents(
   // having this override for Directory.names is a fair price to pay for not having Store/Stores duality...
   override def names: Names = collection.names
 
-  override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(url, ScalaXml)
+  override protected def loadFile(url: URL): Parser[Tei] = Tei.parse(From.url(url))
 
 object Documents:
 

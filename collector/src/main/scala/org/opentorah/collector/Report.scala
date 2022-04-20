@@ -1,6 +1,6 @@
 package org.opentorah.collector
 
-import org.opentorah.metadata.{Named, Names}
+import org.opentorah.metadata.Names
 import org.opentorah.html.A
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.store.{Context, Path, Terminal, Viewer, WithSource}
@@ -33,10 +33,7 @@ object Report:
     "Имена без атрибута /ref/"
   ):
     override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[EntityReference]]] =
-      collector.getReferences.map(_
-        .filter(_.value.ref.isEmpty)
-        .sortBy(reference => reference.value.name.toString.toLowerCase)
-      )
+      collector.getNoRefs
 
     override protected def lineToXml(reference: WithSource[EntityReference], context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
       val source: String = reference.source
@@ -47,7 +44,7 @@ object Report:
     "Неясности"
   ):
     override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[Unclear.Value]]] =
-      collector.getUnclears.map(_.sortBy(_.source))
+      collector.getUnclears
 
     override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
       val source: String = unclear.source

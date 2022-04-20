@@ -120,3 +120,28 @@ final class EpochTest extends AnyFlatSpec, Matchers:
     val revolution: Julian.Day = Julian.Year(1917).month(Julian.Month.October).day(25)
     revolution.to(Gregorian) shouldBe Gregorian.Year(1917).month(Gregorian.Month.November).day(7)
   }
+
+  "Julian Day" should "be correct" in {
+    // The dates and days Meeus lists are Julian before 1582-10-04 Julian (1582-10-15 Gregorian) and Gregorian after.
+
+    Gregorian.Year( 2000).month(Gregorian.Month.January ).day(  1).toMoment.hours(12).toJulianDay shouldBe 2451545.0
+    Gregorian.Year( 2000).month(Gregorian.Month.January ).day(  1).toMoment.hours(12).to(Jewish).toJulianDay shouldBe 2451545.0
+    Gregorian.Year( 1999).month(Gregorian.Month.January ).day(  1).toMoment                 .toJulianDay shouldBe 2451179.5
+    Gregorian.Year( 1988).month(Gregorian.Month.June    ).day( 19).toMoment.hours(12).toJulianDay shouldBe 2447332.0
+    Gregorian.Year( 1988).month(Gregorian.Month.January ).day( 27).toMoment                 .toJulianDay shouldBe 2447187.5
+    Gregorian.Year( 1987).month(Gregorian.Month.June    ).day( 19).toMoment.hours(12).toJulianDay shouldBe 2446966.0
+    Gregorian.Year( 1987).month(Gregorian.Month.January ).day( 27).toMoment                 .toJulianDay shouldBe 2446822.5
+    Gregorian.Year( 1900).month(Gregorian.Month.January ).day(  1).toMoment                 .toJulianDay shouldBe 2415020.5
+    Gregorian.Year( 1858).month(Gregorian.Month.November).day( 17).toMoment                 .toJulianDay shouldBe 2400000.5
+    Gregorian.Year( 1600).month(Gregorian.Month.December).day( 31).toMoment                 .toJulianDay shouldBe 2305812.5
+    Gregorian.Year( 1600).month(Gregorian.Month.January ).day(  1).toMoment                 .toJulianDay shouldBe 2305447.5
+    Julian.Year(  837).month(Julian.Month.April   ).day(10).toMoment          .toJulianDay shouldBe 2026871.5
+    Julian.Year(- 122).month(Julian.Month.January ).day( 1).toMoment          .toJulianDay shouldBe 1676497.5
+    Julian.Year(- 123).month(Julian.Month.December).day(31).toMoment          .toJulianDay shouldBe 1676496.5
+    Julian.Year(-1000).month(Julian.Month.July    ).day(12).toMoment.hours(12).toJulianDay shouldBe 1356001.0
+    Julian.Year(-1000).month(Julian.Month.February).day(29).toMoment          .toJulianDay shouldBe 1355866.5
+    Julian.Year(-1001).month(Julian.Month.August  ).day(17).toMoment          .toJulianDay shouldBe 1355670.5
+    Julian.Year(-4712).month(Julian.Month.January ).day( 1).toMoment.hours(12).toJulianDay shouldBe       0.0
+    Gregorian.Year(-4713).month(Gregorian.Month.November).day(24).toMoment.hours(12).toJulianDay shouldBe       0.0
+    Gregorian.Year(-4713).month(Gregorian.Month.November).day(24).toMoment.hours(12).to(Jewish).toJulianDay shouldBe       0.0
+  }

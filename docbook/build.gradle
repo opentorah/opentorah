@@ -17,7 +17,7 @@ dependencies {
 
   implementation libs.bundles.xmlresolver
   implementation libs.saxon6
-  implementation libs.saxon10
+  implementation libs.saxon11
   implementation libs.bundles.fop
 
   // JEuclid

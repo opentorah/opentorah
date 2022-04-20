@@ -69,7 +69,7 @@ trait XsltFormat extends Format, Section:
     context.info(s"Running Saxon")
     processOutputDirectory.mkdirs
 
-    (if xslt.usesSaxon6 then Saxon.Saxon6 else Saxon.Saxon10).transform(
+    (if xslt.usesSaxon6 then Saxon.Saxon6 else Saxon.Saxon11).transform(
       filters =
         Seq(EvalFilter(substitutions)) ++
         (if !(isPdf && mathConfiguration.mathJaxEnabled.contains(true)) then Seq.empty else Seq(mathConfiguration.mathFilter)),
@@ -106,7 +106,7 @@ trait XsltFormat extends Format, Section:
     if isPdf then
       context.info(s"Running FOP")
       Fop.run(
-        saxon = Saxon.Saxon10,
+        saxon = Saxon.Saxon11,
         configurationFile = layout.fopConfigurationFile,
         creationDate = substitutions.get("creationDate"),
         author = substitutions.get("author"),

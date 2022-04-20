@@ -15,6 +15,10 @@ final class Variant(
   override def name: String = format.name + configuration.fold("")(configuration => s"-${configuration.name}") // TODO unify with Distribution's
 
   def isDefault: Boolean = configuration.isEmpty
+  
+  def isEmpty: Boolean =
+    parameters.isEmpty && (math.isEmpty || math.get.isEmpty) &&
+    xslt1version.isEmpty && xslt2version.isEmpty && epubEmbeddedFonts.isEmpty && configuration.isEmpty
 
 object Variant:
   // TODO split the format and variant names

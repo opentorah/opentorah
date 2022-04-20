@@ -4,7 +4,7 @@ import org.opentorah.fop.FopFonts
 import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.{BuildContext, Distribution, Files}
-import org.opentorah.xml.{Catalog, ScalaXml, Xsl}
+import org.opentorah.xml.{Catalog, Dom, Resolver, ScalaXml, Xsl}
 import java.io.File
 
 // TODO combine epubEmbeddedFonts, xslt1version and xslt2version?
@@ -29,11 +29,25 @@ final class DocBookProcessor(
 
   private def inputFile(document: Document): File = Files.file(layout.input, s"${document.name}.xml")
 
-  def inputFiles: Set[File] = for
-    document: Document <- documents
-    file = inputFile(document)
-    if file.exists
-  yield file
+  def prettyPrintDocBook: Seq[File] =
+    val result: Seq[Seq[File]] = for
+      document: Document <- documents.toSeq
+      file = inputFile(document)
+      if file.exists
+    yield
+      // TODO Scala XML does not work with XInclude-aware parsers (see https://github.com/scala/scala-xml/issues/506)
+      val resolver: Resolver = DocBookProcessor.getResolver(
+        layout,
+        context,
+        document.name,
+        into = layout.documentTmp(document.name),
+        xsltConfiguration = None
+      )
+      val dom: Dom.Element = Dom.loadFromUrl(Files.file2url(file), resolver = Some(resolver))
+      val bases: Seq[String] = Dom.allBases(dom).filterNot(_.contains(":"))
+      val includes: Seq[File] = for base: String <- bases yield File(file.getParentFile, base)
+      file +: includes
+    result.flatten
 
   def verify(): Unit =
     def logUnused[T <: HasName](whats: String, unused: Set[T]): Unit = if unused.nonEmpty then
@@ -46,10 +60,11 @@ final class DocBookProcessor(
       if variant.parameters.nonEmpty
     do context.warn(s"DocBook: direct format variant has parameters configured: ${variant.name}")
 
+    val variantsNonEmpty: Set[Variant] = variants.filterNot(_.isEmpty)
     val variantsUsed: Set[Variant] = documents.flatMap(_.output)
-    logUnused("variants", variants -- variantsUsed)
+    logUnused("variants", variantsNonEmpty -- variantsUsed)
 
-    val formats: Set[Format] = variants.filter(_.parameters.nonEmpty).map(_.format)
+    val formats: Set[Format] = variantsNonEmpty.map(_.format)
     val formatsUsed: Set[Format] = variantsUsed.map(_.format)
     logUnused("formats", formats -- formatsUsed)
 
@@ -175,36 +190,27 @@ final class DocBookProcessor(
     for document: Document <- documents; if inputFile(document).exists do
       context.lifecycle(s"DocBook: processing '${document.name}'.")
 
-      val documentTmp: File = Files.file(layout.tmp, document.name)
-
       val substitutions: Map[String, String] =
         (if document.substitutions.nonEmpty then document.substitutions else substitutionsDefault) ++
         globalSubstitutions
 
       // Write substitutions DTD (if there are any)
-      val dtdFile: Option[File] = if substitutions.isEmpty then None else
-        val result: File = Files.file(documentTmp, "substitutions.dtd")
-        Files.write(
-          file = result,
-          content = Catalog.dtd(substitutions)
-        )
-        Some(result)
+      if substitutions.nonEmpty then Files.write(
+        file = layout.dtd(document.name),
+        content = Catalog.dtd(substitutions)
+      )
 
       // Generate data (if configured)
-      val dataDirectory: Option[File] = if document.dataGeneratorClass.isEmpty then None else
-        val result: File = Files.file(documentTmp, "data")
+      if document.dataGeneratorClass.isDefined then
+        val result: File = layout.data(document.name)
         result.mkdirs()
         context.javaexec(document.dataGeneratorClass.get, result.toString)
-        Some(result)
 
       for variantProcessor: VariantProcessor <- variantProcessors(document) do variantProcessor.process(
         context = context,
         layout = layout,
         siteHtml = siteHtml,
-        substitutions = substitutions,
-        documentTmp = documentTmp,
-        dtdFile = dtdFile,
-        dataDirectory = dataDirectory
+        substitutions = substitutions
       )
 
   private def writeCustomStylesheets(): Unit =
@@ -227,3 +233,67 @@ final class DocBookProcessor(
     do
       writeCustomStylesheet(xsltFormat.name, xsltFormat)
       for common: Common <- xsltFormat.common do writeCustomStylesheet(common.fullName, common)
+
+object DocBookProcessor:
+
+  def getResolver(
+    layout: Layout,
+    context: BuildContext,
+    documentName: String,
+    into: File,
+    xsltConfiguration: Option[(Xslt, File)]
+  ): Resolver =
+    val catalog: File = Files.file(into, Layout.catalogDirectory, "catalog.xml")
+    Catalog.prettyPrinter.write(
+      file = catalog,
+      doctype = Some(Catalog),
+      element = Catalog.catalog(catalogContent(
+        xsltConfiguration,
+        layout.customCatalog,
+        layout.dtd(documentName),
+        layout.data(documentName)
+      ))
+    )
+    Resolver(catalog, context.getLogger)
+
+  // TODO unfold
+  private def catalogContent(
+    xsltConfiguration: Option[(Xslt, File)],
+    customCatalog: File,
+    dtdFile: File,
+    dataDirectory: File
+  ): ScalaXml.Nodes =
+
+    Seq(
+      VariantProcessor.doNotEdit,
+      ScalaXml.mkComment(s"customizations go into $customCatalog.")
+    ) ++
+    (if customCatalog.exists
+     then Seq(Catalog.nextCatalog(customCatalog.getPath))
+     else Seq(
+       <!-- ... and had it existed, it'd be the next catalog here instead of the system one: -->,
+       Catalog.nextCatalogSystem
+     )
+    ) ++
+    (if !dtdFile.exists then Seq.empty else Seq(
+      <!-- substitutions DTD -->,
+      Catalog.public(publicId = DocBook.dtdId, uri = Files.file2url(dtdFile).toString)
+    )) ++
+    (if !dataDirectory.exists then Seq.empty else
+      val rewritePrefix: String = Files.file2url(dataDirectory).toString
+      Seq(<!-- generated data -->) ++
+      (for dataSystemId <- Seq(
+        "data:",
+        "data:/",
+        "urn:docbook:data:/",
+        "urn:docbook:data:",
+        "urn:docbook:data/",
+        "http://opentorah.org/docbook/data/"
+      ) yield Catalog.rewriteSystem(
+        rewritePrefix = rewritePrefix,
+        systemIdStartString = dataSystemId
+      ))
+    ) ++ xsltConfiguration.fold(Seq.empty)((xslt: Xslt, xsltDirectory: File) => Seq(
+      ScalaXml.mkComment(s"DocBook ${xslt.name} stylesheets"),
+      Catalog.rewriteUri(rewritePrefix = s"$xsltDirectory/", uriStartString = s"${xslt.uri}/")
+    ))

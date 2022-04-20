@@ -17,8 +17,6 @@ trait Elements[A]:
   private def optionalParser: Parser[Option[A]] = Parsing.optional(this)
 
   final def parse(from: From): Parser[A] = Parsing.required(this, from)
-  final def parse(fromUrl: URL, xml: Xml = ScalaXml): Parser[A] = parse(From.url(fromUrl, xml))
-  final def parse(fromFile: File): Parser[A] = parse(Files.file2url(fromFile))
 
   final def optional: Elements.Optional[A] = Elements.Optional[A](this)
   final def required: Elements.Required[A] = Elements.Required[A](this)

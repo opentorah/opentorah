@@ -14,8 +14,7 @@ object LeapYearsCycle extends YearsCycle:
 
   private final def yearNumberInCycle(yearNumber: Int): Int = forNumber(yearNumber).numberInCycle
 
-  final def isLeapYear(yearNumber: Int): Boolean =
-    leapYears.contains(yearNumberInCycle(yearNumber))
+  final def isLeapYear(yearNumber: Int): Boolean = leapYears.contains(yearNumberInCycle(yearNumber))
 
   final def yearLengthInMonths(yearNumber: Int): Int = yearLengthInMonths(isLeapYear(yearNumber))
 
@@ -25,24 +24,23 @@ object LeapYearsCycle extends YearsCycle:
 
   final val leapYear: TimeVector = Moon.meanLunarPeriod*yearLengthInMonths(isLeap = true)
 
-  private final val monthsBeforeYearInCycle: Seq[Int] =
-    ((1 to yearsInCycle) map yearLengthInMonths).scanLeft(0)(_ + _)
+  private final val monthsBeforeYearInCycle: Seq[Int] = ((1 to yearsInCycle) map yearLengthInMonths).scanLeft(0)(_ + _)
 
   private final val monthsInCycle: Int = monthsBeforeYearInCycle.last
 
-  private final def firstMonthInCycle(yearNumber: Int): Int =
-    monthsBeforeYearInCycle(yearNumberInCycle(yearNumber) - 1) + 1
+  private final def firstMonthInCycle(yearNumber: Int): Int = monthsBeforeYearInCycle(yearNumberInCycle(yearNumber) - 1) + 1
 
   final def firstMonth(yearNumber: Int): Int =
-    val in = forNumber(yearNumber)
-    monthsInCycle * (in.cycleNumber - 1) + firstMonthInCycle(yearNumber)
+    monthsInCycle * (forNumber(yearNumber).cycleNumber - 1) + firstMonthInCycle(yearNumber)
 
   final val cycleLength: TimeVector = Moon.meanLunarPeriod * monthsInCycle
 
+  // TODO make work for negative years
   private final def numberInCycleOfMonth(monthNumber: Int): Int = ((monthNumber - 1) % monthsInCycle) + 1
 
+  // TODO make work for negative years
   final def monthYear(monthNumber: Int): Int =
-    val cycleOfMonth = ((monthNumber - 1) / monthsInCycle) + 1
+    val cycleOfMonth: Int = ((monthNumber - 1) / monthsInCycle) + 1
     val yearsBeforeCycle = (cycleOfMonth - 1) * yearsInCycle
     val yearMonthIsInCycle = monthsBeforeYearInCycle.count(_ < numberInCycleOfMonth(monthNumber))
     yearsBeforeCycle + yearMonthIsInCycle

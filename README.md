@@ -8,7 +8,7 @@
 
 ### XML parsing ###
 
-I use [Scala XML](http://homepages.inf.ed.ac.uk/wadler/) support to parse XML documents,
+I use [Scala XML](https://github.com/scala/scala-xml) support to parse XML documents,
 and then parse resulting in-memory structures into domain-specific objects.
 I found that doing it by hand results in code that is error-prone, fragile, and not very readable,
 since one needs to keep track of which nodes were already consumed and which still remain for the
@@ -17,11 +17,11 @@ continuation of the parsing.
 I decided to switch to a model that uses a state monad of sorts.
 I did not immediately realize that ZIO actually has state monad built-in, so I rewrote my parsers
 using Cats; that was a major improvement :) When I finally understood how to use ZIO's state monad,
-I rewrote the code again uzing ZIO - what a pleasure!
+I rewrote the code again using ZIO - what a pleasure!
 
 ### XML generation ###
 
-In web-apps, I need to generate XML. I tried using [ScalaTags](https://www.lihaoyi.com/scalatags/) for that,
+In web-apps, I need to generate XML. I tried using [ScalaTags](https://com-lihaoyi.github.io/scalatags/) for that,
 and they work, but there is no clean [interoperability](https://github.com/lihaoyi/scalatags/issues/102) with Scala XML,
 so generating - say - HTML wrappers for XML parsed from files is not pleasant, and since ScalaTags does not (in my
 opinion) have obvious advantages over Scala XML, I decided not to bother with it.

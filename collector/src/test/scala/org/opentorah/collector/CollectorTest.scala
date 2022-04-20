@@ -3,10 +3,9 @@ package org.opentorah.collector
 import org.opentorah.site.Site
 import org.opentorah.store.Path
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Caching, Parser}
+import org.opentorah.xml.Caching
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
 import java.io.File
 
 final class CollectorTest extends AnyFlatSpec, Matchers:

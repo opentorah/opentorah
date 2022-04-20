@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
-import org.opentorah.markdown.Markdown
-import org.opentorah.store.{Directory, Context, Path, Viewer}
+import org.opentorah.site.Markdown
+import org.opentorah.store.{Context, Directory, Path, Viewer}
 import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 

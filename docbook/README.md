@@ -119,6 +119,7 @@ Plugin sets some parameters in the `-param` stylesheet based on the logging leve
 `processDocBook` task is executed; for example, `chunk.quietly` is set to `yes` unless
 logging at `info` level is enabled.
 
+Plugin also adds `installDocBookDependencies` Gradle task to the project.
 
 ## Credits ##
 
@@ -130,7 +131,7 @@ I want to thank:
 [XSLT stylesheets for DocBook](https://github.com/docbook/xslt10-stylesheets)
 and a [book]((http://www.sagehill.net/docbookxsl/)) about them;
 - [Michael Kay](https://github.com/michaelhkay) for [Saxon 6](http://saxon.sourceforge.net/saxon6.5.5/)
-and [Saxon 9](https://www.saxonica.com/documentation/documentation.xml);
+and [Saxon 11](https://www.saxonica.com/documentation/documentation.xml);
 - [Apache FOP team](https://xmlgraphics.apache.org/fop/) for Apache FOP;
 - [Max Berger](https://github.com/maxberger) for JEuclid and
 its [FOP plugin](http://jeuclid.sourceforge.net/jeuclid-fop/);

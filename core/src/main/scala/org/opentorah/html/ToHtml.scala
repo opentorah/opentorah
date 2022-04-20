@@ -118,8 +118,8 @@ trait ToHtml[R]:
   yield ScalaXml.setChildren(element, children)
 
 object ToHtml:
-  // TODO xml:base? xml:space?
   private val xml2htmlAttribute: Map[Attribute[String], Attribute[String]] = Map(
     Xml.idAttribute   -> Html.idAttribute,
     Xml.langAttribute -> Html.langAttribute
+    // TODO xml:base? xml:space?
   )

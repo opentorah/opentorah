@@ -11,7 +11,7 @@ trait Times extends Numbers.NonPeriodic:
     case MOMENTS extends TimesDigit("m")
 
   final override type DigitType = TimesDigit
-  
+
   final override type DigitCompanionType = TimesDigit.type
 
   final override def Digit: DigitCompanionType = TimesDigit
@@ -58,6 +58,7 @@ trait Times extends Numbers.NonPeriodic:
     final def seconds: Int = (partsWithoutMinutes*Times.momentsPerPart + moments) * Times.secondsPerMinute /
       Times.momentsPerMinute
 
+    // TODO switch to nanoseconds
     final def milliseconds: Int = ((partsWithoutMinutes*Times.momentsPerPart + moments) * Times.secondsPerMinute %
       Times.momentsPerMinute) * Times.millisecondsPerSecond / Times.momentsPerMinute
 

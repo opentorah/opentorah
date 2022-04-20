@@ -1,6 +1,5 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.WithNumber
 import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
 import org.opentorah.xml.Parser
 

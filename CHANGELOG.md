@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2022-04-20
+- FOP 2.7;
+- Saxon 11;
+- dependencies update;
+- using scala-xml with my enhancements;
+- make XML includes leave xml:base traces;
+calendar: modern sun position calculations using com.kosherjava:zmanim;
+calendar: conversions to java.time.LocalDateTime and Julian Day;
+docbook: installDocBookDependencies task;
+site: list DocBook files to pretty-print;
+site: use per-entity reference lists instead of the monolithic one to avoid OOM;
+
 ## [0.10.0] - 2022-01-20
 - from now on, version applies to DocBook plugin too;
 - Scala 3: new syntax and strict equality;

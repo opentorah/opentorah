@@ -19,7 +19,7 @@ object Dom extends Xml:
   ): Element =
     val result: javax.xml.transform.dom.DOMResult = new javax.xml.transform.dom.DOMResult
 
-    Saxon.Saxon10.transform(
+    Saxon.Saxon11.transform(
       filters = filters,
       resolver = resolver,
       stylesheetFile = None,
@@ -30,12 +30,19 @@ object Dom extends Xml:
 
     result.getNode.asInstanceOf[org.w3c.dom.Document].getDocumentElement
 
+  override protected def loadNodesFromInputSource(
+    inputSource: InputSource,
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ): Nodes = ???
+
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text =    node.asInstanceOf[Text]
   override def getText(text: Text): String = text.getData
   override def mkText(text: String, seed: Node): Text = seed.getOwnerDocument.createTextNode(text)
 
-  def mkComment(text: String, seed: Node): Comment = seed.getOwnerDocument.createComment(text)
+  override def isComment(node: Node): Boolean = node.isInstanceOf[Comment]
+  override def mkComment(text: String, seed: Node): Comment = seed.getOwnerDocument.createComment(text)
 
   override def toString(node: Node): String = node match
     case comment: org.w3c.dom.Comment => s"<!--${comment.getTextContent}-->"
@@ -81,7 +88,7 @@ object Dom extends Xml:
       if namespace.isDefault then attributes.getAttribute(name)
       else attributes.getAttributeNS(namespace.getUri.orNull, name)
     )
-    
+
   override def getAttributes(attributes: Attributes): Attribute.StringValues =
     val result = for attribute <- listAttributes(attributes, isXmlns = false) yield
       Attribute(
@@ -103,7 +110,7 @@ object Dom extends Xml:
       attribute <- for index: Int <- 0 until list.getLength yield list.item(index).asInstanceOf[org.w3c.dom.Attr]
       if (attribute.getNamespaceURI == Namespace.Xmlns.uri) == isXmlns
     yield attribute
-    
+
   override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace

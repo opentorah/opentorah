@@ -4,6 +4,8 @@ import org.opentorah.fop.FopPlugin
 import org.opentorah.util.{BuildContext, Distribution, Strings}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
+// Note: yes, all the PDF-only fields look weird in the Site configuration;
+// they also look weird in the non-PDF formats - but I do not see a clean way to clean this up.
 final class MathConfiguration(
   val jEuclidEnabled     : Option[Boolean],
   val mathJaxEnabled     : Option[Boolean],
@@ -32,6 +34,11 @@ final class MathConfiguration(
 
   val starts: Seq[String] = (texDelimiters ++ texInlineDelimiters ++ asciiMathDelimiters).map(_.start)
   if starts.toSet.size != starts.size then throw IllegalArgumentException(s"Duplicate start delimiters")
+
+  def isEmpty: Boolean =
+    jEuclidEnabled.isEmpty && mathJaxEnabled.isEmpty && nodeVersion.isEmpty && useMathJaxV3.isEmpty &&
+    font.isEmpty && mathJaxExtensions.isEmpty && texExtensions.isEmpty && processEscapes.isEmpty &&
+    texDelimiters.isEmpty && texInlineDelimiters.isEmpty && asciiMathDelimiters.isEmpty
 
   def orElse(other: MathConfiguration): MathConfiguration = MathConfiguration(
     jEuclidEnabled      = this.jEuclidEnabled     .orElse(other.jEuclidEnabled      ),

@@ -1,36 +1,29 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.metadata.{HasName, HasValues, Language, Named, Names, Numbered}
+import org.opentorah.metadata.{HasName, HasValues, Language, Named, Names}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
-trait Calendar extends Times:
+trait Calendar extends Times, Epoch:
 
-  // days before the start of the calendar
-  def epoch: Int
-
-  // hours offset; for example:
-  //  Jewish:   6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0  1  2  3  4  5  6
-  //  Roman :  |0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23| 0
-  def epochHours: Int
+  // Note: YearBase, MonthBase and DayBase used to require their number to be positive;
+  // because Roman years can be negative for years after Creation, YearBase can not;
+  // because of the need to calculate Julian Date, neither can MonthBase and DayBase.
 
   type YearCharacter
 
-  abstract class YearBase(final override val number: Int) extends Numbered[Year], Language.ToString derives CanEqual:
+  abstract class YearBase(final override val number: Int) extends
+    Numbered[Year],
+    Language.ToString
+    derives CanEqual:
     this: Year =>
+
+    final override def companion: Numbered.Companion[Year] = Year
 
     def character: YearCharacter
 
     final def isLeap: Boolean = Year.isLeap(number)
-
-    final def next: Year = this + 1
-
-    final def prev: Year = this - 1
-
-    final def +(change: Int): Year = Year(number + change)
-
-    final def -(change: Int): Year = Year(number - change)
 
     final def firstDay: Day = firstMonth.firstDay
 
@@ -75,17 +68,15 @@ trait Calendar extends Times:
 
   type Year <: YearBase
 
-  protected def areYearsPositive: Boolean
-
   final val cacheYears: Boolean = true
 
-  trait YearCompanion:
-    private final val yearsCache: Cache[Int, Year] = new Cache[Int, Year]:
-      override def calculate(number: Int): Year = newYear(number)
-
-    final def apply(number: Int): Year =
+  trait YearCompanion extends Numbered.Companion[Year]:
+    final override def apply(number: Int): Year =
       yearsCache.get(number, cacheYears)
 
+    private final val yearsCache: Cache[Int, Year] = (number: Int) => newYear(number)
+
+    // Note: actual constructor - for when apply() gets a cache miss
     protected def newYear(number: Int): Year
 
     // lazy to make initialization work
@@ -122,21 +113,13 @@ trait Calendar extends Times:
   open class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered[Month] derives CanEqual:
     this: Month =>
 
-    protected var yearOpt: Option[Year] = yearOption
+    final override def companion: Numbered.Companion[Month] = Month
 
-    require(0 < number)
+    protected var yearOpt: Option[Year] = yearOption
 
     final def year: Year =
       if yearOpt.isEmpty then yearOpt = Some(Year(Month.yearNumber(number)))
       yearOpt.get
-
-    final def next: Month = this + 1
-
-    final def prev: Month = this - 1
-
-    final def +(change: Int): Month = Month(number + change)
-
-    final def -(change: Int): Month = Month(number - change)
 
     final def numberInYear: Int = Month.numberInYear(number)
 
@@ -161,8 +144,9 @@ trait Calendar extends Times:
   type Month <: MonthBase
 
   // TODO toString once all deriveds are enums - but making them such breaks Scala 3 compiler!!!
-  open class MonthNameBase(nameOverride: Option[String])
-    extends Named.ByLoader[MonthName](loader = Month, nameOverride), HasName.NonEnum
+  open class MonthNameBase(nameOverride: Option[String]) extends
+    Named.ByLoader[MonthName](loader = Month, nameOverride),
+    HasName.NonEnum
 
   type MonthName <: MonthNameBase
 
@@ -174,12 +158,16 @@ trait Calendar extends Times:
 
   final class MonthAndDay(val monthName: Month.Name, val numberInMonth: Int)
 
-  abstract class MonthCompanion(resourceName: String)
-    extends Names.Loader[MonthName](resourceNameOverride = Some(resourceName)),
-      HasValues.FindByDefaultName[MonthName], HasValues.FindByName[MonthName]:
+  abstract class MonthCompanion(resourceName: String) extends
+    Names.Loader[MonthName](resourceNameOverride = Some(resourceName)),
+    HasValues.FindByDefaultName[MonthName],
+    HasValues.FindByName[MonthName],
+    Numbered.Companion[Month]:
+
     final type Name = MonthName
 
-    final def apply(number: Int): Month = apply(None, number)
+    final override def apply(number: Int): Month = apply(None, number)
+
     private[opentorah] def apply(yearOpt: Option[Year], number: Int): Month
 
     private[Calendar] def yearNumber(monthNumber: Int): Int
@@ -196,19 +184,22 @@ trait Calendar extends Times:
 
   protected def createMonthCompanion: MonthCompanionType
 
-  open class DayBase(monthOption: Option[Month], final override val number: Int) extends Numbered[Day], Language.ToString derives CanEqual:
+  open class DayBase(monthOption: Option[Month], final override val number: Int) extends
+    Numbered[Day],
+    Language.ToString
+    derives CanEqual:
     this: Day =>
 
-    protected var monthOpt: Option[Month] = monthOption
+    final override def companion: Numbered.Companion[Day] = Day
 
-    require(0 < number)
+    protected var monthOpt: Option[Month] = monthOption
 
     final def calendar: Calendar = Calendar.this
 
     final def month: Month =
       if monthOpt.isEmpty then monthOpt = Some {
-        // TODO remove magic constant
-        var year: Year = Year(scala.math.max(if areYearsPositive then 1 else 0, (4 * number / (4 * 365 + 1)) - 1))
+        // TODO remove magic constant 4
+        var year: Year = Year((4 * number / (4 * Calendar.fullDaysInSolarYear + 1)) - 1)
         require(year.firstDayNumber <= number)
 
         while year.next.firstDayNumber <= number do year = year.next
@@ -217,14 +208,6 @@ trait Calendar extends Times:
       }
 
       monthOpt.get
-
-    final def next: Day = this + 1
-
-    final def prev: Day = this - 1
-
-    final def +(change: Int): Day = Day(number + change)
-
-    final def -(change: Int): Day = Day(number - change)
 
     final def -(that: Day): Int = this.number - that.number
 
@@ -236,9 +219,9 @@ trait Calendar extends Times:
 
     final def numberInWeek: Int = Day.numberInWeek(number)
 
-    final def to(calendar: Calendar): calendar.Day =
-      if this.calendar eq calendar then this.asInstanceOf[calendar.Day]
-      else calendar.Day(number + epoch - calendar.epoch)
+    final def to(calendar: Calendar): calendar.Day = if this.calendar eq calendar
+      then this.asInstanceOf[calendar.Day]
+      else calendar.Day(number + epochDifference(calendar))
 
     final def name: Week.Day = Week.Day.forNumber(numberInWeek)
 
@@ -247,10 +230,10 @@ trait Calendar extends Times:
     final def monthAndDay: MonthAndDay = MonthAndDay(month.name, numberInMonth)
 
     @scala.annotation.tailrec
-    final def next(dayName: Week.Day): Day = if is(dayName) then this else this.next.next(dayName)
+    final def nextDay(dayName: Week.Day): Day = if is(dayName) then this else this.next.nextDay(dayName)
 
     @scala.annotation.tailrec
-    final def prev(dayName: Week.Day): Day = if is(dayName) then this else this.prev.prev(dayName)
+    final def prevDay(dayName: Week.Day): Day = if is(dayName) then this else this.prev.prevDay(dayName)
 
     // Note: Day numbering starts at 1; that is why 1 is subtracted here and added MomentBase.dayNumber:
     final def toMoment: Moment = Moment().days(number - 1)
@@ -264,8 +247,8 @@ trait Calendar extends Times:
 
   type Day <: DayBase
 
-  final class DayCompanion:
-    def apply(number: Int): Day = newDay(None, number)
+  final class DayCompanion extends Numbered.Companion[Day]:
+    override def apply(number: Int): Day = newDay(None, number)
 
     private[Calendar] def witNumberInMonth(month: Month, numberInMonth: Int): Day =
       require (0 < numberInMonth && numberInMonth <= month.length)
@@ -274,7 +257,7 @@ trait Calendar extends Times:
     // Note: change of day because of the time offset is not taken into account,
     // so careful with things like molad announcements...
     def numberInWeek(dayNumber: Int): Int =
-      ((dayNumber - 1) + (Jewish.epochDayNumberInWeek - 1) + epoch - Jewish.epoch) % Week.length + 1
+      ((dayNumber - 1) + (Jewish.epochDayNumberInWeek - 1) + epochDifference(Jewish)) % Week.length + 1
 
   final val Day: DayCompanion = new DayCompanion
 
@@ -290,16 +273,16 @@ trait Calendar extends Times:
     // Note: Day numbering starts at 1; that is why 1 is added here and subtracted in DayBase.toMoment:
     final def dayNumber: Int = days + 1
 
-    def to(calendar: Calendar): calendar.Moment = if this.calendar eq calendar then this.asInstanceOf[calendar.Moment] else
-      // TODO this looks like Digits addition with carry, and should be implemented that way...
-      val toHours: Int = hours + epochHours - calendar.epochHours
+    final def to(calendar: Calendar): calendar.Moment = if this.calendar eq calendar
+      then this.asInstanceOf[calendar.Moment]
+      else calendar.Moment.fromDigits(toEpoch(calendar))
 
-      val (newDay, newHours) =
-        if hours < 0                 then (day.prev, toHours + Times.hoursPerDay) else
-        if hours > Times.hoursPerDay then (day.next, toHours - Times.hoursPerDay) else
-                                          (day     , toHours                    )
+    final def toJulianDay: Double = convertTo[Double](getDigits(toEpoch(Epoch.JulianDay)))
 
-      newDay.to(calendar).toMoment.hours(newHours).parts(parts)
+    private def toEpoch(epoch: Epoch): Digits = add(Seq(
+      epochDifference(epoch),
+      epochHoursDifference(epoch)
+    ))
 
     final override def toLanguageString(using spec: Language.Spec): String =
       day.toLanguageString +
@@ -326,10 +309,12 @@ trait Calendar extends Times:
   final override protected def createPointCompanion: PointCompanionType = new MomentCompanion
 
   final def Moment: MomentCompanion = Point
-  
+
   final type TimeVector = Vector
-  
+
   final def TimeVector: VectorCompanion = Vector
 
   def intToString(number: Int)(using spec: Language.Spec): String
 
+object Calendar:
+  final val fullDaysInSolarYear: Int = 365

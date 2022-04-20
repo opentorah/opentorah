@@ -2,14 +2,13 @@ package org.opentorah.docbook
 
 import org.opentorah.html.{SiteHtml, Html as XHtml}
 import org.opentorah.math.MathConfiguration
-import org.opentorah.xml.{PrettyPrinter, Resolver}
+import org.opentorah.xml.{PrettyPrinter, ScalaXml}
 import java.io.File
 
 trait DirectFormat extends Format:
 
   def process(
-    resolver: Resolver,
-    inputFile: File,
+    xml: ScalaXml.Element,
     parameters: Parameters,
     math: MathConfiguration,
     siteHtml: SiteHtml,

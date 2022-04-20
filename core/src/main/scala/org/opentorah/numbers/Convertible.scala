@@ -5,6 +5,7 @@ package org.opentorah.numbers
   *
   * @tparam T  type of the number to convert to/from
   */
+// TODO rename
 trait Convertible[T]:
   def signum(value: T): Int
   def abs(value: T): T
@@ -31,6 +32,6 @@ object Convertible:
     override def mult(value: Double, n: Int): Double = value * n
     override def div(digit: Int, denominator: BigInt): Double = digit.toDouble/denominator.bigInteger.longValueExact
     override def round(value: Double): Int = math.round(value).toInt
-    override def wholeAndFraction(value: Double): (Int, Double) = 
-      val whole = math.floor(value).toInt
+    override def wholeAndFraction(value: Double): (Int, Double) =
+      val whole: Int = math.floor(value).toInt
       (whole, value - whole)

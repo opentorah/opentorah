@@ -1,5 +1,6 @@
 package org.opentorah.metadata
 
+// TODO move into util?
 trait Numbered[T] extends Ordered[Numbered[T]]:
   def number: Int
 

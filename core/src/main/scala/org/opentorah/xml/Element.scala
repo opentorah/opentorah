@@ -18,6 +18,7 @@ abstract class Element[A](val elementName: String) extends Elements[A]:
 
   final override protected def elementByValue(value: A): Element[?] = this
 
+  // TODO allow declaring this element's namespace...
   final override def xmlElement(value: A): ScalaXml.Element =
     ScalaXml.setAttributes(
       attributes = contentParsable.unparser.attributes(value),
@@ -44,14 +45,14 @@ object Element:
   final class Nodes(val xml: Xml)(val nodes: xml.Nodes) {
     // TODO: if xml != ScalaXml, this will fail *at run-time*...
     def scalaXml: ScalaXml.Nodes = nodes.asInstanceOf[ScalaXml.Nodes]
-    
+
     override def toString: String = xml.toString(nodes)
   }
 
   val nodes: Parsable[Nodes] = new Parsable[Nodes]:
     override protected def parser: Parser[Nodes] = Parsing.allNodes
     override def unparser: Unparser[Nodes] = Unparser[Nodes](content = _.scalaXml)
-    
+
   final class FromUrl(
     val url: URL,
     val inline: Boolean
