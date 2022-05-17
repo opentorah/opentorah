@@ -90,7 +90,7 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
       // to display 0 as empty string :)      require(number > 0)
       require(number <= 10000)
 
-      val result: StringBuilder = new StringBuilder
+      val result: scala.collection.mutable.StringBuilder = new scala.collection.mutable.StringBuilder
       var remainder: Int = number
 
       def step(condition: Int => Boolean, append: Int => String, modify: Int => Int): Unit =

@@ -21,3 +21,7 @@ subprojects {
   group = 'org.opentorah'
   version = projectVersion
 }
+
+tasks.named('wrapper') {
+  distributionType = Wrapper.DistributionType.ALL
+}

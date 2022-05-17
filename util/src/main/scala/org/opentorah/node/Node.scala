@@ -1,4 +1,4 @@
-package org.opentorah.math
+package org.opentorah.node
 
 import org.opentorah.platform.{Exec, Os}
 import org.slf4j.{Logger, LoggerFactory}

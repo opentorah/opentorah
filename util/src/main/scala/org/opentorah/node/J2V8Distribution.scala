@@ -1,7 +1,7 @@
-package org.opentorah.math
+package org.opentorah.node
 
-import org.opentorah.platform.{Architecture, Os}
 import org.opentorah.build.Distribution
+import org.opentorah.platform.{Architecture, Os}
 import java.io.File
 
 final class J2V8Distribution(version: String) extends Distribution[J2V8](version):

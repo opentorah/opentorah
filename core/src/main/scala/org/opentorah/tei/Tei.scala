@@ -7,7 +7,7 @@ import org.opentorah.html.{A, ToHtml}
 import org.opentorah.metadata.Language
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, ScalaXml, Unparser}
-import zio.URIO
+import zio.{URIO, ZIO}
 import java.net.URI
 
 final class Tei(
@@ -79,7 +79,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
         val ref: Option[String] = EntityName.refAttribute.get(ScalaXml)(element)
 
         if ref.isEmpty then succeed(A.empty(children)) else
-          URIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get)).map(_.
+          ZIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get)).map(_.
             getOrElse(A(ref.toSeq))
             (children)
           ).map(noTooltip)
@@ -96,7 +96,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
       case Pb.elementName =>
         require(ScalaXml.isEmpty(children), element)
         val pageId: String = Pb.pageId(Pb.nAttribute.get(ScalaXml)(element))
-        URIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
+        ZIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
           .getOrElse(A(Seq(pageId)))
           .setId(pageId)
           (text = facsimileSymbol)
@@ -119,10 +119,10 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
         succeed(<td colspan={colsAttribute.get(ScalaXml)(element).orNull}>{children}</td>)
 
       case "date" =>
-        URIO.succeed((element, dateTooltip(element)))
+        ZIO.succeed((element, dateTooltip(element)))
 
       case "gap" =>
-        URIO.succeed((element, gapTooltip(element)))
+        ZIO.succeed((element, gapTooltip(element)))
 
       case _ =>
         succeed(element)
@@ -131,8 +131,8 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
     val uri: URI = URI(targetAttribute.get(ScalaXml)(element))
 
     // TODO maybe just call up regardless?
-    if uri.isAbsolute then URIO.succeed(A(uri))
-    else URIO.environmentWithZIO[LinksResolver](_.get.resolve(Files.splitUrl(uri.getPath))).map(_
+    if uri.isAbsolute then ZIO.succeed(A(uri))
+    else ZIO.environmentWithZIO[LinksResolver](_.get.resolve(Files.splitUrl(uri.getPath))).map(_
       .map(a => Option(uri.getFragment).fold(a)(a.setFragment))
       .getOrElse(A(uri))
     )

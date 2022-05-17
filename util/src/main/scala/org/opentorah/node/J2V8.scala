@@ -1,4 +1,4 @@
-package org.opentorah.math
+package org.opentorah.node
 
 import com.eclipsesource.v8.V8
 import org.opentorah.util.Collections.mapValues

@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.site.Markdown
 import org.opentorah.store.{By, Context, Directory, Path, Viewer}
 import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
-import zio.UIO
+import zio.{UIO, ZIO}
 import java.net.URL
 
 final class Notes(
@@ -20,7 +20,7 @@ final class Notes(
   By.WithSelector[Note](selectorName),
   Viewer.Default:
 
-  override protected def loadFile(url: URL): UIO[Markdown] = UIO.succeed(Markdown(url))
+  override protected def loadFile(url: URL): UIO[Markdown] = ZIO.succeed(Markdown(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)

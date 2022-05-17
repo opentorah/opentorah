@@ -24,7 +24,7 @@ object From:
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
     // Note: if xml != this.xml, this will fail *at run-time*:
-    override def load: Effects.IO[xml.Element] = zio.IO.succeed(element)
+    override def load: Effects.IO[xml.Element] = zio.ZIO.succeed(element)
 
   def scalaXml(name: String, elem: ScalaXml.Element): From = xml(ScalaXml)(name, elem)
   def xml(xml: Xml)(name: String, elem: xml.Element): From = FromXml(xml)(name, elem)

@@ -39,8 +39,8 @@ object Strings:
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
 
-  def sbToString(f: StringBuilder => Unit): String =
-    val sb = new StringBuilder
+  def sbToString(f: scala.collection.mutable.StringBuilder => Unit): String =
+    val sb = new scala.collection.mutable.StringBuilder
     f(sb)
     sb.toString
 
@@ -58,7 +58,7 @@ object Strings:
   private val hexDigits: Array[Char] = "0123456789abcdef".toCharArray
 
   def bytes2hex(bytes: Seq[Byte]): String =
-    val sb: StringBuilder = StringBuilder(2 * bytes.length)
+    val sb: scala.collection.mutable.StringBuilder = scala.collection.mutable.StringBuilder(2 * bytes.length)
     for b: Byte <- bytes do sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
     sb.toString
 

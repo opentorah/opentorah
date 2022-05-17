@@ -1,7 +1,7 @@
 package org.opentorah.html
 
 import org.opentorah.xml.ScalaXml
-import zio.{URIO, ZLayer}
+import zio.{URIO, ZIO, ZLayer}
 
 class Footnotes:
   private var nextIdNumber: Int = 1
@@ -17,9 +17,9 @@ class Footnotes:
   def isEmpty: Boolean = footnotes.isEmpty
 
   // There may be multiple levels of footnotes, so emptying the head of the stack is separate from popping it.
-  def push: Unit = footnotes = Seq.empty +: footnotes
+  def push(): Unit = footnotes = Seq.empty +: footnotes
 
-  def pop: Unit = footnotes = footnotes.tail
+  def pop(): Unit = footnotes = footnotes.tail
 
   def getNextNumber: Int = footnotes.head.length + 1
 
@@ -35,12 +35,12 @@ class Footnotes:
 // TODO add nested section ids
 // TODO use ZIO.service()
 object Footnotes:
-  def takeNextIdNumber: URIO[Footnotes, Int] = URIO.environmentWith(_.get.takeNextIdNumber)
-  def isEmpty: URIO[Footnotes, Boolean] = URIO.environmentWith(_.get.isEmpty)
-  def push: URIO[Footnotes, Unit] = URIO.environmentWith(_.get.push)
-  def pop: URIO[Footnotes, Unit] = URIO.environmentWith(_.get.pop)
-  def getNextNumber: URIO[Footnotes, Int] = URIO.environmentWith(_.get.getNextNumber)
-  def add(footnote: ScalaXml.Element): URIO[Footnotes, Unit] = URIO.environmentWith(_.get.add(footnote))
-  def get: URIO[Footnotes, Seq[ScalaXml.Element]] = URIO.environmentWith(_.get.get)
+  def takeNextIdNumber: URIO[Footnotes, Int] = ZIO.environmentWith(_.get.takeNextIdNumber)
+  def isEmpty: URIO[Footnotes, Boolean] = ZIO.environmentWith(_.get.isEmpty)
+  def push: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.push())
+  def pop: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.pop())
+  def getNextNumber: URIO[Footnotes, Int] = ZIO.environmentWith(_.get.getNextNumber)
+  def add(footnote: ScalaXml.Element): URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.add(footnote))
+  def get: URIO[Footnotes, Seq[ScalaXml.Element]] = ZIO.environmentWith(_.get.get)
 
   def empty: ZLayer[Any, Nothing, Footnotes] = ZLayer.succeed(new Footnotes)

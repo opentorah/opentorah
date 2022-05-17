@@ -4,7 +4,7 @@ import org.opentorah.html.A
 import org.opentorah.xml.{From, Parser, Parsing, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import zio.{UIO, URIO, ZLayer}
+import zio.{UIO, URIO, ZIO, ZLayer}
 
 final class TeiTest extends AnyFlatSpec, Matchers:
 
@@ -30,9 +30,9 @@ final class TeiTest extends AnyFlatSpec, Matchers:
   private def tei2html(element: ScalaXml.Element): ScalaXml.Element =
     //    println(Xhtml.prettyPrinter.render(element))
     val resolver: LinksResolver = new LinksResolver:
-      override def resolve(path: Seq[String]): UIO[Option[A]] = URIO.none
-      override def findByRef(ref:  String): UIO[Option[A]] = URIO.none
-      override def facs(pageId: String): UIO[Option[A]] = UIO.some(A(Seq("facsimiles"))
+      override def resolve(path: Seq[String]): UIO[Option[A]] = ZIO.none
+      override def findByRef(ref:  String): UIO[Option[A]] = ZIO.none
+      override def facs(pageId: String): UIO[Option[A]] = ZIO.some(A(Seq("facsimiles"))
         .setFragment(pageId)
         .setTarget("facsViewer")
       )

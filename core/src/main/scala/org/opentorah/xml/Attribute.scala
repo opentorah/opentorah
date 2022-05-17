@@ -11,7 +11,7 @@ abstract class Attribute[T](
 )(using CanEqual[T, T]) derives CanEqual:
   require((name != null) && !name.contains(":"))
   require(name.nonEmpty || (namespace == Namespace.Xmlns))
-  
+
   final override def equals(other: Any): Boolean =
     val that: Attribute[T] = other.asInstanceOf[Attribute[T]]
     (name == that.name) && (namespace.getUri == that.namespace.getUri)
@@ -104,7 +104,7 @@ object Attribute:
   ) extends Attribute[String](name, namespace, default):
     final override def fromString(value: String): String = value
 
-    final override def parseFromString(value: String): Effects.IO[String] = zio.IO.succeed(value)
+    final override def parseFromString(value: String): Effects.IO[String] = zio.ZIO.succeed(value)
 
   def apply(
     name: String,
@@ -147,4 +147,3 @@ object Attribute:
     default: Float = 0.0f
   ) extends Attribute[Float](name, namespace, default):
     final override def fromString(value: String): Float = value.toFloat
-

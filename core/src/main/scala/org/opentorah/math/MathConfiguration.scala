@@ -2,6 +2,7 @@ package org.opentorah.math
 
 import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.fop.FopPlugin
+import org.opentorah.node.{J2V8Distribution, Node, NodeDistribution}
 import org.opentorah.util.Strings
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 

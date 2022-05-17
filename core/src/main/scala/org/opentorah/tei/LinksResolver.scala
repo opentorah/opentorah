@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.html.A
-import zio.UIO
+import zio.{UIO, ZIO}
 
 trait LinksResolver:
   def resolve(path: Seq[String]): UIO[Option[A]]
@@ -12,6 +12,6 @@ trait LinksResolver:
 
 object LinksResolver:
   val empty: LinksResolver = new LinksResolver:
-    override def resolve(path:  Seq[String]): UIO[Option[A]] = UIO.none
-    override def findByRef(ref: String): UIO[Option[A]] = UIO.none
-    override def facs(pageId: String): UIO[Option[A]] = UIO.none
+    override def resolve(path:  Seq[String]): UIO[Option[A]] = ZIO.none
+    override def findByRef(ref: String): UIO[Option[A]] = ZIO.none
+    override def facs(pageId: String): UIO[Option[A]] = ZIO.none

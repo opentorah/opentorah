@@ -18,7 +18,7 @@ object FopFonts:
   def list(configurationFile: File): String =
     val fontFamilies: SortedMap[String, List[FontSpec]] = getFamilies(configurationFile)
 
-    val result: StringBuilder = new StringBuilder
+    val result: scala.collection.mutable.StringBuilder = new scala.collection.mutable.StringBuilder
 
     for (firstFamilyName: String, fontSpecs: List[FontSpec]) <- fontFamilies do
       result.append(s"$firstFamilyName:\n")

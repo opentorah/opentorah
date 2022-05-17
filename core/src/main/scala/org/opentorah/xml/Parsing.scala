@@ -44,7 +44,7 @@ final class Parsing private:
   private def modifyCurrent[A](newCurrent: Current): Unit =
     stack = newCurrent :: stack.tail
 
-  private def checkEmpty: Unit =
+  private def checkEmpty(): Unit =
     if stack.nonEmpty then throw IllegalStateException(s"Non-empty $this!")
 
   private def checkNoLeftovers: Effects.IO[Unit] =
@@ -214,7 +214,7 @@ private[xml] object Parsing:
 
   def takeCharacters: Parser[Option[String]] = accessZIO(_.takeCharacters)
 
-  def checkEmpty: Parser[Unit] = access(_.checkEmpty)
+  def checkEmpty: Parser[Unit] = access(_.checkEmpty())
 
   private def access[T](f: Parsing => T): Parser[T] = ZIO.service[Parsing].map(f)
 

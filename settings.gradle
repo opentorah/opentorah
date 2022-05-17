@@ -15,14 +15,15 @@ pluginManagement {
   }
 }
 
-final String scalaVersion      = '3.1.3-RC2'
+final String scalaVersion      = '3.1.3-RC5'
 final String scalaVersionMajor = '3'
+
+final String zioVersion        = '2.0.0-RC6'
+final String zhttpVersion      = '2.0.0-RC9'
+final String zioPreludeVersion = '1.0.0-RC13'
+
 final String flexmarkVersion   = '0.64.0'
 final String batikVersion      = '1.14'
-
-final String zioVersion        = '2.0.0-RC5' // TODO -RC6
-final String zhttpVersion      = '2.0.0-RC7'
-final String zioPreludeVersion = '1.0.0-RC10'// TODO: '1.0.0-RC13'
 
 dependencyResolutionManagement {
   repositories {
@@ -40,21 +41,10 @@ dependencyResolutionManagement {
     // Scala
     library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
     library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.1.0")
+    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.7.0-M2')
 
     // GraalVM
     library('graalvm-sdk'  , 'org.graalvm:graal-sdk:22.0.0.2')
-
-    // Zinc brings in log4j:
-    // 1.3.5-1.5.7 - 2.11.2
-    // 1.5.8       - 2.15.0
-    // 1.5.9       - 2.16.0
-    // 1.6.0       - 2.17.0
-    // Because of the log4j vulnerability, Gradle plugin publishing plugin rejects log4j before 2.17.0
-    // (it doesn't care that this is just a zinc configuration dependency...).
-    // Gradle doesn't yet support Zinc later than 1.3.5
-    // (also, current latest Zinc - 1.6.0 - uses log4j 1.17.0 which it still doesn't like),
-    // so I am forcing log4j version with constraint in configure.gradle...
-    library('zinc'         , "org.scala-sbt:zinc_2.12:1.3.5")
 
     // XML
     library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.3.0')
@@ -66,7 +56,7 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.6.1')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.8.0')
 
     // TODO drop support for JEuclid
     library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
@@ -94,7 +84,7 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.0')
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.1')
 
     // FOP
     library('fop-core'        , 'org.apache.xmlgraphics:fop:2.7')
@@ -106,12 +96,12 @@ dependencyResolutionManagement {
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
     // PDF Generation
-    library('playwright', 'com.microsoft.playwright:playwright:1.21.0')
+    library('playwright', 'com.microsoft.playwright:playwright:1.22.0')
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:1.7.36')
     library('logback' , 'ch.qos.logback:logback-classic:1.2.11')
-    library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.1.1')
+    library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.2')
 
     // Flexmark
     library('flexmark-core'           , "com.vladsch.flexmark:flexmark:$flexmarkVersion")
