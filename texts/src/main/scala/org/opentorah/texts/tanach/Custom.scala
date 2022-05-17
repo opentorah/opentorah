@@ -87,8 +87,10 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
     final def map[R](f: T => R, full: Boolean = true): Of[R] =
       new Of[R](Collections.mapValues(customs)(f), full = full)
 
+    @scala.annotation.targetName("append")
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs, full = false)
 
+    @scala.annotation.targetName("multiply")
     final def *(other: Of[T]): Of[(T, Option[T])] =
       liftL[T, (T, Option[T])](other, (_: Custom, a /*: T*/, b: Option[T]) => (a, b))
 
@@ -121,7 +123,7 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
       // start with maximized representation: all Customs other than Common present;
       val result: Customs[T] =
         byLevelDescending.foldLeft(customs)((customs: Customs[T], custom: Custom) =>
-          if custom.children.isEmpty then customs else 
+          if custom.children.isEmpty then customs else
             customs.get(custom).fold(customs)(value =>
               customs -- custom.children.filter(customs(_) == value)
             )
@@ -132,7 +134,7 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
         if values.size != 1 then None else Some(values.head)
 
       commonValue.fold[Customs[T]](result)(commonValue => Map(Common -> commonValue))
-  
+
   def parse(names: String): Set[Custom] =
     val result: Seq[Custom] = names.split(',').toIndexedSeq.map(_.trim).map(getForName)
     Collections.checkNoDuplicates(result, "customs")

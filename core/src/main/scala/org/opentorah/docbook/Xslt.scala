@@ -40,7 +40,7 @@ object Xslt:
     override def uri: String = "https://cdn.docbook.org/release/latest/xslt"
     override def groupId: String = "org.docbook"
     override def artifactId: String = "docbook-xslt2"
-    override def classifier = None
-    override def extension = Some("jar")
+    override def classifier: Option[String] = None
+    override def extension: Option[String] = Some("jar")
     override def archiveSubdirectoryPath: Seq[String] = Seq("xslt", "base")
     override def usesSaxon6: Boolean = false

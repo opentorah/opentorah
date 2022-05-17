@@ -1,6 +1,6 @@
 package org.opentorah.build
 
-import org.gradle.api.{Project, Task}
+import org.gradle.api.Project
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.file.CopySpec
@@ -8,6 +8,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.process.JavaExecSpec
 import org.slf4j.Logger
 import java.io.File
+import Gradle.getMainSourceSet
 import scala.jdk.CollectionConverters.*
 
 final class GradleBuildContext(project: Project) extends BuildContext:
@@ -77,9 +78,7 @@ final class GradleBuildContext(project: Project) extends BuildContext:
     )
 
   override def javaexec(mainClass: String, args: String*): Unit =
-    val mainSourceSet: SourceSet = GradleBuildContext.mainSourceSet(project).getOrElse(
-      throw IllegalAccessException(s"No Java plugin in the project")
-    )
+    val mainSourceSet: SourceSet = project.getMainSourceSet
     getLogger.info(s"Running $mainClass(${args.mkString(", ")})")
 
     project.javaexec((exec: JavaExecSpec) =>
@@ -88,20 +87,3 @@ final class GradleBuildContext(project: Project) extends BuildContext:
       exec.args(args*)
       ()
     )
-
-object GradleBuildContext:
-  def getClassesTask(project: Project): Option[Task] =
-    mainSourceSet(project).flatMap(mainSourceSet => getTask(project, mainSourceSet.getClassesTaskName))
-
-  private def getTask(project: Project, name: String): Option[Task] = Option(project.getTasks.findByName(name))
-
-  // TODO switch DocBook to use getMainSourceSet()
-  private def mainSourceSet(project: Project): Option[SourceSet] =
-    Option(project.getConvention.findPlugin(classOf[org.gradle.api.plugins.JavaPluginConvention]))
-      .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
-
-  def getMainSourceSet(project: Project): SourceSet = project
-    .getExtensions
-    .getByType(classOf[org.gradle.api.plugins.JavaPluginExtension])
-    .getSourceSets
-    .getByName(SourceSet.MAIN_SOURCE_SET_NAME)

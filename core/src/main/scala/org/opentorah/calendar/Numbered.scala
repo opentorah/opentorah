@@ -3,8 +3,10 @@ package org.opentorah.calendar
 trait Numbered[T] extends org.opentorah.metadata.Numbered[T]:
   def companion: Numbered.Companion[T]
 
+  @scala.annotation.targetName("add")
   final def +(change: Int): T = companion(number + change)
 
+  @scala.annotation.targetName("subtract")
   final def -(change: Int): T = companion(number - change)
 
   final def next: T = this + 1

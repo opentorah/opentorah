@@ -8,8 +8,10 @@ trait WithBookSpans[Book <: TanachBook]:
   open class Spans(val spans: Seq[BookSpan]):
     final def length: Int = spans.length
 
+    @scala.annotation.targetName("append")
     final def ++(that: Many): Many = apply(spans ++ that.spans)
 
+    @scala.annotation.targetName("append")
     final def :+(that: BookSpan): Many = apply(spans :+ that)
 
     def from(source: Named): Many = apply(spans.map(_.from(source)))
@@ -33,6 +35,7 @@ trait WithBookSpans[Book <: TanachBook]:
     override def toLanguageString(using spec: Language.Spec): String =
       book.toLanguageString + " " + span.toLanguageString
 
+    @scala.annotation.targetName("add")
     def +(next: BookSpan): BookSpan = merge(Seq(this, next))
 
     def from(source: Named): BookSpan = BookSpan(book, span, Some(source))

@@ -40,6 +40,7 @@ final class PrettyPrinter(
     preformattedElements
   )
 
+  @scala.annotation.targetName("add")
   def +(other: PrettyPrinter): PrettyPrinter = copy(
     doNotStackElements = doNotStackElements ++ other.doNotStackElements,
     alwaysStackElements = alwaysStackElements ++ other.alwaysStackElements,

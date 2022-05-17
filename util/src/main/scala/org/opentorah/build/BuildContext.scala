@@ -1,6 +1,5 @@
 package org.opentorah.build
 
-import org.gradle.api.Project
 import org.opentorah.util.Logging
 import org.slf4j.Logger
 import java.io.File
@@ -26,9 +25,7 @@ trait BuildContext:
   def javaexec(mainClass: String, args: String*): Unit
 
 object BuildContext:
-
-  def forGradleProject(project: Project): BuildContext = GradleBuildContext(project)
-
+  
   def default(logger: Logger): BuildContext =
     val home: Option[String] = Option(System.getenv("HOME"))
     val frameworksDir: File = File(home.map(_ + "/.gradle").getOrElse("/tmp"))

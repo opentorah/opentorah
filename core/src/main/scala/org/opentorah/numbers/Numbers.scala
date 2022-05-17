@@ -113,9 +113,11 @@ trait Numbers:
     final def abs: N = companion.fromDigits(digits.map(math.abs))
 
     /** Returns this number with the sign inverted. */
+    @scala.annotation.targetName("uminus")
     final def unary_- : N = companion.fromDigits(digits.map(-_))
 
     /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
+    @scala.annotation.targetName("subtract")
     final def -(that: N): Vector = Vector.fromDigits(subtract(that))
 
     /** Returns this number rounded to the digit described by the [[Digit]] descriptor `digit`. */
@@ -218,19 +220,24 @@ trait Numbers:
     final override def companion: VectorCompanionType = Vector
 
     /** Returns Vector resulting from adding specified Vector to this one. */
+    @scala.annotation.targetName("add")
     final def +(that: Vector): Vector = Vector.fromDigits(add(that))
 
     /** Returns Point resulting from adding specified Point to this Vector. */
+    @scala.annotation.targetName("add")
     final def +(that: Point): Point = Point.fromDigits(add(that))
 
     /** Returns this Vector multiplied by the specified Int. */
+    @scala.annotation.targetName("multiply")
     final def *(n: Int): Vector = Vector.fromDigits(digits map (_ * n))
 
     /** Returns this Vector divided by the specified Int with up to length digits after the point. */
+    @scala.annotation.targetName("divide")
     final def /(n: Int, length: Int): Vector = this.*(BigRational(n).invert, length)
 
     /** Returns this Vector multiplied by the specified [[org.opentorah.numbers.BigRational]]
       * with up to length digits after the point. */
+    @scala.annotation.targetName("multiply")
     final def *(that: BigRational, length: Int): Vector =
       Vector.fromRational(this.toRational*that, math.max(this.length, length))
 
@@ -251,9 +258,11 @@ trait Numbers:
     final override def companion: PointCompanionType = Point
 
     /** Returns Point resulting from adding specified Vector to this one. */
+    @scala.annotation.targetName("add")
     final def +(that: Vector): Point = Point.fromDigits(add(that))
 
     /** Returns Point resulting subtracting specified Vector to this one. */
+    @scala.annotation.targetName("subtract")
     final def -(that: Vector): Point = Point.fromDigits(subtract(that))
 
   open class PointCompanion extends NumberCompanion[Point]:

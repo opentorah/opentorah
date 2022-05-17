@@ -1,14 +1,15 @@
-package org.opentorah.math
+package org.opentorah.node
 
-import org.opentorah.platform.{Architecture, Os}
 import org.opentorah.build.{Distribution, Repository}
+import org.opentorah.platform.{Architecture, Os}
 import org.opentorah.util.Strings
 import java.io.File
 
 // Heavily inspired by (read: copied and reworked from :)) https://github.com/srs/gradle-node-plugin by srs.
 // That plugin is not used directly because its tasks are not reusable unless the plugin is applied to the project,
-// and I do not want to apply Node plugin to every project that uses DocBook.
+// and I do not want to apply Node plugin to every project that uses DocBook, for instance.
 // Also, I want to be able to run npm from within my code without creating tasks.
+// Also, I would like to be able to use Node available via GraalVM's polyglot support.
 // My simplified Node support is under 200 lines.
 
 // Describes Node distribution's packaging and structure.
@@ -42,6 +43,7 @@ final class NodeDistribution(version: String) extends Distribution[Node](version
     case Architecture.i686    => "x86"
     case Architecture.nacl    => "x86"
 
+  // TODO move into Distribution
   private val versionTokens: Array[String] = version.split('.')
   private val majorVersion: Int = versionTokens(0).toInt
   private val minorVersion: Int = versionTokens(1).toInt
@@ -55,7 +57,7 @@ final class NodeDistribution(version: String) extends Distribution[Node](version
 
   private def fixUpOsAndArch: Boolean = isWindows && !hasWindowsZip
   private val dependencyOsName: String = if fixUpOsAndArch then "linux" else osName
-  private val dependencyOsArch: String = if fixUpOsAndArch then "x86" else osArch
+  private val dependencyOsArch: String = if fixUpOsAndArch then "x86"   else osArch
 
   override protected def cacheDirectory: String = "nodejs"
   override protected def repository: Option[Repository] = Some(Repository(

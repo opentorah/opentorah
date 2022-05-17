@@ -2,6 +2,7 @@ package org.opentorah.math
 
 import com.eclipsesource.v8.*
 import com.eclipsesource.v8.utils.V8ObjectUtils
+import org.opentorah.node.{J2V8, Node}
 import java.io.File
 import scala.jdk.CollectionConverters.*
 

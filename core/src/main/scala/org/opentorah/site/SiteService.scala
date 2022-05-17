@@ -70,7 +70,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
 
   private def routes(siteUrl: String): HttpApp[zio.Clock, Throwable] =
     var cachedSite: Option[S] = None
-    def getSite: Task[S] = cachedSite.map(Task.succeed(_)).getOrElse(readSite(siteUrl).map(result =>
+    def getSite: Task[S] = cachedSite.map(ZIO.succeed(_)).getOrElse(readSite(siteUrl).map(result =>
       cachedSite = Some(result)
       result
     ))

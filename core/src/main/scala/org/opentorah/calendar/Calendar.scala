@@ -209,6 +209,7 @@ trait Calendar extends Times, Epoch:
 
       monthOpt.get
 
+    @scala.annotation.targetName("subtract")
     final def -(that: Day): Int = this.number - that.number
 
     final def year: Year = month.year

@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2022-04-20
+- update Gradle, Zinc, ZIO, ZHTTP and other dependencies;
+- minor ZIO cleanup;
+- minor code inspections cleanup;
+- ServiceApp cleanup;
+- re-added the `util` module;
+- `util` module cleanup;
+- Node support in the util module;
+- Gradle utility class with extension methods;
+
 ## [0.10.1] - 2022-04-20
 - FOP 2.7;
 - Saxon 11;

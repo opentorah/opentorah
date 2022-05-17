@@ -1,7 +1,7 @@
 package org.opentorah.html
 
 import org.opentorah.xml.{Attribute, Namespace, ScalaXml, Xml}
-import zio.URIO
+import zio.{URIO, ZIO}
 
 // Converting other XML dialects (e.g., TEI, DocBook) to HTML
 trait ToHtml[R]:
@@ -19,7 +19,7 @@ trait ToHtml[R]:
     (element, Seq.empty)
 
   protected final def succeed(element: ScalaXml.Element): URIO[R, (ScalaXml.Element, ScalaXml.Nodes)] =
-    URIO.succeed(noTooltip(element))
+    ZIO.succeed(noTooltip(element))
 
   final def toHtml(element: ScalaXml.Element): URIO[R, ScalaXml.Element] =
     processFootnotes(element).provideSomeLayer[R](Footnotes.empty).flatMap(elementsToHtml)
@@ -27,14 +27,14 @@ trait ToHtml[R]:
   private def processFootnotes(element: ScalaXml.Element): URIO[Footnotes & R, ScalaXml.Element] = for
     isEmpty: Boolean <- Footnotes.isEmpty
     doPush: Boolean = isEmpty || (isInNamespace(element) && isFootnotesContainer(element))
-    _ <- if !doPush then URIO.succeed(()) else Footnotes.push
+    _ <- if !doPush then ZIO.succeed(()) else Footnotes.push
     newElement: ScalaXml.Element <-
       if isInNamespace(element) && isFootnote(element)
       then processFootnote(element)
       else transformChildren(processFootnotes, element)
     result: ScalaXml.Element <-
       if !doPush
-      then URIO.succeed(newElement)
+      then ZIO.succeed(newElement)
       else processLevels(newElement, Seq.empty)
   yield result
 
@@ -68,14 +68,14 @@ trait ToHtml[R]:
           (for level <- levels yield <div xmlns={Html.namespace.uri} class="footnotes">{level}</div>)
         )
       else for
-        nextLevel: Seq[ScalaXml.Element] <- URIO.foreach(footnotes)(processFootnotes)
+        nextLevel: Seq[ScalaXml.Element] <- ZIO.foreach(footnotes)(processFootnotes)
         result <- processLevels(newElement, levels :+ nextLevel)
       yield result
   yield result
 
   private def elementsToHtml(oldElement: ScalaXml.Element): URIO[R, ScalaXml.Element] = for
     element: ScalaXml.Element <- transformChildren(elementsToHtml, oldElement)
-    result: ScalaXml.Element <- if !isInNamespace(element) then URIO.succeed(element) else
+    result: ScalaXml.Element <- if !isInNamespace(element) then ZIO.succeed(element) else
       val name: String = ScalaXml.getName(element)
 
       val attributes: Attribute.StringValues = ScalaXml.getAttributes(element).map((attribute: Attribute.Value[String]) =>
@@ -112,8 +112,8 @@ trait ToHtml[R]:
     transform: ScalaXml.Element => URIO[R, ScalaXml.Element],
     element: ScalaXml.Element
   ): URIO[R, ScalaXml.Element] = for
-    children: ScalaXml.Nodes <- URIO.foreach(ScalaXml.getChildren(element))((node: ScalaXml.Node) =>
-      if !ScalaXml.isElement(node) then URIO.succeed(node) else transform(ScalaXml.asElement(node))
+    children: ScalaXml.Nodes <- ZIO.foreach(ScalaXml.getChildren(element))((node: ScalaXml.Node) =>
+      if !ScalaXml.isElement(node) then ZIO.succeed(node) else transform(ScalaXml.asElement(node))
     )
   yield ScalaXml.setChildren(element, children)
 

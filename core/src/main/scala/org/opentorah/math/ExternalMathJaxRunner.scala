@@ -1,5 +1,7 @@
 package org.opentorah.math
 
+import org.opentorah.node.Node
+
 final class ExternalMathJaxRunner(
   node: Node,
   math: MathConfiguration

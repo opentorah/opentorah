@@ -4,6 +4,7 @@ import org.gradle.api.{Action, DefaultTask, NamedDomainObjectContainer, Plugin, 
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{Internal, Nested, TaskAction}
 import org.opentorah.build.{BuildContext, GradleBuildContext}
+import org.opentorah.build.Gradle.*
 import org.opentorah.docbook.{CommonConfiguration, DocBookConfiguration, DocBookProcessor, DocumentConfiguration,
   FormatConfiguration, Layout, VariantConfiguration}
 import org.opentorah.fop.FopFonts
@@ -41,25 +42,28 @@ object DocBookPlugin:
   trait ToConfiguration[T]:
     def getName: String // Type must have a read-only 'name' property
     def getParameters: MapProperty[String, String]
-    def parameters: Map[String, String] = toMap(getParameters)
+    def parameters: Map[String, String] = getParameters.toMap
     def toConfiguration: T
+
+  private def toSet[C, T <: ToConfiguration[C]](container: NamedDomainObjectContainer[T]): Set[C] =
+    container.asScala.toSet.map(_.toConfiguration)
 
   trait SettingsProperties:
     def getEpubEmbeddedFonts: ListProperty[String]
-    def epubEmbeddedFonts: List[String] = toList(getEpubEmbeddedFonts)
+    def epubEmbeddedFonts: List[String] = getEpubEmbeddedFonts.toList
     def getXslt1version: Property[String]
-    def xslt1version: Option[String] = optional(getXslt1version)
+    def xslt1version: Option[String] = getXslt1version.toOption
     def getXslt2version: Property[String]
-    def xslt2version: Option[String] = optional(getXslt2version)
+    def xslt2version: Option[String] = getXslt2version.toOption
     @Nested def getMath: MathConfigurationProperties
     def math(action: Action[MathConfigurationProperties]): Unit = action.execute(getMath)
     def math: Option[MathConfiguration] = Some(getMath.toConfiguration)
 
   trait OutputProperties extends SettingsProperties:
     def getSubstitutions: MapProperty[String, String]
-    def substitutions: Map[String, String] = toMap(getSubstitutions)
+    def substitutions: Map[String, String] = getSubstitutions.toMap
     def getOutput: ListProperty[String]
-    def output: Set[String] = toList(getOutput).toSet
+    def output: Set[String] = getOutput.toList.toSet
 
   abstract class Extension @Inject(project: Project) extends OutputProperties:
 
@@ -89,9 +93,9 @@ object DocBookPlugin:
     def getProcessor: DocBookProcessor =
       if processor.isEmpty then
         val layout: Layout = Layout.forGradleProject(project)
-        val context: BuildContext = BuildContext.forGradleProject(project)
+        val context: BuildContext = GradleBuildContext(project)
         val configurationFromExtension: DocBookConfiguration = toConfiguration
-        val configurationFile: File = File(layout.root, optional(getConfiguration).getOrElse("docbook.xml"))
+        val configurationFile: File = File(layout.root, getConfiguration.getOrElse("docbook.xml"))
         val configuration: DocBookConfiguration = if !configurationFile.exists() then configurationFromExtension else
           if !configurationFromExtension.isEmpty
           then context.warn(s"DocBook: configuration file will be used and configuration in the extension ignored.")
@@ -99,7 +103,7 @@ object DocBookPlugin:
           context.info(s"DocBook: reading configuration from file: $configurationFile")
           Parser.unsafeRun(DocBookConfiguration.parse(From.file(configurationFile)))
 
-        val htmlConfigurationFile: File = File(layout.root, optional(getHtmlConfiguration).getOrElse("html.xml"))
+        val htmlConfigurationFile: File = File(layout.root, getHtmlConfiguration.getOrElse("html.xml"))
         val siteHtml: SiteHtml =
           if !htmlConfigurationFile.exists()
           then SiteHtml.empty
@@ -125,8 +129,8 @@ object DocBookPlugin:
       xslt1version = xslt1version,
       xslt2version = xslt2version,
       epubEmbeddedFonts = epubEmbeddedFonts,
-      dataGeneratorClass = optional(getDataGeneratorClass),
-      imagesDirectory = optional(getImagesDirectory)
+      dataGeneratorClass = getDataGeneratorClass.toOption,
+      imagesDirectory = getImagesDirectory.toOption
     )
 
   abstract class CommonProperties extends ToConfiguration[CommonConfiguration]:
@@ -173,18 +177,18 @@ object DocBookPlugin:
     def getAsciiMathDelimiters: ListProperty[String]
 
     def toConfiguration: MathConfiguration = MathConfiguration(
-      jEuclidEnabled      = optional(getJEuclidEnabled),
-      mathJaxEnabled      = optional(getMathJaxEnabled),
-      nodeVersion         = optional(getNodeVersion),
-      useMathJaxV3        = optional(getUseMathJaxV3),
-      useJ2V8             = optional(getUseJ2V8),
-      font                = optional(getFont),
-      mathJaxExtensions   = toList(getMathJaxExtensions  ),
-      texExtensions       = toList(getTexExtensions      ),
-      texDelimiters       = toList(getTexDelimiters      ).map(Delimiters.fromString), // TODO split start/end
-      texInlineDelimiters = toList(getTexInlineDelimiters).map(Delimiters.fromString), // TODO split start/end
-      asciiMathDelimiters = toList(getAsciiMathDelimiters).map(Delimiters.fromString), // TODO split start/end
-      processEscapes      = optional(getProcessEscapes)
+      jEuclidEnabled      = getJEuclidEnabled     .toOption,
+      mathJaxEnabled      = getMathJaxEnabled     .toOption,
+      nodeVersion         = getNodeVersion        .toOption,
+      useMathJaxV3        = getUseMathJaxV3       .toOption,
+      useJ2V8             = getUseJ2V8            .toOption,
+      font                = getFont               .toOption,
+      mathJaxExtensions   = getMathJaxExtensions  .toList,
+      texExtensions       = getTexExtensions      .toList,
+      texDelimiters       = getTexDelimiters      .toList.map(Delimiters.fromString), // TODO split start/end
+      texInlineDelimiters = getTexInlineDelimiters.toList.map(Delimiters.fromString), // TODO split start/end
+      asciiMathDelimiters = getAsciiMathDelimiters.toList.map(Delimiters.fromString), // TODO split start/end
+      processEscapes      = getProcessEscapes     .toOption
     )
 
 //  abstract class DelimitersProperties:
@@ -195,18 +199,6 @@ object DocBookPlugin:
 //      start = getStart.get(),
 //      end   = getEnd  .get()
 //    )
-
-  private def optional[T](property: Property[T]): Option[T] =
-    if !property.isPresent then None else Some(property.get)
-
-  private def toList[T](property: ListProperty[T]): List[T] =
-    property.get().asScala.toList
-
-  private def toMap(property: MapProperty[String, String]): Map[String, String] =
-    property.get().asScala.toMap
-
-  private def toSet[C, T <: ToConfiguration[C]](container: NamedDomainObjectContainer[T]): Set[C] =
-    container.asScala.toSet.map(_.toConfiguration)
 
   class ListFopFontsTask extends DefaultTask:
     setDescription("List FOP fonts")
@@ -225,7 +217,7 @@ object DocBookPlugin:
     setGroup("publishing")
     @TaskAction def execute(): Unit =
       val extension: Extension = getProject.getExtensions.getByType(classOf[Extension])
-      extension.getProcessor.installDistibutions
+      extension.getProcessor.installDistibutions()
 
   class ProcessDocBookTask extends DefaultTask:
     setDescription(s"Process DocBook")
@@ -241,8 +233,8 @@ object DocBookPlugin:
     // Note: even when DocBook plugin is applied after the Scala one,
     // there is no 'classes' task during its application - but there is after project evaluation:
     getProject.afterEvaluate((project: Project) =>
-      val context: BuildContext = BuildContext.forGradleProject(project)
-      val classesTask: Option[Task] = GradleBuildContext.getClassesTask(project)
+      val context: BuildContext = GradleBuildContext(project)
+      val classesTask: Option[Task] = project.findClassesTask
       if classesTask.isEmpty then
         context.info("No 'classes' task found.")
       else
@@ -254,5 +246,5 @@ object DocBookPlugin:
     @TaskAction def processDocBook(): Unit =
       val extension: Extension = getProject.getExtensions.getByType(classOf[Extension])
       extension.getProcessor.process(
-        globalSubstitutions = toMap(extension.getGlobalSubstitutions)
+        globalSubstitutions = extension.getGlobalSubstitutions.toMap
       )

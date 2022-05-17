@@ -22,13 +22,10 @@ object Effects:
   def check(condition: Boolean, message: => String): IO[Unit] =
     if condition then ok else fail(message)
 
-  // Note: when running with 1 cpu (on Cloud Run or in local Docker),
-  // take care to avoid deadlocks:
-
-  // Note: using blockingRuntime to avoid deadlocks with nested unsafeRun() calls (TODO is this still needed?):
-  private val blockingRuntime: Runtime[?] = Runtime.default.withExecutor(Runtime.default.runtimeConfig.blockingExecutor)
-
-  def unsafeRun[E, A](io: => zio.IO[E, A]): A = blockingRuntime.unsafeRun[E, A](io)
+  // Note: In the past, when running with 1 cpu (on Cloud Run or in local Docker),
+  // I had to use blockingRuntime to avoid deadlocks with nested unsafeRun() calls;
+  // this seems to be no longer necessary.
+  def unsafeRun[E, A](io: => zio.IO[E, A]): A = Runtime.default.unsafeRun[E, A](io)
 
   def effect[A](f: => A): IO[A] = throwable2error(ZIO.attemptBlocking(f))
 

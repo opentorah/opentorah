@@ -18,6 +18,7 @@ dependencies {
   compileOnly libs.logback
   compileOnly libs.logstash
   compileOnly libs.google.cloud.storage
+  compileOnly libs.j2v8
 
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()

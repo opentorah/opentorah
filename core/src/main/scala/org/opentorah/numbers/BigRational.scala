@@ -36,22 +36,27 @@ final class BigRational private(val numerator: BigInt, val denominator: BigInt)
 
   def abs: BigRational = BigRational(numerator.abs, denominator)
 
+  @scala.annotation.targetName("uminus")
   def unary_- : BigRational = BigRational(-numerator, denominator)
 
+  @scala.annotation.targetName("add")
   def +(that: BigRational): BigRational = BigRational(
     this.numerator * that.denominator + that.numerator * this.denominator,
     this.denominator * that.denominator
   )
 
+  @scala.annotation.targetName("subtract")
   def -(that: BigRational): BigRational = this + -that
 
   def invert: BigRational = BigRational(denominator, numerator)
 
+  @scala.annotation.targetName("multiply")
   def *(that: BigRational): BigRational = BigRational(
     numerator = this.numerator * that.numerator,
     denominator = this.denominator * that.denominator
   )
 
+  @scala.annotation.targetName("divide")
   def /(that: BigRational): BigRational = this * that.invert
 
   def whole: Int = (numerator / denominator).bigInteger.intValueExact
