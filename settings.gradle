@@ -15,7 +15,7 @@ pluginManagement {
   }
 }
 
-final String scalaVersion      = '3.1.3-RC5'
+final String scalaVersion      = '3.1.3'
 final String scalaVersionMajor = '3'
 
 final String zioVersion        = '2.0.0-RC6'
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.8.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.8.1')
 
     // TODO drop support for JEuclid
     library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
