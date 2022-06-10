@@ -10,7 +10,7 @@ pluginManagement {
     id 'com.google.cloud.tools.jib'    version '3.2.1'
     id 'org.podval.tools.cloudrun'     version '0.3.1'
     id 'com.gradle.plugin-publish'     version '0.20.0'
-    id 'io.miret.etienne.sass'         version '1.3.0'
+    id 'io.miret.etienne.sass'         version '1.4.0'
     id 'org.opentorah.docbook'         version docBookPluginVersion
   }
 }
@@ -18,7 +18,7 @@ pluginManagement {
 final String scalaVersion      = '3.1.3'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.0-RC6'
+final String zioVersion        = '2.0.0'
 final String zhttpVersion      = '2.0.0-RC9'
 final String zioPreludeVersion = '1.0.0-RC13'
 
@@ -47,7 +47,7 @@ dependencyResolutionManagement {
     library('graalvm-sdk'  , 'org.graalvm:graal-sdk:22.0.0.2')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.3.0')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.4.0')
     library('jing'         , 'org.relaxng:jing:20181222')  // TODO 20220510
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.8.1')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.9.0')
 
     // TODO drop support for JEuclid
     library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
@@ -72,9 +72,9 @@ dependencyResolutionManagement {
     library('zhttp'        , "io.d11:zhttp_$scalaVersionMajor:$zhttpVersion")
 
     // Algebra
-    library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:2.7.0")
-    library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:2.7.0")
-    library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:2.7.0")
+    library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:2.8.0")
+    library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:2.8.0")
+    library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:2.8.0")
     library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
 
     // Paiges
@@ -96,7 +96,7 @@ dependencyResolutionManagement {
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
     // PDF Generation
-    library('playwright', 'com.microsoft.playwright:playwright:1.22.0')
+    library('playwright', 'com.microsoft.playwright:playwright:1.23.0')
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:1.7.36')

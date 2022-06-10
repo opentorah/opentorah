@@ -15,6 +15,8 @@ dependencies {
   // - are declared here as 'compileOnly';
   // - need to be supplied as 'runtimeOnly' ('implementation'?) where needed.
   compileOnly libs.zhttp
+  compileOnly libs.zio.core
+  compileOnly libs.zio.streams
   compileOnly libs.logback
   compileOnly libs.logstash
   compileOnly libs.google.cloud.storage

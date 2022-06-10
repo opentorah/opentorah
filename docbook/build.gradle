@@ -64,6 +64,7 @@ gradlePlugin {
   }
 }
 
+// TODO this block goes away in Gradle 8; tags move to gradlePlugin block.
 pluginBundle {
   website = 'https://github.com/opentorah/opentorah/tree/master/docbook'
   vcsUrl  = 'https://github.com/opentorah/opentorah/tree/master/docbook' //.git' ?

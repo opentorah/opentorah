@@ -1,9 +1,13 @@
 package org.opentorah.build
 
-import org.gradle.api.{Project, Task, UnknownDomainObjectException}
+import org.gradle.api.{Project, Task}
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
-import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.{SourceSet, TaskProvider}
+import org.gradle.api.tasks.scala.ScalaCompile
+import java.lang.reflect.Method
+import java.net.{URL, URLClassLoader}
 import scala.jdk.CollectionConverters.*
 
 object Gradle:
@@ -13,6 +17,12 @@ object Gradle:
 
     def getExtension[T](clazz: Class[T]): T =
       project.getExtensions.getByType(clazz)
+
+    def getConfiguration(name: String): Configuration =
+      project.getConfigurations.getByName(name)
+
+    def getScalaCompile(sourceSet: SourceSet): ScalaCompile =
+      project.getClassesTask(sourceSet).getScalaCompile
 
     def findSourceSet(name: String): Option[SourceSet] =
       project.findExtension(classOf[JavaPluginExtension])
@@ -40,6 +50,15 @@ object Gradle:
 
     def getClassesTask(sourceSet: SourceSet): Task = project.getTask(sourceSet.getClassesTaskName)
 
+  extension(classesTask: Task)
+    def getScalaCompile: ScalaCompile = classesTask
+      .getDependsOn
+      .asScala
+      .find(classOf[TaskProvider[ScalaCompile]].isInstance)
+      .get
+      .asInstanceOf[TaskProvider[ScalaCompile]]
+      .get
+
   extension[T](property: Property[T])
     def toOption: Option[T] =
       if !property.isPresent then None else Some(property.get)
@@ -58,3 +77,15 @@ object Gradle:
   extension(property: MapProperty[String, String])
     def toMap: Map[String, String] =
       property.get().asScala.toMap
+
+  private val addUrlMethod: Method = classOf[URLClassLoader].getDeclaredMethod("addURL", classOf[URL])
+  addUrlMethod.setAccessible(true)
+
+  def addConfigurationToClassPath(task: Task, configurationName: String): Unit =
+    val classLoader: URLClassLoader = task.getClass.getClassLoader.asInstanceOf[URLClassLoader]
+    task
+      .getProject
+      .getConfiguration(configurationName)
+      .asScala
+      .map(_.toURI.toURL)
+      .foreach((url: URL) => addUrlMethod.invoke(classLoader, url))
