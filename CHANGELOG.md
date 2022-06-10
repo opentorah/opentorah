@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.2] - 2022-04-20
+## [0.10.2] - 2022-06-16
 - update Gradle, Zinc, ZIO, ZHTTP and other dependencies;
 - minor ZIO cleanup;
 - minor code inspections cleanup;

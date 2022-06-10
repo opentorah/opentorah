@@ -78,11 +78,10 @@ final class GradleBuildContext(project: Project) extends BuildContext:
     )
 
   override def javaexec(mainClass: String, args: String*): Unit =
-    val mainSourceSet: SourceSet = project.getMainSourceSet
     getLogger.info(s"Running $mainClass(${args.mkString(", ")})")
 
     project.javaexec((exec: JavaExecSpec) =>
-      exec.setClasspath(mainSourceSet.getRuntimeClasspath)
+      exec.setClasspath(project.getMainSourceSet.getRuntimeClasspath)
       exec.getMainClass.set(mainClass)
       exec.args(args*)
       ()

@@ -14,21 +14,31 @@ object Gradle:
     def getExtension[T](clazz: Class[T]): T =
       project.getExtensions.getByType(clazz)
 
-    def findMainSourceSet: Option[SourceSet] =
+    def findSourceSet(name: String): Option[SourceSet] =
       project.findExtension(classOf[JavaPluginExtension])
-      .map(_.getSourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME))
+      .map(_.getSourceSets.getByName(name))
 
-    def getMainSourceSet: SourceSet = project.findMainSourceSet
-      .getOrElse(throw UnknownDomainObjectException("No Java plugin in the project: JavaPluginExtension does not exist."))
+    def getSourceSet(name: String): SourceSet =
+      project
+      .getExtension(classOf[JavaPluginExtension])
+      .getSourceSets.getByName(name)
+
+    def findMainSourceSet: Option[SourceSet] =
+      findSourceSet(SourceSet.MAIN_SOURCE_SET_NAME)
+
+    def getMainSourceSet: SourceSet =
+      getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME)
 
     def findTask(name: String): Option[Task] =
       Option(project.getTasks.findByName(name))
 
-    def findClassesTask: Option[Task] =
-      project.findMainSourceSet.flatMap(mainSourceSet => project.findTask(mainSourceSet.getClassesTaskName))
+    def getTask(name: String): Task =
+      project.getTasks.getByName(name)
 
-    def getClassesTask: Task = project.findClassesTask
-      .getOrElse(throw UnknownDomainObjectException("No classes task in the project."))
+    def findClassesTask: Option[Task] =
+      project.findMainSourceSet.flatMap(sourceSet => project.findTask(sourceSet.getClassesTaskName))
+
+    def getClassesTask(sourceSet: SourceSet): Task = project.getTask(sourceSet.getClassesTaskName)
 
   extension[T](property: Property[T])
     def toOption: Option[T] =
