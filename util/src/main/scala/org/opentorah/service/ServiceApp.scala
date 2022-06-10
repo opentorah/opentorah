@@ -46,7 +46,7 @@ trait ServiceApp extends zio.ZIOAppDefault:
   protected def run(args: zio.Chunk[String]): ZIO[Any, Throwable, Any]
 
   final protected def serve(
-    routes: HttpApp[zio.Clock, Throwable],
+    routes: HttpApp[Any, Throwable],
     nThreads: Int = 0
   ): ZIO[Any, Throwable, Nothing] =
     val port: Int = getParameter("PORT", portDefault.toString).toInt
@@ -63,8 +63,6 @@ trait ServiceApp extends zio.ZIOAppDefault:
       // Ensures the server doesn't die after printing
       .flatMap((start: Server.Start) => zio.Console.printLine(s"Server started on port ${start.port}") *> ZIO.never) // TODO use logger
       .tapError((error: Throwable)   => zio.Console.printLine(s"Execution failed with: $error")) // TODO use logger
-      .provideSomeLayer(zio.Clock.live)
-      .provideSomeLayer(zio.Console.live)
       .provideSomeLayer(
         zio.Scope.default ++
         zhttp.service.EventLoopGroup.auto(nThreads) ++
@@ -99,7 +97,7 @@ trait ServiceApp extends zio.ZIOAppDefault:
 
   final protected def timed[R](
     get: Request => ZIO[R, Throwable, Response]
-  ): Request => ZIO[R & zio.Clock, Throwable, Response] = (request: Request) =>
+  ): Request => ZIO[R, Throwable, Response] = (request: Request) =>
     val response: ZIO[R, Throwable, Response] = get(request)
 
     response.timed.mapAttempt((duration: zio.Duration, response: Response) =>

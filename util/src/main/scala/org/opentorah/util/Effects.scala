@@ -25,7 +25,13 @@ object Effects:
   // Note: In the past, when running with 1 cpu (on Cloud Run or in local Docker),
   // I had to use blockingRuntime to avoid deadlocks with nested unsafeRun() calls;
   // this seems to be no longer necessary.
-  def unsafeRun[E, A](io: => zio.IO[E, A]): A = Runtime.default.unsafeRun[E, A](io)
+  // TODO how am I supposed to do unsafeRun?
+  // The following is from https://www.reddit.com/r/scala/comments/vjrvux/zio_20_released/
+  implicit class RuntimeExtension(thiz: Runtime[Any]) extends AnyVal:
+    def unsafeRun[E, A](prog: zio.IO[E, A]): A =
+      zio.Unsafe.unsafeCompat(implicit _ => thiz.unsafe.run(prog).getOrThrowFiberFailure())
+
+  def unsafeRun[E <: Throwable, A](io: => zio.IO[E, A]): A = Runtime.default.unsafeRun(io)
 
   def effect[A](f: => A): IO[A] = throwable2error(ZIO.attemptBlocking(f))
 
