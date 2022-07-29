@@ -1,14 +1,12 @@
 package org.opentorah.build
 
-import org.gradle.api.artifacts.{Dependency as GDependency}
-import org.gradle.api.Project
+import org.gradle.api.artifacts.{Configuration, Dependency as GDependency}
 import org.opentorah.util.Strings
 import java.io.File
 import java.util.regex.{Matcher, Pattern}
 import Gradle.*
 import scala.jdk.CollectionConverters.*
 
-// TODO merge into org.opentorah.build
 abstract class DependencyVersion(
   val dependency: Dependency,
   val version: String
@@ -28,10 +26,10 @@ abstract class Dependency(
 ):
   protected def namePattern: String
 
-  def getFromConfiguration(configurationNames: ConfigurationNames, project: Project): Option[DependencyVersion] =
+  def getFromConfiguration(configuration: Configuration): Option[DependencyVersion] =
     val patternCompiled: Pattern = Pattern.compile(namePattern)
     val result: Set[DependencyVersion] = for
-      dependency: GDependency <- project.getConfiguration(configurationNames.toAdd).getDependencies.asScala.toSet
+      dependency: GDependency <- configuration.getDependencies.asScala.toSet
       if dependency.getGroup == group
       matcher: Matcher = patternCompiled.matcher(dependency.getName)
       if matcher.matches
@@ -41,10 +39,10 @@ abstract class Dependency(
 
   protected def fromMatcher(matcher: Matcher, version: String): DependencyVersion
 
-  def getFromClasspath(configurationNames: ConfigurationNames, project: Project): Option[DependencyVersion] =
+  def getFromClassPath(classPath: Iterable[File]): Option[DependencyVersion] =
     val patternCompiled: Pattern = Pattern.compile(s"$namePattern-(\\d.*).jar")
     val result: Iterable[DependencyVersion] = for
-      file: File <- project.getConfiguration(configurationNames.toCheck).asScala
+      file: File <- classPath
       matcher: Matcher = patternCompiled.matcher(file.getName)
       if matcher.matches
     yield

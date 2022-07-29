@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.3] - 2022-07-
+## [0.10.4] - 2022-07-31
+- Gradle cleanup;
+- dependency updates;
+
+## [0.10.3] - 2022-07-05
 - Gradle cleanup;
 - dependency manipulations and other utilities from the ScalaJS plugin moved here;
 - dependency updates;

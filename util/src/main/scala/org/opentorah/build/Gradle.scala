@@ -6,8 +6,11 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{SourceSet, TaskProvider}
 import org.gradle.api.tasks.scala.ScalaCompile
-import java.lang.reflect.Method
+import org.gradle.internal.classloader.{ClassLoaderVisitor, ClasspathUtil, VisitableURLClassLoader}
+import org.opentorah.util.Files
+import java.io.File
 import java.net.{URL, URLClassLoader}
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object Gradle:
@@ -23,6 +26,9 @@ object Gradle:
 
     def getScalaCompile(sourceSet: SourceSet): ScalaCompile =
       project.getClassesTask(sourceSet).getScalaCompile
+
+    def getScalaCompile(sourceSetName: String): ScalaCompile =
+      project.getScalaCompile(project.getSourceSet(sourceSetName))
 
     def findSourceSet(name: String): Option[SourceSet] =
       project.findExtension(classOf[JavaPluginExtension])
@@ -72,20 +78,51 @@ object Gradle:
 
   extension[T](property: ListProperty[T])
     def toList: List[T] =
-      property.get().asScala.toList
+      property.get.asScala.toList
 
   extension(property: MapProperty[String, String])
     def toMap: Map[String, String] =
-      property.get().asScala.toMap
+      property.get.asScala.toMap
 
-  private val addUrlMethod: Method = classOf[URLClassLoader].getDeclaredMethod("addURL", classOf[URL])
-  addUrlMethod.setAccessible(true)
+//  private val addUrlMethod: Method = classOf[URLClassLoader].getDeclaredMethod("addURL", classOf[URL])
+//  addUrlMethod.setAccessible(true)
 
-  def addConfigurationToClassPath(task: Task, configurationName: String): Unit =
-    val classLoader: URLClassLoader = task.getClass.getClassLoader.asInstanceOf[URLClassLoader]
-    task
-      .getProject
-      .getConfiguration(configurationName)
-      .asScala
-      .map(_.toURI.toURL)
-      .foreach((url: URL) => addUrlMethod.invoke(classLoader, url))
+  def addToClassPath(obj: AnyRef, files: Iterable[File]): ClassLoader =
+    val result: ClassLoader = obj.getClass.getClassLoader
+
+    val urls: Iterable[URL] = files.map(_.toURI.toURL)
+
+    result match
+      case visitable: VisitableURLClassLoader =>
+        for url <- urls do visitable.addURL(url)
+      case classLoader =>
+        ClasspathUtil.addUrl(
+          classLoader.asInstanceOf[URLClassLoader],
+          urls.asJava
+        )
+
+    result
+
+  def findOnClasPath(obj: AnyRef, name: String): URL =
+    var result: Option[URL] = None
+
+    val visitor: ClassLoaderVisitor = new ClassLoaderVisitor:
+      override def visitClassPath(classPath: Array[URL]): Unit = classPath
+        .find(_.getPath.contains(name))
+        .foreach((url: URL) => result = Some(url))
+
+    visitor.visit(obj.getClass.getClassLoader)
+
+    result.getOrElse(throw IllegalArgumentException(s"Did not find artifact $name"))
+
+  def collectClassPath(classLoader: ClassLoader): Seq[File] =
+    val result: mutable.ArrayBuffer[File] = mutable.ArrayBuffer.empty[File]
+    val visitor: ClassLoaderVisitor = new ClassLoaderVisitor:
+      override def visitClassPath(classPath: Array[URL]): Unit =
+        for
+          url <- classPath
+          if url.getProtocol == "file"
+        do
+          result += Files.url2file(url)
+    visitor.visit(classLoader)
+    result.toSeq
