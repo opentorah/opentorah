@@ -19,7 +19,7 @@ final String scalaVersion      = '3.1.3'
 final String scalaVersionMajor = '3'
 
 final String zioVersion        = '2.0.0'
-final String zhttpVersion      = '2.0.0-RC9'
+final String zhttpVersion      = '2.0.0-RC10'
 final String zioPreludeVersion = '1.0.0-RC13'
 
 final String flexmarkVersion   = '0.64.0'
@@ -41,22 +41,22 @@ dependencyResolutionManagement {
     // Scala
     library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
     library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.1.0")
-    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.7.0-M2')
+    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.7.1')
 
     // GraalVM
     library('graalvm-sdk'  , 'org.graalvm:graal-sdk:22.0.0.2')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.4.0')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.4.3')
     library('jing'         , 'org.relaxng:jing:20181222')  // TODO 20220510
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
-    library('saxon11'      , 'net.sf.saxon:Saxon-HE:11.3')
+    library('saxon11'      , 'net.sf.saxon:Saxon-HE:11.4')
     library('saxon6'       , 'saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.9.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.10.0')
 
     // TODO drop support for JEuclid
     library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
@@ -75,7 +75,7 @@ dependencyResolutionManagement {
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:2.8.0")
     library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:2.8.0")
     library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:2.8.0")
-    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.1.5")
+    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.2.0")
 
     // Paiges
     library('paiges'       , "org.typelevel:paiges-core_$scalaVersionMajor:0.4.2")
@@ -96,7 +96,7 @@ dependencyResolutionManagement {
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
     // PDF Generation
-    library('playwright', 'com.microsoft.playwright:playwright:1.23.0')
+    library('playwright', 'com.microsoft.playwright:playwright:1.24.1')
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:1.7.36')
@@ -114,11 +114,11 @@ dependencyResolutionManagement {
 
     // Testing
     library('podvalRun' , 'org.podval.tools:org.podval.tools.run:0.1.4')
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.12")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.13")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.16.0")
 
     // Documentation
-    library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.2")
+    library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.3")
   }}
 }
 

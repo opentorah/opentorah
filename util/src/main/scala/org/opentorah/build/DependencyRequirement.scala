@@ -3,17 +3,19 @@ package org.opentorah.build
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.{GradleException, Project}
 import Gradle.*
+import scala.jdk.CollectionConverters.*
 
 final class DependencyRequirement(
   dependency: Dependency,
   version: String,
   scalaLibrary: ScalaLibrary,
   reason: String,
-  isVersionExact: Boolean = false,
-  configurationNames: ConfigurationNames = ConfigurationNames.implementation
+  configurations: Configurations,
+  isVersionExact: Boolean = false
 ):
   def applyToConfiguration(project: Project): DependencyVersion =
-    val found: Option[DependencyVersion] = dependency.getFromConfiguration(configurationNames, project)
+    val found: Option[DependencyVersion] = dependency
+      .getFromConfiguration(project.getConfiguration(configurations.configuration))
     found.foreach(verify(_, project))
     found.getOrElse {
       val (configuration: Configuration, toAdd: DependencyVersion) = addition(project)
@@ -28,8 +30,10 @@ final class DependencyRequirement(
   // dependencies can not be added to the configurations involved:
   //   Cannot change dependencies of dependency configuration ... after it has been included in dependency resolution
   // So the only thing we can do is to report the missing dependency:
-  def applyToClasspath(project: Project): DependencyVersion =
-    val found: Option[DependencyVersion] = dependency.getFromClasspath(configurationNames, project)
+  def applyToClassPath(project: Project): DependencyVersion =
+    val found: Option[DependencyVersion] = dependency.getFromClassPath(
+      project.getConfiguration(configurations.classPath).asScala
+    )
     found.foreach(verify(_, project))
     found.getOrElse {
       val (configuration: Configuration, toAdd: DependencyVersion) = addition(project)
@@ -50,15 +54,15 @@ final class DependencyRequirement(
     )
 
   private def addition(project: Project): (Configuration, DependencyVersion) =
-    val configuration: Configuration = project.getConfiguration(configurationNames.toAdd)
+    val configuration: Configuration = project.getConfiguration(configurations.configuration)
     val dependencyVersion: DependencyVersion = dependency match
-    case s2: Scala2Dependency => s2.apply(
-      scalaVersion = getScalaVersion(s2),
-      version = version
-    )
-    case s : SimpleDependency => s .apply(
-      version = version
-    )
+      case s2: Scala2Dependency => s2.apply(
+        scalaVersion = getScalaVersion(s2),
+        version = version
+      )
+      case s : SimpleDependency => s .apply(
+        version = version
+      )
     (configuration, dependencyVersion)
 
   private def getScalaVersion(s2: Scala2Dependency): String =
