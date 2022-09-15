@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.5] - 2022-09-15
+- dependency updates;
+
 ## [0.10.4] - 2022-07-31
 - Gradle cleanup;
 - dependency updates;
