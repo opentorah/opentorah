@@ -85,7 +85,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
       _ <- getSite
     yield Response(
       headers = Headers.contentType(HeaderValues.textPlain),
-      data = HttpData.fromString("Site reset!")
+      body = Body.fromString("Site reset!")
     )
 
     def get(request: Request): ZIO[Any, Nothing, Response] =
@@ -105,7 +105,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
               // TODO more headers!
               Headers.contentType(siteResponse.mimeType) ++
               Headers.contentLength(bytes.length.toLong),
-            data = HttpData.fromStream(zio.stream.ZStream.fromChunk(Chunk.fromArray(bytes)))
+            body = Body.fromStream(zio.stream.ZStream.fromChunk(Chunk.fromArray(bytes)))
           )
         )
       ))

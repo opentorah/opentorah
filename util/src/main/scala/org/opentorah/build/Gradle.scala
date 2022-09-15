@@ -103,7 +103,7 @@ object Gradle:
 
     result
 
-  def findOnClasPath(obj: AnyRef, name: String): URL =
+  def findOnClassPath(obj: AnyRef, name: String): URL =
     var result: Option[URL] = None
 
     val visitor: ClassLoaderVisitor = new ClassLoaderVisitor:

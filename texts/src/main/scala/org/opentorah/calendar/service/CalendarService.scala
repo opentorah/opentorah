@@ -4,7 +4,7 @@ import org.opentorah.metadata.Language
 import org.opentorah.service.ServiceApp
 import ServiceApp.given
 import org.slf4j.{Logger, LoggerFactory}
-import zhttp.http.{!!, /, Headers, HeaderValues, Http, HttpData, Method, Request, Response, *} // TODO remove '*'
+import zhttp.http.{!!, /, Body, Headers, HeaderValues, Http, Method, Request, Response, *} // TODO remove '*'
 import zio.ZIO
 
 /*
@@ -62,5 +62,5 @@ object CalendarService extends ServiceApp:
 
   def renderHtml(content: String): zio.UIO[Response] = ZIO.succeed(Response(
     headers = Headers.contentType(HeaderValues.textHtml), // TODO UTF-8?
-    data = HttpData.fromString(content)
+    body = Body.fromString(content)
   ))

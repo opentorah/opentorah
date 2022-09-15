@@ -2,7 +2,7 @@ package org.opentorah.service
 
 import org.opentorah.util.{Effects, Files, Logging}
 import org.slf4j.{Logger, LoggerFactory}
-import zhttp.http.{!!, /, Headers, Http, HttpApp, HttpData, Method, Path, Request, Response, Status, *} // TODO remove *
+import zhttp.http.{!!, /, Body, Headers, Http, HttpApp, Method, Path, Request, Response, Status, *} // TODO remove *
 import zhttp.service.Server
 import zio.ZIO
 import java.time.Instant
@@ -135,7 +135,7 @@ object ServiceApp:
   def orNotFound[R](path: String, zio: ZIO[R, Throwable, Response]): ZIO[R, Nothing, Response] =
     zio.catchAll((error: Throwable) => ZIO.succeed(Response(
       status = Status.NotFound,
-      data = HttpData.fromString(s"File Not Found: $path \n ${error.getMessage}")
+      body = Body.fromString(s"File Not Found: $path \n ${error.getMessage}")
     )))
 
   // Inspired by https://github.com/http4s/http4s/blob/main/core/jvm/src/main/scala/org/http4s/StaticFile.scala
@@ -183,7 +183,7 @@ object ServiceApp:
                 then Headers.contentLength(contentLength)
                 else Headers.transferEncoding(zhttp.http.HeaderValues.chunked)
               ),
-          data = HttpData.fromStream(zio.stream.ZStream.fromInputStream(inputStream))
+          body = Body.fromStream(zio.stream.ZStream.fromInputStream(inputStream))
         )
     yield result
 

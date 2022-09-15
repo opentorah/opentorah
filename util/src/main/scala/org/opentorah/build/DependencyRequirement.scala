@@ -73,3 +73,10 @@ final class DependencyRequirement(
     else scalaLibrary.scala2
       .map(scala2 => DependencyVersion.getMajor(scala2.version))
       .getOrElse(ScalaLibrary.scala2versionMinor(scalaLibrary.scala3.get.version))
+
+object DependencyRequirement:
+  // Note: all applyToConfiguration() must be run first: once a applyToClassPath() runs,
+  // configuration is no longer changeable.
+  def applyToProject(requirements: Seq[DependencyRequirement], project: Project): Unit =
+    requirements.foreach(_.applyToConfiguration(project))
+    requirements.foreach(_.applyToClassPath(project))
