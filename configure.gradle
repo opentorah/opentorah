@@ -17,14 +17,15 @@ dependencies {
   testImplementation libs.algebraLaws
 }
 
-// with switch to ZIO2.0 (?) the tests started hanging if run in parallel...
-// TODO this is not the end of the story; am I going to run into ZIO's
-// blocking thread-pool size in production?!
-test {
-  maxParallelForks = 1
+// Note: starting with Gradle 8.0, without explicit toolchain specification, Java 8 gets picked up
+// even when Gradle itself runs on Java 11?!
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
 }
 
-tasks.withType(ScalaCompile) {
+tasks.withType(ScalaCompile).configureEach {
   scalaCompileOptions.with {
     targetCompatibility = '' // TODO remove when https://youtrack.jetbrains.com/issue/SCL-18813 is fixed
     additionalParameters = [
@@ -41,12 +42,19 @@ tasks.withType(ScalaCompile) {
   }
 }
 
+// with switch to ZIO2.0 (?) the tests started hanging if run in parallel...
+// TODO this is not the end of the story; am I going to run into ZIO's
+// blocking thread-pool size in production?!
+test {
+  maxParallelForks = 1
+}
+
 // library: all projects are configured as a library (except for the docs one)
 if (project.name != 'docs') {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String orgName = 'Open Torah Project'
-  final String orgUrl = 'http://www.opentorah.org'
+  final String orgUrl = 'https://www.opentorah.org'
 
   jar {
     // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
@@ -63,19 +71,19 @@ if (project.name != 'docs') {
     }
   }
 
-  task sourcesJar(type: Jar) {
+  tasks.register('sourcesJar', Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
   }
 
-  task scaladocJar(type: Jar) {
+  tasks.register('scaladocJar', Jar) {
     from scaladoc.destinationDir
     archiveClassifier.set('scaladoc')
   }
   scaladocJar.dependsOn(scaladoc)
 
   // there is no Java in the project, but Maven Central requires javadoc JAR...
-  task javadocJar(type: Jar) {
+  tasks.register('javadocJar', Jar) {
     from javadoc.destinationDir
     archiveClassifier.set('javadoc')
   }
@@ -113,7 +121,7 @@ if (project.name != 'docs') {
             licenses {
               license {
                 name = 'The Apache Software License, Version 2.0'
-                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                 distribution = 'repo'
                 comments = 'A business-friendly OSS license'
               }
@@ -139,17 +147,20 @@ if (project.name != 'docs') {
   }
 
   signing {
-    useInMemoryPgpKeys(findProperty('gnupg.dub-opentorah-org.key'), findProperty('gnupg.dub-opentorah-org.password'))
+    useInMemoryPgpKeys(
+      findProperty('gnupg.dub-opentorah-org.key'),
+      findProperty('gnupg.dub-opentorah-org.password')
+    )
     sign publishing.publications.library
   }
 
-  task uploadLibrary {
+  tasks.register('uploadLibrary') {
     group = 'publishing'
     description = 'Upload artifacts'
   }
   uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
 
-  task upload {
+  tasks.register('upload') {
     description = 'Upload artifacts and plugins'
     group = 'publishing'
   }

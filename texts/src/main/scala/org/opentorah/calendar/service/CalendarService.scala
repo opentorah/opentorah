@@ -4,7 +4,8 @@ import org.opentorah.metadata.Language
 import org.opentorah.service.ServiceApp
 import ServiceApp.given
 import org.slf4j.{Logger, LoggerFactory}
-import zhttp.http.{!!, /, Body, Headers, HeaderValues, Http, Method, Request, Response, *} // TODO remove '*'
+import zio.http.{!!, /, Body, Http, Request, Response, *} // TODO remove '*'
+import zio.http.model.{Headers, HeaderValues, Method}
 import zio.ZIO
 
 /*

@@ -29,8 +29,7 @@ object ScalaXml extends Xml:
     resolver: Option[Resolver]
   ): Element = load(
     inputSource,
-    filters,
-    resolver
+    getXMLReader(filters, resolver)
   ).rootElem.asInstanceOf[Element]
 
   override protected def loadNodesFromInputSource(
@@ -40,11 +39,21 @@ object ScalaXml extends Xml:
   ): Nodes =
     val result = load(
       inputSource,
-      filters,
-      resolver
+      getXMLReader(filters, resolver)
     )
 
     result.prolog ++ (result.rootElem :: result.epilogue)
+
+  private def getXMLReader(
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver]
+  ): XMLReader = Xerces.getXMLReader(
+    filters,
+    resolver,
+    xincludeAware = false,
+    addXmlBase = false,
+    logger = Xml.logger // TODO globalize
+  )
 
   // TODO I'd like the following code to look this way: scala.xml.XML.withSAXParser(...).load(inputSource), but:
   // - I need to filter the input, and XMLFilter only works with XMLReader, not SAXParser;
@@ -55,22 +64,11 @@ object ScalaXml extends Xml:
   // which by default should be obtained from the SAXParser :)
   private def load(
     inputSource: InputSource,
-    filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
+    xmlReader: XMLReader
   ):  scala.xml.parsing.FactoryAdapter =
     val adapter: scala.xml.parsing.FactoryAdapter = scala.xml.parsing.NoBindingFactoryAdapter()
     adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
 
-    // Note: scala.xml.parsing.FactoryAdapter looks for namespace declarations
-    // in the attributes passed into startElement(), and does not override
-    // startPrefixMapping(), so it does not work with a namespace-aware parser...
-    val xmlReader: XMLReader = Xerces.getXMLReader(
-      filters,
-      resolver,
-      xincludeAware = false,
-      addXmlBase = false,
-      logger = Xml.logger // TODO globalize
-    )
     xmlReader.setContentHandler(adapter)
     xmlReader.setDTDHandler(adapter)
     xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", adapter)
@@ -175,6 +173,6 @@ object ScalaXml extends Xml:
 
   override def setChildren(element: Element, children: Nodes): Element = element.copy(child = children)
 
-  override protected def descendats(nodes: Nodes, elementName: String): Nodes = nodes.flatMap(node => node.flatMap(_ \\ elementName))
+  override protected def descendants(nodes: Nodes, elementName: String): Nodes = nodes.flatMap(node => node.flatMap(_ \\ elementName))
 
   def toNodes(nodes: Nodes): Element.Nodes = Element.Nodes(ScalaXml)(nodes)

@@ -66,10 +66,10 @@ trait Xml extends XmlAttributes:
     if !condition then Seq.empty else f
 
   def descendants[T](nodes: Nodes, elementName: String, elements: Elements[T]): Parser[Seq[T]] = ZIO.foreach(
-    descendats(nodes, elementName).filter(isElement).map[Element](asElement)
+    descendants(nodes, elementName).filter(isElement).map[Element](asElement)
   )(descendant => elements.parse(From.xml(this)("descendants", descendant)))
 
-  protected def descendats(nodes: Nodes, elementName: String): Nodes
+  protected def descendants(nodes: Nodes, elementName: String): Nodes
 
   def multi(nodes: Nodes, separator: String = ", "): Nodes = nodes match
     case Nil => Nil

@@ -81,7 +81,7 @@ final class GoogleCloudStorageSynchronizer(
 
     val toUpdate: List[(Blob, File)] = existing
       .filter((_   , file) => !file.isDirectory)
-      .filter((blob, file) => file.lastModified() > blob.getUpdateTime)
+      .filter((blob, file) => file.lastModified() > blob.getUpdateTimeOffsetDateTime.toInstant.toEpochMilli)
       .filter((blob, file) => blob.getCrc32cToHexString !=
         Strings.bytes2hex(Hashing.crc32c.hashBytes(Files.readFile(file)).asBytes.toIndexedSeq.reverse)
       )

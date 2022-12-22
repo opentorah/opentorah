@@ -1,7 +1,7 @@
 package org.opentorah.service
 
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
-import zhttp.http.Request
+import zio.http.Request
 
 final class GCPLogger(projectId: String, logger: org.slf4j.Logger):
   def info   (request: Option[Request], message: String): Unit = log    (     request , message, "INFO"   )
