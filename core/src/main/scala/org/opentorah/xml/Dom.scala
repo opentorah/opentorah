@@ -135,4 +135,4 @@ object Dom extends Xml:
     element
 
   // TODO implement!
-  override protected def descendats(nodes: Nodes, elementName: String): Nodes = ???
+  override protected def descendants(nodes: Nodes, elementName: String): Nodes = ???

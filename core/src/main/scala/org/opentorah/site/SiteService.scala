@@ -8,7 +8,8 @@ import org.opentorah.tei.LinksResolver
 import org.opentorah.util.{Effects, Files, Strings}
 import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser}
 import org.slf4j.Logger
-import zhttp.http.*
+import zio.http.{!!, /, Body, Http, HttpApp, Request, Response, *} // TODO remove * - what in it makes matching Methods possible?
+import zio.http.model.{Headers, HeaderValues, HTTP_CHARSET, Method}
 import zio.{Chunk, Task, ZIO}
 import java.io.File
 import java.net.URL

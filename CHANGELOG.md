@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.6] - 
+- dependency updates;
+- move from zhttp to zio-http;
+
 ## [0.10.5] - 2022-09-15
 - dependency updates;
 

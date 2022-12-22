@@ -2,13 +2,14 @@ package org.opentorah.service
 
 import org.opentorah.util.{Effects, Files, Logging}
 import org.slf4j.{Logger, LoggerFactory}
-import zhttp.http.{!!, /, Body, Headers, Http, HttpApp, Method, Path, Request, Response, Status, *} // TODO remove *
-import zhttp.service.Server
-import zio.ZIO
+import zio.http.{Body, HttpApp, Path, Request, Response, Server, ServerConfig}
+import zio.http.model.{Headers, Method, Status}
+import zio.{ZIO, ZLayer}
+
 import java.time.Instant
 import ServiceApp.given
 
-// TODO use ZHTTP middleware to:
+// TODO use zio-http middleware to:
 // - auto-time (as opposed to the current manual approach with timed()) all requests (not just GETs);
 // - turn failures into appropriate responses (ala orNotFound());
 // - handle static resources and files in a centralized manner.
@@ -53,21 +54,20 @@ trait ServiceApp extends zio.ZIOAppDefault:
 
     logger.warning(s"serviceName=$serviceName") // TODO more information
 
-    Server(routes)
+    val config: ServerConfig = ServerConfig.default
       // Note: To be accessible when running in a docker container the server
       // must bind to all IPs, not just 127.0.0.1;
       // with http4s, I had to supply a "host" string "0.0.0.0",
-      // but with zhttp there seems to be no way to do it - and no need :)
-      .withPort(port)
-      .make
-      // Ensures the server doesn't die after printing
-      .flatMap((start: Server.Start) => zio.Console.printLine(s"Server started on port ${start.port}") *> ZIO.never) // TODO use logger
-      .tapError((error: Throwable)   => zio.Console.printLine(s"Execution failed with: $error")) // TODO use logger
-      .provideSomeLayer(
-        zio.Scope.default ++
-        zhttp.service.EventLoopGroup.auto(nThreads) ++
-        zhttp.service.server.ServerChannelFactory.auto
-      )
+      // but with zio-http there seems to be no way to do it - and no need :)
+      .port(port)
+      .leakDetection(ServerConfig.LeakDetectionLevel.PARANOID)
+      .maxThreads(nThreads)
+    val configLayer: ZLayer[Any, Nothing, ServerConfig] = ServerConfig.live(config)
+
+    (Server.install(routes).flatMap { port =>
+      zio.Console.printLine(s"Started server on port: $port") // TODO use logger
+    } *> ZIO.never)
+      .provide(configLayer, Server.live)
 
   protected def portDefault: Int = 8080
 
@@ -181,7 +181,7 @@ object ServiceApp:
               (
                 if contentLength >= 0
                 then Headers.contentLength(contentLength)
-                else Headers.transferEncoding(zhttp.http.HeaderValues.chunked)
+                else Headers.transferEncoding(zio.http.model.HeaderValues.chunked)
               ),
           body = Body.fromStream(zio.stream.ZStream.fromInputStream(inputStream))
         )

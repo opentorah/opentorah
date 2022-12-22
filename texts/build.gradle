@@ -20,6 +20,6 @@ dependencies {
   implementation project(':opentorah-util')
 
   testImplementation libs.caffeine
-  implementation libs.zhttp
+  implementation libs.zio.http
   implementation libs.logback
 }

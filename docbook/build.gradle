@@ -56,33 +56,16 @@ test {
 }
 
 gradlePlugin {
+  website = 'https://github.com/opentorah/opentorah/tree/master/docbook'
+  vcsUrl  = 'https://github.com/opentorah/opentorah/tree/master/docbook' //.git' ?
   plugins {
     docBook {
       id = 'org.opentorah.docbook'
       implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
-    }
-  }
-}
-
-// TODO this block goes away in Gradle 8; tags move to gradlePlugin block.
-pluginBundle {
-  website = 'https://github.com/opentorah/opentorah/tree/master/docbook'
-  vcsUrl  = 'https://github.com/opentorah/opentorah/tree/master/docbook' //.git' ?
-
-  plugins {
-    docBook {
       displayName = project.description
       description = project.description
-      tags        = ['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid']
+      tags.set(['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid'])
     }
-  }
-
-  // If you have an existing plugin deployed to Bintray and would like to keep
-  // your existing group ID and artifact ID for continuity, you can specify
-  // them here (needs manual approval on first publication).
-  mavenCoordinates {
-    groupId    = 'org.opentorah'
-    artifactId = 'opentorah-docbook'
   }
 }
 
