@@ -81,9 +81,9 @@ final class SimpleTimesTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks,
   }
 
   "simple()/canonical()" should "be correct" in {
-    Vector(1816909, 751829, 49683240).toString shouldBe "1850152d"
-    Vector(1816909, 751829+46003).toString shouldBe "1850152d"
-    Vector(1816909+33243).toString shouldBe "1850152d"
+    Vector(1816909, 751829, 49683240).toString shouldBe "1850152ᵈ"
+    Vector(1816909, 751829+46003).toString shouldBe "1850152ᵈ"
+    Vector(1816909+33243).toString shouldBe "1850152ᵈ"
   }
 
   "toRational()" should "be correct" in {
@@ -143,14 +143,14 @@ final class SimpleTimesTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks,
   }
 
   "toString()" should "be correct" in {
-    Vector(3).toString shouldBe "3d"
-    Vector(3, 5).toString shouldBe "3d5h"
-    Vector(3, 5).toString(2) shouldBe "3d5h0p"
-    Vector(3, 5).toString(3) shouldBe "3d5h0p0m"
-    Vector(3, 5).toString(4) shouldBe "3d5h0p0m0"
-    Vector(3, 5, 4).toString shouldBe "3d5h4p"
-    Vector(-3, 5, 4).toString shouldBe "-2d18h1076p"
-    Vector(3, 5, 4, 1).toString shouldBe "3d5h4p1m"
-    Vector(-3, 5, 4, 1).toString shouldBe "-2d18h1075p75m"
-    (-Vector(0, 5, 4, 1)).toString shouldBe "-0d5h4p1m"
+    Vector(3).toString shouldBe "3ᵈ"
+    Vector(3, 5).toString shouldBe "3ᵈ5ʰ"
+    Vector(3, 5).toString(2) shouldBe "3ᵈ5ʰ0ᵖ"
+    Vector(3, 5).toString(3) shouldBe "3ᵈ5ʰ0ᵖ0ᵐ"
+    Vector(3, 5).toString(4) shouldBe "3ᵈ5ʰ0ᵖ0ᵐ0"
+    Vector(3, 5, 4).toString shouldBe "3ᵈ5ʰ4ᵖ"
+    Vector(-3, 5, 4).toString shouldBe "-2ᵈ18ʰ1076ᵖ"
+    Vector(3, 5, 4, 1).toString shouldBe "3ᵈ5ʰ4ᵖ1ᵐ"
+    Vector(-3, 5, 4, 1).toString shouldBe "-2ᵈ18ʰ1075ᵖ75ᵐ"
+    (-Vector(0, 5, 4, 1)).toString shouldBe "-0ᵈ5ʰ4ᵖ1ᵐ"
   }

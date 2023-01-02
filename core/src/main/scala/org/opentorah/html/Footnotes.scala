@@ -1,12 +1,12 @@
 package org.opentorah.html
 
-import org.opentorah.xml.ScalaXml
+import org.opentorah.xml.{ScalaXml, Xml}
 import zio.{URIO, ZIO, ZLayer}
 
 class Footnotes:
   private var nextIdNumber: Int = 1
 
-  def takeNextIdNumber: Int =
+  private def takeNextIdNumber: Int =
     val result: Int = nextIdNumber
     nextIdNumber += 1
     result
@@ -21,7 +21,7 @@ class Footnotes:
 
   def pop(): Unit = footnotes = footnotes.tail
 
-  def getNextNumber: Int = footnotes.head.length + 1
+  private def getNextNumber: Int = footnotes.head.length + 1
 
   def add(footnote: ScalaXml.Element): Unit =
     footnotes = (footnotes.head :+ footnote) +: footnotes.tail
@@ -34,13 +34,24 @@ class Footnotes:
 // TODO add pre-existing ids as a set and take it into account when getting a new id (including for notes)
 // TODO add nested section ids
 // TODO use ZIO.service()
+// TODO introduce footnote types (sections; differentiated by the reference symbol)
 object Footnotes:
-  def takeNextIdNumber: URIO[Footnotes, Int] = ZIO.environmentWith(_.get.takeNextIdNumber)
   def isEmpty: URIO[Footnotes, Boolean] = ZIO.environmentWith(_.get.isEmpty)
   def push: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.push())
   def pop: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.pop())
-  def getNextNumber: URIO[Footnotes, Int] = ZIO.environmentWith(_.get.getNextNumber)
-  def add(footnote: ScalaXml.Element): URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.add(footnote))
+
   def get: URIO[Footnotes, Seq[ScalaXml.Element]] = ZIO.environmentWith(_.get.get)
 
   def empty: ZLayer[Any, Nothing, Footnotes] = ZLayer.succeed(new Footnotes)
+
+  def footnote(element: ScalaXml.Element): URIO[Footnotes, ScalaXml.Element] = for
+  // TODO get two ids, one for the actual content at the end
+    idNumber: Int <- ZIO.environmentWith[Footnotes](_.get.takeNextIdNumber)
+    srcId: String = Xml.idAttribute.optional.get(ScalaXml)(element).getOrElse(s"footnote_src_$idNumber")
+    contentId: String = s"footnote_$idNumber"
+    number: Int <- ZIO.environmentWith[Footnotes](_.get.getNextNumber)
+    symbol: String = number.toString
+    footnote: ScalaXml.Element = Html.footnote(contentId, srcId, symbol, ScalaXml.getChildren(element))
+    _ <- ZIO.environmentWith[Footnotes](_.get.add(footnote))
+  yield
+    Html.footnoteRef(contentId, srcId, symbol)

@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH15">
   <title>Chapter 15</title>
 
-  <section xml:id="KH15-1" role="NotInToc">
+  <simplesect xml:id="KH15-1">
     <title>Law 1</title>
 
     <para>
@@ -12,9 +12,9 @@
       Then, subtract mean solar longitude from the mean lunar longitude and double the result.
       This value is called <glossterm linkend="dd-term">doubled distance</glossterm> .
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-2" role="NotInToc">
+  <simplesect xml:id="KH15-2">
     <title>Law 2</title>
 
     <para>
@@ -23,9 +23,9 @@
       observation when the moon is indeed visible to be outside the interval from 5° to 62°.
       It cannot be more - nor less.
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-3" role="NotInToc">
+  <simplesect xml:id="KH15-3">
     <title>Law 3</title>
     <para> A correction that depends on the doubled distance is added to the mean lunar
       anomaly, giving  <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון): </para>
@@ -82,9 +82,9 @@
         </tbody>
       </tgroup>
     </informaltable>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-4" role="NotInToc">
+  <simplesect xml:id="KH15-4">
     <title>Law 4</title>
 
     <para xml:id="l15-4"> Then, see how many degrees is corrected lunar anomaly. If it
@@ -95,36 +95,36 @@
       you add to it or subtract from it is the
       <glossterm>true lunar longitude at the observation time</glossterm>.
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-5" role="NotInToc">
+  <simplesect xml:id="KH15-5">
     <title>Law 5</title>
     <para>
       If the corrected anomaly is 180° or 360°, there is no visible anomaly,
       so mean lunar longitude at observation time is also true longitude.<footnote><para>This is Law 5.</para></footnote>
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-6" role="NotInToc">
+  <simplesect xml:id="KH15-6">
     <title>Law 6</title>
     <para>
       What is the value of the visible
       anomaly for a given value of the corrected anomaly?
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-7" role="NotInToc">
+  <simplesect xml:id="KH15-7">
     <title>Law 7</title>
     <para>TODO</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-8" role="NotInToc">
+  <simplesect xml:id="KH15-8">
     <title>Law 8</title>
     <para>TODO</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH15-9" role="NotInToc">
+  <simplesect xml:id="KH15-9">
     <title>Law 9</title>
     <para>TODO</para>
-  </section>
+  </simplesect>
 </chapter>

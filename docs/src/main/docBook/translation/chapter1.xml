@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH1">
   <title>Chapter 1</title>
 
-  <section xml:id="KH1-1" role="NotInToc">
+  <simplesect xml:id="KH1-1">
     <title>Law 1</title>
     <para>The months of the year are lunar months, as it is said: "[...] the burnt offering of the month in its month"<footnote>
       <para>Bamidbar 28:14</para>
@@ -10,13 +10,15 @@
       <para>Shemos 12:2</para>
     </footnote>. This is what the sages said:
       "The Holy One, blessed be He, showed to Moshe, in a prophetic vision, the image of the Moon, and said to him:
-      '[When] you see [the Moon] like this - sanctify [it].'"<footnote><para>Rosh Hashanah 20b;<footnote><para>This is a test footnote of the second level; TODO REMOVE!</para></footnote> Menachot 29a</para></footnote>
+      '<phrase revisionflag="added">When</phrase> you see <phrase revisionflag="added">the Moon</phrase> like this - sanctify
+      <phrase revisionflag="added">it</phrase>.'"<footnote><para>Rosh Hashanah 20b; Menachot 29a</para></footnote>
     </para>
-    <para>But the years that we reckon are solar years, as it is said: "Keep the month of aviv [spring]".<footnote><para>Dvarim 16</para></footnote>
+    <para>But the years that we reckon are solar years, as it is said: "Keep the month of aviv [spring]".<footnote>
+      <para>Dvarim 16</para></footnote>
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-2" role="NotInToc">
+  <simplesect xml:id="KH1-2">
     <title>Law 2</title>
     <para>By how much is the solar year longer than the lunar year? By approximately 11 days. Therefore, when this excess
       accumulates to around 30 days, or a little less, or a little more, a month is added and the year is made to have
@@ -24,36 +26,36 @@
       and some days, as it is said: "for the months of the year" - you count the months of the year, but not the days of
       the year.<footnote><para>Megilla 5a; Nazir 7a</para></footnote>
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-3" role="NotInToc">
+  <simplesect xml:id="KH1-3">
     <title>Law 3</title>
     <para>Each month, the moon becomes hidden for about two days, or a little less or more: about one day before its
       conjunction with the sun at the end of the month, and about one day after its conjunction with the sun, and in the
-      evening it is sightet in the west. The night when it is sighted in the west after being hidden is the beginning of
+      evening it is sighted in the west. The night when it is sighted in the west after being hidden is the beginning of
       the month. We count 29 days from that day; if the moon is sighted on the 30th night, the 30th day is the first day
       of the [next] month. If it is not sighted, first day of the [next] month is the 31st day, and the 30th day belongs
       to the previous month. On the 31st night, we do not depend on the moon, regardless if it is visible or not, since
       lunar month is never longer than 30 days.</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-4" role="NotInToc">
+  <simplesect xml:id="KH1-4">
     <title>Law 4</title>
     <para>Month of 29 days, [when] the moon was sighted on the 30th night, is called "lacking". If the moon was not
       sighted, and the previous month has 30 days, it is called "pregnant" month, or "full" month.
       The moon sighted on the 30th night is called "moon sighted on time". If it is sighted on the 31st night, but
       not on the 30th night, it is called "moon sighted on the night of pregnancy".</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-5" role="NotInToc">
+  <simplesect xml:id="KH1-5">
     <title>Law 5</title>
     <para>Sighting of the moon is not up to an individual, unlike determination of the Shabbos, where one
       counts 6 days and observes Shabbos on the 7th, but is given to the court. Only when the court sanctifies and
       establishes the day as the beginning of the [new] month does it become the beginning of the [new] month.
       As it is said: "this month shall be for you" - this testimony is entrusted to you.</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-6" role="NotInToc">
+  <simplesect xml:id="KH1-6">
     <title>Law 6</title>
     <para>The court calculates, like the astronomers who know positions of the planets and their movements,
       and look into it until they know if it is possible for the moon to be sighted on time - that is, on the 30th
@@ -64,25 +66,25 @@
       impossible to sight the moon, they do not sit during the 30th day and do not await the witnesses.
       And if the witnesses did come, it is certain that they are false witnesses or that they saw a likeness of the
       moon in the clouds and not the real moon.</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-7" role="NotInToc">
+  <simplesect xml:id="KH1-7">
     <title>Law 7</title>
     <para>It is a positive commandment of the Torah for the court to calculate and to know whether the moon can
       be sighted or not, and to examine the witnesses before the month is sanctified, and to send [messengers] to
       notify the rest of the people which day is the beginning of the month, so that they know on which day are
       the festivals. As it is said: "which you will call the holy convocations" and as it is said : "keep this
       statute in its time".</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH1-8" role="NotInToc">
+  <simplesect xml:id="KH1-8">
     <title>Law 8</title>
     <para>Calculation and establishment of the months and declaration of "pregnant" years is done only in the
-      Land of Israel, as it is said: "For out of Zion will come forth Torah, and the word of G-d - from Yerushalaim".
+      Land of Israel, as it is said: "For out of Zion will come forth Torah, and the word of G-d - from Jerusalem".
       But, if there was a man great in wisdom, and ordained in the Land of Israel, who came out of the Land, and
       there remains no one equal to him in the Land of Israel, he can calculate and establish month, and declares
       "pregnant" years outside of the Land. If he becomes aware that in the Land of Israel there appeared a man as great
       as him - or, needless to say, greater than him - he is prohibited to establish and to proclaim outside of the Land,
       and if he transgressed and did establish or did proclaim, it is as if he didn't do a thing.</para>
-  </section>
+  </simplesect>
 </chapter>

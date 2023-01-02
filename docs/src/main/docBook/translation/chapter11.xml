@@ -2,88 +2,88 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH11">
     <title>Chapter 11</title>
 
-    <section xml:id="KH11-1" role="NotInToc">
+    <simplesect xml:id="KH11-1">
         <title>Law 1</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-2" role="NotInToc">
+    <simplesect xml:id="KH11-2">
         <title>Law 2</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-3" role="NotInToc">
+    <simplesect xml:id="KH11-3">
         <title>Law 3</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-4" role="NotInToc">
+    <simplesect xml:id="KH11-4">
         <title>Law 4</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-5" role="NotInToc">
+    <simplesect xml:id="KH11-5">
         <title>Law 5</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-6" role="NotInToc">
+    <simplesect xml:id="KH11-6">
         <title>Law 6</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-7" role="NotInToc">
+    <simplesect xml:id="KH11-7">
         <title>Law 7</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-8" role="NotInToc">
+    <simplesect xml:id="KH11-8">
         <title>Law 8</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-9" role="NotInToc">
+    <simplesect xml:id="KH11-9">
         <title>Law 9</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-10" role="NotInToc">
+    <simplesect xml:id="KH11-10">
         <title>Law 10</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-11" role="NotInToc">
+    <simplesect xml:id="KH11-11">
         <title>Law 11</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-12" role="NotInToc">
+    <simplesect xml:id="KH11-12">
         <title>Law 12</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-13" role="NotInToc">
+    <simplesect xml:id="KH11-13">
         <title>Law 13</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-14" role="NotInToc">
+    <simplesect xml:id="KH11-14">
         <title>Law 14</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-15" role="NotInToc">
+    <simplesect xml:id="KH11-15">
         <title>Law 15</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-16" role="NotInToc">
+    <simplesect xml:id="KH11-16">
         <title>Law 16</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
     
-    <section xml:id="KH11-17" role="NotInToc">
+    <simplesect xml:id="KH11-17">
         <title>Law 17</title>
         <para>TODO</para>
-    </section>
+    </simplesect>
 </chapter>

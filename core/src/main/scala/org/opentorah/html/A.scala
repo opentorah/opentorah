@@ -10,7 +10,7 @@ final class A(
   target: Option[String] = None,
   id: Option[String] = None,
   classes: Seq[String] = Seq.empty,
-  declareNamespace: Boolean = false
+  declareNamespace: Boolean = false // TODO eliminate; add to the <a> xmlns={namespace.uri}
 ):
   private def copy(
     uri: Option[URI] = uri,
