@@ -177,11 +177,10 @@ social-media-list a:hover .username {
 
 @media screen and (max-width: 800px) {
   .footer-col-1,
-.footer-col-2 {
+  .footer-col-2 {
     width: -webkit-calc(50% - (30px / 2));
     width: calc(50% - (30px / 2));
   }
-
   .footer-col-3 {
     width: -webkit-calc(100% - (30px / 2));
     width: calc(100% - (30px / 2));
@@ -278,8 +277,7 @@ h1, h2, h3, h4, h5, h6, p, tei-p, para, blockquote, pre, ul, ol, dl, figure, div
 }
 
 main {
-  display: block;
-  /* Default value of `display` of `main` element is 'inline' in IE 11. */
+  display: block; /* Default value of `display` of `main` element is 'inline' in IE 11. */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -297,9 +295,9 @@ book > info > db-title,
 }
 @media screen and (max-width: 800px) {
   .post-title,
-book > db-title,
-book > info > db-title,
-.store-header > tei-head {
+  book > db-title,
+  book > info > db-title,
+  .store-header > tei-head {
     font-size: 36px;
   }
 }
@@ -310,7 +308,7 @@ tei-div > tei-head {
 }
 @media screen and (max-width: 800px) {
   h2,
-tei-div > tei-head {
+  tei-div > tei-head {
     font-size: 28px;
   }
 }
@@ -330,26 +328,30 @@ bibliodiv > db-title {
 
 h3,
 tei-div > tei-div > tei-head,
-section > db-title {
+section > db-title,
+simplesect > db-title {
   font-size: 26px;
 }
 @media screen and (max-width: 800px) {
   h3,
-tei-div > tei-div > tei-head,
-section > db-title {
+  tei-div > tei-div > tei-head,
+  section > db-title,
+  simplesect > db-title {
     font-size: 22px;
   }
 }
 
 h4,
 tei-div > tei-div > tei-div > tei-head,
-section > section > db-title {
+section > section > db-title,
+section > simplesect > db-title {
   font-size: 20px;
 }
 @media screen and (max-width: 800px) {
   h4,
-tei-div > tei-div > tei-div > tei-head,
-section > section > db-title {
+  tei-div > tei-div > tei-div > tei-head,
+  section > section > db-title,
+  section > simplesect > db-title {
     font-size: 18px;
   }
 }
@@ -591,33 +593,28 @@ listitem > itemizedlist, listitem > simplelist {
   margin-bottom: 0;
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list, list[type=simple], list[type=ordered], listBibl, simplelist {
   list-style-type: none;
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list[type=bulleted] {
   list-style-type: disc;
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list[type=ordered] {
   counter-reset: items 0;
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list[type=ordered] > item:before {
   counter-increment: items 1;
   content: counter(items, decimal) ". ";
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list[type=ordered] > item {
   margin-left: 0;
 }
@@ -627,8 +624,7 @@ item > list[type=ordered] {
   margin-left: 1em;
 }
 
-/*text*/
-/*tei|*/
+/*text*/ /*tei|*/
 list[type=gloss] {
   list-style-type: none;
 }
@@ -682,6 +678,11 @@ glossterm {
 /*db|*/
 glossdef {
   text-indent: 1em;
+}
+
+/*db|*/
+phrase[revisionflag=added] {
+  font-style: italic;
 }
 
 /* a */

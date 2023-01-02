@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH12">
   <title>Chapter 12</title>
 
-  <section xml:id="KH12-1" role="NotInToc">
+  <simplesect xml:id="KH12-1">
     <title>Law 1</title>
 
     <para>The mean rate of movement of the sun in one day (that is, twenty-four hours)
@@ -43,9 +43,9 @@
       thirty-five minutes and one second, in symbols - 28°35′1″.
       Its movement in a regular year is three hundred forty-eight degrees,
       fifty-five minutes and fifteen seconds, in symbols - 348°55′15″.</para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH12-2" role="NotInToc">
+  <simplesect xml:id="KH12-2">
     <title>Law 2</title>
 
     <para>There is a point on the Sun's orbit (and on orbits of the other seven planets) such that when the planet is there
@@ -104,5 +104,5 @@
       And the same you shall do for the mean Moon and the rest of the planets if [their movements] will be known to you.
       And it should be clear to you from the idea of our words that the same way you can find out mean Sun for any day you want from the coming days,
       you can calculate its mean for any day you want from the days that passed.</para>
-  </section>
+  </simplesect>
 </chapter>

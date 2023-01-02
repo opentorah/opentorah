@@ -70,6 +70,7 @@ trait Numbers:
    *
    * @param digits  sequence of the digits comprising this number.
    */
+  // TODO extend scala.math.Numeric
   abstract class Number[N <: Number[N]](final val digits: Digits) extends Ordered[N]:
     this: N =>
 
@@ -142,6 +143,8 @@ trait Numbers:
     /** Converts this number to `Double`. */
     final def toDouble: Double = convertTo[Double](digits)
 
+    // TODO fromString()?
+    
     /** Convert a number to String.
      *
      * If length specified is bugger than the number of digits after the point in the number,

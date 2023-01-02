@@ -2,7 +2,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="KH14">
   <title>Chapter 14</title>
 
-  <section xml:id="KH14-1" role="NotInToc">
+  <simplesect xml:id="KH14-1">
     <title>Law 1</title>
 
     <para>The moon has two mean movements. The moon itself rotates on a small circle
@@ -12,9 +12,9 @@
       that encircles the Earth.
       The mean movement of the small circle on the big circle that encircles the Earth
       is called movement of the <glossterm>mean lunar longitude</glossterm> (אמצע הירח). </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH14-2" role="NotInToc">
+  <simplesect xml:id="KH14-2">
     <title>Law 2</title>
 
     <para>
@@ -26,9 +26,9 @@
     <para>
       And in this way you can calculate it for any number of days and years that you want.
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH14-3" role="NotInToc">
+  <simplesect xml:id="KH14-3">
     <title>Law 3</title>
     <para>
       Movement in mean lunar anomaly in one day is 13°3′54″.
@@ -36,9 +36,9 @@
     <para>
       For longer periods, (remainder) of the movement in mean lunar anomaly is:
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH14-4" role="NotInToc">
+  <simplesect xml:id="KH14-4">
     <title>Law 4</title>
 
     <para>
@@ -49,9 +49,9 @@
       to which you add, you'll calculate mean lunar longitude on any day that you want the same
       way as you did for the mean solar longitude. TODO: reference
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH14-5" role="NotInToc">
+  <simplesect xml:id="KH14-5">
     <title>Law 5</title>
 
     <para> After you calculate mean lunar longitude at the
@@ -60,9 +60,9 @@
       [This is the correction of the mean lunar longitude depending on
       the mean solar longitude:]
     </para>
-  </section>
+  </simplesect>
 
-  <section xml:id="KH14-6" role="NotInToc">
+  <simplesect xml:id="KH14-6">
     <title>Law 6</title>
     <informaltable frame="all">
       <tgroup cols="4">
@@ -135,5 +135,5 @@
       date you are calculating it for. And this is what is called
       <glossterm>mean lunar longitude at observation time</glossterm>.
     </para>
-  </section>
+  </simplesect>
 </chapter>

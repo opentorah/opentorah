@@ -36,7 +36,7 @@ final class Node(
   )
 
   def npmInstall(module: String, overwrite: Boolean): Unit =
-    if overwrite || !nodeModules.exists then
+    if overwrite || !File(nodeModules, module).exists then
       Node.logger.info(s"Node.npmInstall($module)")
       nodeModules.mkdirs()
       npm(Seq("install", "--no-save", "--silent", module))

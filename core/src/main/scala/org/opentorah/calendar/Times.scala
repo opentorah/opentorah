@@ -5,10 +5,10 @@ import org.opentorah.numbers.{Digits, Numbers}
 trait Times extends Numbers.NonPeriodic:
 
   enum TimesDigit(override val sign: String) extends Digit(sign):
-    case DAYS extends TimesDigit("d")
-    case HOURS extends TimesDigit("h")
-    case PARTS extends TimesDigit("p")
-    case MOMENTS extends TimesDigit("m")
+    case DAYS extends TimesDigit("ᵈ")
+    case HOURS extends TimesDigit("ʰ")
+    case PARTS extends TimesDigit("ᵖ")
+    case MOMENTS extends TimesDigit("ᵐ")
 
   final override type DigitType = TimesDigit
 

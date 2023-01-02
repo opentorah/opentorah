@@ -18,7 +18,6 @@ import org.opentorah.xml.ScalaXml
     - nodeSnippet;
   - what version of MathJax loads for MathJax2? do I need to specify the version?
   - verify that FOP works with both MathJax2 and MathJax3 for calendar (how does it even work? or does it?);
-  - upgrade Node.js version;
   - in MathJaxConfiguration, adjust for versions 2 and 3:
     - fontURL;
     - fonts;
@@ -201,7 +200,7 @@ made clear that:
     // Looks like exFactor in MathJax3 chtml options is my `exInEms`; if so, it is now 0.5:
     override val exInEms: Float = 0.5f
 
-    override val packageName: String = "mathjax-node"
+    override val packageName: String = "mathjax"
 
     override val configurationFunction: String = "config"
 

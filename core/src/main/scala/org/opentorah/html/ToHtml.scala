@@ -7,22 +7,24 @@ import zio.{URIO, ZIO}
 trait ToHtml[R]:
   protected def namespace: Namespace
 
+  // TODO handle table/tr/td systematically
+
   protected def isFootnote(element: ScalaXml.Element): Boolean
 
   protected def isFootnotesContainer(element: ScalaXml.Element): Boolean = false
 
-  protected def elementToHtml(
-    element: ScalaXml.Element
-  ): URIO[R, (ScalaXml.Element, ScalaXml.Nodes)]
+  protected def elementToHtml(element: ScalaXml.Element): URIO[R, ScalaXml.Element]
 
-  protected final def noTooltip(element: ScalaXml.Element): (ScalaXml.Element, ScalaXml.Nodes) =
-    (element, Seq.empty)
+  private def isInNamespace(element: ScalaXml.Element): Boolean = ScalaXml.getNamespace(element) == namespace.default
 
-  protected final def succeed(element: ScalaXml.Element): URIO[R, (ScalaXml.Element, ScalaXml.Nodes)] =
-    ZIO.succeed(noTooltip(element))
+  private def addPrefix(name: String): String = s"${namespace.getPrefix.get}-$name"
 
   final def toHtml(element: ScalaXml.Element): URIO[R, ScalaXml.Element] =
-    processFootnotes(element).provideSomeLayer[R](Footnotes.empty).flatMap(elementsToHtml)
+    for
+      footnotesDone <- processFootnotes(element).provideSomeLayer[R](Footnotes.empty)
+      html <- elementsToHtml(footnotesDone)
+    yield
+      html
 
   private def processFootnotes(element: ScalaXml.Element): URIO[Footnotes & R, ScalaXml.Element] = for
     isEmpty: Boolean <- Footnotes.isEmpty
@@ -30,29 +32,13 @@ trait ToHtml[R]:
     _ <- if !doPush then ZIO.succeed(()) else Footnotes.push
     newElement: ScalaXml.Element <-
       if isInNamespace(element) && isFootnote(element)
-      then processFootnote(element)
+      then Footnotes.footnote(element)
       else transformChildren(processFootnotes, element)
     result: ScalaXml.Element <-
       if !doPush
       then ZIO.succeed(newElement)
       else processLevels(newElement, Seq.empty)
   yield result
-
-  private def processFootnote(element: ScalaXml.Element): URIO[Footnotes & R, ScalaXml.Element] =  for
-    // TODO get two ids, one for the actual content at the end
-    idNumber: Int <- Footnotes.takeNextIdNumber
-    srcId: String = Xml.idAttribute.optional.get(ScalaXml)(element).getOrElse(s"footnote_src_$idNumber")
-    contentId = s"footnote_$idNumber"
-    number: Int <- Footnotes.getNextNumber
-    symbol: String = number.toString
-    _ <- Footnotes.add(
-      <span xmlns={Html.namespace.uri} class="footnote" id={contentId}>
-        <a href={s"#$srcId"} class="footnote-backlink">{symbol}</a>
-        {ScalaXml.getChildren(element)}
-      </span>
-    )
-  yield
-    <a xmlns={Html.namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>{symbol}</a>
 
   private def processLevels(
     newElement: ScalaXml.Element,
@@ -63,9 +49,10 @@ trait ToHtml[R]:
       if footnotes.isEmpty then for
         _ <- Footnotes.pop
       yield
-        if levels.isEmpty then newElement else ScalaXml.setChildren(newElement,
-          ScalaXml.getChildren(newElement) ++ <hr class="footnotes-line"/> ++
-          (for level <- levels yield <div xmlns={Html.namespace.uri} class="footnotes">{level}</div>)
+        if levels.isEmpty
+        then newElement
+        else ScalaXml.appendChildren(newElement,
+          (for (level, depth) <- levels.zipWithIndex yield Html.footnoteLevel(level, depth)).flatten
         )
       else for
         nextLevel: Seq[ScalaXml.Element] <- ZIO.foreach(footnotes)(processFootnotes)
@@ -76,42 +63,34 @@ trait ToHtml[R]:
   private def elementsToHtml(oldElement: ScalaXml.Element): URIO[R, ScalaXml.Element] = for
     element: ScalaXml.Element <- transformChildren(elementsToHtml, oldElement)
     result: ScalaXml.Element <- if !isInNamespace(element) then ZIO.succeed(element) else
-      val name: String = ScalaXml.getName(element)
 
-      val attributes: Attribute.StringValues = ScalaXml.getAttributes(element).map((attribute: Attribute.Value[String]) =>
-        ToHtml.xml2htmlAttribute.get(attribute.attribute).map(_.optional.withValue(attribute.value)).getOrElse {
-          val name: String = attribute.attribute.name
-          if !Html.reservedAttributes.contains(name) then attribute
-          else Attribute(addPrefix(name)).optional.withValue(attribute.value)
-        }
-      )
+      val attributes: Attribute.StringValues =
+        for attribute: Attribute.Value[String] <- ScalaXml.getAttributes(element) yield
+          ToHtml.xml2htmlAttribute.get(attribute.attribute).map(_.optional.withValue(attribute.value)).getOrElse {
+            val name: String = attribute.attribute.name
+            if !Html.reservedAttributes.contains(name) then attribute
+            else Attribute(addPrefix(name)).optional.withValue(attribute.value)
+          }
 
-      for
-        // Note: if I  do this in one step, NoSuchElement gets into the error type...
-        newElementAndTooltip: (ScalaXml.Element, ScalaXml.Nodes) <- elementToHtml(element)
-        newElement: ScalaXml.Element = newElementAndTooltip._1
-        tooltip: ScalaXml.Nodes = newElementAndTooltip._2
-      yield
-        val result: ScalaXml.Element = if newElement eq element then ScalaXml.setAttributes(
-          element = if Html.reservedElements.contains(name) then ScalaXml.rename(element, addPrefix(name)) else element,
-          attributes = attributes
-        ) else ScalaXml.addAttributes(
-          element = ScalaXml.declareNamespace(Html.namespace.default, newElement),
-          attributes = Html.classAttribute.required.withValue(name) +: attributes
-        )
-        if tooltip.isEmpty then result else ScalaXml.setChildren(result,
-          <span xmlns={Html.namespace.uri} class="tooltip">{tooltip}</span> +: ScalaXml.getChildren(result))
+      for newElement: ScalaXml.Element <- elementToHtml(element) yield
+        if isInNamespace(newElement) then
+          val name: String = ScalaXml.getName(newElement)
+          ScalaXml.setAttributes(
+            element = if !Html.reservedElements.contains(name) then newElement else ScalaXml.rename(newElement, addPrefix(name)),
+            attributes = attributes
+          )
+        else
+          ScalaXml.addAttributes(
+            element = newElement,
+            attributes = Html.classAttribute.required.withValue(ScalaXml.getName(element)) +: attributes
+          )
 
   yield result
 
-  private def addPrefix(name: String): String = s"${namespace.getPrefix.get}-$name"
-
-  private def isInNamespace(element: ScalaXml.Element): Boolean = ScalaXml.getNamespace(element) == namespace.default
-
-  private def transformChildren[R](
-    transform: ScalaXml.Element => URIO[R, ScalaXml.Element],
+  private def transformChildren[T](
+    transform: ScalaXml.Element => URIO[T, ScalaXml.Element],
     element: ScalaXml.Element
-  ): URIO[R, ScalaXml.Element] = for
+  ): URIO[T, ScalaXml.Element] = for
     children: ScalaXml.Nodes <- ZIO.foreach(ScalaXml.getChildren(element))((node: ScalaXml.Node) =>
       if !ScalaXml.isElement(node) then ZIO.succeed(node) else transform(ScalaXml.asElement(node))
     )
@@ -123,3 +102,7 @@ object ToHtml:
     Xml.langAttribute -> Html.langAttribute
     // TODO xml:base? xml:space?
   )
+
+  // TODO eliminate
+  def namespace(element: ScalaXml.Element): ScalaXml.Element =
+    ScalaXml.declareNamespace(Html.namespace.default, element)

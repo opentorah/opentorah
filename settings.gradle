@@ -15,7 +15,7 @@ pluginManagement {
   }
 }
 
-final String scalaVersion      = '3.2.1'
+final String scalaVersion      = '3.2.2'
 final String scalaVersionMajor = '3'
 
 final String zioVersion        = '2.0.5'
@@ -29,9 +29,9 @@ final String catsVersion       = '2.9.0'
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
-    maven {
-      url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-    }
+//    maven {
+//      url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+//    }
   }
 
   // Yes, I know about 'libs.versions.toml', but:
@@ -48,16 +48,16 @@ dependencyResolutionManagement {
     library('graalvm-sdk'  , 'org.graalvm:graal-sdk:22.0.0.2')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.6.0')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.6.4')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
-    library('saxon11'      , 'net.sf.saxon:Saxon-HE:11.4')
-    library('saxon6'       , 'saxon:saxon:6.5.2') // Note: 6.5.3 is the latest, but - no sources for debugging...
+    library('saxon11'      , 'net.sf.saxon:Saxon-HE:12.0')
+    library('saxon6'       , 'saxon:saxon:6.5.3') // Note: 6.5.3 is the latest, but - no sources for debugging, so 6.5.2...
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.16.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.17.1')
 
     // TODO drop support for JEuclid
     library('fop-jeuclid'  , 'de.rototor.jeuclid:jeuclid-fop:3.1.14')
@@ -115,7 +115,7 @@ dependencyResolutionManagement {
 
     // Testing
     library('podvalRun' , 'org.podval.tools:org.podval.tools.run:0.1.4')
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.14")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.15")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
 
     // Documentation

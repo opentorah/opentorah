@@ -183,3 +183,38 @@ object Html extends Dialect, Doctype:
   // TODO implement and move into mathjax and highlighter correspondingly:
   private def isMathPresent(content: ScalaXml.Element): Boolean = true // TODO
   private def isCodePresent(content: ScalaXml.Element): Boolean = true
+
+  private def tooltip(content: ScalaXml.Nodes): ScalaXml.Element =
+    <span xmlns={namespace.uri} class="tooltip">
+      {content}
+    </span>
+  
+  def addTooltip(content: ScalaXml.Nodes, element: ScalaXml.Element): ScalaXml.Element =
+    ScalaXml.prependChildren(element, tooltip(content))
+
+  def footnote(contentId: String, srcId: String, symbol: String, content: ScalaXml.Nodes): ScalaXml.Element =
+    <span xmlns={namespace.uri} class="footnote" id={contentId}>
+      <a href={s"#$srcId"} class="footnote-backlink">
+        {symbol}
+      </a>{content}
+    </span>
+
+  def footnoteRef(contentId: String, srcId: String, symbol: String): ScalaXml.Element =
+    <a xmlns={namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>
+      {symbol}
+    </a>
+
+  def footnoteLevel(content: Seq[ScalaXml.Element], depth: Int): ScalaXml.Nodes =
+    <hr class="footnotes-line"/> ++
+    <div xmlns={namespace.uri} class="footnotes">
+      {content}
+    </div>
+
+  def table(children: ScalaXml.Nodes): ScalaXml.Element =
+    <table xmlns={namespace.uri}>{children}</table>
+
+  def tr(children: ScalaXml.Nodes): ScalaXml.Element =
+    <tr xmlns={namespace.uri}>{children}</tr>
+
+  def td(colspan: Option[String], children: ScalaXml.Nodes): ScalaXml.Element =
+    <td xmlns={namespace.uri} colspan={colspan.orNull}>{children}</td>

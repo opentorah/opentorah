@@ -93,4 +93,4 @@ final class NodeDistribution(version: String) extends Distribution[Node](version
   override protected def fixup(installation: Node): Unit = installation.fixup(this)
 
 object NodeDistribution:
-  val versionDefault: String = "14.1.0"
+  val versionDefault: String = "19.4.0"

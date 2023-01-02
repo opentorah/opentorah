@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="new-year-corrections">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="new-year-corrections" xmlns:xlink="http://www.w3.org/1999/xlink">
   <title>New Year corrections</title>
 
   <itemizedlist>
@@ -11,9 +11,9 @@
       and RoshHashono.</para></listitem>
   </itemizedlist>
 
-  <para>There is an <ulink
-    url="https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8">
-    argument</ulink> concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
+  <para>There is an <link
+    xlink:xref="https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8">
+    argument</link> concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
 
     Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
     По нашей шите от Расага и дальше - 18 часов

@@ -3,11 +3,11 @@ package org.opentorah.tei
 import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.roman.{Gregorian, Julian}
-import org.opentorah.html.{A, ToHtml}
+import org.opentorah.html.{A, Html, ToHtml}
 import org.opentorah.metadata.Language
 import org.opentorah.util.Files
 import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, ScalaXml, Unparser}
-import zio.{URIO, ZIO}
+import zio.ZIO
 import java.net.URI
 
 final class Tei(
@@ -68,9 +68,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
   // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
   // based on the 'rendition' itself.
   // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
-  override protected def elementToHtml(
-    element: ScalaXml.Element
-  ): URIO[LinksResolver, (ScalaXml.Element, ScalaXml.Nodes)] =
+  override protected def elementToHtml(element: ScalaXml.Element): zio.URIO[LinksResolver, ScalaXml.Element] =
     val children: ScalaXml.Nodes = ScalaXml.getChildren(element)
 
     ScalaXml.getName(element) match
@@ -78,19 +76,20 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
         require(!ScalaXml.isEmpty(children), element)
         val ref: Option[String] = EntityName.refAttribute.get(ScalaXml)(element)
 
-        if ref.isEmpty then succeed(A.empty(children)) else
-          ZIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get)).map(_.
-            getOrElse(A(ref.toSeq))
-            (children)
-          ).map(noTooltip)
+        if ref.isEmpty then ZIO.succeed(ToHtml.namespace(A.empty(children))) else
+          ZIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get))
+            .map(_.getOrElse(A(ref.toSeq))(children))
+            .map(ToHtml.namespace)
 
       case "ref" =>
         require(!ScalaXml.isEmpty(children), element)
-        reference(element).map(_(children)).map(noTooltip)
+        reference(element).map(_(children))
+          .map(ToHtml.namespace)
 
       case "ptr" =>
         require(ScalaXml.isEmpty(children), element)
-        reference(element).map(_(Seq.empty)).map(noTooltip)
+        reference(element).map(_(Seq.empty))
+          .map(ToHtml.namespace)
 
       // TODO feed pageId through State to obtain unique id
       case Pb.elementName =>
@@ -100,34 +99,24 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
           .getOrElse(A(Seq(pageId)))
           .setId(pageId)
           (text = facsimileSymbol)
-        ).map(noTooltip)
+        )
+          .map(ToHtml.namespace)
 
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
         require(ScalaXml.isEmpty(children), element)
-        succeed(<img src={urlAttribute.get(ScalaXml)(element)}/>)
+        ZIO.succeed(ToHtml.namespace(<img src={urlAttribute.get(ScalaXml)(element)}/>))
 
-//      case "table" =>
-//        URIO.succeed(noTooltip(<table>{children}</table>))
-
+//      case "table" => ZIO.succeed(Html.table(children))
       // Note: before the first row there can be <head>HEAD</head>;
       // it should become <caption>transform(HEAD)</caption>.
-      case "row" =>
-        succeed(<tr>{children}</tr>)
+      case "row" => ZIO.succeed(Html.tr(children))
+      case "cell" => ZIO.succeed(Html.td(colsAttribute.get(ScalaXml)(element), children))
+      case "date" => ZIO.succeed(Html.addTooltip(dateTooltip(element), element))
+      case "gap" => ZIO.succeed(Html.addTooltip(gapTooltip(element), element))
+      case _ => ZIO.succeed(element)
 
-      case "cell" =>
-        succeed(<td colspan={colsAttribute.get(ScalaXml)(element).orNull}>{children}</td>)
-
-      case "date" =>
-        ZIO.succeed((element, dateTooltip(element)))
-
-      case "gap" =>
-        ZIO.succeed((element, gapTooltip(element)))
-
-      case _ =>
-        succeed(element)
-
-  private def reference(element: ScalaXml.Element): URIO[LinksResolver, A] =
+  private def reference(element: ScalaXml.Element): zio.URIO[LinksResolver, A] =
     val uri: URI = URI(targetAttribute.get(ScalaXml)(element))
 
     // TODO maybe just call up regardless?
@@ -140,18 +129,18 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
   private def gapTooltip(element: ScalaXml.Element): ScalaXml.Nodes =
     reasonAttribute.get(ScalaXml)(element).fold(Seq.empty)(ScalaXml.mkText)
 
-  // TODO move into Calendar - but under different name...
-  private final class Interval(
+  // TODO move into Calendar
+  private final class DateInterval(
     val from: Calendar#Day,
     val to: Calendar#Day
   ) {
-    def to(calendar: Calendar): Interval = Interval(
+    def to(calendar: Calendar): DateInterval = DateInterval(
       from.to(calendar),
       to.to(calendar)
     )
   }
 
-  private def parse(when: String, calendar: Calendar): Either[Interval, Calendar#Day] =
+  private def parse(when: String, calendar: Calendar): Either[DateInterval, Calendar#Day] =
     def parseNumbers(when: String): Seq[Int] =
       val result: Seq[Int] = when.split("-").map(_.toInt).toIndexedSeq
       require(result.length >= 1, s"Too few dashes in 'when': $when")
@@ -181,12 +170,12 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
       require(toNumbers.length <= fromNumbers.length, s"Too many dashes in the 'to': $when")
       val toNumbersEffective: Seq[Int] = fromNumbers.take(fromNumbers.length-toNumbers.length) ++ toNumbers
 
-      Left(Interval(from(fromNumbers), to(toNumbersEffective)))
+      Left(DateInterval(from(fromNumbers), to(toNumbersEffective)))
     else
       val numbers: Seq[Int] = parseNumbers(when)
-      if numbers.length == 3 then Right(from(numbers)) else Left(Interval(from(numbers), to(numbers)))
+      if numbers.length == 3 then Right(from(numbers)) else Left(DateInterval(from(numbers), to(numbers)))
 
-  def dateTooltip(element: ScalaXml.Element): ScalaXml.Nodes =
+  private def dateTooltip(element: ScalaXml.Element): ScalaXml.Nodes =
     val when: String = Date.whenAttribute.get(ScalaXml)(element)
 
     try
@@ -199,12 +188,12 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
       def display(date: Calendar#Day): ScalaXml.Element =
         <td>{date.toLanguageString(using displayLanguage)}</td>
 
-      def displayInterval(interval: Interval): Seq[ScalaXml.Element] =
+      def displayInterval(interval: DateInterval): Seq[ScalaXml.Element] =
         Seq(display(interval.from), display(interval.to))
 
       parse(when, calendar) match {
         case Right(date) =>
-          <table>
+          <table xmlns={Html.namespace.uri}>
             <tr><th>Calendar</th><th>Date</th></tr>
             {ScalaXml.conditional(useJulian)(
             <tr><td>Julian   </td>{display(date)}</tr>)}
@@ -213,7 +202,7 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
           </table>
 
         case Left(interval) =>
-          <table>
+          <table xmlns={Html.namespace.uri}>
             <tr><th>Calendar</th><th>From</th><th>To</th></tr>
             {ScalaXml.conditional(useJulian)(
             <tr><td>Julian   </td>{displayInterval(interval)}</tr>)}

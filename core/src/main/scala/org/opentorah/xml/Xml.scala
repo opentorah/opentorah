@@ -52,6 +52,9 @@ trait Xml extends XmlAttributes:
   def getChildren(element: Element): Nodes
   def setChildren(element: Element, children: Nodes): Element
 
+  final def prependChildren(element: Element, nodes: Nodes): Element = setChildren(element, nodes ++ getChildren(element))
+  final def appendChildren(element: Element, nodes: Nodes): Element = setChildren(element, getChildren(element) ++ nodes)
+  
   final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
 

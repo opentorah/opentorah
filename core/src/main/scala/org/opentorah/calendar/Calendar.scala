@@ -115,7 +115,7 @@ trait Calendar extends Times, Epoch:
 
     final override def companion: Numbered.Companion[Month] = Month
 
-    protected var yearOpt: Option[Year] = yearOption
+    private var yearOpt: Option[Year] = yearOption
 
     final def year: Year =
       if yearOpt.isEmpty then yearOpt = Some(Year(Month.yearNumber(number)))
@@ -192,7 +192,7 @@ trait Calendar extends Times, Epoch:
 
     final override def companion: Numbered.Companion[Day] = Day
 
-    protected var monthOpt: Option[Month] = monthOption
+    private var monthOpt: Option[Month] = monthOption
 
     final def calendar: Calendar = Calendar.this
 

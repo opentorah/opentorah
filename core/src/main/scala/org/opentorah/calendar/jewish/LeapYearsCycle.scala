@@ -18,11 +18,15 @@ object LeapYearsCycle extends YearsCycle:
 
   final def yearLengthInMonths(yearNumber: Int): Int = yearLengthInMonths(isLeapYear(yearNumber))
 
-  private final def yearLengthInMonths(isLeap: Boolean): Int = if isLeap then 13 else 12
+  final def yearLengthInMonths(isLeap: Boolean): Int = if isLeap then 13 else 12
 
   final val normalYear: TimeVector = Moon.meanLunarPeriod*yearLengthInMonths(isLeap = false)
 
   final val leapYear: TimeVector = Moon.meanLunarPeriod*yearLengthInMonths(isLeap = true)
+
+  final lazy val solarYearOverLunar: TimeVector = Sun.Shmuel.yearLength - LeapYearsCycle.normalYear
+
+  final lazy val solarMonthOverLunar: TimeVector = Sun.Shmuel.monthLength - Moon.meanLunarPeriod
 
   private final val monthsBeforeYearInCycle: Seq[Int] = ((1 to yearsInCycle) map yearLengthInMonths).scanLeft(0)(_ + _)
 

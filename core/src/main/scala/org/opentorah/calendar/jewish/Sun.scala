@@ -32,6 +32,8 @@ object Sun:
     final override val yearLength: TimeVector =
       TimeVector().days(365).hours(6)
 
+    final val monthLength: TimeVector = yearLength/(12, 4)
+
     // KH 9:3
     final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
       TimeVector().days(7).hours(9).parts(642)
