@@ -22,7 +22,7 @@ final class Sizes private(
 
   private def toMilliPoints(value: Float): Int = Math.round(value * fontSize)
 
-  private def toPoints(value: Float): Float = value * fontSize / Sizes.points2Millipoints
+  private def toPoints(value: Float): Float = value * fontSize / Sizes.points2milliPoints
 
   def getPoint: Point2D = new Point2D.Float(
     toPoints(width),
@@ -34,21 +34,21 @@ final class Sizes private(
 
   def getImageSize(sourceResolution: Float): ImageSize =
     val scale: Float = Sizes.inches2points / sourceResolution
-    def millipoints(value: Float): Int = toMilliPoints(value * scale)
+    def milliPoints(value: Float): Int = toMilliPoints(value * scale)
     val result: ImageSize = new ImageSize
     result.setSizeInMillipoints(
-      millipoints(width),
-      millipoints(height)
+      milliPoints(width),
+      milliPoints(height)
     )
-    result.setBaselinePositionFromBottom(millipoints(depth))
+    result.setBaselinePositionFromBottom(milliPoints(depth))
     result.setResolution(sourceResolution)
     result.calcPixelsFromSize()
     result
 
-  def getDimension: Dimension = Dimension(
-    toMilliPoints(width),
-    toMilliPoints(height)
-  )
+//  def getDimension: Dimension = Dimension(
+//    toMilliPoints(width),
+//    toMilliPoints(height)
+//  )
 
   def setViewPortSizes(svgDocument: SVGDocument): Unit =
     def set(attribute: Attribute.Required[String], value: Float): Unit =
@@ -58,25 +58,24 @@ final class Sizes private(
     set(Sizes.heightAttribute, height)
 
 object Sizes:
-  val inches2points: Int = 72
+  private val inches2points: Int = 72
 
-  val points2Millipoints: Float = 1000.0f
-
-  val batikExInEms: Float = 0.5f
+  val points2milliPoints: Float = 1000.0f
 
   /* Note:
  Reading of the code that creates SVG and sets its sizes
  (https://github.com/mathjax/MathJax/blob/master/unpacked/jax/output/SVG/jax.js)
  made clear that:
- - viewBox sizes are in milli-ems, and thus can be converted to millipoints by scaling by the fontSize
+ - viewBox sizes are in milli-ems, and thus can be converted to milliPoints by scaling by the fontSize
    (MathJax internally assumes em to be 10 points);
- - viewbox minY is negative SVG height, and viewBox height is SVG height + SVG depth,
-   so depth (descent) can be calculated as viewbox height + viewbox minY;
+ - viewBox minY is negative SVG height, and viewBox height is SVG height + SVG depth,
+   so depth (descent) can be calculated as viewBox height + viewBox minY;
  - vertical-align (in exs) in the style attribute is not depth, so I don't need to use it;
- - viewport sizes (in exs) are calculated from viewbox sizes, so I don't need to use them;
- - MathJax assumes ex height of 430.554 milli-ems (WTF?!), while Batik assumes ex height of 500 milli-ems,
+ - viewport sizes (in exs) are calculated from viewBox sizes, so I don't need to use them;
+ - MathJax2 assumes ex height of 430.554 milli-ems (WTF?!), while Batik assumes ex height of 500 milli-ems,
    so before handing the SVG image to Batik, I need to convert viewport sizes to units that are interpreted
-   the same way by MathJax and Batik: points (see Sizes.setViewPortSizes()).
+   the same way by MathJax and Batik: points.
+  - it looks like exFactor in MathJax3 chtml options is my `exInEms`; if so, it is now 0.5:
   */
   def apply(svgDocument: SVGDocument): Sizes =
     val element: Dom.Element = svgDocument.getDocumentElement

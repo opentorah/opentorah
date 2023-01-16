@@ -194,7 +194,7 @@ object MathFilter:
   /**
    * Type of the input: TeX, MathML, AsciiMath.
    */
-  final class InputAttribute extends Attribute[Input]("input", namespace = namespace, default = Input.MathML):
+  private final class InputAttribute extends Attribute[Input]("input", namespace = namespace, default = Input.MathML):
     override def toString(value: Input): String = value.name
 
     override def fromString(value: String): Input =

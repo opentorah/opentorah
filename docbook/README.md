@@ -312,15 +312,17 @@ Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete FOP f
 Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
 server-side MathJax for PDF.
 
+Current version of MathJax - version 3 - does not yet
+fully support features that version 2 does (fonts, asciimath delimeters etc.);
+to use MathJax 2, set `useMathJaxV3` to `false`.
+
 Mathematics processing is configured using `math` block (values below are the defaults):
 ```groovy
 math {
   mathJaxEnabled      = false
-  nodeVersion         = "14.1.0"
-  useMathJaxV3        = false
+  nodeVersion         = "19.4.0"
+  useMathJaxV3        = true
   font                = "TeX"
-  mathJaxExtensions   = []
-  texExtensions       = ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
   processEscapes      = true
   texDelimiters       = ['$$-$$']
   texInlineDelimiters = ['$-$']

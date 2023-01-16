@@ -39,7 +39,7 @@ object Exec:
       command = cmd,
       cwd,
       extraEnv = extraEnv*
-    ).!(ProcessLogger(line => err = err :+ line, line => out = out :+ line))
+    ).!(ProcessLogger(fout = line => out = out :+ line, ferr = line => err = err :+ line))
 
     val errStr = err.mkString("\n")
     val outStr = out.mkString("\n")

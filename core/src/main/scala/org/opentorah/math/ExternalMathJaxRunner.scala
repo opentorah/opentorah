@@ -5,15 +5,17 @@ import org.opentorah.node.Node
 final class ExternalMathJaxRunner(
   node: Node,
   math: MathConfiguration
-) extends MathJaxRunner(
-  math
-):
+) extends MathJaxRunner:
 
   override protected def typeset(
-    options: Map[String, Matchable],
-    outputName: String,
-  ): String =  node.evaluate(math.mathJax.nodeSnippet(
-    math,
-    options,
-    outputName
-  ))
+    mathString: String,
+    input: Input,
+    fontSize: Float
+  ): String = node.evaluate(
+    useEsm = math.mathJax.useEsm,
+    script = math.mathJax.nodeScript(
+      math,
+      mathString,
+      input,
+      fontSize
+    ))

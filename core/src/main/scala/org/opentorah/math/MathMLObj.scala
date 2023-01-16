@@ -16,7 +16,7 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
   ): PropertyList =
     val commonFont = pList.getFontProps
 
-    fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.points2Millipoints).toFloat)
+    fontSize = Some((commonFont.fontSize.getNumericValue / Sizes.points2milliPoints).toFloat)
 
     // fonts: commonFont.getFontState(getFOEventHandler.getFontInfo).toList.map(_.getName)
 
@@ -34,6 +34,7 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
 
     Sizes.fontSizeAttribute.optional.withValue(fontSize).set(Dom)(getDOMDocument.getDocumentElement)
 
+  // TODO
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions
   // - one here in getSizes() and another one in PreloaderMathML -
   // but resulting SVG is then preloaded by FOP itself (our preloader doesn't get called),

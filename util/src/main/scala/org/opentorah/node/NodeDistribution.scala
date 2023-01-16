@@ -87,8 +87,7 @@ final class NodeDistribution(version: String) extends Distribution[Node](version
       npmExec  = File(bin, if isWindows then "npm.cmd"  else "npm" )
     )
 
-  override protected def exists(installation: Node): Boolean =
-    installation.nodeExec.exists && installation.npmExec.exists
+  override protected def exists(installation: Node): Boolean = installation.exists
 
   override protected def fixup(installation: Node): Unit = installation.fixup(this)
 

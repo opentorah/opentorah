@@ -7,14 +7,16 @@ import java.nio.file.{Files, Path, Paths}
 
 final class Node(
   nodeModulesParent: File,
-  val nodeExec: File,
-  val npmExec: File
+  nodeExec: File,
+  npmExec: File
 ):
-  override def toString: String = s"Node with $nodeExec and $npmExec with modules in $nodeModules"
+  override def toString: String = s"Node with $nodeExec\n and $npmExec\n with modules in $nodeModules"
 
+  def exists: Boolean = nodeExec.exists && npmExec.exists
+  
   def root: File = nodeModulesParent
 
-  val nodeModules: File = File(nodeModulesParent, "node_modules")
+  private val nodeModules: File = File(nodeModulesParent, "node_modules")
 
   def fixup(distribution: NodeDistribution): Unit = if !distribution.isWindows then
     val npm: Path = npmExec.toPath
@@ -26,7 +28,10 @@ final class Node(
         distribution.getBin(root).toPath.relativize(Paths.get(npmCliJs))
       )
 
-  def evaluate(script: String): String = node(Seq("--print", script))
+  def evaluate(script: String, useEsm: Boolean): String = node(
+    (if useEsm then Seq("--require", "esm") else Seq.empty) ++
+    Seq("--no-warnings", "--print", script)
+  )
 
   private def node(args: Seq[String]): String = Exec(
     command = nodeExec,
@@ -35,11 +40,13 @@ final class Node(
     extraEnv = ("NODE_PATH", nodeModules.getAbsolutePath)
   )
 
-  def npmInstall(module: String, overwrite: Boolean): Unit =
-    if overwrite || !File(nodeModules, module).exists then
-      Node.logger.info(s"Node.npmInstall($module)")
-      nodeModules.mkdirs()
-      npm(Seq("install", "--no-save", "--silent", module))
+  private var installed: Set[String] = Set.empty
+
+  def npmInstall(module: String): Unit = if !installed.contains(module) then
+    Node.logger.info(s"Node.npmInstall($module)")
+    nodeModules.mkdirs()
+    npm(Seq("install", "--no-save", "--silent", module))
+    installed = installed + module
 
   private def npm(args: Seq[String]): String = Exec(
     command = npmExec,
