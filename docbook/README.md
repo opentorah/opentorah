@@ -323,7 +323,6 @@ math {
   mathJaxEnabled      = false
   nodeVersion         = "14.1.0"
   useMathJaxV3        = false
-  useJ2V8             = false
   font                = "TeX"
   mathJaxExtensions   = []
   texExtensions       = ["AMSmath.js", "AMSsymbols.js", "noErrors.js", "noUndefined.js"]
@@ -433,8 +432,7 @@ the same name as the document.
 Frameworks used by the plugin are cached under `~/.gradle.
 Distribution for each version of the framework is unpacked into its own folder:
 - DocBook XSLT 1.0 and XSLT 2.0 stylesheets - under `docbook`;
-- Node.js - under `nodejs`, with modules in `node_modules` subfolder;
-- J2V8 library - under `j2v8library`.
+- Node.js - under `nodejs`, with modules in `node_modules` subfolder.
 With this caching, build time is significantly shorter than when the frameworks are
 unpacked under the project's `build` directory, which gets wiped out with every `./gradlew clean`. 
 
@@ -445,6 +443,13 @@ Following features of the Maven Gradle plugin are not supported:
 - resolve XSL files based on the type of processing 
 - expressions in `<?eval?>`
 - access to the project and its properties in `<?eval?>`
+
+### J2V8 ###
+
+The code used to support running MathJax on NodeJS via integration with J2V8.
+J2V8's support for NodeJS was always shaky;
+for some years now J2V8 seems to have abandoned producing artifacts for Linux altogether.
+I am removing J2V8 support - and hope to integrate with GraalVM instead at some point ;)
 
 ## Future ##
 
@@ -462,7 +467,6 @@ Following features of the Maven Gradle plugin are not supported:
   - [GraalVM](https://www.graalvm.org/)
   - [Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme)
   - Dyno
-- [ ] look at the current J2V8 and drop support for it if it is not usable
 - [ ] drop JEuclid support
   
 ### Code Highlighting ###

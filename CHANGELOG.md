@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LeapYearsTest (from Pirush);
 - superscripted d,h,p and m in the TimesDigit;
 - fix: npm install;
+- J2V8 support removed;
 
 ## [0.10.5] - 2022-09-15
 - dependency updates;

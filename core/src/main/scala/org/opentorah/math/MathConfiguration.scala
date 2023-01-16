@@ -2,7 +2,7 @@ package org.opentorah.math
 
 import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.fop.FopPlugin
-import org.opentorah.node.{J2V8Distribution, Node, NodeDistribution}
+import org.opentorah.node.{Node, NodeDistribution}
 import org.opentorah.util.Strings
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
@@ -13,7 +13,6 @@ final class MathConfiguration(
   val mathJaxEnabled     : Option[Boolean],
   val nodeVersion        : Option[String],
   val useMathJaxV3       : Option[Boolean],
-  val useJ2V8            : Option[Boolean],
   val font               : Option[String],
   val mathJaxExtensions  : List[String], // a convenience option to add MathJax extensions; example: 'Safe,TeX/noUndefined'
   val texExtensions      : List[String],
@@ -47,7 +46,6 @@ final class MathConfiguration(
     mathJaxEnabled      = this.mathJaxEnabled     .orElse(other.mathJaxEnabled      ),
     nodeVersion         = this.nodeVersion        .orElse(other.nodeVersion         ),
     useMathJaxV3        = this.useMathJaxV3       .orElse(other.useMathJaxV3        ),
-    useJ2V8             = this.useJ2V8            .orElse(other.useJ2V8             ),
     font                = this.font               .orElse(other.font                ),
     processEscapes      = this.processEscapes     .orElse(other.processEscapes      ),
     mathJaxExtensions   = orElse(this.mathJaxExtensions  , other.mathJaxExtensions  ),
@@ -87,14 +85,7 @@ final class MathConfiguration(
       // Make sure MathJax is installed
       val node: Node = nodeDistribution.getInstallation(context).get
       node.npmInstall(mathJax.packageName, false)
-
-      // If J2V8 is configured to be used, is available and actually loads - we use it;
-      // otherwise each typesetting is done by calling Node in a separate process.
-      Some(MathJaxFopPlugin(
-        if useJ2V8.contains(true) && J2V8Distribution.forOs.flatMap(_.getInstallation(context)).exists(_.load())
-        then J2V8MathJaxRunner    (node, this)
-        else ExternalMathJaxRunner(node, this)
-      ))
+      Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, this)))
     else None
 
   def distributionsNeeded: Set[Distribution[_]] = Set(nodeDistribution)
@@ -115,7 +106,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
     mathJaxEnabled        = Some(false),
     nodeVersion           = Some(NodeDistribution.versionDefault),
     useMathJaxV3          = Some(false),
-    useJ2V8               = Some(false),
     font                  = Some("TeX"),
     processEscapes        = Some(true),
     mathJaxExtensions     = List.empty,
@@ -130,7 +120,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
     private val mathJaxEnabledAttribute     : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("mathJaxEnabled"     ).optional
     private val nodeVersionAttribute        : Attribute.Optional[String]  = Attribute.StringAttribute ("nodeVersion"        ).optional
     private val useMathJaxV3Attribute       : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("useMathJaxV3"       ).optional
-    private val useJ2V8Attribute            : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("useJ2V8"            ).optional
     private val processEscapesAttribute     : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("processEscapes"     ).optional
     private val fontAttribute               : Attribute.Optional[String]  = Attribute.StringAttribute ("font"               ).optional
     // TODO parse those as nested elements, not as attributes:
@@ -145,7 +134,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
       mathJaxEnabled     : Option[Boolean] <- mathJaxEnabledAttribute()
       nodeVersion        : Option[String]  <- nodeVersionAttribute()
       useMathJaxV3       : Option[Boolean] <- useMathJaxV3Attribute()
-      useJ2V8            : Option[Boolean] <- useJ2V8Attribute()
       font               : Option[String]  <- fontAttribute()
       mathJaxExtensions  : Option[String]  <- mathJaxExtensionsAttribute()
       texExtensions      : Option[String]  <- texExtensionsAttribute()
@@ -158,7 +146,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
       mathJaxEnabled      = mathJaxEnabled,
       nodeVersion         = nodeVersion,
       useMathJaxV3        = useMathJaxV3,
-      useJ2V8             = useJ2V8,
       font                = font,
       processEscapes      = processEscapes,
       mathJaxExtensions   = Strings.toList(mathJaxExtensions),
@@ -173,7 +160,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
       mathJaxEnabledAttribute     (_.mathJaxEnabled),
       nodeVersionAttribute        (_.nodeVersion),
       useMathJaxV3Attribute       (_.useMathJaxV3),
-      useJ2V8Attribute            (_.useJ2V8),
       fontAttribute               (_.font),
       processEscapesAttribute     (_.processEscapes),
       mathJaxExtensionsAttribute  (math => Strings.fromListOption(math.mathJaxExtensions)),

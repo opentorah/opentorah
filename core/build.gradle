@@ -39,7 +39,6 @@ dependencies {
   compileOnly libs.playwright
 
   compileOnly libs.bundles.fop
-  compileOnly libs.j2v8
   compileOnly libs.fop.jeuclid
 
   // TODO move into docbook module?

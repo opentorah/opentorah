@@ -26,17 +26,6 @@ dependencies {
   // JEuclid
   implementation libs.fop.jeuclid
 
-  // J2V8 integration
-  // Note: Native library (if needed and available) is loaded from a dynamically retrieved artifact,
-  // not from this one - but it needs to be compatible with the Java JNI wrappers, so I probably
-  // have to use the same version on all platforms.
-  // Since 4.6.0 doesn't work on Linux, and 4.8.0 doesn't work with mathjax-node,
-  // this probably won't work on any other platform :(
-  //
-  // For reasons that are not clear to me, if I declare this dependency as compileOnly (as I think it should be),
-  // tests fail...
-  implementation libs.j2v8
-
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
 

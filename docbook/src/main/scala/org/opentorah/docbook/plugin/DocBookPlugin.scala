@@ -167,7 +167,6 @@ object DocBookPlugin:
     def getMathJaxEnabled     : Property[Boolean]
     def getNodeVersion        : Property[String]
     def getUseMathJaxV3       : Property[Boolean]
-    def getUseJ2V8            : Property[Boolean]
     def getFont               : Property[String]
     def getMathJaxExtensions  : ListProperty[String]
     def getTexExtensions      : ListProperty[String]
@@ -181,7 +180,6 @@ object DocBookPlugin:
       mathJaxEnabled      = getMathJaxEnabled     .toOption,
       nodeVersion         = getNodeVersion        .toOption,
       useMathJaxV3        = getUseMathJaxV3       .toOption,
-      useJ2V8             = getUseJ2V8            .toOption,
       font                = getFont               .toOption,
       mathJaxExtensions   = getMathJaxExtensions  .toList,
       texExtensions       = getTexExtensions      .toList,
