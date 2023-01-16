@@ -10,7 +10,8 @@ class PluginTestProject private(
   document: String,
   substitutions: Map[String, String],
   isPdfEnabled: Boolean,
-  isMathJaxEnabled: Boolean
+  isMathJaxEnabled: Boolean,
+  useMathJaxV3: Boolean
 ):
   projectDir.mkdirs()
 
@@ -63,6 +64,7 @@ class PluginTestProject private(
           |docBook {
           |  math {
           |    mathJaxEnabled = $isMathJaxEnabled
+          |    useMathJaxV3 = $useMathJaxV3
           |  }
           |
           |  documents {
@@ -99,7 +101,8 @@ object PluginTestProject:
     document: String,
     substitutions: Map[String, String] = Map.empty,
     isPdfEnabled: Boolean = false,
-    isMathJaxEnabled: Boolean = false
+    isMathJaxEnabled: Boolean = false,
+    useMathJaxV3: Boolean = false
   ): PluginTestProject =
     val root: File = File(".").getAbsoluteFile.getParentFile
     val result: PluginTestProject = new PluginTestProject(
@@ -108,7 +111,8 @@ object PluginTestProject:
       document,
       substitutions,
       isPdfEnabled,
-      isMathJaxEnabled
+      isMathJaxEnabled,
+      useMathJaxV3
     )
 
     result.write()

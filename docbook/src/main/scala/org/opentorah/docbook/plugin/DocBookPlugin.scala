@@ -167,8 +167,6 @@ object DocBookPlugin:
     def getNodeVersion        : Property[String]
     def getUseMathJaxV3       : Property[Boolean]
     def getFont               : Property[String]
-    def getMathJaxExtensions  : ListProperty[String]
-    def getTexExtensions      : ListProperty[String]
     def getProcessEscapes     : Property[Boolean]
     def getTexDelimiters      : ListProperty[String]
     def getTexInlineDelimiters: ListProperty[String]
@@ -179,8 +177,6 @@ object DocBookPlugin:
       nodeVersion         = getNodeVersion        .toOption,
       useMathJaxV3        = getUseMathJaxV3       .toOption,
       font                = getFont               .toOption,
-      mathJaxExtensions   = getMathJaxExtensions  .toList,
-      texExtensions       = getTexExtensions      .toList,
       texDelimiters       = getTexDelimiters      .toList.map(Delimiters.fromString), // TODO split start/end
       texInlineDelimiters = getTexInlineDelimiters.toList.map(Delimiters.fromString), // TODO split start/end
       asciiMathDelimiters = getAsciiMathDelimiters.toList.map(Delimiters.fromString), // TODO split start/end

@@ -59,6 +59,7 @@ final class MathJaxFopPlugin(mathJax: MathJaxRunner) extends FopPlugin:
         val document: Document = src.asInstanceOf[DOMSource].getNode.asInstanceOf[Document]
 
         if MathML.namespace.getUri != Dom.getNamespace(document.getDocumentElement).getUri then null else
+          // TODO every formula gets typeset twice!
           val svgDocument: SVGDocument = mathJax.typeset(document)
           val sizes: Sizes = Sizes(svgDocument)
           // convert sizes from exs to points:

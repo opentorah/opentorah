@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix: npm install;
 - J2V8 support removed;
 - JEuclid support removed;
+- cleanup: MathJax;
+- switched to MathJax 3;
 
 ## [0.10.5] - 2022-09-15
 - dependency updates;

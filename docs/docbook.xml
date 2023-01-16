@@ -3,6 +3,7 @@
 <!--    <output format="pdf"/>-->
 <!--    <output format="epub2"/>-->
     <document name="calendar" dataGeneratorClass="org.opentorah.calendar.paper.Tables">
+      <output format="pdf"/>
       <output format="html"/>
       <output format="htmlOneDirect-mathJax"/>
       <math mathJaxEnabled="true"/>
@@ -33,8 +34,6 @@
       <parameter name="orderedlist.label.width" value="2em"/>            <!-- was only in non-calendar papers -->
     </format>
     <format name="htmlOneDirect">
-      <variant name="mathJax">
-        <math useMathJaxV3="true"/>
-      </variant>
+      <variant name="mathJax"/>
     </format>
 </docbook>
