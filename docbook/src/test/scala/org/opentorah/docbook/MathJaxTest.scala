@@ -13,26 +13,24 @@ class MathJaxTest extends AnyFlatSpecLike, Matchers:
     tex: String,
     svgExpected: String
   ): Unit =
-    def test(useJ2V8: Boolean): Unit =
+    def test(): Unit =
       val project = PluginTestProject(
         prefix = "mathJaxTestProjects",
-        name = s"$name-useJ2V8-$useJ2V8",
+        name = name,
         document = DocBook.prettyPrinter.renderWithHeader(ScalaXml)(
           <article xmlns={DocBook.namespace.uri} version={DocBook.version}>
             <para>{s"$$$tex$$"}</para>
           </article>
         ),
         isPdfEnabled = true,
-        isMathJaxEnabled = true,
-        useJ2V8 = useJ2V8
+        isMathJaxEnabled = true
       )
 
       val log: String = project.run(logInfo = true)
       substring(log, MathJaxRunner.logStart, MathJaxRunner.logSep) shouldBe tex
       substring(log, MathJaxRunner.logSep, MathJaxRunner.logEnd) shouldBe svgExpected
 
-///    test(useJ2V8 = true)
-    test(useJ2V8 = false)
+    test()
 
   private def substring(string: String, from: String, to: String): String =
     val result: String = string.substring(string.indexOf(from) + from.length)

@@ -5,7 +5,6 @@ import org.opentorah.xml.ScalaXml
 
 /*
   THE PLAN:
-  - if J2V8 doesn't support running Node.js - remove it and all the supporting code;
   - adjust in MathJax3:
     - nodeConfiguration (to be removed with J2V8?);
     - htmlConfiguration;
