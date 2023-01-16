@@ -145,7 +145,7 @@ made clear that:
       "css"             -> false // generate CSS for HTML output?
     )
 
-    // I have to use console.error() and not console.log() so that the output gets flushed before the project exist;
+    // Note: I have to use console.error() and not console.log() so that the output gets flushed before the project exits;
     // that is why I collect both out and err in Node.node()...
     override def nodeSnippet(
       math: MathConfiguration,

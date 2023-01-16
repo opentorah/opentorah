@@ -22,8 +22,7 @@ with DocBook [XSLT stylesheets](https://docbook.org/tools/) to process DocBook d
 [XSLT 2.0 stylesheets](https://github.com/docbook/xslt20-stylesheets) is supported for HTML
 only ("HTML2"). For PDF, DocBook is first processed into
 [XSL-FO](https://www.xml.com/articles/2017/01/01/what-is-xsl-fo/), which is post-processed by
-[Apache FOP](https://xmlgraphics.apache.org/fop/). For PDF,
-[JEuclid](http://jeuclid.sourceforge.net/) or MathJax FOP plugin can be enabled to process mathematics.
+[Apache FOP](https://xmlgraphics.apache.org/fop/). For PDF, MathJax FOP plugin can be enabled to process mathematics.
 Document name(s) and output formats are configurable; variants with different settings
 for the same output format are supported.
 
@@ -311,15 +310,11 @@ Plugin adds a Gradle task `deleteFopFontsCache` that can be used to delete FOP f
 ## Mathematics ##
 
 Plugin supports typesetting mathematics using MathJax for HTML and EPUB and
-either server-side MathJax or JEuclid for PDF. JEuclid typesets in document's fonts; MathJax does not.
-MathJax delivers better quality and is under active development; JEuclid is not.
-JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
+server-side MathJax for PDF.
 
 Mathematics processing is configured using `math` block (values below are the defaults):
 ```groovy
 math {
-  // no more than one of `jEuclidEnabled` and `mathJaxEenabled` can be `true` 
-  jEuclidEnabled      = false
   mathJaxEnabled      = false
   nodeVersion         = "14.1.0"
   useMathJaxV3        = false
@@ -451,6 +446,17 @@ J2V8's support for NodeJS was always shaky;
 for some years now J2V8 seems to have abandoned producing artifacts for Linux altogether.
 I am removing J2V8 support - and hope to integrate with GraalVM instead at some point ;)
 
+### JEuclid ###
+
+The code used to support usinf JEuclid for typesetting mathematics in PDF.
+FOP/JEuclid integration inspired integration with MathJax that I wrote.
+
+JEuclid typesets in document's fonts; MathJax does not.
+MathJax delivers better quality and is under active development; JEuclid is not.
+JEuclid can handle MathML; MathJax can handle MathML, TeX, inline TeX and AsciiMath.
+
+I am removing support for it.
+
 ## Future ##
 
 ### Configuration ###
@@ -467,7 +473,6 @@ I am removing J2V8 support - and hope to integrate with GraalVM instead at some 
   - [GraalVM](https://www.graalvm.org/)
   - [Rhino](https://github.com/mozilla/rhino) / [Trireme](https://github.com/apigee/trireme)
   - Dyno
-- [ ] drop JEuclid support
   
 ### Code Highlighting ###
 - [ ] add DocBook code highlighting to the pipeline;
