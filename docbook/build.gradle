@@ -23,9 +23,6 @@ dependencies {
 
 //  implementation libs.graalvm.sdk
 
-  // JEuclid
-  implementation libs.fop.jeuclid
-
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
 
@@ -53,7 +50,7 @@ gradlePlugin {
       implementationClass = 'org.opentorah.docbook.plugin.DocBookPlugin'
       displayName = project.description
       description = project.description
-      tags.set(['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax', 'JEuclid'])
+      tags.set(['Scala', 'DocBook', 'Html', 'Epub', 'Pdf', 'FOP', 'MathML', 'MathJax'])
     }
   }
 }

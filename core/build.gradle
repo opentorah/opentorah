@@ -39,7 +39,6 @@ dependencies {
   compileOnly libs.playwright
 
   compileOnly libs.bundles.fop
-  compileOnly libs.fop.jeuclid
 
   // TODO move into docbook module?
   // Needed to compile classes using Gradle, but does not become a dependency:

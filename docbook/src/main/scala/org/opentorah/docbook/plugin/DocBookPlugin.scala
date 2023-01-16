@@ -163,7 +163,6 @@ object DocBookPlugin:
     )
 
   abstract class MathConfigurationProperties:
-    def getJEuclidEnabled     : Property[Boolean]
     def getMathJaxEnabled     : Property[Boolean]
     def getNodeVersion        : Property[String]
     def getUseMathJaxV3       : Property[Boolean]
@@ -176,7 +175,6 @@ object DocBookPlugin:
     def getAsciiMathDelimiters: ListProperty[String]
 
     def toConfiguration: MathConfiguration = MathConfiguration(
-      jEuclidEnabled      = getJEuclidEnabled     .toOption,
       mathJaxEnabled      = getMathJaxEnabled     .toOption,
       nodeVersion         = getNodeVersion        .toOption,
       useMathJaxV3        = getUseMathJaxV3       .toOption,

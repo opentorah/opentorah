@@ -9,7 +9,6 @@ import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unpars
 // Note: yes, all the PDF-only fields look weird in the Site configuration;
 // they also look weird in the non-PDF formats - but I do not see a clean way to clean this up.
 final class MathConfiguration(
-  val jEuclidEnabled     : Option[Boolean],
   val mathJaxEnabled     : Option[Boolean],
   val nodeVersion        : Option[String],
   val useMathJaxV3       : Option[Boolean],
@@ -27,8 +26,6 @@ final class MathConfiguration(
   val fontURL            : String = MathConfiguration.fontURL, // for webfont urls in the CSS for HTML output
   // paths: Map[String, String] = Map.empty,  // configures custom path variables (e.g., for third party extensions, cf. test/config-third-party-extensions.js)
 ):
-  require(!mathJaxEnabled.contains(true) || !jEuclidEnabled.contains(true))
-
   if font.isDefined && !MathConfiguration.fonts.contains(font.get) then
     val knownFonts: String = MathConfiguration.fonts.mkString(", ")
     throw IllegalArgumentException(s"MathJax: unknown font ${font.get}; known fonts are: $knownFonts")
@@ -37,12 +34,11 @@ final class MathConfiguration(
   if starts.toSet.size != starts.size then throw IllegalArgumentException(s"Duplicate start delimiters")
 
   def isEmpty: Boolean =
-    jEuclidEnabled.isEmpty && mathJaxEnabled.isEmpty && nodeVersion.isEmpty && useMathJaxV3.isEmpty &&
+    mathJaxEnabled.isEmpty && nodeVersion.isEmpty && useMathJaxV3.isEmpty &&
     font.isEmpty && mathJaxExtensions.isEmpty && texExtensions.isEmpty && processEscapes.isEmpty &&
     texDelimiters.isEmpty && texInlineDelimiters.isEmpty && asciiMathDelimiters.isEmpty
 
   def orElse(other: MathConfiguration): MathConfiguration = MathConfiguration(
-    jEuclidEnabled      = this.jEuclidEnabled     .orElse(other.jEuclidEnabled      ),
     mathJaxEnabled      = this.mathJaxEnabled     .orElse(other.mathJaxEnabled      ),
     nodeVersion         = this.nodeVersion        .orElse(other.nodeVersion         ),
     useMathJaxV3        = this.useMathJaxV3       .orElse(other.useMathJaxV3        ),
@@ -57,7 +53,7 @@ final class MathConfiguration(
 
   private def orElse[T](list: List[T], default: List[T]): List[T] = if list.nonEmpty then list else default
 
-  def enableMathJax: Boolean = mathJaxEnabled.contains(true) || jEuclidEnabled.contains(true) // TODO in HTML!
+  def enableMathJax: Boolean = mathJaxEnabled.contains(true) // TODO in HTML!
 
   def mathJax: MathJax = if useMathJaxV3.contains(true) then MathJax.MathJax3 else MathJax.MathJax2
 
@@ -79,14 +75,11 @@ final class MathConfiguration(
 
   private def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
 
-  def fopPlugin(context: BuildContext): Option[FopPlugin] =
-    if jEuclidEnabled.contains(true) then Some(new JEuclidFopPlugin) else
-    if mathJaxEnabled.contains(true) then
-      // Make sure MathJax is installed
-      val node: Node = nodeDistribution.getInstallation(context).get
-      node.npmInstall(mathJax.packageName, false)
-      Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, this)))
-    else None
+  def fopPlugin(context: BuildContext): Option[FopPlugin] = if !enableMathJax then None else
+    // Make sure MathJax is installed
+    val node: Node = nodeDistribution.getInstallation(context).get
+    node.npmInstall(mathJax.packageName, false)
+    Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, this)))
 
   def distributionsNeeded: Set[Distribution[_]] = Set(nodeDistribution)
 
@@ -102,7 +95,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
   val inputs: List[String] = List("input/TeX", "input/AsciiMath", "input/MathML")
 
   val default: MathConfiguration = new MathConfiguration(
-    jEuclidEnabled        = Some(false),
     mathJaxEnabled        = Some(false),
     nodeVersion           = Some(NodeDistribution.versionDefault),
     useMathJaxV3          = Some(false),
@@ -116,7 +108,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
   )
 
   override def contentParsable: Parsable[MathConfiguration] = new Parsable[MathConfiguration]:
-    private val jEuclidEnabledAttribute     : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("jEuclidEnabled"     ).optional
     private val mathJaxEnabledAttribute     : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("mathJaxEnabled"     ).optional
     private val nodeVersionAttribute        : Attribute.Optional[String]  = Attribute.StringAttribute ("nodeVersion"        ).optional
     private val useMathJaxV3Attribute       : Attribute.Optional[Boolean] = Attribute.BooleanAttribute("useMathJaxV3"       ).optional
@@ -130,7 +121,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
     private val asciiMathDelimitersAttribute: Attribute.Optional[String]  = Attribute.StringAttribute ("asciiMathDelimiters").optional
 
     override def parser: Parser[MathConfiguration] = for
-      jEuclidEnabled     : Option[Boolean] <- jEuclidEnabledAttribute()
       mathJaxEnabled     : Option[Boolean] <- mathJaxEnabledAttribute()
       nodeVersion        : Option[String]  <- nodeVersionAttribute()
       useMathJaxV3       : Option[Boolean] <- useMathJaxV3Attribute()
@@ -142,7 +132,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
       asciiMathDelimiters: Option[String]  <- asciiMathDelimitersAttribute()
       processEscapes     : Option[Boolean] <- processEscapesAttribute()
     yield MathConfiguration(
-      jEuclidEnabled      = jEuclidEnabled,
       mathJaxEnabled      = mathJaxEnabled,
       nodeVersion         = nodeVersion,
       useMathJaxV3        = useMathJaxV3,
@@ -156,7 +145,6 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
     )
 
     override def unparser: Unparser[MathConfiguration] = Unparser.concat[MathConfiguration](
-      jEuclidEnabledAttribute     (_.jEuclidEnabled),
       mathJaxEnabledAttribute     (_.mathJaxEnabled),
       nodeVersionAttribute        (_.nodeVersion),
       useMathJaxV3Attribute       (_.useMathJaxV3),
