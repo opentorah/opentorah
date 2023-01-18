@@ -18,19 +18,17 @@ trait Times extends Numbers.NonPeriodic:
 
   final override protected def digitDescriptors: Array[TimesDigit] = TimesDigit.values
 
+  final protected def digitSignDefault: String = ":"
+
   import Times.{hoursPerHalfDay, partsPerHalfHour, partsPerMinute}
 
   trait Time[N <: Time[N]] extends Number[N]:
     this: N =>
 
     final def days: Int = get(Digit.DAYS)
-
     final def days(value: Int): N = set(Digit.DAYS, value)
-
     final def time: Vector = this - companion(days)
-
     final def hours: Int = get(Digit.HOURS)
-
     final def hours(value: Int): N = set(Digit.HOURS, value)
 
     final def firstHalfHours(value: Int): N =
@@ -42,19 +40,13 @@ trait Times extends Numbers.NonPeriodic:
       hours(value + hoursPerHalfDay)
 
     final def parts: Int = get(Digit.PARTS)
-
     final def parts(value: Int): N = set(Digit.PARTS, value)
-
     final def halfHour: N = parts(partsPerHalfHour)
-
     final def minutes: Int = parts / partsPerMinute
-
     final def minutes(value: Int): N = parts(value*partsPerMinute + partsWithoutMinutes)
-
     final def partsWithoutMinutes: Int = parts % partsPerMinute
-
     final def partsWithoutMinutes(value: Int): N = parts(minutes*partsPerMinute + value)
-
+    
     final def seconds: Int = (partsWithoutMinutes*Times.momentsPerPart + moments) * Times.secondsPerMinute /
       Times.momentsPerMinute
 
@@ -69,7 +61,6 @@ trait Times extends Numbers.NonPeriodic:
       partsWithoutMinutes(newParts).moments(newMoments)
 
     final def moments: Int = get(Digit.MOMENTS)
-
     final def moments(value: Int): N = set(Digit.MOMENTS, value)
 
   open class TimePointBase(digits: Digits) extends PointNumber(digits), Time[Point]:
@@ -100,22 +91,15 @@ object Times:
   require(hoursPerDay % 2 == 0)
 
   final val hoursPerHalfDay: Int = hoursPerDay / 2
-
   final val partsPerHour: Int = 1080
-
   final val partsPerHalfHour: Int = partsPerHour / 2
-
+  
   final val minutesPerHour: Int = 60 // KH 10:1
   require(partsPerHour % minutesPerHour == 0)
 
   final val partsPerMinute: Int = partsPerHour / minutesPerHour
-
   final val momentsPerPart: Int = 76
-
   final val momentsPerMinute: Int = partsPerMinute*momentsPerPart
-
   final val secondsPerMinute: Int = 60
-
   final val millisecondsPerSecond: Int = 1000
-
   final val millisecondsPerMinute: Int = secondsPerMinute*millisecondsPerSecond

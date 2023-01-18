@@ -10,6 +10,7 @@ description = 'OpenTorah Documentation'
 apply from: '../configure.gradle'
 
 dependencies {
+  implementation project(':opentorah-util')
   implementation project(':opentorah-core')
 
   implementation libs.caffeine

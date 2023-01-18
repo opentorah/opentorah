@@ -1,12 +1,12 @@
 package org.opentorah.math
 
 import org.opentorah.docbook.DocBook
-import org.opentorah.xml.{Attribute, Dom, Namespace, Sax}
+import org.opentorah.xml.{Dom, Namespace, Sax}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-final class MathFilter(
+final class DocBookMathFilter(
   allDelimiters: Seq[DelimitersAndInput],
   processEscapes: Boolean
 ) extends Sax.WarningFilter:
@@ -28,12 +28,12 @@ final class MathFilter(
   private def element(
     namespace: Namespace,
     localName: String,
-    atts: Attributes = new AttributesImpl
+    attrs: Attributes = new AttributesImpl
   )(content: => Unit): Unit =
     val uri = namespace.uri
     val qName = namespace.qName(localName)
 
-    super.startElement(uri, localName, qName, atts)
+    super.startElement(uri, localName, qName, attrs)
     pushElement(localName)
 
     content
@@ -58,14 +58,15 @@ final class MathFilter(
 
     super.endDocument()
 
-  override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit =
+  override def startElement(uri: String, localName: String, qName: String, attrs: Attributes): Unit =
     flush()
 
+    // TODO remove?
     val isMathMLMath: Boolean = (uri == MathML.namespace.uri) && (localName == MathML.math)
-    val attributes: Attributes = if !isMathMLMath then atts else
-      val result: AttributesImpl = AttributesImpl(atts)
-      val isInline: Option[Boolean] = MathML.displayAttribute.optional.get(Sax)(atts)
-      MathML.displayAttribute.optionalSetDefault.withValue(checkInline(isInline)).set(Sax)(result)
+    val attributes: Attributes = if !isMathMLMath then attrs else
+      val result: AttributesImpl = AttributesImpl(attrs)
+      val display: Option[Input.Display] = Input.Display.attribute.optional.get(Sax)(attrs)
+      Input.Display.attribute.required.withValueOption(checkDisplay(display)).set(Sax)(result)
       result
 
     super.startElement(uri, localName, qName, attributes)
@@ -99,7 +100,7 @@ final class MathFilter(
     val currentElementIsExcluded: Boolean = DocBook.codeElements.contains(currentElement)
     val start: Option[(DelimitersAndInput, Int)] =
       if currentElementIsExcluded then None
-      else MathFilter.start(allDelimiters, chars)
+      else DocBookMathFilter.start(allDelimiters, chars)
 
     start.fold(sendToParent(unescape(chars)))((delimitersStarting: DelimitersAndInput, index: Int) =>
       if index != 0 then sendToParent(unescape(chars.take(index)))
@@ -108,7 +109,7 @@ final class MathFilter(
     )
 
   }((delimiters: DelimitersAndInput) =>
-    MathFilter.findUnescaped(delimiters.end, chars).fold(addToMath(chars))((index: Int) =>
+    DocBookMathFilter.findUnescaped(delimiters.end, chars).fold(addToMath(chars))((index: Int) =>
       if index != 0 then addToMath(chars.take(index))
       flush(closedByDelimiter = true)
       characters(chars.substring(index + delimiters.end.length))
@@ -121,24 +122,27 @@ final class MathFilter(
   // TODO should I use DocBook's <markup role="mathjax"> element or something instead of the MathML one?
 
   private def flush(closedByDelimiter: Boolean = false): Unit = if delimiters.isDefined then
-    if !closedByDelimiter then warning(s"Math '$math' not closed")
+    if !closedByDelimiter then warning(s"Math '$math' not closed!")
 
-    MathFilter.logger.debug(s"MathFilter.flush(): math=$math")
+    DocBookMathFilter.logger.debug(s"MathFilter.flush(): math=$math")
 
-    val input = delimiters.get.input
-    val isInline: Option[Boolean] = checkInline(input.isInline)
-    val attributes = new AttributesImpl
-    MathFilter.inputAttribute.withValue(Input.withInline(input, isInline)).set(Sax)(attributes)
+    val input: Input = delimiters.get.input
+    val display: Option[Input.Display] = checkDisplay(input.display)
+
+    val attributes: AttributesImpl = new AttributesImpl
+    Input.Type.attribute.orDefault.withValue(input.inputType).set(Sax)(attributes)
+    Input.Display.attribute.optional.withValue(display).set(Sax)(attributes)
 
     def mml(): Unit =
+      // TODO
       // Note: unless prefix mappings for MathML and MathJax plugin namespaces are delineated properly,
       // math element and its children end up having *two* default namespaces - MathML and DocBook.
       //
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
       prefixMapping(MathML.namespace.default)(
-        prefixMapping(MathFilter.namespace)(
-          element(MathML.namespace.default, MathML.math, atts = attributes)(
+        prefixMapping(DocBookMathFilter.namespace)(
+          element(MathML.namespace.default, MathML.math, attrs = attributes)(
             element(MathML.namespace.default, MathML.mrow)(
               element(MathML.namespace.default, MathML.mi)(
                 sendToParent(math)
@@ -146,29 +150,27 @@ final class MathFilter(
 
     if currentlyInEquationElement then
       mml()
-    else element(DocBook.namespace.default, if isInline.contains(true) then "inlineequation" else "informalequation")(
+    else element(DocBook.namespace.default, if Input.Display.isBlock(display) then "informalequation" else "inlineequation")(
       mml()
     )
 
     delimiters = None
     math = ""
 
-  private def checkInline(isInline: Option[Boolean]): Option[Boolean] =
-    val shouldBeInline: Option[Boolean] =
+  private def checkDisplay(is: Option[Input.Display]): Option[Input.Display] =
+    val shouldBe: Option[Input.Display] =
       if !currentlyInEquationElement then None
       // mark the MathML wrapper as inline if inside this
-      else Some(DocBook.inlineEquationElements.contains(currentElement))
+      else Some(if DocBook.inlineEquationElements.contains(currentElement) then Input.Display.Inline else Input.Display.Block)
 
-    if shouldBeInline.isDefined && isInline.isDefined && (shouldBeInline.get != isInline.get) then
-      val should: String = MathML.displayAttribute.toString(shouldBeInline.get)
-      val is: String = MathML.displayAttribute.toString(isInline.get)
-      warning(s"Display mode conflict: based on context, math should be '$should', but it is marked as '$is'")
+    if shouldBe.isDefined && is.isDefined && (shouldBe.get != is.get) then
+      warning(s"Display mode conflict: based on context, math should be '${shouldBe.get.name}', but it is marked as '${is.get.name}'")
 
-    shouldBeInline.orElse(isInline)
+    shouldBe.orElse(is)
 
-object MathFilter:
+object DocBookMathFilter:
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[MathFilter])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[DocBookMathFilter])
 
   private def start(allDelimiters: Seq[DelimitersAndInput], chars: String): Option[(DelimitersAndInput, Int)] =
     val starts: Seq[(DelimitersAndInput, Int)] = for
@@ -190,18 +192,6 @@ object MathFilter:
     uri = "http://opentorah.org/mathjax/ns/ext",
     prefix = "mathjax"
   )
-
-  /**
-   * Type of the input: TeX, MathML, AsciiMath.
-   */
-  private final class InputAttribute extends Attribute[Input]("input", namespace = namespace, default = Input.MathML):
-    override def toString(value: Input): String = value.name
-
-    override def fromString(value: String): Input =
-      Input.values.find(_.name == value).getOrElse(throw IllegalArgumentException(s"Unknown input type: $value"))
-
-  @SerialVersionUID(1L)
-  val inputAttribute: Attribute.OrDefault[Input] = (new InputAttribute).orDefault
 
   def unwrap(mathML: Dom.Element): String = mathML
     .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Dom.Element]

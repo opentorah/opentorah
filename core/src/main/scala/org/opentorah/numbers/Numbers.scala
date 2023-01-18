@@ -1,7 +1,5 @@
 package org.opentorah.numbers
 
-type Digits = Seq[Int]
-
 /** Number System.
  *
  * Each number system `S` (derived from [[org.opentorah.numbers.Numbers]])
@@ -25,14 +23,14 @@ type Digits = Seq[Int]
  * However, for dates (`Point`s) it makes sense to ask what year/month the date is in -
  * but not for time intervals (`Vector`s)!
  */
-trait Numbers:
+trait Numbers extends NumbersBase:
 
   open class Digit(val sign: String):
     lazy val position: Int = digitDescriptors.indexOf(this.asInstanceOf[DigitType]) // TODO ordinal?
 
   type DigitType <: Digit
 
-  type WithValues[T] = { val values: Array[T] } // TODO move to Collections
+  private type WithValues[T] = { val values: Array[T] } // TODO move to Collections
 
   type DigitCompanionType <: WithValues[DigitType]
 
@@ -40,6 +38,8 @@ trait Numbers:
 
   // TODO is there any way to pull this in here instead of calling values in every derived number system?
   protected def digitDescriptors: Array[DigitType]
+
+  final override protected lazy val digitSigns: Seq[String] = digitDescriptors.toIndexedSeq.map(_.sign)
 
   type Point <: PointNumber
 
@@ -70,8 +70,7 @@ trait Numbers:
    *
    * @param digits  sequence of the digits comprising this number.
    */
-  // TODO extend scala.math.Numeric
-  abstract class Number[N <: Number[N]](final val digits: Digits) extends Ordered[N]:
+  abstract class Number[N <: Number[N]](final override val digits: Digits) extends HasDigits with Ordered[N]:
     this: N =>
 
     // at least the head digit is present
@@ -85,21 +84,11 @@ trait Numbers:
     /** Returns digit described by the [[Digit]] descriptor `digit`. */
     final def get(digit: Digit): Int = get(digit.position)
 
-    /** Returns digit at `position`. */
-    final def get(position: Int): Int = if digits.length > position then digits(position) else 0
-
     /** Returns this number with digit described by the [[Digit]] descriptor `digit` set to `value`. */
     final def set(digit: Digit, value: Int): N = set(digit.position, value)
 
     /** Returns this number with digit at `position` set to `value`. */
-    final def set(position: Int, value: Int): N =
-      companion.fromDigits(digits.padTo(position+1, 0).updated(position, value))
-
-    /** Returns number of digits after the `point`. */
-    final def length: Int = digits.tail.length
-
-    /** Returns the signum of this number: `-1` if it is negative, `1` if it is positive and `0` if it is neither. */
-    final def signum: Int = Numbers.this.signum(digits)
+    final def set(position: Int, value: Int): N = companion.fromDigits(setDigits(position, value))
 
     /** Is this number equal to `0`? */
     final def isZero: Boolean = signum == 0
@@ -111,87 +100,46 @@ trait Numbers:
     final def isNegative: Boolean = signum < 0
 
     /** Returns absolute value of this number. */
-    final def abs: N = companion.fromDigits(digits.map(math.abs))
+    final def abs: N = companion.fromDigits(absDigits)
 
     /** Returns this number with the sign inverted. */
     @scala.annotation.targetName("uminus")
-    final def unary_- : N = companion.fromDigits(digits.map(-_))
+    final def unary_- : N = companion.fromDigits(negateDigits)
 
     /** Returns Vector representing difference between `this` and `that` numbers (which must be both Points or both Vectors). */
     @scala.annotation.targetName("subtract")
-    final def -(that: N): Vector = Vector.fromDigits(subtract(that))
+    final def -(that: N): Vector = Vector.fromDigits(subtractDigits(that))
 
     /** Returns this number rounded to the digit described by the [[Digit]] descriptor `digit`. */
     final def roundTo(digit: Digit): N = roundTo(digit.position)
 
     /** Returns this number rounded to the `position`. */
-    final def roundTo(length: Int): N =
-      require(length >= 0)
-
-      val result: Digits = transform(
-        digits = digits,
-        forDigit = (digit: Int, position: Int, range: Int) =>
-          if position < length then (0, digit)
-          else (if math.abs(digit) >= range / 2 then math.signum(digit) else 0, 0),
-        forHead = identity
-      )
-      companion.fromDigits(result)
+    final def roundTo(length: Int): N = companion.fromDigits(roundToDigits(this, length))
 
     /** Converts this number to [[org.opentorah.numbers.BigRational]]. */
-    final def toRational: BigRational = convertTo[BigRational](digits)
+    final def toRational: BigRational = convertTo[BigRational](this)
 
     /** Converts this number to `Double`. */
-    final def toDouble: Double = convertTo[Double](digits)
-
-    // TODO fromString()?
-    
-    /** Convert a number to String.
-     *
-     * If length specified is bugger than the number of digits after the point in the number,
-     * missing positions are assumed to have 0s; if the length is smaller, some digits will not
-     * be shown.
-     * Signs (like 'h' for hours or '°' for degrees) are inserted after digits.
-     * If no sign is configured for a position, ',' is used - except for the last digit,
-     * where no sign is appended in such a case.
-     *
-     * @param length desired number of digits after the point
-     * @return String representation of the number
-     */
-    final def toString(length: Int): String =
-      val digits: Digits = this.digits.padTo(length+1, 0)
-      val signs: Seq[String] = digitSigns.take(length+1).padTo(length, ",").padTo(length+1, "")
-
-      // ignore the signums of digits: all digits have the same signum, which we reflect in the overall result
-      val result: Seq[String] = (digits zip signs) map((digit: Int, sign: String) => math.abs(digit).toString + sign)
-      (if isNegative then "-" else "") + result.mkString
+    final def toDouble: Double = convertTo[Double](this)
 
     /** Returns string representation of this number. */
     override def toString: String = toString(length)
+    final def toString(length: Int): String = toStringDigits(this, length)
 
     /** How does `this` number compare with `that`? */
-    final override def compare(that: N): Int = zipWith(that.digits, _ compare _).find(_ != 0).getOrElse(0)
+    final override def compare(that: N): Int = compareDigits(that)
 
     /** Are the two numbers equal? */
     final override def equals(other: Any): Boolean = this.compare(other.asInstanceOf[N]) == 0
 
     final override def hashCode: Int = digits.hashCode
 
-    protected final def add(that: Number[?]): Digits = add(that.digits)
-
-    protected final def add(thatDigits: Digits): Digits = zipWith(thatDigits, _ + _)
-
-    protected final def subtract(that: Number[?]): Digits = zipWith(that.digits, _ - _)
-
-    private def zipWith(
-      thatDigits: Digits,
-      operation: (Int, Int) => Int
-    ): Digits =
-      this.digits.zipAll(thatDigits, 0, 0).map(operation.tupled)
-
   trait NumberCompanion[N <: Number[N]]:
     final lazy val zero: N = apply(0)
 
     final def apply(digits: Int*): N = fromDigits(digits)
+
+    final def apply(string: String): N = fromDigits(fromStringDigits(string))
 
     final def fromRational(value: BigRational, length: Int): N = fromDigits(convertFrom[BigRational](value, length))
 
@@ -224,15 +172,15 @@ trait Numbers:
 
     /** Returns Vector resulting from adding specified Vector to this one. */
     @scala.annotation.targetName("add")
-    final def +(that: Vector): Vector = Vector.fromDigits(add(that))
+    final def +(that: Vector): Vector = Vector.fromDigits(addDigits(that))
 
     /** Returns Point resulting from adding specified Point to this Vector. */
     @scala.annotation.targetName("add")
-    final def +(that: Point): Point = Point.fromDigits(add(that))
+    final def +(that: Point): Point = Point.fromDigits(addDigits(that))
 
     /** Returns this Vector multiplied by the specified Int. */
     @scala.annotation.targetName("multiply")
-    final def *(n: Int): Vector = Vector.fromDigits(digits map (_ * n))
+    final def *(n: Int): Vector = Vector.fromDigits(multiplyDigits(n))
 
     /** Returns this Vector divided by the specified Int with up to length digits after the point. */
     @scala.annotation.targetName("divide")
@@ -253,7 +201,7 @@ trait Numbers:
     final override protected def newNumber(digits: Seq[Int]): Vector = newVector(digits)
 
   protected def newVector(digits: Seq[Int]): Vector
-
+  
   /** Point from the number system. */
   abstract class PointNumber(digits: Digits) extends Number[Point](digits):
     this: Point =>
@@ -262,106 +210,17 @@ trait Numbers:
 
     /** Returns Point resulting from adding specified Vector to this one. */
     @scala.annotation.targetName("add")
-    final def +(that: Vector): Point = Point.fromDigits(add(that))
+    final def +(that: Vector): Point = Point.fromDigits(addDigits(that))
 
     /** Returns Point resulting subtracting specified Vector to this one. */
     @scala.annotation.targetName("subtract")
-    final def -(that: Vector): Point = Point.fromDigits(subtract(that))
+    final def -(that: Vector): Point = Point.fromDigits(subtractDigits(that))
 
   open class PointCompanion extends NumberCompanion[Point]:
     final override protected def isCanonical: Boolean = true
     final override protected def newNumber(digits: Seq[Int]): Point = newPoint(digits)
 
   protected def newPoint(digits: Seq[Int]): Point
-
-  def headRangeOpt: Option[Int]
-
-  /**
-   * Maximum number of digits after the dot.
-   *
-   * @return maximum number of digits after the dot
-   */
-  def maxLength: Int
-
-  /**
-   *
-   * @param position within the tail
-   * @return positive, even number
-   */
-  def range(position: Int): Int
-
-  private[numbers] final lazy val ranges: Seq[Int] = (0 until maxLength).map(range)
-
-  private final lazy val denominators: Seq[BigInt] =
-    def mult(acc: BigInt, tail: Digits): Seq[BigInt] = tail.toList match
-      case Nil => Seq.empty
-      case r :: rs => acc +: mult(acc * r, rs)
-
-    mult(BigInt(1), ranges :+ 0)
-
-  private lazy val digitSigns: Seq[String] = digitDescriptors.toIndexedSeq.map(_.sign)
-
-  private def signum(digits: Digits): Int = digits.find(_ != 0).map(math.signum).getOrElse(0)
-
-  private def transform(
-    digits: Digits,
-    forDigit: (Int, Int, Int) => (Int, Int),
-    forHead: Int => Int
-  ): Digits =
-    val (headCarry: Int, newTail: Digits) = digits.tail.zipWithIndex.foldRight(0, Seq.empty[Int]) {
-      case ((digit: Int, position: Int), (carry: Int, result: Digits)) =>
-        val (resultCarry: Int, resultDigit: Int) = forDigit(digit + carry, position, range(position))
-        (resultCarry, resultDigit +: result)
-    }
-
-    forHead(digits.head + headCarry) +: newTail
-
-  final protected def convertTo[T: Convertible](digits: Digits)(using convertible: Convertible[T]): T =
-    digits.zip(denominators.take(digits.length))
-      .map(convertible.div.tupled)
-      .reduce(convertible.plus)
-
-    // this can probably be done with digit(i) = value*denominators(i).whole%denominator(i) - but will it be less precise?
-  private def convertFrom[T: Convertible](value: T, length: Int)(using convertible: Convertible[T]): Digits =
-    val (digits: Digits, lastReminder: T) = ranges.take(length)
-      .foldLeft((Seq.empty[Int], convertible.abs(value))) { case ((acc: Digits, reminder: T), range: Int) =>
-        val (whole: Int, fraction: T) = convertible.wholeAndFraction(reminder)
-        (acc :+ whole, convertible.mult(fraction, range))
-      }
-
-    (digits :+ convertible.round(lastReminder)).map(convertible.signum(value)*_)
-
-  final protected def getDigits(digits: Digits, isCanonical: Boolean = false): Digits =
-    def t(
-      digits: Digits,
-      forDigit: (/* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
-    ): Digits = transform(
-      digits,
-      (digit: Int, _ /* TODO position - unused! */: Int, digitRange: Int) => forDigit(digit, digitRange),
-      (headDigit: Int) =>
-        if !isCanonical then headDigit
-        else headRangeOpt.fold(headDigit)((headRange: Int) => forDigit(headDigit, headRange)._2)
-    )
-
-    // fit all digits within their ranges
-    val normalDigits: Digits = t(
-      digits = if digits.isEmpty then Seq(0) else digits,
-      forDigit = (digit: Int, digitRange: Int) => (digit / digitRange, digit % digitRange)
-    )
-
-    // determine the sign of the result
-    val willBePositive: Boolean = (signum(normalDigits) >= 0) || (isCanonical && headRangeOpt.isDefined)
-    val sign: Int = if willBePositive then 1 else -1
-
-    // make all digits of the same sign
-    val preResult: Digits = t(
-      digits = normalDigits,
-      forDigit = (digit: Int, digitRange: Int) =>
-        if (digit == 0) || (math.signum(digit) == sign) then (0, digit) else (-sign, digit + sign * digitRange)
-    )
-
-    // drop trailing zeros in the tail; use reverse() since there is no dropWhileRight :)
-    preResult.head +: preResult.tail.reverse.dropWhile(_ == 0).reverse
 
 object Numbers:
 
@@ -372,9 +231,7 @@ object Numbers:
     final override def headRangeOpt: Option[Int] = Some(headRange)
 
     def headRange: Int
-
     require(headRange % 2 == 0)
 
     final lazy val period: Vector = Vector(headRange)
-
     final lazy val halfPeriod: Vector = Vector(headRange/2)

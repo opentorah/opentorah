@@ -87,10 +87,17 @@ object BigRational:
 
   final def apply(numerator: Int): BigRational = apply(numerator, 1)
 
-  final def fromString(value: String): BigRational =
-    val values = value.split('/')
-    if values.length != 2 then throw ArithmeticException(s"Invalid BigRational: $value")
-    apply(BigInt(values(0).trim), BigInt(values(1).trim))
+  final def apply(string: String): BigRational = fromString(string)
+
+  final def fromString(string: String): BigRational =
+    val stringTrimmed: String = string.trim
+    val isNegative: Boolean = stringTrimmed.startsWith("-")
+    val values: Array[String] = (if isNegative then stringTrimmed.substring(1) else stringTrimmed).split('/')
+    val numeratorAbs: BigInt = BigInt(values(0).trim)
+    val numerator: BigInt = if isNegative then -numeratorAbs else numeratorAbs
+    if values.length == 2
+    then apply(numerator, BigInt(values(1).trim))
+    else apply(numerator, BigInt(1)             )
 
   final def continuedFraction(value: BigRational, length: Int): Digits =
     require(length >= 1)

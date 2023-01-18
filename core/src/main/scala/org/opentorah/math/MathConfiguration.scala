@@ -56,16 +56,16 @@ final class MathConfiguration(
   
   def body: ScalaXml.Nodes = mathJax.body(ScalaXml.mkText(mathJax.htmlConfigurationString(this)))
 
-  def mathFilter: MathFilter =
+  def mathFilter: DocBookMathFilter =
     def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
-      for delimiters <- values yield new DelimitersAndInput(delimiters, input)
+      for delimiters <- values yield DelimitersAndInput(delimiters, input)
 
     val allDelimiters: Seq[DelimitersAndInput] =
-      withInput(texDelimiters      , Input.Tex      ) ++
-      withInput(texInlineDelimiters, Input.TexInline) ++
-      withInput(asciiMathDelimiters, Input.AsciiMath)
+      withInput(texDelimiters      , Input(Input.Type.Tex      , Some(Input.Display.Block ))) ++
+      withInput(texInlineDelimiters, Input(Input.Type.Tex      , Some(Input.Display.Inline))) ++
+      withInput(asciiMathDelimiters, Input(Input.Type.AsciiMath, None                      ))
 
-    MathFilter(
+    DocBookMathFilter(
       allDelimiters = allDelimiters.sortWith((l: DelimitersAndInput, r: DelimitersAndInput) => l.start.length > r.start.length),
       processEscapes = processEscapes.contains(true)
     )

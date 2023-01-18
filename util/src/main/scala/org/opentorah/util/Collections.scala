@@ -54,7 +54,6 @@ object Collections:
 
   def mapValues[A, B, C](map: Map[A, B])(f: B => C): Map[A, C] =
     map.view.mapValues(f).toMap // Scala 2.13
-    //map.mapValues(f) // Scala 2.12
 
   // where is this in the standard library?
   def compare(a: Option[String], b: Option[String]): Int =

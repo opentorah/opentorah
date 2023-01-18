@@ -1,6 +1,6 @@
 package org.opentorah.math
 
-import org.opentorah.util.Json
+import org.opentorah.util.{Json, Strings}
 import org.opentorah.xml.ScalaXml
 
 object MathJax3 extends MathJax:
@@ -33,10 +33,10 @@ object MathJax3 extends MathJax:
     fontSize: Float
   ): String =
 
-    val (inputComponent: String, promiseOf: String, additionalComponents: List[String]) = input match
-      case Input.Tex | Input.TexInline => ("tex"      , "tex"      , List())
-      case Input.AsciiMath             => ("asciimath", "asciimath", List())
-      case Input.MathML                => ("mml"      , "mathml"   , List("input/mml/entities"))
+    val (inputComponent: String, promiseOf: String, additionalComponents: List[String]) = input.inputType match
+      case Input.Type.Tex       => ("tex"      , "tex"      , List())
+      case Input.Type.AsciiMath => ("asciimath", "asciimath", List())
+      case Input.Type.MathML    => ("mml"      , "mathml"   , List("input/mml/entities"))
 
     val components: Seq[String] = List(
       s"input/$inputComponent",
@@ -56,7 +56,7 @@ object MathJax3 extends MathJax:
     val ex: Int = (fontSize/2).toInt
 
     val options: Map[String, Matchable] = Map(
-      "display"        -> !input.isInline.contains(true),
+      "display"        -> Input.Display.isBlock(input.display),
       "em"             -> em,
       "ex"             -> ex,
       "containerWidth" -> 80 * ex
@@ -66,7 +66,7 @@ object MathJax3 extends MathJax:
     // TODO Why is it that unless I nest the phases instead of chaining tme (as I think I saw in some examples), it breaks?
     s"""
        |require("mathjax-full").init(${Json.fromMap(configuration)}).then((MathJax) => {
-       |  MathJax.${promiseOf}2svgPromise("$mathString", ${Json.fromMap(options)})
+       |  MathJax.${promiseOf}2svgPromise("${Strings.escape(mathString)}", ${Json.fromMap(options)})
        |  .then((node) => { console.log(MathJax.startup.adaptor.innerHTML(node)); });
        |}).catch(err => console.log(err));
        |""".stripMargin

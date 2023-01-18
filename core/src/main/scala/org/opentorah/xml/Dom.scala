@@ -78,10 +78,10 @@ object Dom extends Xml:
     namespace.attribute.get(Dom)(attributes) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
-    setAttribute(namespace.attributeValue, element)
+    namespace.attributeValue.set(Dom)(element)
     element
 
-  override protected def getAttributeValueString(attribute: Attribute[?], attributes: Attributes): Option[String] =
+  override def getAttribute(attribute: Attribute[?], attributes: Attributes): Option[String] =
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     Option(
@@ -111,16 +111,16 @@ object Dom extends Xml:
       if (attribute.getNamespaceURI == Namespace.Xmlns.uri) == isXmlns
     yield attribute
 
-  override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
-    val name: String = attribute.name
-    val namespace: Namespace = attribute.namespace
-    val valueStr: String = attribute.toString(value)
-    if namespace.isDefault then element.setAttribute(name, valueStr) else
-      // declare the attribute's namespace if it is not declared - unless the attribute *is* a namespace declaration ;)
-      if namespace != Namespace.Xmlns then ensureNamespaceDeclared(namespace, element)
-
-      element.setAttributeNS(namespace.getUri.orNull, namespace.qName(name), valueStr)
-    element
+  override def setAttribute[T](attribute: Attribute.Value[T], element: Element): Element = attribute.valueEffective match
+    case None => element
+    case Some(value) =>
+      val name: String = attribute.attribute.name
+      val namespace: Namespace = attribute.attribute.namespace
+      if namespace.isDefault then element.setAttribute(name, value) else
+        // declare the attribute's namespace if it is not declared - unless the attribute *is* a namespace declaration ;)
+        if namespace != Namespace.Xmlns then ensureNamespaceDeclared(namespace, element)
+        element.setAttributeNS(namespace.getUri.orNull, namespace.qName(name), value)
+      element
 
   override def setAttributes(attributes: Attribute.Values, element: Element): Element = ??? // TODO implement
 

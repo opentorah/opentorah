@@ -1,16 +1,17 @@
 package org.opentorah.calendar.jewish
 
+import org.opentorah.astronomy.Zodiac
 import org.opentorah.metadata.{HasName, Named, Names}
 
-enum Season(name: String)
+enum Season(name: String, val sunEnters: Zodiac)
   extends Named.ByLoader[Season](loader = Season, nameOverride = Some(name)), HasName.Enum derives CanEqual:
   lazy val numberInYear: Int = ordinal + 1
 
   // tkufos KH 9:3, 10:3
-  case TkufasNisan   extends Season("Spring Equinox"  ) // sun enters Tele (Aries)
-  case TkufasTammuz  extends Season("Summer Solstice" ) // sun enters Sarton (Cancer)
-  case TkufasTishrei extends Season("Autumnal Equinox") // sun enters Moznaim (Libra)
-  case TkufasTeves   extends Season("Winter Solstice" ) // sun enters Gdi (Capricorn)
+  case TkufasNisan   extends Season("Spring Equinox"  , Zodiac.Aries    )
+  case TkufasTammuz  extends Season("Summer Solstice" , Zodiac.Cancer   )
+  case TkufasTishrei extends Season("Autumnal Equinox", Zodiac.Libra    )
+  case TkufasTeves   extends Season("Winter Solstice" , Zodiac.Capricorn)
 
 object Season extends Names.Loader[Season]:
   def SpringEquinox   : Season = TkufasNisan

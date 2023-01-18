@@ -35,15 +35,15 @@ object Exec:
     var err: Seq[String] = Seq.empty
     var out: Seq[String] = Seq.empty
 
-    val exitCode = Process(
+    val exitCode: Int = Process(
       command = cmd,
       cwd,
       extraEnv = extraEnv*
     ).!(ProcessLogger(fout = line => out = out :+ line, ferr = line => err = err :+ line))
 
-    val errStr = err.mkString("\n")
-    val outStr = out.mkString("\n")
+    val errStr: String = err.mkString("\n")
+    val outStr: String = out.mkString("\n")
 
-    val result = s"Platform.exec() => exitCode=$exitCode; err=$errStr; out=$outStr"
+    val result: String = s"Platform.exec() => exitCode=$exitCode; err=$errStr; out=$outStr"
     if exitCode == 0 then logger.debug(result) else logger.error(result)
     if exitCode == 0 then outStr else throw IllegalArgumentException(s"Platfor.exec() => exitCode=$exitCode")

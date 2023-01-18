@@ -7,7 +7,7 @@ object Moon:
   final def newMoon(number: Int): Moment = firstNewMoon + meanLunarPeriod*(number-1)
 
   // KH 6:3
-  final lazy val meanLunarPeriod: TimeVector = TimeVector().days(29).hours(12).parts(793)
+  final lazy val meanLunarPeriod: TimeVector = TimeVector("29ᵈ12ʰ793ᵖ")
 
   // KH 6:8 Molad of the year of Creation (#1; Man was created on Rosh Hashono of the year #2);
   // BeHaRaD: it was on the second day of the *week* (Monday),

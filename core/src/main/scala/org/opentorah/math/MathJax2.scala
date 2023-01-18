@@ -8,7 +8,11 @@ object MathJax2 extends MathJax:
   // TODO use TeX-MML-AM_CHTML instead of TeX-MML-AM_SVG?
   override def body(payload: ScalaXml.Nodes): Seq[ScalaXml.Element] = Seq(
     <script type="text/javascript">window.MathJax={payload};</script>,
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_SVG"/>
+    <script
+      type="text/javascript"
+      async="async"
+      src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-MML-AM_SVG"
+    />
   )
 
   override def htmlConfiguration(math: MathConfiguration): Map[String, Matchable] = Map(
@@ -45,11 +49,18 @@ object MathJax2 extends MathJax:
       )
     )
 
+    val inputName: String = input.inputType match
+      case Input.Type.AsciiMath => "AsciiMath"
+      case Input.Type.MathML    => "MathML"
+      case Input.Type.Tex       => Input.Display.orDefault(input.display) match
+        case Input.Display.Block  => "TeX"
+        case Input.Display.Inline => "inline-TeX"
+
     // Note: see https://github.com/mathjax/MathJax-node
     val options: Map[String, Matchable] = Map(
       "math"      -> mathString, // the math string to typeset
       "svg"       -> true, // which output format to produce,
-      "format"    -> input.name, // the input format (TeX, inline-TeX, AsciiMath, or MathML)
+      "format"    -> inputName, // the input format (TeX, inline-TeX, AsciiMath, or MathML)
       "ex"        -> (fontSize * exInEms).toInt, // ex-size in pixels
       "speakText" -> false // add textual alternative (for TeX/asciimath the input string, for MathML a dummy string)?
     )

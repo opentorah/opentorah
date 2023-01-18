@@ -26,13 +26,13 @@
         <article class="post">
           <div>
             <div class="post-content">
-              <book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink=
-              "http://www.w3.org/1999/xlink" version="5.0">
+              <book xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
                 <info>
                   <db-title>Rambam on Calendar</db-title>
                   <author><personname>Leonid Dubinsky</personname></author>
                 </info>
-                <preface version="5.0" xml:base="calendar/introduction.xml" id="introduction">
+                <preface xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:base="calendar/introduction.xml"
+                id="introduction">
                   <db-title>Introduction</db-title>
                   <para>Latest version of this paper and the code used to produce it are available from
                   http://www.opentorah.org/.</para>
@@ -114,7 +114,8 @@
                 </preface>
                 <part id="remarks">
                   <db-title>Part I: Some Remarks</db-title>
-                  <chapter version="5.0" xml:base="calendar/new-year-corrections.xml" id="new-year-corrections">
+                  <chapter xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:base=
+                  "calendar/new-year-corrections.xml" id="new-year-corrections">
                     <db-title>New Year corrections</db-title>
                     <itemizedlist>
                       <listitem><para>are there meaningful names for the corrections?</para></listitem>
@@ -176,7 +177,7 @@
                     xml:base=
                     "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-printed.xml" id=
                     "slm-printed"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
-                    "http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" cols="2">
+                    "http://www.w3.org/2001/XInclude" cols="2">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                         <td class="entry">days</td>
                         <td class="entry">printed</td>
@@ -191,8 +192,16 @@
                           <td class="entry">9°51′23″</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">29</td>
+                          <td class="entry">28°35′1″</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">100</td>
                           <td class="entry">98°33′53″</td>
+                        </tr>
+                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
+                          <td class="entry">354</td>
+                          <td class="entry">348°55′15″</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">1000</td>
@@ -201,14 +210,6 @@
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">10000</td>
                           <td class="entry">136°28′20″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">29</td>
-                          <td class="entry">28°35′1″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">354</td>
-                          <td class="entry">348°55′15″</td>
                         </tr>
                       </tbody>
                     </tgroup></table>
@@ -216,153 +217,54 @@
                     the number of days (and discarding full circles as appropriate):</para>
                     <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0"
                     xml:base=
-                    "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-reconstructed-1.xml"
-                    id="slm-reconstructed-1"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
-                    "http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" cols="4">
+                    "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-reconstructed.xml"
+                    id="slm-reconstructed"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
+                    "http://www.w3.org/2001/XInclude" cols="7">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                        <td class="entry">days</td>
-                        <td class="entry">printed</td>
-                        <td class="entry">reconstructed</td>
-                        <td class="entry">difference</td>
+                        <td class="entry">from</td>
+                        <td class="entry">10</td>
+                        <td class="entry">29</td>
+                        <td class="entry">100</td>
+                        <td class="entry">354</td>
+                        <td class="entry">1000</td>
+                        <td class="entry">10000</td>
                       </tr></thead>
                       <tbody>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">1</td>
-                          <td class="entry">0°59′8″</td>
-                          <td class="entry"></td>
-                          <td class="entry"></td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">10</td>
-                          <td class="entry">9°51′23″</td>
-                          <td class="entry">9°51′20″</td>
-                          <td class="entry">0°0′3″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">29</td>
-                          <td class="entry">28°35′1″</td>
-                          <td class="entry">28°34′52″</td>
-                          <td class="entry">0°0′9″</td>
+                          <td class="entry"></td>
+                          <td class="entry"></td>
+                          <td class="entry">-</td>
+                          <td class="entry"></td>
+                          <td class="entry">-</td>
+                          <td class="entry">-</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">100</td>
-                          <td class="entry">98°33′53″</td>
-                          <td class="entry">98°33′20″</td>
-                          <td class="entry">0°0′33″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">354</td>
-                          <td class="entry">348°55′15″</td>
-                          <td class="entry">348°53′12″</td>
-                          <td class="entry">0°2′3″</td>
+                          <td class="entry"></td>
+                          <td class="entry"></td>
+                          <td class="entry"></td>
+                          <td class="entry"></td>
+                          <td class="entry">=</td>
+                          <td class="entry">=</td>
                         </tr>
                         <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">1000</td>
-                          <td class="entry">265°38′50″</td>
-                          <td class="entry">265°33′20″</td>
-                          <td class="entry">0°5′30″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">10000</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">135°33′20″</td>
-                          <td class="entry">0°55′</td>
-                        </tr>
-                      </tbody>
-                    </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0"
-                    xml:base=
-                    "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-reconstructed-10.xml"
-                    id="slm-reconstructed-10"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
-                    "http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" cols="4">
-                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                        <td class="entry">days</td>
-                        <td class="entry">printed</td>
-                        <td class="entry">reconstructed</td>
-                        <td class="entry">difference</td>
-                      </tr></thead>
-                      <tbody>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">10</td>
-                          <td class="entry">9°51′23″</td>
                           <td class="entry"></td>
                           <td class="entry"></td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">100</td>
-                          <td class="entry">98°33′53″</td>
-                          <td class="entry">98°33′50″</td>
-                          <td class="entry">0°0′3″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">1000</td>
-                          <td class="entry">265°38′50″</td>
-                          <td class="entry">265°38′20″</td>
-                          <td class="entry">0°0′30″</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">10000</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">136°23′20″</td>
-                          <td class="entry">0°5′</td>
-                        </tr>
-                      </tbody>
-                    </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0"
-                    xml:base=
-                    "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-reconstructed-100.xml"
-                    id="slm-reconstructed-100"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
-                    "http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" cols="4">
-                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                        <td class="entry">days</td>
-                        <td class="entry">printed</td>
-                        <td class="entry">reconstructed</td>
-                        <td class="entry">difference</td>
-                      </tr></thead>
-                      <tbody>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">100</td>
-                          <td class="entry">98°33′53″</td>
                           <td class="entry"></td>
                           <td class="entry"></td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">1000</td>
-                          <td class="entry">265°38′50″</td>
-                          <td class="entry">265°38′50″</td>
-                          <td class="entry">0°</td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">10000</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">0°</td>
-                        </tr>
-                      </tbody>
-                    </tgroup></table>
-                    <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all" version="5.0"
-                    xml:base=
-                    "file:/home/dub/OpenTorah/opentorah.org/docs/build/docBook/tmp/calendar/data/slm-reconstructed-1000.xml"
-                    id="slm-reconstructed-1000"><tgroup xmlns="http://docbook.org/ns/docbook" xmlns:xi=
-                    "http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" cols="4">
-                      <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                        <td class="entry">days</td>
-                        <td class="entry">printed</td>
-                        <td class="entry">reconstructed</td>
-                        <td class="entry">difference</td>
-                      </tr></thead>
-                      <tbody>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">1000</td>
-                          <td class="entry">265°38′50″</td>
                           <td class="entry"></td>
-                          <td class="entry"></td>
-                        </tr>
-                        <tr xmlns="http://www.w3.org/1999/xhtml" class="row">
-                          <td class="entry">10000</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">136°28′20″</td>
-                          <td class="entry">0°</td>
+                          <td class="entry">=</td>
                         </tr>
                       </tbody>
                     </tgroup></table>
@@ -505,8 +407,7 @@
                     transcription error: one letter; extra word... Probable correct values.</para>
                     <para>This is how different sources treat the often misprinted values:</para>
                     <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
-                    "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink=
-                    "http://www.w3.org/1999/xlink" cols="4">
+                    "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
                       <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                         <td class="entry">Edition</td>
                         <td class="entry">120°</td>
@@ -640,16 +541,16 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
                       <span class="footnote" id="footnote_1">
                         <a href="#footnote_src_1" class="footnote-backlink">1</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">It is not clear how did authoritative Yemenite texts
-                        acquire the same misprints as in the ashkenazic editions.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">It is not
+                        clear how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic
+                        editions.</para>
                       </span>
                       <span class="footnote" id="footnote_2">
                         <a href="#footnote_src_2" class="footnote-backlink">2</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Reprints the text and does not correct any of the
-                        misprints - surpising for a textbook on the subject (even introductory). TODO: Link to the scans
-                        of the appropriate pages - with the stuff highlighted.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Reprints
+                        the text and does not correct any of the misprints - surpising for a textbook on the subject
+                        (even introductory). TODO: Link to the scans of the appropriate pages - with the stuff
+                        highlighted.</para>
                       </span>
                     </div>
                   </chapter>
@@ -676,6 +577,7 @@
                     <para>- 6:11 Leap years: 3,6,8,11,14,17,19.</para>
                     <para>QUESTION: in what sense is this an optimal correspondence? and for different cycle lengths? It
                     is possible that true Sun calculations are needed to answer those questions...</para>
+                    <para>Pirush in the beginning of Rambam -!!!</para>
                   </chapter>
                   <chapter version="5.0" xml:base="calendar/rambam-summary.xml" id="rambam-summary">
                     <db-title>Rambam: Summary</db-title>
@@ -976,28 +878,28 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
                       <span class="footnote" id="footnote_3">
                         <a href="#footnote_src_3" class="footnote-backlink">1</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Bamidbar 28:14</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Bamidbar
+                        28:14</para>
                       </span>
                       <span class="footnote" id="footnote_4">
                         <a href="#footnote_src_4" class="footnote-backlink">2</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Shemos 12:2</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Shemos
+                        12:2</para>
                       </span>
                       <span class="footnote" id="footnote_5">
                         <a href="#footnote_src_5" class="footnote-backlink">3</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Rosh Hashanah 20b; Menachot 29a</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Rosh
+                        Hashanah 20b; Menachot 29a</para>
                       </span>
                       <span class="footnote" id="footnote_6">
                         <a href="#footnote_src_6" class="footnote-backlink">4</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Dvarim 16</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Dvarim
+                        16</para>
                       </span>
                       <span class="footnote" id="footnote_7">
                         <a href="#footnote_src_7" class="footnote-backlink">5</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">Megilla 5a; Nazir 7a</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">Megilla
+                        5a; Nazir 7a</para>
                       </span>
                     </div>
                   </chapter>
@@ -1310,8 +1212,7 @@
                     <simplesect id="KH14-6">
                       <db-title>Law 6</db-title>
                       <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
-                      "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink=
-                      "http://www.w3.org/1999/xlink" cols="4">
+                      "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="4">
                         <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">Solar Longitude on the Zodiac</td>
                           <td class="entry">from</td>
@@ -1380,25 +1281,23 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
                       <span class="footnote" id="footnote_8">
                         <a href="#footnote_src_8" class="footnote-backlink">1</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">This is part of Law 1.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        part of Law 1.</para>
                       </span>
                       <span class="footnote" id="footnote_9">
                         <a href="#footnote_src_9" class="footnote-backlink">2</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">This is part of Law 4.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        part of Law 4.</para>
                       </span>
                       <span class="footnote" id="footnote_10">
                         <a href="#footnote_src_10" class="footnote-backlink">3</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">My understanding of the word usage in the
-                        original.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">My
+                        understanding of the word usage in the original.</para>
                       </span>
                       <span class="footnote" id="footnote_11">
                         <a href="#footnote_src_11" class="footnote-backlink">4</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">See Chapter 11, Law 7 on the start of Jewish Zodiac.
-                        (TODO reference)</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">See
+                        Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)</para>
                       </span>
                     </div>
                   </chapter>
@@ -1424,8 +1323,7 @@
                       <para>A correction that depends on the doubled distance is added to the mean lunar anomaly, giving
                       <glossterm>corrected lunar anomaly</glossterm> (מסלול הנכון):</para>
                       <table xmlns="http://www.w3.org/1999/xhtml" class="informaltable" db-frame="all"><tgroup xmlns=
-                      "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink=
-                      "http://www.w3.org/1999/xlink" cols="2">
+                      "http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" cols="2">
                         <thead><tr xmlns="http://www.w3.org/1999/xhtml" class="row">
                           <td class="entry">doubled distance</td>
                           <td class="entry">correction of the mean anomaly</td>
@@ -1509,8 +1407,8 @@
                     <div xmlns="http://www.w3.org/1999/xhtml" class="footnotes">
                       <span class="footnote" id="footnote_12">
                         <a href="#footnote_src_12" class="footnote-backlink">1</a>
-                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-                        xmlns:xlink="http://www.w3.org/1999/xlink">This is Law 5.</para>
+                        <para xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude">This is
+                        Law 5.</para>
                       </span>
                     </div>
                   </chapter>

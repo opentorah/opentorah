@@ -18,34 +18,23 @@ object Angles extends Numbers.Periodic:
 
   override protected def digitDescriptors: Array[AnglesDigit] = AnglesDigit.values
 
+  override protected def digitSignDefault: String = ","
+
   trait Angle[N <: Angle[N]] extends Number[N]:
     this: N =>
     final def degrees: Int = get(Digit.DEGREES)
-
     final def degrees(value: Int): N = set(Digit.DEGREES, value)
-
     final def roundToDegrees: N = roundTo(Digit.DEGREES)
-
     final def minutes: Int = get(Digit.MINUTES)
-
     final def minutes(value: Int): N = set(Digit.MINUTES, value)
-
     final def roundToMinutes: N = roundTo(Digit.MINUTES)
-
     final def seconds: Int = get(Digit.SECONDS)
-
     final def seconds(value: Int): N = set(Digit.SECONDS, value)
-
     final def roundToSeconds: N = roundTo(Digit.SECONDS)
-
     final def thirds: Int  = get(Digit.THIRDS)
-
     final def thirds(value: Int): N = set(Digit.THIRDS, value)
-
     final def roundToThirds: N = roundTo(Digit.THIRDS)
-
     final def toRadians: Double = math.toRadians(toDegrees)
-
     final def toDegrees: Double = toDouble
 
   sealed trait AngleCompanion[N <: Angle[N]] extends NumberCompanion[N]:

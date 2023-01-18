@@ -36,7 +36,7 @@ object Caching:
     private val cache: Cache[AnyRef, AnyRef] = Caffeine.newBuilder
       .softValues()
       .expireAfterAccess(Duration.ofMinutes(10))
-      .removalListener((key: AnyRef, value: AnyRef, cause: RemovalCause) => log.info(s"EVICTED ($cause) $key"))
+      .removalListener((key: AnyRef, _: AnyRef, cause: RemovalCause) => log.info(s"EVICTED ($cause) $key"))
       .build[AnyRef, AnyRef]
 
     var logEnabled: Boolean = true

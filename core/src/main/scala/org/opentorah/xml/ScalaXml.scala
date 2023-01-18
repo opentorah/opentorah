@@ -129,7 +129,7 @@ object ScalaXml extends Xml:
     val element = asElement(node)
     element.copy(scope = scala.xml.TopScope, child = removeNamespace(getChildren(element)))
 
-  override protected def getAttributeValueString(attribute: Attribute[?], attributes: Attributes): Option[String] = {
+  override def getAttribute(attribute: Attribute[?], attributes: Attributes): Option[String] = {
     val name: String = attribute.name
     val namespace: Namespace = attribute.namespace
     if namespace.isDefault then attributes.attribute(name)
@@ -151,8 +151,9 @@ object ScalaXml extends Xml:
     )
 
   // TODO addAll() doesn't modify existing attributes; this should...
-  override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
-    addAttributes(Seq(attribute.required.withValue(value)), element)
+  override def setAttribute[T](attribute: Attribute.Value[T], element: Element): Element = attribute.valueEffective match
+    case None => element
+    case _ => addAttributes(Seq(attribute), element)
 
   override def setAttributes(attributes: Attribute.Values, element: Element): Element =
     element.copy(attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null)(
@@ -161,11 +162,10 @@ object ScalaXml extends Xml:
 
   private def toMetaData[T](attributeValue: Attribute.Value[T], next: scala.xml.MetaData): scala.xml.MetaData =
     val attribute: Attribute[T] = attributeValue.attribute
-    val value: Option[T] = attributeValue.effectiveValue
     scala.xml.Attribute(
       pre = attribute.namespace.getPrefix.orNull,
       key = attribute.name,
-      value = value.map(attribute.toString).map(mkText).map(Seq(_)).orNull,
+      value = attributeValue.valueEffective.map(mkText).map(Seq(_)).orNull,
       next = next
     )
 

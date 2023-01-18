@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.Pb
 import org.opentorah.store.Path
-import org.opentorah.xml.{Attribute, Namespace, ScalaXml}
+import org.opentorah.xml.{Attribute, ScalaXml}
 
 sealed abstract class Page(val pb: Pb):
   def base: String
@@ -17,7 +17,7 @@ object Page:
     def name: String
     def apply(pb: Pb): Page
 
-  object Manuscript extends Type:
+  private object Manuscript extends Type:
     override def name: String = "manuscript"
 
     private val frontSuffix: String = "-1"
@@ -51,7 +51,7 @@ object Page:
   ) extends Page(pb):
     override def displayName: String = base + (if back then "об" else "")
 
-  object Book extends Type:
+  private object Book extends Type:
     override def name: String = "book"
 
     override def apply(pb: Pb): Page =
@@ -64,16 +64,10 @@ object Page:
   ) extends Page(pb):
     override def base: String = pb.n
     override def displayName: String = pb.n
-
-  val values: Seq[Type] = Seq(Manuscript, Book)
-
-  val typeAttribute: Attribute.OrDefault[Type] = new Attribute[Type](
-    "pageType",
-    namespace = Namespace.No,
-    default = Manuscript
-  ):
-    override def toString(value: Type): String = value.name
-
-    override def fromString(value: String): Type =
-      values.find(_.name == value).getOrElse(throw IllegalArgumentException(s"Unknown page type: $value"))
-  .orDefault
+  
+  val typeAttribute: Attribute.OrDefault[Type] = Attribute.EnumeratedAttribute[Type](
+    name = "pageType",
+    values = Seq(Manuscript, Book),
+    default = Manuscript,
+    getName = _.name
+  ).orDefault

@@ -7,7 +7,7 @@ import org.opentorah.numbers.Math
 object DayOfSighting:
   val calculator: Calculator = Calculator.Text
 
-  // Trying to figure out why Iyar 2 4938 is the day of sighting
+  // TODO Trying to figure out why Iyar 2 4938 is the day of sighting
   def elongation(moment: Moment): Angles.Rotation = calculator.calculate(moment.day).elongation
 
   def dayOfSighting(month: Month): Day =

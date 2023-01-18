@@ -106,7 +106,7 @@ final class PrettyPrinter(
     private def fromPreformattedElement(element: xml.Element, parent: Option[xml.Element]): Seq[String] =
       val attributeValues: Attribute.StringValues = getAttributeValues(element, parent)
       val attributes: String = if attributeValues.isEmpty then "" else attributeValues
-        .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueToString.get + "\"")
+        .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueEffective.get + "\"")
         .mkString(" ", ", ", "")
 
       val children: Seq[String] =
@@ -131,7 +131,7 @@ final class PrettyPrinter(
         else Doc.lineOrSpace + Doc.intercalate(Doc.lineOrSpace, attributeValues.map(attributeValue =>
           Doc.text(attributeValue.attribute.qName + "=") + Doc.lineOrEmpty +
           // Note: maybe use single quotes if the value contains double quote?
-          Doc.text("\"" + encodeXmlSpecials(attributeValue.valueToString.get) + "\"")
+          Doc.text("\"" + encodeXmlSpecials(attributeValue.valueEffective.get) + "\"")
         ))
 
       val nodes: xml.Nodes = atomize(Seq.empty, xml.getChildren(element))

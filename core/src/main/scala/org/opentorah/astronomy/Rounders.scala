@@ -4,33 +4,19 @@ import Angles.{Position, Rotation}
 
 trait Rounders:
   def sunCourse: Rotation => Rotation
-
   def sunLongitudeTrue: Position => Position
-
   def moonAnomalyTrue: Position => Position
-
   def moonAnomalyVisible: Rotation => Rotation
-
   def moonLongitudeTrue: Position => Position
-
   def moonHeadMean: Position => Position
-
   def moonLatitudeCourse: Rotation => Rotation
-
   def longitude1: Rotation => Rotation
-
   def longitude2: Rotation => Rotation
-
   def moonCircuit: Rotation => Rotation
-
   def longitude3: Rotation => Rotation
-
   def moonLongitude3Correction: Rotation => Rotation
-
   def geographicCorrection: Rotation => Rotation
-
   def arcOfSighting: Rotation => Rotation
-
 
 object Rounders:
   object Text extends Rounders:

@@ -6,7 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.6] - 
+## [0.10.7] - 2023-01-28
+- fix: set the fontSize attribute even if its value is the default
+- fix: escape backslashes in TeX strings
+- cleanup: XML Attribute;
+- cleanup: math Input;
+- exactification;
+- cleanup: Numbers;
+- Numbers.fromString();
+- cleanup: astronomy;
+
+## [0.10.6] - 2023-01-18
 - dependency updates;
 - move from zhttp to zio-http;
 - cleanup: Html, ToHtml, DocBook, Tei;

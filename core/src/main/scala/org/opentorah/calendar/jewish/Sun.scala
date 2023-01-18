@@ -29,14 +29,12 @@ object Sun:
 
   object Shmuel extends Sun, YearsCycle:
     // KH 9:1
-    final override val yearLength: TimeVector =
-      TimeVector().days(365).hours(6)
+    final override val yearLength: TimeVector = TimeVector("365ᵈ6ʰ")
 
     final val monthLength: TimeVector = yearLength/(12, 4)
 
     // KH 9:3
-    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
-      TimeVector().days(7).hours(9).parts(642)
+    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector = TimeVector("7ᵈ9ʰ642ᵖ")
 
     final override val length: Int = 28
 
@@ -57,5 +55,4 @@ object Sun:
       LeapYearsCycle.cycleLength /(LeapYearsCycle.yearsInCycle, Jewish.maxLength)
 
     // KH 10:3
-    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector =
-      TimeVector().hours(9).parts(642)
+    final override val firstTkufasNisanBeforeFirstMoladNisan: TimeVector = TimeVector("0ᵈ9ʰ642ᵖ")

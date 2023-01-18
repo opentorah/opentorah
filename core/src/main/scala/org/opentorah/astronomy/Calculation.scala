@@ -67,8 +67,8 @@ final class Calculation(
   def moonHeadMeanReversed: Position = epoch.moonHeadMean + calculators.moonHeadMean(daysAfterEpoch)
   def moonHeadMeanRaw: Position = -moonHeadMeanReversed
   lazy val moonHeadMean: Position = rounders.moonHeadMean(moonHeadMeanRaw)
-  def moonTailMeanRaw: Position = moonHeadMeanRaw + Rotation(180)
-  def moonTailMean: Position = moonHeadMean + Rotation(180)
+  def moonTailMeanRaw: Position = moonHeadMeanRaw + Rotation("180°")
+  def moonTailMean: Position = moonHeadMean + Rotation("180°")
 
   // KH 16:10
   def moonLatitudeCourseRaw: Rotation = moonLongitudeTrue - moonHeadMean
@@ -83,9 +83,7 @@ final class Calculation(
   lazy val latitude1: Rotation = moonLatitude
 
   // KH 17:3-4
-  lazy val inNortherlyInclinedConstellations: Boolean = Zodiac.in(moonLongitudeTrue, Set(
-    Zodiac.Capricorn, Zodiac.Aquarius, Zodiac.Pisces, Zodiac.Aries, Zodiac.Taurus, Zodiac.Gemini
-  ))
+  lazy val inNortherlyInclinedConstellations: Boolean = Zodiac.notherlyInclined.contains(Zodiac.forPosition(moonLongitudeTrue))
 
   // KH 17:5-6
   lazy val longitudeSightingAdjustment: Rotation =
