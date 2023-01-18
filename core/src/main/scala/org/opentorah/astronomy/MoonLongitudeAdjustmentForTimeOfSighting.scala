@@ -1,19 +1,20 @@
 package org.opentorah.astronomy
 
 import Angles.{Position, Rotation}
+import Zodiac.*
 
-// KH 14:5
-object MoonLongitudeAdjustmentForTimeOfSighting:
-  final def calculate(sun: Position): Rotation =
-    import Zodiac.*
-    def in(from: Position, to: Position): Boolean = (from <= sun) && (sun < to)
+// KH 14:5-6
+// TODO if the table is symmetric, why isn't the text exploiting this like in the MoonLatitude?
+object MoonLongitudeAdjustmentForTimeOfSighting extends OrderedTable[Position, Position, Rotation](
+  Aries      .start  -> " 0°   ",
+  Aries      .middle -> " 0°15′",
+  Gemini     .start  -> " 0°30′",
+  Leo        .start  -> " 0°15′",
+  Virgo      .middle -> " 0°   ",
+  Libra      .middle -> "-0°15′",
+  Sagittarius.start  -> "-0°30′",
+  Aquarius   .start  -> "-0°15′",
+  Pisces     .middle -> " 0°   "
+)(identity, Rotation(_)):
 
-    if in(Pisces     .middle, Aries      .middle) then  Rotation(0)     else
-    if in(Aries      .middle, Gemini     .start ) then  Rotation(0, 15) else
-    if in(Gemini     .start , Leo        .start ) then  Rotation(0, 30) else
-    if in(Leo        .start , Virgo      .middle) then  Rotation(0, 15) else
-    if in(Virgo      .middle, Libra      .middle) then  Rotation(0)     else
-    if in(Libra      .middle, Sagittarius.start ) then -Rotation(0, 15) else
-    if in(Sagittarius.start , Aquarius   .start ) then -Rotation(0, 30) else
-    if in(Aquarius   .start , Pisces     .middle) then -Rotation(0, 15) else
-      throw IllegalArgumentException()
+  def calculate(sun: Position): Rotation = find(sun)

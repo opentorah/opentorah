@@ -35,13 +35,13 @@ final class Parsing private:
   private var stack: List[Current] = List.empty
 
   // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))?
-  private def addErrorTrace[A](error: Effects.Error): Effects.Error =
+  private def addErrorTrace(error: Effects.Error): Effects.Error =
     Effects.Error(
       message = error.getMessage + "\n" + stack.flatMap(_.from).map(_.url),
       cause = error.getCause
     )
 
-  private def modifyCurrent[A](newCurrent: Current): Unit =
+  private def modifyCurrent(newCurrent: Current): Unit =
     stack = newCurrent :: stack.tail
 
   private def checkEmpty(): Unit =

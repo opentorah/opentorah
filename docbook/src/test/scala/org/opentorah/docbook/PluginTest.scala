@@ -112,6 +112,8 @@ class PluginTest extends AnyFlatSpecLike, Matchers:
         </article>
       ))
 
-    project.fail().contains(
-      """The entity "version" was referenced, but not declared.""") shouldBe true
+    val fail: String = project.fail()
+    val failed: Boolean = fail.contains("""The entity "version" was referenced, but not declared.""")
+    if !failed then println(s"*** fail(): [$fail]")
+    failed shouldBe true
   }

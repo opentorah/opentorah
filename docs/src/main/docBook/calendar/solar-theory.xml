@@ -49,10 +49,7 @@
 
   <para>Now let's see if the printed values can be recovered by multiplying the value for
     one day by the number of days (and discarding full circles as appropriate):</para>
-  <xi:include href="data:slm-reconstructed-1.xml"/>
-  <xi:include href="data:slm-reconstructed-10.xml"/>
-  <xi:include href="data:slm-reconstructed-100.xml"/>
-  <xi:include href="data:slm-reconstructed-1000.xml"/>
+  <xi:include href="data:slm-reconstructed.xml"/>
 
   <section xml:id="solar-model">
     <title>Model (TODO)</title>

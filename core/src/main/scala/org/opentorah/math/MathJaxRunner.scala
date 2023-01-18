@@ -11,17 +11,18 @@ abstract class MathJaxRunner:
   final def typeset(mathMLDocument: Document): SVGDocument =
     val element: Element = mathMLDocument.getDocumentElement
 
-    val input: Input = MathFilter.inputAttribute.get(Dom)(element)
-    val mathString: String =
-      if input == Input.MathML
-      then MathML.prettyPrinter.render(Dom)(element)
-      else MathFilter.unwrap(element)
-
     val fontSize: Float = Sizes.fontSizeAttribute.required.get(Dom)(element)
+    val inputType: Input.Type = Input.Type.attribute.orDefault.get(Dom)(element)
+    val display: Option[Input.Display] = Input.Display.attribute.optional.get(Dom)(element)
+
+    val mathString: String =
+      if inputType == Input.Type.MathML
+      then MathML.prettyPrinter.render(Dom)(element)
+      else DocBookMathFilter.unwrap(element)
 
     val svgRaw: String = typeset(
       mathString = mathString,
-      input = input,
+      input = Input(inputType, display),
       fontSize = fontSize
     )
 

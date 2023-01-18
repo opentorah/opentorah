@@ -12,7 +12,7 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     val year1newMoon: Jewish.Moment = year1.newMoon
     year1newMoon.day.name shouldBe Week.Day.Sheni
-    year1newMoon.time     shouldBe Jewish.TimeVector().hours(5).parts(204) // BaHaRaD
+    year1newMoon.time     shouldBe Jewish.TimeVector("0ᵈ5ʰ204ᵖ") // BaHaRaD
 
     val year1firstDay: Jewish.Day = year1.firstDay
     year1firstDay.numberInYear shouldBe 1
@@ -29,7 +29,7 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     val year2newMoon: Jewish.Moment = year2.newMoon
     year2newMoon.day.name shouldBe Week.Day.Shishi
-    year2newMoon.time shouldBe Jewish.TimeVector().hours(14) // WeYaD 8:00am
+    year2newMoon.time shouldBe Jewish.TimeVector("0ᵈ14ʰ") // WeYaD 8:00am
 
     val year2firstDay: Jewish.Day = year2.firstDay
     year2firstDay.numberInYear shouldBe 1

@@ -76,18 +76,18 @@ if (project.name != 'docs') {
     archiveClassifier.set('sources')
   }
 
-  tasks.register('scaladocJar', Jar) {
-    from scaladoc.destinationDir
-    archiveClassifier.set('scaladoc')
-  }
-  scaladocJar.dependsOn(scaladoc)
-
   // there is no Java in the project, but Maven Central requires javadoc JAR...
   tasks.register('javadocJar', Jar) {
     from javadoc.destinationDir
     archiveClassifier.set('javadoc')
   }
   javadocJar.dependsOn(javadoc)
+
+  tasks.register('scaladocJar', Jar) {
+    from scaladoc.destinationDir
+    archiveClassifier.set('scaladoc')
+  }
+  scaladocJar.dependsOn(scaladoc)
 
   publishing {
     repositories {

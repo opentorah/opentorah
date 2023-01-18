@@ -9,7 +9,7 @@ final class SimpleDependencyVersion(
   dependency,
   version
 ):
-  final override def nameDependencyNotation: String = dependency.nameBase
+  override def nameDependencyNotation: String = dependency.nameBase
 
 open class SimpleDependency(
   group: String,

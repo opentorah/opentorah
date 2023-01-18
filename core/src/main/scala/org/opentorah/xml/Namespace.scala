@@ -40,8 +40,7 @@ sealed trait Namespace derives CanEqual:
 
   // Note: empty string attribute name is used for default namespace attributes;
   // it is processed specially by Namespace.Xmlns.qName()
-  final def attribute: Attribute.Optional[String] =
-    Attribute.StringAttribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
+  final def attribute: Attribute.Optional[String] = Attribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
@@ -94,7 +93,6 @@ object Namespace:
     if prefix.isEmpty && uri.isDefined then Default(uri.get) else
     if uri.isDefined then Prefixed(prefix.get, uri.get) else
       throw IllegalArgumentException(s"prefix [${prefix.get}] without uri!")
-
 
   def apply(
     prefix: String,

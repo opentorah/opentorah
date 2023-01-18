@@ -16,39 +16,37 @@ abstract class Attribute[T](
     val that: Attribute[T] = other.asInstanceOf[Attribute[T]]
     (name == that.name) && (namespace.getUri == that.namespace.getUri)
 
-  final override def toString: String = s"$qName"
+  final override def toString: String = qName
 
   final def qName: String = namespace.qName(name)
 
-  final def optional           : Attribute.Optional [T] = Attribute.Optional [T](this, setDefault = false)
-  final def optionalSetDefault : Attribute.Optional [T] = Attribute.Optional [T](this, setDefault = true )
-  final def orDefault          : Attribute.OrDefault[T] = Attribute.OrDefault[T](this, setDefault = false)
-  final def orDefaultSetDefault: Attribute.OrDefault[T] = Attribute.OrDefault[T](this, setDefault = true )
-  final def required           : Attribute.Required [T] = Attribute.Required [T](this)
-
-  def toString(value: T): String = value.toString
-
-  final def get(value: Option[String]): Option[T] = value.filter(_.nonEmpty).map(fromString)
+  final def optional : Attribute.Optional [T] = Attribute.Optional [T](this)
+  final def orDefault: Attribute.OrDefault[T] = Attribute.OrDefault[T](this)
+  final def required : Attribute.Required [T] = Attribute.Required [T](this)
 
   // TODO ZIOify! (and unify Effects.effect() and IO.succeed() - and then remove overrides of one of the methods and it itself...Z)
-  def fromString(value: String): T
-  def parseFromString(value: String): Effects.IO[T] = Effects.effect(fromString(value))
+  protected def fromString(value: String): T
+  protected def parseFromString(value: String): Effects.IO[T] = Effects.effect(fromString(value))
+  protected def toString(value: T): String
 
 object Attribute:
 
   final class Value[T](
     val attributeParsable: Parsable[T, ?],
     val value: Option[T]
-  ):
+  )(using CanEqual[T, T]):
     def attribute: Attribute[T] = attributeParsable.attribute
 
-    override def toString: String = s"""$attribute="${valueToString.orNull}""""
-
-    def effectiveValue: Option[T] = attributeParsable.effectiveValue(value)
-
-    def valueToString: Option[String] = effectiveValue.map(attribute.toString)
+    override def toString: String = s"""$attribute="${valueEffective.getOrElse("<default>")}""""
 
     def set(xml: XmlAttributes)(element: xml.Element): xml.Element = xml.setAttribute(this, element)
+
+    def valueEffective: Option[String] =
+      val result: Option[T] =
+        if !attributeParsable.isSetDefault
+        then value.filterNot(_ == attribute.default)
+        else value.orElse(Some(attribute.default))
+      result.map(attribute.toString)
 
   type Values = Seq[Value[?]]
 
@@ -56,55 +54,57 @@ object Attribute:
 
   def allAttributes: Parser[StringValues] = Parsing.allAttributes
 
-  sealed abstract class Parsable[T, A](val attribute: Attribute[T]) extends org.opentorah.xml.Parsable[A]:
-    final override def unparser: Unparser[A] = Unparser(
-      attributes = value => Seq(withValue(value))
-    )
+  // TODO A is either T or Option[T]; are there any type-level tricks I can use to enforce this?
+  sealed abstract class Parsable[T, A](val attribute: Attribute[T])(using CanEqual[T, T]) extends org.opentorah.xml.Parsable[A]:
+    final override protected def parser: Parser[A] = toParser(Parsing.takeAttribute(attribute).flatMap {
+      case None => zio.ZIO.none
+      case Some(value) => attribute.parseFromString(value).map(Some(_))
+    })
 
-    def withValue(value: A): Value[T]
+    final def get(xml: XmlAttributes)(attributes: xml.Attributes): A =
+      fromOption(xml.getAttribute(attribute, attributes).filter(_.nonEmpty).map(attribute.fromString))
 
-    def effectiveValue(value: Option[T]): Option[T]
+    final protected def orDefault(value: Option[T]): T = value.getOrElse(attribute.default)
 
-    def get(xml: XmlAttributes)(element: xml.Attributes): A
+    final override def unparser: Unparser[A] = Unparser(attributes = value => Seq(withValue(value)))
 
-  private def optionalParser[T](attribute: Attribute[T]): Parser[Option[T]] =
-    Parsing.takeAttribute(attribute).flatMap(value =>
-      value.fold[Parser[Option[T]]](zio.ZIO.none)(attribute.parseFromString(_).map(Some(_)))
-    )
+    final def withValueOption(value: Option[T]): Value[T] = Attribute.Value[T](this, value)
+    final def withValue(value: A): Value[T] = withValueOption(toOption(value))
 
-  final class Optional[T](attribute: Attribute[T], setDefault: Boolean)(using CanEqual[T, T]) extends Parsable[T, Option[T]](attribute):
-    override protected def parser: Parser[Option[T]] = optionalParser(attribute)
-    override def withValue(value: Option[T]): Value[T] = Attribute.Value[T](this, value)
-    override def effectiveValue(value: Option[T]): Option[T] =
-      if !setDefault then value.filterNot(_ == attribute.default)
-      else value.orElse(Some(attribute.default))
+    def isSetDefault: Boolean
 
-    override def get(xml: XmlAttributes)(element: xml.Attributes): Option[T] = xml.getAttribute(attribute, element)
+    protected def toParser: Parser[Option[T]] => Parser[A]
 
-  final class OrDefault[T](attribute: Attribute[T], setDefault: Boolean)(using CanEqual[T, T]) extends Parsable[T, T](attribute):
-    override protected def parser: Parser[T] = optionalParser(attribute).map(_.getOrElse(attribute.default))
-    override def withValue(value: T): Attribute.Value[T] = Attribute.Value[T](this, Option(value))
-    override def effectiveValue(value: Option[T]): Option[T] =
-      if !setDefault then value.filterNot(_ == attribute.default)
-      else value.orElse(Some(attribute.default))
+    protected val fromOption: Option[T] => A
+    
+    protected val toOption: A => Option[T]
 
-    override def get(xml: XmlAttributes)(element: xml.Attributes): T = xml.getAttributeWithDefault(attribute, element)
+  final class Optional[T](attribute: Attribute[T])(using CanEqual[T, T]) extends Parsable[T, Option[T]](attribute):
+    override def isSetDefault: Boolean = false
+    override protected val toParser: Parser[Option[T]] => Parser[Option[T]] = identity
+    override protected val fromOption: Option[T] => Option[T] = identity
+    override protected val toOption: Option[T] => Option[T] = identity
 
-  final class Required[T](attribute: Attribute[T]) extends Parsable[T, T](attribute):
-    override protected def parser: Parser[T] = Effects.required(optionalParser(attribute), attribute)
-    override def withValue(value: T): Attribute.Value[T] = Attribute.Value[T](this, Option(value))
-    override def effectiveValue(value: Option[T]): Option[T] = value.orElse(Some(attribute.default))
+  final class OrDefault[T](attribute: Attribute[T])(using CanEqual[T, T]) extends Parsable[T, T](attribute):
+    override def isSetDefault: Boolean = false
+    override protected val toParser: Parser[Option[T]] => Parser[T] = _.map(orDefault)
+    override protected val fromOption: Option[T] => T = orDefault
+    override protected val toOption: T => Option[T] = Some(_)
 
-    override def get(xml: XmlAttributes)(element: xml.Attributes): T = xml.doGetAttribute(attribute, element)
+  final class Required[T](attribute: Attribute[T])(using CanEqual[T, T]) extends Parsable[T, T](attribute):
+    override def isSetDefault: Boolean = true
+    override protected val toParser: Parser[Option[T]] => Parser[T] = Effects.required(_, attribute)
+    override protected val fromOption: Option[T] => T = _.get // TODO better error handling
+    override protected val toOption: T => Option[T] = Some(_)
 
   final class StringAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: String = ""
   ) extends Attribute[String](name, namespace, default):
-    final override def fromString(value: String): String = value
-
-    final override def parseFromString(value: String): Effects.IO[String] = zio.ZIO.succeed(value)
+    override protected def fromString(value: String): String = value
+    override protected def toString(value: String): String = value
+    override protected def parseFromString(value: String): Effects.IO[String] = zio.ZIO.succeed(value)
 
   def apply(
     name: String,
@@ -117,7 +117,8 @@ object Attribute:
     namespace: Namespace = Namespace.No,
     default: Boolean = false
   ) extends Attribute[Boolean](name, namespace, default):
-    final override def fromString(value: String): Boolean = value match
+    override protected def toString(value: Boolean): String = value.toString
+    override protected def fromString(value: String): Boolean = value match
       case "yes" => true
       case "no"  => false
       case value => value.toBoolean
@@ -127,18 +128,20 @@ object Attribute:
     namespace: Namespace = Namespace.No,
     default: Int = 0
   ) extends Attribute[Int](name, namespace, default):
-    final override def fromString(value: String): Int = int(value, mustBePositive = false)
+    override protected def fromString(value: String): Int = int(value, mustBePositive = false)
+    override protected def toString(value: Int): String = value.toString
 
   final class PositiveIntAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: Int = 1
   ) extends Attribute[Int](name, namespace, default):
-    final override def fromString(value: String): Int = int(value, mustBePositive = true)
+    override protected def fromString(value: String): Int = int(value, mustBePositive = true)
+    override protected def toString(value: Int): String = value.toString
 
   private def int(value: String, mustBePositive: Boolean): Int =
-    val result = value.toInt
-    if mustBePositive && result <= 0 then throw IllegalArgumentException(s"Non-positive integer: $result")
+    val result: Int = value.toInt
+    require(!mustBePositive || (result > 0), s"Non-positive integer: $result")
     result
 
   final class FloatAttribute(
@@ -146,4 +149,16 @@ object Attribute:
     namespace: Namespace = Namespace.No,
     default: Float = 0.0f
   ) extends Attribute[Float](name, namespace, default):
-    final override def fromString(value: String): Float = value.toFloat
+    override protected def fromString(value: String): Float = value.toFloat
+    override protected def toString(value: Float): String = value.toString
+  
+  final class EnumeratedAttribute[T](
+    name: String,
+    namespace: Namespace = Namespace.No,
+    default: T,
+    values: Seq[T],
+    getName: T => String
+  )(using CanEqual[T, T]) extends Attribute[T](name, namespace, default):
+    override protected def toString(value: T): String = getName(value)
+    override protected def fromString(value: String): T =
+      values.find(getName(_) == value).getOrElse(throw IllegalArgumentException(s"Unknown $name: $value"))

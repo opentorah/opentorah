@@ -60,7 +60,7 @@ final class DependencyRequirement(
         scalaVersion = getScalaVersion(s2),
         version = version
       )
-      case s : SimpleDependency => s .apply(
+      case s: SimpleDependency => s.apply(
         version = version
       )
     (configuration, dependencyVersion)

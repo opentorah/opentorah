@@ -24,16 +24,17 @@ object Epoch:
     final override lazy val day: Day = Year(4938).month(Month.Nisan).day(3)
 
     // KH 12:2
-    final override def sunLongitudeMean: Position = Zodiac.Aries.at(Rotation(7, 3, 32))
+    final override def sunLongitudeMean: Position = Zodiac.Aries.at(Rotation("7°3′32″"))
 
     // KH 12:2
-    final override def sunApogee: Position = Zodiac.Gemini.at(Rotation(26, 45, 8))
+    final override def sunApogee: Position = Zodiac.Gemini.at(Rotation("26°45′8″"))
 
     // KH 14:4
-    final override def moonLongitudeMean: Position = Zodiac.Taurus.at(Rotation(1, 14, 43))
+    final override def moonLongitudeMean: Position = Zodiac.Taurus.at(Rotation("1°14′43″"))
 
     // KH 14:4
-    final override def moonAnomalyMean: Position = Position(84, 28, 42)
+    // TODO not in Zodiac terms
+    final override def moonAnomalyMean: Position = Position("84°28′42″")
 
     // KH 14:4; f7
-    final override def moonHeadMean: Position = Position(180, 57, 28)
+    final override def moonHeadMean: Position = Position("180°57′28″")

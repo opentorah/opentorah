@@ -2,31 +2,27 @@ package org.opentorah.astronomy
 
 import Angles.Rotation
 
-object MoonLatitude:
-  final val table: InterpolatedTable[Rotation] = new InterpolatedTable[Rotation]:
-    // KH 16:11
-    final override val values: Map[Rotation, Rotation] = Map(
-      row( 0, 0,  0),
-      row(10, 0, 52),
-      row(20, 1, 43),
-      row(30, 2, 30),
-      row(40, 3, 13),
-      row(50, 3, 50),
-      row(60, 4, 20),
-      row(70, 4, 42),
-      row(80, 4, 55),
-      row(90, 5,  0)
-    )
+// KH 16:11
+object MoonLatitude extends OrderedRotationTable[Rotation](
+  " 0°" -> "0° 0′",
+  "10°" -> "0°52′",
+  "20°" -> "1°43′",
+  "30°" -> "2°30′",
+  "40°" -> "3°13′",
+  "50°" -> "3°50′",
+  "60°" -> "4°20′",
+  "70°" -> "4°42′",
+  "80°" -> "4°55′",
+  "90°" -> "5° 0′"
+)(Rotation(_)):
+  // KH 16:13-15
+  override def calculate(moonLatitudeCourse: Rotation): Rotation =
+    val angle: Rotation = moonLatitudeCourse.canonical
+    // canonical angle is always >= 0°
+    val argument: Rotation =
+      if angle <= Rotation(" 90°") then angle                    else // KH 16:11
+      if angle <= Rotation("180°") then Rotation("180°") - angle else // KH 16:13
+      if angle <= Rotation("270°") then angle - Rotation("180°") else // KH 16:14
+                                        Rotation("360°") - angle      // KH 16:15
 
-    // KH 16:13-15
-    final override def calculate(moonLatitudeCourse: Rotation): Rotation =
-      def forCanonical(argument: Rotation): Rotation = interpolate(argument.canonical)
-      val angle: Rotation = moonLatitudeCourse.canonical
-      // canonical angle is always >= Rotation(0)
-      if angle <= Rotation( 90) then forCanonical(angle                ) else // KH 16:11
-      if angle <= Rotation(180) then forCanonical(Rotation(180) - angle) else // KH 16:13
-      if angle <= Rotation(270) then forCanonical(angle - Rotation(180)) else // KH 16:14
-                                  forCanonical(Rotation(360) - angle)      // KH 16:15
-
-  private def row(argumentDegrees: Int, valueDegrees: Int, valueMinutes: Int): (Rotation, Rotation) =
-    Rotation(argumentDegrees) -> Rotation(valueDegrees, valueMinutes)
+    interpolate(argument.canonical)

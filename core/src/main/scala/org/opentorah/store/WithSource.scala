@@ -21,7 +21,7 @@ object WithSource:
 
       override def unparser: Unparser[WithSource[T]] = Unparser.concat[WithSource[T]](
         WithSource.sourceAttribute(_.source),
-        (valueElement(_.value) : Unparser[WithSource[T]])/////.removeNamespace() // TODO why do I need an ascription here?
+        valueElement(_.value)/////.removeNamespace()
       )
 
   private val sourceAttribute: Attribute.Required[String] = Attribute("sourceUrl").required

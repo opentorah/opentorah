@@ -36,7 +36,7 @@ object Effects:
   def effect[A](f: => A): IO[A] = throwable2error(ZIO.attemptBlocking(f))
 
   def collectAll[R, A](zios: Seq[ZIO[R, Error, A]]): ZIO[R, Error, Seq[A]] = for
-    runs <- ZIO.foreach(zios)(_.either)
+    runs: Seq[Either[Error, A]] <- ZIO.foreach(zios)(_.either)
     errors: Seq[Error] = runs.flatMap(_.left.toOption)
     results: Seq[A] = runs.flatMap(_.toOption)
     _ <- check(errors.isEmpty, errors.mkString("Errors:\n  ", "\n  ", "\n."))

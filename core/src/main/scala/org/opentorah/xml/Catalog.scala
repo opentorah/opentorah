@@ -6,7 +6,7 @@ object Catalog extends Dialect, Doctype:
   override val mimeType: String = "application/xml"
 
   override val doctype: String = Doctype.string(
-    "catalog",
+    rootElementName = "catalog",
     dtdId = "-//OASIS//DTD XML Catalogs V1.1//EN",
     dtdUri = "http://www.oasis-open.org/committees/entity/release/1.1/catalog.dtd"
   )

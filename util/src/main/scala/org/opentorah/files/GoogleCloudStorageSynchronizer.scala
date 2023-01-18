@@ -134,8 +134,11 @@ final class GoogleCloudStorageSynchronizer(
     def listDirectories(result: List[File], directoriesToList: List[File]): List[File] =
       if directoriesToList.isEmpty then result else
         val current: File = directoriesToList.head
-        val gsignore: File = File(current, ".gsignore")
-        val ignore: Set[String] = if !gsignore.exists() then Set.empty else Files.read(gsignore).toSet + ".gsignore"
+        val gsIgnore: File = File(current, GoogleCloudStorageSynchronizer.ignoreFileName)
+        val ignore: Set[String] =
+          if !gsIgnore.exists
+          then Set.empty
+          else Files.read(gsIgnore).toSet + GoogleCloudStorageSynchronizer.ignoreFileName
         val (directories: List[File], files: List[File]) = current.listFiles.toList
           .filterNot(file => ignore.contains(file.getName))
           .partition(_.isDirectory)
@@ -175,3 +178,6 @@ final class GoogleCloudStorageSynchronizer(
         Storage.BlobListOption.prefix(bucketPrefix)
       )
     )
+
+object GoogleCloudStorageSynchronizer:
+  val ignoreFileName: String = ".gsignore"

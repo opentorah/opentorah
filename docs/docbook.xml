@@ -3,7 +3,7 @@
 <!--    <output format="pdf"/>-->
 <!--    <output format="epub2"/>-->
     <document name="calendar" dataGeneratorClass="org.opentorah.calendar.paper.Tables">
-      <output format="pdf"/>
+<!--      <output format="pdf"/>-->
       <output format="html"/>
       <output format="htmlOneDirect-mathJax"/>
       <math mathJaxEnabled="true"/>

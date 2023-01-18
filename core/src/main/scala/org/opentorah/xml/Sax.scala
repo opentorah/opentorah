@@ -46,7 +46,7 @@ object Sax extends XmlAttributes:
     namespace.attribute.get(Sax)(attributes) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
-    setAttribute(namespace.attributeValue, element)
+    namespace.attributeValue.set(Sax)(element)
 
   /*
     Note: when attribute is in the default namespace, it needs to be retrieved accordingly; I use inNamespace() for that.
@@ -55,7 +55,7 @@ object Sax extends XmlAttributes:
 
     Note: we ignore attribute `type` (attributes.getType(index)) and assume "CNAME".
    */
-  override protected def getAttributeValueString(attribute: Attribute[?], attributes: Attributes): Option[String] =
+  override def getAttribute(attribute: Attribute[?], attributes: Attributes): Option[String] =
     Option(attributes.getValue(
       attribute.namespace.getUri.getOrElse(""),
       attribute.name
@@ -102,19 +102,20 @@ object Sax extends XmlAttributes:
 
   if (!inDefaultNamespace) namespace.ensureDeclared(attributes)
   */
-  override protected def setAttribute[T](attribute: Attribute[T], value: T, element: Element): Element =
-    val name: String = attribute.name
-    val namespace: Namespace = attribute.namespace
-    val valueStr: String = attribute.toString(value)
-    element.addAttribute(
-      namespace.getUri.getOrElse(""),
-      name,
-      namespace.qName(name),
-      "CDATA",
-      valueStr
-    )
+  override def setAttribute[T](attribute: Attribute.Value[T], element: Element): Element = attribute.valueEffective match
+    case None => element
+    case Some(value) =>
+      val name: String = attribute.attribute.name
+      val namespace: Namespace = attribute.attribute.namespace
+      element.addAttribute(
+        namespace.getUri.getOrElse(""),
+        name,
+        namespace.qName(name),
+        "CDATA",
+        value
+      )
 
-    element
+      element
 
   override def setAttributes(attributes: Attribute.Values, element: Element): Element = ??? // TODO implement
 
@@ -129,5 +130,5 @@ object Sax extends XmlAttributes:
 
     val result: Element = org.xml.sax.helpers.AttributesImpl()
     for namespace: Namespace <- usedNamespaces -- declaredNamespaces do declareNamespace(namespace, result)
-    for attributeValue: Attribute.Value[String] <- nonXmlns do setAttribute(attributeValue, result)
+    for attributeValue: Attribute.Value[String] <- nonXmlns do attributeValue.set(Sax)(result)
     result

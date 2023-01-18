@@ -1,16 +1,43 @@
 package org.opentorah.math
 
-enum Input(
-  val name: String,
-  val isInline: Option[Boolean]
-) derives CanEqual:
-  case Tex       extends Input(name = "TeX"       , isInline = Some(false))
-  case TexInline extends Input(name = "inline-TeX", isInline = Some(true))
-  case AsciiMath extends Input(name = "AsciiMath" , isInline = None) // same for both
-  case MathML    extends Input(name = "MathML"    , isInline = None) // accepts both
+import org.opentorah.xml.Attribute
+
+final case class Input(
+  inputType: Input.Type,
+  display: Option[Input.Display]
+) derives CanEqual
 
 object Input:
-  def withInline(input: Input, isInline: Option[Boolean]): Input = input match
-    case Tex       if isInline == TexInline.isInline => TexInline
-    case TexInline if isInline == Tex      .isInline => Tex
-    case _ => input
+  enum Type(val name: String) derives CanEqual:
+    case Tex extends Type(name = "tex")
+    case AsciiMath extends Type(name = "asciimath")
+    case MathML extends Type(name = "mathml")
+
+  object Type:
+    @SerialVersionUID(1L)
+    val attribute: Attribute[Type] = Attribute.EnumeratedAttribute[Type](
+      name = "inputType",
+      namespace = DocBookMathFilter.namespace,
+      values = Type.values.toIndexedSeq,
+      default = Type.MathML,
+      getName = _.name
+    )
+
+  // Note: "display" is only important for TeX...
+  enum Display(val name: String) derives CanEqual:
+    case Inline extends Display("inline")
+    case Block extends Display("block") // "display math"
+
+  object Display:
+    val default: Display = Display.Block
+    def orDefault(value: Option[Display]): Display = value.getOrElse(default)
+    def isBlock(value: Option[Display]): Boolean = orDefault(value) == Display.Block
+
+    // Note: this attribute is always used within its native MathML.namespace, so I set its namespace to No.
+    @SerialVersionUID(1L)
+    val attribute: Attribute[Display] = Attribute.EnumeratedAttribute[Display](
+      name = "display",
+      values = Display.values.toIndexedSeq,
+      default = default,
+      getName = _.name
+    )

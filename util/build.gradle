@@ -2,6 +2,7 @@ plugins {
   id 'java-library'
   id 'scala'
   id 'com.github.maiflai.scalatest'
+//  id 'org.podval.tools.scalajs' # TODO make this work!
   id 'maven-publish'
   id 'signing'
 }

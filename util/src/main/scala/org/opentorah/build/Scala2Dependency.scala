@@ -10,7 +10,7 @@ final class Scala2DependencyVersion(
   dependency = dependency,
   version = version
 ):
-  final override def nameDependencyNotation: String = s"${dependency.nameBase}_$scalaVersion"
+  override def nameDependencyNotation: String = s"${dependency.nameBase}_$scalaVersion"
 
 open class Scala2Dependency(
   group: String,

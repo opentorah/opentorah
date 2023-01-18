@@ -280,7 +280,7 @@ trait Calendar extends Times, Epoch:
 
     final def toJulianDay: Double = convertTo[Double](getDigits(toEpoch(Epoch.JulianDay)))
 
-    private def toEpoch(epoch: Epoch): Digits = add(Seq(
+    private def toEpoch(epoch: Epoch): Digits = addDigits(Seq(
       epochDifference(epoch),
       epochHoursDifference(epoch)
     ))

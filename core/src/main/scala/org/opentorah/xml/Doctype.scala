@@ -8,4 +8,4 @@ object Doctype:
     s"<!DOCTYPE $rootElementName>"
 
   def string(rootElementName: String, dtdId: String, dtdUri: String): String =
-    s"""<!DOCTYPE catalog PUBLIC "$dtdId" "$dtdUri">"""
+    s"""<!DOCTYPE $rootElementName PUBLIC "$dtdId" "$dtdUri">"""

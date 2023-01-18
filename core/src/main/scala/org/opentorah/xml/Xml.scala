@@ -9,7 +9,7 @@ import zio.{URIO, ZIO}
 // This abstracts over the XML model, allowing parsing and pretty-printing of both Scala XML and DOM.
 trait Xml extends XmlAttributes:
   type Node
-  given CanEqual[scala.collection.immutable.Nil.type, Nodes] = CanEqual.derived // Note: just for case matching of Nil agains Nodes...
+  given CanEqual[scala.collection.immutable.Nil.type, Nodes] = CanEqual.derived // Note: just for case matching of Nil against Nodes...
 
   final type Nodes = Seq[Node]
   override type Attributes <: Node
@@ -59,7 +59,7 @@ trait Xml extends XmlAttributes:
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
 
   final def allBases(element: Element): Seq[String] =
-    getAttribute(Xml.baseAttribute, element).toSeq ++
+    Xml.baseAttribute.optional.get(this)(element).toSeq ++
     getChildren(element).filter(isElement).map(asElement).flatMap(allBases)
 
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =

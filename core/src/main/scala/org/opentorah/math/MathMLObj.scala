@@ -32,7 +32,7 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
 
     createBasicDocument()
 
-    Sizes.fontSizeAttribute.optional.withValue(fontSize).set(Dom)(getDOMDocument.getDocumentElement)
+    Sizes.fontSizeAttribute.required.withValueOption(fontSize).set(Dom)(doc.getDocumentElement)
 
   // TODO
   // Note: It is tempting to typeset MathML to SVG right here to avoid duplicate conversions

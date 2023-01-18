@@ -36,39 +36,35 @@ class TextTest extends AnyFunSpec, Matchers:
       }
     }
 
-    describe("Law 3") {
-      it("mean lunar period") {
-        Moon.meanLunarPeriod shouldBe TimeVector().days(29).hours(12).parts(793)
-      }
+    it("Law 3: mean lunar period") {
+      Moon.meanLunarPeriod shouldBe TimeVector("29ᵈ12ʰ793ᵖ")
     }
 
-    describe("Law 4") {
-      it("year lengths") {
-        LeapYearsCycle.normalYear shouldBe Moon.meanLunarPeriod*12
-        LeapYearsCycle.normalYear shouldBe TimeVector().days(354).hours( 8).parts(876)
+    it("Law 4: year lengths") {
+      LeapYearsCycle.normalYear shouldBe Moon.meanLunarPeriod*12
+      LeapYearsCycle.normalYear shouldBe TimeVector("354ᵈ8ʰ876ᵖ")
 
-        LeapYearsCycle.leapYear shouldBe Moon.meanLunarPeriod*13
-        LeapYearsCycle.leapYear shouldBe TimeVector().days(383).hours(21).parts(589)
+      LeapYearsCycle.leapYear shouldBe Moon.meanLunarPeriod*13
+      LeapYearsCycle.leapYear shouldBe TimeVector("383ᵈ21ʰ589ᵖ")
 
-        // see also KH 9:1, 10:6
-        Sun.Shmuel.yearLength shouldBe TimeVector().days(365).hours(6)
-        (Sun.Shmuel.yearLength - LeapYearsCycle.normalYear) shouldBe TimeVector().days(10).hours(21).parts(204)
-      }
+      // see also KH 9:1, 10:6
+      Sun.Shmuel.yearLength shouldBe TimeVector("365ᵈ6ʰ")
+      (Sun.Shmuel.yearLength - LeapYearsCycle.normalYear) shouldBe TimeVector("10ᵈ21ʰ204ᵖ")
     }
 
     describe("Law 5: Remainders for a Week") {
       it("month") {
-        remainderForWeek(Moon.meanLunarPeriod     ) shouldBe TimeVector().days(1).hours(12).parts(793)
+        remainderForWeek(Moon.meanLunarPeriod     ) shouldBe TimeVector("1ᵈ12ʰ793ᵖ")
       }
       it("normal year") {
-        remainderForWeek(LeapYearsCycle.normalYear) shouldBe TimeVector().days(4).hours( 8).parts(876)
+        remainderForWeek(LeapYearsCycle.normalYear) shouldBe TimeVector("4ᵈ 8ʰ876ᵖ")
       }
       it("leap year") {
-        remainderForWeek(LeapYearsCycle.leapYear  ) shouldBe TimeVector().days(5).hours(21).parts(589)
+        remainderForWeek(LeapYearsCycle.leapYear  ) shouldBe TimeVector("5ᵈ21ʰ589ᵖ")
       }
     }
 
-    describe("Law 7") {
+    it("Law 7: molad Nisan example") {
       /*
       Rambam mentions Nisan conjunction on Sunday, 5 hours and 107 units parts after sunrise.
       He doesn't give the year, and there seems to be no such year...
@@ -79,7 +75,7 @@ class TextTest extends AnyFunSpec, Matchers:
         Один из комментаторов недоволен этими числами у Рамбама и меняет часы (17 вместо 5).
         Мой вопрос: решает ли таков изменение твою проблему.
        */
-      it("molad Nisan example") { // TODO Note: Rambam says 5 instead of 17:
+      // TODO Note: Rambam says 5 instead of 17:
 //        for (yearNumber <- 4890.to(4966) /*1.to(6000)*/) { // Rambam: 1138–1204
 //          val moladNisan = Year(yearNumber).month(Month.Nisan).newMoon
 //          if (moladNisan.day.name == Rishon) //(moladNisan.parts == 107)
@@ -89,10 +85,7 @@ class TextTest extends AnyFunSpec, Matchers:
 //              moladNisan.day.name + " " +
 //              s"${moladNisan.hours}h ${moladNisan.parts}p"
 //            )
-//        }
-        (TimeVector().hours(17).parts(107) + Moon.meanLunarPeriod).time shouldBe
-          TimeVector().hours( 5).parts(900)
-      }
+        (TimeVector("0ᵈ17ʰ107ᵖ") + Moon.meanLunarPeriod).time shouldBe TimeVector("0ᵈ5ʰ900ᵖ")
     }
 
     describe("Law 8: First New Moons") {
@@ -101,166 +94,130 @@ class TextTest extends AnyFunSpec, Matchers:
       it("year 1") {
         year1newMoon.day.name shouldBe Sheni
         // see also KH 6:13
-        year1newMoon.time shouldBe TimeVector().hours(5).parts(204) // BaHaRaD
+        year1newMoon.time shouldBe TimeVector("0ᵈ5ʰ204ᵖ") // BaHaRaD
       }
 
       it("year 2") {
         val year2newMoon: Moment = Year(2).newMoon
         year2newMoon.day.name shouldBe Shishi
-        year2newMoon.time shouldBe TimeVector().hours(14) // WeYaD 8:00am
+        year2newMoon.time shouldBe TimeVector("0ᵈ14ʰ") // WeYaD 8:00am
 
         (year2newMoon - Moon.meanLunarPeriod*12) shouldBe year1newMoon
       }
     }
 
-    describe("Law 10") {
-      it("year of Shmuel") {
-        // see also 9:1-2
-        LeapYearsCycle.yearsInCycle shouldBe 19
-        LeapYearsCycle.leapYearsInCycle shouldBe 7
-        Sun.Shmuel.yearLength shouldBe TimeVector().days(365).hours(6)
-        LeapYearsCycle.cycleLength shouldBe (LeapYearsCycle.normalYear*12 + LeapYearsCycle.leapYear*7)
-        (Sun.Shmuel.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe
-          TimeVector().hours(1).parts(485)
-        // KH 9:2
-        Sun.Shmuel.seasonLength shouldBe TimeVector().days(91).hours(7).halfHour
-      }
+    it("Law 10: year of Shmuel") {
+      // see also 9:1-2
+      LeapYearsCycle.yearsInCycle shouldBe 19
+      LeapYearsCycle.leapYearsInCycle shouldBe 7
+      Sun.Shmuel.yearLength shouldBe TimeVector("365ᵈ6ʰ")
+      LeapYearsCycle.cycleLength shouldBe (LeapYearsCycle.normalYear*12 + LeapYearsCycle.leapYear*7)
+      (Sun.Shmuel.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector("0ᵈ1ʰ485ᵖ")
+      // KH 9:2
+      Sun.Shmuel.seasonLength shouldBe TimeVector("91ᵈ7ʰ").halfHour
     }
 
-    describe("Law 11") {
-      it("leap years") {
-        LeapYearsCycle.leapYears shouldBe Set(3, 6, 8, 11, 14, 17, 19)
-      }
+    it("Law 11: leap years") {
+      LeapYearsCycle.leapYears shouldBe Set(3, 6, 8, 11, 14, 17, 19)
     }
 
-    describe("Law 12") {
-      it("cycle remainder") {
-        remainderForWeek(TimeVector().days(4).hours( 8).parts(876)*12 +
-          TimeVector().days(5).hours(21).parts(589)* 7) shouldBe
-          TimeVector().days(2).hours(16).parts(595)
-      }
+    it("Law 12: cycle remainder") {
+      remainderForWeek(TimeVector("4ᵈ8ʰ876ᵖ")*12 + TimeVector("5ᵈ21ʰ589ᵖ")*7) shouldBe TimeVector("2ᵈ16ʰ595ᵖ")
     }
   }
 
   describe("Chapter 8") {
-    describe("Laws 7-8") {
-      it("year length for short years") {
-        Year.shortNonLeapYearLength shouldBe 353
-        Year.shortLeapYearLength shouldBe 383
-      }
+    it("Laws 7-8: year length for short years") {
+      Year.shortNonLeapYearLength shouldBe 353
+      Year.shortLeapYearLength shouldBe 383
     }
 
-    describe("Law 9") {
-      it("kind of the year") {
-        var numberRegular: Int = 0
-        var numberFull: Int = 0
-        var numberShort: Int = 0
-        for
-          yearNumber <- 2 to 6000 // TODO remove magic constants
-          year: Year = Year(yearNumber)
-          if !year.isLeap
-          firstDay: Day = year.firstDay
-          nextYearFirstDay: Day = year.next.firstDay
-          kind: Year.Kind = year.kind
-        do
-          if firstDay.is(Chamishi) then
-            if nextYearFirstDay.is(Sheni) then
-              numberRegular += 1
-              kind shouldBe Year.Kind.Regular
-            if nextYearFirstDay.is(Shlishi) then
-              numberFull += 1
-              kind shouldBe Year.Kind.Full
-          if firstDay.is(Shabbos) then
-            if nextYearFirstDay.is(Shlishi) then
-              numberShort += 1
-              kind shouldBe Year.Kind.Short
+    it("Law 9: kind of the year") {
+      var numberRegular: Int = 0
+      var numberFull: Int = 0
+      var numberShort: Int = 0
+      for
+        yearNumber <- 2 to 6000 // TODO remove magic constants
+        year: Year = Year(yearNumber)
+        if !year.isLeap
+        firstDay: Day = year.firstDay
+        nextYearFirstDay: Day = year.next.firstDay
+        kind: Year.Kind = year.kind
+      do
+        if firstDay.is(Chamishi) then
+          if nextYearFirstDay.is(Sheni) then
+            numberRegular += 1
+            kind shouldBe Year.Kind.Regular
+          if nextYearFirstDay.is(Shlishi) then
+            numberFull += 1
+            kind shouldBe Year.Kind.Full
+        if firstDay.is(Shabbos) then
+          if nextYearFirstDay.is(Shlishi) then
+            numberShort += 1
+            kind shouldBe Year.Kind.Short
 
-        // Verify that we saw some years with properties from the text
-        assert(numberRegular > 0) // 1084 of them!
-        assert(numberFull    > 0) // 198 of them!
-        assert(numberShort   > 0) // 259 of them!
-      }
+      // Verify that we saw some years with properties from the text
+      assert(numberRegular > 0) // 1084 of them!
+      assert(numberFull    > 0) // 198 of them!
+      assert(numberShort   > 0) // 259 of them!
     }
 
-    describe("Law 10") {
-      it("year kind laws") {
-        for yearNumber <- NewYear.delaysEnabledFromYear to 6000 do // TODO remove magic constants
-          val year: Year = Year(yearNumber)
-          val kind: Year.Kind = year.kind
-          year.firstDay.name match
-            case Shlishi  => assert(kind == Year.Kind.Regular)
-            case Shabbos  => assert(kind != Year.Kind.Regular)
-            case Sheni    => assert(kind != Year.Kind.Regular)
-            case Chamishi => assert(kind != (if year.isLeap then Year.Kind.Regular else Year.Kind.Short))
-            case _ => throw IllegalArgumentException()
-      }
+    it("Law 10: year kind laws") {
+      for yearNumber <- NewYear.delaysEnabledFromYear to 6000 do // TODO remove magic constants
+        val year: Year = Year(yearNumber)
+        val kind: Year.Kind = year.kind
+        year.firstDay.name match
+          case Shlishi  => assert(kind == Year.Kind.Regular)
+          case Shabbos  => assert(kind != Year.Kind.Regular)
+          case Sheni    => assert(kind != Year.Kind.Regular)
+          case Chamishi => assert(kind != (if year.isLeap then Year.Kind.Regular else Year.Kind.Short))
+          case _ => throw IllegalArgumentException()
     }
   }
 
   describe("Chapter 9") {
-    describe("Laws 3-4") {
-      it("first tkufas Nisan for Shmuel") {
-        Moon.firstMoladNisan shouldBe Year(1).month(Month.Nisan).newMoon
-        (Moon.firstMoladNisan - Sun.Shmuel.firstTkufasNisan) shouldBe
-          TimeVector().days(7).hours(9).parts(642)
-        Sun.Shmuel.firstTkufasNisan.day.name shouldBe Rvii
-      }
+    it("Laws 3-4: first tkufas Nisan for Shmuel") {
+      Moon.firstMoladNisan shouldBe Year(1).month(Month.Nisan).newMoon
+      (Moon.firstMoladNisan - Sun.Shmuel.firstTkufasNisan) shouldBe TimeVector("7ᵈ9ʰ642ᵖ")
+      Sun.Shmuel.firstTkufasNisan.day.name shouldBe Rvii
     }
 
-    describe("Laws 5-7") {
-      it("tkufos of 4930") {
-        val year: Year = Year(4930)
+    it("Laws 5-7: tkufos of 4930") {
+      val year: Year = Year(4930)
 
-        LeapYearsCycle.forYear(Jewish)(year) shouldBe YearsCycle.In(260, 9)
+      LeapYearsCycle.forYear(Jewish)(year) shouldBe YearsCycle.In(260, 9)
 
-        val tkufasNisan: Moment = Sun.Shmuel.seasonForYear(Season.TkufasNisan, year)
-        tkufasNisan.day.name shouldBe Chamishi
-        tkufasNisan.time shouldBe TimeVector().hours(6)
-        tkufasNisan.day shouldBe year.month(Month.Nisan).day(8)
+      def check(year: Year, season: Season, weekDay: Week.Day, time: TimeVector): Unit =
+        val result: Moment = Sun.Shmuel.seasonForYear(season, year)
+        result.day.name shouldBe weekDay
+        result.time shouldBe time
 
-        val tkufasTammuz: Moment = Sun.Shmuel.seasonForYear(Season.TkufasTammuz, year)
-        tkufasTammuz.day.name shouldBe Chamishi
-        tkufasTammuz.time shouldBe TimeVector().hours(13).halfHour
+      Sun.Shmuel.seasonForYear(Season.TkufasNisan, year).day shouldBe year.month(Month.Nisan).day(8)
 
-        val tkufasTishrei: Moment = Sun.Shmuel.seasonForYear(Season.TkufasTishrei, year)
-        tkufasTishrei.day.name shouldBe Chamishi
-        tkufasTishrei.time shouldBe TimeVector().hours(21)
-
-        val tkufasTeves: Moment = Sun.Shmuel.seasonForYear(Season.TkufasTeves, year)
-        tkufasTeves.day.name shouldBe Shishi
-        tkufasTeves.time shouldBe TimeVector().hours(4).halfHour
-
-        val nextTkufasNisan: Moment = Sun.Shmuel.seasonForYear(Season.TkufasNisan, year+1)
-        nextTkufasNisan.day.name shouldBe Shishi
-        nextTkufasNisan.time shouldBe TimeVector().hours(12)
-      }
+      check(year  , Season.TkufasNisan  , Chamishi, TimeVector("0ᵈ 6ʰ")         )
+      check(year  , Season.TkufasTammuz , Chamishi, TimeVector("0ᵈ13ʰ").halfHour)
+      check(year  , Season.TkufasTishrei, Chamishi, TimeVector("0ᵈ21ʰ")         )
+      check(year  , Season.TkufasTeves  , Shishi  , TimeVector("0ᵈ 4ʰ").halfHour)
+      check(year+1, Season.TkufasNisan  , Shishi  , TimeVector("0ᵈ12ʰ")         )
     }
   }
 
   describe("Chapter 10") {
-    describe("Laws 1-2") {
-      it("year of RavAda") {
-        Sun.RavAda.yearLength shouldBe
-          TimeVector().days(365).hours(5 ).parts(997).moments(48)
+    it("Laws 1-2: year of Rav Ada") {
+      Sun.RavAda.yearLength shouldBe TimeVector("365ᵈ5ʰ997ᵖ48ᵐ")
 
-        (Sun.RavAda.yearLength - LeapYearsCycle.normalYear) shouldBe
-          TimeVector().days( 10).hours(21).parts(121).moments(48)
+      (Sun.RavAda.yearLength - LeapYearsCycle.normalYear) shouldBe TimeVector("10ᵈ21ʰ121ᵖ48ᵐ")
 
-        (Sun.RavAda.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector.zero
+      (Sun.RavAda.yearLength*LeapYearsCycle.yearsInCycle - LeapYearsCycle.cycleLength) shouldBe TimeVector.zero
 
-        // KH 10:2
-        Sun.RavAda.seasonLength shouldBe
-          TimeVector().days(91).hours(7).parts(519).moments(31)
-      }
+      // KH 10:2
+      Sun.RavAda.seasonLength shouldBe TimeVector("91ᵈ7ʰ519ᵖ31ᵐ")
     }
 
-    describe("Law 3") {
-      it("first tkufas Nisan for RavAda") {
-        (Moon.firstMoladNisan - Sun.RavAda.firstTkufasNisan) shouldBe
-          TimeVector().hours(9).parts(642)
+    it("Law 3: first tkufas Nisan for RavAda") {
+      (Moon.firstMoladNisan - Sun.RavAda.firstTkufasNisan) shouldBe TimeVector("0ᵈ9ʰ642ᵖ")
 
-        Sun.RavAda.firstTkufasNisan.day.name shouldBe Rvii
-      }
+      Sun.RavAda.firstTkufasNisan.day.name shouldBe Rvii
     }
   }
 
