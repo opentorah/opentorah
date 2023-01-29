@@ -14,6 +14,7 @@ import zio.{Chunk, Task, ZIO}
 import java.io.File
 import java.net.URL
 
+// TODO merge into the Collector?
 abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
   final override protected def log: Logger = Site.logger
 
@@ -43,10 +44,9 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
 
   private def build(prettyPrint: Boolean, args: Chunk[String]): Task[Unit] =
     val directoryPath: String = args(0)
-    val globalSubstitutions: Map[String, String] = args.lift(1).fold(Map.empty)(Strings.toMap)
     for
       site: S <- readSite(Files.file2url(File(directoryPath)))
-      _ <- site.build(prettyPrint, globalSubstitutions)
+      _ <- site.build(prettyPrint)
     yield ()
 
   private def upload(dryRun: Boolean, args: Chunk[String]): Task[Unit] =
@@ -115,25 +115,3 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
       case request@Method.GET -> !! / "reset-cached-site" => reset(request)
       case request => timed(get)(request)
     }
-
-// Note: this is on the top level and not nested in the companion object,
-// *and* is not the companion object (TODO: try this again!)
-// since in those cases Scala compiler does not generate static main()...
-object SiteServiceCommon extends SiteService[Site]:
-  override def projectId: String = "???"
-  override def bucketName: String = "???"
-
-  override def contentParsable: Parsable[Site] = new Parsable[Site]:
-    override def unparser: Unparser[Site] = Unparser.concat[Site](
-      SiteCommon.required(_.common),
-    )
-
-    override def parser: Parser[Site] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
-      common: SiteCommon <- SiteCommon.required()
-    yield new Site(fromUrl, common) with Pure[?]:
-      override def storesPure: Seq[Store] = Seq.empty
-      override def content(path: Path, extension: Option[String]): Caching.Parser[Site.Response] = ???
-      override def pathShortener: Caching.Parser[Path.Shortener] = ZIO.succeed(identity)
-      override def path(store: Store): Path = Seq.empty
-      override protected def linkResolver(path: Path, pathShortener: Path.Shortener): LinksResolver = LinksResolver.empty

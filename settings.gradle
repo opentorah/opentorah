@@ -11,9 +11,13 @@ pluginManagement {
     id 'com.google.cloud.tools.jib'    version '3.3.1'
     id 'org.podval.tools.cloudrun'     version '0.3.1'
     id 'com.gradle.plugin-publish'     version '1.1.0'
-    id 'io.miret.etienne.sass'         version '1.4.2'
-    id 'org.opentorah.docbook'         version docBookPluginVersion
+    id 'org.asciidoctor.jvm.convert'   version '3.3.2'
+    id 'org.asciidoctor.jvm.gems'      version '3.3.2'
+    id 'org.asciidoctor.jvm.pdf'       version '3.3.2'
   }
+
+//includeBuild '../../Projects/cloud-run'
+//includeBuild '../../Projects/scalajs/scalajs-gradle'
 }
 
 final String scalaVersion      = '3.2.2'
@@ -114,7 +118,7 @@ dependencyResolutionManagement {
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
 
     // Documentation
-    library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.6")
+    //library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.7")
   }}
 }
 
@@ -136,5 +140,3 @@ include ':docbook'
 project(':docbook'  ).name = 'opentorah-docbook'
 
 include ':docs'
-
-//includeBuild '../../Projects/cloud-run'

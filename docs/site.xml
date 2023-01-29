@@ -30,6 +30,6 @@
     />
     <!-- TODO ScalaXml parser doesn't support includes yet, and I want to keep this separate for now
     so that I could configure DocBook plugin with it - so I use my own redirects... -->
-    <docbook file="docbook.xml"/>
+<!--    <docbook file="docbook.xml"/>-->
   </common>
 </site>

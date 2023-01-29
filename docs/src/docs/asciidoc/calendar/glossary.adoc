@@ -1,0 +1,26 @@
+[#glossary]
+[glossary]
+== Glossary
+
+Astronomical Terms
+
+[glossary]
+[[gva-hashemesh]]solar apogee:: Point on the orbit of the Sun where it is highest above the Earth.
+
+[[solar-portion-term]]solar portion:: ???
+
+[[mla-term]]mean lunar anomaly:: in the original: אמצע המסלול
++
+Mean angular coordinate of the Moon on its epicycle.
+
+[[cla-term]]corrected lunar anomaly:: in the original: מסלול הנכון
+
+[[mll-term]]mean lunar longitude:: in the original: אמצע הירח
+
+[[mllo-term]]mean lunar longitude at observation time:: ???
+
+[[tll-term]]true lunar longitude:: in the original: הירח האמיתי
+
+[[tllo-term]]true lunar longitude at the observation time:: ???
+
+[[dd-term]]doubled distance:: in the original: מרחק הכפול

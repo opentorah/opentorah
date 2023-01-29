@@ -12,13 +12,10 @@ In addition to the main website www.opentorah.org, the project maintains:
  (including the arrests of the Alter Rebbe in 1798 and 1800): www.alter-rebbe.org.
 
 ## Papers ##
-- paper ([HTML](/paper/dream/html/index.html), [PDF](/paper/dream/pdf/dream.pdf),
-  [EPUB](/paper/dream/epub2/dream.epub)) describing ideas (dating from 1991) for the dream environment for
+- [paper](/paper/multipage_html5/dream/dream.html) describing ideas (dating from 1991) for the dream environment for
    working with Jewish texts;
-- companion paper ([HTML](/paper/typesetting/html/index.html), [PDF](/paper/typesetting/pdf/typesetting.pdf),
-  [EPUB](/paper/typesetting/epub2/typesetting.epub)) on typesetting Jewish texts;
-- paper ([HTML](/paper/calendar/html/index.html), [PDF](/paper/calendar/pdf/calendar.pdf),
-  [EPUB](/paper/calendar/epub2/calendar.epub)) on Rambam's Laws of the Sanctification of the Moon;
+- companion [paper](/paper/multipage_html5/typesetting/typesetting.html) on typesetting Jewish texts;
+- [paper](/paper/multipage_html5/calendar/calendar.html) on Rambam's Laws of the Sanctification of the Moon;
   goals of the paper:
   - reconstruct models that Rambam uses and their parameters from the Rambam's text;
   - identify misprints in the traditional editions;

@@ -1,0 +1,14 @@
+[#remarks]
+== Some Remarks
+
+include::{docfile}/../new-year-corrections.adoc[]
+
+include::{docfile}/../problematic-nissan.adoc[]
+
+include::{docfile}/../solar-theory.adoc[]
+
+include::{docfile}/../lunar-theory.adoc[]
+
+include::{docfile}/../leap-years-cycle.adoc[]
+
+include::{docfile}/../kh-summary.adoc[]

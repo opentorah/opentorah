@@ -1,111 +1,132 @@
 plugins {
-  id 'io.miret.etienne.sass'
   id 'java-library'
   id 'scala'
-  id 'org.opentorah.docbook'
+  id 'org.asciidoctor.jvm.convert'
+  id 'org.asciidoctor.jvm.gems'
 }
 
 description = 'OpenTorah Documentation'
 
 apply from: '../configure.gradle'
 
+repositories {
+  mavenCentral()
+  ruby.gems()
+}
+
 dependencies {
   implementation project(':opentorah-util')
   implementation project(':opentorah-core')
-
-  implementation libs.caffeine
-
   implementation libs.logback
-  implementation libs.logstash
 
-  implementation libs.bundles.xmlresolver
-  implementation libs.saxon6
-  implementation libs.saxon11
-  implementation libs.bundles.fop
-
-  implementation libs.zio.http
-
-  runtimeOnly libs.mdoc
+  asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.16'
 }
 
-sass {
-  version = '1.57.1'
-}
-compileSass {
+final File tablesDir = file("$buildDir/docs/tables")
+tasks.register('generateTables', JavaExec) {
   group = 'publishing'
 
-  sourceDir = project.file("$projectDir/sass")
-  outputDir = project.file("$projectDir/css")
-}
-
-docBook {
-  globalSubstitutions = [
-    "project.version": project.version
-  ]
-}
-
-final String mdocOutputDirectory = "$buildDir/docs/mdoc"
-// TODO: using register() here breaks Gradle...
-task mdoc(type: JavaExec) {
-  group = 'publishing'
-  description = 'Process and publish mdoc documentation'
-
-  mainClass = 'mdoc.Main'
-  args = [
-    '--in', "$projectDir/src/main/mdoc",
-    '--out', mdocOutputDirectory,
-    '--classpath', sourceSets.main.runtimeClasspath.asPath
-  ]
+  mainClass.set('org.opentorah.calendar.paper.Tables')
+  args = [tablesDir]
   classpath = sourceSets.main.runtimeClasspath
 }
-mdoc.dependsOn(classes)
-mdoc.doFirst {
-  // clean
-  project.delete(mdocOutputDirectory)
-}
-mdoc.doLast {
-  // publish
-  project.sync {
-    from mdocOutputDirectory
-    into "$projectDir/docs"
+
+final File asciidocSourceDir = file("$projectDir/src/docs/asciidoc/")
+final File asciidocOutputDir = file("$buildDir/docs/asciidoc")
+asciidoctor {
+  dependsOn(generateTables, asciidoctorGemsPrepare)
+
+  sourceDir asciidocSourceDir
+  inputs.dir(asciidocSourceDir)
+
+  sources {
+    include 'calendar/calendar.adoc'
+    include 'typesetting/typesetting.adoc'
+    include 'dream/dream.adoc'
+  }
+
+  outputOptions {
+    backends = [
+//      'pdf',
+      'html5',
+      'multipage_html5',
+    ]
+  }
+
+  outputDir asciidocOutputDir
+
+  doFirst {
+    project.delete(asciidocOutputDir)
+  }
+  doLast {
+    project.sync {
+      from asciidocOutputDir
+      into "$projectDir/paper"
+    }
+  }
+
+  attributes = [
+    tablesdir: tablesDir,
+    docinfo: 'shared',
+    docinfodir: "$asciidocSourceDir/docinfo",
+    // partnums: true,
+    // sectnums: true,
+    sectlinks: true,
+    sectanchors: true,
+    "hide-uri-scheme": true
+  ]
+
+  asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
+    requires 'asciidoctor-multipage'
+    modules.pdf.version '2.3.4'
+  // TODO bibliography: https://github.com/riboseinc/asciidoctor-bibliography
+  // TODO bibliography: https://github.com/asciidoctor/asciidoctor-bibtex
   }
 }
 
-processDocBook.doLast {
-  project.sync {
-    from processDocBook.outputDirectory
-    into "$projectDir/paper"
-  }
-}
-
-tasks.register('buildAndPrettyPrintSite', JavaExec) {
-  group = 'publishing'
-
-  mainClass = 'org.opentorah.site.SiteServiceCommon'
-  args = ['buildAndPrettyPrintSite', projectDir]
-  classpath = sourceSets.main.runtimeClasspath
-}
-buildAndPrettyPrintSite.dependsOn(compileSass)
-buildAndPrettyPrintSite.doLast {
-  project.sync {
-    from processDocBook.outputDirectory
-    into "$projectDir/paper"
-  }
-}
+//final File mdocOutputDir = file("$buildDir/docs/mdoc")
+//// TODO: using register() here breaks Gradle...
+//task mdoc(type: JavaExec) {
+//  group = 'publishing'
+//  description = 'Process and publish mdoc documentation'
+//
+//  dependsOn(classes)
+//
+//  mainClass = 'mdoc.Main'
+//  args = [
+//    '--in', "$projectDir/src/docs/mdoc",
+//    '--out', mdocOutputDir,
+//    '--classpath', sourceSets.main.runtimeClasspath.asPath
+//  ]
+//  classpath = sourceSets.main.runtimeClasspath
+//
+//  doFirst {
+//    project.delete(mdocOutputDir)
+//  }
+//  doLast {
+//    project.sync {
+//      from mdocOutputDir
+//      into "$projectDir/docs"
+//    }
+//  }
+//}
 
 tasks.register('site') {
   description = 'Generate project website'
   group = 'publishing'
-}
-//site.dependsOn(processDocBook)
-site.dependsOn(buildAndPrettyPrintSite)
-//buildAndPrettyPrintSite.mustRunAfter(processDocBook)
-site.dependsOn(mdoc)
 
-tasks.register('serveSite', JavaExec) {
+  dependsOn(asciidoctor /*, mdoc*/)
+}
+
+final String httpPort = '8080'
+tasks.register('serveSite', Exec) {
   group = 'publishing'
 
-  mainClass = 'org.opentorah.site.SiteServiceCommon'
-  args = ['serveSite', "file://$projectDir/"]
-  classpath = sourceSets.main.runtimeClasspath
+  dependsOn(site)
+
+  doFirst {
+    logger.lifecycle("Serving " + projectDir + " on port " + httpPort)
+  }
+  workingDir projectDir
+  commandLine 'python', '-m', 'http.server', httpPort
 }

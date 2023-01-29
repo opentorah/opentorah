@@ -1,0 +1,144 @@
+[#problematic-nissan-sicho]
+=== Problematic Nissan
+TODO
+
+SIE translation is available as chapter 4 of https://www.sie.org/templates/sie/article_cdo/aid/2518606/jewish/Shabbos-Parshas-Chukas-1st-Day-of-Rosh-Chodesh-Tammuz-5744-1984.htm[]
+
+As usual, we shall analyze a point in the daily portion of Rambam’s
+Mishneh Torah — chapters 9-11 of the Laws of Sanctification of the New Moon.
+Earlier, Rambam described the method of reckoning to determine when will be
+the birth of the new moon (chapter 6). Basically, the period of time between
+the births of each new moon is a fixed period: 29 days, 12 hours (1 day = 24
+hours) and 793 parts (1 hour = 1080 parts). If the exact time of the birth
+of any new moon is known, one need merely add the above figure to that time
+to know when will be the birth of the next new moon. Adding this figure again
+will give the time of the birth of the new moon after that, and so forth. To
+make the calculations easier, Rambam advises a simple method. We are
+interested only in knowing on which day of the week and at which time of
+day the new moon will be born. If one subtracts round weeks from the above
+figure, one will be left with 1 day, 12 hours and 793 parts.
+[I.e., 29 days, 12 hours, 793 parts minus 28 days (4 whole weeks) = 1 day,
+12 hours, 793 parts.] This is termed the “remainder of the lunar month.”
+Adding this figure to the time of birth of a new moon will give the day of
+the week, the hour, and the number of parts of the hour at which the next
+birth of the new moon will occur.
+
+The 24 hour day is divided into two parts — “day” proper (i.e. daytime) and
+night, each of 12 hours duration, with the night preceding the day. The night
+is considered to start from 6 p.m. and extends until 6 a.m.; day from 6 a.m.
+until 6 p.m.
+
+Rambam then gives an example (6:7). The birth of the new moon for the month
+of Nissan was Sunday, at the fifth hour of the “day,” and 107th part of the
+hour (i.e. Sunday, at 11 a.m. and 107/1080 of the hour). Adding the “remainder
+of the lunar month” — 1 day, 12 hours, 793 parts — gives the birth of the new
+moon for the next month (Iyar) as Monday night, at the fifth hour and 900th
+part of the night (i.e. Monday night, at 11 p.m. and 900/1080 of the hour).
+
+Rambam wrote Mishneh Torah with the utmost precision. We can therefore assume
+that the example he chose as the given date for the birth of a new moon — for
+Nissan, Sunday, at the fifth hour and 107th part of that hour — has significance.
+
+Similarly, we find in today’s portion of Mishneh Torah (chapter 11, halachah
+16 of the Laws of the Sanctification of the New Moon) that Rambam gives a date
+which he says he will use as the basic starting point for all calculations to
+know where exactly the moon will be at any given time. That date is “The
+beginning of the eve of Thursday (i.e. Wednesday 6:00 p.m.), the third of
+Nissan .., of the year 4938 from creation.”
+
+Again, the question is: What is the reason for choosing this date specifically.
+Indeed, R. Levi Ibin Chaviv, in his commentary on Rambam, says: “I question why
+the Rav (i.e. Rambam) used the third of the month as his basic starting point; it
+would have been proper to use the first of the month.” However, R. Levi Ibin
+Chaviv makes no comment on Rambam’s choice of the example quoted previously
+(Sunday during the day at the fifth hour and 107th part of the hour).
+
+The “Pirush” (a commentary on Rambam’s “Laws of Sanctification of the New Moon”)
+notes that the date chosen by Rambam as his basic starting point (in chapter 11,
+halachah 16) was concurrent to when Rambam lived. He writes “Know that this basic
+date from which the sage (i.e. Rambam) started is far removed from our times
+(i.e. the times of the “Pirush”). We therefore must set another basic date from
+which we will start [to make calculations]...”
+
+We can posit that the same is true of the date given by Rambam as an example of
+the birth of a new moon (in chapter 6, halachah 7) — for the month of Nissan,
+Sunday, at the fifth hour of the day, and at the 107th part of the hour. At the
+time Rambam was writing these laws, this was then the actual new moon. Thus
+Rambam chose as his example the birth of a new moon that happened at the time
+he was writing these laws, and not a new moon from earlier or from the future.
+
+But not all is clear: Earlier, at the beginning of today’s portion (chapter 9,
+halachah 5), Rambam gives an example of how to find the time of a “tekufah”
+[There are four tekufahs: The tekufahs of Tammuz and Teves — the summer and
+winter solstices (the precise times at which the sun is farthest from the
+equator); and the tekufahs of Nissan and Tishrei — the vernal and autumnal
+equinoxes (the precise times when the sun crosses the equator)]. Again, there
+is an exact length of time between tekufahs. Once the date of one tekufah is
+known, one merely need add the length of time between tekufahs to this date to
+arrive at the precise date of the next tekufah. Rambam then gives an example
+of the calculation necessary to find the time of the tekufah of Nissan of the
+year 4930.
+
+Now, according to our previous explanation, that Rambam gives examples of the
+time at which he was writing, it follows that Rambam wrote this halachah in
+the year 4930. Yet, as we noted earlier, when setting a basic date from which
+to start calculations, Rambam (in chapter 11, halachah 16) gives the year
+4938 — 8 years later! It is highly improbable that 8 years passed from the
+time Rambam wrote chapter 9 (in which he gave the date as 4930) until he wrote
+chapter 11 (in which he gives the date as 4938) — when Rambam writes that it
+took him 10 years to write the entire Mishneh Torah.
+
+Moreover, even if Rambam had not given the year 4930 as a date, there would
+still be a problem. It is known that Rambam finished writing Mishneh Torah in
+approximately the year 4940. Rambam wrote Mishneh Torah in order — i.e., the
+laws which are placed earlier were written earlier, and those placed at the
+end of Mishneh Torah were written toward the conclusion of the writing of
+Mishneh Torah. The Laws of Sanctification of the New Moon are near the
+beginning of Mishneh Torah. How is it possible, then, that he wrote the Laws
+of Sanctification of the New Moon in the year 4938, close to the conclusion
+of the writing of Mishneh Torah?
+
+The Explanation
+
+After Rambam wrote Mishneh Torah, he checked and corrected it, and then
+re-checked and re-corrected it, etc., such that there were two or three
+different editions. Indeed, Rambam himself wrote to the Sages of Lunel that
+they should correct their copy of his work according to his final edition.
+
+Naturally, Rambam edited manly those laws which needed correction, not the
+entire manuscript. Even those matters which had to be changed because of
+corrections made by Rambam in other places, Rambam himself did not make these
+changes in his manuscript, but relied on the fact that his readers would
+themselves understand that such corrections naturally follow.
+
+In our case, Rambam first wrote the Laws of Sanctification of the New Moon in
+the year 4930 (as recorded in chapter 9). The date Rambam gives as the basic
+starting point for calculations — the year 4938 — was the year in which
+Rambam edited and corrected these laws. Hence, when giving a year which to
+use as the basic starting point, he used the year in which he was then, when
+correcting it — 4938, and not the old date in which these laws were originally
+written eight years earlier — 4930.
+
+In chapter nine, however, no corrections were necessary, and therefore the
+date originally written — 4930 — remained.
+
+Accordingly, we can say that the time given in the example (in chapter 6,
+halachah 7) for the birth of the new moon — for Nissan, Monday night, at the
+fifth hour and 900th part of the hour — was indeed the time for the birth of
+the new moon for the month of Nissan when Rambam was writing this law.
+
+There is a lesson to be derived from this, concerning our Sages’ statement,
+“Every day they (Torah and mitzvos) should be new in your eyes as if you were
+commanded about them on that day.” When Rambam edited and corrected a halachah,
+he didn’t edit an old matter that was written 8 years earlier; it was a totally
+new thing, for “every day they should be new in your eyes.” Thus Rambam
+naturally wrote the date of the time he was in now, and not a date of 8 years
+ago! Even if he was working on a manuscript which had the date of 4930 written
+on it, he still wrote the date of the year in which he was now working when he
+edited it — 4938. He wasn’t just correcting something old; it was “new,”
+something which happened “on that day.”
+
+This teaches every Jew how he should learn Torah. Even when he learns something
+he has learned in the past — even if he has repeated it 101 times (as the Alter
+Rebbe instructs) — his study of it should be such that “every day they should
+be new in your eyes.”

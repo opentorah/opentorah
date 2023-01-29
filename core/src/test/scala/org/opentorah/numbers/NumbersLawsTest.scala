@@ -9,7 +9,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatestplus.scalacheck.Checkers
 import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 
-open class NumbersLawsTest(val numbers: Numbers) extends AnyFunSuite, FunSuiteDiscipline, Checkers:
+abstract class NumbersLawsTest(val numbers: Numbers) extends AnyFunSuite, FunSuiteDiscipline, Checkers:
   val headRange: Int = numbers.headRangeOpt.getOrElse(Int.MaxValue)
   val ranges: Seq[Int] = headRange +: numbers.ranges
 

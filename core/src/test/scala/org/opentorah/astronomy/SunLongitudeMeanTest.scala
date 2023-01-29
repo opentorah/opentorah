@@ -11,7 +11,6 @@ class SunLongitudeMeanTest extends Days2RotationTest(SunLongitudeMean):
 
   it should "have printed values not exact" in {
     what.nonReconstructable.nonEmpty should be (true)
-    println(what.reconstructed)
   }
 
   it should "exactify" in {
