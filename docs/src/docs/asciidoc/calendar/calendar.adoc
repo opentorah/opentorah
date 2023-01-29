@@ -1,0 +1,23 @@
+= Rambam on Calendar
+:author: Leonid Dubinsky
+:email: dub@opentorah.org
+:description: Rambam's laws of the sanctification of the Moon, translated, with some remarks
+:keywords: Rambam, calendar, astronomy
+// :firstname: Leonid
+// :lastname: Dubinsky
+:doctype: book
+:stem: latexmath
+:toc:
+:multipage-level: 2
+
+// :stylesheet: my-stylesheet.css
+
+include::{docfile}/../introduction.adoc[]
+
+include::{docfile}/../remarks.adoc[]
+
+include::{docfile}/../kh.adoc[]
+
+include::{docfile}/../glossary.adoc[]
+
+include::{docfile}/../bibliography.adoc[]

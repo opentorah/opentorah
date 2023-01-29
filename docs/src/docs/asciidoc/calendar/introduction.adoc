@@ -1,0 +1,50 @@
+[#introduction]
+//TODO [preface]
+== Introduction
+
+Latest version of this paper and the code used to produce it are available from http://www.opentorah.org[].
+
+In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two calendars: fixed ("arithmetic") and observational ("astronomical").
+Both calendars are described in a form ready to be implemented, but the reasons for the calculation steps - especially for the astronomical calendar - are not always given: what are the models - and the formulae resulting from them - that reproduce the numbers?
+Sometimes Rambam describes the models, so only the formulae need to be reconstructed; sometimes the models are not described, so both the models and the formulae need to be reconstructed.
+
+Goals of this paper are:
+
+* reconstruct models that Rambam uses from the Rambam's text
+* describe the models with diagrams and formulae
+* reconstruct parameters of the models from the numbers given by Rambam
+* identify misprints in the traditional editions
+* analyze correspondence with the fixed calendar
+* verify Rambam's tables and rounding decisions against his models
+* analyze impact of various misprints on the sighting calculations
+* verify consistency of Rambam's numbers.
+* translate relevant chapters of Rambam into English.
+The translation does not have to be literal; literal translations are already available (<<Yale>>, <<Moznaim>>).
+The goal of our translation is to make the text complete and accessible for collaboration by people not proficient enough in Hebrew.
+* see how Rambam's calculations of the moon visibility compare to the current models
+
+Approximate timeline of the project:
+
+* In 1984, The Rebbe instructed Jews to learn Rambam every day.
+As a result, in 1991 I encountered calendar chapters of Rambam, decided to reconstruct the models behind the calculations described in them, and discovered mistakes in the text of one of the laws (15:6).
+The results were published in "Notices of Temimim and Anash", a weekly of the central Lubavicher Yeshiva 770. Some of the readers were appalled that someone dares to correct the text of Rambam!
+My point was that the text as published contains mistakes that need to be corrected.
+Indeed, Frenkel edition <<Frenkel>>, that was already published at the time, corrects all of the mistakes I did.
+In fact, they were already corrected by Hazon Ish in his commentary on Rambam <<HazonIsh>> - but I did not know it then.
+* 2008: I acquired a pile of books on the subject and started looking into it; I also experimented with various ways of publishing the work on the web.
+* 2009: coded some of the algorithms to look into the rumors the dates of http://dub.podval.org/2019/07/18/sanctification-of-the-sun.html[Birkhat HaHamah] that were circulating then.
+* 2013: code converted to Scala.
+* 2017-2018: split-file encoding of the family polymorphism and current representation of the dates and angles were implemented in the supporting code.
+* 2018-2019: generation of reading and learning schedules was added to the code.
+
+I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;) If your name should be on this list but isn't, please forgive me: the omission is not intentional.
+
+* Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither;
+* Ilia Pomansky - for encouraging this work at the early stages, in 1991;
+* my wife Nina - for listening to my wild ideas, for her patience, and for help with math;
+* my daughter Menucha Rochel - for assistance with the translation;
+* Rabbi Michael Koretz - for stimulating discussions during our visit to Israel in 2005, encouragement, and extensive research into customs of Torah/Haftarah reading;
+* Dr. Michael Partensky - for encouragement and advise;
+* Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;
+* Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;
+* Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1;

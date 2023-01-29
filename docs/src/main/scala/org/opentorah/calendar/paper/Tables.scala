@@ -48,12 +48,16 @@ object Tables:
     directory.mkdirs
 
     for time2rotation <- List(SunLongitudeMean, SunApogee, MoonLongitudeMean, MoonHeadMean, MoonAnomalyMean) do
+      printed(time2rotation).writeAsciidoc(directory, s"${time2rotation.name}-printed")
+      nonReconstructable(time2rotation).writeAsciidoc(directory, s"${time2rotation.name}-reconstructed")
+      exactified(time2rotation, 6).writeAsciidoc(directory, s"${time2rotation.name}-exactified")
+
 //      printed(time2rotation).writeMarkdown(directory, s"${time2rotation.name}-printed")
 //      nonReconstructable(time2rotation).writeMarkdown(directory, s"${time2rotation.name}-reconstructed")
 //      exactified(time2rotation, 6).writeMarkdown(directory, s"${time2rotation.name}-exactified")
-      printed(time2rotation).writeDocbook(directory, s"${time2rotation.name}-printed")
-      nonReconstructable(time2rotation).writeDocbook(directory, s"${time2rotation.name}-reconstructed")
-      exactified(time2rotation, 6).writeDocbook(directory, s"${time2rotation.name}-exactified")
+//      printed(time2rotation).writeDocbook(directory, s"${time2rotation.name}-printed")
+//      nonReconstructable(time2rotation).writeDocbook(directory, s"${time2rotation.name}-reconstructed")
+//      exactified(time2rotation, 6).writeDocbook(directory, s"${time2rotation.name}-exactified")
 
 //  private def mvaTables(data: Map[Angle, Angle]) = {
 //      def e(a: Angle, v: Angle) = {

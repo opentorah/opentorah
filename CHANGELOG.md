@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.8] - 2023-
+build: dogfooding ScalaJS plugin for running tests
+build: switching papers to asciidoc
+build: remove DocBooks processing for docs
+build: removed mdoc from `docs`
+build: removed SASS from `docs`
+site: remove DocBook processing from Site/SiteService
+
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default
 - fix: escape backslashes in TeX strings

@@ -1,6 +1,5 @@
 package org.opentorah.site
 
-import org.opentorah.docbook.DocBookConfiguration
 import org.opentorah.html.SiteHtml
 import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
@@ -10,7 +9,6 @@ final class SiteCommon(
   val html: Option[SiteHtml],
   val license: Option[SiteLicense],
   val pages: Seq[String],
-  val docbook: Option[DocBookConfiguration],
   private val tei: Option[SiteTei],
   val isStatic: Option[Boolean]
 ):
@@ -28,14 +26,12 @@ object SiteCommon extends Element[SiteCommon]("common"):
       license: Option[SiteLicense] <- SiteLicense.optional()
       pages: Seq[String] <- SitePage.seq()
       tei: Option[SiteTei] <- SiteTei.optional()
-      docbook: Option[DocBookConfiguration] <- DocBookConfiguration.followRedirects.optional()
       isStatic: Option[Boolean] <- isStaticAttribute()
     yield SiteCommon(
       names,
       html,
       license,
       pages,
-      docbook,
       tei,
       isStatic
     )
@@ -45,7 +41,6 @@ object SiteCommon extends Element[SiteCommon]("common"):
       SiteHtml.optional(_.html),
       SiteLicense.optional(_.license),
       SitePage.seq(_.pages),
-      DocBookConfiguration.optional(_.docbook),
       SiteTei.optional(_.tei),
       isStaticAttribute(_.isStatic)
     )

@@ -1,6 +1,10 @@
 plugins {
   id 'java-library'
   id 'scala'
+  // TODO scalajs plugin in tests-only mode does not work here:
+  //   id 'org.podval.tools.scalajs'
+  // Plugin [id: 'org.opentorah.docbook', version: '1.0.0'] was not found in any of the following sources:
+  //- Included Builds (None of the included builds contain this plugin)
   id 'com.github.maiflai.scalatest'
   id 'java-gradle-plugin'
   id 'maven-publish'
@@ -55,4 +59,4 @@ gradlePlugin {
   }
 }
 
-upload.dependsOn(publishPlugins)
+//upload.dependsOn(publishPlugins)

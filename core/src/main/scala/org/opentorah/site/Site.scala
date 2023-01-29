@@ -24,12 +24,6 @@ abstract class Site(
 
   final override def names: Names = common.names
 
-  private val docBookProcessor: Option[DocBookProcessor] = common.docbook.map(_.toProcessor(
-    layout = Layout.forRoot(Files.url2file(fromUrl.url).getParentFile),
-    context = BuildContext.default(logger),
-    siteHtml = common.getHtml
-  ))
-
   final def logger: Logger = Site.logger
 
   final val caching: Caching.Simple = new Caching.Simple
@@ -173,14 +167,13 @@ abstract class Site(
     )
   )
 
-  final def build(withPrettyPrint: Boolean, globalSubstitutions: Map[String, String]): Task[Unit] = toTask {
+  final def build(withPrettyPrint: Boolean): Task[Unit] = toTask {
     caching.logEnabled = false
 
     for
       _ <- writeDirectories
       _ <- innerBuild
       _ <- verify
-      _ <- processDocBook(globalSubstitutions)
       _ <- if !withPrettyPrint then Effects.ok else prettyPrint
     yield ()
   }
@@ -199,12 +192,6 @@ abstract class Site(
 
   protected def verify: Caching.Parser[Unit] = Effects.ok
 
-  private def processDocBook(globalSubstitutions: Map[String, String]): Caching.Parser[Unit] =
-    docBookProcessor.fold(Effects.ok)(docBookProcessor => ZIO.succeed {
-      docBookProcessor.verify()
-      docBookProcessor.process(globalSubstitutions)
-    })
-
   private def prettyPrint: Caching.Parser[Unit] =
     logger.info("Pretty-printing site.")
 
@@ -213,16 +200,9 @@ abstract class Site(
     for
       prettyPrintTei    : Seq[URL]  <- prettyPrintTei
       prettyPrintStores : Seq[URL]  <- prettyPrintStores
-      prettyPrintDocBook: Seq[File] = docBookProcessor.map(_.prettyPrintDocBook).getOrElse(Seq.empty)
     yield
       prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None, xml)
       prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None, xml)
-      // TODO prettyPrintDocBook when:
-      // I can retain DocType!
-      //  PrettyPrinter keeps empty lines
-      //  PrettyPrinter stacks mixed content
-      //prettyPrint(prettyPrintDocBook.map(Files.file2url), DocBook.prettyPrinter, doctype = None, xml)
-
 
   private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype], xml: Xml): Unit =
     for url <- urls do Files.write(

@@ -19,6 +19,7 @@ dependencies {
 
 // Note: starting with Gradle 8.0, without explicit toolchain specification, Java 8 gets picked up
 // even when Gradle itself runs on Java 11?!
+// TODO it seems that this causes `bad option '-target:11' was ignored` from the Scala compiler though...
 java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(11)
@@ -49,8 +50,9 @@ test {
   maxParallelForks = 1
 }
 
-// library: all projects are configured as a library (except for the docs one)
-if (project.name != 'docs') {
+// library: all projects are configured as a library (except for the docs one);
+// with the latest Gradle plugin publishing plugin, uploading of it as a library started failing, so I disabled it...
+if (project.name != 'docs' && project.name != 'opentorah-docbook') {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String orgName = 'Open Torah Project'
@@ -148,8 +150,8 @@ if (project.name != 'docs') {
 
   signing {
     useInMemoryPgpKeys(
-      findProperty('gnupg.dub-opentorah-org.key'),
-      findProperty('gnupg.dub-opentorah-org.password')
+      findProperty('gnupg.dub-opentorah-org.key').toString(),
+      findProperty('gnupg.dub-opentorah-org.password').toString()
     )
     sign publishing.publications.library
   }
