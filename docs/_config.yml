@@ -8,18 +8,21 @@ baseurl: "" # the subpath of your site, e.g. /blog
 
 url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.g. http://example.com
 timezone: America/New_York
-github_username:  dubinsky
+github_username: dubinsky
+
+# TODO Google Analytics?
+# TODO add back the tags for the blog?
 
 markdown: kramdown
 theme: minima
 
-plugins:
-  - jekyll-avatar
-  - jekyll-feed
-  - jekyll-sitemap
+#plugins:
+#  - jekyll-avatar
+#  - jekyll-feed
+#  - jekyll-sitemap
 
-header_pages:
-  - tags.html
+#header_pages:
+#  - tags.html
 
 exclude:
   - build.gradle
