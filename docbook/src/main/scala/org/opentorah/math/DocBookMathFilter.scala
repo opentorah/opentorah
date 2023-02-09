@@ -141,7 +141,7 @@ final class DocBookMathFilter(
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
       prefixMapping(MathML.namespace.default)(
-        prefixMapping(DocBookMathFilter.namespace)(
+        prefixMapping(MathJax.namespace)(
           element(MathML.namespace.default, MathML.math, attrs = attributes)(
             element(MathML.namespace.default, MathML.mrow)(
               element(MathML.namespace.default, MathML.mi)(
@@ -187,13 +187,22 @@ object DocBookMathFilter:
     else if index == 0 then Some(index)
     else if chars.charAt(index-1) == '\\' then None
     else Some(index)
-
-  val namespace: Namespace = Namespace(
-    uri = "http://opentorah.org/mathjax/ns/ext",
-    prefix = "mathjax"
-  )
-
+  
   def unwrap(mathML: Dom.Element): String = mathML
     .getElementsByTagName(MathML.mrow).item(0).asInstanceOf[Dom.Element]
     .getElementsByTagName(MathML.mi  ).item(0).asInstanceOf[Dom.Element]
     .getTextContent
+
+  def apply(math: MathConfiguration): DocBookMathFilter =
+    def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
+      for delimiters <- values yield DelimitersAndInput(delimiters, input)
+
+    val allDelimiters: Seq[DelimitersAndInput] =
+      withInput(math.texDelimiters      , Input(Input.Type.Tex, Some(Input.Display.Block ))) ++
+      withInput(math.texInlineDelimiters, Input(Input.Type.Tex, Some(Input.Display.Inline))) ++
+      withInput(math.asciiMathDelimiters, Input(Input.Type.AsciiMath, None))
+
+    new DocBookMathFilter(
+      allDelimiters = allDelimiters.sortWith((l: DelimitersAndInput, r: DelimitersAndInput) => l.start.length > r.start.length),
+      processEscapes = math.processEscapes.contains(true)
+    )

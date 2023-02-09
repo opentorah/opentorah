@@ -1,7 +1,6 @@
 package org.opentorah.site
 
 import org.opentorah.build.BuildContext
-import org.opentorah.docbook.{DocBook, DocBookProcessor, Layout}
 import org.opentorah.html.Html
 import org.opentorah.math.MathConfiguration
 import org.opentorah.metadata.Names
@@ -239,4 +238,4 @@ object Site:
     alwaysStackElements = Set("store", "by")
   )
 
-  val prettyPrinter: PrettyPrinter = Html.prettyPrinter + Tei.prettyPrinter + DocBook.prettyPrinter
+  val prettyPrinter: PrettyPrinter = Html.prettyPrinter + Tei.prettyPrinter
