@@ -1,5 +1,6 @@
-package org.opentorah.docbook
+package org.opentorah.docbook.plugin
 
+import org.opentorah.docbook.DocBook
 import org.opentorah.fop.Svg
 import org.opentorah.math.MathJaxRunner
 import org.opentorah.xml.{ScalaXml, XLink}

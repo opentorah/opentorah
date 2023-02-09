@@ -1,8 +1,9 @@
-package org.opentorah.docbook
+package org.opentorah.docbook.plugin
 
+import org.opentorah.docbook.{DocBook, Layout}
+import org.opentorah.util.Files
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
-import org.opentorah.util.Files
 
 class PluginTestProject private(
   projectDir: File,

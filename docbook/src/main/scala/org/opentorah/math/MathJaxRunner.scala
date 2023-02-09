@@ -12,8 +12,8 @@ abstract class MathJaxRunner:
     val element: Element = mathMLDocument.getDocumentElement
 
     val fontSize: Float = Sizes.fontSizeAttribute.required.get(Dom)(element)
-    val inputType: Input.Type = Input.Type.attribute.orDefault.get(Dom)(element)
-    val display: Option[Input.Display] = Input.Display.attribute.optional.get(Dom)(element)
+    val inputType: Input.Type = DocBookMathFilter.inputTypeAttribute.orDefault.get(Dom)(element)
+    val display: Option[Input.Display] = DocBookMathFilter.displayAttribute.optional.get(Dom)(element)
 
     val mathString: String =
       if inputType == Input.Type.MathML

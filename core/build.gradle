@@ -32,18 +32,6 @@ dependencies {
   compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
   compileOnly libs.saxon11 // Saxon 11 (XSLT 2.0)
 
-  compileOnly libs.zio.http
-
-  compileOnly libs.bundles.markdown
-
-  compileOnly libs.playwright
-
-  compileOnly libs.bundles.fop
-
-  // TODO move into docbook module?
-  // Needed to compile classes using Gradle, but does not become a dependency:
-  compileOnly gradleApi()
-
   testImplementation libs.zio.test
   //testImplementation libs.zio.prelude
   testImplementation libs.cats.core

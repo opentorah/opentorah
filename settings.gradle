@@ -49,9 +49,6 @@ dependencyResolutionManagement {
     library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.1.0")
     library('zinc'         , 'org.scala-sbt:zinc_2.13:1.8.0')
 
-    // GraalVM
-    library('graalvm-sdk'  , 'org.graalvm:graal-sdk:22.0.0.2')
-
     // XML
     library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.6.4')
     library('jing'         , 'org.relaxng:jing:20220510')
@@ -91,7 +88,6 @@ dependencyResolutionManagement {
     library('fop-hyph'        , 'net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
     library('batik-transcoder', "org.apache.xmlgraphics:batik-transcoder:$batikVersion")
     library('batik-extension' , "org.apache.xmlgraphics:batik-extension:$batikVersion")
-    //final String jaiVersion = '1.1.3'
     // TODO split runtime-only out of it
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 

@@ -13,6 +13,8 @@ build: remove DocBooks processing for docs
 build: removed mdoc from `docs`
 build: removed SASS from `docs`
 site: remove DocBook processing from Site/SiteService
+docbook: moved docbook, fop and pdf packages and part of the math package from the core module into the docbook module
+site: moved site and tei packages from the core module into the collector module
 
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default
