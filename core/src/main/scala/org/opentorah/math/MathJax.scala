@@ -1,7 +1,7 @@
 package org.opentorah.math
 
 import org.opentorah.util.Json
-import org.opentorah.xml.ScalaXml
+import org.opentorah.xml.{Namespace, ScalaXml}
 
 trait MathJax:
 
@@ -25,3 +25,8 @@ trait MathJax:
     fontSize: Float
   ): String
 
+object MathJax:
+  val namespace: Namespace = Namespace(
+    uri = "http://opentorah.org/mathjax/ns/ext",
+    prefix = "mathjax"
+  )

@@ -17,7 +17,7 @@ object Input:
     @SerialVersionUID(1L)
     val attribute: Attribute[Type] = Attribute.EnumeratedAttribute[Type](
       name = "inputType",
-      namespace = DocBookMathFilter.namespace,
+      namespace = MathJax.namespace,
       values = Type.values.toIndexedSeq,
       default = Type.MathML,
       getName = _.name
@@ -26,7 +26,7 @@ object Input:
   // Note: "display" is only important for TeX...
   enum Display(val name: String) derives CanEqual:
     case Inline extends Display("inline")
-    case Block extends Display("block") // "display math"
+    case Block  extends Display("block" ) // "display math"
 
   object Display:
     val default: Display = Display.Block

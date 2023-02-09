@@ -98,4 +98,8 @@ object Sizes:
     */
   @SerialVersionUID(1L)
   val fontSizeAttribute: Attribute.FloatAttribute =
-    Attribute.FloatAttribute("fontSize", namespace = DocBookMathFilter.namespace, default = 12.0f)
+    Attribute.FloatAttribute(
+      name = "fontSize",
+      namespace = MathJax.namespace, 
+      default = 12.0f
+    )

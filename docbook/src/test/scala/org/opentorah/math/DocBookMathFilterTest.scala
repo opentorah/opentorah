@@ -16,7 +16,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
          |  <para>
          |    Wrapped display TeX:<informalequation>
          |    <math xmlns="${MathML.namespace.uri}"
-         |          xmlns:mathjax="${DocBookMathFilter.namespace.uri}" mathjax:input="TeX">
+         |          xmlns:mathjax="${MathJax.namespace.uri}" mathjax:input="TeX">
          |      <mrow><mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi></mrow>
          |    </math></informalequation>
          |  </para>
@@ -26,7 +26,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
          |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Wrapped display TeX:<informalequation>
-         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${DocBookMathFilter.namespace.uri}" display="block"
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" display="block"
          |    mathjax:input="TeX">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
@@ -48,7 +48,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
          |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Display TeX:<informalequation>
-         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${DocBookMathFilter.namespace.uri}"
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}"
          |    mathjax:inputType="tex">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
@@ -71,7 +71,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
          |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Inline TeX:<inlineequation>
-         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${DocBookMathFilter.namespace.uri}" display=
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}" display=
          |    "inline" mathjax:inputType="tex">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
@@ -93,7 +93,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
          |<article xmlns="${DocBook.namespace.uri}" xmlns:xi="${XInclude.namespace.uri}" version="${DocBook.version}" xml:id="test-id"
          |>
          |  <para>Explicit display TeX:<equation>
-         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${DocBookMathFilter.namespace.uri}"
+         |    <math xmlns="${MathML.namespace.uri}" xmlns:mathjax="${MathJax.namespace.uri}"
          |    mathjax:inputType="tex">
          |      <mrow>
          |        <mi>x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.</mi>
@@ -106,7 +106,7 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
 
   private def parse(string: String): String =
     val element: Dom.Element = Dom.loadFromString(string, filters = Seq(
-        MathConfiguration.default.mathFilter
+        DocBookMathFilter(MathConfiguration.default)
 //        , new org.opentorah.xml.TracingFilter
       )
     )

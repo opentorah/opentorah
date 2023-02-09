@@ -1,8 +1,7 @@
 package org.opentorah.math
 
-import org.opentorah.build.{BuildContext, Distribution}
-import org.opentorah.fop.FopPlugin
-import org.opentorah.node.{Node, NodeDistribution}
+import org.opentorah.build.Distribution
+import org.opentorah.node.NodeDistribution
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
 
 // Note: yes, all the PDF-only fields look weird in the Site configuration;
@@ -55,28 +54,8 @@ final class MathConfiguration(
   )
   
   def body: ScalaXml.Nodes = mathJax.body(ScalaXml.mkText(mathJax.htmlConfigurationString(this)))
-
-  def mathFilter: DocBookMathFilter =
-    def withInput(values: Seq[Delimiters], input: Input): Seq[DelimitersAndInput] =
-      for delimiters <- values yield DelimitersAndInput(delimiters, input)
-
-    val allDelimiters: Seq[DelimitersAndInput] =
-      withInput(texDelimiters      , Input(Input.Type.Tex      , Some(Input.Display.Block ))) ++
-      withInput(texInlineDelimiters, Input(Input.Type.Tex      , Some(Input.Display.Inline))) ++
-      withInput(asciiMathDelimiters, Input(Input.Type.AsciiMath, None                      ))
-
-    DocBookMathFilter(
-      allDelimiters = allDelimiters.sortWith((l: DelimitersAndInput, r: DelimitersAndInput) => l.start.length > r.start.length),
-      processEscapes = processEscapes.contains(true)
-    )
-
-  private def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
-
-  def fopPlugin(context: BuildContext): Option[FopPlugin] = if !enableMathJax then None else
-    // Make sure MathJax is installed
-    val node: Node = nodeDistribution.getInstallation(context).get
-    for packageName <- mathJax.npmPackagesToInstall do node.npmInstall(packageName)
-    Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, this)))
+  
+  def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
 
   def distributionsNeeded: Set[Distribution[_]] = Set(nodeDistribution)
 

@@ -1,11 +1,13 @@
 package org.opentorah.docbook
 
 import org.opentorah.build.BuildContext
-import org.opentorah.fop.Fop
-import org.opentorah.math.MathConfiguration
 import org.opentorah.files.Copy
+import org.opentorah.fop.{Fop, FopPlugin}
+import org.opentorah.math.{DocBookMathFilter, ExternalMathJaxRunner, MathConfiguration, MathJaxFopPlugin}
+import org.opentorah.node.Node
 import org.opentorah.util.Files
 import org.opentorah.xml.{Resolver, Sax, Saxon, ScalaXml, Xsl}
+
 import java.io.File
 
 trait XsltFormat extends Format, Section:
@@ -74,7 +76,7 @@ trait XsltFormat extends Format, Section:
     (if xslt.usesSaxon6 then Saxon.Saxon6 else Saxon.Saxon11).transform(
       filters =
         Seq(EvalFilter(substitutions)) ++
-        (if !(isPdf && mathConfiguration.mathJaxEnabled.contains(true)) then Seq.empty else Seq(mathConfiguration.mathFilter)),
+        (if !(isPdf && mathConfiguration.mathJaxEnabled.contains(true)) then Seq.empty else Seq(DocBookMathFilter(mathConfiguration))),
         // ++ Seq(new TracingFilter),
       resolver = Some(resolver),
       stylesheetFile = Some(mainStylesheet),
@@ -117,9 +119,18 @@ trait XsltFormat extends Format, Section:
         keywords = substitutions.get("keywords"),
         inputFile = processOutputFile,
         outputFile = finalOutputFile,
-        plugin = mathConfiguration.fopPlugin(context),
+        plugin = fopPlugin(mathConfiguration, context),
         logger = context.getLogger
       )
+
+  private def fopPlugin(
+    mathConfiguration: MathConfiguration,
+    context: BuildContext
+  ): Option[FopPlugin] = if !mathConfiguration.enableMathJax then None else
+      // Make sure MathJax is installed
+      val node: Node = mathConfiguration.nodeDistribution.getInstallation(context).get
+      for packageName <- mathConfiguration.mathJax.npmPackagesToInstall do node.npmInstall(packageName)
+      Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, mathConfiguration)))
 
   // xsl:param has the last value assigned to it, so customization must come last;
   // since it is imported (so as not to be overwritten), and import elements must come first,
