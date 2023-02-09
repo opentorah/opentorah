@@ -1,5 +1,6 @@
-package org.opentorah.docbook
+package org.opentorah.docbook.plugin
 
+import org.opentorah.docbook.DocBook
 import org.opentorah.xml.{Doctype, PrettyPrinter, ScalaXml, XLink}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

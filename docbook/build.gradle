@@ -25,6 +25,8 @@ dependencies {
   implementation libs.saxon11
   implementation libs.bundles.fop
 
+  compileOnly libs.playwright
+
 //  implementation libs.graalvm.sdk
 
   // Needed to compile classes using Gradle, but does not become a dependency:

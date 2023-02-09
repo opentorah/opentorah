@@ -1,7 +1,7 @@
 package org.opentorah.math
 
 import org.opentorah.docbook.DocBook
-import org.opentorah.xml.{Dom, Namespace, Sax}
+import org.opentorah.xml.{Attribute, Dom, Namespace, Sax}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -65,8 +65,8 @@ final class DocBookMathFilter(
     val isMathMLMath: Boolean = (uri == MathML.namespace.uri) && (localName == MathML.math)
     val attributes: Attributes = if !isMathMLMath then attrs else
       val result: AttributesImpl = AttributesImpl(attrs)
-      val display: Option[Input.Display] = Input.Display.attribute.optional.get(Sax)(attrs)
-      Input.Display.attribute.required.withValueOption(checkDisplay(display)).set(Sax)(result)
+      val display: Option[Input.Display] = DocBookMathFilter.displayAttribute.optional.get(Sax)(attrs)
+      DocBookMathFilter.displayAttribute.required.withValueOption(checkDisplay(display)).set(Sax)(result)
       result
 
     super.startElement(uri, localName, qName, attributes)
@@ -130,8 +130,8 @@ final class DocBookMathFilter(
     val display: Option[Input.Display] = checkDisplay(input.display)
 
     val attributes: AttributesImpl = new AttributesImpl
-    Input.Type.attribute.orDefault.withValue(input.inputType).set(Sax)(attributes)
-    Input.Display.attribute.optional.withValue(display).set(Sax)(attributes)
+    DocBookMathFilter.inputTypeAttribute.orDefault.withValue(input.inputType).set(Sax)(attributes)
+    DocBookMathFilter.displayAttribute.optional.withValue(display).set(Sax)(attributes)
 
     def mml(): Unit =
       // TODO
@@ -141,7 +141,7 @@ final class DocBookMathFilter(
       // Note: On Saxon 10 (but not 9!), XInclude namespace, if present on the `<article>`,
       // is added to the `<math>` element - but not its children.
       prefixMapping(MathML.namespace.default)(
-        prefixMapping(MathJax.namespace)(
+        prefixMapping(DocBookMathFilter.namespace)(
           element(MathML.namespace.default, MathML.math, attrs = attributes)(
             element(MathML.namespace.default, MathML.mrow)(
               element(MathML.namespace.default, MathML.mi)(
@@ -206,3 +206,26 @@ object DocBookMathFilter:
       allDelimiters = allDelimiters.sortWith((l: DelimitersAndInput, r: DelimitersAndInput) => l.start.length > r.start.length),
       processEscapes = math.processEscapes.contains(true)
     )
+
+  val namespace: Namespace = Namespace(
+    uri = "http://opentorah.org/mathjax/ns/ext",
+    prefix = "mathjax"
+  )
+
+  @SerialVersionUID(1L)
+  val inputTypeAttribute: Attribute[Input.Type] = Attribute.EnumeratedAttribute[Input.Type](
+    name = "inputType",
+    namespace = DocBookMathFilter.namespace,
+    values = Input.Type.values.toIndexedSeq,
+    default = Input.Type.MathML,
+    getName = _.name
+  )
+
+  // Note: this attribute is always used within its native MathML.namespace, so I set its namespace to No.
+  @SerialVersionUID(1L)
+  val displayAttribute: Attribute[Input.Display] = Attribute.EnumeratedAttribute[Input.Display](
+    name = "display",
+    values = Input.Display.values.toIndexedSeq,
+    default = Input.Display.default,
+    getName = _.name
+  )
