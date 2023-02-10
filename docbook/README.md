@@ -4,14 +4,16 @@
 
 ## THAT'S IT !##
 
-While I was fighting to create a toolchain for processing DocBook into HTML and PDF with support for math, there appeared a different format - AsciiDoc!
+While I was fighting to create a toolchain for processing DocBook into HTML and PDF with support for math, there appeared a different format - [AsciiDoc](https://asciidoc.org/)!
 
-It has an excellent toolchain and active community.
-It has a Gradle plugin.
+It is well-documented.
+It has an excellent [toolchain](https://docs.asciidoctor.org/) and active community.
+It has a [Gradle plugin](https://asciidoctor.github.io/asciidoctor-gradle-plugin/development-3.x/user-guide/#_the_new_asciidoctorj_plugin).
 Editing it is easier than dealing with DocBook, **and** my IDE (IntelliJ Idea) has a plugin for it too.
 It supports math too.
+It is not great with footnotes though...
 
-I am not going to spend any more time trying to use the browser to turn DocBook into PDF, nor writing HTML chunkers :)
+I am not going to spend any more time trying to use the browser to turn DocBook into PDF, writing HTML chunkers, coding support for XSLTNG and newer versions of the DocBook XSLT, or integrating with GraalVM just to run Node (about that though :)) :)
 
 Instead, I converted my writings to AsciiDoc - and am suspending the DocBook processing and Gradle plugin project.
 

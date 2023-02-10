@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.html.A
+import org.opentorah.xml.A
 import zio.{UIO, ZIO}
 
 trait LinksResolver:

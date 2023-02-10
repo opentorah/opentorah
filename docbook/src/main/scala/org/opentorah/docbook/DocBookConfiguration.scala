@@ -1,7 +1,6 @@
 package org.opentorah.docbook
 
 import org.opentorah.build.BuildContext
-import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Strings
 import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
@@ -28,8 +27,7 @@ final class DocBookConfiguration(
 
   def toProcessor(
     layout: Layout,
-    context: BuildContext,
-    siteHtml: SiteHtml
+    context: BuildContext
   ): DocBookProcessor =
 
     val variants: Set[Variant] = formats.flatMap(_.toVariants)
@@ -37,7 +35,6 @@ final class DocBookConfiguration(
     new DocBookProcessor(
       layout,
       context,
-      siteHtml,
       outputDefault = Variant.forNames(output, variants),
       mathDefault = math,
       substitutionsDefault = substitutions,

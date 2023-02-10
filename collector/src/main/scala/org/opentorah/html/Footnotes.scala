@@ -51,7 +51,7 @@ object Footnotes:
     contentId: String = s"footnote_$idNumber"
     number: Int <- ZIO.environmentWith[Footnotes](_.get.getNextNumber)
     symbol: String = number.toString
-    footnote: ScalaXml.Element = Html.footnote(contentId, srcId, symbol, ScalaXml.getChildren(element))
+    footnote: ScalaXml.Element = ToHtml.footnote(contentId, srcId, symbol, ScalaXml.getChildren(element))
     _ <- ZIO.environmentWith[Footnotes](_.get.add(footnote))
   yield
-    Html.footnoteRef(contentId, srcId, symbol)
+    ToHtml.footnoteRef(contentId, srcId, symbol)

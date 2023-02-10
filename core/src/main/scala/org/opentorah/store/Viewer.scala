@@ -1,7 +1,5 @@
 package org.opentorah.store
 
-import org.opentorah.html.Html
-
 object Viewer:
 
   trait Hierarchy extends Store:
@@ -21,6 +19,6 @@ object Viewer:
 
   def default: String = hierarchy
 
-  val hierarchy: String = Html.viewerDefault
+  val hierarchy: String = "hierarchyViewer"
 
   val facsimile: String = "facsimileViewer"

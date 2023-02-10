@@ -3,12 +3,13 @@ author: "Leonid Dubinsky"
 email: dub@opentorah.org
 
 description: >- # this means to ignore newlines until "baseurl:"
-  Digital Judaica Done Right :)
+  code, papers, books and historical documents
 baseurl: "" # the subpath of your site, e.g. /blog
 
 url: "http://www.opentorah.org" # the base hostname & protocol for your site, e.g. http://example.com
 timezone: America/New_York
 github_username: dubinsky
+# TODO add twitter...
 
 # TODO Google Analytics?
 # google_analytics: UA-NNNNNNNN-N
@@ -22,6 +23,7 @@ theme: minima
 #  - jekyll-avatar
 #  - jekyll-feed
 #  - jekyll-sitemap
+# TODO add asciidoc
 
 #header_pages:
 #  - tags.html

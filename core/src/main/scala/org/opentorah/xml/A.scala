@@ -1,7 +1,7 @@
-package org.opentorah.html
+package org.opentorah.xml
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{RawXml, ScalaXml}
+import org.opentorah.xml.{Html, RawXml, ScalaXml}
 import java.net.URI
 
 // HTML anchor element

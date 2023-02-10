@@ -1,7 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.html.A
-import org.opentorah.xml.{From, Parser, Parsing, ScalaXml}
+import org.opentorah.xml.{A, From, Parser, Parsing, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import zio.{UIO, URIO, ZIO, ZLayer}

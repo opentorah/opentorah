@@ -2,6 +2,7 @@ package org.opentorah.docbook
 
 import java.io.File
 
+// TODO collapse into the XsltFormat
 trait Format extends HasName derives CanEqual:
   final override def equals(other: Any): Boolean = other.isInstanceOf[Format] && this.name == other.asInstanceOf[Format].name
 
@@ -29,6 +30,6 @@ trait Format extends HasName derives CanEqual:
   }
 
 object Format:
-  val all: List[Format] = List(Html, Epub2, Epub3, Pdf, Html2, HtmlOneDirect)
+  val all: List[Format] = List(Html, Epub2, Epub3, Pdf, Html2)
 
   def forName(name: String): Format = HasName.forName(name, all, "format")
