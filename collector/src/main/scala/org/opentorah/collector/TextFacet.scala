@@ -1,5 +1,6 @@
 package org.opentorah.collector
 
+import org.opentorah.site.TeiToHtml
 import org.opentorah.store.{Context, Path, Viewer}
 import org.opentorah.tei.Tei
 import org.opentorah.xml.{Caching, ScalaXml}
@@ -28,6 +29,6 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
     translations <- collection.translations(document)
     pathShortener: Path.Shortener <- context.pathShortener
   yield
-    Seq(document.facetLink(collectionPath, collection.facsimileFacet, pathShortener)(text = Tei.facsimileSymbol)) ++
+    Seq(document.facetLink(collectionPath, collection.facsimileFacet, pathShortener)(text = TeiToHtml.facsimileSymbol)) ++
     (for translation <- if document.isTranslation then Seq.empty else translations
      yield translation.textFacetLink(collectionPath, pathShortener)(s"[${translation.lang}]"))

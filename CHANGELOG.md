@@ -14,9 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - build: removed SASS from `docs`
 - site: removed DocBook processing, math and highlighter support
 - site: moved site and tei packages from the core module into the collector module
-- docbook: removed ToHtml and direct (non-XSLT) processing functionality
+- site: ToHtml became TeiToHtml
+- docbook: removed ToHtml and direct (non-XSLT) processing functionality and Playwright
 - docbook: moved docbook, fop, math and pdf packages from the core module into the docbook module
-- html: moved Html and A into the xml package, and the rest of the package into the collector module
+- html: moved Html and A into the xml package, and merged the rest of the package into the site package in the collector module
 
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default

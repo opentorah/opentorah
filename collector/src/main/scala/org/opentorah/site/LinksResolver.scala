@@ -1,4 +1,4 @@
-package org.opentorah.tei
+package org.opentorah.site
 
 import org.opentorah.xml.A
 import zio.{UIO, ZIO}

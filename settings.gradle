@@ -91,9 +91,6 @@ dependencyResolutionManagement {
     // TODO split runtime-only out of it
     bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
 
-    // PDF Generation
-    library('playwright', 'com.microsoft.playwright:playwright:1.29.0')
-
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.6')
     library('logback' , 'ch.qos.logback:logback-classic:1.4.5')

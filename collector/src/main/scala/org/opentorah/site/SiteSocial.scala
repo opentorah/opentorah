@@ -1,4 +1,4 @@
-package org.opentorah.html
+package org.opentorah.site
 
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 

@@ -1,14 +1,12 @@
 package org.opentorah.site
 
-import org.opentorah.html.HtmlTheme
 import org.opentorah.metadata.Names
-import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores, Viewer}
-import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
+import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
+import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
 import org.opentorah.xml.{Caching, Doctype, Element, Html, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
-import java.io.File
 import java.net.URL
 
 // TODO add static site server/generator.
@@ -121,7 +119,7 @@ abstract class Site(
       store.htmlBodyTitle,
       content
     )
-    result: ScalaXml.Element <- Tei.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path, pathShortener)))
+    result: ScalaXml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path, pathShortener)))
   yield result
 
   protected def linkResolver(

@@ -1,4 +1,4 @@
-package org.opentorah.html
+package org.opentorah.site
 
 import org.opentorah.xml.{ScalaXml, Xml}
 import zio.{URIO, ZIO, ZLayer}
@@ -51,7 +51,7 @@ object Footnotes:
     contentId: String = s"footnote_$idNumber"
     number: Int <- ZIO.environmentWith[Footnotes](_.get.getNextNumber)
     symbol: String = number.toString
-    footnote: ScalaXml.Element = ToHtml.footnote(contentId, srcId, symbol, ScalaXml.getChildren(element))
+    footnote: ScalaXml.Element = TeiToHtml.footnote(contentId, srcId, symbol, ScalaXml.getChildren(element))
     _ <- ZIO.environmentWith[Footnotes](_.get.add(footnote))
   yield
-    ToHtml.footnoteRef(contentId, srcId, symbol)
+    TeiToHtml.footnoteRef(contentId, srcId, symbol)

@@ -1,4 +1,4 @@
-package org.opentorah.html
+package org.opentorah.site
 
 import org.opentorah.store.Viewer
 import org.opentorah.util.Json

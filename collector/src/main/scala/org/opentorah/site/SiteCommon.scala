@@ -1,6 +1,5 @@
 package org.opentorah.site
 
-import org.opentorah.html.SiteHtml
 import org.opentorah.metadata.Names
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
