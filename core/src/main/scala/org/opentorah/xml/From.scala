@@ -7,7 +7,7 @@ import java.net.URL
 
 sealed abstract class From(val name: String, val xml: Xml):
 
-  def isRedirect: Boolean
+  def isInclude: Boolean
 
   def url: Option[URL]
 
@@ -20,7 +20,7 @@ object From:
     name: String,
     element: xml.Element
   ) extends From(name, xml):
-    override def isRedirect: Boolean = false
+    override def isInclude: Boolean = false
     override def toString: String = s"From.xml($name)"
     override def url: Option[URL] = None
     // Note: if xml != this.xml, this will fail *at run-time*:
@@ -34,34 +34,32 @@ object From:
     string: String,
     override val xml: Xml
   ) extends From(name, xml):
-    override def isRedirect: Boolean = false
+    override def isInclude: Boolean = false
     override def toString: String = s"From.string($name)"
     override def url: Option[URL] = None
-    override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromString(string))
+    override def load: Effects.IO[xml.Element] = Effects.effect(xml.load(Sax.string2inputSource(string)))
 
   def string(name: String, string: String, xml: Xml = ScalaXml): From = FromString(name, string, xml)
 
-  private final class FromUrl(fromUrl: URL, override val isRedirect: Boolean, override val xml: Xml)
+  private final class FromUrl(fromUrl: URL, override val isInclude: Boolean, override val xml: Xml)
     extends From(Files.nameAndExtension(fromUrl.getPath)._1, xml):
-    override def toString: String = s"From.url($fromUrl, isRedirect=$isRedirect)"
+    override def toString: String = s"From.url($fromUrl, isInclude=$isInclude)"
     override def url: Option[URL] = Some(fromUrl)
-    override def load: Effects.IO[xml.Element] = Effects.effect(xml.loadFromUrl(fromUrl))
+    override def load: Effects.IO[xml.Element] = Effects.effect(xml.load(Sax.url2inputSource(fromUrl)))
 
-  def url(url: URL, xml: Xml = ScalaXml): From = FromUrl(url, false, xml)
-  def file(file: File, xml: Xml = ScalaXml): From = FromUrl(Files.file2url(file), false, xml)
-
-  private[xml] def redirect(url: URL, xml: Xml): From = FromUrl(url, true, xml)
+  def url(url: URL, xml: Xml = ScalaXml): From = FromUrl(fromUrl = url, isInclude = false, xml)
+  private[xml] def include(url: URL, xml: Xml): From = FromUrl(fromUrl = url, isInclude = true, xml)
 
   private final class FromResource(
     clazz: Class[?],
     name: String,
     override val xml: Xml
   ) extends From(name, xml):
-    override def isRedirect: Boolean = false
+    override def isInclude: Boolean = false
     override def toString: String = s"From.resource($clazz:$name.xml)"
     override def url: Option[URL] = Option(clazz.getResource(name + ".xml"))
     override def load: Effects.IO[xml.Element] = url
-      .map(url => Effects.effect(xml.loadFromUrl(url)))
+      .map(url => Effects.effect(xml.load(Sax.url2inputSource(url))))
       .getOrElse(Effects.fail(s"Resource not found: $this"))
 
   def resourceNamed(obj: AnyRef, name: String, xml: Xml = ScalaXml): From = FromResource(obj.getClass, name, xml)

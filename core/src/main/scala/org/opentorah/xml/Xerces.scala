@@ -2,7 +2,6 @@ package org.opentorah.xml
 
 import org.slf4j.Logger
 import org.xml.sax.{ErrorHandler, SAXParseException, XMLFilter, XMLReader}
-import javax.xml.parsers.SAXParserFactory
 
 object Xerces:
 
@@ -10,22 +9,32 @@ object Xerces:
   val saxParserFactoryName: String = classOf[org.apache.xerces.jaxp.SAXParserFactoryImpl].getName
   val saxParserName: String = classOf[org.apache.xerces.parsers.SAXParser].getName
 
+  enum ProcessIncludes derives CanEqual:
+    case No
+    case YesWithBases
+    case YesWithoutBases
+
   def getXMLReader(
     filters: Seq[XMLFilter],
     resolver: Option[Resolver],
-    xincludeAware: Boolean,
-    addXmlBase: Boolean,
+    processIncludes: ProcessIncludes,
     logger: Logger
   ): XMLReader =
-    val saxParserFactory: SAXParserFactory = org.apache.xerces.jaxp.SAXParserFactoryImpl()
+    val saxParserFactory: javax.xml.parsers.SAXParserFactory = org.apache.xerces.jaxp.SAXParserFactoryImpl()
 
-    if xincludeAware then
-      saxParserFactory.setNamespaceAware(true) // needed for XIncludeAware to kick in
-      saxParserFactory.setXIncludeAware(true)
-      if !addXmlBase then saxParserFactory.setFeature(
-        org.apache.xerces.impl.Constants.XERCES_FEATURE_PREFIX + org.apache.xerces.impl.Constants.XINCLUDE_FIXUP_BASE_URIS_FEATURE,
-        false
-      )
+    processIncludes match
+      case ProcessIncludes.YesWithBases | ProcessIncludes.YesWithoutBases =>
+        saxParserFactory.setNamespaceAware(true) // needed for XIncludeAware to kick in
+        saxParserFactory.setXIncludeAware(true)
+      case _ =>
+
+    processIncludes match
+      case ProcessIncludes.YesWithoutBases =>
+        saxParserFactory.setFeature(
+          org.apache.xerces.impl.Constants.XERCES_FEATURE_PREFIX + org.apache.xerces.impl.Constants.XINCLUDE_FIXUP_BASE_URIS_FEATURE,
+          false
+        )
+      case _ =>
 
     val result: XMLReader = filters.foldLeft(saxParserFactory.newSAXParser.getXMLReader)((parent, filter) =>
       filter.setParent(parent)

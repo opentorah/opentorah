@@ -1,8 +1,8 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Effects
+import org.opentorah.util.{Effects, Files}
 import java.net.URL
-import zio.{ZEnvironment, ZIO}
+import zio.ZIO
 
 final class Parsing private:
 
@@ -61,6 +61,9 @@ final class Parsing private:
 
   private def currentBaseUrl: Option[URL] =
     stack.flatMap(_.from).head.url
+
+  private def initialBaseUrl: Option[URL] =
+    stack.flatMap(_.from).last.url
 
   private def currentXml: Xml =
     stack.head.xml
@@ -159,6 +162,7 @@ final class Parsing private:
 
 private[xml] object Parsing:
 
+  // TODO shouldn't xml be the same for all layers?
   private final class NextElement[A](val xml: Xml)(val xmlElement: xml.Element, val elementAndParser: Element.AndParser[A])
 
   def empty: Parsing = new Parsing
@@ -168,13 +172,25 @@ private[xml] object Parsing:
 
   def optional[A](elements: Elements[A]): Parser[Option[A]] = for
     // TODO take namespace into account!
+    // TODO tidy up
     nextElementOpt: Option[NextElement[A]] <- accessZIO(_.nextElement(elements))
-    result: Option[A] <- nextElementOpt.fold(ZIO.none)((nextElement: NextElement[A]) =>
-      nested(
-        from = None,
-        nextElement = nextElement
-      ).map(Some(_))
-    )
+    result: Option[A] <- nextElementOpt.fold(ZIO.none) { (nextElement: NextElement[A]) =>
+      for
+        parentBase: Option[URL] <- nextElement.xml.parentBase
+        base: Option[String] = Xml.baseAttribute.optional.get(nextElement.xml)(nextElement.xmlElement)
+        fromUrl: Option[URL] = base.map(Files.subUrl(parentBase, _))
+
+        nextElementWithoutBase: NextElement[A] = fromUrl match
+          case None => nextElement
+          case Some(_) =>
+            NextElement(nextElement.xml)(nextElement.xml.removeAttribute(Xml.baseAttribute, nextElement.xmlElement), nextElement.elementAndParser)
+
+        result <- nested(
+          from = fromUrl.map(From.include(_, nextElementWithoutBase.xml)),
+          nextElement = nextElementWithoutBase
+        )
+      yield Some(result)
+    }
   yield result
 
   final def required[A](elements: Elements[A], from: From): Parser[A] = for
@@ -203,6 +219,8 @@ private[xml] object Parsing:
   def fromUrl: Parser[Element.FromUrl] = access(_.currentFromUrl)
 
   def currentBaseUrl: Parser[Option[URL]] = access(_.currentBaseUrl)
+
+  def initialBaseUrl: Parser[Option[URL]] = access(_.initialBaseUrl)
 
   def currentXml: Parser[Xml] = access(_.currentXml)
 

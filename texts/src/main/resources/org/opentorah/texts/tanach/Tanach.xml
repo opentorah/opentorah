@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Tanach>
-    <book file="Genesis.xml"/>
-    <book file="Exodus.xml"/>
-    <book file="Leviticus.xml"/>
-    <book file="Numbers.xml"/>
-    <book file="Deuteronomy.xml"/>
+<Tanach xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="Genesis.xml"/>
+    <xi:include href="Exodus.xml"/>
+    <xi:include href="Leviticus.xml"/>
+    <xi:include href="Numbers.xml"/>
+    <xi:include href="Deuteronomy.xml"/>
 
     <book>
         <name lang="en" n="Joshua"/>
@@ -494,7 +494,7 @@
         <chapter n="3" length="24"/>
     </book>
 
-    <book file="Psalms.xml"/>
+    <xi:include href="Psalms.xml"/>
 
     <book>
       <name lang="en" n="Proverbs"/>

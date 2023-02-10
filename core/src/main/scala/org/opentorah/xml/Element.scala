@@ -63,24 +63,3 @@ object Element:
       def fromUrl: FromUrl
 
   def fromUrl: Parser[FromUrl] = Parsing.fromUrl
-
-//  abstract class WithToXmlFromUrl[A <: FromUrl.With](elementName: String) extends Element[A](elementName) {
-//    final def withRedirect(fromUrl: FromUrl.With, follow: Boolean): Elements[A] = new Elements[A] {
-//      override def toXmlElement(value: A): Xml.Element =
-//        if (follow || value.fromUrl.inline) WithToXmlFromUrl.this.toXmlElement(value)
-//        else constructRedirect(relativize(value.fromUrl.url, fromUrl.fromUrl.url).toString)
-//
-//      override private[xml] def canParse(elementName: String) = ???
-//      override protected def optionalParser: Parser[Option[A]] = ??? // TODO
-//    }
-//
-//    private def relativize(url: URL, base: URL): URL =
-//      url.toURI.relativize(base.toURI).toURL
-//
-//    private def constructRedirect(redirect: String): Xml.Element = Xml.construct(
-//      name = elementName,
-//      namespace = None,
-//      attributes = Seq(redirectAttribute.required.withValue(redirect)),
-//      children = Seq.empty
-//    )
-//  }

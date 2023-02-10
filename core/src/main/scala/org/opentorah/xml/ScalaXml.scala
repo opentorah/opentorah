@@ -1,7 +1,9 @@
 package org.opentorah.xml
 
-import org.opentorah.util.Strings
+import org.opentorah.util.{Files, Strings}
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}
+import java.net.URL
+import scala.xml.parsing.FactoryAdapter
 
 object ScalaXml extends Xml:
 
@@ -23,36 +25,17 @@ object ScalaXml extends Xml:
     case node: Node => node.text
   )
 
-  override protected def loadFromInputSource(
+  override def load(
     inputSource: InputSource,
     filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
-  ): Element = load(
-    inputSource,
-    getXMLReader(filters, resolver)
-  ).rootElem.asInstanceOf[Element]
-
-  override protected def loadNodesFromInputSource(
-    inputSource: InputSource,
-    filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
-  ): Nodes =
-    val result = load(
+    resolver: Option[Resolver],
+    processIncludes: Xerces.ProcessIncludes = Xerces.ProcessIncludes.YesWithBases
+  ): Element = load0(
       inputSource,
-      getXMLReader(filters, resolver)
-    )
-
-    result.prolog ++ (result.rootElem :: result.epilogue)
-
-  private def getXMLReader(
-    filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
-  ): XMLReader = Xerces.getXMLReader(
-    filters,
-    resolver,
-    xincludeAware = false,
-    addXmlBase = false,
-    logger = Xml.logger // TODO globalize
+      filters,
+      resolver,
+      processIncludes,
+      fixXercesXIncludes = true
   )
 
   // TODO I'd like the following code to look this way: scala.xml.XML.withSAXParser(...).load(inputSource), but:
@@ -62,10 +45,20 @@ object ScalaXml extends Xml:
   // - there is no going back from the XMLReader to SAXParser... (?)
   // So: file a pull request that will change XMLLoader from using SAXParser to XMLReader,
   // which by default should be obtained from the SAXParser :)
-  private def load(
+  def load0(
     inputSource: InputSource,
-    xmlReader: XMLReader
-  ):  scala.xml.parsing.FactoryAdapter =
+    filters: Seq[XMLFilter],
+    resolver: Option[Resolver],
+    processIncludes: Xerces.ProcessIncludes,
+    fixXercesXIncludes: Boolean
+  ): Element =
+    val xmlReader: XMLReader = Xerces.getXMLReader(
+      filters,
+      resolver,
+      processIncludes,
+      logger = Xml.logger // TODO globalize
+    )
+
     val adapter: scala.xml.parsing.FactoryAdapter = scala.xml.parsing.NoBindingFactoryAdapter()
     adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
 
@@ -76,7 +69,9 @@ object ScalaXml extends Xml:
     xmlReader.parse(inputSource)
 
     adapter.scopeStack = adapter.scopeStack.tail
-    adapter
+    val result: Element = adapter.rootElem.asInstanceOf[Element]
+
+    if !fixXercesXIncludes then result else fixXIncludeBug(result)
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text    = node.asInstanceOf[Text]
@@ -176,3 +171,50 @@ object ScalaXml extends Xml:
   override protected def descendants(nodes: Nodes, elementName: String): Nodes = nodes.flatMap(node => node.flatMap(_ \\ elementName))
 
   def toNodes(nodes: Nodes): Element.Nodes = Element.Nodes(ScalaXml)(nodes)
+
+  // This is mind-bogglingly weird, but:
+  // - Xerces has a bug in the handling of XIncludes;
+  // - starting at the third level of nested includes, the values of the xml:base attributes are wrong;
+  // - the bug https://issues.apache.org/jira/browse/XERCESJ-1102 was reported in October 2005!!!
+  // - a patch that allegedly fixes the issue is known for years
+  // - a comment from the Xerces maintainer says:
+  //   What Xerces needs most is new contributors / committers who can volunteer their time and help review these patches and get them committed.
+  //   We also need a new release. It's been 5 years. Long overdue.
+  //   If you or anyone else is interested in getting involved we'd be happy to have you join the project.
+  // - latest release of Xerces was in 2023, with the bug still there
+  // - many projects depend on Xerces, including Saxon, where the bug was also discussed: https://saxonica.plan.io/issues/4664
+  // - allegedly, the bug is "SaxonC 11.1" - although how can this be with Saxon not shipping its own Xerces is not clear.
+  //
+  // So, I need to process XIncludes myself instead of relying on the industry-standard Xerces!
+  // What a nightmare...
+  private def fixXIncludeBug(element: ScalaXml.Element): ScalaXml.Element =
+    def fix(current: Option[String], level: Int, element: ScalaXml.Element): ScalaXml.Element =
+      val base: Option[String] = Xml.baseAttribute.optional.get(ScalaXml)(element)
+
+      val (baseFixed: Option[String], levelNew: Int) = base match
+        case None => (current, level)
+        case Some(base) =>
+          val baseFixed: String = current match
+            case None => base
+            case Some(current) =>
+              val basePath: Seq[String] = Files.splitUrl(base)
+              (Files.splitUrl(current).takeWhile(_ != basePath.head) ++ basePath).mkString("/")
+          (Some(baseFixed), level + 1)
+
+      val result: ScalaXml.Element = ScalaXml.setChildren(element,
+        for child <- ScalaXml.getChildren(element) yield
+          if !ScalaXml.isElement(child) then child else fix(baseFixed, levelNew, ScalaXml.asElement(child))
+      )
+
+      if base.isEmpty then result else
+        ScalaXml.addAttribute(Xml.baseAttribute.required.withValue(baseFixed.get),
+          ScalaXml.removeAttribute(Xml.baseAttribute, result)
+        )
+
+    fix(current = None, level = 0, element = element)
+
+  // Since I essentially "fix" xml:base attributes above
+  // to be relative to the initial document and not to the including one
+  // (which is incorrect, but what else can I do?)
+  // I need to supply that initial URL for the subUrl calculations *for ScalaXml only*:
+  override def parentBase: Parser[Option[URL]] = Parsing.initialBaseUrl

@@ -9,6 +9,7 @@ import org.opentorah.docbook.{CommonConfiguration, DocBookConfiguration, DocBook
   FormatConfiguration, Layout, VariantConfiguration}
 import org.opentorah.fop.FopFonts
 import org.opentorah.math.{Delimiters, MathConfiguration}
+import org.opentorah.util.Files
 import org.opentorah.xml.{From, Parser}
 import java.io.File
 import javax.inject.Inject
@@ -100,7 +101,7 @@ object DocBookPlugin:
           then context.warn(s"DocBook: configuration file will be used and configuration in the extension ignored.")
 
           context.info(s"DocBook: reading configuration from file: $configurationFile")
-          Parser.unsafeRun(DocBookConfiguration.parse(From.file(configurationFile)))
+          Parser.unsafeRun(DocBookConfiguration.parse(From.url(Files.file2url(configurationFile))))
 
         processor = Some(configuration.toProcessor(
           layout = layout,

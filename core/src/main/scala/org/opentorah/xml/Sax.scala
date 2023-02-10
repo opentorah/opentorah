@@ -3,7 +3,7 @@ package org.opentorah.xml
 import org.opentorah.util.{Files, Strings}
 import org.xml.sax.helpers.XMLFilterImpl
 import org.xml.sax.{InputSource, Locator, SAXParseException}
-import java.io.File
+import java.io.{File, StringReader}
 import java.net.URL
 
 // Note: declareNamespace() and setAttribute() modify in-place.
@@ -18,6 +18,7 @@ object Sax extends XmlAttributes:
       super.setDocumentLocator(locator)
       this.locator = Some(locator)
 
+  def string2inputSource(string: String): InputSource = InputSource(StringReader(string))
   def file2inputSource(file: File): InputSource = url2inputSource(Files.file2url(file))
   def url2inputSource(url: URL): InputSource = InputSource(url.toString)
 

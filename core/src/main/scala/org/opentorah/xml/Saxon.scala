@@ -45,14 +45,24 @@ sealed abstract class Saxon(name: String):
 
     val transformer: Transformer = stylesheetFile.fold(transformerFactory.newTransformer)(
       stylesheetFile => transformerFactory.newTransformer(SAXSource(
-        Xerces.getXMLReader(filters = Seq.empty, resolver, xincludeAware = true, addXmlBase = false, logger), // no need to filter stylesheets
+        Xerces.getXMLReader(
+          filters = Seq.empty, // no need to filter stylesheets
+          resolver = resolver,
+          processIncludes = Xerces.ProcessIncludes.YesWithoutBases,
+          logger = logger
+        ),
         Sax.file2inputSource(stylesheetFile)
       ))
     )
 
     transformer.transform(
       SAXSource(
-        Xerces.getXMLReader(filters, resolver, xincludeAware = true, addXmlBase = true, logger),
+        Xerces.getXMLReader(
+          filters = filters,
+          resolver = resolver,
+          processIncludes = Xerces.ProcessIncludes.YesWithBases,
+          logger = logger
+        ),
         inputSource
       ),
       result

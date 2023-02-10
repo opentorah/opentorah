@@ -18,15 +18,12 @@ trait Xml extends XmlAttributes:
   type Comment <: Node
 
   // TODO just take XMLReader - but see transform()...
-
-  final def loadFromString(string: String, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
-    loadFromInputSource(InputSource(StringReader(string)), filters, resolver)
-
-  final def loadFromUrl(url: URL, filters: Seq[XMLFilter] = Seq.empty, resolver: Option[Resolver] = None): Element =
-    loadFromInputSource(Sax.url2inputSource(url), filters, resolver)
-
-  protected def loadFromInputSource     (source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Element
-  protected def loadNodesFromInputSource(source: InputSource, filters: Seq[XMLFilter], resolver: Option[Resolver]): Nodes
+  def load(
+    source: InputSource,
+    filters: Seq[XMLFilter] = Seq.empty,
+    resolver: Option[Resolver] = None,
+    processIncludes: Xerces.ProcessIncludes = Xerces.ProcessIncludes.YesWithBases
+  ): Element
 
   def isText(node: Node): Boolean
   def asText(node: Node): Text
@@ -81,6 +78,8 @@ trait Xml extends XmlAttributes:
     case n :: ns => Seq(n) ++ multi(ns, separator)
     case n => n
 
+  def parentBase: Parser[Option[URL]]
+  
 object Xml:
   val logger: Logger = LoggerFactory.getLogger("org.opentorah.xml") // TODO eliminate
 

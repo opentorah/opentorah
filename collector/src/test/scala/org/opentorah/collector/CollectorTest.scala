@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.site.Site
-import org.opentorah.store.Path
+import org.opentorah.store.{Path, Store}
 import org.opentorah.util.Effects
-import org.opentorah.xml.Caching
+import org.opentorah.xml.{Caching, Element}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.io.File
@@ -18,10 +18,19 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
   collector.caching.logEnabled = false
 
   "Collector smoke tests" should "work" in {
+//    val site: ScalaXml.Element = Effects.unsafeRun(From.file(File(localStorePath + "site.xml"), ScalaXml).load).asInstanceOf[ScalaXml.Element]
+//    println(site)
+
     def getResponse(pathString: String): Either[Throwable, Site.Response] =
       Effects.unsafeRun(collector.getResponse(pathString).either)
     def getContent(pathString: String): String = getResponse(pathString).getOrElse(fail()).content
     def getError(pathString: String): String = getResponse(pathString).left.getOrElse(fail()).getMessage
+
+    def getStoreUrl(pathString: String): String = Effects.unsafeRun(collector.toTask(collector.resolveUrl(pathString)))
+      .get.last.asInstanceOf[Element.FromUrl.With].fromUrl.url.toString
+
+    getStoreUrl("/rgada") should endWith("archive/rgada/category/VII/inventory/2/case/3140.xml")
+    getStoreUrl("/archive/rgada/") should endWith("/archive/rgada.xml")
 
     getContent("/") should include("Дела")
     getContent("/collections") should include("Архивы")

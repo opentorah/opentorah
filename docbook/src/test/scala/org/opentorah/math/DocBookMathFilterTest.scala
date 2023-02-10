@@ -1,7 +1,7 @@
 package org.opentorah.math
 
 import org.opentorah.docbook.DocBook
-import org.opentorah.xml.{Dom, XInclude, Xml}
+import org.opentorah.xml.{Dom, Sax, XInclude, Xml}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
@@ -105,11 +105,9 @@ class DocBookMathFilterTest extends AnyFlatSpecLike, Matchers:
   }
 
   private def parse(string: String): String =
-    val element: Dom.Element = Dom.loadFromString(string, filters = Seq(
+    val element: Dom.Element = Dom.load(Sax.string2inputSource(string), filters = Seq(
         DocBookMathFilter(MathConfiguration.default)
 //        , new org.opentorah.xml.TracingFilter
       )
     )
-    val result: String = DocBook.prettyPrinter.renderWithHeader(Dom)(element)
-//    println(result)
-    result
+    DocBook.prettyPrinter.renderWithHeader(Dom)(element)

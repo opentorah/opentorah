@@ -1,9 +1,7 @@
 package org.opentorah.xml
 
-import org.opentorah.util.{Collections, Effects, Files}
+import org.opentorah.util.{Collections, Effects}
 import zio.ZIO
-import java.io.File
-import java.net.URL
 
 trait Elements[A]:
 
@@ -25,23 +23,6 @@ trait Elements[A]:
   // Note: this is only used in Named and ListFile, but still...
   final def wrappedSeq(wrapperElementName: String): Element[Seq[A]] = new Element[Seq[A]](wrapperElementName):
     override def contentParsable: Parsable[Seq[A]] = Elements.this.seq
-
-  final def followRedirects: Elements.HandleRedirect[A, A] = followRedirects(identity)
-
-  private def followRedirects[B](f: Parser[A] => Parser[B]): Elements.HandleRedirect[A, B] = Elements.HandleRedirect(
-    this,
-    noRedirect = f,
-    redirected = (from: From) => followRedirects(f).parse(from)
-  )
-
-  final def orRedirect: Elements.HandleRedirect[A, Elements.Redirect.Or[A]] = Elements.HandleRedirect(
-    this,
-    noRedirect = _.map(Right(_)),
-    redirected = (from: From) => ZIO.left(Elements.Redirect[A](from, this))
-  )
-
-  final def withRedirect(follow: Boolean): Elements.HandleRedirect[A, Elements.Redirect.Or[A]] =
-    if !follow then orRedirect else followRedirects(_.map(Right(_)))
 
 object Elements:
 
@@ -74,41 +55,6 @@ object Elements:
     override def unparser: Unparser[Seq[A]] = Unparser[Seq[A]](
       content = value => xml(value)
     )
-
-  // TODO just use XInclude?
-  final class Redirect[A](val from: From, elements: Elements[A]):
-    def parse: Parser[A] = elements.parse(from)
-    def followRedirects: Parser[A] = elements.followRedirects.parse(from)
-    def orRedirect: Parser[Redirect.Or[A]] = elements.orRedirect.parse(from)
-    def withRedirect(follow: Boolean): Parser[Redirect.Or[A]] = elements.withRedirect(follow).parse(from)
-
-  object Redirect:
-    type Or[A] = Either[Redirect[A], A]
-
-  private val redirectAttribute: Attribute[String] = Attribute("file")
-
-  final class HandleRedirect[A, B](
-    elements: Elements[A],
-    noRedirect: Parser[A] => Parser[B],
-    redirected: From => Parser[B]
-  ) extends Elements[B]:
-    override def elementAndParser(name: String): Option[Element.AndParser[B]] =
-      elements.elementAndParser(name).map(_.element).map { element =>
-        val parser = for
-          url: Option[String] <- redirectAttribute.optional()
-          result: B <- url.fold(noRedirect(element.contentParsable().asInstanceOf[Parser[A]]))((url: String) =>
-            for
-              currentBaseUrl: Option[URL] <- Parsing.currentBaseUrl
-              from: URL <- Effects.effect(Files.subUrl(currentBaseUrl, url))
-              xml: Xml <- Parsing.currentXml
-              result: B <- redirected(From.redirect(from, xml))
-            yield result
-          )
-        yield result
-        Element.AndParser[B](element, parser)
-      }
-
-    override protected def elementByValue(value: B): Element[?] = ???
 
   abstract class Union[A] extends Elements[A]:
     protected def elements: Seq[Element[? <: A]]

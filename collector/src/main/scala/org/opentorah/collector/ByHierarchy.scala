@@ -51,7 +51,7 @@ object ByHierarchy extends Element[ByHierarchy]("by"):
     override def parser: Parser[ByHierarchy] = for
       fromUrl: Element.FromUrl <- Element.fromUrl
       selectorName: String <- By.selectorParser
-      hierarchyStores: Seq[Hierarchical] <- Hierarchical.followRedirects.seq()
+      hierarchyStores: Seq[Hierarchical] <- Hierarchical.seq()
     yield ByHierarchy(
       fromUrl,
       selectorName,
