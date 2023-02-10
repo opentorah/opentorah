@@ -1,6 +1,5 @@
 package org.opentorah.collector
 
-import org.opentorah.html
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.store.{By, Context, Path, Selector, Store}

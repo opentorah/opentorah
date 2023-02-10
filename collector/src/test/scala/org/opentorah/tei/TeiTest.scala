@@ -1,5 +1,6 @@
 package org.opentorah.tei
 
+import org.opentorah.site.{LinksResolver, TeiToHtml}
 import org.opentorah.xml.{A, From, Parser, Parsing, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -36,7 +37,7 @@ final class TeiTest extends AnyFlatSpec, Matchers:
         .setTarget("facsViewer")
       )
 
-    unsafeRun(Tei.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
+    unsafeRun(TeiToHtml.toHtml(element).provideLayer(ZLayer.succeed(resolver)))
 
   "905" should "work" in {
     val tei: Tei = unsafeRun("905")

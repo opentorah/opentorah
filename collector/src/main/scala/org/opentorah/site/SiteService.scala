@@ -4,7 +4,6 @@ import org.opentorah.service.ServiceApp
 import ServiceApp.given
 import org.opentorah.files.GoogleCloudStorageSynchronizer
 import org.opentorah.store.{Path, Pure, Store}
-import org.opentorah.tei.LinksResolver
 import org.opentorah.util.{Effects, Files, Strings}
 import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser}
 import org.slf4j.Logger
