@@ -1,6 +1,20 @@
 # DocBook plugin for Gradle #
 
 [TOC]
+
+## THAT'S IT !##
+
+While I was fighting to create a toolchain for processing DocBook into HTML and PDF with support for math, there appeared a different format - AsciiDoc!
+
+It has an excellent toolchain and active community.
+It has a Gradle plugin.
+Editing it is easier than dealing with DocBook, **and** my IDE (IntelliJ Idea) has a plugin for it too.
+It supports math too.
+
+I am not going to spend any more time trying to use the browser to turn DocBook into PDF, nor writing HTML chunkers :)
+
+Instead, I converted my writings to AsciiDoc - and am suspending the DocBook processing and Gradle plugin project.
+
 ## Motivation ##
 
 There is an excellent [DocBook](http://www.docbook.org/) plugin
