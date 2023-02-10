@@ -1,7 +1,6 @@
 package org.opentorah.docbook
 
 import org.opentorah.build.{BuildContext, Distribution}
-import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Files
 import org.opentorah.xml.{Dom, Resolver, ScalaXml}
@@ -25,7 +24,6 @@ final class VariantProcessor(
   def process(
     context: BuildContext,
     layout: Layout,
-    siteHtml: SiteHtml,
     substitutions: Map[String, String]
   ): Unit =
     context.lifecycle(s"DocBook: processing '$documentName' to $outputName.")
@@ -86,25 +84,6 @@ final class VariantProcessor(
           epubEmbeddedFontsString,
           xslt,
           customStylesheets
-        )
-
-      case directFormat: DirectFormat =>
-        // TODO Scala XML does not work with XInclude-aware parsers
-        // (see https://github.com/scala/scala-xml/issues/506),
-        // but DocBook uses XInclude to assemble the document,
-        // so I parse to Dom, pretty-print combined document to String and re-parse it with ScalaXml:
-        val dom: Dom.Element = Dom.loadFromUrl(
-          Files.file2url(inputFile),
-          resolver = Some(getResolver(None))
-        )
-        val xml: ScalaXml.Element = ScalaXml.loadFromString(DocBook.prettyPrinter.renderWithHeader(Dom)(dom))
-
-        directFormat.process(
-          xml,
-          parameters,
-          mathConfiguration,
-          siteHtml,
-          processOutputFile
         )
 
     if format.usesIntermediate then

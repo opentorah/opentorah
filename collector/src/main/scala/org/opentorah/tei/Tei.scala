@@ -3,10 +3,10 @@ package org.opentorah.tei
 import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.roman.{Gregorian, Julian}
-import org.opentorah.html.{A, Html, ToHtml}
+import org.opentorah.html.ToHtml
 import org.opentorah.metadata.Language
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Attribute, Dialect, Element, Html, Namespace, Parsable, Parser, PrettyPrinter, ScalaXml, Unparser}
 import zio.ZIO
 import java.net.URI
 
@@ -110,10 +110,10 @@ object Tei extends Element[Tei]("TEI"), Dialect, ToHtml[LinksResolver]:
 //      case "table" => ZIO.succeed(Html.table(children))
       // Note: before the first row there can be <head>HEAD</head>;
       // it should become <caption>transform(HEAD)</caption>.
-      case "row" => ZIO.succeed(Html.tr(children))
-      case "cell" => ZIO.succeed(Html.td(colsAttribute.get(ScalaXml)(element), children))
-      case "date" => ZIO.succeed(Html.addTooltip(dateTooltip(element), element))
-      case "gap" => ZIO.succeed(Html.addTooltip(gapTooltip(element), element))
+      case "row" => ZIO.succeed(ToHtml.tr(children))
+      case "cell" => ZIO.succeed(ToHtml.td(colsAttribute.get(ScalaXml)(element), children))
+      case "date" => ZIO.succeed(ToHtml.addTooltip(dateTooltip(element), element))
+      case "gap" => ZIO.succeed(ToHtml.addTooltip(gapTooltip(element), element))
       case _ => ZIO.succeed(element)
 
   private def reference(element: ScalaXml.Element): zio.URIO[LinksResolver, A] =

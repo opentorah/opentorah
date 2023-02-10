@@ -2,7 +2,6 @@ package org.opentorah.docbook
 
 import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.fop.FopFonts
-import org.opentorah.html.SiteHtml
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Files
 import org.opentorah.xml.{Catalog, Dom, Resolver, ScalaXml, Xsl}
@@ -16,7 +15,6 @@ import java.io.File
 final class DocBookProcessor(
   layout: Layout,
   context: BuildContext,
-  siteHtml: SiteHtml,
   outputDefault: Set[Variant],
   mathDefault: Option[MathConfiguration],
   substitutionsDefault: Map[String, String],
@@ -54,12 +52,6 @@ final class DocBookProcessor(
     def logUnused[T <: HasName](whats: String, unused: Set[T]): Unit = if unused.nonEmpty then
       val unusedString: String = unused.map(_.name).mkString(", ")
       context.warn(s"DocBook: unused $whats: $unusedString")
-
-    for
-      variant <- variants
-      if variant.format.isInstanceOf[DirectFormat]
-      if variant.parameters.nonEmpty
-    do context.warn(s"DocBook: direct format variant has parameters configured: ${variant.name}")
 
     val variantsNonEmpty: Set[Variant] = variants.filterNot(_.isEmpty)
     val variantsUsed: Set[Variant] = documents.flatMap(_.output)
@@ -124,7 +116,6 @@ final class DocBookProcessor(
         variant.configuration.flatMap(_.math),
         variant.math,
         mathDefault,
-        siteHtml.math,
         Some(MathConfiguration.default)
       )
         .flatten
@@ -210,7 +201,6 @@ final class DocBookProcessor(
       for variantProcessor: VariantProcessor <- variantProcessors(document) do variantProcessor.process(
         context = context,
         layout = layout,
-        siteHtml = siteHtml,
         substitutions = substitutions
       )
 

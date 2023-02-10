@@ -1,7 +1,7 @@
 package org.opentorah.store
 
-import org.opentorah.html.A
 import org.opentorah.metadata.Language
+import org.opentorah.xml.A
 
 type Path = Seq[Store]
 

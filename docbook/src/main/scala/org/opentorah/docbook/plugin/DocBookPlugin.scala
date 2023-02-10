@@ -8,7 +8,6 @@ import org.opentorah.build.Gradle.*
 import org.opentorah.docbook.{CommonConfiguration, DocBookConfiguration, DocBookProcessor, DocumentConfiguration,
   FormatConfiguration, Layout, VariantConfiguration}
 import org.opentorah.fop.FopFonts
-import org.opentorah.html.SiteHtml
 import org.opentorah.math.{Delimiters, MathConfiguration}
 import org.opentorah.xml.{From, Parser}
 import java.io.File
@@ -103,16 +102,9 @@ object DocBookPlugin:
           context.info(s"DocBook: reading configuration from file: $configurationFile")
           Parser.unsafeRun(DocBookConfiguration.parse(From.file(configurationFile)))
 
-        val htmlConfigurationFile: File = File(layout.root, getHtmlConfiguration.getOrElse("html.xml"))
-        val siteHtml: SiteHtml =
-          if !htmlConfigurationFile.exists()
-          then SiteHtml.empty
-          else Parser.unsafeRun(SiteHtml.parse(From.file(htmlConfigurationFile)))
-
         processor = Some(configuration.toProcessor(
           layout = layout,
-          context = context,
-          siteHtml = siteHtml
+          context = context
         ))
       processor.get
 

@@ -1,6 +1,5 @@
 package org.opentorah.html
 
-import org.opentorah.math.MathConfiguration
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, RawXml, Unparser}
 
 final class SiteHtml(
@@ -10,12 +9,9 @@ final class SiteHtml(
   val email: Option[String],
   val title: Option[SiteHtml.Title.Value],
   private val social: Option[SiteSocial],
-  val footer: Option[SiteHtml.Footer.Value],
-  private val highlighter: Option[SiteHighlighter],
-  val math: Option[MathConfiguration]
+  val footer: Option[SiteHtml.Footer.Value]
 ):
-  def getSocial     : SiteSocial        = social     .getOrElse(SiteSocial       .empty  )
-  def getHighlighter: SiteHighlighter   = highlighter.getOrElse(SiteHighlighter  .empty  )
+  def getSocial: SiteSocial = social.getOrElse(SiteSocial.empty  )
 
 object SiteHtml extends Element[SiteHtml]("html"):
 
@@ -26,9 +22,7 @@ object SiteHtml extends Element[SiteHtml]("html"):
     email = None,
     title = None,
     social = None,
-    footer = None,
-    highlighter = None,
-    math = None
+    footer = None
   )
 
   object Title  extends RawXml("title")
@@ -39,7 +33,6 @@ object SiteHtml extends Element[SiteHtml]("html"):
     private val faviconAttribute: Attribute.Optional[String] = Attribute("favicon").optional
     private val googleAnalyticsIdAttribute: Attribute.Optional[String] = Attribute("googleAnalyticsId").optional
     private val emailAttribute: Attribute.Optional[String] = Attribute("email").optional
-    private val isStaticAttribute: Attribute.Optional[Boolean] = new Attribute.BooleanAttribute("isStatic").optional
 
     override def parser: Parser[SiteHtml] = for
       url: Option[String] <- urlAttribute()
@@ -49,8 +42,6 @@ object SiteHtml extends Element[SiteHtml]("html"):
       title: Option[Title.Value] <- Title.element.optional()
       social: Option[SiteSocial] <- SiteSocial.optional()
       footer: Option[Footer.Value] <- Footer.element.optional()
-      highlighter: Option[SiteHighlighter] <- SiteHighlighter.optional()
-      math: Option[MathConfiguration] <- MathConfiguration.optional()
     yield SiteHtml(
       url,
       favicon,
@@ -58,9 +49,7 @@ object SiteHtml extends Element[SiteHtml]("html"):
       email,
       title,
       social,
-      footer,
-      highlighter,
-      math
+      footer
     )
 
     override def unparser: Unparser[SiteHtml] = Unparser.concat[SiteHtml](
@@ -70,7 +59,5 @@ object SiteHtml extends Element[SiteHtml]("html"):
       emailAttribute(_.email),
       Title.element.optional(_.title),
       SiteSocial.optional(_.social),
-      Footer.element.optional(_.footer),
-      SiteHighlighter.optional(_.highlighter),
-      MathConfiguration.optional(_.math)
+      Footer.element.optional(_.footer)
     )

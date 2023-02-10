@@ -3,7 +3,6 @@ package org.opentorah.calendar.service
 import org.opentorah.calendar.{Calendar, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, NewYear, Season, Shemittah, SpecialDay, Sun, YearType}
 import org.opentorah.calendar.roman.Gregorian
-import org.opentorah.html.A
 import org.opentorah.metadata.{Language, Named, Numbered}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
@@ -11,7 +10,7 @@ import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.util.Collections
-import org.opentorah.xml.{PrettyPrinter, ScalaXml}
+import org.opentorah.xml.{A, PrettyPrinter, ScalaXml}
 import Renderer.Location
 
 // TODO there was supposed to be a way to avoid passing context parameters everywhere...

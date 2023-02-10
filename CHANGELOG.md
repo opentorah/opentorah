@@ -7,14 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.10.8] - 2023-
-build: dogfooding ScalaJS plugin for running tests
-build: switching papers to asciidoc
-build: remove DocBooks processing for docs
-build: removed mdoc from `docs`
-build: removed SASS from `docs`
-site: remove DocBook processing from Site/SiteService
-docbook: moved docbook, fop and pdf packages and part of the math package from the core module into the docbook module
-site: moved site and tei packages from the core module into the collector module
+- build: dogfooding ScalaJS plugin for running tests
+- build: switched papers to AsciiDoc
+- build: removed DocBooks processing from `docs`
+- build: removed mdoc from `docs`
+- build: removed SASS from `docs`
+- site: removed DocBook processing, math and highlighter support
+- site: moved site and tei packages from the core module into the collector module
+- docbook: removed ToHtml and direct (non-XSLT) processing functionality
+- docbook: moved docbook, fop, math and pdf packages from the core module into the docbook module
+- html: moved Html and A into the xml package, and the rest of the package into the collector module
 
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default

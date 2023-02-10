@@ -1,13 +1,11 @@
 package org.opentorah.site
 
-import org.opentorah.build.BuildContext
-import org.opentorah.html.Html
-import org.opentorah.math.MathConfiguration
+import org.opentorah.html.HtmlTheme
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores, Viewer}
-import org.opentorah.tei.{Availability, Language, LangUsage, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
+import org.opentorah.tei.{Availability, LangUsage, Language, LinksResolver, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Doctype, Element, Parser, PrettyPrinter, ScalaXml, Xml}
+import org.opentorah.xml.{Caching, Doctype, Element, Html, Parser, PrettyPrinter, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
 import java.io.File
@@ -102,9 +100,8 @@ abstract class Site(
     storeNavigationLinks: Seq[ScalaXml.Element] <- store.navigationLinks(path, this)
     content: ScalaXml.Element <- resolveLinks(path)
   yield
-    val result: ScalaXml.Element = Html.toHtml(
+    val result: ScalaXml.Element = HtmlTheme.toHtml(
       siteHtml = common.getHtml,
-      math = common.getHtml.math.getOrElse(MathConfiguration.default),
       headTitle = store.htmlHeadTitle,
       cssFileName = store.style,
       viewer = store.viewer,
@@ -118,7 +115,7 @@ abstract class Site(
     store = path.last
     header: Option[ScalaXml.Element] <- store.header(path, this)
     content: ScalaXml.Element <- store.content(path, this)
-    fullContent: ScalaXml.Element = Html.fullContent(
+    fullContent: ScalaXml.Element = HtmlTheme.fullContent(
       store.wrapperCssClass,
       header,
       store.htmlBodyTitle,
