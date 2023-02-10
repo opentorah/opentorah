@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Doctype, Element, Html, Parser, PrettyPrinter, ScalaXml, Xml}
+import org.opentorah.xml.{Caching, Doctype, Element, From, Html, Parser, PrettyPrinter, Sax, ScalaXml, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
 import java.net.URL
@@ -23,7 +23,7 @@ abstract class Site(
 
   final val caching: Caching.Simple = new Caching.Simple
 
-  final protected def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
+  final def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
 
   final private val staticPaths: Set[String] =
     Set("assets", "css", "js", "sass", "robots.txt") ++ common.getHtml.favicon.toSet
@@ -201,7 +201,7 @@ abstract class Site(
   private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype], xml: Xml): Unit =
     for url <- urls do Files.write(
       file = Files.url2file(url),
-      content = prettyPrinter.renderWithHeader(xml, doctype)(xml.loadFromUrl(url))
+      content = prettyPrinter.renderWithHeader(xml, doctype)(Effects.unsafeRun(From.url(url, xml).load.map(_.asInstanceOf[xml.Element])))
     )
 
   protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)

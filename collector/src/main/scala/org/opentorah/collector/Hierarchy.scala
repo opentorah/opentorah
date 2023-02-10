@@ -36,7 +36,7 @@ object Hierarchy extends Element[Hierarchy]("store"):
       title: Title.Value <- Hierarchical.titleElement()
       description: Option[Abstract.Value] <- Hierarchical.descriptionElement()
       body: Option[Body.Value] <- Hierarchical.bodyElement()
-      by: ByHierarchy <- ByHierarchy.followRedirects.required()
+      by: ByHierarchy <- ByHierarchy.required()
     yield Hierarchy(
       fromUrl,
       names,

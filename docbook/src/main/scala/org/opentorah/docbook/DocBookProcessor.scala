@@ -4,7 +4,7 @@ import org.opentorah.build.{BuildContext, Distribution}
 import org.opentorah.fop.FopFonts
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Files
-import org.opentorah.xml.{Catalog, Dom, Resolver, ScalaXml, Xsl}
+import org.opentorah.xml.{Catalog, Dom, Resolver, Sax, ScalaXml, Xsl}
 import java.io.File
 
 // TODO combine epubEmbeddedFonts, xslt1version and xslt2version?
@@ -42,7 +42,7 @@ final class DocBookProcessor(
         into = layout.documentTmp(document.name),
         xsltConfiguration = None
       )
-      val dom: Dom.Element = Dom.loadFromUrl(Files.file2url(file), resolver = Some(resolver))
+      val dom: Dom.Element = Dom.load(Sax.file2inputSource(file), resolver = Some(resolver))
       val bases: Seq[String] = Dom.allBases(dom).filterNot(_.contains(":"))
       val includes: Seq[File] = for base: String <- bases yield File(file.getParentFile, base)
       file +: includes

@@ -106,7 +106,6 @@ dependencyResolutionManagement {
     library('zmanim', 'com.kosherjava:zmanim:2.4.0')
 
     // Testing
-    library('podvalRun' , 'org.podval.tools:org.podval.tools.run:0.1.4')
     library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.15")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
 

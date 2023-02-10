@@ -2,6 +2,7 @@ package org.opentorah.xml
 
 import org.slf4j.Logger
 import org.xml.sax.{InputSource, XMLFilter}
+import java.net.URL
 
 // TODO my Dom doesn't parse comments!!!
 // Note: declareNamespace() and setAttribute[s]() modify in-place.
@@ -12,10 +13,11 @@ object Dom extends Xml:
   override type Text = org.w3c.dom.Text
   override type Comment = org.w3c.dom.Comment
 
-  override protected def loadFromInputSource(
+  override def load(
     inputSource: InputSource,
     filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
+    resolver: Option[Resolver],
+    processIncludes: Xerces.ProcessIncludes = Xerces.ProcessIncludes.No
   ): Element =
     val result: javax.xml.transform.dom.DOMResult = new javax.xml.transform.dom.DOMResult
 
@@ -29,12 +31,6 @@ object Dom extends Xml:
     )
 
     result.getNode.asInstanceOf[org.w3c.dom.Document].getDocumentElement
-
-  override protected def loadNodesFromInputSource(
-    inputSource: InputSource,
-    filters: Seq[XMLFilter],
-    resolver: Option[Resolver]
-  ): Nodes = ???
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]
   override def asText(node: Node): Text =    node.asInstanceOf[Text]
@@ -136,3 +132,5 @@ object Dom extends Xml:
 
   // TODO implement!
   override protected def descendants(nodes: Nodes, elementName: String): Nodes = ???
+
+  override def parentBase: Parser[Option[URL]] = Parsing.currentBaseUrl

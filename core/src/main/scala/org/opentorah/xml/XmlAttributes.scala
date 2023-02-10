@@ -27,6 +27,10 @@ trait XmlAttributes:
 
   def setAttributes(attributes: Attribute.Values, element: Element): Element
 
+  final def removeAttribute(attribute: Attribute[_], element: Element): Element =
+    val attributes: Attribute.StringValues = getAttributes(element)
+    setAttributes(attributes.filterNot(_.attribute.name == attribute.name), element)
+
   // TODO rework addAttribute[s]:
   
   final def addAttribute(attribute: Attribute.Value[_], element: Element): Element =

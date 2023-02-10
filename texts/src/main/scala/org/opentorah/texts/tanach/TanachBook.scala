@@ -32,7 +32,7 @@ private[tanach] object TanachBook:
   private lazy val book2parsed: Map[TanachBook, Parsed] = Parser.unsafeRun(
     HasName.load(
       from = From.resource(Tanach),
-      content = Parsed.followRedirects
+      content = Parsed
     ).flatMap(HasName.bind[TanachBook, Parsed](
       keys = valuesSeq,
       _,

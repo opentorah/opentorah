@@ -294,8 +294,8 @@ object Collector extends SiteService[Collector]:
       entities: Entities <- Entities.required()
       entityLists: EntityLists <- EntityLists.required()
       notes: Notes <- Notes.required()
-      // TODO do not follow redirects; instead, cache the parsed store from a stub that has the URL?
-      by: ByHierarchy <- ByHierarchy.followRedirects.required()
+      // TODO do not follow the includes; instead, cache the parsed store from a stub that has the URL?
+      by: ByHierarchy <- ByHierarchy.required()
       aliases: Seq[Alias] <- Alias.seq()
     yield Collector(
       fromUrl,
