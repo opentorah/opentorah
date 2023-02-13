@@ -1,8 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.site.Markdown
-import org.opentorah.store.{By, Context, Directory, Path, Viewer}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.store.{By, Context, Directory, Path}
+import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.{UIO, ZIO}
 import java.net.URL
 
@@ -17,8 +17,7 @@ final class Notes(
     Note,
     Notes.All(_),
   ),
-  By.WithSelector[Note](selectorName),
-  Viewer.Default:
+  By.WithSelector[Note](selectorName):
 
   override protected def loadFile(url: URL): UIO[Markdown] = ZIO.succeed(Markdown(url))
 
@@ -27,14 +26,11 @@ final class Notes(
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
     notes: Seq[Note] <- stores
-    pathShortener: Path.Shortener <- context.pathShortener
-  yield
-    <div>{
-      for note <- notes.sortBy(_.title) yield
-        <l>{
-          a(path :+ note, pathShortener)(text = note.title.getOrElse("NO TITLE"))
-        }</l>
-    }</div>
+    lines: Seq[ScalaXml.Element] <- ZIO.foreach(notes.sortBy(_.title))((note: Note) =>
+      for a: A <- context.a(path :+ note) yield
+        <l>{a(text = note.title.getOrElse("NO TITLE"))}</l>
+    )
+  yield <div>{lines}</div>
 
 object Notes extends Element[Notes]("notes"):
 

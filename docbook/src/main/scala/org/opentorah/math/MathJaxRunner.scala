@@ -1,14 +1,18 @@
 package org.opentorah.math
 
 import org.opentorah.fop.Svg
+import org.opentorah.node.Node
 import org.opentorah.xml.Dom
 import org.slf4j.{Logger, LoggerFactory}
 import org.w3c.dom.{Document, Element}
 import org.w3c.dom.svg.SVGDocument
 
-abstract class MathJaxRunner:
+final class MathJaxRunner(
+   node: Node,
+   math: MathConfiguration
+):
 
-  final def typeset(mathMLDocument: Document): SVGDocument =
+  def typeset(mathMLDocument: Document): SVGDocument =
     val element: Element = mathMLDocument.getDocumentElement
 
     val fontSize: Float = Sizes.fontSizeAttribute.required.get(Dom)(element)
@@ -20,11 +24,14 @@ abstract class MathJaxRunner:
       then MathML.prettyPrinter.render(Dom)(element)
       else DocBookMathFilter.unwrap(element)
 
-    val svgRaw: String = typeset(
-      mathString = mathString,
-      input = Input(inputType, display),
-      fontSize = fontSize
-    )
+    val svgRaw: String = node.evaluate(
+      useEsm = MathJax(math).useEsm,
+      script = MathJax(math).nodeScript(
+        math,
+        mathString,
+        input = Input(inputType, display),
+        fontSize
+      ))
 
     // Note: chop off parasitic output from NodeJS: 'undefined', Promise<pending> -
     // I guess this is the overall result of the script?
@@ -42,12 +49,6 @@ abstract class MathJaxRunner:
     Sizes.fontSizeAttribute.required.withValue(fontSize).set(Dom)(result.getDocumentElement)
 
     result
-
-  protected def typeset(
-    mathString: String,
-    input: Input,
-    fontSize: Float
-  ): String
 
 object MathJaxRunner:
 

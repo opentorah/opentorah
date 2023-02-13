@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Tei
-import org.opentorah.store.{By, Context, Path, Pure, Viewer}
+import org.opentorah.store.{By, Context, Path, Pure}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class EntityLists(
@@ -11,13 +11,12 @@ final class EntityLists(
   val lists: Seq[EntityList]
 ) extends
   By.WithSelector[EntityList](selectorName),
-  Pure[EntityList],
-  Viewer.Apparatus:
+  Pure[EntityList]:
   
   def setUp(collector: Collector): Caching.Parser[Unit] = for
     entities: Seq[Entity] <- collector.entities.stores
   yield
-    for list <- lists do list.setEntities(
+    for list: EntityList <- lists do list.setEntities(
       entities.filter(entity =>
         (entity.entityType == list.entityType) &&
         (entity.role       == list.role      )
@@ -31,24 +30,35 @@ final class EntityLists(
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
     val nonEmptyLists: Seq[EntityList] = lists.filter(_.getEntities.nonEmpty)
-    for pathShortener: Path.Shortener <- context.pathShortener yield
-    <div>
-      <p>{for list <- nonEmptyLists yield
-        // TODO why is it path and entityListPath(list)?
-        <l>
-          {a(path, pathShortener).setFragment(list.names.name)(xml = list.title)}
-          {a(context.path(list), pathShortener)(EntityLists.expand)}
-        </l>
-      }</p>
-      {for list <- nonEmptyLists yield
-      <list id={list.names.name}>
-        <head xmlns={Tei.namespace.uri}>
-          {list.title.content.scalaXml}
-          {a(context.path(list), pathShortener)(EntityLists.expand)}
-        </head>
-        {for entity <- list.getEntities yield entity.line(context, pathShortener)}
-      </list>
-    }</div>
+    for
+      tocA: A <- context.a(path)
+      toc: Seq[ScalaXml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+        for contentA: A <- context.a(list) yield
+          <l>
+            {tocA.setFragment(list.names.name)(xml = list.title)}
+            {contentA(EntityLists.expand)}
+          </l>
+      )
+      content: Seq[ScalaXml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+        for
+          a: A <- context.a(list)
+          lines: Seq[ScalaXml.Element] <- ZIO.foreach(list.getEntities)((entity: Entity) =>
+            entity.line(context)
+          )
+        yield
+          <list id={list.names.name}>
+            <head xmlns={Tei.namespace.uri}>
+              {list.title.content.scalaXml}
+              {a(EntityLists.expand)}
+            </head>
+            {lines}
+          </list>
+      )
+    yield
+      <div>
+        <p>{toc}</p>
+        {content}
+      </div>
 
 
 object EntityLists extends Element[EntityLists]("entityLists"):

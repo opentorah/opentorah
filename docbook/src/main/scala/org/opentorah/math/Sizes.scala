@@ -15,7 +15,7 @@ final class Sizes private(
   minX: Float,           // in milli-ems
   minY: Float            // in milli-ems
 ):
-  def depth: Float = height + minY
+  private def depth: Float = height + minY
 
   override def toString: String =
     s"Sizes(fontSize = $fontSize; minX=$minX; width=$width; minY=$minY; height=$height; depth=$depth)"

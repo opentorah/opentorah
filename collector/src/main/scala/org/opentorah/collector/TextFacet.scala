@@ -1,20 +1,18 @@
 package org.opentorah.collector
 
 import org.opentorah.site.TeiToHtml
-import org.opentorah.store.{Context, Path, Viewer}
+import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{Caching, ScalaXml}
+import org.opentorah.xml.{A, Caching, ScalaXml}
+import zio.ZIO
 
 final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends
-  Facet(document, collectionFacet),
-  Viewer.Text derives CanEqual:
+  Facet(document, collectionFacet) derives CanEqual:
 
   override def equals(other: Any): Boolean =
     val that: TextFacet = other.asInstanceOf[TextFacet]
     (this.collection == that.collection) && (this.document == that.document)
-
-  override def wrapperCssClass: String = "textWrapper"
-
+  
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
     tei: Tei <- getTei
   yield
@@ -26,9 +24,12 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
     collectionPath: Path,
     context: Context
   ): Caching.Parser[Seq[ScalaXml.Element]] = for
-    translations <- collection.translations(document)
-    pathShortener: Path.Shortener <- context.pathShortener
+    translations: Seq[Document] <- collection.translations(document)
+    translationsToLink: Seq[Document] = if document.isTranslation then Seq.empty else translations
+    translationLinks: Seq[ScalaXml.Element] <- ZIO.foreach(translationsToLink)((translation: Document) =>
+      for textFacetA: A <- translation.textFacetLink(context, collectionPath)
+      yield textFacetA(s"[${translation.lang}]")
+    )
+    facsimileA: A <- document.facetLink(context, collectionPath, collection.facsimileFacet)
   yield
-    Seq(document.facetLink(collectionPath, collection.facsimileFacet, pathShortener)(text = TeiToHtml.facsimileSymbol)) ++
-    (for translation <- if document.isTranslation then Seq.empty else translations
-     yield translation.textFacetLink(collectionPath, pathShortener)(s"[${translation.lang}]"))
+    Seq(facsimileA(text = TeiToHtml.facsimileSymbol)) ++ translationLinks

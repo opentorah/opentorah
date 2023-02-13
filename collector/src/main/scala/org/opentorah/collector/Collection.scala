@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.store.{By, Context, Path, Selector, Store}
-import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 
 final class Collection(
@@ -23,11 +23,11 @@ final class Collection(
   body
 ) derives CanEqual:
 
+  override def toString: String = s"Collection $names $directory [${fromUrl.url}]"
+
   override def equals(other: Any): Boolean =
     val that: Collection = other.asInstanceOf[Collection]
     this.directory == that.directory
-
-  override def style: String = "wide"
 
   val documents: Documents = Documents(
     this,
@@ -61,7 +61,6 @@ final class Collection(
     textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(ZIO.some)) // TODO ZIO.someOrElseM?
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
-    pathShortener: Path.Shortener <- context.pathShortener
     directory: Documents.All <- documents.getDirectory
     columns: Seq[Collection.Column] = Seq(
       Collection.descriptionColumn,
@@ -70,21 +69,27 @@ final class Collection(
       Collection.addresseeColumn,
 
       Collection.Column("Язык", "language", (document: Document) =>
-        translations(document).map(documentTranslations =>
-          Seq(ScalaXml.mkText(document.lang)) ++ documentTranslations.flatMap(translation =>
-            Seq(ScalaXml.mkText(" "), translation.textFacetLink(path, pathShortener)(text = translation.lang))
+        for
+          documentTranslations: Seq[Document] <- translations(document)
+          translationLinks <- ZIO.foreach(documentTranslations)((translation: Document) =>
+            for textFacetA: A <- translation.textFacetLink(context, path)
+            yield Seq(ScalaXml.mkText(" "), textFacetA(text = translation.lang)))
+        yield
+          Seq(ScalaXml.mkText(document.lang)) ++ translationLinks.flatten
+      ),
+
+      Collection.Column("Документ", "document", (document: Document) =>
+        for textFacetA: A <- document.textFacetLink(context, path)
+        yield textFacetA(text = document.baseName)
+      ),
+
+      Collection.Column("Страницы", "pages", (document: Document) =>
+        for
+          nodes <- ZIO.foreach(document.pages(pageType))((page: Page) =>
+            page.reference(context, document, path)
           )
-        )
-      ),
-
-      Collection.PureColumn("Документ", "document", (document: Document) =>
-        document.textFacetLink(path, pathShortener)(text = document.baseName)
-      ),
-
-      Collection.PureColumn("Страницы", "pages", (document: Document) =>
-        ScalaXml.multi(separator = " ", nodes = for page: Page <- document.pages(pageType)
-          yield page.reference(document, path, pathShortener)
-        )
+        yield
+          ScalaXml.multi(separator = " ", nodes = nodes)
       ),
 
       Collection.transcribersColumn

@@ -24,3 +24,6 @@ trait MathJax:
     input: Input,
     fontSize: Float
   ): String
+
+object MathJax:
+  def apply(math: MathConfiguration): MathJax = if math.useMathJaxV3.contains(true) then MathJax3 else MathJax2

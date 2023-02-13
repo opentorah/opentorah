@@ -4,7 +4,7 @@ import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.roman.{Gregorian, Julian}
 import org.opentorah.metadata.Language
-import org.opentorah.tei.{Date, EntityName, EntityType, Pb}
+import org.opentorah.tei.{Date, EntityName, EntityType, Pb, Tei}
 import org.opentorah.util.Files
 import org.opentorah.xml.{A, Attribute, Element, Html, Namespace, ScalaXml, Xml}
 import zio.{URIO, ZIO}
@@ -195,9 +195,10 @@ object TeiToHtml:
       case e => throw IllegalArgumentException(s"Exception processing when=$when", e)
 
 
-  private def isInNamespace(element: ScalaXml.Element): Boolean = ScalaXml.getNamespace(element) == namespace.default
+  private def isInNamespace(element: ScalaXml.Element): Boolean =
+    ScalaXml.getNamespace(element) == Tei.namespace.default
 
-  private def addPrefix(name: String): String = s"${namespace.getPrefix.get}-$name"
+  private def addPrefix(name: String): String = s"${Html.namespace.getPrefix.get}-$name"
 
   def toHtml(element: ScalaXml.Element): URIO[LinksResolver, ScalaXml.Element] =
     for
@@ -304,49 +305,47 @@ object TeiToHtml:
   Also, HTML disallows tables within paragraphs, so to have a tooltip inside a TEI paragraph,
   it needs to not be an HTML <p> (and of course, namespace is ignored...)
   */
-  val reservedElements: Set[String] = Set("head", "body", "title", "div", "p")
+  private val reservedElements: Set[String] = Set("head", "body", "title", "div", "p")
 
-  val reservedAttributes: Set[String] = Set("class", "target", "lang", "frame")
-
-  private def namespace: Namespace = Html.namespace
+  private val reservedAttributes: Set[String] = Set("class", "target", "lang", "frame")
 
   private def tooltip(content: ScalaXml.Nodes): ScalaXml.Element =
-    <span xmlns={namespace.uri} class="tooltip">
+    <span xmlns={Html.namespace.uri} class="tooltip">
       {content}
     </span>
 
-  def addTooltip(content: ScalaXml.Nodes, element: ScalaXml.Element): ScalaXml.Element =
+  private def addTooltip(content: ScalaXml.Nodes, element: ScalaXml.Element): ScalaXml.Element =
     ScalaXml.prependChildren(element, tooltip(content))
 
   def footnote(contentId: String, srcId: String, symbol: String, content: ScalaXml.Nodes): ScalaXml.Element =
-    <span xmlns={namespace.uri} class="footnote" id={contentId}>
+    <span xmlns={Html.namespace.uri} class="footnote" id={contentId}>
       <a href={s"#$srcId"} class="footnote-backlink">
         {symbol}
       </a>{content}
     </span>
 
   def footnoteRef(contentId: String, srcId: String, symbol: String): ScalaXml.Element =
-    <a xmlns={namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>
+    <a xmlns={Html.namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>
       {symbol}
     </a>
 
-  def footnoteLevel(content: Seq[ScalaXml.Element], depth: Int): ScalaXml.Nodes =
+  private def footnoteLevel(content: Seq[ScalaXml.Element], depth: Int): ScalaXml.Nodes =
       <hr class="footnotes-line"/> ++
-      <div xmlns={namespace.uri} class="footnotes">
+      <div xmlns={Html.namespace.uri} class="footnotes">
         {content}
       </div>
 
   def table(children: ScalaXml.Nodes): ScalaXml.Element =
-    <table xmlns={namespace.uri}>
+    <table xmlns={Html.namespace.uri}>
       {children}
     </table>
 
   def tr(children: ScalaXml.Nodes): ScalaXml.Element =
-    <tr xmlns={namespace.uri}>
+    <tr xmlns={Html.namespace.uri}>
       {children}
     </tr>
 
   def td(colspan: Option[String], children: ScalaXml.Nodes): ScalaXml.Element =
-    <td xmlns={namespace.uri} colspan={colspan.orNull}>
+    <td xmlns={Html.namespace.uri} colspan={colspan.orNull}>
       {children}
     </td>

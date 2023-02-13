@@ -1,15 +1,17 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Pb
-import org.opentorah.store.Path
-import org.opentorah.xml.{Attribute, ScalaXml}
+import org.opentorah.store.{Context, Path}
+import org.opentorah.xml.{A, Attribute, Caching, ScalaXml}
+import zio.ZIO
 
 sealed abstract class Page(val pb: Pb):
   def base: String
   def displayName: String
 
-  def reference(document: Document, path: Path, pathShortener: Path.Shortener): ScalaXml.Element =
-    pb.addAttributes(document.textFacetLink(path, pathShortener).setFragment(Pb.pageId(pb.n))(text = displayName))
+  def reference(context: Context, document: Document, path: Path): Caching.Parser[ScalaXml.Element] =
+    for textFacetA: A <- document.textFacetLink(context, path)
+    yield pb.addAttributes(textFacetA.setFragment(Pb.pageId(pb.n))(text = displayName))
 
 object Page:
 

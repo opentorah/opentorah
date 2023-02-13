@@ -198,7 +198,12 @@ object ScalaXml extends Xml:
             case None => base
             case Some(current) =>
               val basePath: Seq[String] = Files.splitUrl(base)
-              (Files.splitUrl(current).takeWhile(_ != basePath.head) ++ basePath).mkString("/")
+              val missing: Seq[String] = Files.splitUrl(current)
+                .init // drop the xml file at the end
+                .takeWhile(_ != basePath.head)
+              if missing.isEmpty then base else
+//                println(s"current=$current; prepending missing to $base")
+                (missing ++ basePath).mkString("/")
           (Some(baseFixed), level + 1)
 
       val result: ScalaXml.Element = ScalaXml.setChildren(element,

@@ -3,6 +3,7 @@ package org.opentorah.store
 import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser}
 import java.net.URL
 
+// TODO site?
 final class WithSource[T](val source: String, val value: T)
 
 object WithSource:

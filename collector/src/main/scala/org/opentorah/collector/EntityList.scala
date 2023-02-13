@@ -1,7 +1,7 @@
 package org.opentorah.collector
 
 import org.opentorah.metadata.Names
-import org.opentorah.store.{Context, Path, Pure, Viewer}
+import org.opentorah.store.{Context, Path, Pure}
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
 import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
@@ -15,7 +15,6 @@ final class EntityList(
   val title: Title.Value,
 ) extends
   Pure[Entity],
-  Viewer.Apparatus,
   Element.FromUrl.With:
   private var entities: Seq[Entity] = Seq.empty
 
@@ -30,10 +29,10 @@ final class EntityList(
   override def htmlBodyTitle: Option[ScalaXml.Nodes] = Some(title.content.scalaXml)
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
-    for pathShortener: Path.Shortener <- context.pathShortener yield
-    <list>
-      {for entity <- getEntities yield entity.line(context, pathShortener)}
-    </list>
+    for lines: Seq[ScalaXml.Element] <- ZIO.foreach(getEntities)((entity: Entity) =>
+      entity.line(context)
+    )
+    yield <list>{lines}</list>
 
 object EntityList extends EntityRelated[EntityList](
   elementName = _.listElement,

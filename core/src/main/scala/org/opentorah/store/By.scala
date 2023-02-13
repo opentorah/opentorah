@@ -16,4 +16,4 @@ object By:
 
   val selectorParser: Parser[String] = selectorAttribute()
 
-  def selectorUnparser[T <: By[_]]: Unparser[T] = selectorAttribute(_.names.name)
+  def selectorUnparser[T <: By[?]]: Unparser[T] = selectorAttribute(_.names.name)

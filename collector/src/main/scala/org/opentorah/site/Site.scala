@@ -4,12 +4,11 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Doctype, Element, From, Html, Parser, PrettyPrinter, Sax, ScalaXml, Xml}
+import org.opentorah.xml.{A, Caching, Doctype, Element, From, Html, Parser, PrettyPrinter, Sax, ScalaXml, Xerces, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
 import java.net.URL
 
-// TODO add static site server/generator.
 // TODO consolidate all js, css etc. files in `asset` (singular)
 // TODO fix favicon to the default `favicon.ico` and convert the Alter Rebbe picture.
 abstract class Site(
@@ -82,8 +81,6 @@ abstract class Site(
       else ZIO.succeed(Site.PathAndExtension(path, extension))
     )
 
-  def pathShortener: Caching.Parser[Path.Shortener]
-
   private var initializeResolveDone: Boolean = false
 
   protected def initializeResolve: Caching.Parser[Unit] = Effects.ok
@@ -101,31 +98,34 @@ abstract class Site(
     val result: ScalaXml.Element = HtmlTheme.toHtml(
       siteHtml = common.getHtml,
       headTitle = store.htmlHeadTitle,
-      cssFileName = store.style,
-      viewer = store.viewer,
+      cssFileName = style(store),
+      viewer = viewer(store),
+      viewerDefault = viewerDefault,
       navigationLinks = siteNavigationLinks ++ storeNavigationLinks,
       content = content
     )
     Site.prettyPrinter.render(ScalaXml, doctype = Some(Html))(result)
 
+  def viewerDefault: String
+
+  def style(store: Store): String
+
+  def wrapperCssClass(store: Store): String
+
   final protected def resolveLinks(path: Path): Caching.Parser[ScalaXml.Element] = for
-    pathShortener: Path.Shortener <- pathShortener
-    store = path.last
+    store: Store <- ZIO.succeed(path.last)
     header: Option[ScalaXml.Element] <- store.header(path, this)
     content: ScalaXml.Element <- store.content(path, this)
     fullContent: ScalaXml.Element = HtmlTheme.fullContent(
-      store.wrapperCssClass,
+      wrapperCssClass(store),
       header,
       store.htmlBodyTitle,
       content
     )
-    result: ScalaXml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path, pathShortener)))
+    result: ScalaXml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path)))
   yield result
 
-  protected def linkResolver(
-    path: Path,
-    pathShortener: Path.Shortener
-  ): LinksResolver
+  protected def linkResolver(path: Path): LinksResolver
 
   final protected def renderTei(tei: Tei): String = Tei.prettyPrinter.renderWithHeader(ScalaXml)(
     Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
@@ -151,13 +151,13 @@ abstract class Site(
     )))
   )
 
-  private def getNavigationLinks: Caching.Parser[Seq[ScalaXml.Element]] = caching.getCached("navigationLibks",
-    ZIO.foreach(common.pages)(url => for
+  private def getNavigationLinks: Caching.Parser[Seq[ScalaXml.Element]] = caching.getCached("navigationLinks",
+    ZIO.foreach(common.pages)((url: String) => for
       pathOpt: Option[Path] <- resolveUrl(url)
       path: Path = pathOpt.get
-      pathShortener: Path.Shortener <- pathShortener
+      a: A <- a(path)
     yield
-      Path.a(path, pathShortener)(text = path.last.htmlHeadTitle.getOrElse("NO TITLE"))
+      a(text = path.last.htmlHeadTitle.getOrElse("NO TITLE"))
     )
   )
 
@@ -189,20 +189,20 @@ abstract class Site(
   private def prettyPrint: Caching.Parser[Unit] =
     logger.info("Pretty-printing site.")
 
-    val xml: Xml = ScalaXml
-
     for
       prettyPrintTei    : Seq[URL]  <- prettyPrintTei
       prettyPrintStores : Seq[URL]  <- prettyPrintStores
     yield
-      prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None, xml)
-      prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None, xml)
+      prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None)
+      prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None)
 
-  private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype], xml: Xml): Unit =
-    for url <- urls do Files.write(
-      file = Files.url2file(url),
-      content = prettyPrinter.renderWithHeader(xml, doctype)(Effects.unsafeRun(From.url(url, xml).load.map(_.asInstanceOf[xml.Element])))
-    )
+  private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype]): Unit =
+    for url <- urls do
+      val content: ScalaXml.Element = ScalaXml.load(Sax.url2inputSource(url), processIncludes = Xerces.ProcessIncludes.No)
+      Files.write(
+        file = Files.url2file(url),
+        content = prettyPrinter.renderWithHeader(ScalaXml, doctype)(content)
+      )
 
   protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 
@@ -228,6 +228,7 @@ object Site:
     val up  : String = "⇧"
     val text: String = "A"
 
+  //TODO move into Store!
   val storePrettyPrinter: PrettyPrinter = PrettyPrinter(
     nestElements = Set("p"), // TODO remnants of TEI?
     alwaysStackElements = Set("store", "by")

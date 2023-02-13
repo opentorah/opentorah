@@ -19,7 +19,7 @@ final class VariantProcessor(
 ):
   private def format: Format = variant.format
 
-  def distributionsNeeded: Set[Distribution[_]] = xslt.toSet ++ mathConfiguration.distributionsNeeded
+  def distributionsNeeded: Set[Distribution[?]] = xslt.toSet ++ Set(mathConfiguration.nodeDistribution)
 
   def process(
     context: BuildContext,
