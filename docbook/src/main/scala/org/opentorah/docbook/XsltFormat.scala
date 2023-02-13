@@ -3,7 +3,7 @@ package org.opentorah.docbook
 import org.opentorah.build.BuildContext
 import org.opentorah.files.Copy
 import org.opentorah.fop.{Fop, FopPlugin}
-import org.opentorah.math.{DocBookMathFilter, ExternalMathJaxRunner, MathConfiguration, MathJaxFopPlugin}
+import org.opentorah.math.{DocBookMathFilter, MathConfiguration, MathJax, MathJaxFopPlugin, MathJaxRunner}
 import org.opentorah.node.Node
 import org.opentorah.util.Files
 import org.opentorah.xml.{Resolver, Sax, Saxon, ScalaXml, Xsl}
@@ -129,8 +129,8 @@ trait XsltFormat extends Format, Section:
   ): Option[FopPlugin] = if !mathConfiguration.enableMathJax then None else
       // Make sure MathJax is installed
       val node: Node = mathConfiguration.nodeDistribution.getInstallation(context).get
-      for packageName <- mathConfiguration.mathJax.npmPackagesToInstall do node.npmInstall(packageName)
-      Some(MathJaxFopPlugin(ExternalMathJaxRunner(node, mathConfiguration)))
+      for packageName <- MathJax(mathConfiguration).npmPackagesToInstall do node.npmInstall(packageName)
+      Some(MathJaxFopPlugin(MathJaxRunner(node, mathConfiguration)))
 
   // xsl:param has the last value assigned to it, so customization must come last;
   // since it is imported (so as not to be overwritten), and import elements must come first,

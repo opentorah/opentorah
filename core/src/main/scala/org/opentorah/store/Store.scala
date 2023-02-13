@@ -1,9 +1,13 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Named
-import org.opentorah.xml.{A, Caching, ScalaXml}
+import org.opentorah.xml.{Caching, ScalaXml}
 import zio.ZIO
 
+/*
+  Not all `Stores` are read from XML - some are constructed -
+  so `Store` does *not* extend `FromUrl.With`.
+*/
 trait Store extends Named:
 
   final def getPaths(
@@ -21,21 +25,15 @@ trait Store extends Named:
         yield self ++ results.flatten
       case _ => ZIO.succeed(self)
 
+  // HTML content
+
   def htmlHeadTitle: Option[String] = None
 
   def navigationLinks(path: Path, context: Context): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed(Seq.empty)
-
-  def wrapperCssClass: String = null
 
   def header(path: Path, context: Context): Caching.Parser[Option[ScalaXml.Element]] = ZIO.none
 
   def htmlBodyTitle: Option[ScalaXml.Nodes] = None
 
   def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
-    throw IllegalAccessException(s"Called unimplemented Store.content($path, $context)  on $this")
-  
-  def style: String = "main"
-
-  def viewer: String = Viewer.default
-
-  final def a(path: Path, pathShortener: Path.Shortener): A = Path.a(path, pathShortener)
+    throw IllegalAccessException(s"Called unimplemented Store.content($path, $context) on $this")

@@ -1,7 +1,8 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{By, Context, Path, Pure}
-import org.opentorah.xml.{Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import zio.ZIO
 
 final class ByHierarchy(
   override val fromUrl: Element.FromUrl,
@@ -12,39 +13,48 @@ final class ByHierarchy(
   Pure[Hierarchical],
   Element.FromUrl.With:
 
+  override def toString: String = s"ByHierarchy $selectorName [${fromUrl.url}]"
+
   override def storesPure: Seq[Hierarchical] = hierarchyStores
 
   // TODO generate hierarchy root index and reference it from the summary.
   // TODO allow viewing tree indexes rooted in intermediate ByHierarchys.
 
-  def oneLevelIndex(path: Path, pathShortener: Path.Shortener): ScalaXml.Element =
-    <p>
-      <l>{Hierarchical.displayName(this)}:</l>
-      <ul>{
-        for hierarchical <- hierarchyStores yield
-          val hierarchicalPath: Path = path :+ hierarchical
-          <li>
-            {hierarchical.reference(hierarchicalPath, pathShortener)}
-          </li>
-      }</ul>
-    </p>
+  def oneLevelIndex(context: Context, path: Path): Caching.Parser[ScalaXml.Element] =
+    for
+      content <- ZIO.foreach(hierarchyStores)((hierarchical: Hierarchical) =>
+        val hierarchicalPath: Path = path :+ hierarchical
+        for reference <- hierarchical.reference(context, hierarchicalPath)
+        yield <li>{reference}</li>
+      )
+    yield
+      <p>
+        <l>{Hierarchical.displayName(this)}:</l>
+        <ul>{content}</ul>
+      </p>
 
-  def treeIndex(path: Path, context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
-    <div class="tree-index">
-      <ul>
-        <li><em>{Hierarchical.displayName(this)}</em></li>
-        <li>
-          <ul>{
-            for hierarchical <- hierarchyStores yield
-              val hierarchicalPath: Path = path :+ hierarchical
-              <li>
-                {hierarchical.reference(hierarchicalPath, pathShortener)}
-                {hierarchical.getBy.toSeq.map(by => by.treeIndex(hierarchicalPath :+ by, context, pathShortener))}
-              </li>
-          }</ul>
-        </li>
-      </ul>
-    </div>
+  def treeIndex(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+    for
+      content <- ZIO.foreach(hierarchyStores)((hierarchical: Hierarchical) =>
+        val hierarchicalPath: Path = path :+ hierarchical
+        for
+          reference: ScalaXml.Element <- hierarchical.reference(context, hierarchicalPath)
+          tree: Seq[ScalaXml.Element] <- ZIO.foreach(hierarchical.getBy.toSeq)((by: ByHierarchy) =>
+            by.treeIndex(hierarchicalPath :+ by, context)
+          )
+        yield
+          <li>
+            {reference}
+            {tree}
+          </li>
+      )
+    yield
+      <div class="tree-index">
+        <ul>
+          <li><em>{Hierarchical.displayName(this)}</em></li>
+          <li><ul>{content}</ul></li>
+        </ul>
+      </div>
 
 object ByHierarchy extends Element[ByHierarchy]("by"):
   override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy]:

@@ -76,12 +76,12 @@ final class DocBookProcessor(
     if outputDefault.isEmpty then logUnused("documents", documents.filter(_.output.isEmpty))
 
   def installDistibutions(): Unit =
-    for distribution: Distribution[_] <- distributionsNeeded do
+    for distribution: Distribution[?] <- distributionsNeeded do
       context.info(s"DocBook: checking dependency: $distribution")
-      val installationOpt: Option[_] = distribution.getInstallation(context)
+      val installationOpt: Option[?] = distribution.getInstallation(context)
       if installationOpt.isEmpty then context.warn(s"DocBook: can not install needed dependency: $distribution")
 
-  def distributionsNeeded: Set[Distribution[_]] = (
+  def distributionsNeeded: Set[Distribution[?]] = (
     for
       document: Document <- documents
       if inputFile(document).exists

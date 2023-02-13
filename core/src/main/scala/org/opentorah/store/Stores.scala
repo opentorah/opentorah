@@ -18,9 +18,6 @@ trait Stores[+T <: Store] extends Store:
   URL resolved by such a path can be reconstructed from it (in its canonical form);
   such a reconstructed URL should resolve to the same path (TODO add tests for this ;)).
 
-  Not all `Stores` are read from XML - some are constructed -
-  so `Store` does *not* extend `FromUrl.With`.
-
   Store.Path returned is nonEmpty ;)
  */
   final def resolve(path: String): Caching.Parser[Path] = resolve(Files.splitAndDecodeUrl(path))

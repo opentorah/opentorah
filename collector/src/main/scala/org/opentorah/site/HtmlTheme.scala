@@ -1,6 +1,5 @@
 package org.opentorah.site
 
-import org.opentorah.store.Viewer
 import org.opentorah.util.Json
 import org.opentorah.xml.{Attribute, Html, ScalaXml, XLink}
 
@@ -30,6 +29,7 @@ object HtmlTheme:
     headTitle: Option[String],
     cssFileName: String,
     viewer: String,
+    viewerDefault: String,
     navigationLinks: Seq[ScalaXml.Element], // normally, <a>s
     content: ScalaXml.Element
   ): ScalaXml.Element =
@@ -49,7 +49,7 @@ object HtmlTheme:
         <header class="site-header" role="banner">
           <div class="wrapper">
             {ScalaXml.optional(siteHtml.title)(title =>
-            <a class="site-title" rel="author" target={Viewer.default} href="/">
+            <a class="site-title" rel="author" target={viewerDefault} href="/">
               {title.content.scalaXml}
             </a>)}<nav class="site-nav">
             <input type="checkbox" id="nav-trigger" class="nav-trigger"/>

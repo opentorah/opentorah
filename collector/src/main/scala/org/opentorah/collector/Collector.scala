@@ -29,6 +29,24 @@ final class Collector(
     case entity: Entity => Seq(entities, entity)
     case entityList: EntityList => Seq(entityLists, entityList)
 
+  override def viewer(store: Store): String = store match
+    case _: Collection | _: Hierarchical | _: Hierarchy => viewerDefault
+    case _: TextFacet => "textViewer"
+    case _: FacsimileFacet => "facsimileViewer"
+    case _: Entities | _: EntityLists | _: EntityList | _: Entity | _: Reports.type => "apparatusViewer"
+    case _ => viewerDefault
+
+  override def viewerDefault: String = "hierarchyViewer"
+
+  override def style(store: Store): String = store match
+    case _: Collection => "wide"
+    case _ => "main"
+
+  override def wrapperCssClass(store: Store): String = store match
+    case _: TextFacet => "textWrapper"
+    case _: FacsimileFacet => "facsimileWrapper"
+    case _ => null
+
   private def findEntityByName[T](name: String, action: Option[Entity] => T): Caching.Parser[T] =
     entities.findByName(name).map(action)
 
@@ -100,10 +118,7 @@ final class Collector(
 
   override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
 
-  override protected def linkResolver(
-    path: Path,
-    pathShortener: Path.Shortener
-  ): LinksResolver =
+  override protected def linkResolver(path: Path): LinksResolver =
     val facsUrl: Option[Path] = path.last match
       case textFacet: TextFacet => Some(textFacet.document.facetPath(Collector.collectionPath(path), textFacet.collection.facsimileFacet))
       case _ => None
@@ -113,10 +128,17 @@ final class Collector(
         pathFinder: Caching.Parser[Option[Path]],
         error: => String,
         modifier: A => A = identity,
-      ): UIO[Option[A]] = toTask(pathFinder.map(pathOpt =>
-        if pathOpt.isEmpty then logger.warn(error)
-        pathOpt.map((path: Path) => modifier(Path.a(path, pathShortener)))
-      )).orDie
+      ): UIO[Option[A]] = toTask(
+        for
+          pathOpt: Option[Path] <- pathFinder
+          _ <- if pathOpt.isEmpty then ZIO.succeed(logger.warn(error)) else ZIO.unit
+          result: Option[A] <-
+            if pathOpt.isEmpty
+            then ZIO.none
+            else for a: A <- a(pathOpt.get) yield Some(modifier(a))
+        yield
+          result
+      ).orDie
 
       override def resolve(url: Seq[String]): UIO[Option[A]] = toUIO(
         pathFinder = Collector.this.resolveUrl(url),

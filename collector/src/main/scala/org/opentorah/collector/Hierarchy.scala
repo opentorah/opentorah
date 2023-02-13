@@ -20,13 +20,14 @@ final class Hierarchy(
   description,
   body
 ):
+  override def toString: String = s"Hierarchy $names [${fromUrl.url}]"
+
   override def storesPure: Seq[ByHierarchy] = Seq(by)
 
   override def getBy: Option[ByHierarchy] = Some(by)
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
-    pathShortener: Path.Shortener <- context.pathShortener
-  yield by.oneLevelIndex(path :+ by, pathShortener)
+  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+    by.oneLevelIndex(context, path :+ by)
 
 object Hierarchy extends Element[Hierarchy]("store"):
   override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy]:

@@ -8,20 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.8] - 2023-
 - build: dogfooding ScalaJS plugin for running tests
-- build: switched papers to AsciiDoc
-- build: removed DocBooks processing from `docs`
-- build: removed mdoc from `docs`
-- build: removed SASS from `docs`
-- site: removed DocBook processing, math and highlighter support
-- site: moved site and tei packages from the core module into the collector module
-- site: ToHtml became TeiToHtml
-- docbook: removed ToHtml and direct (non-XSLT) processing functionality and Playwright
-- docbook: moved docbook, fop, math and pdf packages from the core module into the docbook module
+- docs:
+  - switched papers to AsciiDoc
+  - removed DocBooks processing
+  - removed mdoc
+  - removed SASS
+- site:
+  - removed DocBook processing, math and highlighter support
+  - moved site and tei packages from the core module into the collector module
+  - ToHtml became TeiToHtml
+- docbook:
+  - removed ToHtml and direct (non-XSLT) processing functionality and Playwright
+  - moved docbook, fop, math and pdf packages from the core module into the docbook module
+  - cleanup
 - html: moved Html and A into the xml package, and merged the rest of the package into the site package in the collector module
-- xml: use XML includes instead of redirects
-- xml: worked around a terrible Xerces XInclude bug
-- xml: removed my home-grown redirect support
-- 
+- xml:
+  - use XML includes instead of redirects
+  - worked around a terrible Xerces XInclude bug
+  - removed my home-grown redirect support
+- store/site/collector: cleanup
+
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default
 - fix: escape backslashes in TeX strings

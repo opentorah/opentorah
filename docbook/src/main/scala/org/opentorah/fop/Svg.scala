@@ -6,6 +6,7 @@ import org.opentorah.xml.{Dialect, Namespace, PrettyPrinter, Xerces}
 import org.w3c.dom.svg.SVGDocument
 import java.io.{InputStream, StringBufferInputStream}
 
+// TODO move into math
 object Svg extends Dialect:
 
   override val namespace: Namespace = Namespace(uri = "http://www.w3.org/2000/svg", prefix = "svg")

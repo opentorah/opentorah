@@ -1,9 +1,9 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as TeiEntity}
-import org.opentorah.store.{Context, Directory, ListFile, Path, Store, Viewer, WithSource}
+import org.opentorah.store.{Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
 import zio.ZIO
 import java.net.URL
 
@@ -12,9 +12,7 @@ final class Entity(
   val role: Option[String],
   override val name: String,
   val mainName: String  // Note: can mostly be reconstructed from the name...
-) extends
-  Directory.Entry(name),
-  Viewer.Apparatus derives CanEqual:
+) extends Directory.Entry(name) derives CanEqual:
 
   override def equals(other: Any): Boolean =
     val that: Entity = other.asInstanceOf[Entity]
@@ -39,11 +37,12 @@ final class Entity(
   def getTei(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
 
   // TODO dissolve?
-  def line(context: Context, pathShortener: Path.Shortener): ScalaXml.Element =
-    <l>{reference(context, pathShortener)}</l>
+  def line(context: Context): Caching.Parser[ScalaXml.Element] =
+    for result <- reference(context) yield <l>{result}</l>
 
-  private def reference(context: Context, pathShortener: Path.Shortener) =
-    a(context.path(this), pathShortener)(mainName)
+  // TODO eliminate
+  private def reference(context: Context): Caching.Parser[ScalaXml.Element] =
+    for a: A <- context.a(this) yield a(mainName)
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
     val collector: Collector = Collector.get(context)
@@ -54,18 +53,20 @@ final class Entity(
       sources: Seq[Store] <- ZIO.foreach(references)((withSource: WithSource[EntityReference]) =>
         collector.resolveUrl(withSource.source).map(_.get.last))
       collectionPaths: Seq[Path] <- collector.collectionPaths
-      pathShortener: Path.Shortener <- context.pathShortener
-    yield
 
-      val fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
+      fromEntities: Seq[Entity] = Collections.removeConsecutiveDuplicatesWith(
         sources.filter(_.isInstanceOf[Entity]).map(_.asInstanceOf[Entity])
       )(_.id).sortBy(_.mainName)
 
-      val fromDocuments: Map[Collection, Seq[TextFacet]] = sources
+      fromEntitiesResult: Seq[ScalaXml.Element] <- ZIO.foreach(fromEntities)((fromEntity: Entity) =>
+        fromEntity.reference(context)
+      )
+
+      fromDocuments: Map[Collection, Seq[TextFacet]] = sources
         .filter(_.isInstanceOf[TextFacet]).map(_.asInstanceOf[TextFacet])
         .groupBy(_.collection)
 
-      val byCollection: Seq[(Collection, (Path, Seq[TextFacet]))] = for
+      byCollection: Seq[(Collection, (Path, Seq[TextFacet]))] = for
         path: Path <- collectionPaths
         collection: Collection = Path.last[Collection](path)
         textsOpt: Option[Seq[TextFacet]] = fromDocuments.get(collection)
@@ -73,22 +74,31 @@ final class Entity(
         texts: Seq[TextFacet] = Collections.removeConsecutiveDuplicatesWith(textsOpt.get)(_.document.name).sortBy(_.document.name)
       yield collection -> (path, texts)
 
+      fromCollectionsResult: Seq[ScalaXml.Element] <- ZIO.foreach(byCollection){
+        case (collection: Collection, (collectionPath: Path, texts: Seq[TextFacet])) =>
+          for pageLinks: Seq[ScalaXml.Node] <- ZIO.foreach(texts)(
+            (text: TextFacet) =>
+              for textFacetA: A <- text.document.textFacetLink(context, collectionPath)
+              yield textFacetA(text = text.document.baseName)
+            )
+          yield
+            <l>
+              {collection.pathHeaderHorizontal(collectionPath)}: {ScalaXml.multi(separator = " ", nodes = pageLinks)}
+            </l>
+      }
+
+    yield
+
       val mentions: ScalaXml.Element =
         <p class="mentions">
           {if fromEntities.isEmpty then Seq.empty else
           <l>
             <em>{collector.entityLists.selector.title.get}:</em>
-            {ScalaXml.multi(nodes = for fromEntity <- fromEntities yield fromEntity.reference(context, pathShortener))}
+            {ScalaXml.multi(nodes = fromEntitiesResult)}
           </l>
           }
-          {for (collection: Collection, (collectionPath: Path, texts: Seq[TextFacet])) <- byCollection yield
-            <l>{
-              collection.pathHeaderHorizontal(collectionPath)
-            }: {ScalaXml.multi(separator = " ", nodes =
-              for text: TextFacet <- texts yield
-                text.document.textFacetLink(collectionPath, pathShortener)(text = text.document.baseName))
-            }</l>
-          }</p>
+          {fromCollectionsResult}
+        </p>
 
       TeiEntity.xmlElement(entity.copy(content = ScalaXml.toNodes(entity.content.scalaXml :+ mentions)))
 

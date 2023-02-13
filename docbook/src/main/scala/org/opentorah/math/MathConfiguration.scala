@@ -2,7 +2,7 @@ package org.opentorah.math
 
 import org.opentorah.build.Distribution
 import org.opentorah.node.NodeDistribution
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 // Note: yes, all the PDF-only fields look weird in the Site configuration;
 // they also look weird in the non-PDF formats - but I do not see a clean way to clean this up.
@@ -45,19 +45,13 @@ final class MathConfiguration(
 
   def enableMathJax: Boolean = mathJaxEnabled.contains(true) // TODO in HTML!
 
-  def mathJax: MathJax = if useMathJaxV3.contains(true) then MathJax3 else MathJax2
-
   def texConfiguration: Map[String, Matchable] = Map(
     "processEscapes" -> processEscapes.contains(true),
     "inlineMath"     -> Delimiters.json(texInlineDelimiters),
     "displayMath"    -> Delimiters.json(texDelimiters)
   )
-  
-  def body: ScalaXml.Nodes = mathJax.body(ScalaXml.mkText(mathJax.htmlConfigurationString(this)))
-  
-  def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
 
-  def distributionsNeeded: Set[Distribution[_]] = Set(nodeDistribution)
+  def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
 
 object MathConfiguration extends Element[MathConfiguration]("math"):
 

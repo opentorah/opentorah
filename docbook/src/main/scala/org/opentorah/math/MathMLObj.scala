@@ -6,7 +6,7 @@ import org.opentorah.xml.{Dom, Sax}
 import org.xml.sax.{Attributes, Locator}
 import java.awt.geom.Point2D
 
-final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.Obj(parent):
+final class MathMLObj(parent: FONode, mathJaxRunner: MathJaxRunner) extends MathMLObj.Obj(parent):
 
   private var fontSize: Option[Float] = None
 
@@ -45,13 +45,13 @@ final class MathMLObj(parent: FONode, mathJax: MathJaxRunner) extends MathMLObj.
   // in the MathJax namespace...
   //
   //   override def finalizeNode(): Unit = {
-  //     doc = mathJax.typeset(doc)
+  //     doc = mathJaxRunner.typeset(doc)
   //   }
 
   private var sizes: Option[Sizes] = None
 
   private def getSizes: Sizes = sizes.getOrElse {
-    val result = Sizes(mathJax.typeset(doc))
+    val result = Sizes(mathJaxRunner.typeset(doc))
     sizes = Some(result)
     result
   }

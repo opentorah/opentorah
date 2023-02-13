@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
 import org.opentorah.tei.Entity as TeiEntity
-import org.opentorah.store.{By, Context, Directory, Path, Store, Viewer}
+import org.opentorah.store.{By, Context, Directory, Path, Store}
 import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, ScalaXml, Unparser}
 import java.net.URL
+import zio.ZIO
 
 final class Entities(
   override val fromUrl: Element.FromUrl,
@@ -16,8 +17,7 @@ final class Entities(
     Entity,
     Entities.All(_)
   ),
-  By.WithSelector[Entity](selectorName),
-  Viewer.Apparatus:
+  By.WithSelector[Entity](selectorName):
 
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(From.url(url))
 
@@ -26,11 +26,11 @@ final class Entities(
 
   override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
     allEntities: Seq[Entity] <- stores
-    pathShortener: Path.Shortener <- context.pathShortener
+    lines: Seq[ScalaXml.Element] <- ZIO.foreach(Entity.sort(allEntities))((entity: Entity) =>
+      entity.line(context)
+    )
   yield
-    <list>
-      {for entity: Entity <- Entity.sort(allEntities) yield entity.line(context, pathShortener)}
-    </list>
+    <list>{lines}</list>
 
 object Entities extends Element[Entities]("entities"):
 

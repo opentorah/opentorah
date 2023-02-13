@@ -4,7 +4,8 @@ import org.opentorah.metadata.Names
 import org.opentorah.site.Site
 import org.opentorah.store.{Context, Path, Terminal}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{Caching, ScalaXml}
+import org.opentorah.xml.{A, Caching, ScalaXml}
+import zio.ZIO
 
 abstract class Facet(val document: Document, val collectionFacet: CollectionFacet) extends Terminal:
   // TODO titles: .orElse(document.tei.titleStmt.titles.headOption.map(_.xml))
@@ -19,11 +20,11 @@ abstract class Facet(val document: Document, val collectionFacet: CollectionFace
   final override def header(path: Path, context: Context): Caching.Parser[Option[ScalaXml.Element]] =
     val collectionPath: Path = Collector.collectionPath(path)
     for
-      header <- collection.documentHeader(document)
-      pathShortener: Path.Shortener <- context.pathShortener
+      pathHeader: Seq[ScalaXml.Element] <- collection.pathHeaderVertical(context, collectionPath)
+      header: ScalaXml.Element <- collection.documentHeader(document)
     yield Some(
       <div class="store-header">
-        {collection.pathHeaderVertical(collectionPath, pathShortener)}
+        {pathHeader}
         <l>
           {Hierarchical.displayName(collectionFacet)}
           {Hierarchical.displayName(this)}
@@ -37,15 +38,21 @@ abstract class Facet(val document: Document, val collectionFacet: CollectionFace
     context: Context
   ): Caching.Parser[Seq[ScalaXml.Element]] = for
     siblings: (Option[Document], Option[Document]) <- collection.siblings(document)
+    (prev: Option[Document], next: Option[Document]) = siblings
     collectionPath: Path = Collector.collectionPath(path)
+    prevSeq: Seq[ScalaXml.Element] <- ZIO.foreach(prev.toSeq)((prev: Document) =>
+      for a: A <- prev.facetLink(context, collectionPath, collectionFacet) yield a(Site.Navigation.prev)
+    )
+    nextSeq: Seq[ScalaXml.Element] <- ZIO.foreach(prev.toSeq)((next: Document) =>
+      for a: A <- next.facetLink(context, collectionPath, collectionFacet) yield a(Site.Navigation.next)
+    )
+    upA: A <- context.a(collectionPath)
+    upSeq: Seq[ScalaXml.Element] = Seq(upA(Site.Navigation.up))
     moreLinks: Seq[ScalaXml.Element] <- moreNavigationLinks(collectionPath, context)
-    pathShortener: Path.Shortener <- context.pathShortener
   yield
-    val (prev: Option[Document], next: Option[Document]) = siblings
-
-    prev.toSeq.map(_.facetLink(collectionPath, collectionFacet, pathShortener)(Site.Navigation.prev)) ++
-    Seq(                     a(collectionPath                 , pathShortener)(Site.Navigation.up  )) ++
-    next.toSeq.map(_.facetLink(collectionPath, collectionFacet, pathShortener)(Site.Navigation.next)) ++
+    prevSeq ++
+    upSeq ++
+    nextSeq ++
     moreLinks
 
   protected def moreNavigationLinks(

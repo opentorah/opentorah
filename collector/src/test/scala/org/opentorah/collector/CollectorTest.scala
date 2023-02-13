@@ -2,8 +2,8 @@ package org.opentorah.collector
 
 import org.opentorah.site.Site
 import org.opentorah.store.{Path, Store}
-import org.opentorah.util.Effects
-import org.opentorah.xml.{Caching, Element}
+import org.opentorah.util.{Effects, Files}
+import org.opentorah.xml.{Caching, Element, From, ScalaXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.io.File
@@ -18,7 +18,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
   collector.caching.logEnabled = false
 
   "Collector smoke tests" should "work" in {
-//    val site: ScalaXml.Element = Effects.unsafeRun(From.file(File(localStorePath + "site.xml"), ScalaXml).load).asInstanceOf[ScalaXml.Element]
+//    val site: ScalaXml.Element = Effects.unsafeRun(From.url(Files.file2url(File(localStorePath + "site.xml")), ScalaXml).load).asInstanceOf[ScalaXml.Element]
 //    println(site)
 
     def getResponse(pathString: String): Either[Throwable, Site.Response] =
@@ -26,8 +26,9 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
     def getContent(pathString: String): String = getResponse(pathString).getOrElse(fail()).content
     def getError(pathString: String): String = getResponse(pathString).left.getOrElse(fail()).getMessage
 
-    def getStoreUrl(pathString: String): String = Effects.unsafeRun(collector.toTask(collector.resolveUrl(pathString)))
-      .get.last.asInstanceOf[Element.FromUrl.With].fromUrl.url.toString
+    def getStoreUrl(pathString: String): String =
+      val path: Path = Effects.unsafeRun(collector.toTask(collector.resolveUrl(pathString))).get
+      path.last.asInstanceOf[Element.FromUrl.With].fromUrl.url.toString
 
     getStoreUrl("/rgada") should endWith("archive/rgada/category/VII/inventory/2/case/3140.xml")
     getStoreUrl("/archive/rgada/") should endWith("/archive/rgada.xml")
@@ -50,7 +51,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
     getContent("/dubnov") should include("Вмешательство")
     getContent("/dubnov/index") should include("Вмешательство")
     getContent("/dubnov/index.html") should include("Вмешательство")
-    getContent("/rgada") should include("Ф.З. Швайгер; новые - Елена")
+    getContent("/rgada") should include("Швайгер; новые - Елена")
     getContent("/rgada/029") should include("о сѣктѣ каролиновъ")
     getError  ("/rgada/029/index") should include("get an index")
     getContent("/rgada/029.html") should include("о сѣктѣ каролиновъ")
