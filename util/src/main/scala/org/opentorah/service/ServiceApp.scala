@@ -188,6 +188,7 @@ object ServiceApp:
     yield result
 
   private val name2contentType: Map[String, String] = Map(
+    "css"  -> "text/css",               // Note: without this, browser does not apply stylesheets (since recently)
     "js"   -> "application/javascript", // Note: without this, browser does not process scripts
     "svg"  -> "image/svg+xml",          // Note: without this, browser does not process SVG
     "jpg"  -> "image/jpeg",
