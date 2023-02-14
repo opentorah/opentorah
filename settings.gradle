@@ -23,12 +23,9 @@ pluginManagement {
 final String scalaVersion      = '3.2.2'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.6'
-final String zioPreludeVersion = '1.0.0-RC13'
-
+final String zioVersion        = '2.0.8'
 final String flexmarkVersion   = '0.64.0'
 final String batikVersion      = '1.16'
-
 final String catsVersion       = '2.9.0'
 
 dependencyResolutionManagement {
@@ -50,22 +47,21 @@ dependencyResolutionManagement {
     library('zinc'         , 'org.scala-sbt:zinc_2.13:1.8.0')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:4.6.4')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.0.0')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
     library('saxon11'      , 'net.sf.saxon:Saxon-HE:12.0')
-    library('saxon6'       , 'saxon:saxon:6.5.3') // Note: 6.5.3 is the latest, but - no sources for debugging, so 6.5.2...
+    library('saxon6'       , 'saxon:saxon:6.5.3')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.17.2')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.18.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-prelude'  , "dev.zio:zio-prelude_$scalaVersionMajor:$zioPreludeVersion")
     library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:0.0.3") // TODO 0.0.4
 
     // Algebra
@@ -81,7 +77,7 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.2')
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.3')
 
     // FOP
     library('fop-core'        , 'org.apache.xmlgraphics:fop:2.8')

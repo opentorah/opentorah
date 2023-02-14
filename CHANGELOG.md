@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - worked around a terrible Xerces XInclude bug
   - removed my home-grown redirect support
 - store/site/collector: cleanup
+- dependency updates
 
 ## [0.10.7] - 2023-01-28
 - fix: set the fontSize attribute even if its value is the default
