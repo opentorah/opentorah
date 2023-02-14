@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.8] - 2023-
+## [0.10.8] - 2023-02-14
 - build: dogfooding ScalaJS plugin for running tests
 - docs:
   - switched papers to AsciiDoc

@@ -33,9 +33,9 @@ final class GradleBuildContext(project: Project) extends BuildContext:
       project.getRepositories.ivy((newRepository: IvyArtifactRepository) =>
         newRepository.setUrl(repository.get.url)
           newRepository.patternLayout((repositoryLayout: IvyPatternRepositoryLayout) =>
-          repositoryLayout.artifact(repository.get.artifactPattern)
-          repositoryLayout.ivy(repository.get.ivy)
-        )
+            repositoryLayout.artifact(repository.get.artifactPattern)
+            repositoryLayout.ivy(repository.get.ivy)
+          )
 
         // Gradle 6.0 broke NodeJS retrieval;
         // from https://github.com/gradle/gradle/issues/11006 and code referenced there
