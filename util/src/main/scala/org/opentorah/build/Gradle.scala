@@ -2,6 +2,7 @@ package org.opentorah.build
 
 import org.gradle.api.{Project, Task}
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.logging.{Logger, LogLevel}
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{SourceSet, TaskProvider}
@@ -14,6 +15,17 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object Gradle:
+  def getLogLevelEnabled(logger: Logger): LogLevel = levels.find(logger.isEnabled).get
+
+  private val levels: Seq[LogLevel] = Seq(
+    LogLevel.DEBUG,
+    LogLevel.INFO,
+    LogLevel.LIFECYCLE,
+    LogLevel.WARN,
+    LogLevel.QUIET,
+    LogLevel.ERROR
+  )
+
   extension(project: Project)
     def findExtension[T](clazz: Class[T]): Option[T] =
       Option(project.getExtensions.findByType(clazz))
