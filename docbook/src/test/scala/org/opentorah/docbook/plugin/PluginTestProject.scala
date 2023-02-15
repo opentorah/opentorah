@@ -105,7 +105,17 @@ object PluginTestProject:
     isMathJaxEnabled: Boolean = false,
     useMathJaxV3: Boolean = false
   ): PluginTestProject =
-    val root: File = File(".").getAbsoluteFile.getParentFile
+    // .../opentorah.org/docbook/build/resources/test/org/opentorah/docbook/plugin/anchor.txt
+    val root: File = Files.url2file(getClass.getResource("anchor.txt"))
+      .getParentFile
+      .getParentFile
+      .getParentFile
+      .getParentFile
+      .getParentFile
+      .getParentFile
+      .getParentFile
+      .getParentFile
+
     val result: PluginTestProject = new PluginTestProject(
       projectDir = Files.file(root, "build", prefix, name),
       pluginRootDir = root.getParentFile,

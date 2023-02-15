@@ -89,5 +89,5 @@ final class TanachTest extends TestBase(Tanach):
       include = _.isInstanceOf[TanachBook],
       stop = _.isInstanceOf[TanachBook]
     ))
-    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
+//    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
   }

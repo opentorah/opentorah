@@ -6,7 +6,7 @@ import org.opentorah.xml.{Caching, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class TestBase(underTest: Stores[?]) extends AnyFlatSpec, Matchers:
+abstract class TestBase(underTest: Stores[?]) extends AnyFlatSpec, Matchers:
   val caching: Caching.Simple = new Caching.Simple
   caching.logEnabled = false
 

@@ -28,7 +28,6 @@ java {
 
 tasks.withType(ScalaCompile).configureEach {
   scalaCompileOptions.with {
-    targetCompatibility = '' // TODO remove when https://youtrack.jetbrains.com/issue/SCL-18813 is fixed
     additionalParameters = [
       '-new-syntax',
       '-feature',

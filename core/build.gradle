@@ -1,8 +1,7 @@
 plugins {
   id 'java-library'
   id 'scala'
-//  id 'org.podval.tools.scalajs'
-  id 'com.github.maiflai.scalatest'
+  id 'org.podval.tools.scalajs'
   id 'maven-publish'
   id 'signing'
 }
