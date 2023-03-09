@@ -83,7 +83,7 @@ final class GoogleCloudStorageSynchronizer(
       .filter((_   , file) => !file.isDirectory)
       .filter((blob, file) => file.lastModified() > blob.getUpdateTimeOffsetDateTime.toInstant.toEpochMilli)
       .filter((blob, file) => blob.getCrc32cToHexString !=
-        Strings.bytes2hex(Hashing.crc32c.hashBytes(Files.readFile(file)).asBytes.toIndexedSeq.reverse)
+        Strings.bytes2hex(Hashing.crc32c.hashBytes(Files.readBytes(file)).asBytes.toIndexedSeq.reverse)
       )
       .sortBy((blob, _   ) => blob.getName)
     log(s"Found ${toUpdate.length} blobs to update")
@@ -124,7 +124,7 @@ final class GoogleCloudStorageSynchronizer(
     val blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, blobName))
       .setContentType(contentType)
       .build()
-    val content: Array[Byte] = Files.readFile(file)
+    val content: Array[Byte] = Files.readBytes(file)
     val writer: WriteChannel = storage.writer(blobInfo)
     writer.write(ByteBuffer.wrap(content, 0, content.length))
     writer.close()

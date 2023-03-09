@@ -1,7 +1,7 @@
 package org.opentorah.math
 
-import org.opentorah.build.Distribution
-import org.opentorah.node.NodeDistribution
+import org.opentorah.build.{Dependency, InstallableDependency}
+import org.opentorah.node.{NodeDependency, NodeInstallation}
 import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
 
 // Note: yes, all the PDF-only fields look weird in the Site configuration;
@@ -51,7 +51,7 @@ final class MathConfiguration(
     "displayMath"    -> Delimiters.json(texDelimiters)
   )
 
-  def nodeDistribution: NodeDistribution = NodeDistribution(nodeVersion.get)
+  def nodeDistribution: InstallableDependency.WithVersion[NodeInstallation] = NodeDependency(nodeVersion.get)
 
 object MathConfiguration extends Element[MathConfiguration]("math"):
 
@@ -62,7 +62,7 @@ object MathConfiguration extends Element[MathConfiguration]("math"):
 
   val default: MathConfiguration = new MathConfiguration(
     mathJaxEnabled        = Some(false),
-    nodeVersion           = Some(NodeDistribution.versionDefault),
+    nodeVersion           = Some(NodeDependency.versionDefault),
     useMathJaxV3          = Some(true),
     font                  = Some("TeX"),
     processEscapes        = Some(true),

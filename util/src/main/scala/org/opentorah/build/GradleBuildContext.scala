@@ -1,6 +1,6 @@
 package org.opentorah.build
 
-import org.gradle.api.Project
+import org.gradle.api.{GradleException, Project}
 import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.file.CopySpec
@@ -16,6 +16,8 @@ final class GradleBuildContext(project: Project) extends BuildContext:
 
   override def lifecycle(message: String): Unit = project.getLogger.lifecycle(message)
   override def getLogger: Logger = project.getLogger
+
+  override def fatalError(message: String): Unit = throw GradleException(s"Fatal error in $this: $message")
 
   override def getArtifact(
     repository: Option[Repository],
@@ -50,6 +52,7 @@ final class GradleBuildContext(project: Project) extends BuildContext:
 
     val dependency: Dependency = project.getDependencies.create(dependencyNotation)
     val configuration: Configuration = project.getConfigurations.detachedConfiguration(dependency)
+    configuration.setDescription(s"Detached Configuration for resolving $dependencyNotation")
     configuration.setTransitive(false)
 
     try

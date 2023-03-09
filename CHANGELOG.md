@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.9] - 2023-03-17
+- chore: dependency updates
+- chore: Gradle updated to 8.0.2
+- test: dogfooding ScalaJS plugin for testing 'docbook'
+- cleanup: [Installable]Dependency[.WithVersion]
+- cleanup: [Java|Scala]DependencyRequirement
+- cleanup: NodeDependency/NodeInstallation/Node
+- cleanup: BuildContext
+- cleanup: Exec
+
 ## [0.10.8] - 2023-02-14
 - build: dogfooding ScalaJS plugin for running tests
 - docs:

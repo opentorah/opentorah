@@ -5,20 +5,22 @@ import org.gradle.api.{GradleException, Project}
 import Gradle.*
 import scala.jdk.CollectionConverters.*
 
-final class DependencyRequirement(
+abstract class DependencyRequirement(
   dependency: Dependency,
   version: String,
-  scalaLibrary: ScalaLibrary,
   reason: String,
   configurations: Configurations,
   isVersionExact: Boolean = false
 ):
-  def applyToConfiguration(project: Project): DependencyVersion =
-    val found: Option[DependencyVersion] = dependency
+  // Note: all applyToConfiguration() must be run first: once a applyToClassPath() runs,
+  // configuration is no longer changeable.
+  final def applyToConfiguration(project: Project): Dependency.WithVersion =
+    val found: Option[Dependency.WithVersion] = dependency
       .getFromConfiguration(project.getConfiguration(configurations.configuration))
     found.foreach(verify(_, project))
     found.getOrElse {
-      val (configuration: Configuration, toAdd: DependencyVersion) = addition(project)
+      val configuration: Configuration = getConfiguration(project)
+      val toAdd: Dependency.WithVersion = getAddition(project)
       project.getLogger.info(s"Adding dependency $toAdd to the $configuration $reason", null, null, null)
       configuration
         .getDependencies
@@ -30,49 +32,25 @@ final class DependencyRequirement(
   // dependencies can not be added to the configurations involved:
   //   Cannot change dependencies of dependency configuration ... after it has been included in dependency resolution
   // So the only thing we can do is to report the missing dependency:
-  def applyToClassPath(project: Project): DependencyVersion =
-    val found: Option[DependencyVersion] = dependency.getFromClassPath(
+  final def applyToClassPath(project: Project): Dependency.WithVersion =
+    val found: Option[Dependency.WithVersion] = dependency.getFromClassPath(
       project.getConfiguration(configurations.classPath).asScala
     )
     found.foreach(verify(_, project))
     found.getOrElse {
-      val (configuration: Configuration, toAdd: DependencyVersion) = addition(project)
+      val configuration: Configuration = getConfiguration(project)
+      val toAdd: Dependency.WithVersion = getAddition(project)
       throw GradleException(s"Please add dependency $toAdd to the $configuration $reason")
     }
 
-  private def verify(found: DependencyVersion, project: Project): Unit =
-    found match
-      case s2: Scala2DependencyVersion =>
-        val scalaVersion: String = getScalaVersion(s2.dependency)
-        if s2.scalaVersion != scalaVersion then project.getLogger.info(
-          s"Found $s2, but the project uses Scala 2 version $scalaVersion", null, null, null
-        )
-      case _ =>
-
-    if isVersionExact && found.version != version then project.getLogger.info(
+  protected def verify(found: Dependency.WithVersion, project: Project): Unit =
+    if isVersionExact && found.version.version != version then project.getLogger.info(
       s"Found $found, but the project uses version $version", null, null, null
     )
 
-  private def addition(project: Project): (Configuration, DependencyVersion) =
-    val configuration: Configuration = project.getConfiguration(configurations.configuration)
-    val dependencyVersion: DependencyVersion = dependency match
-      case s2: Scala2Dependency => s2.apply(
-        scalaVersion = getScalaVersion(s2),
-        version = version
-      )
-      case s: SimpleDependency => s.apply(
-        version = version
-      )
-    (configuration, dependencyVersion)
-
-  private def getScalaVersion(s2: Scala2Dependency): String =
-    if s2.isScala2versionFull
-    then scalaLibrary.scala2
-      .get
-      .version
-    else scalaLibrary.scala2
-      .map(scala2 => DependencyVersion.getMajor(scala2.version))
-      .getOrElse(ScalaLibrary.scala2versionMinor(scalaLibrary.scala3.get.version))
+  private def getConfiguration(project: Project): Configuration = project.getConfiguration(configurations.configuration)
+  
+  protected def getAddition(project: Project): Dependency.WithVersion
 
 object DependencyRequirement:
   // Note: all applyToConfiguration() must be run first: once a applyToClassPath() runs,

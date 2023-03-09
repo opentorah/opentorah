@@ -1,11 +1,13 @@
 plugins {
-  id 'java-library'
   id 'scala'
-  id 'org.podval.tools.scalajs'
-  id 'java-gradle-plugin'
-  id 'maven-publish'
   id 'signing'
   id 'com.gradle.plugin-publish'
+  // Gradle Plugin Portal Publishing Plugin applies Gradle Plugin Plugin,
+  // which adds dependencies to configurations,
+  // ScalaJS plugin forces resolution of configurations,
+  // after which dependencies can no longer be added,
+  // and thus must be applied later.
+  id 'org.podval.tools.scalajs'
 }
 
 description = 'Gradle DocBook Plugin'
@@ -22,9 +24,6 @@ dependencies {
   implementation libs.bundles.fop
 
 //  implementation libs.graalvm.sdk
-
-  // Needed to compile classes using Gradle, but does not become a dependency:
-  compileOnly gradleApi()
 
   // TODO still?
   // added by the 'java-gradle-plugin': testImplementation gradleTestKit()

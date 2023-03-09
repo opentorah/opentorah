@@ -4,14 +4,19 @@ import org.gradle.api.artifacts.Configuration
 import java.io.File
 
 final class ScalaLibrary(
-  val scala3: Option[DependencyVersion],
-  val scala2: Option[DependencyVersion]
+  val scala3: Option[Dependency.WithVersion],
+  val scala2: Option[Dependency.WithVersion]
 ):
   require(scala3.nonEmpty || scala2.nonEmpty, "No Scala library!")
   def isScala3: Boolean = scala3.nonEmpty
   def isScala2: Boolean = scala3.isEmpty
 
   override def toString: String = s"ScalaLibrary(scala3=${scala3.map(_.version)}, scala2=${scala2.map(_.version)})"
+
+  def getScala2Version: String = scala2.map(_.version.version)
+    .getOrElse(ScalaLibrary.scala2version(scala3.get.version.version))
+
+  def getScala3Version: String = scala3.get.version.version
 
   def verify(other: ScalaLibrary): Unit =
     require(
@@ -20,25 +25,26 @@ final class ScalaLibrary(
     )
     if isScala3
     then require(
-      other.scala3.get.version == scala3.get.version,
-      s"Scala 3 version changed from ${scala3.get.version} to ${other.scala3.get.version}"
+      other.scala3.get.version.version == scala3.get.version.version,
+      s"Scala 3 version changed from ${scala3.get.version.version} to ${other.scala3.get.version.version}"
     )
     else require(
-      other.scala2.get.version == scala2.get.version,
-      s"Scala 2 version changed from ${scala2.get.version} to ${other.scala2.get.version}"
+      other.scala2.get.version.version == scala2.get.version.version,
+      s"Scala 2 version changed from ${scala2.get.version.version} to ${other.scala2.get.version.version}"
     )
 
 object ScalaLibrary:
   val group: String = "org.scala-lang"
 
-  object Scala2 extends SimpleDependency(group = group, nameBase = "scala-library")
-  object Scala3 extends Scala3Dependency(group = group, nameBase = "scala3-library")
+  object Scala2 extends JavaDependency(group = group, artifact = "scala-library" )
+  object Scala3 extends JavaDependency(group = group, artifact = "scala3-library_3")
 
   // Note: there is no Scala 2 equivalent
-  object Scala3SJS extends Scala3Dependency(group = group, nameBase = "scala3-library_sjs1")
+  // TODO introduce platformSuffix
+  object Scala3SJS extends Scala3Dependency(group = group, artifact = "scala3-library_sjs1")
 
   // Note: Scala 2 minor version used by Scala 3 from 3.0.0 to the current is 2.13
-  def scala2versionMinor(scala3version: String): String = "2.13"
+  private def scala2version(scala3version: String): String = "2.13"
 
   def getFromConfiguration(configuration: Configuration): ScalaLibrary =
     ScalaLibrary(
