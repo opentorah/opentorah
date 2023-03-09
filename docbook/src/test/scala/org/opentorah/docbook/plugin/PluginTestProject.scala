@@ -89,8 +89,8 @@ class PluginTestProject private(
   def fail(): String = getRunner(logInfo = false).buildAndFail.getOutput
 
   private def getRunner(logInfo: Boolean): GradleRunner =
-    val result = GradleRunner.create.withProjectDir(projectDir)
-    if logInfo then result.withArguments("-d", "processDocBook") else result.withArguments("processDocBook")
+    val result: GradleRunner = GradleRunner.create.withProjectDir(projectDir)
+    if logInfo then result.withArguments(/*"-d",*/ "processDocBook") else result.withArguments("processDocBook")
 
 object PluginTestProject:
 

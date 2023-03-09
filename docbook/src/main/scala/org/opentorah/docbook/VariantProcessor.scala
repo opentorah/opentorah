@@ -1,9 +1,10 @@
 package org.opentorah.docbook
 
-import org.opentorah.build.{BuildContext, Distribution}
+import org.opentorah.build.{BuildContext, Dependency, InstallableDependency}
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Files
 import org.opentorah.xml.{Dom, Resolver, ScalaXml}
+
 import java.io.File
 
 final class VariantProcessor(
@@ -15,11 +16,11 @@ final class VariantProcessor(
   parameters: Parameters,
   mathConfiguration: MathConfiguration,
   epubEmbeddedFontsString: Option[String],
-  xslt: Option[Xslt]
+  xslt: Option[InstallableDependency.WithVersion[File]]
 ):
   private def format: Format = variant.format
 
-  def distributionsNeeded: Set[Distribution[?]] = xslt.toSet ++ Set(mathConfiguration.nodeDistribution)
+  def distributionsNeeded: Set[InstallableDependency.WithVersion[_]] = xslt.toSet ++ Set(mathConfiguration.nodeDistribution)
 
   def process(
     context: BuildContext,
@@ -53,8 +54,8 @@ final class VariantProcessor(
 
     format match
       case xsltFormat: XsltFormat =>
-        val xslt: Xslt = this.xslt.get
-        val xsltInstallation: File = xslt.getInstallation(context).get
+        val xslt: InstallableDependency.WithVersion[File] = this.xslt.get
+        val xsltInstallation: File = xslt.getInstallation(context, installIfDoesNotExist = false, mustExist = true)
 
         def customStylesheetSrcOrTmp(name: String): Seq[File] =
           val srcFile: File = layout.customStylesheetSrc(name)
@@ -71,7 +72,7 @@ final class VariantProcessor(
           context,
           documentName,
           substitutions,
-          getResolver(Some((xslt, xsltInstallation))),
+          getResolver(Some((xslt.dependency.asInstanceOf[Xslt], xsltInstallation))),
           imagesDirectory,
           inputFile,
           tmp,
@@ -82,7 +83,7 @@ final class VariantProcessor(
           parameters,
           mathConfiguration,
           epubEmbeddedFontsString,
-          xslt,
+          xslt.dependency.asInstanceOf[Xslt],
           customStylesheets
         )
 

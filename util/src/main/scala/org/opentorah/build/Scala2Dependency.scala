@@ -1,42 +1,14 @@
 package org.opentorah.build
 
-import java.util.regex.Matcher
-
-final class Scala2DependencyVersion(
-  override val dependency: Scala2Dependency,
-  version: String,
-  val scalaVersion: String
-) extends DependencyVersion(
-  dependency = dependency,
-  version = version
-):
-  override def nameDependencyNotation: String = s"${dependency.nameBase}_$scalaVersion"
-
 open class Scala2Dependency(
   group: String,
-  nameBase: String,
+  artifact: String,
   val isScala2versionFull: Boolean = false
-) extends Dependency(
+) extends ScalaDependency(
   group = group,
-  nameBase = nameBase
+  artifact = artifact
 ):
-  final override protected def namePattern: String = s"${nameBase}_(\\d.*)"
-
-  final override protected def fromMatcher(matcher: Matcher, version: String): Scala2DependencyVersion = apply(
-    scalaVersion = matcher.group(1),
-    version = version
-  )
-
-  final override protected def fromMatcher(matcher: Matcher): Scala2DependencyVersion = apply(
-    scalaVersion = matcher.group(1),
-    version = matcher.group(2)
-  )
-
-  def apply(
-    scalaVersion: String,
-    version: String
-  ): Scala2DependencyVersion = Scala2DependencyVersion(
-    dependency = this,
-    scalaVersion = scalaVersion,
-    version = version
-  )
+  final override protected def versionSuffix(scalaVersion: String): String =
+    if isScala2versionFull
+    then scalaVersion
+    else scalaVersion.split('.').take(2).mkString(".")

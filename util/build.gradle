@@ -1,12 +1,12 @@
 plugins {
   id 'java-library'
   id 'scala'
+  id 'maven-publish'
+  id 'signing'
   id 'com.github.maiflai.scalatest'
 // TODO: when scalajs plugin is applied here, Gradle errors out
 // failing to load DependencyVersion - is it because this is the project that has it?
 //  id 'org.podval.tools.scalajs'
-  id 'maven-publish'
-  id 'signing'
 }
 
 description = 'Open Torah Util'

@@ -2,36 +2,30 @@ package org.opentorah.build
 
 import java.util.regex.Matcher
 
-final class SimpleDependencyVersion(
-  dependency: SimpleDependency,
-  version: String
-) extends DependencyVersion(
-  dependency,
-  version
-):
-  override def nameDependencyNotation: String = dependency.nameBase
-
-open class SimpleDependency(
+abstract class SimpleDependency(
   group: String,
-  nameBase: String
+  artifact: String
 ) extends Dependency(
   group = group,
-  nameBase = nameBase
+  artifact = artifact
 ):
+  override type Version = Dependency.Version
 
-  final override protected def namePattern: String = nameBase
+  final override protected def artifactSuffix(version: Version): String = ""
 
-  final override protected def fromMatcher(matcher: Matcher, version: String): SimpleDependencyVersion = apply(
+  final override protected def artifactSuffixPattern: String = ""
+
+  final override protected def fromMatcher(matcher: Matcher, version: String): Dependency.WithVersion = apply(
     version = version
   )
 
-  final override protected def fromMatcher(matcher: Matcher): SimpleDependencyVersion = apply(
+  final override protected def fromMatcher(matcher: Matcher): Dependency.WithVersion = apply(
     version = matcher.group(1)
   )
 
-  final def apply(
+  def apply(
     version: String
-  ): SimpleDependencyVersion = SimpleDependencyVersion(
+  ): Dependency.WithVersion = Dependency.WithVersion(
     dependency = this,
-    version = version
+    version = Dependency.Version(version)
   )

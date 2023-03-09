@@ -42,8 +42,11 @@ object Files:
     source.close
     result
 
-  def readFile(file: File): Array[Byte] =
+  def readBytes(file: File): Array[Byte] =
     java.nio.file.Files.readAllBytes(Paths.get(file.toURI))
+
+  def writeBytes(file: File, content: Array[Byte]): Unit =
+    java.nio.file.Files.write(Paths.get(file.toURI), content)
 
   def deleteFiles(directory: File): Unit = if directory.exists() then
     if directory.isDirectory then for file <- directory.listFiles() do deleteFiles(file)

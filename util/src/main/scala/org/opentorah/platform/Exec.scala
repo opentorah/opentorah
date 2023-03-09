@@ -10,27 +10,28 @@ object Exec:
   def which(what: String): Option[File] =
     attempt(command = s"which $what").map(File(_))
 
+  def unameM: String = Exec("uname -m")
+
   def attempt(command: String): Option[String] =
-    try Some(Exec(command))
-    catch
-      case _: Exception => None
+    try Some(Exec(command)) catch case _: Exception => None
 
   def apply(command: String): String = Process(command).!!.trim
 
   def apply(
     command: File,
-    args: Seq[String],
+    args: String,
     cwd: Option[File],
     extraEnv: (String, String)*
   ): String =
-    val cmd: Seq[String] = command.getAbsolutePath +: args
-    logger.debug(
-      s"""Platform.exec(
+    val cmd: String = s"${command.getAbsolutePath} $args"
+    val what: String =
+      s"""Exec(
          |  cmd = $cmd,
          |  cwd = $cwd,
          |  extraEnv = $extraEnv
          |)""".stripMargin
-    )
+
+    logger.debug(what)
 
     var err: Seq[String] = Seq.empty
     var out: Seq[String] = Seq.empty
@@ -39,11 +40,16 @@ object Exec:
       command = cmd,
       cwd,
       extraEnv = extraEnv*
-    ).!(ProcessLogger(fout = line => out = out :+ line, ferr = line => err = err :+ line))
+    ).!(ProcessLogger(
+      fout = line => out = out :+ line,
+      ferr = line => err = err :+ line
+    ))
 
     val errStr: String = err.mkString("\n")
     val outStr: String = out.mkString("\n")
 
-    val result: String = s"Platform.exec() => exitCode=$exitCode; err=$errStr; out=$outStr"
-    if exitCode == 0 then logger.debug(result) else logger.error(result)
-    if exitCode == 0 then outStr else throw IllegalArgumentException(s"Platfor.exec() => exitCode=$exitCode")
+    val result: String = s"$what => exitCode=$exitCode; err=[$errStr]; out=[$outStr]"
+    if exitCode == 0
+    then logger.debug(result)
+    else throw IllegalArgumentException(result)
+    outStr

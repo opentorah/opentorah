@@ -202,7 +202,7 @@ object DocBookPlugin:
     setGroup("publishing")
     @TaskAction def execute(): Unit =
       val extension: Extension = getProject.getExtensions.getByType(classOf[Extension])
-      extension.getProcessor.installDistibutions()
+      extension.getProcessor.installDistributions()
 
   class ProcessDocBookTask extends DefaultTask:
     setDescription(s"Process DocBook")

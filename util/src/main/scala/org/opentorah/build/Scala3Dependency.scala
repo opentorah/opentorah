@@ -1,10 +1,12 @@
 package org.opentorah.build
 
-// TODO unify with Scal3Dependency, even though the Scala 3 version is always 3?
 open class Scala3Dependency(
   group: String,
-  nameBase: String
-) extends SimpleDependency(
+  artifact: String
+) extends ScalaDependency(
   group = group,
-  nameBase = s"${nameBase}_3"
-)
+  artifact = artifact
+):
+  final override protected def versionSuffix(scalaVersion: String): String = "3"
+
+

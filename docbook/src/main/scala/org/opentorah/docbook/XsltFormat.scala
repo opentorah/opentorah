@@ -4,10 +4,9 @@ import org.opentorah.build.BuildContext
 import org.opentorah.files.Copy
 import org.opentorah.fop.{Fop, FopPlugin}
 import org.opentorah.math.{DocBookMathFilter, MathConfiguration, MathJax, MathJaxFopPlugin, MathJaxRunner}
-import org.opentorah.node.Node
+import org.opentorah.node.{Node, NodeInstallation}
 import org.opentorah.util.Files
 import org.opentorah.xml.{Resolver, Sax, Saxon, ScalaXml, Xsl}
-
 import java.io.File
 
 trait XsltFormat extends Format, Section:
@@ -128,8 +127,10 @@ trait XsltFormat extends Format, Section:
     context: BuildContext
   ): Option[FopPlugin] = if !mathConfiguration.enableMathJax then None else
       // Make sure MathJax is installed
-      val node: Node = mathConfiguration.nodeDistribution.getInstallation(context).get
-      for packageName <- MathJax(mathConfiguration).npmPackagesToInstall do node.npmInstall(packageName)
+      val nodeInstallation: NodeInstallation =
+        mathConfiguration.nodeDistribution.getInstallation(context, installIfDoesNotExist = false, mustExist = true)
+      val node: Node = nodeInstallation.getNode(nodeInstallation.getRoot)
+      node.npmInstall(MathJax(mathConfiguration).npmPackagesToInstall)
       Some(MathJaxFopPlugin(MathJaxRunner(node, mathConfiguration)))
 
   // xsl:param has the last value assigned to it, so customization must come last;

@@ -1,10 +1,11 @@
 package org.opentorah.docbook
 
-import org.opentorah.build.{BuildContext, Distribution}
+import org.opentorah.build.{BuildContext, Dependency, InstallableDependency}
 import org.opentorah.fop.FopFonts
 import org.opentorah.math.MathConfiguration
 import org.opentorah.util.Files
 import org.opentorah.xml.{Catalog, Dom, Resolver, Sax, ScalaXml, Xsl}
+
 import java.io.File
 
 // TODO combine epubEmbeddedFonts, xslt1version and xslt2version?
@@ -75,13 +76,11 @@ final class DocBookProcessor(
 
     if outputDefault.isEmpty then logUnused("documents", documents.filter(_.output.isEmpty))
 
-  def installDistibutions(): Unit =
-    for distribution: Distribution[?] <- distributionsNeeded do
-      context.info(s"DocBook: checking dependency: $distribution")
-      val installationOpt: Option[?] = distribution.getInstallation(context)
-      if installationOpt.isEmpty then context.warn(s"DocBook: can not install needed dependency: $distribution")
+  def installDistributions(): Unit =
+    for distribution: InstallableDependency.WithVersion[_] <- distributionsNeeded do
+      distribution.getInstallation(context, installIfDoesNotExist = true, mustExist = true)
 
-  def distributionsNeeded: Set[Distribution[?]] = (
+  def distributionsNeeded: Set[InstallableDependency.WithVersion[_]] = (
     for
       document: Document <- documents
       if inputFile(document).exists
@@ -135,7 +134,7 @@ final class DocBookProcessor(
           .mkString(", ")
       )
 
-      val xslt: Option[Xslt] = format match
+      val xslt: Option[InstallableDependency.WithVersion[File]] = format match
         case xsltFormat: XsltFormat =>
 
           // XSLT
