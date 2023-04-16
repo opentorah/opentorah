@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.11] - 2023-
+
+## [0.10.10] - 2023-05-31
+- cleanup: Node
+- cleanup: disabled DocBook module
+- cleanup: Asciidoc
+- cleanup: BibTex bibliography
+- cleanup: CalendarService
+- cleanup: ServiceApp
+- chore: latest Gradle
+- chore: ZIO HTTP 3.0.0-RC2
+- chore: dependency updates
+- chore: Scala 3.3.0
+- cleanup: fewer braces
+
 ## [0.10.9] - 2023-03-17
 - chore: dependency updates
 - chore: Gradle updated to 8.0.2
@@ -286,7 +301,7 @@ Code in the 'collector' module was re-written, and 'store' module emptied out.
 
 ## [0.7.52 docbook] - 2020-07-14
 - parameters cleanup
-- using Xerces for loading Sla XML
+- using Xerces for loading Scala XML
 
 ## [0.1.52] - 2020-07-03 (`collector-service`)
 - instructions for the `collector-service` setup;

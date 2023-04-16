@@ -6,6 +6,11 @@ import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
 trait Calendar extends Times, Epoch:
+  // TODO load from a metadata resource
+  def name: String
+
+  trait Member:
+    final def calendar: Calendar = Calendar.this
 
   // Note: YearBase, MonthBase and DayBase used to require their number to be positive;
   // because Roman years can be negative for years after Creation, YearBase can not;
@@ -14,6 +19,7 @@ trait Calendar extends Times, Epoch:
   type YearCharacter
 
   abstract class YearBase(final override val number: Int) extends
+    Member,
     Numbered[Year],
     Language.ToString
     derives CanEqual:
@@ -110,7 +116,10 @@ trait Calendar extends Times, Epoch:
 
   protected def createYearCompanion: YearCompanionType
 
-  open class MonthBase(yearOption: Option[Year], final override val number: Int) extends Numbered[Month] derives CanEqual:
+  open class MonthBase(yearOption: Option[Year], final override val number: Int) extends
+    Member,
+    Numbered[Month]
+    derives CanEqual:
     this: Month =>
 
     final override def companion: Numbered.Companion[Month] = Month
@@ -185,6 +194,7 @@ trait Calendar extends Times, Epoch:
   protected def createMonthCompanion: MonthCompanionType
 
   open class DayBase(monthOption: Option[Month], final override val number: Int) extends
+    Member,
     Numbered[Day],
     Language.ToString
     derives CanEqual:
@@ -193,8 +203,6 @@ trait Calendar extends Times, Epoch:
     final override def companion: Numbered.Companion[Day] = Day
 
     private var monthOpt: Option[Month] = monthOption
-
-    final def calendar: Calendar = Calendar.this
 
     final def month: Month =
       if monthOpt.isEmpty then monthOpt = Some {
@@ -236,7 +244,7 @@ trait Calendar extends Times, Epoch:
     @scala.annotation.tailrec
     final def prevDay(dayName: Week.Day): Day = if is(dayName) then this else this.prev.prevDay(dayName)
 
-    // Note: Day numbering starts at 1; that is why 1 is subtracted here and added MomentBase.dayNumber:
+    // Note: Day numbering starts at 1; that is why 1 is subtracted here and added in MomentBase.dayNumber:
     final def toMoment: Moment = Moment().days(number - 1)
 
     final override def toLanguageString(using spec: Language.Spec): String =
@@ -248,7 +256,9 @@ trait Calendar extends Times, Epoch:
 
   type Day <: DayBase
 
-  final class DayCompanion extends Numbered.Companion[Day]:
+  final class DayCompanion extends
+    Member,
+    Numbered.Companion[Day]:
     override def apply(number: Int): Day = newDay(None, number)
 
     private[Calendar] def witNumberInMonth(month: Month, numberInMonth: Int): Day =
@@ -264,10 +274,11 @@ trait Calendar extends Times, Epoch:
 
   protected def newDay(monthOpt: Option[Month], number: Int): Day
 
-  abstract class MomentBase(digits: Digits) extends TimePointBase(digits), Language.ToString:
+  abstract class MomentBase(digits: Digits) extends
+    TimePointBase(digits),
+    Member,
+    Language.ToString:
     this: Moment =>
-
-    final def calendar: Calendar = Calendar.this
 
     final def day: Day = Day(dayNumber)
 

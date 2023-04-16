@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 
 final class EpochTest extends AnyFlatSpec, Matchers:
 
-  "First Jewish year (of Chaos)" should "be correct" in {
+  "First Jewish year (of Chaos)" should "be correct" in:
     val year1: Jewish.Year = Jewish.Year(1)
 
     val year1newMoon: Jewish.Moment = year1.newMoon
@@ -22,9 +22,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
     year1newMoon.day shouldBe year1firstDay
 
     year1.newYearDelay shouldBe NewYear.Delay.No // even when not suppressed
-  }
 
-  "Second Jewish year (of Creation)" should "be correct" in {
+  "Second Jewish year (of Creation)" should "be correct" in:
     val year2: Jewish.Year = Jewish.Year(2)
 
     val year2newMoon: Jewish.Moment = year2.newMoon
@@ -42,9 +41,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
     year2newMoon.day shouldBe year2firstDay
 
     year2.newYearDelay shouldBe NewYear.Delay.No // when suppresed; Adu otherwise
-  }
 
-  "Gregorian.epoch" should "be correct" in {
+  "Gregorian.epoch" should "be correct" in:
     val epoch: Gregorian.Day = Gregorian.Year(1).month(Gregorian.Month.January).day(1)
 
     epoch.year.number shouldBe 1
@@ -60,9 +58,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     epoch           .number shouldBe 1
     epoch.to(Jewish).number shouldBe (Gregorian.epoch+1)
-  }
 
-  "Julian.epoch" should "be correct" in {
+  "Julian.epoch" should "be correct" in:
     val epoch: Julian.Day = Julian.Year(1).month(Julian .Month.January).day(1)
 
     epoch.year.number shouldBe 1
@@ -78,9 +75,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     epoch           .number shouldBe 1
     epoch.to(Jewish).number shouldBe (Julian.epoch+1)
-  }
 
-  "Roman epochs" should "be consistent" in {
+  "Roman epochs" should "be consistent" in:
     // Julian 1,1,3 = Gregorian 1,1,1    (Monday)
     // Julian 1,1,1 = Gregorian 0,12,30
 
@@ -92,17 +88,15 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     julian   .to(Gregorian) shouldBe gregorian
     gregorian.to(Julian   ) shouldBe julian
-  }
 
-  "Calendrical Calculations Epoch" should "work" in {
+  "Calendrical Calculations Epoch" should "work" in:
     val example: Gregorian.Day = Gregorian.Day(710347)
     example            shouldBe Gregorian.Year(1945).month(Gregorian.Month.November).day(12)
     example            shouldBe Julian   .Year(1945).month(Julian   .Month.October ).day(30).to(Gregorian)
     example.to(Julian) shouldBe Julian   .Year(1945).month(Julian   .Month.October ).day(30)
     example.to(Jewish) shouldBe Jewish   .Year(5706).month(Jewish   .Month.Kislev  ).day( 7)
-  }
 
-  "Russian switch dates" should "convert correctly" in {
+  "Russian switch dates" should "convert correctly" in:
     // In Russia, the Gregorian calendar was accepted after the October Revolution.
     // On 24 January 1918 the Council of People's Commissars issued a decree that Wednesday,
     // 31 January 1918, was to be followed by Thursday, 14 February 1918, thus dropping 13 days from the calendar.
@@ -119,9 +113,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
 
     val revolution: Julian.Day = Julian.Year(1917).month(Julian.Month.October).day(25)
     revolution.to(Gregorian) shouldBe Gregorian.Year(1917).month(Gregorian.Month.November).day(7)
-  }
 
-  "Julian Day" should "be correct" in {
+  "Julian Day" should "be correct" in:
     // The dates and days Meeus lists are Julian before 1582-10-04 Julian (1582-10-15 Gregorian) and Gregorian after.
 
     Gregorian.Year( 2000).month(Gregorian.Month.January ).day(  1).toMoment.hours(12).toJulianDay shouldBe 2451545.0
@@ -144,4 +137,3 @@ final class EpochTest extends AnyFlatSpec, Matchers:
     Julian.Year(-4712).month(Julian.Month.January ).day( 1).toMoment.hours(12).toJulianDay shouldBe       0.0
     Gregorian.Year(-4713).month(Gregorian.Month.November).day(24).toMoment.hours(12).toJulianDay shouldBe       0.0
     Gregorian.Year(-4713).month(Gregorian.Month.November).day(24).toMoment.hours(12).to(Jewish).toJulianDay shouldBe       0.0
-  }

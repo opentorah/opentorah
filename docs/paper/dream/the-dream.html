@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Digital Judaica Done Right</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="the-dream" class="article">
+<div id="header">
+<h1>Digital Judaica Done Right</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="dream.html">Digital Judaica Done Right</a></span></p><ul class="sectlevel1">
+<li><a href="introduction.html">Introduction</a>
+</li>
+<li><a href="the-dream.html"><span class="toc-current">What do we want? (The Dream)</span></a>
+</li>
+<li><a href="bibliography-sources.html">Sources</a>
+</li>
+<li><a href="implementation.html">Implementation</a>
+</li>
+<li><a href="laying-out.html">Laying out classic Jewish texts</a>
+</li>
+<li><a href="fonts.html">Fonts</a>
+</li>
+<li><a href="free-texts.html">Sources of Free Texts</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="the-dream"><a class="anchor" href="#the-dream"></a><a class="link" href="#the-dream">What do we want? (The Dream)</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_texts_etc"><a class="anchor" href="#_texts_etc"></a><a class="link" href="#_texts_etc">Texts etc.</a></h3>
+<div class="paragraph">
+<p>We need to store texts in different languages, some of which are written right-to-left.
+Some Hebrew texts will have vowels, some - cantillation signs, some - special glyphs (small, big, inverted etc.).</p>
+</div>
+<div class="paragraph">
+<p>We need to store photographs of manuscripts, book scans, possibly - audio and video.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_markup"><a class="anchor" href="#_markup"></a><a class="link" href="#_markup">Markup</a></h3>
+<div class="paragraph">
+<p>We need to be able to mark up textual features (encode information contained in the text):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>People names</p>
+</li>
+<li>
+<p>Geographical names</p>
+</li>
+<li>
+<p>First words of comments</p>
+</li>
+<li>
+<p>Authors of statements</p>
+</li>
+<li>
+<p>Inference rule used in a fragment of Talmud</p>
+</li>
+<li>
+<p>Index entries for a text fragment</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We also need to be able to associate metadata with a text fragment:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>What stage of proofreading is the fragment in?</p>
+</li>
+<li>
+<p>Tags</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hierarchical_structure"><a class="anchor" href="#_hierarchical_structure"></a><a class="link" href="#_hierarchical_structure">Hierarchical Structure</a></h3>
+<div class="paragraph">
+<p>Store hierarchical structure of texts and use it for references and retrieval of text fragments.
+Examples: Tanach - book, chapter, verse; Chumash - weekly portion; Chumash - parsha (with type - open/closed); Rashi on Tanach: book, chapter, verse, comment; Mishna: treatise, chapter, mishna; Talmud: treatise, folio, side; Talmud - treatise, chapter, statement; Rambam: [book,] laws of, law, statement; Shulchan Aruch: division, chapter, paragraph, small paragraph&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Store page (and line) breaks for multiple editions of the same text.</p>
+</div>
+<div class="paragraph">
+<p>A text can have multiple hierarchical structures, some of which can be incompatible with one another: parsha can end inside a verse, weekly portion - inside a chapter, page break can be inside a sentence&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Some texts have the same structure, although they are not commentaries on one another, e.g.:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>original and translation</p>
+</li>
+<li>
+<p>different editions of the same text</p>
+</li>
+<li>
+<p>Shulchan Aruch and Shulchan Aruch HaRav</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We need to be able to combine texts with the same structure - e.g., parallel translation.
+Specific edition gets chosen based on the user preferences: language, presence of vowel points etc.</p>
+</div>
+<div class="paragraph">
+<p>We need to be able to show differences between different editions of the same text - in a form of a text, with differences highlighted :).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_references"><a class="anchor" href="#_references"></a><a class="link" href="#_references">References</a></h3>
+<div class="paragraph">
+<p>Texts reference one another.
+A reference links point or interval in one text with a point or an interval in another (or the same) text.</p>
+</div>
+<div class="paragraph">
+<p>References can be external to the texts they link, e.g., parallel statements in Talmud or sources in Shulchan Aruch.</p>
+</div>
+<div class="paragraph">
+<p>References can have different semantics, which we should store:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>one end comments on the other</p>
+</li>
+<li>
+<p>one end proves or illustrates the other</p>
+</li>
+<li>
+<p>one end transcribes or translates the other</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>References can have different "strengths".</p>
+</div>
+<div class="paragraph">
+<p>References should be reversable: enumerate references that end in a given interval.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_corrections"><a class="anchor" href="#_corrections"></a><a class="link" href="#_corrections">Corrections</a></h3>
+<div class="paragraph">
+<p>Correction of one text by another is a specially-handled type of reference.</p>
+</div>
+<div class="paragraph">
+<p>Texts can correct other texts (Rashi - Talmud) or themselves (Talmud - quotes from early sources).</p>
+</div>
+<div class="paragraph">
+<p>Text can correct references (from Talmud to Tanach) and structure of another (break up of laws in Rambam).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_attribution"><a class="anchor" href="#_attribution"></a><a class="link" href="#_attribution">Attribution</a></h3>
+<div class="paragraph">
+<p>We need to store many versions ("editions") of the same text.
+This includes typing-in, proofreading and corrections to the text by a user: that&#8217;s an "edition" too.</p>
+</div>
+<div class="paragraph">
+<p>We need to develop a theory of attribution for Talmud etc.: "A says in the name of B in the name of C", "two students of B say in accordance to B&#8217;s views".
+We should be able to retrieve a text "as seen through the eyes of A".</p>
+</div>
+<div class="paragraph">
+<p>So: Chumash, Keter edition, according to Peter; ((Rambam through the eyes of Rosh) Romm edition) according to Paul.</p>
+</div>
+<div class="paragraph">
+<p>Reference to a text that has different "editions" should be resolved in accordance with the user preferences: language, presence of vowels etc.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_versioning"><a class="anchor" href="#_versioning"></a><a class="link" href="#_versioning">Versioning</a></h3>
+<div class="paragraph">
+<p>We need to store the history of changes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_search"><a class="anchor" href="#_search"></a><a class="link" href="#_search">Search</a></h3>
+<div class="paragraph">
+<p>A query language provided by the API should allow selection of a subset of texts and support text search that takes structure of texts, markup and grammar into account. e.g:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>by keywords</p>
+</li>
+<li>
+<p>all mentions of a city</p>
+</li>
+<li>
+<p>all statements by an author</p>
+</li>
+<li>
+<p>by language</p>
+</li>
+<li>
+<p>latest additions</p>
+</li>
+<li>
+<p>by groups of users</p>
+</li>
+<li>
+<p>close by the "crowd opinion"</p>
+</li>
+<li>
+<p>by "crowd rating"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See <a href="http://www.wisdom.weizmann.ac.il/~fraenkel/Papers/annot.ps">Information retrieval from annotated texts</a> by A.S. Fraenkel, S.T. Klein.
+J.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_individualization"><a class="anchor" href="#_individualization"></a><a class="link" href="#_individualization">Individualization</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Personal study program</p>
+</li>
+<li>
+<p>Daily study schedule with a list of what you "owe"</p>
+</li>
+<li>
+<p>Notebook - selections of text fragments via search of references.
+Compounding.
+Storage.
+Printing.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_crowdsourcing"><a class="anchor" href="#_crowdsourcing"></a><a class="link" href="#_crowdsourcing">Crowdsourcing</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Typing in of the texts</p>
+</li>
+<li>
+<p>Proofreading: Wikipedia, Wikisource, Distributed Proofreaders</p>
+</li>
+<li>
+<p>Marking the texts up</p>
+</li>
+<li>
+<p>Adding references</p>
+</li>
+<li>
+<p>Annotations</p>
+</li>
+<li>
+<p>New presentation styles (XProc/XQuery/XSLT)</p>
+</li>
+<li>
+<p>New printing styles</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_typesetting"><a class="anchor" href="#_typesetting"></a><a class="link" href="#_typesetting">Typesetting</a></h3>
+<div class="paragraph">
+<p>We need to be able to typeset a tree of interlinked texts.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_miscellaneous"><a class="anchor" href="#_miscellaneous"></a><a class="link" href="#_miscellaneous">Miscellaneous</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Integration with blogs etc.</p>
+</li>
+<li>
+<p>Discussion forums</p>
+</li>
+<li>
+<p>Digital libraries</p>
+</li>
+<li>
+<p>User levels: guest, registered, editor; "editor, make an editor"; reputation.</p>
+</li>
+<li>
+<p>Protection from sabotage: Wikipedia</p>
+</li>
+<li>
+<p>Registered domain name opentorah.org.</p>
+</li>
+<li>
+<p>Look into publishing an ODPS catalog.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_interface"><a class="anchor" href="#_interface"></a><a class="link" href="#_interface">Interface</a></h3>
+<div class="paragraph">
+<p>Передвижение по текстам - горизонтальное и через таги (смысловое); поиск; выбор "фокуса": даф/сугъя; заметки: внести/просмотреть мои; недельная глава, последние и ближайшие шиурим, прошлые поиски юзера, последние поступления и т.д. От текста переход на соседние логические единицы текста, комментарии к нему (к выделенному юзером отрывку), поднятие к комментируемум им тексту, переводы и варианты.
+Список просмотренных сегодня текстов. "рабочий стол": выбранные тексты и большой лист для записей юзера - план урока или хидуш (конспект проведенной работы).</p>
+</div>
+<div class="paragraph">
+<p>Отец семейства хочет подготовить субботний разговор.
+Мы помним его любимых комментаторов , ему они предложены на "столе", при желании он находит дополнительные материалы на "полке", вытаскивает понравившиеся на лист, возможно добавляет список вопросов для детей.
+Текст и добавления идут в одном потоке</p>
+</div>
+<div class="paragraph">
+<p>Подготовка драши к событию.
+Юзер выбирает из списка (бар мицва, бат мицва, брит, сиюм &#8230;&#8203;) события, затем из другого списка - шиурим ему подходяшие (недельная глава, Тания, Рамбам, ближайшие праздники) и на основе этого выбора он получает набор текстов.</p>
+</div>
+<div class="paragraph">
+<p>Kроме побора текстов в формате "форума" может понадобиться например снимок листа Гемары.</p>
+</div>
+<div class="paragraph">
+<p>Для урока в ешиве тихонит учитель может захотеть добавить виде-аудиоматериалы и разные картинки.
+(При обращени к внешним материалам надо продумать политику цензурирования, чтобы досов не спугнуть)</p>
+</div>
+<div class="paragraph">
+<p>Презентации.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_web_api"><a class="anchor" href="#_web_api"></a><a class="link" href="#_web_api">Web API</a></h3>
+<div class="paragraph">
+<p>Everything doable using the interface should be doable using the Web API.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Retrieval and modification via various protocols, primarily - HTTP (AtomPub, WebDav, XML-RPC?)</p>
+</li>
+<li>
+<p>Retrieval and modification in various formats, primarily - TEI.</p>
+</li>
+<li>
+<p>Add/change; add/change metadata.</p>
+</li>
+<li>
+<p>It should be possible to work with the text in a text editor.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_attraction_and_commercialization"><a class="anchor" href="#_attraction_and_commercialization"></a><a class="link" href="#_attraction_and_commercialization">Attraction and Commercialization</a></h3>
+<div class="sect3">
+<h4 id="_guilt"><a class="anchor" href="#_guilt"></a><a class="link" href="#_guilt">Guilt</a></h4>
+<div class="paragraph">
+<p>Our system must become a part of Jewish culture.
+A bochur that does not curate a folio of Talmud or a chapter of a rishon will be ostracized.
+Nobody will deal with a publisher that did not gift us 10 electronic texts.
+All sponsors will be ours: we are visible across the world.
+We will be the place to perform a commandment of writing the Scroll, give haskomos, print hiddushim (like the physicists do in arXivе).
+And to leave a memory of yourself or other people.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_graduated_paid_services"><a class="anchor" href="#_graduated_paid_services"></a><a class="link" href="#_graduated_paid_services">Graduated paid services</a></h4>
+<div class="paragraph">
+<p>Additional services for money: quality printing, access to the "super-proofread" texts.</p>
+</div>
+<div class="paragraph">
+<p>Access based on the purchase of the print book.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_google"><a class="anchor" href="#_google"></a><a class="link" href="#_google">Google</a></h4>
+<div class="paragraph">
+<p>They can host and pay for this - but looks like they already did Sefaria :)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="introduction.html">Introduction</a> | ↑ Up: <a href="dream.html">Digital Judaica Done Right</a> | Next: <a href="bibliography-sources.html">Sources</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

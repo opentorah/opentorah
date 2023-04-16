@@ -20,7 +20,7 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
   private def check(xml: ScalaXml.Element, width: Int, expected: String): Unit =
     check(From.scalaXml("test XML", xml), width, expected)
 
-  "Chunking" should "work" in {
+  "Chunking" should "work" in:
     check(<a>X<b/> </a>, 120, expected =
     """|<a>X<b/></a>""")
 
@@ -38,9 +38,8 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
          |  <b/>
          |  <b/>
          |</a>""")
-  }
 
-  "PrettyPrinter" should "work" in {
+  "PrettyPrinter" should "work" in:
     check(<a><b></b></a>, 4, expected =
       """|<a>
          |<b/>
@@ -144,10 +143,8 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
             |  <xsl:param value="x"/>
             |  <d:y xmlns:y="zzz"/>
             |</xsl:stylesheet>""")
-  }
 
-  "Encoding" should "work" in {
+  "Encoding" should "work" in:
     check(<ref target="https://forum.j-roots.info/viewtopic.php?t=5970&amp;start=240">text</ref>, 120,
     s"""<ref target="https://forum.j-roots.info/viewtopic.php?t=5970&amp;start=240">text</ref>"""
     )
-  }

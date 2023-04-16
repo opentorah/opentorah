@@ -5,8 +5,8 @@ import org.opentorah.calendar.jewish.{NewYear, SpecialDay}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-final class LeapShemittahSelichosTest extends AnyFlatSpec, Matchers {
-  "Shemittah/Leap/Long Slichos frequencies" should "be known" in {
+final class LeapShemittahSelichosTest extends AnyFlatSpec, Matchers:
+  "Shemittah/Leap/Long Slichos frequencies" should "be known" in:
     var num: Int = 0
     var numLeap: Int = 0
     var numShemittah: Int = 0
@@ -28,5 +28,3 @@ final class LeapShemittahSelichosTest extends AnyFlatSpec, Matchers {
 
     println(s"all=$num; leap=$numLeap; shemittah=$numShemittah; leap shemittah=$numLeapShemittah")
     println(s"numDaysSelichos=${numDaysSelichosArray.mkString(", ")}")
-  }
-}

@@ -1,8 +1,8 @@
 plugins {
-  id 'java-library'
   id 'scala'
   id 'org.asciidoctor.jvm.convert'
   id 'org.asciidoctor.jvm.gems'
+  id 'org.asciidoctor.jvm.pdf'
 }
 
 description = 'OpenTorah Documentation'
@@ -20,12 +20,25 @@ dependencies {
   implementation libs.logback
 
   asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.16'
+
+  // Note: version 0.11.0 results in
+  //  nokogiri requires Ruby version >= 2.7.0. The current ruby version is 2.5.7.0
+  // no idea where this comes from: ambient Ruby (which is not used) is 3.1, and JRuby version setting does not make a difference...
+  // version 0.10.3 break spectacularly
+//  asciidoctorGems 'rubygems:asciidoctor-bibliography:0.10.3'
+
+  // Note: attempts to require this *sporadically* result in
+  //   org.jruby.exceptions.LoadError: (LoadError) no such file to load -- asciidoctor-bibtex
+  // This seems to be a bug: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/628
+  // with a workaround - disabling build cache: ./gradlew clean asciidoctor --no-build-cache
+  // that does not work for me (although this extension /did/ work for a while I think - and then stopped)...
+//  asciidoctorGems 'rubygems:asciidoctor-bibtex:0.8.0'
 }
 
 final File tablesDir = file("$buildDir/docs/tables")
 tasks.register('generateTables', JavaExec) {
-  group = 'publishing'
-
+  group = 'documentation'
+  outputs.dir(tablesDir)
   mainClass.set('org.opentorah.calendar.paper.Tables')
   args = [tablesDir]
   classpath = sourceSets.main.runtimeClasspath
@@ -33,65 +46,98 @@ tasks.register('generateTables', JavaExec) {
 
 final File asciidocSourceDir = file("$projectDir/src/docs/asciidoc/")
 final File asciidocOutputDir = file("$buildDir/docs/asciidoc")
+final File paperDir = file("$projectDir/paper")
+
 asciidoctor {
   dependsOn(generateTables, asciidoctorGemsPrepare)
 
   sourceDir asciidocSourceDir
   inputs.dir(asciidocSourceDir)
-
   sources {
     include 'calendar/calendar.adoc'
     include 'typesetting/typesetting.adoc'
     include 'dream/dream.adoc'
   }
 
-  outputOptions {
-    backends = [
-//      'pdf',
-      'html5',
-      'multipage_html5',
-    ]
-  }
-
   outputDir asciidocOutputDir
-
-  doFirst {
-    project.delete(asciidocOutputDir)
+  outputs.dir(asciidocOutputDir)
+  outputOptions {
+    backends = [/*'pdf',*/ 'html5', 'multipage_html5']
   }
+
   doLast {
-    project.sync {
-      from asciidocOutputDir
-      into "$projectDir/paper"
+    project.copy {
+      into paperDir
+
+      from "$asciidocSourceDir/styles.css"
+      from "$asciidocOutputDir/html5/calendar/calendar.html"
+      from "$asciidocOutputDir/html5/dream/dream.html"
+      from "$asciidocOutputDir/html5/typesetting/typesetting.html"
+      from "$asciidocOutputDir/multipage_html5"
     }
+  }
+
+  asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
+//    version '2.0.16'
+//    jrubyVersion '9.4.2.0' // '9.2.7.0' //'9.4.2.0'
+    modules.pdf.version '2.3.4'
+    // modules.epub.version '???'
+
+    requires 'asciidoctor-multipage'
+
+//    requires 'asciidoctor-bibliography'
+//    requires 'asciidoctor-bibtex'
   }
 
   attributes = [
     tablesdir: tablesDir,
+    reproducible: true,
+    linkcss: true,
+    'multipage-disable-css': true,
+    copycss: "$asciidocSourceDir/styles.css",
+    stylesdir: '.',
+    stylesheet: 'styles.css',
     docinfo: 'shared',
-    docinfodir: "$asciidocSourceDir/docinfo",
-    // partnums: true,
-    // sectnums: true,
+    docinfodir: asciidocSourceDir,
+    author: 'Leonid Dubinsky',
+    email: 'dub@opentorah.org',
+    toclevels: 1,
+    'multipage-level': 1,
     sectlinks: true,
     sectanchors: true,
-    "hide-uri-scheme": true
+    'hide-uri-scheme': true,
+    'bibliography-database': "$asciidocSourceDir/bibliography.bib",
+    'bibliography-style': 'apa',
+    'bibtex-file': "$asciidocSourceDir/bibliography.bib",
+    'bibtex-style': 'university-of-york-ieee'
   ]
-
-  asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
-    requires 'asciidoctor-multipage'
-    modules.pdf.version '2.3.4'
-  // TODO bibliography: https://github.com/riboseinc/asciidoctor-bibliography
-  // TODO bibliography: https://github.com/asciidoctor/asciidoctor-bibtex
-  }
 }
 
+tasks.register('site') {
+  description = 'Generate project website'
+  group = 'documentation'
+  dependsOn(asciidoctor /*, mdoc*/)
+}
+
+tasks.named('build') {
+  dependsOn(site)
+}
+
+final String httpPort = '8080'
+tasks.register('serveSite', Exec) {
+  group = 'documentation'
+  dependsOn(site)
+  doFirst {
+    logger.lifecycle("Serving " + projectDir + " on port " + httpPort)
+  }
+  workingDir projectDir
+  commandLine 'python', '-m', 'http.server', httpPort
+}
+
+//library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.7")
 //final File mdocOutputDir = file("$buildDir/docs/mdoc")
 //// TODO: using register() here breaks Gradle...
 //task mdoc(type: JavaExec) {
-//  group = 'publishing'
-//  description = 'Process and publish mdoc documentation'
-//
-//  dependsOn(classes)
-//
 //  mainClass = 'mdoc.Main'
 //  args = [
 //    '--in', "$projectDir/src/docs/mdoc",
@@ -99,34 +145,4 @@ asciidoctor {
 //    '--classpath', sourceSets.main.runtimeClasspath.asPath
 //  ]
 //  classpath = sourceSets.main.runtimeClasspath
-//
-//  doFirst {
-//    project.delete(mdocOutputDir)
-//  }
-//  doLast {
-//    project.sync {
-//      from mdocOutputDir
-//      into "$projectDir/docs"
-//    }
-//  }
 //}
-
-tasks.register('site') {
-  description = 'Generate project website'
-  group = 'publishing'
-
-  dependsOn(asciidoctor /*, mdoc*/)
-}
-
-final String httpPort = '8080'
-tasks.register('serveSite', Exec) {
-  group = 'publishing'
-
-  dependsOn(site)
-
-  doFirst {
-    logger.lifecycle("Serving " + projectDir + " on port " + httpPort)
-  }
-  workingDir projectDir
-  commandLine 'python', '-m', 'http.server', httpPort
-}

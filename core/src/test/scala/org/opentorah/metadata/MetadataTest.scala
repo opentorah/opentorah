@@ -5,11 +5,10 @@ import org.scalatest.matchers.should.Matchers
 
 final class MetadataTest extends AnyFlatSpec, Matchers:
 
-  "Language" should "work" in {
+  "Language" should "work" in:
     Language.English.names.names.length shouldBe 4
-  }
 
-  "Hebrew.numberToString" should "work" in {
+  "Hebrew.numberToString" should "work" in:
     def check(number: Int, string: String): Unit =
       Language.Hebrew.numberToString(number) shouldBe string
       Language.Hebrew.numberFromString(string) shouldBe Some(number)
@@ -31,4 +30,4 @@ final class MetadataTest extends AnyFlatSpec, Matchers:
 
     fail("הה")
     fail("ק׳")
-  }
+

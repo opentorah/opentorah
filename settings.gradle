@@ -7,8 +7,8 @@ pluginManagement {
   plugins {
     id 'com.github.ben-manes.versions' version '0.44.0'
     id 'com.github.maiflai.scalatest'  version '0.32'
-    id 'org.podval.tools.scalajs'      version '0.4.7'
-    id 'com.google.cloud.tools.jib'    version '3.3.1'
+    id 'org.podval.tools.scalajs'      version '0.4.8'
+    id 'com.google.cloud.tools.jib'    version '3.3.2'
     id 'org.podval.tools.cloudrun'     version '0.3.1'
     id 'com.gradle.plugin-publish'     version '1.1.0'
     id 'org.asciidoctor.jvm.convert'   version '3.3.2'
@@ -20,11 +20,11 @@ pluginManagement {
 //includeBuild '../../Projects/scalajs/scalajs-gradle'
 }
 
-final String scalaVersion      = '3.2.2'
+final String scalaVersion      = '3.3.0'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.10'
-final String flexmarkVersion   = '0.64.0'
+final String zioVersion        = '2.0.13'
+final String flexmarkVersion   = '0.64.8'
 final String batikVersion      = '1.16'
 final String catsVersion       = '2.9.0'
 
@@ -47,22 +47,22 @@ dependencyResolutionManagement {
     library('zinc'         , 'org.scala-sbt:zinc_2.13:1.8.0')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.1.1')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.0')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
-    library('saxon11'      , 'net.sf.saxon:Saxon-HE:12.0')
+    library('saxon11'      , 'net.sf.saxon:Saxon-HE:12.2')
     library('saxon6'       , 'saxon:saxon:6.5.3')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.20.1')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.22.3')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:0.0.3") // TODO 0.0.4
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.0-RC2")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
@@ -77,19 +77,11 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.5')
-
-    // FOP
-    library('fop-core'        , 'org.apache.xmlgraphics:fop:2.8')
-    library('fop-hyph'        , 'net.sf.offo:fop-hyph:2.0') // Hyphenation patterns
-    library('batik-transcoder', "org.apache.xmlgraphics:batik-transcoder:$batikVersion")
-    library('batik-extension' , "org.apache.xmlgraphics:batik-extension:$batikVersion")
-    // TODO split runtime-only out of it
-    bundle('fop', ['fop-core', 'fop-hyph', 'batik-transcoder', 'batik-extension'])
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.6')
 
     // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.6')
-    library('logback' , 'ch.qos.logback:logback-classic:1.4.5')
+    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.7')
+    library('logback' , 'ch.qos.logback:logback-classic:1.4.7')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.3')
 
     // Flexmark
@@ -102,11 +94,8 @@ dependencyResolutionManagement {
     library('zmanim', 'com.kosherjava:zmanim:2.4.0')
 
     // Testing
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.15")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.16")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
-
-    // Documentation
-    //library('mdoc', "org.scalameta:mdoc_$scalaVersionMajor:2.3.7")
   }}
 }
 
@@ -124,7 +113,7 @@ project(':texts'    ).name = 'opentorah-texts'
 include ':collector'
 project(':collector').name = 'opentorah-collector'
 
-include ':docbook'
-project(':docbook'  ).name = 'opentorah-docbook'
+//include ':docbook'
+//project(':docbook'  ).name = 'opentorah-docbook'
 
 include ':docs'

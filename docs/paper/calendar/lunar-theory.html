@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="description" content="Rambam's laws of the sanctification of the Moon, translated, with some remarks">
+<meta name="keywords" content="Rambam, calendar, astronomy">
+<meta name="author" content="Leonid Dubinsky">
+<title>Rambam on Calendar</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="lunar-theory" class="book">
+<div id="header">
+<h1>Rambam on Calendar</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="calendar.html">Rambam on Calendar</a></span></p><ul class="sectlevel1">
+<li><a href="introduction.html">Introduction</a>
+</li>
+<li><a href="remarks.html">Some Remarks</a>
+<ul class="sectlevel1">
+<li><a href="new-year-corrections.html">New Year corrections</a>
+</li>
+<li><a href="problematic-nissan.html">Problematic Nissan (KH 6:7)</a>
+</li>
+<li><a href="solar-theory.html">Solar Theory</a>
+</li>
+<li><a href="lunar-theory.html"><span class="toc-current">Lunar Theory</span></a>
+</li>
+<li><a href="leap-years-cycle.html">Meton&#8217;s cycle</a>
+</li>
+</ul>
+</li>
+<li><a href="translation.html">Translation of the original text</a>
+</li>
+<li><a href="glossary.html">Glossary</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="lunar-theory"><a class="anchor" href="#lunar-theory"></a><a class="link" href="#lunar-theory">Lunar Theory</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
+Why is the second "mean"? Because of the effects of the sun?</p>
+</div>
+<div class="paragraph">
+<p>Note: From what and in which direction are the angles measured?</p>
+</div>
+<div class="paragraph">
+<p>Anomaly (and head?): opposite direction!</p>
+</div>
+<div class="paragraph">
+<p>TODO MoonHeadMean rambamValue and almagestValue</p>
+</div>
+<div class="paragraph">
+<p>Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
+"'ordered' year"; it was rendered as 254 in accordance with Law 12:1.</p>
+</div>
+<div class="paragraph">
+<p>Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+Also, this value is actually given in Law 4.</p>
+</div>
+<div class="paragraph">
+<p>14: 5,6 TODO: Compare with 11:9, about Dli&#8230;&#8203; Something is off!</p>
+</div>
+<div class="paragraph">
+<p>15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)).
+Rambam does not describe the model behind this correction.
+Because the models Rambam did describe until now are the same
+as Almagest&#8217;s models
+(including numerical parameters), and because this correction
+is determined by the (doubled)
+sun-moon elongation, just like Almagest&#8217;s "improved" model of
+the moon ("the crank"),
+I assume that that model was used to calculate this correction.
+TODO: describe the model!</p>
+</div>
+<div class="paragraph">
+<p>TODO: Derive the formula! Make the diagram!
+TODO: How come the fact that sun and moon move in different
+plains does not affect this calculation?</p>
+</div>
+<div class="paragraph">
+<p>It seems that Rambam treats "the crank" as just a calculation
+device - otherwise,
+table giving visible anomaly from the corrected anomaly should
+take into account changes in the
+earth-moon distance depending on the elongation - and it does not!
+Maybe that is why he does not describe the model behind this correction.
+And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
+needs to be calculated correctly.
+TODO: How does Almagest calculate visible anomaly?</p>
+</div>
+<div class="paragraph">
+<p>Law 4,5,6: True Lunar Longitude.</p>
+</div>
+<div class="paragraph">
+<p>Formulae:</p>
+</div>
+<div class="stemblock">
+<div class="content">
+\[\tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right)\]
+</div>
+</div>
+<div class="paragraph">
+<p>\(R\) - radius of the big circle;
+\(r\) - radius of the small circle;
+\(\epsilon = R/r\).
+A little trigonometry, and we get:
+visible anomaly = arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e))
+and:
+e = ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly)</p>
+</div>
+<div class="paragraph">
+<p>TODO: Make the diagram! Here?</p>
+</div>
+<div class="paragraph">
+<p>It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
+when they should be smaller. Value for 120° is also misprinted, but it is less obvious.</p>
+</div>
+<div class="paragraph">
+<p>Calculations show that for the precision up to a minute,
+it is sufficient to know e to up to the second
+digit after the dot.
+Below, a column giving the value of e was added to the table.
+Look at the value of e, and the misprints become obvious:
+value of e for them is way out of range it is in
+for the rest of them.</p>
+</div>
+<div class="paragraph">
+<p>TODO Range of e - graph. Range of possible values for each based on the range of e.
+This is transcription error: one letter; extra word&#8230;&#8203; Probable correct values.</p>
+</div>
+<div class="paragraph">
+<p>This is how different sources treat the often misprinted values:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Edition</th>
+<th class="tableblock halign-left valign-top">120°</th>
+<th class="tableblock halign-left valign-top">150°</th>
+<th class="tableblock halign-left valign-top">170°</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#Vilno">[Vilno]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#Eshkol">[Eshkol]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#LaAm">[LaAm]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#Kapach">[Kapach]</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#Bluming">[Bluming]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-translations.html#Frenkel">[Frenkel]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-jews-on-calendar.html#Keller">[Keller]</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="bibliography-jews-on-calendar.html#Losh">[Losh]</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="moon-questions"><a class="anchor" href="#moon-questions"></a><a class="link" href="#moon-questions">Questions</a></h3>
+<div class="sect3">
+<h4 id="_moznaim_rambam_kh_132f4"><a class="anchor" href="#_moznaim_rambam_kh_132f4"></a><a class="link" href="#_moznaim_rambam_kh_132f4">Moznaim Rambam, KH 13:2f4</a></h4>
+<div class="paragraph">
+<p>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_moons_mean_period_from_astronomical_models"><a class="anchor" href="#_moons_mean_period_from_astronomical_models"></a><a class="link" href="#_moons_mean_period_from_astronomical_models">Moon&#8217;s mean period from astronomical models</a></h4>
+<div class="paragraph">
+<p>Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+Moon.meanLunarPeriod - what is it called? Tropical?</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_145_moon_longitude_adjustment_for_time_of_seeing"><a class="anchor" href="#_145_moon_longitude_adjustment_for_time_of_seeing"></a><a class="link" href="#_145_moon_longitude_adjustment_for_time_of_seeing">14:5 Moon Longitude Adjustment for Time of Seeing</a></h4>
+<div class="paragraph">
+<p>See notes in Moznaim Rambam
+Sun longitude: mean or true?
+In 3rd and 7th lines, most editions incorrectly have 15.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_todo_moznaim_rambam_kh_151f2"><a class="anchor" href="#_todo_moznaim_rambam_kh_151f2"></a><a class="link" href="#_todo_moznaim_rambam_kh_151f2">TODO Moznaim Rambam, KH 15:1f2</a></h4>
+<div class="paragraph">
+<p>double elongation = distance between moon&#8217;s mean and apogee
+Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
+encode the limits</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_moonsightable_forsightinglimits"><a class="anchor" href="#_moonsightable_forsightinglimits"></a><a class="link" href="#_moonsightable_forsightinglimits">MoonSightable.forSightingLimits</a></h4>
+<div class="paragraph">
+<p>is that what Rambam is saying?</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_distance_between_mean_and_true_new_moon"><a class="anchor" href="#_distance_between_mean_and_true_new_moon"></a><a class="link" href="#_distance_between_mean_and_true_new_moon">Distance between mean and true new moon</a></h4>
+<div class="paragraph">
+<p>KH 5:1-2 says that the distance is no more than a day.
+Calculate this difference for all months; Rambam&#8217;s epoch - two days after molad?! (Petya Ofman).</p>
+</div>
+<div class="paragraph">
+<p>How to find the day of sighting given a month?</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_differences_between_arithmetic_and_observational_calendars"><a class="anchor" href="#_differences_between_arithmetic_and_observational_calendars"></a><a class="link" href="#_differences_between_arithmetic_and_observational_calendars">Differences between arithmetic and observational calendars</a></h4>
+<div class="ulist">
+<ul>
+<li>
+<p>основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
+а-шана, а методами последних глав Кидуш а-ходеш</p>
+</li>
+<li>
+<p>другой порядок високосных и простых лет</p>
+</li>
+<li>
+<p>другой порядок полных и неполных месяцев</p>
+</li>
+<li>
+<p>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
+и днями недели?</p>
+</li>
+<li>
+<p>Пример: выход из Египта - 15 день от освящения месяца, четверг</p>
+</li>
+<li>
+<p>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_timetorotation_calculate"><a class="anchor" href="#_timetorotation_calculate"></a><a class="link" href="#_timetorotation_calculate">TimeToRotation.calculate()</a></h4>
+<div class="paragraph">
+<p>without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test);
+see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
+see if the end result is stable when Rambam&#8217;s "real" value is used with straight multiplication and rounding
+(abstract away the calculation mechaninsm).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_todo_example_in_158_9"><a class="anchor" href="#_todo_example_in_158_9"></a><a class="link" href="#_todo_example_in_158_9">TODO Example in 15:8-9</a></h4>
+<div class="paragraph">
+<p>moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
+still 108°21′46″, which doesn&#8217;t round to 108°21&#8230;&#8203;
+moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_todo_example_1713_14"><a class="anchor" href="#_todo_example_1713_14"></a><a class="link" href="#_todo_example_1713_14">TODO Example 17:13-14</a></h4>
+<div class="paragraph">
+<p>"this longitude is in Taurus" - but longitude3 isn&#8217;t, so I get 1/6 instead of 1/5&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_todo_crescent_calculations_kh_18_19"><a class="anchor" href="#_todo_crescent_calculations_kh_18_19"></a><a class="link" href="#_todo_crescent_calculations_kh_18_19">TODO crescent calculations: KH 18-19!</a></h4>
+
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="solar-theory.html">Solar Theory</a> | ↑ Up: <a href="remarks.html">Some Remarks</a> | ⌂ Home: <a href="calendar.html">Rambam on Calendar</a> | Next: <a href="leap-years-cycle.html">Meton&#8217;s cycle</a> →</p>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. It is not clear how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic editions.
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. Reprints the text and does not correct any of the misprints - surprising for a textbook on the subject (even introductory). TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 = Digital Judaica Done Right
-Leonid Dubinsky <dub@podval.org>
 :doctype: article
 :toc:
 

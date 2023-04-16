@@ -1,0 +1,76 @@
+[#kh-13]
+== Chapter 13
+
+[#kh-13-1]
+=== Law 1
+If you want to find out true position of the Sun for any day that you want, first calculate its mean position for that day
+the way we explained, and calculate position of the Sun's apogee. Subtract position of the Sun's apogee from the Sun's mean position;
+what is left is called <<solar-portion-term>>.
+
+[#kh-13-2]
+=== Law 2
+See how many degrees is the maslul of the Sun;
+if maslul was less than one hundred and eighty degrees, subtract parallax correction from the position of the mean Sun;
+if maslul was more than one hundred and eighty degrees up to three hundred and sixty, add parallax correction to the position of the mean Sun;
+that what it is after you add to it or subtract from it is the true position.
+
+[#kh-13-3]
+=== Law 3
+Know that if maslul is exactly one hundred and eighty or exactly three hundred and sixty, it doesn't have parallax correction;
+rather, the mean position is the true position
+
+[#kh-13-4]
+=== Law 4
+And what is the value of the parallax correction?
+If maslul will be ten degrees, its parallax correction will be twenty seconds;
+and if it will be twenty degrees, its parallax correction will be fourty minutes;
+and if it will be thirty degrees, its parallax correction will be fifty eight minutes;
+and if it will be forty degrees, its parallax correction will be one degree and fifteen minutes;
+and if it will be fifty degrees, its parallax correction will be one degree and twenty nine minutes;
+and if it will be sixty degrees, its parallax correction will be one degree and forty one minutes;
+and if it will be seventy degrees, its parallax correction will be one degree and fifty one minutes;
+and if it will be eighty degrees, its parallax correction will be one degree and fifty seven minutes;
+and if it will be ninety degrees, its parallax correction will be one degree and fifty nine minutes;
+and if it will be one hundred degrees, its parallax correction will be one degree and fifty eight minutes;
+and if it will be one hundred and ten degrees, its parallax correction will be one degree and fifty three minutes;
+and if it will be one hundred and twenty degrees, its parallax correction will be one degree and forty five minutes;
+and if it will be one hundred and thirty degrees, its parallax correction will be one degree and thirty three minutes;
+and if it will be one hundred and forty degrees, its parallax correction will be one degree and nineteen minutes;
+and if it will be one hundred and fifty degrees, its parallax correction will be one degree and one minute;
+and if it will be one hundred and sixty degrees, its parallax correction will be forty two minutes;
+and if it will be one hundred and seventy degrees, its parallax correction will be twenty one minutes;
+and if it will be one hundred and eighty degrees exactly, it doesn't have parallax correction, as we explained,
+rather Sun's mean position is its true position.
+
+[#kh-13-5]
+=== Law 5
+If maslul was more than one hundred and eighty degrees, subtract it from three hundred and sixty degrees and find out its parallax correction.
+For example, if maslul was two hundred degrees, subtract it from three hundred and sixty, and one hundred and sixty degrees will be left.
+And we already made known that parallax correction for one hundred and sixty degrees is fourty two minutes,
+and so is the parallax correction for two hundred - forty two minutes.
+
+[#kh-13-6]
+=== Law 6
+Also, if the maslul was three hundred degrees, subtract it from three hundred and sixty - and sixty will remain.
+And you already know that parallax correction for sixty degrees [is] one degree and forty one minutes,
+and so is the parallax correction for three hundred degrees. And the same way - for every number.
+
+[#kh-13-7]
+=== Law 7
+TODO
+
+[#kh-13-8]
+=== Law 8
+TODO
+
+[#kh-13-9]
+=== Law 9
+TODO
+
+[#kh-13-10]
+=== Law 10
+TODO
+
+[#kh-13-11]
+=== Law 11
+TODO

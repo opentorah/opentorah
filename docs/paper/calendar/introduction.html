@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="description" content="Rambam's laws of the sanctification of the Moon, translated, with some remarks">
+<meta name="keywords" content="Rambam, calendar, astronomy">
+<meta name="author" content="Leonid Dubinsky">
+<title>Rambam on Calendar</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="introduction" class="book">
+<div id="header">
+<h1>Rambam on Calendar</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="calendar.html">Rambam on Calendar</a></span></p><ul class="sectlevel1">
+<li><a href="introduction.html"><span class="toc-current">Introduction</span></a>
+</li>
+<li><a href="remarks.html">Some Remarks</a>
+</li>
+<li><a href="translation.html">Translation of the original text</a>
+</li>
+<li><a href="glossary.html">Glossary</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a><a class="link" href="#introduction">Introduction</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Latest version of this paper and the code used to produce it are available from <a href="http://www.opentorah.org" class="bare">www.opentorah.org</a>.</p>
+</div>
+<div class="paragraph">
+<p>In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two calendars: fixed ("arithmetic") and observational ("astronomical").
+Both calendars are described in a form ready to be implemented, but the reasons for the calculation steps - especially for the astronomical calendar - are not always given: what are the models - and the formulae resulting from them - that reproduce the numbers?
+Sometimes Rambam describes the models, so only the formulae need to be reconstructed; sometimes the models are not described, so both the models and the formulae need to be reconstructed.</p>
+</div>
+<div class="paragraph">
+<p>Goals of this paper are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>reconstruct models that Rambam uses from the Rambam&#8217;s text</p>
+</li>
+<li>
+<p>describe the models with diagrams and formulae</p>
+</li>
+<li>
+<p>reconstruct parameters of the models from the numbers given by Rambam</p>
+</li>
+<li>
+<p>identify misprints in the traditional editions</p>
+</li>
+<li>
+<p>analyze correspondence with the fixed calendar</p>
+</li>
+<li>
+<p>verify Rambam&#8217;s tables and rounding decisions against his models</p>
+</li>
+<li>
+<p>analyze impact of various misprints on the sighting calculations</p>
+</li>
+<li>
+<p>verify consistency of Rambam&#8217;s numbers.</p>
+</li>
+<li>
+<p>translate relevant chapters of Rambam into English.
+The translation does not have to be literal; literal translations are already available (<a href="bibliography-translations.html#Yale">[Yale]</a>, <a href="bibliography-translations.html#Moznaim">[Moznaim]</a>).
+The goal of our translation is to make the text complete and accessible for collaboration by people not proficient enough in Hebrew.</p>
+</li>
+<li>
+<p>see how Rambam&#8217;s calculations of the moon visibility compare to the current models</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Approximate timeline of the project:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In 1984, The Rebbe instructed Jews to learn Rambam every day.
+As a result, in 1991 I encountered calendar chapters of Rambam, decided to reconstruct the models behind the calculations described in them, and discovered mistakes in the text of one of the laws (15:6).
+The results were published in "Notices of Temimim and Anash", a weekly of the central Lubavicher Yeshiva 770. Some of the readers were appalled that someone dares to correct the text of Rambam!
+My point was that the text as published contains mistakes that need to be corrected.
+Indeed, Frenkel edition <a href="bibliography-translations.html#Frenkel">[Frenkel]</a>, that was already published at the time, corrects all of the mistakes I did.
+In fact, they were already corrected by Hazon Ish in his commentary on Rambam <a href="bibliography-translations.html#HazonIsh">[HazonIsh]</a> - but I did not know it then.</p>
+</li>
+<li>
+<p>2008: I acquired a pile of books on the subject and started looking into it; I also experimented with various ways of publishing the work on the web.</p>
+</li>
+<li>
+<p>2009: coded some of the algorithms to look into the rumors the dates of <a href="http://dub.podval.org/2019/07/18/sanctification-of-the-sun.html">Birkhat HaHamah</a> that were circulating then.</p>
+</li>
+<li>
+<p>2013: code converted to Scala.</p>
+</li>
+<li>
+<p>2017-2018: split-file encoding of the family polymorphism and current representation of the dates and angles were implemented in the supporting code.</p>
+</li>
+<li>
+<p>2018-2019: generation of reading and learning schedules was added to the code.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;) If your name should be on this list but isn&#8217;t, please forgive me: the omission is not intentional.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither;</p>
+</li>
+<li>
+<p>Ilia Pomansky - for encouraging this work at the early stages, in 1991;</p>
+</li>
+<li>
+<p>my wife Nina - for listening to my wild ideas, for her patience, and for help with math;</p>
+</li>
+<li>
+<p>my daughter Menucha Rochel - for assistance with the translation;</p>
+</li>
+<li>
+<p>Rabbi Michael Koretz - for stimulating discussions during our visit to Israel in 2005, encouragement, and extensive research into customs of Torah/Haftarah reading;</p>
+</li>
+<li>
+<p>Dr. Michael Partensky - for encouragement and advise;</p>
+</li>
+<li>
+<p>Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;</p>
+</li>
+<li>
+<p>Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;</p>
+</li>
+<li>
+<p>Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1;</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>↑ Up: <a href="calendar.html">Rambam on Calendar</a> | Next: <a href="remarks.html">Some Remarks</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+</body>
+</html>

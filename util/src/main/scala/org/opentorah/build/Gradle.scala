@@ -2,6 +2,7 @@ package org.opentorah.build
 
 import org.gradle.api.{Project, Task}
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.{ListProperty, MapProperty, Property}
 import org.gradle.api.tasks.{SourceSet, TaskProvider}
@@ -100,6 +101,9 @@ object Gradle:
         )
 
     result
+
+  def log(project: Project, logLevel: LogLevel): String => Unit =
+    (message: String) => project.getLogger.log(logLevel, message)
 
   def findOnClassPath(obj: AnyRef, name: String): URL =
     var result: Option[URL] = None

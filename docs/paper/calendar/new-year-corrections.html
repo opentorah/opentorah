@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="description" content="Rambam's laws of the sanctification of the Moon, translated, with some remarks">
+<meta name="keywords" content="Rambam, calendar, astronomy">
+<meta name="author" content="Leonid Dubinsky">
+<title>Rambam on Calendar</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="new-year-corrections" class="book">
+<div id="header">
+<h1>Rambam on Calendar</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="calendar.html">Rambam on Calendar</a></span></p><ul class="sectlevel1">
+<li><a href="introduction.html">Introduction</a>
+</li>
+<li><a href="remarks.html">Some Remarks</a>
+<ul class="sectlevel1">
+<li><a href="new-year-corrections.html"><span class="toc-current">New Year corrections</span></a>
+</li>
+<li><a href="problematic-nissan.html">Problematic Nissan (KH 6:7)</a>
+</li>
+<li><a href="solar-theory.html">Solar Theory</a>
+</li>
+<li><a href="lunar-theory.html">Lunar Theory</a>
+</li>
+<li><a href="leap-years-cycle.html">Meton&#8217;s cycle</a>
+</li>
+</ul>
+</li>
+<li><a href="translation.html">Translation of the original text</a>
+</li>
+<li><a href="glossary.html">Glossary</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="new-year-corrections"><a class="anchor" href="#new-year-corrections"></a><a class="link" href="#new-year-corrections">New Year corrections</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>are there meaningful names for the corrections?</p>
+</li>
+<li>
+<p>are corrections explained by the desire to not have Yom Kippur on Sunday etc.?</p>
+</li>
+<li>
+<p>calculate third correction from the maximum length of a year and the first correction</p>
+</li>
+<li>
+<p>KH 7:8 says that postponement of RoshHaShonoh is done to align the calendar better with the true molad; analyze the statistics of distances between mean and true molad
+and RoshHashono.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There is an <a href="https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8">argument</a> concerning some of the Rosh Hashono delays involving r. Saadia Gaon:</p>
+</div>
+<div class="paragraph">
+<p>Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
+По нашей шите от Расага и дальше - 18 часов
+По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа</p>
+</div>
+<div class="paragraph">
+<p>make possible calculating the calendar according to the other opinion and compare the results.</p>
+</div>
+<div class="paragraph">
+<p>Молад года творения человека выходит в пятницу.
+Это и было Рош а-Шана второго года, ведь тогда принцип ли аду Рош не применялся.
+Тогда понятней спор Рамбама и Райвада о причине сдвига Рош а-Шана ло аду.
+Рамбама настаивает, что оно нужно для подсчёта по кибуц эмцаи,
+а Райвад на него из Талмуда возмущается.
+Теоретически можно сделать календарь на время до установления календаря без сдвига Рош а-Шана.</p>
+</div>
+<div class="paragraph">
+<p>Rav Ada&#8217;s tkufos started a week later than Shmuel&#8217;s! Isn&#8217;t it readily observable?
+Analyze the difference in historic periods&#8230;&#8203;</p>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>↑ Up: <a href="remarks.html">Some Remarks</a> | ⌂ Home: <a href="calendar.html">Rambam on Calendar</a> | Next: <a href="problematic-nissan.html">Problematic Nissan (KH 6:7)</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+</body>
+</html>

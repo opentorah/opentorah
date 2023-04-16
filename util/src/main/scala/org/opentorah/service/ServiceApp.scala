@@ -1,32 +1,28 @@
 package org.opentorah.service
 
-import org.opentorah.util.{Effects, Files, Logging}
+import org.opentorah.util.{Files, Logging}
 import org.slf4j.{Logger, LoggerFactory}
-import zio.http.{Body, HttpApp, Path, Request, Response, Server, ServerConfig}
-import zio.http.model.{Headers, Method, Status}
+import zio.http.{App, Body, Header, HttpApp, Method, Path, Request, Response, Server, Status}
 import zio.{ZIO, ZLayer}
-
-import java.time.Instant
 import ServiceApp.given
 
 // TODO use zio-http middleware to:
 // - auto-time (as opposed to the current manual approach with timed()) all requests (not just GETs);
-// - turn failures into appropriate responses (ala orNotFound());
-// - handle static resources and files in a centralized manner.
+// - turn failures into appropriate responses (ala orNotFound()).
+// TODO use Zio logging with logstash
 trait ServiceApp extends zio.ZIOAppDefault:
   // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
   // with `Metadata-Flavor: Google` header;
   // or do I even need it for logging?
   protected def projectId: String
 
-  // This is set when running in Cloud Run (or KNative in general?)
-  final protected def serviceName: Option[String] = Option(System.getenv("K_SERVICE"))
+  final protected val serviceName: Option[String] = ServiceApp.getServiceName
 
   Logging.configureLogBack(useLogStash = serviceName.isDefined)
 
-  final protected lazy val logger: GCPLogger = GCPLogger(projectId, log)
-
   protected def log: Logger = LoggerFactory.getLogger(this.getClass)
+
+  final protected lazy val logger: GCPLogger = GCPLogger(projectId, log)
 
   final protected def getParameter(name: String, defaultValue: String): String =
     def result(value: String, message: String): String =
@@ -34,7 +30,7 @@ trait ServiceApp extends zio.ZIOAppDefault:
       value
 
     scala.util.Properties.envOrNone(name).map((value: String) =>
-      result(value       , s"Value    for '$name' in the environment; using it     : '$value'")
+      result(value, s"Value    for '$name' in the environment; using it     : '$value'")
     ).getOrElse(
       result(defaultValue, s"No value for '$name' in the environment; using default: '$defaultValue'")
     )
@@ -46,30 +42,17 @@ trait ServiceApp extends zio.ZIOAppDefault:
 
   protected def run(args: zio.Chunk[String]): ZIO[Any, Throwable, Any]
 
-  final protected def serve(
-    routes: HttpApp[Any, Throwable],
-    nThreads: Int = 0
-  ): ZIO[Any, Throwable, Nothing] =
-    val port: Int = getParameter("PORT", portDefault.toString).toInt
+  final protected def serve(app: App[Any]): ZIO[Any, Throwable, Nothing] =
+    val port: Int = getParameter("PORT", 8080.toString).toInt
+    logger.warning(s"serviceName=$serviceName; port=$port") // TODO more information
 
-    logger.warning(s"serviceName=$serviceName") // TODO more information
+    // Note: To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1.
+    val config: Server.Config = Server.Config.default.port(port)
 
-    val config: ServerConfig = ServerConfig.default
-      // Note: To be accessible when running in a docker container the server
-      // must bind to all IPs, not just 127.0.0.1;
-      // with http4s, I had to supply a "host" string "0.0.0.0",
-      // but with zio-http there seems to be no way to do it - and no need :)
-      .port(port)
-      .leakDetection(ServerConfig.LeakDetectionLevel.PARANOID)
-      .maxThreads(nThreads)
-    val configLayer: ZLayer[Any, Nothing, ServerConfig] = ServerConfig.live(config)
-
-    (Server.install(routes).flatMap { port =>
-      zio.Console.printLine(s"Started server on port: $port") // TODO use logger
-    } *> ZIO.never)
-      .provide(configLayer, Server.live)
-
-  protected def portDefault: Int = 8080
+    Server.serve(app).provide(
+      Server.live,
+      ZLayer.succeed(config)
+    )
 
 //  private def staticRoutes: HttpApp[Any, Throwable] = Http.collectZIO[Request] {
 //    case request @ Method.GET -> !! / path if isStaticResource(path) =>
@@ -91,9 +74,9 @@ trait ServiceApp extends zio.ZIOAppDefault:
 //          request = Some(request)
 //        )
 //  }
-
-  protected def isStaticResource(path: String): Boolean = false
-  protected def isStaticFile    (path: String): Boolean = false
+//
+//  protected def isStaticResource(path: String): Boolean = false
+//  protected def isStaticFile    (path: String): Boolean = false
 
   final protected def timed[R](
     get: Request => ZIO[R, Throwable, Response]
@@ -120,6 +103,9 @@ trait ServiceApp extends zio.ZIOAppDefault:
     )
 
 object ServiceApp:
+  // This is set when running in Cloud Run (or KNative in general?)
+  def getServiceName: Option[String] = Option(System.getenv("K_SERVICE"))
+
   given CanEqual[Method, Method] = CanEqual.derived
   given CanEqual[Path  , Path  ] = CanEqual.derived
   given CanEqual[Status, Status] = CanEqual.derived
@@ -137,60 +123,3 @@ object ServiceApp:
       status = Status.NotFound,
       body = Body.fromString(s"File Not Found: $path \n ${error.getMessage}")
     )))
-
-  // Inspired by https://github.com/http4s/http4s/blob/main/core/jvm/src/main/scala/org/http4s/StaticFile.scala
-
-  def staticResource(
-    name: String,
-    request: Option[Request] = None,
-    classloader: Option[ClassLoader] = None
-  ): zio.Task[Response] =
-    val loader: ClassLoader = classloader.getOrElse(getClass.getClassLoader)
-    val normalizedName: String = name.split("/").filter(_.nonEmpty).mkString("/") // TODO Files.splitUrl
-    for
-      resourceOpt <- ZIO.attemptBlocking(Option(loader.getResource(normalizedName)))
-      result <- resourceOpt.map(staticFile(_, request)).getOrElse(Effects.fail(s"No such resource: $normalizedName"))
-    yield result
-
-  def staticFile(url: java.net.URL, request: Option[Request]): zio.Task[Response] =
-    for
-      isDirectory: Boolean <- ZIO.attemptBlocking((url.getProtocol == "file") && java.io.File(url.getFile).isDirectory)
-      _ <- Effects.check(!isDirectory, s"Is a directory: $url")
-
-      urlConnection: java.net.URLConnection <- ZIO.attemptBlocking(url.openConnection)
-
-      lastModifiedMilliseconds: Long <- ZIO.attemptBlocking(urlConnection.getLastModified)
-      lastModified: Instant = Instant.ofEpochSecond(lastModifiedMilliseconds / 1000)
-      ifModifiedSince: Option[String] = request.flatMap(_.headerValue(io.netty.handler.codec.http.HttpHeaderNames.IF_MODIFIED_SINCE))
-      expired: Boolean = ifModifiedSince.forall((ifModifiedSince: String) => Instant.parse(ifModifiedSince).isBefore(lastModified))
-
-      result <- if !expired then
-        for _ <- ZIO.attemptBlocking(urlConnection.getInputStream.close()).catchAll(_ => ZIO.succeed(()))
-        yield Response(status = Status.NotModified)
-      else
-        for
-          contentLength: Long <- ZIO.attemptBlocking(urlConnection.getContentLengthLong)
-          inputStream: java.io.InputStream <- ZIO.attemptBlocking(urlConnection.getInputStream)
-        yield Response(
-          headers =
-            Headers.lastModified(lastModified.toString) ++
-              Files.nameAndExtension(url.getPath)._2
-                .flatMap(name2contentType.get)
-                .map(Headers.contentType)
-                .getOrElse(Headers.empty) ++
-              (
-                if contentLength >= 0
-                then Headers.contentLength(contentLength)
-                else Headers.transferEncoding(zio.http.model.HeaderValues.chunked)
-              ),
-          body = Body.fromStream(zio.stream.ZStream.fromInputStream(inputStream))
-        )
-    yield result
-
-  private val name2contentType: Map[String, String] = Map(
-    "css"  -> "text/css",               // Note: without this, browser does not apply stylesheets (since recently)
-    "js"   -> "application/javascript", // Note: without this, browser does not process scripts
-    "svg"  -> "image/svg+xml",          // Note: without this, browser does not process SVG
-    "jpg"  -> "image/jpeg",
-    "jpeg" -> "image/jpeg"
-  )

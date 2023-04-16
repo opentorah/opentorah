@@ -8,10 +8,6 @@ dependencies {
   testRuntimeOnly libs.logback
 
   testImplementation libs.scalatest
-  // for scalatest reports
-  testImplementation libs.flexmark.core
-  testImplementation libs.flexmark.profile.pegdown
-
   testImplementation libs.scalacheck
   testImplementation libs.discipline.scalatest
   testImplementation libs.algebraLaws

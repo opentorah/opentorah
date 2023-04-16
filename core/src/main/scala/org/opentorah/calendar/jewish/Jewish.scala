@@ -5,6 +5,8 @@ import org.opentorah.metadata.{Language, Named, Names}
 
 object Jewish extends Calendar:
 
+  override def name: String = "jewish"
+
   override def epoch: Int = 0
 
   override def epochHours: Int = 0

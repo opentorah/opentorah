@@ -5,7 +5,7 @@ import org.opentorah.xml.ScalaXml
 import java.io.File
 
 object Table:
-  final class Column[T](val heading: String, /*subheading: String,*/ val f: T => Any)
+  final class Column[T](val heading: String, val f: T => Any)
 
 final class Table[T](rows: Seq[T])(columns: Table.Column[T]*):
 

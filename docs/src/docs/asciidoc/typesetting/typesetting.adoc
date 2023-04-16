@@ -1,5 +1,4 @@
 = Typesetting classic Jewish texts
-Leonid Dubinsky <dub@podval.org>
 :doctype: article
 :toc:
 

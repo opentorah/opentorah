@@ -1,0 +1,182 @@
+[#lunar-theory]
+== Lunar Theory
+Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
+Why is the second "mean"? Because of the effects of the sun?
+
+Note: From what and in which direction are the angles measured?
+
+Anomaly (and head?): opposite direction!
+
+TODO MoonHeadMean rambamValue and almagestValue
+
+Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
+"'ordered' year"; it was rendered as 254 in accordance with Law 12:1.
+
+Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
+Also, this value is actually given in Law 4.
+
+14: 5,6 TODO: Compare with 11:9, about Dli... Something is off!
+
+15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)).
+Rambam does not describe the model behind this correction.
+Because the models Rambam did describe until now are the same
+as Almagest's models
+(including numerical parameters), and because this correction
+is determined by the (doubled)
+sun-moon elongation, just like Almagest's "improved" model of
+the moon ("the crank"),
+I assume that that model was used to calculate this correction.
+TODO: describe the model!
+
+TODO: Derive the formula! Make the diagram!
+TODO: How come the fact that sun and moon move in different
+plains does not affect this calculation?
+
+It seems that Rambam treats "the crank" as just a calculation
+device - otherwise,
+table giving visible anomaly from the corrected anomaly should
+take into account changes in the
+earth-moon distance depending on the elongation - and it does not!
+Maybe that is why he does not describe the model behind this correction.
+And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
+needs to be calculated correctly.
+TODO: How does Almagest calculate visible anomaly?
+
+Law 4,5,6: True Lunar Longitude.
+
+Formulae:
+[stem]
+++++
+\tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right)
+++++
+
+stem:[R] - radius of the big circle;
+stem:[r] - radius of the small circle;
+stem:[\epsilon = R/r].
+A little trigonometry, and we get:
+visible anomaly = arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e))
+and:
+e = ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly)
+
+TODO: Make the diagram! Here?
+
+It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
+when they should be smaller. Value for 120° is also misprinted, but it is less obvious.
+
+Calculations show that for the precision up to a minute,
+it is sufficient to know e to up to the second
+digit after the dot.
+Below, a column giving the value of e was added to the table.
+Look at the value of e, and the misprints become obvious:
+value of e for them is way out of range it is in
+for the rest of them.
+
+TODO Range of e - graph. Range of possible values for each based on the range of e.
+This is transcription error: one letter; extra word... Probable correct values.
+
+This is how different sources treat the often misprinted values:
+
+[%header, cols="1, 1, 1, 1"]
+|===
+|Edition
+|120°
+|150°
+|170°
+
+|<<Vilno>>
+|incorrect
+|incorrect
+|incorrect
+
+|<<Eshkol>>
+|incorrect
+|incorrect
+|incorrect
+
+|<<LaAm>>
+|corrected in the notes
+|incorrect
+|incorrect
+
+|<<Kapach>>footnote:[It is not clear how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic editions.]
+
+|incorrect
+|corrected in the notes
+|corrected in the notes
+
+|<<Bluming>>
+|incorrect
+|corrected in the notes
+|corrected in the notes
+
+|<<Frenkel>>
+|correct and noted
+|correct and noted
+|correct and noted
+
+|<<Keller>>
+|not given
+|not given
+|not given
+
+|<<Losh>>footnote:[Reprints the text and does not correct any of the misprints - surprising for a textbook on the subject (even introductory). TODO: Link to the scans of the appropriate pages - with the stuff highlighted.]
+|incorrect
+|incorrect
+|incorrect
+
+|===
+
+[#moon-questions]
+=== Questions
+
+==== Moznaim Rambam, KH 13:2f4
+(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)
+
+==== Moon's mean period from astronomical models
+Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
+Moon.meanLunarPeriod - what is it called? Tropical?
+
+==== 14:5 Moon Longitude Adjustment for Time of Seeing
+See notes in Moznaim Rambam
+Sun longitude: mean or true?
+In 3rd and 7th lines, most editions incorrectly have 15.
+
+==== TODO Moznaim Rambam, KH 15:1f2
+double elongation = distance between moon's mean and apogee
+Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
+encode the limits
+
+==== MoonSightable.forSightingLimits
+is that what Rambam is saying?
+
+==== Distance between mean and true new moon
+KH 5:1-2 says that the distance is no more than a day.
+Calculate this difference for all months; Rambam's epoch - two days after molad?! (Petya Ofman).
+
+How to find the day of sighting given a month?
+
+==== Differences between arithmetic and observational calendars
+* основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
+    а-шана, а методами последних глав Кидуш а-ходеш
+* другой порядок високосных и простых лет
+* другой порядок полных и неполных месяцев
+* возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
+    и днями недели?
+* Пример: выход из Египта - 15 день от освящения месяца, четверг
+* Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.
+
+==== TimeToRotation.calculate()
+without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test);
+see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
+see if the end result is stable when Rambam's "real" value is used with straight multiplication and rounding
+(abstract away the calculation mechaninsm).
+
+==== TODO Example in 15:8-9
+moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
+still 108°21′46″, which doesn't round to 108°21...
+moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.
+
+==== TODO Example 17:13-14
+"this longitude is in Taurus" - but longitude3 isn't, so I get 1/6 instead of 1/5...
+
+==== TODO crescent calculations: KH 18-19!

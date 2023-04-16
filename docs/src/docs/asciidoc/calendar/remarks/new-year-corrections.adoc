@@ -1,0 +1,25 @@
+[#new-year-corrections]
+== New Year corrections
+* are there meaningful names for the corrections?
+* are corrections explained by the desire to not have Yom Kippur on Sunday etc.?
+* calculate third correction from the maximum length of a year and the first correction
+* KH 7:8 says that postponement of RoshHaShonoh is done to align the calendar better with the true molad; analyze the statistics of distances between mean and true molad
+and RoshHashono.
+
+There is an https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8[argument] concerning some of the Rosh Hashono delays involving r. Saadia Gaon:
+
+Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
+По нашей шите от Расага и дальше - 18 часов
+По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа
+
+make possible calculating the calendar according to the other opinion and compare the results.
+
+Молад года творения человека выходит в пятницу.
+Это и было Рош а-Шана второго года, ведь тогда принцип ли аду Рош не применялся.
+Тогда понятней спор Рамбама и Райвада о причине сдвига Рош а-Шана ло аду.
+Рамбама настаивает, что оно нужно для подсчёта по кибуц эмцаи,
+а Райвад на него из Талмуда возмущается.
+Теоретически можно сделать календарь на время до установления календаря без сдвига Рош а-Шана.
+
+Rav Ada's tkufos started a week later than Shmuel's! Isn't it readily observable?
+Analyze the difference in historic periods...
