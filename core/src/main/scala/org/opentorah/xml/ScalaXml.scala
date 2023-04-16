@@ -183,7 +183,7 @@ object ScalaXml extends Xml:
   //   If you or anyone else is interested in getting involved we'd be happy to have you join the project.
   // - latest release of Xerces was in 2023, with the bug still there
   // - many projects depend on Xerces, including Saxon, where the bug was also discussed: https://saxonica.plan.io/issues/4664
-  // - allegedly, the bug is "SaxonC 11.1" - although how can this be with Saxon not shipping its own Xerces is not clear.
+  // - allegedly, the bug is fixed in "SaxonC 11.1" - although how can this be with Saxon not shipping its own Xerces is not clear.
   //
   // So, I need to process XIncludes myself instead of relying on the industry-standard Xerces!
   // What a nightmare...

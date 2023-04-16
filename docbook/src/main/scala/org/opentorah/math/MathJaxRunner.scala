@@ -24,14 +24,17 @@ final class MathJaxRunner(
       then MathML.prettyPrinter.render(Dom)(element)
       else DocBookMathFilter.unwrap(element)
 
-    val svgRaw: String = node.evaluate(
-      useEsm = MathJax(math).useEsm,
-      script = MathJax(math).nodeScript(
+    val svgRaw: String =
+      val script: String = MathJax(math).nodeScript(
         math,
         mathString,
         input = Input(inputType, display),
         fontSize
-      ))
+      )
+      node.node(
+        arguments = (if MathJax(math).useEsm then "--require esm" else "") + "--no-warnings --print " + script,
+        log = (message: String) => ()
+      )
 
     // Note: chop off parasitic output from NodeJS: 'undefined', Promise<pending> -
     // I guess this is the overall result of the script?

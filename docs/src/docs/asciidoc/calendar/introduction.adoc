@@ -48,3 +48,5 @@ I want to acknowledge people who contributed to the content of this work - and t
 * Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;
 * Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;
 * Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1;
+
+// cite:[Neu83]

@@ -1,0 +1,85 @@
+[#kh-15]
+== Chapter 15
+
+[#kh-15-1]
+=== Law 1
+To find <<tll-term>> on a specific day:
+First, calculate mean lunar longitude during observation time of the desired night.
+Also, calculate mean lunar anomaly and mean solar longitude for the same time.
+Then, subtract mean solar longitude from the mean lunar longitude and double the result.
+This value is called <<dd-term>>.
+
+[#kh-15-2]
+=== Law 2
+We already stipulated that all the calculations in these chapters are for one purpose only:
+to know if the moon is visible.
+And it is not possible for this double distance during the night of observation when the moon is indeed visible to be outside the interval from 5° to 62°.
+It cannot be more - nor less.
+
+[#kh-15-3]
+=== Law 3
+A correction that depends on the doubled distance is added to the mean lunar anomaly, giving <<cla-term>>:
+
+[%header,cols="1, 1"]
+|===
+|doubled distance
+|correction of the mean anomaly
+
+|~5°
+|0°
+
+|6°-11°
+|1°
+
+|12°-18°
+|2°
+
+|19°-24°
+|3°
+
+|25°-31°
+|4°
+
+|32°-38°
+|5°
+
+|39°-45°
+|6°
+
+|46°-51°
+|7°
+
+|52°-59°
+|8°
+
+|60°-63°
+|9°
+|===
+
+[#kh-15-4]
+=== Law 4
+Then, see how many degrees is corrected lunar anomaly.
+If it is less than 180°, subtract visible anomaly of this corrected anomaly from the mean lunar longitude the observation time.
+And if corrected lunar anomaly is more than 180° but less than 360°, add visible anomaly of this corrected anomaly to the mean lunar longitude the observation time.
+And mean lunar longitude after you add to it or subtract from it is the
+<<tllo-term>>.
+
+[#kh-15-5]
+=== Law 5
+If the corrected anomaly is 180° or 360°, there is no visible anomaly, so mean lunar longitude at observation time is also true longitude.footnote:[This is Law 5.]
+
+[#kh-15-6]
+=== Law 6
+What is the value of the visible anomaly for a given value of the corrected anomaly?
+
+[#kh-15-7]
+=== Law 7
+TODO
+
+[#kh-15-8]
+=== Law 8
+TODO
+
+[#kh-15-9]
+=== Law 9
+TODO

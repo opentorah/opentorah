@@ -5,6 +5,8 @@ import java.time.temporal.ChronoField
 
 object Gregorian extends Roman:
 
+  override def name: String = "gregorian"
+
   override protected def numberOfLeapYears(yearNumber: Int): Int =
     yearNumber/4 - yearNumber/100 + yearNumber/400
 

@@ -36,6 +36,8 @@ final class ScalaLibrary(
 object ScalaLibrary:
   val group: String = "org.scala-lang"
 
+  // TODO add default versions for Scala library
+
   object Scala2 extends JavaDependency(group = group, artifact = "scala-library" )
   object Scala3 extends JavaDependency(group = group, artifact = "scala3-library_3")
 

@@ -1,0 +1,14 @@
+[#remarks]
+= Some Remarks
+
+TODO Kapach and Hazak
+
+include::new-year-corrections.adoc[]
+
+include::problematic-nissan.adoc[]
+
+include::solar-theory.adoc[]
+
+include::lunar-theory.adoc[]
+
+include::leap-years-cycle.adoc[]

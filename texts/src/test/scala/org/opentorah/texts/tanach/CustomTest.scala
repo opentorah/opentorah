@@ -6,11 +6,10 @@ import Custom.*
 
 final class CustomTest extends AnyFlatSpec, Matchers:
 
-  "Customs" should "load correctly" in {
+  "Customs" should "load correctly" in:
     Custom.ChayeyOdom.names.hasName("Хаей адам") shouldBe true
-  }
 
-  "minimize()" should "remove redundant children" in {
+  "minimize()" should "remove redundant children" in:
     check(
       Map(Ashkenaz -> "X", Chabad -> "X", Sefard -> "X"),
       Map(Common -> "X")
@@ -19,7 +18,6 @@ final class CustomTest extends AnyFlatSpec, Matchers:
       Map(Ashkenaz -> "X", Sefard -> "X"),
       Map(Common -> "X")
     )
-  }
 
   private def check[T](sourceMap: Custom.Customs[T], expectedMap: Custom.Customs[T])(using CanEqual[T, T]): Unit =
     val source: Of[T] = Of[T](sourceMap)

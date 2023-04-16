@@ -130,7 +130,12 @@ trait XsltFormat extends Format, Section:
       val nodeInstallation: NodeInstallation =
         mathConfiguration.nodeDistribution.getInstallation(context, installIfDoesNotExist = false, mustExist = true)
       val node: Node = nodeInstallation.getNode(nodeInstallation.getRoot)
-      node.npmInstall(MathJax(mathConfiguration).npmPackagesToInstall)
+      val npmPackagesToInstall: List[String] = MathJax(mathConfiguration).npmPackagesToInstall
+      node.mkNodeModules()
+      node.npm(
+        arguments = "install " + npmPackagesToInstall.mkString(" "),
+        log = (message: String) => ()
+      )
       Some(MathJaxFopPlugin(MathJaxRunner(node, mathConfiguration)))
 
   // xsl:param has the last value assigned to it, so customization must come last;

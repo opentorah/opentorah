@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Typesetting classic Jewish texts</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body class="article">
+<div id="header">
+<h1>Typesetting classic Jewish texts</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#todo">TODO</a></li>
+<li><a href="#font-formats">Font Formats</a></li>
+<li><a href="#open-type">TrueType, Type1 and history of OpenType</a></li>
+<li><a href="#font-rendering">Font Rendering</a></li>
+<li><a href="#fonts">Fonts</a></li>
+<li><a href="#glyph-layout">Glyph Layout with Vowels and Cantillation</a></li>
+<li><a href="#people">People</a></li>
+<li><a href="#intermediate-format">Intermediate Format</a></li>
+<li><a href="#pdf-generation">PDF generation</a></li>
+<li><a href="#xsl-fo-engines">XSL-FO engines</a></li>
+<li><a href="#notes">Notes</a></li>
+<li><a href="#bibliography">Bibliography</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Date: 9-10 Kislev 5768</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="todo"><a class="anchor" href="#todo"></a><a class="link" href="#todo">TODO</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Make bibliods of the uri class active!</p>
+</li>
+<li>
+<p>FOP</p>
+</li>
+<li>
+<p>When do we need this</p>
+</li>
+<li>
+<p>Examples of the problem with images</p>
+</li>
+<li>
+<p>History of contacts with the SIL font guy</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="font-formats"><a class="anchor" href="#font-formats"></a><a class="link" href="#font-formats">Font Formats</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The problem: <a href="http://www.tanach.us/Tanach.xml#Intallation" class="bare">www.tanach.us/Tanach.xml#Intallation</a> .</p>
+</div>
+<div class="paragraph">
+<p>To show on screen (and print) acceptably texts with vowel points and cantillation (and
+without them), we need good fonts. It would be nice to be able to force the browser to
+show a page using a specified font, and there is even a declaration for that in CSS
+(TODO), but it is not universally supported by modern browsers/operating systems, so the
+user will need to install a decent font if he is not satisfied with the quality of the
+pre-installed ones. Font installation is easy, but we need to provide the fonts to
+install.</p>
+</div>
+<div class="paragraph">
+<p>We need to be able to install fonts in cross-platform formats.</p>
+</div>
+<div class="paragraph">
+<p>It happens that there are both a vowel and a cantillation sign under a letter (vowel
+is printed first in such cases (TODO)). How can we make sure that vowel and cantillation
+sign do not overlap?</p>
+</div>
+<div class="paragraph">
+<p>Apple developed font format that allows inclusion (in form of tables) of instructions
+about combining glyphs. This format used to be called GX, and is now called AAT - Apple
+Advanced Typography <a href="#AAT">[AAT]</a>. It is currently supported only on macOS
+(there are plans to support it in HarfBuzz <a href="#HarfBuzz">[HarfBuzz]</a> in the future
+(TODO)), so we can not use it.</p>
+</div>
+<div class="paragraph">
+<p>SIL International is developing AAT replacement for Windows - Graphite <a href="#Graphite">[Graphite]</a>. This format allows inclusion into the font of a program in a
+special language. This program then chooses and places glyphs. This format is supported
+on Windows and Linux, but requires installation of programs in addition' to fonts, so we
+can not use it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="open-type"><a class="anchor" href="#open-type"></a><a class="link" href="#open-type">TrueType, Type1 and history of OpenType</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Microsoft and Apple developed OpenType format <a href="#OpenType">[OpenType]</a>. This
+format has various tables and is more expressive than Type1 and TrueType <a href="#TrueType">[TrueType]</a>, but less expressive than AAT. Applications rely on a platform
+library to render text well for a complex writing system (like ours) - or do it
+themselves. On Windows, Uniscribe <a href="#Uniscribe">[Uniscribe]</a> is such a library. We
+need to find out, how well it really supports, as they said, "the use of kerning for
+adding space to bases with diacritics (Nikud or Teamin)". On Linux, this is done by
+Pango <a href="#Pango">[Pango]</a>, and it, it seems, does not deal with cantillation at
+all - just with consonants and vowels <a href="#PangoH">[PangoH]</a>; we need to contact
+them, find out what the situation is and possibly change it. Firefox (the only program
+that we care about) uses Pango, which works on Windows (via Uniscribe), and on
+macOS.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="font-rendering"><a class="anchor" href="#font-rendering"></a><a class="link" href="#font-rendering">Font Rendering</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Firefox: Pango everywhere?</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.freedesktop.org">FreeDesktop</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.freedesktop.org/wiki/TextLayout">Text Layout Working
+Group</a></p>
+</div>
+<div class="paragraph">
+<p>Fedora <a href="http://fedoraproject.org/wiki/SIGs/Fonts">Fonts SIG</a> <a href="http://fedoraproject.org/wiki/SIGs/Fonts/QA">QA</a></p>
+</div>
+<div class="paragraph">
+<p><a href="#HarfBuzz">[HarfBuzz]</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://cairographics.org/">Cairo graphics</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://freedesktop.org/wiki/TextLayout">TextLayout</a> <a href="http://live.gnome.org/Boston2006/TextLayout/">2006</a> <a href="http://www.freedesktop.org/wiki/TextLayout2007/">2007</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://openfontlibrary.org/wiki/Knowledge_Resources">Open Font Library Wiki</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="fonts"><a class="anchor" href="#fonts"></a><a class="link" href="#fonts">Fonts</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>SIL Ezra</p>
+</li>
+<li>
+<p>Cardon?</p>
+</li>
+<li>
+<p>Gorkin?!</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="glyph-layout"><a class="anchor" href="#glyph-layout"></a><a class="link" href="#glyph-layout">Glyph Layout with Vowels and Cantillation</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TODO XXX&#8217;s algorithm.</p>
+</div>
+<div class="paragraph">
+<p>Gorkin&#8217;s algorithm.</p>
+</div>
+<div class="paragraph">
+<p>There is a book on fonts: Fonts &amp; Encodings by Yannis Haralambous. <a href="#Hara">[Hara]</a>. Despite the raving <a href="http://www.oreillynet.com/xml/blog/2007/10/fonts_encodings_by_yannis_hara.html">review</a>, I was underwhelmed by it. I wanted to find out if it is possible to
+encode the vowel/cantillation placement logic into an OpenType font - and did not find
+the answer in the book.</p>
+</div>
+<div class="paragraph">
+<p>Which is not really surprising, since the book&#8217;s author is also the author of Omega
+project (Unicode in TeX), about which a very informative <a href="http://www.valdyas.org/linguistics/printing_unicode.html">text</a> about printing Unicode in 2002 says:</p>
+</div>
+<div class="paragraph">
+<p>However, Omega is very much a failure. Its creators have been guided by
+Principles. They were conscious of the Desirability of Flexibility. They Knew
+about the Demands of Fine Typesetting of Complex Scripts. &#8230;&#8203; You cannot run to
+the manual, because the manual is a very interesting piece of academic prose
+about the difficulty of the task, but useless for a mere user.</p>
+</div>
+<div class="paragraph">
+<p>I <em>did</em> find out about a useful tool for OpenType font jobs: TTX <a href="#TTX">[TTX]</a>.</p>
+</div>
+<div class="paragraph">
+<p>Does kerning work through vowels?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="people"><a class="anchor" href="#people"></a><a class="link" href="#people">People</a></h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="intermediate-format"><a class="anchor" href="#intermediate-format"></a><a class="link" href="#intermediate-format">Intermediate Format</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Repeatability and hand-finishing: contradictory requirements?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pdf-generation"><a class="anchor" href="#pdf-generation"></a><a class="link" href="#pdf-generation">PDF generation</a></h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="xsl-fo-engines"><a class="anchor" href="#xsl-fo-engines"></a><a class="link" href="#xsl-fo-engines">XSL-FO engines</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For real typesetting of a tree of texts we&#8217;ll need to generate our own PDF anyway. For
+    typesetting papers and other project documentation, almost anything will work.</p>
+</div>
+<div class="paragraph">
+<p>For typesetting of the Hebrew text with vowel points and cantillation, we have:</p>
+</div>
+<div class="sect2">
+<h3 id="fop"><a class="anchor" href="#fop"></a><a class="link" href="#fop">FOP</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre>No support for OpenType fonts</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="xep"><a class="anchor" href="#xep"></a><a class="link" href="#xep">XEP</a></h3>
+<div class="paragraph">
+<p><a href="#XEP">[XEP]</a>
+Ignores OpenType GPOS/GSUB table, so useless for typesetting Tanach. Attempts to
+        contact support for clarifications failed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_xmlroff"><a class="anchor" href="#_xmlroff"></a><a class="link" href="#_xmlroff">xmlroff</a></h3>
+<div class="paragraph">
+<p><a href="#xmlroff">[xmlroff]</a></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Does not support regions other than main.</p>
+</li>
+<li>
+<p>Excellent with OpenType (uses Pango).</p>
+</li>
+<li>
+<p>Excellent support (see <a href="http://xmlroff.org/ticket/131" class="bare">xmlroff.org/ticket/131</a> for an example)</p>
+</li>
+<li>
+<p>There seems to be some issue with embedding the fonts and display on
+macOS/Windows.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="passivetex"><a class="anchor" href="#passivetex"></a><a class="link" href="#passivetex">passivetex</a></h3>
+<div class="paragraph">
+<p>antennahouse and other commercial::No breaks for non-profit</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="notes"><a class="anchor" href="#notes"></a><a class="link" href="#notes">Notes</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are rumors that Pango processes cantillation correctly - possibly, with good
+fonts? We need to accertain - with Behdad? - that we do not need special support from
+Pango, and that expressive power of OpenType is sufficient.</p>
+</div>
+<div class="paragraph">
+<p>InDesign <a href="#InDesign">[InDesign]</a>  and its storage format INX <a href="#INX">[INX]</a> are something to think about in the context of Outside-In XML Publishing <a href="#Outside-In">[Outside-In]</a>.</p>
+</div>
+<div class="paragraph">
+<p>"Typesetting Hebrew Cantillation".</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bibliography"><a class="anchor" href="#bibliography"></a><a class="link" href="#bibliography">Bibliography</a></h2>
+<div class="sectionbody">
+<div class="ulist bibliography">
+<ul class="bibliography">
+<li>
+<p><a id="AAT"></a>[AAT] Apple Advanced Typography (AAT). Apple. <a href="http://developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html" class="bare">developer.apple.com/fonts/TTRefMan/RM06/Chap6AATIntro.html</a></p>
+</li>
+<li>
+<p><a id="Graphite"></a>[Graphite] Graphite. SIL. <a href="http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ" class="bare">scripts.sil.org/cms/scripts/page.php?site_id=nrsi&amp;item_id=GraphiteFAQ</a></p>
+</li>
+<li>
+<p><a id="TrueType"></a>[TrueType] TrueType. <a href="http://en.wikipedia.org/wiki/TrueType" class="bare">en.wikipedia.org/wiki/TrueType</a></p>
+</li>
+<li>
+<p><a id="OpenType"></a>[OpenType] OpenType. Wikipedia. <a href="http://en.wikipedia.org/wiki/OpenType" class="bare">en.wikipedia.org/wiki/OpenType</a></p>
+</li>
+<li>
+<p><a id="Uniscribe"></a>[Uniscribe] Uniscribe. Microsoft. <a href="http://www.microsoft.com/typography/otfntdev/hebrewot/features.aspx" class="bare">www.microsoft.com/typography/otfntdev/hebrewot/features.aspx</a></p>
+</li>
+<li>
+<p><a id="Pango"></a>[Pango] Pango. <a href="http://www.pango.org" class="bare">www.pango.org</a></p>
+</li>
+<li>
+<p><a id="PangoH"></a>[PangoH] Pango Hebrew. <a href="http://cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup" class="bare">cvs.gnome.org/viewcvs/pango/modules/hebrew/hebrew-shaper.c?view=markup</a></p>
+</li>
+<li>
+<p><a id="XSL-FO"></a>[XSL-FO] XSL-FO. Wikipedia. <a href="http://en.wikipedia.org/wiki/XSL-FO" class="bare">en.wikipedia.org/wiki/XSL-FO</a></p>
+</li>
+<li>
+<p><a id="Anvil"></a>[Anvil] Anvil Toolkit. Dave Pawson. <a href="http://www.dpawson.co.uk/nodesets/entries/070709.html" class="bare">www.dpawson.co.uk/nodesets/entries/070709.html</a></p>
+</li>
+<li>
+<p><a id="Prince"></a>[Prince] Prince. <a href="http://www.princexml.com" class="bare">www.princexml.com</a></p>
+</li>
+<li>
+<p><a id="GoogleBooks"></a>[GoogleBooks] Google Books PDF. <a href="http://www.imperialviolet.org/binary/google-books-pdf.pdf" class="bare">www.imperialviolet.org/binary/google-books-pdf.pdf</a></p>
+</li>
+<li>
+<p><a id="HarfBuzz"></a>[HarfBuzz] HarfBuzz. <a href="http://www.freedesktop.org/wiki/Software/HarfBuzz" class="bare">www.freedesktop.org/wiki/Software/HarfBuzz</a></p>
+</li>
+<li>
+<p><a id="Hara"></a>[Hara] Fonts &amp; Encodings. Yannis Haralambous. <a href="http://www.amazon.com/Fonts-Encodings-Yannis-Haralambous/dp/0596102429" class="bare">www.amazon.com/Fonts-Encodings-Yannis-Haralambous/dp/0596102429</a></p>
+</li>
+<li>
+<p><a id="XEP"></a>[XEP] XEP. RenderX. <a href="http://www.renderx.com/RenderX" class="bare">www.renderx.com/RenderX</a></p>
+</li>
+<li>
+<p><a id="xmlroff"></a>[xmlroff] xmlroff. <a href="http://xmlroff.org" class="bare">xmlroff.org</a></p>
+</li>
+<li>
+<p><a id="InDesign"></a>[InDesign] Adobe InDesign. <a href="http://en.wikipedia.org/wiki/Adobe_InDesign" class="bare">en.wikipedia.org/wiki/Adobe_InDesign</a></p>
+</li>
+<li>
+<p><a id="INX"></a>[INX] INX. <a href="http://avondale.typepad.com/indesignupdate/2005/08/what_the_heck_i.html" class="bare">avondale.typepad.com/indesignupdate/2005/08/what_the_heck_i.html</a></p>
+</li>
+<li>
+<p><a id="Outside-In"></a>[Outside-In] Outside-In XML publishing. <a href="http://2007.xmlconference.org/public/schedule/detail/249" class="bare">2007.xmlconference.org/public/schedule/detail/249</a></p>
+</li>
+<li>
+<p><a id="TTX"></a>[TTX] TTX. <a href="http://www.letterror.com/code/ttx/index.html" class="bare">www.letterror.com/code/ttx/index.html</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

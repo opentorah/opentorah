@@ -5,6 +5,10 @@ plugins {
 }
 
 idea {
+//  project {
+//    jdkName = '1.6'
+//    languageLevel = '1.5'
+//  }
   module {
     excludeDirs += [
       file('.idea'),
@@ -19,7 +23,7 @@ project.gradle.startParameter.excludedTaskNames.add('compileJava')
 // TODO is this needed?
 subprojects {
   group = 'org.opentorah'
-  version = projectVersion
+  version = '0.10.11'
 }
 
 tasks.named('wrapper') {

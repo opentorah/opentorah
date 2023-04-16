@@ -15,6 +15,13 @@ apply from: '../configure.gradle'
 //  container { mainClass = 'org.opentorah.calendar.service.CalendarService' }
 //}
 
+tasks.register('serveCalendar', JavaExec) {
+  group = 'publishing'
+  mainClass.set('org.opentorah.calendar.service.CalendarService')
+  args = []
+  classpath = sourceSets.main.runtimeClasspath
+}
+
 dependencies {
   implementation project(':opentorah-core')
   implementation project(':opentorah-util')
@@ -22,8 +29,10 @@ dependencies {
   testImplementation libs.caffeine
   implementation libs.zio.http
   implementation libs.logback
+  implementation libs.logstash
 }
 
 //test {
 //  maxParallelForks = 1
 //}
+

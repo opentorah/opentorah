@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Digital Judaica Done Right</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="laying-out" class="article">
+<div id="header">
+<h1>Digital Judaica Done Right</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="dream.html">Digital Judaica Done Right</a></span></p><ul class="sectlevel1">
+<li><a href="introduction.html">Introduction</a>
+</li>
+<li><a href="the-dream.html">What do we want? (The Dream)</a>
+</li>
+<li><a href="bibliography-sources.html">Sources</a>
+</li>
+<li><a href="implementation.html">Implementation</a>
+</li>
+<li><a href="laying-out.html"><span class="toc-current">Laying out classic Jewish texts</span></a>
+</li>
+<li><a href="fonts.html">Fonts</a>
+</li>
+<li><a href="free-texts.html">Sources of Free Texts</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="laying-out"><a class="anchor" href="#laying-out"></a><a class="link" href="#laying-out">Laying out classic Jewish texts</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It is natural for a user, after researching with our system, to desire to print selected texts and fragments for personal - or group - study away from a computer.
+Such printouts are one-use artifacts.
+It is clear that ability to produce such printouts must be present in the system from the beginning.
+The question is: how good the typographically does it need to be?</p>
+</div>
+<div class="paragraph">
+<p>We need to format a tree of texts: main one, commentaries of it, commentaries on commentaries etc.
+It is known about each piece of commentaries what is it commenting on.
+All the font metrics are also known: glyph sizes, what is hanging how low and what is sticking up and how high.
+Result needs to be readable and (is it a separate requirement?) beatyfull.</p>
+</div>
+<div class="paragraph">
+<p>To format "like in a book", we need to optimize the following contradicting constraints (the list is probably incomplete):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the page must be fully covered with print</p>
+</li>
+<li>
+<p>comment must start on the same page where what it comments on is</p>
+</li>
+<li>
+<p>comment must end on the page it started</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Koritz says that we do not need to print books, but "leaflets" instead: text with comments that fit on one page.
+In the "forum format", whatever that means.</p>
+</div>
+<div class="paragraph">
+<p>Gorkin says that printing "like in the book" of the multi-layered text is extremely challenging typographically, and thus very interesting, but design of the overall interface of the system is even more interesting - and difficult.
+And more importants.
+Also, what exactly are the requirements for the printing facility, and what is their order of importance, will become clear only in the process of using the system.
+So, initially printing needs to be acceptable, but primitive - we do not have resources to do fancy stuff from the beginning.</p>
+</div>
+<div class="paragraph">
+<p>Dubinsky says that the format that will "grow" from the use of the system, will turn out to be a familiar to us all format "like in the book", or so close to it, that a solution for one will fit the other; that good leaflet is not easier to print than a book; and that ability to print familiar "book-like" format is neccessary for the psychological comfort of the users.
+But he also agrees that features and interface of the system are more important.</p>
+</div>
+<div class="paragraph">
+<p>Thus, everybody agrees that initial printing facility will be "primitive".
+Gorkin does not want to expend any effort to even find out how primitive.
+Dubinsky would like to see something acceptable.
+Nothing of the sort has been found so far.
+XSL-FO [7] is insufficiently expressive for our problem - even version 1.1, it seems.</p>
+</div>
+<div class="paragraph">
+<p>Beyond Pretty-Printing: <a href="http://lambda-the-ultimate.org/node/2419">Galley</a> Concepts in Document Formatting Combinators</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.it.usyd.edu.au/~jeff/nonpareil/">Nonpareil</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.lowagie.com/iText/">iText</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.w3.org/TR/2008/WD-xslfo20-req-20080326/">XSL-FO 2.0 Requirements</a></p>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="implementation.html">Implementation</a> | ↑ Up: <a href="dream.html">Digital Judaica Done Right</a> | Next: <a href="fonts.html">Fonts</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

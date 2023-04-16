@@ -8,13 +8,9 @@ class MoonAnomalyVisibleTest extends AnyFlatSpec, Matchers:
 
   behavior of "Anomaly"
 
-  it should "be correctly misprinted :)" in {
-    test(MoonAnomalyVisible.misprinted)
-  }
+  it should "be correctly misprinted :)" in test(MoonAnomalyVisible.misprinted)
 
-  it should "be correct" in {
-    test(MoonAnomalyVisible.corrected)
-  }
+  it should "be correct" in test(MoonAnomalyVisible.corrected)
 
   private def test(table: OrderedRotationTable[Position]): Unit =
     for maslul <- (0 to 36).map(_ * 10).map(Position(_)) do // TODO does not work for interpolated values...

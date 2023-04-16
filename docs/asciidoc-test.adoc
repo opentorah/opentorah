@@ -1,4 +1,0 @@
-= Just testing Jekyll's AsciiDoc support
-
-asdjfhasfjkhasf
-

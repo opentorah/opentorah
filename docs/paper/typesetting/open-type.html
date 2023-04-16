@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Typesetting classic Jewish texts</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="open-type" class="article">
+<div id="header">
+<h1>Typesetting classic Jewish texts</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="typesetting.html">Typesetting classic Jewish texts</a></span></p><ul class="sectlevel1">
+<li><a href="todo.html">TODO</a>
+</li>
+<li><a href="font-formats.html">Font Formats</a>
+</li>
+<li><a href="open-type.html"><span class="toc-current">TrueType, Type1 and history of OpenType</span></a>
+</li>
+<li><a href="font-rendering.html">Font Rendering</a>
+</li>
+<li><a href="fonts.html">Fonts</a>
+</li>
+<li><a href="glyph-layout.html">Glyph Layout with Vowels and Cantillation</a>
+</li>
+<li><a href="people.html">People</a>
+</li>
+<li><a href="intermediate-format.html">Intermediate Format</a>
+</li>
+<li><a href="pdf-generation.html">PDF generation</a>
+</li>
+<li><a href="xsl-fo-engines.html">XSL-FO engines</a>
+</li>
+<li><a href="notes.html">Notes</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="open-type"><a class="anchor" href="#open-type"></a><a class="link" href="#open-type">TrueType, Type1 and history of OpenType</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Microsoft and Apple developed OpenType format <a href="bibliography.html#OpenType">[OpenType]</a>. This
+format has various tables and is more expressive than Type1 and TrueType <a href="bibliography.html#TrueType">[TrueType]</a>, but less expressive than AAT. Applications rely on a platform
+library to render text well for a complex writing system (like ours) - or do it
+themselves. On Windows, Uniscribe <a href="bibliography.html#Uniscribe">[Uniscribe]</a> is such a library. We
+need to find out, how well it really supports, as they said, "the use of kerning for
+adding space to bases with diacritics (Nikud or Teamin)". On Linux, this is done by
+Pango <a href="bibliography.html#Pango">[Pango]</a>, and it, it seems, does not deal with cantillation at
+all - just with consonants and vowels <a href="bibliography.html#PangoH">[PangoH]</a>; we need to contact
+them, find out what the situation is and possibly change it. Firefox (the only program
+that we care about) uses Pango, which works on Windows (via Uniscribe), and on
+macOS.</p>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="font-formats.html">Font Formats</a> | ↑ Up: <a href="typesetting.html">Typesetting classic Jewish texts</a> | Next: <a href="font-rendering.html">Font Rendering</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

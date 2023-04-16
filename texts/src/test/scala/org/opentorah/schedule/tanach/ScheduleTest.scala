@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers
 
 final class ScheduleTest extends AnyFlatSpec, Matchers:
 
-  "Torah readings" should "be assigned correctly" in {
+  "Torah readings" should "be assigned correctly" in:
     val start = System.currentTimeMillis()
     (NewYear.delaysEnabledFromYear to 6000).foreach(number =>
       val year = Year(number)
@@ -20,7 +20,6 @@ final class ScheduleTest extends AnyFlatSpec, Matchers:
       verify(year, inHolyLand = true)
     )
     println("Time in ms: " + (System.currentTimeMillis()-start))
-  }
 
   def verify(year: Year, inHolyLand: Boolean): Unit =
     val readings: Map[Day, WeeklyReading] = Schedule.weeklyReadingsForYear(year, inHolyLand)

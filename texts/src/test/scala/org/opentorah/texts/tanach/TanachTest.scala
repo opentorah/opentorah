@@ -11,83 +11,65 @@ final class TanachTest extends TestBase(Tanach):
   def checkVerseNumber(path: String, number: Int): Unit =
     resolveLast(path).asInstanceOf[Verse].number shouldBe number
 
-  "Tanach" should "load" in {
+  "Tanach" should "load" in:
     Tanach.Chumash.Genesis.chapters.length(17) shouldBe 27
     Parsha.Vayikra.aliyot.spans(2).span.from.verse shouldBe 10
-  }
 
-  it should "load Part names" in {
+  it should "load Part names" in:
     checkName("/", "Танах")
-  }
 
-  it should "contain /book/Genesis" in {
+  it should "contain /book/Genesis" in:
     checkName("/book/Genesis", "Бытие")
-  }
 
-  it should "contain /book/Бытие" in {
+  it should "contain /book/Бытие" in:
     checkName("/book/Бытие", "Genesis")
-  }
 
-  it should "contain /book/Genesis/chapter/3" in {
+  it should "contain /book/Genesis/chapter/3" in:
     checkChapterLength("/book/Genesis/chapter/3", 24)
-  }
 
-  it should "contain /book/Exodus/chapter/1" in {
+  it should "contain /book/Exodus/chapter/1" in:
     checkChapterLength("/book/Exodus/chapter/1", 22)
-  }
 
-  it should "contain /book/Exodus/chapter/1/verse/3" in {
+  it should "contain /book/Exodus/chapter/1/verse/3" in:
     checkVerseNumber("/book/Exodus/chapter/1/verse/3", 3)
-  }
 
-  it should "contain /book/Exodus/chapter/א/verse/ג" in {
+  it should "contain /book/Exodus/chapter/א/verse/ג" in:
     checkVerseNumber("/book/Exodus/chapter/א/verse/ג", 3)
-  }
 
-  it should "contain /book/Бытие/parsha/Noach" in {
+  it should "contain /book/Бытие/parsha/Noach" in:
     checkName("/book/Бытие/parsha/Noach", "Ноах")
-  }
 
-  it should "contain /book/Бытие/parsha/Бытие/chapter/1/verse/1" in {
+  it should "contain /book/Бытие/parsha/Бытие/chapter/1/verse/1" in:
     checkVerseNumber("/book/Бытие/parsha/Бытие/chapter/1/verse/1", 1)
-  }
 
-  it should "contain /part/Prophets" in {
+  it should "contain /part/Prophets" in:
     checkName("/part/Prophets", "Пророки")
-  }
 
-  it should "contain /part/Prophets/book/Joshua" in {
+  it should "contain /part/Prophets/book/Joshua" in:
     checkName("/part/Prophets/book/Joshua", "Ехошуа")
-  }
 
-  it should "contain /part/Prophets/part/Early Prophets/book/Joshua" in {
+  it should "contain /part/Prophets/part/Early Prophets/book/Joshua" in:
     checkName("/part/Prophets/part/Early Prophets/book/Joshua", "Ехошуа")
-  }
 
-  it should "contain /book/Psalms/chapter/119/verse/150" in {
+  it should "contain /book/Psalms/chapter/119/verse/150" in:
     checkName("/book/Psalms/chapter/119/verse/150", "150")
-  }
 
-  it should "contain /book/Psalms/book/5/chapter/119/verse/150" in {
+  it should "contain /book/Psalms/book/5/chapter/119/verse/150" in:
     checkName("/book/Psalms/book/5/chapter/119/verse/150", "150")
-  }
 
-  it should "contain /book/Psalms/day/26/chapter/119/verse/150" in {
+  it should "contain /book/Psalms/day/26/chapter/119/verse/150" in:
     checkName("/book/Psalms/day/26/chapter/119/verse/150", "150")
-  }
 
-  it should "contain /book/Psalms/day of the week/6/chapter/119/verse/150" in {
+  it should "contain /book/Psalms/day of the week/6/chapter/119/verse/150" in:
     checkName("/book/Psalms/day of the week/6/chapter/119/verse/150", "150")
-  }
 
-  it should "contain /book/Psalms/day of the week/Friday/chapter/119/verse/150" in {
+  it should "contain /book/Psalms/day of the week/Friday/chapter/119/verse/150" in:
     checkName("/book/Psalms/day of the week/Friday/chapter/119/verse/150", "150")
-  }
 
-  it should "be walkable" in {
+  it should "be walkable" in:
     val paths: Seq[Path] = Caching.unsafeRun(caching, Tanach.getPaths(
       include = _.isInstanceOf[TanachBook],
       stop = _.isInstanceOf[TanachBook]
     ))
 //    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
-  }
+

@@ -1,14 +1,13 @@
 package org.opentorah.site
 
-import org.opentorah.service.ServiceApp
+import org.opentorah.service.{ServiceApp, Static}
 import ServiceApp.given
 import org.opentorah.files.GoogleCloudStorageSynchronizer
 import org.opentorah.store.{Path, Pure, Store}
 import org.opentorah.util.{Effects, Files, Strings}
 import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser}
 import org.slf4j.Logger
-import zio.http.{!!, /, Body, Http, HttpApp, Request, Response, *} // TODO remove * - what in it makes matching Methods possible?
-import zio.http.model.{Headers, HeaderValues, HTTP_CHARSET, Method}
+import zio.http.{->, /, App, Body, Charsets, Header, Headers, Http, HttpApp, MediaType, Method, Request, Response, Root}
 import zio.{Chunk, Task, ZIO}
 import java.io.File
 import java.net.URL
@@ -66,7 +65,7 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
       result
     else getParameter("STORE", s"http://$bucketName/") // TODO switch to https
 
-    serve(routes(siteUrl))
+    serve(routes(siteUrl).withDefaultErrorResponse)
 
   private def routes(siteUrl: String): HttpApp[Any, Throwable] =
     var cachedSite: Option[S] = None
@@ -83,34 +82,32 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
         cachedSite = None
       })
       _ <- getSite
-    yield Response(
-      headers = Headers.contentType(HeaderValues.textPlain),
-      body = Body.fromString("Site reset!")
-    )
+    yield Response.text("Site reset!")
 
     def get(request: Request): ZIO[Any, Nothing, Response] =
       val pathString: String = request.url.path.toString
       val path: Seq[String] = Files.splitAndDecodeUrl(pathString)
 
       ServiceApp.orNotFound(pathString, getSite.flatMap(site =>
-        if site.isStatic(path) then ServiceApp.staticFile(
+        if site.isStatic(path) then Static.file(
           url = Files.pathUnder(Files.string2url(siteUrl), pathString),
           request = Some(request)
         ) else site.getResponse(pathString).map(siteResponse =>
-          val bytes: Array[Byte] = siteResponse.content.getBytes(HTTP_CHARSET)
+          val bytes: Array[Byte] = siteResponse.content.getBytes(Charsets.Http)
 
           Response(
-            headers =
+            headers = Headers(
               // TODO: `Content-Type`(MediaType.unsafeParse(siteResponse.mimeType), Charset.`UTF-8`)
               // TODO more headers!
-              Headers.contentType(siteResponse.mimeType) ++
-              Headers.contentLength(bytes.length.toLong),
+              Header.ContentType(MediaType.parseCustomMediaType(siteResponse.mimeType).get),
+              Header.ContentLength(bytes.length.toLong)
+            ),
             body = Body.fromStream(zio.stream.ZStream.fromChunk(Chunk.fromArray(bytes)))
           )
         )
       ))
 
     Http.collectZIO[Request] {
-      case request@Method.GET -> !! / "reset-cached-site" => reset(request)
+      case request@Method.GET -> Root / "reset-cached-site" => reset(request)
       case request => timed(get)(request)
     }

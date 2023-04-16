@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Typesetting classic Jewish texts</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="xsl-fo-engines" class="article">
+<div id="header">
+<h1>Typesetting classic Jewish texts</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="typesetting.html">Typesetting classic Jewish texts</a></span></p><ul class="sectlevel1">
+<li><a href="todo.html">TODO</a>
+</li>
+<li><a href="font-formats.html">Font Formats</a>
+</li>
+<li><a href="open-type.html">TrueType, Type1 and history of OpenType</a>
+</li>
+<li><a href="font-rendering.html">Font Rendering</a>
+</li>
+<li><a href="fonts.html">Fonts</a>
+</li>
+<li><a href="glyph-layout.html">Glyph Layout with Vowels and Cantillation</a>
+</li>
+<li><a href="people.html">People</a>
+</li>
+<li><a href="intermediate-format.html">Intermediate Format</a>
+</li>
+<li><a href="pdf-generation.html">PDF generation</a>
+</li>
+<li><a href="xsl-fo-engines.html"><span class="toc-current">XSL-FO engines</span></a>
+</li>
+<li><a href="notes.html">Notes</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="xsl-fo-engines"><a class="anchor" href="#xsl-fo-engines"></a><a class="link" href="#xsl-fo-engines">XSL-FO engines</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For real typesetting of a tree of texts we&#8217;ll need to generate our own PDF anyway. For
+    typesetting papers and other project documentation, almost anything will work.</p>
+</div>
+<div class="paragraph">
+<p>For typesetting of the Hebrew text with vowel points and cantillation, we have:</p>
+</div>
+<div class="sect2">
+<h3 id="fop"><a class="anchor" href="#fop"></a><a class="link" href="#fop">FOP</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre>No support for OpenType fonts</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="xep"><a class="anchor" href="#xep"></a><a class="link" href="#xep">XEP</a></h3>
+<div class="paragraph">
+<p><a href="bibliography.html#XEP">[XEP]</a>
+Ignores OpenType GPOS/GSUB table, so useless for typesetting Tanach. Attempts to
+        contact support for clarifications failed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_xmlroff"><a class="anchor" href="#_xmlroff"></a><a class="link" href="#_xmlroff">xmlroff</a></h3>
+<div class="paragraph">
+<p><a href="bibliography.html#xmlroff">[xmlroff]</a></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Does not support regions other than main.</p>
+</li>
+<li>
+<p>Excellent with OpenType (uses Pango).</p>
+</li>
+<li>
+<p>Excellent support (see <a href="http://xmlroff.org/ticket/131" class="bare">xmlroff.org/ticket/131</a> for an example)</p>
+</li>
+<li>
+<p>There seems to be some issue with embedding the fonts and display on
+macOS/Windows.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="passivetex"><a class="anchor" href="#passivetex"></a><a class="link" href="#passivetex">passivetex</a></h3>
+<div class="paragraph">
+<p>antennahouse and other commercial::No breaks for non-profit</p>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="pdf-generation.html">PDF generation</a> | ↑ Up: <a href="typesetting.html">Typesetting classic Jewish texts</a> | Next: <a href="notes.html">Notes</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

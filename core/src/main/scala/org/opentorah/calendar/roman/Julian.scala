@@ -2,6 +2,8 @@ package org.opentorah.calendar.roman
 
 object Julian extends Roman:
 
+  override def name: String = "julian"
+
   override protected def numberOfLeapYears(yearNumber: Int): Int =
     yearNumber/4
 

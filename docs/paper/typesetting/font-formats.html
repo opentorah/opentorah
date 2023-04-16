@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Leonid Dubinsky">
+<title>Typesetting classic Jewish texts</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" type="image/ico" href="/favicon.ico">
+</head>
+<body id="font-formats" class="article">
+<div id="header">
+<h1>Typesetting classic Jewish texts</h1>
+<div class="details">
+<span id="author" class="author">Leonid Dubinsky</span><br>
+<span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
+<span id="revnumber">version 0.10.9</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<p><span class="toc-root"><a href="typesetting.html">Typesetting classic Jewish texts</a></span></p><ul class="sectlevel1">
+<li><a href="todo.html">TODO</a>
+</li>
+<li><a href="font-formats.html"><span class="toc-current">Font Formats</span></a>
+</li>
+<li><a href="open-type.html">TrueType, Type1 and history of OpenType</a>
+</li>
+<li><a href="font-rendering.html">Font Rendering</a>
+</li>
+<li><a href="fonts.html">Fonts</a>
+</li>
+<li><a href="glyph-layout.html">Glyph Layout with Vowels and Cantillation</a>
+</li>
+<li><a href="people.html">People</a>
+</li>
+<li><a href="intermediate-format.html">Intermediate Format</a>
+</li>
+<li><a href="pdf-generation.html">PDF generation</a>
+</li>
+<li><a href="xsl-fo-engines.html">XSL-FO engines</a>
+</li>
+<li><a href="notes.html">Notes</a>
+</li>
+<li><a href="bibliography.html">Bibliography</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="font-formats"><a class="anchor" href="#font-formats"></a><a class="link" href="#font-formats">Font Formats</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The problem: <a href="http://www.tanach.us/Tanach.xml#Intallation" class="bare">www.tanach.us/Tanach.xml#Intallation</a> .</p>
+</div>
+<div class="paragraph">
+<p>To show on screen (and print) acceptably texts with vowel points and cantillation (and
+without them), we need good fonts. It would be nice to be able to force the browser to
+show a page using a specified font, and there is even a declaration for that in CSS
+(TODO), but it is not universally supported by modern browsers/operating systems, so the
+user will need to install a decent font if he is not satisfied with the quality of the
+pre-installed ones. Font installation is easy, but we need to provide the fonts to
+install.</p>
+</div>
+<div class="paragraph">
+<p>We need to be able to install fonts in cross-platform formats.</p>
+</div>
+<div class="paragraph">
+<p>It happens that there are both a vowel and a cantillation sign under a letter (vowel
+is printed first in such cases (TODO)). How can we make sure that vowel and cantillation
+sign do not overlap?</p>
+</div>
+<div class="paragraph">
+<p>Apple developed font format that allows inclusion (in form of tables) of instructions
+about combining glyphs. This format used to be called GX, and is now called AAT - Apple
+Advanced Typography <a href="bibliography.html#AAT">[AAT]</a>. It is currently supported only on macOS
+(there are plans to support it in HarfBuzz <a href="bibliography.html#HarfBuzz">[HarfBuzz]</a> in the future
+(TODO)), so we can not use it.</p>
+</div>
+<div class="paragraph">
+<p>SIL International is developing AAT replacement for Windows - Graphite <a href="bibliography.html#Graphite">[Graphite]</a>. This format allows inclusion into the font of a program in a
+special language. This program then chooses and places glyphs. This format is supported
+on Windows and Linux, but requires installation of programs in addition' to fonts, so we
+can not use it.</p>
+</div>
+</div>
+</div>
+<div class="paragraph nav-footer">
+<p>← Previous: <a href="todo.html">TODO</a> | ↑ Up: <a href="typesetting.html">Typesetting classic Jewish texts</a> | Next: <a href="open-type.html">TrueType, Type1 and history of OpenType</a> →</p>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.10.9<br>
+</div>
+</div>
+</body>
+</html>

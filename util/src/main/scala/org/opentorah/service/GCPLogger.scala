@@ -18,7 +18,7 @@ final class GCPLogger(projectId: String, logger: org.slf4j.Logger):
     val arguments: Seq[StructuredArgument] =
       Seq(
         StructuredArguments.keyValue("severity", severity)
-      ) ++ request.flatMap(_.headerValue("X-Cloud-Trace-Context")).map(_.split("/")(0)).toSeq.map(trace =>
+      ) ++ request.flatMap(_.headers.get("X-Cloud-Trace-Context")).map(_.split("/")(0)).toSeq.map(trace =>
         StructuredArguments.keyValue("logging.googleapis.com/trace", s"projects/$projectId/traces/$trace")
       )
 

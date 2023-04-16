@@ -9,33 +9,26 @@ class SunLongitudeMeanTest extends Days2RotationTest(SunLongitudeMean):
 
   behavior of "Mean Sun Longitude"
 
-  it should "have printed values not exact" in {
+  it should "have printed values not exact" in:
     what.nonReconstructable.nonEmpty should be (true)
-  }
 
-  it should "exactify" in {
-  }
+  it should "exactify" in ()
 
-  it should "round to the same as Almagest" in {
+  it should "round to the same as Almagest" in:
     what.almagestValue.roundToSeconds shouldBe what.rambamValue.roundToSeconds
-  }
 
-  it should "calculate for 29 days in two steps" in {
+  it should "calculate for 29 days in two steps" in:
     (what.value(Days.Ten)*3-what.value(Days.One)) shouldBe what.value(Days.Month)
     (what.value(Days.Ten)*3-what.value(Days.One)) shouldBe Rotation("28°35′1″")
     (what.value(Days.Ten)*2+what.value(Days.One)*9) shouldBe Rotation("28°34′58″")
-  }
 
-  it should "calculate correctly for the regular year" ignore {
+  it should "calculate correctly for the regular year" ignore:
     (what.value(Days.One)*354) shouldBe what.value(Days.Year)
     what.calculate(354) shouldBe what.value(Days.Year)
-  }
 
-  it should "make a full circle in a year" in {
+  it should "make a full circle in a year" in:
     assert(what.rambamValue *(Sun.RavAda.yearLength.toRational, Angles.maxLength) > Angles.period)
     assert(what.rambamValue *(Sun.Shmuel.yearLength.toRational, Angles.maxLength) > Angles.period)
-  }
-
 
   /*
    Al-Battani, WikiPedia:
