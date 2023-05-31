@@ -4,11 +4,10 @@ import org.gradle.api.{DefaultTask, Project}
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.{ListProperty, Property}
 import org.gradle.api.tasks.{Input, TaskAction}
-import org.opentorah.build.Gradle.*
-import org.opentorah.build.{Gradle, GradleBuildContext}
-import org.opentorah.node.{Node, NodeDependency, NodeInstallation}
+import org.opentorah.build.{Gradle, GradleBuildContext, Version}
 import javax.inject.Inject
 import java.io.File
+import Gradle.*
 
 abstract class NodeExtension @Inject(project: Project):
   def getVersion: Property[String]
@@ -23,7 +22,7 @@ abstract class NodeExtension @Inject(project: Project):
       case None =>
         NodeInstallation.fromOs.get
       case Some(version) =>
-        NodeDependency(version).getInstallation(
+        NodeDependency.withVersion(Version(version)).getInstallation(
           GradleBuildContext(project),
           installIfDoesNotExist = installIfDoesNotExist,
           mustExist = true

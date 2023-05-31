@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.10.11] - 2023-
+- cleanup: *Dependency* and friends
 
 ## [0.10.10] - 2023-05-31
 - cleanup: Node

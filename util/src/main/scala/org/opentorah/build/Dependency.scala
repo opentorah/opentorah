@@ -1,67 +1,60 @@
 package org.opentorah.build
 
-import org.gradle.api.artifacts.{Configuration, Dependency as GDependency}
-import org.opentorah.util.Strings
-import java.io.File
-import java.util.regex.{Matcher, Pattern}
+import org.gradle.api.artifacts.Configuration
 import scala.jdk.CollectionConverters.*
+import java.io.File
 
-abstract class Dependency(
-  val group: String,
-  val artifact: String
-):
-  type Version <: Dependency.Version
+trait Dependency extends DependencyCoordinates:
 
-  final def artifactWithSuffix(version: Version): String = artifact + artifactSuffix(version)
-  
-  protected def artifactSuffix(version: Version): String
+  def artifactName: String
 
-  private def artifactPattern: String = artifact + artifactSuffixPattern
-
-  protected def artifactSuffixPattern: String
-
-  final def getFromConfiguration(configuration: Configuration): Option[Dependency.WithVersion] =
-    val patternCompiled: Pattern = Pattern.compile(artifactPattern)
-    val result: Set[Dependency.WithVersion] = for
-      dependency: GDependency <- configuration.getDependencies.asScala.toSet
-      if dependency.getGroup == group
-      matcher: Matcher = patternCompiled.matcher(dependency.getName)
-      if matcher.matches
-    yield
-      fromMatcher(matcher, dependency.getVersion)
-    result.headOption
-
-  protected def fromMatcher(matcher: Matcher, version: String): Dependency.WithVersion
-
-  final def getFromClassPath(classPath: Iterable[File]): Option[Dependency.WithVersion] =
-    val patternCompiled: Pattern = Pattern.compile(s"$artifactPattern-(\\d.*).jar")
-    val result: Iterable[Dependency.WithVersion] = for
-      file: File <- classPath
-      matcher: Matcher = patternCompiled.matcher(file.getName)
-      if matcher.matches
-    yield
-      fromMatcher(matcher)
-    result.headOption
-
-  protected def fromMatcher(matcher: Matcher): Dependency.WithVersion
-
-  final def dependencyNotation(version: Version): String =
-    val artifactStr: String = artifactWithSuffix(version)
-    val classifierStr: String = Strings.prefix(":", classifier(version))
-    val extensionStr: String = Strings.prefix("@", extension(version))
-    s"$group:$artifactStr:${version.version}$classifierStr$extensionStr"
-
-  def classifier(version: Version): Option[String] = None
-
-  def extension(version: Version): Option[String] = None
+  def withVersion(version: Version): Dependency.WithVersion =
+    Dependency.WithVersion(dependency = this, version)
 
 object Dependency:
-  open class Version(val version: String)
 
-  class WithVersion(
+  trait Findable extends DependencyCoordinates:
+
+    def dependencyForArtifactName(artifactName: String): Option[Dependency]
+
+    final def findInConfiguration(configuration: Configuration): Option[Dependency.WithVersion] =
+      find(configuration.getDependencies.asScala.flatMap(DependencyData.fromGradleDependency))
+
+    final def findInClassPath(classPath: Iterable[File]): Option[Dependency.WithVersion] =
+      find(classPath.flatMap(DependencyData.fromFile))
+
+    private def find(iterable: Iterable[DependencyData]): Option[Dependency.WithVersion] =
+      iterable.flatMap(find).headOption
+
+    private def find(dependencyData: DependencyData): Option[Dependency.WithVersion] =
+      val version: Version = dependencyData.version
+      val groupMatches: Boolean = dependencyData.group.isEmpty || dependencyData.group.contains(group)
+      val classifierMatches: Boolean = this.classifier(version) == dependencyData.classifier
+      val extensionMatches: Boolean =
+        (this.extension(version) == dependencyData.extension) ||
+        (this.extension(version).isEmpty && dependencyData.extension.contains("jar"))
+
+      if !groupMatches || !classifierMatches || !extensionMatches then None else
+        dependencyForArtifactName(dependencyData.artifactName).map(_.withVersion(version))
+
+  abstract class Simple(
+    final override val group: String,
+    final override val artifact: String
+  ) extends Findable with Dependency:
+
+    final override def dependencyForArtifactName(artifactName: String): Option[Dependency] =
+      if artifactName == artifact then Some(this) else None
+
+    final override def artifactName: String =
+      artifact
+      
+  open class WithVersion(
     val dependency: Dependency,
-    val version: dependency.Version
-  ):
-    override def toString: String = s"'$dependencyNotation'"
+    final override val version: Version
+  ) extends DependencyData:
+    final override def toString: String = s"'$dependencyNotation'"
+    final override def group: Option[String] = Some(dependency.group)
+    final override def artifactName: String = dependency.artifactName
+    final override def classifier: Option[String] = dependency.classifier(version)
+    final override def extension: Option[String] = dependency.extension(version)
 
-    def dependencyNotation: String = dependency.dependencyNotation(version)
