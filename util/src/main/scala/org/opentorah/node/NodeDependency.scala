@@ -1,6 +1,6 @@
 package org.opentorah.node
 
-import org.opentorah.build.{Dependency, InstallableDependency, Repository}
+import org.opentorah.build.{Dependency, InstallableDependency, Repository, Version}
 import org.opentorah.platform.{Architecture, Os}
 import org.opentorah.util.Strings
 import java.io.File
@@ -14,12 +14,12 @@ import java.nio.file.{Files, Path, Paths}
 // My simplified Node support is under 200 lines.
 
 // Describes Node distribution's packaging and structure.
-object NodeDependency extends InstallableDependency[NodeInstallation](
+object NodeDependency extends Dependency.Simple(
   group = "org.nodejs",
   artifact = "node"
-):
+) with InstallableDependency[NodeInstallation]:
   // Anything later than that breaks ScalaJS: 17.9.1, 18.15.0, 19.8.1
-  val versionDefault: String = "16.19.1"
+  val versionDefault: Version = Version("16.19.1")
 
   override def cacheDirectory: String = "nodejs"
 
@@ -59,28 +59,24 @@ object NodeDependency extends InstallableDependency[NodeInstallation](
     case Architecture.nacl    => "x86"
 
   //https://github.com/nodejs/node/pull/5995
-  private def hasWindowsZip(version: Dependency.Version): Boolean =
-    // TODO move into DependencyVersion
-    val versionTokens: Array[String] = version.version.split('.')
-    val majorVersion: Int = versionTokens(0).toInt
-    val minorVersion: Int = versionTokens(1).toInt
-    val microVersion: Int = versionTokens(2).toInt
+  private def hasWindowsZip(version: Version): Boolean =
+    val (majorVersion: Int, minorVersion: Int, microVersion: Int) = version.getMajorMinorMicro
 
     ((majorVersion == 4) && (minorVersion >= 5)) || // >= 4.5.0..6
     ((majorVersion == 6) && ((minorVersion > 2) || ((minorVersion == 2) && (microVersion >= 1)))) || // >= 6.2.1..7
      (majorVersion > 6) // 7..
 
-  override def classifier(version: Dependency.Version): Option[String] =
+  override def classifier(version: Version): Option[String] =
     val fixUpOsAndArch: Boolean = isWindows && !hasWindowsZip(version)
     val dependencyOsName: String = if fixUpOsAndArch then "linux" else osName
     val dependencyOsArch: String = if fixUpOsAndArch then "x86"   else osArch
     Some(s"$dependencyOsName-$dependencyOsArch")
 
-  override def isZip(version: Dependency.Version): Boolean = isWindows && hasWindowsZip(version)
+  override def isZip(version: Version): Boolean = isWindows && hasWindowsZip(version)
 
-  override def extension(version: Dependency.Version): Option[String] = Some(if isZip(version) then "zip" else "tar.gz")
+  override def extension(version: Version): Option[String] = Some(if isZip(version) then "zip" else "tar.gz")
 
-  override def archiveSubdirectoryPath(version: Dependency.Version): Seq[String] =
+  override def archiveSubdirectoryPath(version: Version): Seq[String] =
     val classifierStr: String = Strings.prefix("-", classifier(version))
     Seq(
       s"$artifact-v${version.version}$classifierStr"
@@ -94,10 +90,10 @@ object NodeDependency extends InstallableDependency[NodeInstallation](
       npmExec  = File(bin, if isWindows then "npm.cmd"  else "npm" )
     )
 
-  override protected def exists(installation: NodeInstallation): Boolean =
+  override def exists(installation: NodeInstallation): Boolean =
     installation.nodeExec.exists && installation.npmExec.exists
 
-  override protected def fixup(installation: NodeInstallation): Unit = if !isWindows then
+  override def fixup(installation: NodeInstallation): Unit = if !isWindows then
     val npm: Path = installation.npmExec.toPath
     val deleted: Boolean = Files.deleteIfExists(npm)
     if deleted then

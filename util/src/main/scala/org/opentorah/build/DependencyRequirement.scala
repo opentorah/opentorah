@@ -6,8 +6,8 @@ import Gradle.*
 import scala.jdk.CollectionConverters.*
 
 abstract class DependencyRequirement(
-  dependency: Dependency,
-  version: String,
+  findable: Dependency.Findable,
+  version: Version,
   reason: String,
   configurations: Configurations,
   isVersionExact: Boolean = false
@@ -15,12 +15,12 @@ abstract class DependencyRequirement(
   // Note: all applyToConfiguration() must be run first: once a applyToClassPath() runs,
   // configuration is no longer changeable.
   final def applyToConfiguration(project: Project): Dependency.WithVersion =
-    val found: Option[Dependency.WithVersion] = dependency
-      .getFromConfiguration(project.getConfiguration(configurations.configuration))
+    val found: Option[Dependency.WithVersion] = findable
+      .findInConfiguration(project.getConfiguration(configurations.configuration))
     found.foreach(verify(_, project))
     found.getOrElse {
       val configuration: Configuration = getConfiguration(project)
-      val toAdd: Dependency.WithVersion = getAddition(project)
+      val toAdd: Dependency.WithVersion = getDependencyWithVersion
       project.getLogger.info(s"Adding dependency $toAdd to the $configuration $reason", null, null, null)
       configuration
         .getDependencies
@@ -33,24 +33,26 @@ abstract class DependencyRequirement(
   //   Cannot change dependencies of dependency configuration ... after it has been included in dependency resolution
   // So the only thing we can do is to report the missing dependency:
   final def applyToClassPath(project: Project): Dependency.WithVersion =
-    val found: Option[Dependency.WithVersion] = dependency.getFromClassPath(
+    val found: Option[Dependency.WithVersion] = findable.findInClassPath(
       project.getConfiguration(configurations.classPath).asScala
     )
     found.foreach(verify(_, project))
     found.getOrElse {
       val configuration: Configuration = getConfiguration(project)
-      val toAdd: Dependency.WithVersion = getAddition(project)
+      val toAdd: Dependency.WithVersion = getDependencyWithVersion
       throw GradleException(s"Please add dependency $toAdd to the $configuration $reason")
     }
 
   protected def verify(found: Dependency.WithVersion, project: Project): Unit =
-    if isVersionExact && found.version.version != version then project.getLogger.info(
+    if isVersionExact && found.version != version then project.getLogger.info(
       s"Found $found, but the project uses version $version", null, null, null
     )
 
   private def getConfiguration(project: Project): Configuration = project.getConfiguration(configurations.configuration)
-  
-  protected def getAddition(project: Project): Dependency.WithVersion
+
+  private def getDependencyWithVersion: Dependency.WithVersion = getDependency.withVersion(version)
+
+  protected def getDependency: Dependency
 
 object DependencyRequirement:
   // Note: all applyToConfiguration() must be run first: once a applyToClassPath() runs,

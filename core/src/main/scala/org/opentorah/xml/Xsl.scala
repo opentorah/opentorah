@@ -8,9 +8,9 @@ object Xsl extends Dialect:
 
   override def prettyPrinter: PrettyPrinter = PrettyPrinter.default
 
-  def version(usesDocBookXslt2: Boolean): String = if usesDocBookXslt2 then "2.0" else "1.0"
+  def version(useXslt2: Boolean): String = if useXslt2 then "2.0" else "1.0"
 
-  def stylesheet(usesDocBookXslt2: Boolean, content: ScalaXml.Nodes): ScalaXml.Element =
-    <xsl:stylesheet xmlns:xsl={namespace.uri} version={version(usesDocBookXslt2)}>{content}</xsl:stylesheet>
+  def stylesheet(useXslt2: Boolean, content: ScalaXml.Nodes): ScalaXml.Element =
+    <xsl:stylesheet xmlns:xsl={namespace.uri} version={version(useXslt2)}>{content}</xsl:stylesheet>
 
   def xslImport(href:String): ScalaXml.Element = <xsl:import href={href}/>
