@@ -3,11 +3,11 @@
 
 [#kh-1-1]
 === Law 1
-The months of the year are lunar months, as it is said: "[...] the burnt offering of the month in its month"footnote:[Bamidbar 28:14] and it is said: "This month shall be for you the head of the months"footnote:[Shemos 12:2]. This is what the sages said:
+The months of the year are lunar months, as it is said: "[.add]#...# the burnt offering of the month in its month"footnote:[Bamidbar 28:14] and it is said: "This month shall be for you the head of the months"footnote:[Shemos 12:2]. This is what the sages said:
 "The Holy One, blessed be He, showed to Moshe, in a prophetic vision, the image of the Moon, and said to him:
 '[.add]#When# you see [.add]#the Moon# like this - sanctify [.add]#it#.'"footnote:[Rosh Hashanah 20b; Menachot 29a]
 
-But the years that we reckon are solar years, as it is said: "Keep the month of aviv [spring]".footnote:[Dvarim 16]
+But the years that we reckon are solar years, as it is said: "Keep the month of aviv [.add]#spring#".footnote:[Dvarim 16]
 
 [#kh-1-2]
 === Law 2
@@ -23,13 +23,13 @@ Each month, the moon becomes hidden for about two days, or a little less or more
 conjunction with the sun at the end of the month, and about one day after its conjunction with the sun, and in the
 evening it is sighted in the west. The night when it is sighted in the west after being hidden is the beginning of
 the month. We count 29 days from that day; if the moon is sighted on the 30th night, the 30th day is the first day
-of the [next] month. If it is not sighted, first day of the [next] month is the 31st day, and the 30th day belongs
+of the [.add]#next# month. If it is not sighted, first day of the [.add]#next# month is the 31st day, and the 30th day belongs
 to the previous month. On the 31st night, we do not depend on the moon, regardless if it is visible or not, since
 lunar month is never longer than 30 days.
 
 [#kh-1-4]
 === Law 4
-Month of 29 days, [when] the moon was sighted on the 30th night, is called "lacking". If the moon was not
+Month of 29 days, [.add]#when# the moon was sighted on the 30th night, is called "lacking". If the moon was not
 sighted, and the previous month has 30 days, it is called "pregnant" month, or "full" month.
 The moon sighted on the 30th night is called "moon sighted on time". If it is sighted on the 31st night, but
 not on the 30th night, it is called "moon sighted on the night of pregnancy".
@@ -38,7 +38,7 @@ not on the 30th night, it is called "moon sighted on the night of pregnancy".
 === Law 5
 Sighting of the moon is not up to an individual, unlike determination of the Shabbos, where one
 counts 6 days and observes Shabbos on the 7th, but is given to the court. Only when the court sanctifies and
-establishes the day as the beginning of the [new] month does it become the beginning of the [new] month.
+establishes the day as the beginning of the [.add]#new# month does it become the beginning of the [.add]#new# month.
 As it is said: "this month shall be for you" - this testimony is entrusted to you.
 
 [#kh-1-6]
@@ -56,7 +56,7 @@ moon in the clouds and not the real moon.
 [#kh-1-7]
 === Law 7
 It is a positive commandment of the Torah for the court to calculate and to know whether the moon can
-be sighted or not, and to examine the witnesses before the month is sanctified, and to send [messengers] to
+be sighted or not, and to examine the witnesses before the month is sanctified, and to send [.add]#messengers# to
 notify the rest of the people which day is the beginning of the month, so that they know on which day are
 the festivals. As it is said: "which you will call the holy convocations" and as it is said : "keep this
 statute in its time".

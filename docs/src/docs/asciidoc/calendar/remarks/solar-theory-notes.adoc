@@ -1,0 +1,37 @@
+[#sun-todo]
+TODO
+
+* convert each year length mentioned in the fixed calendar to angular speed and compare with the speed given by Rambam
+* what year length does value for mean anomaly velocity given by Moznaim correspond?
+* figure out from the text directions of Sun's movements and what are the position angles from (look at the parallax correction stuff: subtract mean apogee from the mean Sun...).
+* diagrams for the correction in Moznaim's Rambam.
+* Rambam's statement about inexactness: results are the same with the table as with the exact value?
+* Math.findZero(): Finish and test the code; use two separate lengths (precisions)?
+* make possible calculation of the sun's position for a Moment, not just a Day (at least for the sun).
+* calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.
+* SeasonsAstronomical.seasonForYear: should this always be Nisan?
+* Moznaim 9:4 footnote 7 there - about Pesach.
+
+[#sun-creation]
+=== Sun at Creation (TODO)
+
+According to Moznaim 9:3 footnote 5: the sun was created in the first hour of the fourth day of creation (if in Nissan); this is the first vernal equinox; the autumnal equinox half a year later took place on Wednesday, three hours after daybreak, 1 day and 23 hours before the conjunction of Tishrei.
+(Birchat Hachamo is on a different opinion.)
+Does it let us get more precise values of Sun's angular velocities?
+
+[#interesting]
+
+От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции Рамбама в астрономии - https://www.yeshiva.org.il/midrash/11088[]
+
+От Корица: Check statements of Nove Kadosh / Ibn Ezra
+
+ודבר זה הלכה למשה מסיני הוא, שבזמן שיש סנהדרין קובעין על הראייה ובזמן שאין שם סנהדרין קובעין על חשבון זה שאנו מחשבין בו היום ואין נזקקין לראייה, אלא פעמים שיהיה יום שקובעין בו בחשבון זה הוא יום הראייה או קודם לו ביום או אחריו ביום, וזה שיהיה אחר הראייה ביום פלא הוא ובארצות שהן למערב ארץ ישראל.
+
+נאוה קודש הלכות קידוש החודש פרק ה הלכה ב כבר נתבאר לעיל בפרק ראשון הלכה ג' ע"פ ציור באיזה אופן שאפשר להיות קיבוץ האמתי קודם להאמצעי או שיהיה אחר האמצעי, ולפעמים יהיו קיבוץ האמתי והאמצעי ברגע אחד, והקדימה או האחירה של קיבוץ האמתי מהאמצעי לכל היותר הוא קרוב לי"ד שעות וכן דעת הר' אברהם אבן עזרא בפרשת בא דהיינו י"ג שעות ושלשה רביעיות שעה, ודוקא בתשרי אשר הוא במאזנים אזי אפשר שיקדים האמתי להאמצעי שיעור הנזכר אבל האיחור של קיבוץ האמתי מהאמצעי בתשרי לא יהיה כי אם קרוב לשש שעות ולא יותר ובחדש ניסן אשר הוא בטלה יהיה הדין בהפוך ר"ל לכל היותר לא תהיה הקדימה הנזכר כי אם קרוב לשש שעות, והאיחור יכול להיות קרוב לי"ד שעות, כל זה יתבאר בע"ה לקמן בדרך מופת, ומבואר שכל דברי רבינו של הלכה זו הולך וסובב על חדש תשרי אשר בו שייך כל הדחיות המבוארים לקמן בפרק ז' עיין שם,
+
+Не знаю, кто это; не верю, что средневековцы могли доказать теорему о максимальной дистанции; но чтобы проверить эти утверждения, чьи бы они ни были, надо считать не только через 15 минут после захода, а в любой момент :)
+
+ביוגרפיה - נאוה קדש רבי שמעון וואלטש היה מדרי העיר ברונשוויג שבאשכנז, את חכמת התכונה למד ממי שנחשב בדורו (שנות הת"ק) כאחד המומחים הגדולים בחכמה זו, הכונה לרבי ישכר בעריש בנו של הגאון הגדול רבי אריה ליב (בן הפנ"י) רבה הנודע של הנובר, אשר הסכים בהתלהבות לפרסום ספר "נאוה קודש", בפרט לאחר שכבר ניתנה הסכמתו של רבה הגדול של ברלין רבי צבי הירש לוין.
+ספר "נאוה קודש" הודפס בברלין בשנת תקמ"ו (1786). 53 דף. הספר הודפס שנית במהדורת צילום (בתוך ספר פועל ה' ח"ב) בשנת תשכ"ט (1969), ושוב בבני ברק בשנת תשנ"ח (1998) (בתוך ספר פועל ה' ח"ג).
+החידושים על הרמב"ם הוכנסו ממהדורת פרידברג ירושלים תשס"ו.
+

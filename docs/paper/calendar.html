@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <meta name="description" content="Rambam's laws of the sanctification of the Moon, translated, with some remarks">
 <meta name="keywords" content="Rambam, calendar, astronomy">
 <meta name="author" content="Leonid Dubinsky">
@@ -18,19 +18,17 @@
 <div class="details">
 <span id="author" class="author">Leonid Dubinsky</span><br>
 <span id="email" class="email"><a href="mailto:dub@opentorah.org">dub@opentorah.org</a></span><br>
-<span id="revnumber">version 0.10.9</span>
+<span id="revnumber">version 0.1</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#colophon">Colophon</a></li>
+<li><a href="#acknowledgements">Acknowledgements</a></li>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#remarks">Some Remarks</a>
 <ul class="sectlevel1">
-<li><a href="#new-year-corrections">New Year corrections</a></li>
-<li><a href="#problematic-nissan">Problematic Nissan (KH 6:7)</a></li>
 <li><a href="#solar-theory">Solar Theory</a></li>
-<li><a href="#lunar-theory">Lunar Theory</a></li>
-<li><a href="#leap-years-cycle">Meton&#8217;s cycle</a></li>
 </ul>
 </li>
 <li><a href="#translation">Translation of the original text</a>
@@ -50,7 +48,6 @@
 <li><a href="#bibliography-greeks-on-astronomy">Greeks on Astronomy</a></li>
 <li><a href="#bibliography-contemporary-models">Contemporary Models</a></li>
 <li><a href="#bibliography-on-jewish-calendar">On Jewish Calendar</a></li>
-<li><a href="#bibliography-bibtex">Referenced</a></li>
 </ul>
 </li>
 </ul>
@@ -58,11 +55,86 @@
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="introduction"><a class="anchor" href="#introduction"></a><a class="link" href="#introduction">Introduction</a></h2>
+<h2 id="colophon"><a class="anchor" href="#colophon"></a><a class="link" href="#colophon">Colophon</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Latest version of this paper and the code used to produce it are available from <a href="http://www.opentorah.org" class="bare">www.opentorah.org</a>.</p>
+<p>Published by the <a href="http://www.opentorah.org">Open Torah Project</a>.</p>
 </div>
+<div class="paragraph">
+<p>Corrections, additions and suggestions are welcome at <a href="mailto:dub@opentorah.org">dub@opentorah.org</a>.</p>
+</div>
+<div class="paragraph">
+<p>The book is hosted by
+<a href="https://pages.github.com/">GitHub Pages</a> at
+<a href="http://www.opentorsh.org" class="bare">www.opentorsh.org</a> in multiple formats:
+<a href="/paper/calendar/calendar.html">chunked HTML</a>,
+<a href="/paper/calendar.html">one HTML file</a>,
+<a href="/paper/calendar.pdf">PDF</a>.</p>
+</div>
+<div class="paragraph">
+<p>The sources of the paper and the code used to produce it are hosted by <a href="https://github.com">GitHub</a> at
+<a href="https://github.com/opentorah/opentorah" class="bare">github.com/opentorah/opentorah</a>.</p>
+</div>
+<div class="paragraph">
+<p>Book sources in <a href="https://docs.asciidoctor.org">Asciidoc</a> authored in
+<a href="https://www.jetbrains.com/idea/">IntelliJ Idea</a>.
+Built with <a href="https://gradle.org/">Gradle</a> using
+<a href="https://asciidoctor.github.io/asciidoctor-gradle-plugin/development-3.x/user-guide/">Asciidoctor Gradle plugin</a>.</p>
+</div>
+<div class="paragraph">
+<p>Copyright 1991-2023 by Leonid Dubinsky.</p>
+</div>
+<div class="paragraph">
+<p>The book is licensed under the
+<a href="https://creativecommons.org/licenses/by/4.0//">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="https://licensebuttons.net/l/by/3.0/88x31.png" alt="88x31"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="acknowledgements"><a class="anchor" href="#acknowledgements"></a><a class="link" href="#acknowledgements">Acknowledgements</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;) If your name should be on this list but isn&#8217;t, please forgive me: the omission is not intentional.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither;</p>
+</li>
+<li>
+<p>Ilia Pomansky - for encouraging this work from its beginning in in 1991 and on;</p>
+</li>
+<li>
+<p>my wife Nina - for listening to my wild ideas, for her patience, and for help with math;</p>
+</li>
+<li>
+<p>my daughter Menucha Rochel - for assistance with the translation;</p>
+</li>
+<li>
+<p>Rabbi Michael Koretz - for stimulating discussions during our visit to Israel in 2005, encouragement, and extensive research into customs of Torah/Haftarah reading;</p>
+</li>
+<li>
+<p>Dr. Michael Partensky - for encouragement and advise;</p>
+</li>
+<li>
+<p>Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;</p>
+</li>
+<li>
+<p>Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 2012;</p>
+</li>
+<li>
+<p>Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0, 1 or 2;</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a><a class="link" href="#introduction">Introduction</a></h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two calendars: fixed ("arithmetic") and observational ("astronomical").
 Both calendars are described in a form ready to be implemented, but the reasons for the calculation steps - especially for the astronomical calendar - are not always given: what are the models - and the formulae resulting from them - that reproduce the numbers?
@@ -95,15 +167,15 @@ Sometimes Rambam describes the models, so only the formulae need to be reconstru
 <p>analyze impact of various misprints on the sighting calculations</p>
 </li>
 <li>
-<p>verify consistency of Rambam&#8217;s numbers.</p>
-</li>
-<li>
-<p>translate relevant chapters of Rambam into English.
-The translation does not have to be literal; literal translations are already available (<a href="#Yale">[Yale]</a>, <a href="#Moznaim">[Moznaim]</a>).
-The goal of our translation is to make the text complete and accessible for collaboration by people not proficient enough in Hebrew.</p>
+<p>verify consistency of Rambam&#8217;s numbers</p>
 </li>
 <li>
 <p>see how Rambam&#8217;s calculations of the moon visibility compare to the current models</p>
+</li>
+<li>
+<p>translate relevant chapters of Rambam into English
+The translation does not have to be literal; literal translations are already available (<a href="#Yale">[Yale]</a>, <a href="#Moznaim">[Moznaim]</a>).
+The goal of our translation is to make the text complete and accessible for collaboration by people not proficient enough in Hebrew.</p>
 </li>
 </ul>
 </div>
@@ -137,795 +209,794 @@ In fact, they were already corrected by Hazon Ish in his commentary on Rambam <a
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>I want to acknowledge people who contributed to the content of this work - and to the fact of its existence ;) If your name should be on this list but isn&#8217;t, please forgive me: the omission is not intentional.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Mordechai Goldin - for providing office space and computer equipment when I, as a Yeshiva student, had neither;</p>
-</li>
-<li>
-<p>Ilia Pomansky - for encouraging this work at the early stages, in 1991;</p>
-</li>
-<li>
-<p>my wife Nina - for listening to my wild ideas, for her patience, and for help with math;</p>
-</li>
-<li>
-<p>my daughter Menucha Rochel - for assistance with the translation;</p>
-</li>
-<li>
-<p>Rabbi Michael Koretz - for stimulating discussions during our visit to Israel in 2005, encouragement, and extensive research into customs of Torah/Haftarah reading;</p>
-</li>
-<li>
-<p>Dr. Michael Partensky - for encouragement and advise;</p>
-</li>
-<li>
-<p>Dr. Peter Ofman - for asking questions that prodded me to revive this project in 2011, after years of hiatus;</p>
-</li>
-<li>
-<p>Aron Matskin - for a discussion during his visit on Rosh Chodesh Mar Cheshvan 5772;</p>
-</li>
-<li>
-<p>Rabbi Chaim Prus - for causing me to investigate which number does the year of Creation has - 0 or 1;</p>
-</li>
-</ul>
-</div>
 </div>
 </div>
 <h1 id="remarks" class="sect0"><a class="anchor" href="#remarks"></a><a class="link" href="#remarks">Some Remarks</a></h1>
-<div class="openblock partintro">
-<div class="content">
-TODO Kapach and Hazak
-</div>
-</div>
-<div class="sect1">
-<h2 id="new-year-corrections"><a class="anchor" href="#new-year-corrections"></a><a class="link" href="#new-year-corrections">New Year corrections</a></h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>are there meaningful names for the corrections?</p>
-</li>
-<li>
-<p>are corrections explained by the desire to not have Yom Kippur on Sunday etc.?</p>
-</li>
-<li>
-<p>calculate third correction from the maximum length of a year and the first correction</p>
-</li>
-<li>
-<p>KH 7:8 says that postponement of RoshHaShonoh is done to align the calendar better with the true molad; analyze the statistics of distances between mean and true molad
-and RoshHashono.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>There is an <a href="https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%95%D7%A7%D7%AA_%D7%A8%D7%91_%D7%A1%D7%A2%D7%93%D7%99%D7%94_%D7%92%D7%90%D7%95%D7%9F_%D7%95%D7%91%D7%9F_%D7%9E%D7%90%D7%99%D7%A8">argument</a> concerning some of the Rosh Hashono delays involving r. Saadia Gaon:</p>
-</div>
-<div class="paragraph">
-<p>Спор о размерах "старого молада", когда он отодвигает Рош ашана на следующий день.
-По нашей шите от Расага и дальше - 18 часов
-По шите Аарона Бен Меира - 18 часов и 642/1080 частей часа</p>
-</div>
-<div class="paragraph">
-<p>make possible calculating the calendar according to the other opinion and compare the results.</p>
-</div>
-<div class="paragraph">
-<p>Молад года творения человека выходит в пятницу.
-Это и было Рош а-Шана второго года, ведь тогда принцип ли аду Рош не применялся.
-Тогда понятней спор Рамбама и Райвада о причине сдвига Рош а-Шана ло аду.
-Рамбама настаивает, что оно нужно для подсчёта по кибуц эмцаи,
-а Райвад на него из Талмуда возмущается.
-Теоретически можно сделать календарь на время до установления календаря без сдвига Рош а-Шана.</p>
-</div>
-<div class="paragraph">
-<p>Rav Ada&#8217;s tkufos started a week later than Shmuel&#8217;s! Isn&#8217;t it readily observable?
-Analyze the difference in historic periods&#8230;&#8203;</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="problematic-nissan"><a class="anchor" href="#problematic-nissan"></a><a class="link" href="#problematic-nissan">Problematic Nissan (KH 6:7)</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>TODO</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>day    1  5 107</p>
-</li>
-<li>
-<p>1 12 793</p>
-</li>
-<li>
-<p>night  3  5 900</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>TODO split and sort the sources chronologically!</p>
-</div>
-<div class="paragraph">
-<p>TODO re-verify the quotes.</p>
-</div>
-<div class="paragraph">
-<p>TODO Describe what the standard edition is and where did it come from
-(look it up in HebrewBooks.org, Sefaria).
-Translate literally and with the original symbolic forms inserted.
-Formulate the problem with the standard editions.</p>
-</div>
-<div class="paragraph">
-<p>TODO laws and only laws; Rambam apologizes for the inclusion of the astronomical calendar,
-but not for the inclusion of the description of the arithmetic operations like addition
-and (later on) rounding. What about examples? Rambam did not just <strong>formulate</strong>
-the laws (unambiguously; see rounding), his intention was for the reader to "know"
-the laws, and examples are a part of that. This is the only example in the aritmetic part
-of the text, but there are more in the astronomic one (all with years?).
-What about the "simanim"?
-It is much easier to add numbers than word expressions - compare side by side.
-But only if the numbers are unambiguous: 17, not 5(in the daytime).
-This particular example shows how to carry full days accumulated from hours during addition -
-but only if the number is 17!</p>
-</div>
-<div class="paragraph">
-<p>TODO either the word "in the daytime" is wrong, or the number "5".
-Whoever notes the problem assume that the number is wrong.
-It is clear from the actual calculation&#8217;s result that if there is only one mistake,
-it is the number.</p>
-</div>
-<div class="paragraph">
-<p>TODO look carefully in all sources for yud/lamed prefices; see if the same system
-is used by the same manuscripts in the astronomical part of the text.</p>
-</div>
-<div class="paragraph">
-<p>TODO see if Yale/Moznaim abandons translating word forms later on.</p>
-</div>
-<div class="paragraph">
-<p>Yale English translation (TODO) (example is split: Nisan in Law 6, the rest in Law 7):
-&gt; For example: Suppose the conjunction of Nisan occurred in the daytime
-&gt; of a Sunday the fifth hour and one hundred and seven parts of an hour‒in
-&gt; numerals: 1d 5h 107p.
-&gt; You proceed by adding to this the "character" of the lunar month,
-&gt; which is 1d 12h 793p, and find that the conjunction of Iyyar will occur
-&gt; at five hours and nine hundred parts on the night of Tuesday‒in
-&gt; numerals: 3d 5h 900p.
-&gt; And in the same manner you may proceed for month after month,
-&gt; until the end of time.</p>
-</div>
-<div class="paragraph">
-<p>That is what all "standard" editions of the Rambam&#8217;s text say,
-even the modern ones like Eshkol, Pardes HaMelech.</p>
-</div>
-<div class="paragraph">
-<p>Moznaim English translation (TODO):
-&gt; What is implied? If the conjunction [of the moon and the sun]
-&gt; for the month of Nisan takes place on Sunday, five hours and 107 units
-&gt; after sunrise
-&gt; (in numerical terms 1 - 5 - 107),
-&gt; by adding the reminder for a lunar month, 1 - 12 - 793, you will be able to
-&gt; determine that the conjunction of the month of Iyar will take place on
-&gt; Tuesday night, five hours and 900 units after nightfall
-&gt; (in numerical terms, 3 - 5 - 900).
-&gt; One may follow this same method [of calculation]
-&gt; month after month for eternity.</p>
-</div>
-<div class="paragraph">
-<p>Moznaim (TODO) notes on the numerical expression for Nisan (note 6):
-&gt; Kinat Eliyahu suggests that the Rambam should have stated 1 - 17, since
-&gt; five hours after sunrise is seventeen hours after the beginning of the day.</p>
-</div>
-<div class="paragraph">
-<p>Rambam LaAm (TODO) and Rambam Haaruch (TODO) do have notes,
-but seem to work with the long-form values and ignore the Rambam&#8217;s
-"numerical forms" (and thus any issues with them) completely.</p>
-</div>
-<div class="paragraph">
-<p>Kapach (1986) reflects the alternative splits into laws,
-but ignores our issue.</p>
-</div>
-<div class="paragraph">
-<p>Glitzenshtein (1993) writes:
-&gt; "5 hours in the daytime" - which are 17 hours from the beginning of the day</p>
-</div>
-<div class="paragraph">
-<p>and proceeds with the calculations using the value 17
-(TODO quote his calculations as an illustration why numerical expressions
-must be assumption-free)</p>
-</div>
-<div class="paragraph">
-<p>Hazak (2010) brings the question from the Rebbe&#8217;s Yayin Malchut (52; but
-they probably mean 43 - or did the numbers change in the 2016 edition?):
-&gt; why this example specifically, especially since this letter combination
-&gt; does not have any meaning?</p>
-</div>
-<div class="paragraph">
-<p>HaRambam HaMevuar (2020) substantiates the expectation of 17 instead of 5
-(TODO details) and notes (note 36):
-&gt; &#8230;&#8203; according to the note of Y. Ashkenazi on the Levush (Levush Adar HaYakar).
-&gt; Also, see compilation of the text variations in the Frenkel edition (RShF)
-&gt; that there are those who had the text say "1 - 17 - 107".</p>
-</div>
-<div class="paragraph">
-<p>Frenkel TODO !!!</p>
-</div>
-<div class="paragraph">
-<p>TODO translate the sicha</p>
-</div>
-<div class="paragraph">
-<p>TODO search for the year</p>
-</div>
-</div>
-</div>
 <div class="sect1">
 <h2 id="solar-theory"><a class="anchor" href="#solar-theory"></a><a class="link" href="#solar-theory">Solar Theory</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="solar-theory-longitude"><a class="anchor" href="#solar-theory-longitude"></a><a class="link" href="#solar-theory-longitude">Mean movement</a></h3>
 <div class="paragraph">
-<p>In his "Laws of the Sanctification of the Moon",  <a href="#kh-12">Chapter 12</a>, <a href="#kh-12-1">Law 1</a>, Rambam states: (TODO quote/reference)</p>
+<p>In his "Laws of the Sanctification of the Moon", <a href="#kh-12">Chapter 12</a>, <a href="#kh-12-1">Law 1</a>, Rambam states:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The mean rate of movement of the sun in one day (that is, twenty-four hours) is fifty-nine minutes and eight seconds, in symbols - 59′8″.
+It follows that its movement in ten days is nine degrees fifty-one minutes and twenty-three seconds, in symbols - 9°51′23″.
+It also follows that its movement in a hundred days is ninety-eight degrees thirty-three minutes and fifty-three seconds, in symbols - 98°33′53″.
+It also follows that remainder of its movement in a thousand days, after you subtract all <span class="add">multiples of</span> 360° (as was explained) is two hundred sixty-five degrees thirty-eight minutes and fifty seconds, in symbols - 265°38′50″.
+It also follows that the remainder of its movement in ten thousand days is one hundred thirty-six degrees twenty-eight minutes and twenty seconds, in symbols - 136°28′20″.</p>
 </div>
 <div class="paragraph">
-<p>In table format:</p>
+<p>And in this way you can multiply and calculate its movement for any number <span class="add">of days</span> that you want.
+Similarly, if you want to make known to you values of its movement for two days, three, four and so on to ten - do it.
+Similarly, if you want for to have known and ready values of its movement for twenty days, thirty, forty and so on to a hundred - do it.
+This is clear and known once you know its movement in one day.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<div class="paragraph">
+<p>And you should have ready and known to you mean movement of the Sun for twenty-nine days and for three hundred and fifty-four (which is the number of days in the lunar year when its months are "regular", and it is called "regular year").
+The reason is: if you have those movement values ready, these calculations of the visibility of the moon will be easy, because there are twenty-nine complete days from the night of observation to the night of observation of the following month, and so it is every month: no less than twenty-nine days and no more.
+Since our sole desire in all those calculations is exclusively to determine visibility <span class="add">of the moon</span>.
+And between the night of sighting of this month and night of sighting of the same month next year there is either a regular year or a year and one day; and the same every year.
+Mean movement of the Sun in twenty-nine days is twenty-eight degrees thirty-five minutes and one second, in symbols - 28°35′1″.
+Its movement in a regular year is three hundred forty-eight degrees, fifty-five minutes and fifteen seconds, in symbols - 348°55′15″.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Simple reading of the text:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+movement in one day is &#8230;&#8203; it follows that movement in 10, 100, 1000, 10000 days is &#8230;&#8203; you can multiply and calculate movement for any number of days that you want &#8230;&#8203; movement for twenty-nine days and for three hundred and fifty-four &#8230;&#8203;
+</blockquote>
+</div>
+<div class="paragraph">
+<p>suggests the assumption:</p>
+</div>
+<div class="paragraph">
+<p><em>Values given by Rambam can be calculated by multiplying the value for one day that he gives by the number of days and discarding full circles as appropriate.</em></p>
+</div>
+<div class="paragraph">
+<p>If this assumption was true, it would present a difficulty for those that read literally Rambam&#8217;s statement in the introduction to "Mishne Torah" that he only includes laws in the text: values that can be calculated are redundant and should not be included!</p>
+</div>
+<div class="paragraph">
+<p>Turns out, the values Rambam gives can <em>not</em> be calculated from the value for one day, as is clear from the following table, where the values given by Rambam are listed alongside the values calculated from the value for one day and the difference between them:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col>
+<col>
+<col>
+<col>
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">days</th>
 <th class="tableblock halign-left valign-top">printed</th>
+<th class="tableblock halign-left valign-top">calculated</th>
+<th class="tableblock halign-left valign-top">difference</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′1″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°0′3″</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">98°33′53″</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°0′33″</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">265°38′50″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°33′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°5′30″</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">136°28′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">135°33′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°55′</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′1″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°34′52″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°0′9″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°53′12″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°2′3″</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Now let&#8217;s see if the printed values can be recovered by multiplying the value for one day by the number of days (and discarding full circles as appropriate):</p>
+<p>As we see, calculated values are smaller than the values Rambam gives, so the values that Rambam included in the text are not redundant - if, of course, they are used in the calculations; we&#8217;ll look into that when reading <a href="#kh-12">Chapter 12</a>, <a href="#kh-12-2">Law 2</a> in the <a href="#solar-theory-aphelion">Aphelion</a> section below.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<div class="paragraph">
+<p>This prompts the change of assumption to:</p>
+</div>
+<div class="paragraph">
+<p><em>Values given by Rambam, including the value for one day, can be calculated by multiplying the <strong>exact</strong> value for one day that he does not give by the number of days, discarding full circles as appropriate and rounding the remainder up to the seconds.</em></p>
+</div>
+<div class="paragraph">
+<p>The reading of the text then changes to:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+movement in one day <span class="add">if rounded</span> is &#8230;&#8203; it follows that movement in 10, 100, 1000, 10000 days <span class="add">calculated using the exact value and then rounded</span> is &#8230;&#8203; you can multiply <span class="add">the exact value</span> and calculate movement for any number of days that you want &#8230;&#8203; movement for twenty-nine days and for three hundred and fifty-four <span class="add">can also be calculated the same way</span> &#8230;&#8203;
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Our goal is to extract as much information about the exact value Rambam used as possible <em>from the text itself</em>.
+Of course, it is impossible to determine the exact value from the rounded results of multiplying it: the best we can do is to find the <em>interval</em> of possible values for a given precision.</p>
+</div>
+<div class="paragraph">
+<p>To find the interval of possible exact values for a given precision we:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>look for one value that reconstructs the values given by Rambam using step at the precision we want;</p>
+</li>
+<li>
+<p>if none is found, increase the precision (and thus decrease the step);</p>
+</li>
+<li>
+<p>construct an interval that contains just the value found;</p>
+</li>
+<li>
+<p>expand it at its precision using the appropriate step;</p>
+</li>
+<li>
+<p>expand it to the precision desired.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This procedure is probably easier to understand in code than in words; the code is in the <a href="https://github.com/opentorah/opentorah/blob/master/core/src/main/scala/org/opentorah/astronomy/Days2Rotation.scala">org.opentorah.astronomy.Days2Rotation</a> class.</p>
+</div>
+<div class="paragraph">
+<p>First, let&#8217;s see what intervals for the possible exact value that Rambam used we can extract from his table with the least precision possible for each line:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
 <colgroup>
-<col style="width: 14.2857%;">
-<col style="width: 14.2857%;">
-<col style="width: 14.2857%;">
-<col style="width: 14.2857%;">
-<col style="width: 14.2857%;">
-<col style="width: 14.2857%;">
-<col style="width: 14.2858%;">
+<col>
+<col>
+<col>
+<col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">precision</th>
 <th class="tableblock halign-left valign-top">from</th>
-<th class="tableblock halign-left valign-top">10</th>
-<th class="tableblock halign-left valign-top">29</th>
-<th class="tableblock halign-left valign-top">100</th>
-<th class="tableblock halign-left valign-top">354</th>
-<th class="tableblock halign-left valign-top">1000</th>
-<th class="tableblock halign-left valign-top">10000</th>
+<th class="tableblock halign-left valign-top">to</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″15‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">=</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">=</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">=</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴47′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴49′‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴48′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴48′‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″18‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴46′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴55′‴</p></td>
 </tr>
 </tbody>
 </table>
-<div class="sect2">
-<h3 id="solar-model"><a class="anchor" href="#solar-model"></a><a class="link" href="#solar-model">Model (TODO)</a></h3>
 <div class="paragraph">
-<p>Figure out from the text directions of Sun&#8217;s movements and what are the position angles from (look at the parallax correction stuff: subtract mean apogee from the mean Sun&#8230;&#8203;).</p>
+<p>Now once more, with the same precision for <em>all</em> the lines, the one sufficient for all off them - which happens to be four digits:</p>
 </div>
-<div class="paragraph">
-<p>TODO diagrams for the correction in Moznaim&#8217;s Rambam.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="exactification"><a class="anchor" href="#exactification"></a><a class="link" href="#exactification">Exactification (TODO)</a></h3>
-<div class="paragraph">
-<p>It is not clear how Rambam arrived at the values he gives.
-When value of the movement in one day given by Rambam is multiplied by 29, 100 etc., the result is smaller than that of Rambam.
-The following table compares printed and calculated values: TODO</p>
-</div>
-<div class="paragraph">
-<p>Although the value of the movement of the mean solar longitude in one day given by <a href="#Almagest">[Almagest]</a> III 1 (H209) (which, rounded to seconds, becomes Rambam&#8217;s value) is bigger, it is not big enough, and Rambam&#8217;s numbers (for more than 10 days) can not be explained by performing calculations with the long value from Almagest and then rounding the results to the precision of the Rambam&#8217;s values.</p>
-</div>
-<div class="paragraph">
-<p><a href="#Tzikuni">[Tzikuni]</a> (TODO p. XXX) gives the algorithm of such reconstruction: add to the remainder as many times 360 as there were full rotations in given time period, and then divide.
-It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees.
-It seems that origins of the Rambam&#8217;s value were questioned by his commentators, including "Pirush".
-Value that can be derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348.</p>
-</div>
-<div class="paragraph">
-<p>This algorithm can be modified to produce an interval of possible values, taking into account precision of the numbers.</p>
-</div>
-<div class="paragraph">
-<p>From the printed values it is possible to reconstruct the value of the movement in mean solar longitude in one day that Rambam used to calculate each of them:</p>
-</div>
-<div class="paragraph">
-<p>Use it to calculate intervals for Rambam&#8217;s values of the angular velocities.</p>
-</div>
-<div class="paragraph">
-<p><a href="#Tzikuni">[Tzikuni]</a> quotes Rambam&#8217;s value for 354 days as 348°55′15″, but calculated value as 348°55′9″, and notes that this "requires a little thought".</p>
-</div>
-<div class="paragraph">
-<p>TODO About apogee, Rambam says "the same way", but doesn&#8217;t give value for 1 day&#8230;&#8203;
-Exactification requires extra attention, since there is no value for 1 day.
-SunApogee rambamValue and almagestValue.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="solar-movement-29"><a class="anchor" href="#solar-movement-29"></a><a class="link" href="#solar-movement-29">Angular movement for 29 days (TODO)</a></h3>
-<div class="paragraph">
-<p>Are Rambam&#8217;s values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not 2*v(10)+9*v(1), nor 29*vexact(1)?
-For any tables other than SunLongitudeMean?</p>
-</div>
-<div class="paragraph">
-<p>Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give the "official" Rambam&#8217;s value.
-Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published - except for 29 days, 354 days, and 10000 days which we use to calculate the exact value that Rambam used!
-TODO!</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="zeros"><a class="anchor" href="#zeros"></a><a class="link" href="#zeros">Zeros (TODO)</a></h3>
-<div class="paragraph">
-<p>Math.findZero(): Finish and test the code; use two separate lengths (precisions)?</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="sun-precise"><a class="anchor" href="#sun-precise"></a><a class="link" href="#sun-precise">Sun for a precise time (TODO)</a></h3>
-<div class="paragraph">
-<p>make possible calculations for a Moment, not just a Day (at least for the sun).</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="sun-creation"><a class="anchor" href="#sun-creation"></a><a class="link" href="#sun-creation">Sun at Creation (TODO)</a></h3>
-<div class="paragraph">
-<p>Where and when was the Sun created?
-(Birchat Hachamo is on a different opinion.) Does it let us get more precise values of Sun&#8217;s angular velocities?</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="true-seasons"><a class="anchor" href="#true-seasons"></a><a class="link" href="#true-seasons">True seasons (TODO)</a></h3>
-<div class="paragraph">
-<p>calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.</p>
-</div>
-<div class="paragraph">
-<p>SeasonsAstronomical.seasonForYear: should this always be Nisan?</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="year-lengths"><a class="anchor" href="#year-lengths"></a><a class="link" href="#year-lengths">Year lengths (TODO)</a></h3>
-<div class="paragraph">
-<p>Convert each year length mentioned in the fixed calendar to angular speed.</p>
-</div>
-<div class="paragraph">
-<p>What year length does value for mean anomaly velocity given by Moznaim correspond?</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="interesting"><a class="anchor" href="#interesting"></a><a class="link" href="#interesting">Interesting</a></h3>
-<div class="paragraph">
-<p>TODO От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции Рамбама в астрономии - <a href="https://www.yeshiva.org.il/midrash/11088" class="bare">www.yeshiva.org.il/midrash/11088</a></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="interesting2"><a class="anchor" href="#interesting2"></a><a class="link" href="#interesting2">Check statements of Nove Kadosh / Ibn Ezra</a></h3>
-<div class="paragraph">
-<p>TODO От Корица:</p>
-</div>
-<div class="paragraph">
-<p>ודבר זה הלכה למשה מסיני הוא, שבזמן שיש סנהדרין קובעין על הראייה ובזמן שאין שם סנהדרין קובעין על חשבון זה שאנו מחשבין בו היום ואין נזקקין לראייה, אלא פעמים שיהיה יום שקובעין בו בחשבון זה הוא יום הראייה או קודם לו ביום או אחריו ביום, וזה שיהיה אחר הראייה ביום פלא הוא ובארצות שהן למערב ארץ ישראל.</p>
-</div>
-<div class="paragraph">
-<p>נאוה קודש הלכות קידוש החודש פרק ה הלכה ב כבר נתבאר לעיל בפרק ראשון הלכה ג' ע"פ ציור באיזה אופן שאפשר להיות קיבוץ האמתי קודם להאמצעי או שיהיה אחר האמצעי, ולפעמים יהיו קיבוץ האמתי והאמצעי ברגע אחד, והקדימה או האחירה של קיבוץ האמתי מהאמצעי לכל היותר הוא קרוב לי"ד שעות וכן דעת הר' אברהם אבן עזרא בפרשת בא דהיינו י"ג שעות ושלשה רביעיות שעה, ודוקא בתשרי אשר הוא במאזנים אזי אפשר שיקדים האמתי להאמצעי שיעור הנזכר אבל האיחור של קיבוץ האמתי מהאמצעי בתשרי לא יהיה כי אם קרוב לשש שעות ולא יותר ובחדש ניסן אשר הוא בטלה יהיה הדין בהפוך ר"ל לכל היותר לא תהיה הקדימה הנזכר כי אם קרוב לשש שעות, והאיחור יכול להיות קרוב לי"ד שעות, כל זה יתבאר בע"ה לקמן בדרך מופת, ומבואר שכל דברי רבינו של הלכה זו הולך וסובב על חדש תשרי אשר בו שייך כל הדחיות המבוארים לקמן בפרק ז' עיין שם,</p>
-</div>
-<div class="paragraph">
-<p>Не знаю, кто это; не верю, что средневековцы могли доказать теорему о максимальной дистанции; но чтобы проверить эти утверждения, чьи бы они ни были, надо считать не только через 15 минут после захода, а в любой момент :)</p>
-</div>
-<div class="paragraph">
-<p>ביוגרפיה - נאוה קדש רבי שמעון וואלטש היה מדרי העיר ברונשוויג שבאשכנז, את חכמת התכונה למד ממי שנחשב בדורו (שנות הת"ק) כאחד המומחים הגדולים בחכמה זו, הכונה לרבי ישכר בעריש בנו של הגאון הגדול רבי אריה ליב (בן הפנ"י) רבה הנודע של הנובר, אשר הסכים בהתלהבות לפרסום ספר "נאוה קודש", בפרט לאחר שכבר ניתנה הסכמתו של רבה הגדול של ברלין רבי צבי הירש לוין.
-ספר "נאוה קודש" הודפס בברלין בשנת תקמ"ו (1786). 53 דף. הספר הודפס שנית במהדורת צילום (בתוך ספר פועל ה' ח"ב) בשנת תשכ"ט (1969), ושוב בבני ברק בשנת תשנ"ח (1998) (בתוך ספר פועל ה' ח"ג).
-החידושים על הרמב"ם הוכנסו ממהדורת פרידברג ירושלים תשס"ו.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="lunar-theory"><a class="anchor" href="#lunar-theory"></a><a class="link" href="#lunar-theory">Lunar Theory</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Law 1: Two Movements of the Moon: The first is "mean" - because it is corrected by the second, giving "true"?
-Why is the second "mean"? Because of the effects of the sun?</p>
-</div>
-<div class="paragraph">
-<p>Note: From what and in which direction are the angles measured?</p>
-</div>
-<div class="paragraph">
-<p>Anomaly (and head?): opposite direction!</p>
-</div>
-<div class="paragraph">
-<p>TODO MoonHeadMean rambamValue and almagestValue</p>
-</div>
-<div class="paragraph">
-<p>Rambam uses ‘nimzes’ instead of ‘nimzo’ for 10000 days. Also, Rambam says
-"'ordered' year"; it was rendered as 254 in accordance with Law 12:1.</p>
-</div>
-<div class="paragraph">
-<p>Rambam says "'ordered' year"; it was rendered as 254 in accordance with see Law 12:1.
-Also, this value is actually given in Law 4.</p>
-</div>
-<div class="paragraph">
-<p>14: 5,6 TODO: Compare with 11:9, about Dli&#8230;&#8203; Something is off!</p>
-</div>
-<div class="paragraph">
-<p>15:2,3: Corrected Mean Anomaly (Elongation (TODO: ?)).
-Rambam does not describe the model behind this correction.
-Because the models Rambam did describe until now are the same
-as Almagest&#8217;s models
-(including numerical parameters), and because this correction
-is determined by the (doubled)
-sun-moon elongation, just like Almagest&#8217;s "improved" model of
-the moon ("the crank"),
-I assume that that model was used to calculate this correction.
-TODO: describe the model!</p>
-</div>
-<div class="paragraph">
-<p>TODO: Derive the formula! Make the diagram!
-TODO: How come the fact that sun and moon move in different
-plains does not affect this calculation?</p>
-</div>
-<div class="paragraph">
-<p>It seems that Rambam treats "the crank" as just a calculation
-device - otherwise,
-table giving visible anomaly from the corrected anomaly should
-take into account changes in the
-earth-moon distance depending on the elongation - and it does not!
-Maybe that is why he does not describe the model behind this correction.
-And maybe this is why Rambam reiterates - in Law 2 - that only the observability of the new moon
-needs to be calculated correctly.
-TODO: How does Almagest calculate visible anomaly?</p>
-</div>
-<div class="paragraph">
-<p>Law 4,5,6: True Lunar Longitude.</p>
-</div>
-<div class="paragraph">
-<p>Formulae:</p>
-</div>
-<div class="stemblock">
-<div class="content">
-\[\tan ^{-1} \left({\sin \alpha \over \cos \alpha + \epsilon} \right)\]
-</div>
-</div>
-<div class="paragraph">
-<p>\(R\) - radius of the big circle;
-\(r\) - radius of the small circle;
-\(\epsilon = R/r\).
-A little trigonometry, and we get:
-visible anomaly = arctg(sin(corrected anomaly)/(cos(corrected anomaly) + e))
-and:
-e = ctg(visible anomaly)*sin(corrected anomaly) - cos(corrected anomaly)</p>
-</div>
-<div class="paragraph">
-<p>TODO: Make the diagram! Here?</p>
-</div>
-<div class="paragraph">
-<p>It is clear that values for 150° and 170° are misprinted: they are bigger than the one before them
-when they should be smaller. Value for 120° is also misprinted, but it is less obvious.</p>
-</div>
-<div class="paragraph">
-<p>Calculations show that for the precision up to a minute,
-it is sufficient to know e to up to the second
-digit after the dot.
-Below, a column giving the value of e was added to the table.
-Look at the value of e, and the misprints become obvious:
-value of e for them is way out of range it is in
-for the rest of them.</p>
-</div>
-<div class="paragraph">
-<p>TODO Range of e - graph. Range of possible values for each based on the range of e.
-This is transcription error: one letter; extra word&#8230;&#8203; Probable correct values.</p>
-</div>
-<div class="paragraph">
-<p>This is how different sources treat the often misprinted values:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all fit-content">
 <colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
+<col>
+<col>
+<col>
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Edition</th>
-<th class="tableblock halign-left valign-top">120°</th>
-<th class="tableblock halign-left valign-top">150°</th>
-<th class="tableblock halign-left valign-top">170°</th>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">from</th>
+<th class="tableblock halign-left valign-top">to</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Vilno">[Vilno]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′7″29‴30′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″29‴29′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Eshkol">[Eshkol]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″14‴57′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴56′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#LaAm">[LaAm]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴30′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴5′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Kapach">[Kapach]</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴47′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴49′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Bluming">[Bluming]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">corrected in the notes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴48′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴48′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Frenkel">[Frenkel]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">correct and noted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″17‴35′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴38′‴</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Keller">[Keller]</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">not given</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#Losh">[Losh]</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">incorrect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴46′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴55′‴</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>Contemplation of this table reveals a surprising fact: some pairs of the values are <em>incompatible</em> in the sense that they can not be reconstructed from the same exact value by multiplication and rounding, and even though increasing the precision widens the intervals of the possible exact values, intervals for the incompatible values will never intersect, because there is a separating value for the pair such that the intervals of possible exact values are strictly on different sides of the separating value.
+Here is a table that gives those separating values:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">1</th>
+<th class="tableblock halign-left valign-top">10</th>
+<th class="tableblock halign-left valign-top">29</th>
+<th class="tableblock halign-left valign-top">100</th>
+<th class="tableblock halign-left valign-top">354</th>
+<th class="tableblock halign-left valign-top">1000</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴39′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴6′‴</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴39′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴50′‴</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴39′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴49′‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>We can see that 29 is incompatible with 354, 1000 and 10000, and 354 is incompatible with 29, 100, 1000 and 10000; so, we have the following options:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">option</th>
+<th class="tableblock halign-left valign-top">reconstructed</th>
+<th class="tableblock halign-left valign-top">exceptions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1, 10, 100, 1000, 10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29, 365</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1, 10, 100, 29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000, 10000, 365</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1, 10, 354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100, 1000, 10000, 29</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Since we are looking for a reading with the most of the values reconstructed from the exact one and the fewest exceptions, we choose the first option; our assumption now becomes:</p>
+</div>
+<div class="paragraph">
+<p><em>Values given by Rambam, including the value for one day, can be calculated by multiplying the exact value for one day that he does not give by the number of days, discarding full circles as appropriate and rounding the remainder up to the seconds - except for the values for the month and the year, which can not be calculated this way.</em></p>
+</div>
+<div class="paragraph">
+<p>Accordingly, our reading of the text changes to:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+movement in one day <span class="add">if rounded</span> is &#8230;&#8203; it follows that movement in 10, 100, 1000, 10000 days <span class="add">calculated using the exact value and then rounded</span> is &#8230;&#8203; you can multiply <span class="add">the exact value</span> and calculate movement for any number of days that you want &#8230;&#8203; movement for twenty-nine days and for three hundred and fifty-four <span class="add">can not be calculated this way</span> &#8230;&#8203;
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Values for 29 and 354 are separated from the rest of the values in the text itself, and that is another argument (besides minimizing the number of exceptions) for choosing the reading where the exceptions are just 29 and 354: any other choice makes the reading even <em>more</em> unnatural&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Intervals for 1, 10, 100, 1000 and 10000 days nest within one another, so any number in the interval for 10000 days reconstructs all of them.</p>
+</div>
+<div class="paragraph">
+<p>For precision of four digits, that interval contains just one number: 0°59′8″19‴48′‴, so if the exact value Rambam used was of this precision (and not more precise; it could not have been less precise), it is this number.
+In a sense, this number "falls out of the text".
+Here are the values reconstructed from it, and how they compare with Rambam&#8217;s values:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">printed</th>
+<th class="tableblock halign-left valign-top">calculated</th>
+<th class="tableblock halign-left valign-top">difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′53″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′53″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°38′50″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°38′50″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°28′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°28′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′1″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′2″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′1″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′9″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°0′6″</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>As expected, values for 29 and 354 are off.</p>
+</div>
+<div class="paragraph">
+<p>It seems that ancient and medieval authors liked the precision of six sexagesimal digits (minutes, seconds, thirds, fourths, fifths, sixths), although it is not clear how meaningful is precision of less than 1/46 billionth of a degree in this context.
+For completeness, here are the intervals for the exact values at precision of six digits:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">from</th>
+<th class="tableblock halign-left valign-top">to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′7″29‴29′‴29″‴30‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″29‴29′‴29″‴29‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″14‴56′‴56″‴57‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴56′‴56″‴56‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴29′‴41″‴42‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴5′‴41″‴41‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴46′‴10″‴11‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴49′‴46″‴10‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴47′‴49″‴2‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴48′‴10″‴37‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″17‴34′‴7″‴14‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″19‴38′‴15″‴29‴‴</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴45′‴40″‴36‴‴</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″20‴55′‴50″‴45‴‴</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For our chosen interpretation, at this precision the exact value is in the interval from 0°59′8″19‴47′‴49″‴2‴‴ to 0°59′8″19‴48′‴10″‴37‴‴.</p>
+</div>
+<div class="paragraph">
+<p>Now that we saw what the text itself tells us, let&#8217;s see what classic and modern authors have to say about it.</p>
+</div>
+<div class="paragraph">
+<p>The earliest remark that I am aware of belongs to <a href="#Pirush">[Pirush]</a>:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Movement in one day of 0°59′8″ is according to al-Battani, who in his book gives the value close to 0°59′8″20‴35′‴; but according to Btolemeus <span class="add">= Ptolemy</span>, it is 0°59′8″17‴13′‴12″‴31‴‴.
+For every opinion it corresponds with the length of the solar year on that opinion (which for Ptolemy is 365 and 1/4 days minus 1/300 of a day, and for al-Battani 365 and 1/4 days minus 3°40′ - where a day is 360°):
+movement in one day is obtained by dividing 360° (full circle) by the length of the solar year.</p>
+</div>
+<div class="paragraph">
+<p>Proof that Rambam follows al-Battani and not someone else is:
+the value for 10 days that he gives - 9°51′23″ - is 3″ bigger than what it would have been - 9°51′20″ - if it was obtained as he suggests previously <span class="add">by multiplying the value for 1 day that he gives by 10</span>; but since movement in one day is bigger than 0°59′8″ by 20‴, and multiplied by 10 they come to 200‴, he took out 180‴ of them as 3″ and added them to 20″, obtaining 23″; remaining 20‴ he multiplied by 10 and took out of them 3″ and added them to the value for 100 days, which he gives as 98°33′53″ <span class="add">3″ more than the value he gives for 10 days (9°51′23″) multiplied by 10 (98°33′50″)</span>.
+The same applies to the movement over a year and a month.
+(The way to multiply is clear once the rules explained in chapter 11 are understood.)</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>If we calculate movement in one day from the length of the solar year that <a href="#Pirush">[Pirush]</a> attributes to Ptolemy, we get the value that <a href="#Pirush">[Pirush]</a> gives; for al-Battani, we get 0°59′8″21‴12′‴50″‴39‴‴, which is <strong>not</strong> the value <a href="#Pirush">[Pirush]</a> gives: there seems to be a mistake in <a href="#Pirush">[Pirush]</a>'s calculation.</p>
+</div>
+<div class="paragraph">
+<p><a href="#IbnHabib">[IbnHabib]</a> writes:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><a href="#Pirush">[Pirush]</a>'s statement that Rambam follows al-Battani&#8217;s calculations and that is the reason he adds 3″ to the value for 10 days seems to me to be true, correct and unassailable.
+I have a difficulty, though: why didn&#8217;t Rambam do the same with the value for 1000 days, where he should have also added 3″ resulting from <span class="add">multiplying by 10</span> 20‴ remaining from the value for 100 days.
+The same applies to the value for 10000 days: in current time, which is more than 126000 days after Rambam&#8217;s epoch, resulting discrepancy in the position of the sun is 7′&#8230;&#8203; I need to look into this.
+I also have a difficulty with Rambam stating that movement of the sun during a regular year is 348°55′15″: it looks like Rambam added 7″ more than he should have based on the rate of movement mentioned.
+I need to look into this; although some thoughts that provide partial explanation of the Rambam&#8217;s text did occur to me, they are not yet complete in my mind - and that is why I did not write them down.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>In the standard editions, in "3″ resulting from 20‴", 20‴ is misprinted as 2‴, which is hard to explain - unless it used to be written as a number instead of being spelled out, and somebody mistook chof for a bet. It is not clear to me how did IbnHabib arrive at the value 7′ for the discrepancy.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s compare the values reconstructed from the exact value that <a href="#Pirush">[Pirush]</a> suggests with the values given by Rambam:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">printed</th>
+<th class="tableblock halign-left valign-top">calculated</th>
+<th class="tableblock halign-left valign-top">difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′53″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′54″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′1″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°38′50″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°39′3″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′13″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°28′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°30′31″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°2′11″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′1″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′2″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′1″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′13″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°0′2″</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><a href="#IbnHabib">[IbnHabib]</a> questions the values for 1000, 10000 (which <a href="#Pirush">[Pirush]</a> doesn&#8217;t claim as explained by his suggestion) and 365 (which <a href="#Pirush">[Pirush]</a> does claim as explained), affirms the value for 10 days and does not mention the values for 100 and 29 days. From the table above we can see that the only values that are explained by the <a href="#Pirush">[Pirush]</a>'s suggestion are the values for 1 and 10 days; everything else is off (although the differences are not always what IbnHabib says they are).</p>
+</div>
+<div class="paragraph">
+<p>In its in-depth analysis, <a href="#HaMevuar">[HaMevuar]</a>, pp. 116-117, quotes an alternative approach in the name of <a href="#Ajdler">[Ajdler]</a>, but as far as I can tell, it is from <a href="#Neugebauer">[Neugebauer]</a>, p. 338-339 (398-399 in reprint), recapitulated in shorter and less aggressive form in <a href="#Yale">[Yale]</a>, p. 129:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>These values are not consistent with one another in the sense that they are not exact multiples of 0°59′8″. The obvious explanation is, of course, that we are dealing here with rounded off multiples of a more exact initial value.
+Indeed, we can show even more.
+The values for 1, 10 and 29 days and for 354 days (erroneously assumed to be an error by <a href="#Baneth">[Baneth]</a> p. 43 note 5) are identical with the corresponding values in Al-Battani&#8217;s tables, which, in turn are rounded off from multiples of 0°59′8″20‴46′‴56″‴14‴‴. The values for 100, 1,000 and 10,000 are not included in Al-Battani&#8217;s tables but can be derived directly from them as follows.
+We multiply the value for 30 days, given by Al-Battani as 29°34′10″, by 3 and add the value for 10 days, which is 9°51′23″. Then we obtain exactly Maimonides&#8217;s value 98°33′53″. From this the values for 1,000 and for 10,000 days are obtained by multiplication by 10 and 100.</p>
+</div>
+<div class="paragraph">
+<p>The insight into this procedure of Maimonides is historically not without interest.
+In order to obtain the value for 100 days he simply took the rounded-off values for 30 and for 10 days, thus comitting an error 3ε1+ε2 if ε1 and ε2 are the errors of rounding off committed by Al-Battani.
+This total error appears multiplied by 100 in the value for 10,000 days.
+It is an amusing accident that the result agrees much better with modern values than any other value from Ptolemy to Copernicus.
+<a href="#Baneth">[Baneth]</a>, who did not realize how Maimonides&#8217;s tables were constructed, praised this result "als ein glänzendes Ergebnis" <span class="add">= a brilliant result</span> and conjectured that Maimonides compared observations of Al-Battani with results of Hipparchus.
+We see now that Maimonides not only did not have the slightest intention to deviate from Al-Battani but that he showed the same disregard for the cumulative effect of errors which can be recognized in almost all ancient and mediaeval astronomers.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The following table compares the values Rambam gives with the calculations based on the al-Battani&#8217;s exact value given by <a href="#Neugebauer">[Neugebauer]</a>:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">days</th>
+<th class="tableblock halign-left valign-top">printed</th>
+<th class="tableblock halign-left valign-top">calculated</th>
+<th class="tableblock halign-left valign-top">difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°59′8″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9°51′23″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′53″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">98°33′55″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′2″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°38′50″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">265°39′6″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′16″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°28′20″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">136°31′4″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°2′44″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">29</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′1″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28°35′2″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-0°0′1″</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">354</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">348°55′15″</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>We see that the values for 100, 1000 and 10000 days can not be obtained by multiplying and then rounding the exact value derived from al-Battani, just as <a href="#Neugebauer">[Neugebauer]</a> says - but neither is the value for 29 days what it should be, while <a href="#Neugebauer">[Neugebauer]</a> lists it among those "rounded off from multiples" of the exact value for one day!</p>
+</div>
+<div class="paragraph">
+<p><a href="#Neugebauer">[Neugebauer]</a> p. 336 (396) says:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+Off hand, it is to be expected that Maimonides followed Arabic astronomers, even if he had Arabic translations of the Almagest at his disposal.
+Indeed, we shall show that there exist very close relations between Maimonides and AI-Battani. &#8230;&#8203; We shall confirm this result for the whole theory of the solar and lunar movement. The theory of visibility, however, deviates from AI-Battani &#8230;&#8203; I do not know the source of this special section.
+</blockquote>
+</div>
+<div class="paragraph">
+<p>It seems that <a href="#Neugebauer">[Neugebauer]</a> was so set in his preconception that Rambam must have copied his numbers from al Battani, that all the proof of that he needed is the numbers in al-Battani being the same as the ones given by Rambam, even though, as we already know, Rambam&#8217;s numbers (except for the 29 and 353 days) can be reconstructed from an exact value for one day that is <strong>different</strong> from al-Battani&#8217;s! So, <a href="#Neugebauer">[Neugebauer]</a>'s statements that Rambam:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>showed disregard for the cumulative effect of errors</p>
+</li>
+<li>
+<p>did not have the slightest intention to deviate from al-Battani</p>
+</li>
+<li>
+<p>obtained his value for 10000 days through an "amusing accident"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>are incorrect unless Rambam copied all the numbers from al-Battani and calculated the missing value for 100, 1000, and 10000 days the way <a href="#Neugebauer">[Neugebauer]</a> describes - assumption that is not supported by the text itself.</p>
+</div>
+<div class="paragraph">
+<p>The same preconception that Rambam must have copied his numbers from al-Battani if he did not copy them from Ptolemy was shared, as we saw, by <a href="#Pirush">[Pirush]</a> and <a href="#IbnHabib">[IbnHabib]</a>; it was also shared by the later writers (including <a href="#LaAm">[LaAm]</a>) that produced increasingly convoluted "explanations" of Rambams calculations that attempt to preserve <a href="#Pirush">[Pirush]</a>'s statements.</p>
+</div>
+<div class="paragraph">
+<p>We focus on the Rambam&#8217;s text itself, and feel no duty to satisfy any preconceived notions about the "history of ideas" and the "historical context", we choose the reading that minimizes the number of values Rambam gives that can not be reproduced from an exact value for one day - and as we already saw, there is an interval of values that result in just two exceptions: 29 and 354 days.</p>
+</div>
+<div class="paragraph">
+<p>We are not the first to choose this approach; <a href="#HaMevuar">[HaMevuar]</a> ascribes it to: Shvilei HaRakia, Nove Kodosh, Moer Hodosh, Shekel Hakodesh etc.
+<a href="#Baneth">[Baneth]</a> seems to favor this approach.
+<a href="#Moznaim">[Moznaim]</a> also follows it: it quotes (in 12:1 note 1, without giving any reference) the value for one day as 0°59′8″19.8‴, which is 0°59′8″19‴48′‴;
+<a href="#Tzikuni">[Tzikuni]</a>, p. 44 also comes up with this value - if read charitably: the value he gives, 0°59′8.33″, is 0°59′8″20‴, is not precise enough, but the floating point number he gives is; again, no references are given.
+<a href="#Glitzenshtein">[Glitzenshtein]</a> also gives this number, and also without references.</p>
+</div>
+<div class="paragraph">
+<p>On our approach, values for 29 and 354 days are exceptions not explained by multiplication and rounding; disturbingly, nobody writes that thevalue for 29 is an exception, not on the Rambam and not - lehavdil - on al-Battani. This needs attention ;)</p>
+</div>
+<div class="paragraph">
+<p><a href="#HaMevuar">[HaMevuar]</a> quotes Moer Hodosh as suggesting that the value 348°55′15″ for 354 days got garbled during the transmission of the text, and should be corrected (restored) to 348°55′9″ (<a href="#Glitzenshtein">[Glitzenshtein]</a> gives plausible explanation of how this garbling happened);
+<a href="#HaMevuar">[HaMevuar]</a> quotes <a href="#Ajdler">[Ajdler]</a> as questioning a possibility of corruption for the value for 354 days in all five angular velocity tables: two for the sun and three for the moon.
+<a href="#Ajdler">[Ajdler]</a>'s question becomes stronger since 354 is not the only exception that we would like to explain away: we need to think of 29 also; at the same time, I do not see 354 as an exception in the second angular velocity table - the one we discuss in the following section, <a href="#solar-theory-aphelion">Aphelion</a>.</p>
+</div>
+</div>
 <div class="sect2">
-<h3 id="moon-questions"><a class="anchor" href="#moon-questions"></a><a class="link" href="#moon-questions">Questions</a></h3>
-<div class="sect3">
-<h4 id="_moznaim_rambam_kh_132f4"><a class="anchor" href="#_moznaim_rambam_kh_132f4"></a><a class="link" href="#_moznaim_rambam_kh_132f4">Moznaim Rambam, KH 13:2f4</a></h4>
-<div class="paragraph">
-<p>(13, 3, 53, 53) - as explanation of the value for 100 days (7 missing seconds)</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_moons_mean_period_from_astronomical_models"><a class="anchor" href="#_moons_mean_period_from_astronomical_models"></a><a class="link" href="#_moons_mean_period_from_astronomical_models">Moon&#8217;s mean period from astronomical models</a></h4>
-<div class="paragraph">
-<p>Angular speed of the moon = 360 / (1/tropical month + 1/solar year).
-Moon.meanLunarPeriod - what is it called? Tropical?</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_145_moon_longitude_adjustment_for_time_of_seeing"><a class="anchor" href="#_145_moon_longitude_adjustment_for_time_of_seeing"></a><a class="link" href="#_145_moon_longitude_adjustment_for_time_of_seeing">14:5 Moon Longitude Adjustment for Time of Seeing</a></h4>
-<div class="paragraph">
-<p>See notes in Moznaim Rambam
-Sun longitude: mean or true?
-In 3rd and 7th lines, most editions incorrectly have 15.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_todo_moznaim_rambam_kh_151f2"><a class="anchor" href="#_todo_moznaim_rambam_kh_151f2"></a><a class="link" href="#_todo_moznaim_rambam_kh_151f2">TODO Moznaim Rambam, KH 15:1f2</a></h4>
-<div class="paragraph">
-<p>double elongation = distance between moon&#8217;s mean and apogee
-Moon longitude adjustment for double elongation: Moznaim Rambam, KH 15:2f3: discrepancy in the limits;
-encode the limits</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_moonsightable_forsightinglimits"><a class="anchor" href="#_moonsightable_forsightinglimits"></a><a class="link" href="#_moonsightable_forsightinglimits">MoonSightable.forSightingLimits</a></h4>
-<div class="paragraph">
-<p>is that what Rambam is saying?</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_distance_between_mean_and_true_new_moon"><a class="anchor" href="#_distance_between_mean_and_true_new_moon"></a><a class="link" href="#_distance_between_mean_and_true_new_moon">Distance between mean and true new moon</a></h4>
-<div class="paragraph">
-<p>KH 5:1-2 says that the distance is no more than a day.
-Calculate this difference for all months; Rambam&#8217;s epoch - two days after molad?! (Petya Ofman).</p>
-</div>
-<div class="paragraph">
-<p>How to find the day of sighting given a month?</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_differences_between_arithmetic_and_observational_calendars"><a class="anchor" href="#_differences_between_arithmetic_and_observational_calendars"></a><a class="link" href="#_differences_between_arithmetic_and_observational_calendars">Differences between arithmetic and observational calendars</a></h4>
-<div class="ulist">
-<ul>
-<li>
-<p>основан не на среднем движении солнца и луны, поэтому к молад надо делать поправку, но не путем отодвигания Рош
-а-шана, а методами последних глав Кидуш а-ходеш</p>
-</li>
-<li>
-<p>другой порядок високосных и простых лет</p>
-</li>
-<li>
-<p>другой порядок полных и неполных месяцев</p>
-</li>
-<li>
-<p>возможно ли рассчитать по Рамбаму начало месяцев по этим принципам и сравнить с завиксированныму в традиции датами
-и днями недели?</p>
-</li>
-<li>
-<p>Пример: выход из Египта - 15 день от освящения месяца, четверг</p>
-</li>
-<li>
-<p>Год рождения Моше: спор был ли год високосным или простым. Шита Ребе - год был високосным.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_timetorotation_calculate"><a class="anchor" href="#_timetorotation_calculate"></a><a class="link" href="#_timetorotation_calculate">TimeToRotation.calculate()</a></h4>
-<div class="paragraph">
-<p>without the '29' case, mean sun longitude for 4938/Iyar/2 is not what Rambam quotes in KH 15:8-9 (see test);
-see if variations in this algorithms are logical: e.g., for 600, add for 1000 and subtract 4*for 100?
-see if the end result is stable when Rambam&#8217;s "real" value is used with straight multiplication and rounding
-(abstract away the calculation mechaninsm).</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_todo_example_in_158_9"><a class="anchor" href="#_todo_example_in_158_9"></a><a class="link" href="#_todo_example_in_158_9">TODO Example in 15:8-9</a></h4>
-<div class="paragraph">
-<p>moonAnomalyTrue - printing error in standard editions, 180 instead of 108;
-still 108°21′46″, which doesn&#8217;t round to 108°21&#8230;&#8203;
-moonLongitudeTrueRaw - printing error in standard editions, 33 instead of 35.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_todo_example_1713_14"><a class="anchor" href="#_todo_example_1713_14"></a><a class="link" href="#_todo_example_1713_14">TODO Example 17:13-14</a></h4>
-<div class="paragraph">
-<p>"this longitude is in Taurus" - but longitude3 isn&#8217;t, so I get 1/6 instead of 1/5&#8230;&#8203;</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_todo_crescent_calculations_kh_18_19"><a class="anchor" href="#_todo_crescent_calculations_kh_18_19"></a><a class="link" href="#_todo_crescent_calculations_kh_18_19">TODO crescent calculations: KH 18-19!</a></h4>
+<h3 id="solar-theory-aphelion"><a class="anchor" href="#solar-theory-aphelion"></a><a class="link" href="#solar-theory-aphelion">Aphelion</a></h3>
 
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="leap-years-cycle"><a class="anchor" href="#leap-years-cycle"></a><a class="link" href="#leap-years-cycle">Meton&#8217;s cycle</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>TODO
-Show why 19-years cycle is the best.
-Calculate optimal distribution of the leap years.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>1:2 Solar year is ~11 days longer than the lunar (see chapter 6);
-when discrepancy accumulates to ~30 days, year is made leap.</p>
-</li>
-<li>
-<p>4:1-2 Leap year - additional Adar;
-Pesach (15th of Nisan) must be not before the vernal equinox (Sun enters Aries, see 9:3)
-and before the next summer solstice.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Moznaim:
-Based on Sanhedrin 13a-b, the Ramah (cited in Kessef Mishneh on law 15):
-"Succos must be after the autumnal equinox"; Rambam doesn&#8217;t mention this.
-With vernal equinox on Nissan 15th, autumnal could be on Tishrei 21st, 6 days into Succos.
-Ohr Sameach: Rambam did say this, printers missed it.
-Aruch HaShulchan: Rambam holds that that Sanhedrin isn&#8217;t law; we only care about vernal equinox.</p>
-</div>
-<div class="paragraph">
-<p>QUESTION: what are the properties of the fixed calendar in this respect
-(need true seasons)?</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>6:3 Lunar month (between conjunctions) = 29d12h793p.</p>
-</li>
-<li>
-<p>6:4 Lunar year (12 lunar months) = 354d8h876p = 354d8h48m40s;
-Leap lunar year (13 lunar months) = 383d21h589p;
-Solar year = 365d6h (see also 9:1, 10:6);
-longer than the lunar year by 10d21h204p.</p>
-</li>
-<li>
-<p>6:10 19 year cycle (12+7 leap); because the difference between 19 solar years and
-the cycle is less than a day: 1h485p.
-(see 10:1 - with a different year length, the difference is 0)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>QUESTION: what other lengths of the cycle have this property?</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>6:11 Leap years: 3,6,8,11,14,17,19.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>QUESTION: in what sense is this an optimal correspondence?
-and for different cycle lengths? It is possible that true Sun calculations are needed to answer those questions&#8230;&#8203;</p>
-</div>
-<div class="paragraph">
-<p>Pirush in the beginning of Rambam -!!!</p>
 </div>
 </div>
 </div>
@@ -947,12 +1018,12 @@ year begins. Explanation of this commandment is in these chapters.</p>
 <div class="sect2">
 <h3 id="kh-1-1"><a class="anchor" href="#kh-1-1"></a><a class="link" href="#kh-1-1">Law 1</a></h3>
 <div class="paragraph">
-<p>The months of the year are lunar months, as it is said: "[&#8230;&#8203;] the burnt offering of the month in its month"<sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup> and it is said: "This month shall be for you the head of the months"<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>. This is what the sages said:
+<p>The months of the year are lunar months, as it is said: "<span class="add">&#8230;&#8203;</span> the burnt offering of the month in its month"<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> and it is said: "This month shall be for you the head of the months"<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup>. This is what the sages said:
 "The Holy One, blessed be He, showed to Moshe, in a prophetic vision, the image of the Moon, and said to him:
-'<span class="add">When</span> you see <span class="add">the Moon</span> like this - sanctify <span class="add">it</span>.'"<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
+'<span class="add">When</span> you see <span class="add">the Moon</span> like this - sanctify <span class="add">it</span>.'"<sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup></p>
 </div>
 <div class="paragraph">
-<p>But the years that we reckon are solar years, as it is said: "Keep the month of aviv [spring]".<sup class="footnote">[<a id="_footnoteref_6" class="footnote" href="#_footnotedef_6" title="View footnote.">6</a>]</sup></p>
+<p>But the years that we reckon are solar years, as it is said: "Keep the month of aviv <span class="add">spring</span>".<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup></p>
 </div>
 </div>
 <div class="sect2">
@@ -962,7 +1033,7 @@ year begins. Explanation of this commandment is in these chapters.</p>
 accumulates to around 30 days, or a little less, or a little more, a month is added and the year is made to have
 13 months - which is called a "pregnant" year. <span class="add">This is done</span> because it is impossible to have a year of 12 months
 and some days, as it is said: "for the months of the year" - you count the months of the year, but not the days of
-the year.<sup class="footnote">[<a id="_footnoteref_7" class="footnote" href="#_footnotedef_7" title="View footnote.">7</a>]</sup></p>
+the year.<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
 </div>
 </div>
 <div class="sect2">
@@ -972,7 +1043,7 @@ the year.<sup class="footnote">[<a id="_footnoteref_7" class="footnote" href="#_
 conjunction with the sun at the end of the month, and about one day after its conjunction with the sun, and in the
 evening it is sighted in the west. The night when it is sighted in the west after being hidden is the beginning of
 the month. We count 29 days from that day; if the moon is sighted on the 30th night, the 30th day is the first day
-of the [next] month. If it is not sighted, first day of the [next] month is the 31st day, and the 30th day belongs
+of the <span class="add">next</span> month. If it is not sighted, first day of the <span class="add">next</span> month is the 31st day, and the 30th day belongs
 to the previous month. On the 31st night, we do not depend on the moon, regardless if it is visible or not, since
 lunar month is never longer than 30 days.</p>
 </div>
@@ -980,7 +1051,7 @@ lunar month is never longer than 30 days.</p>
 <div class="sect2">
 <h3 id="kh-1-4"><a class="anchor" href="#kh-1-4"></a><a class="link" href="#kh-1-4">Law 4</a></h3>
 <div class="paragraph">
-<p>Month of 29 days, [when] the moon was sighted on the 30th night, is called "lacking". If the moon was not
+<p>Month of 29 days, <span class="add">when</span> the moon was sighted on the 30th night, is called "lacking". If the moon was not
 sighted, and the previous month has 30 days, it is called "pregnant" month, or "full" month.
 The moon sighted on the 30th night is called "moon sighted on time". If it is sighted on the 31st night, but
 not on the 30th night, it is called "moon sighted on the night of pregnancy".</p>
@@ -991,7 +1062,7 @@ not on the 30th night, it is called "moon sighted on the night of pregnancy".</p
 <div class="paragraph">
 <p>Sighting of the moon is not up to an individual, unlike determination of the Shabbos, where one
 counts 6 days and observes Shabbos on the 7th, but is given to the court. Only when the court sanctifies and
-establishes the day as the beginning of the [new] month does it become the beginning of the [new] month.
+establishes the day as the beginning of the <span class="add">new</span> month does it become the beginning of the <span class="add">new</span> month.
 As it is said: "this month shall be for you" - this testimony is entrusted to you.</p>
 </div>
 </div>
@@ -1013,7 +1084,7 @@ moon in the clouds and not the real moon.</p>
 <h3 id="kh-1-7"><a class="anchor" href="#kh-1-7"></a><a class="link" href="#kh-1-7">Law 7</a></h3>
 <div class="paragraph">
 <p>It is a positive commandment of the Torah for the court to calculate and to know whether the moon can
-be sighted or not, and to examine the witnesses before the month is sanctified, and to send [messengers] to
+be sighted or not, and to examine the witnesses before the month is sanctified, and to send <span class="add">messengers</span> to
 notify the rest of the people which day is the beginning of the month, so that they know on which day are
 the festivals. As it is said: "which you will call the holy convocations" and as it is said : "keep this
 statute in its time".</p>
@@ -1042,21 +1113,20 @@ and if he transgressed and did establish or did proclaim, it is as if he didn&#8
 <p>The mean rate of movement of the sun in one day (that is, twenty-four hours) is fifty-nine minutes and eight seconds, in symbols - 59′8″.
 It follows that its movement in ten days is nine degrees fifty-one minutes and twenty-three seconds, in symbols - 9°51′23″.
 It also follows that its movement in a hundred days is ninety-eight degrees thirty-three minutes and fifty-three seconds, in symbols - 98°33′53″.
-It also follows that remainder of its movement in a thousand days, after you subtract all [multiples of] 360° (as was explained) is two hundred sixty-five degrees thirty-eight minutes and fifty seconds, in symbols - 265°38′50″.
+It also follows that remainder of its movement in a thousand days, after you subtract all <span class="add">multiples of</span> 360° (as was explained) is two hundred sixty-five degrees thirty-eight minutes and fifty seconds, in symbols - 265°38′50″.
 It also follows that the remainder of its movement in ten thousand days is one hundred thirty-six degrees twenty-eight minutes and twenty seconds, in symbols - 136°28′20″.</p>
 </div>
 <div class="paragraph">
-<p>And in this way you can multiply and calculate its movement for any number
-[of days] that you want.
+<p>And in this way you can multiply and calculate its movement for any number <span class="add">of days</span> that you want.
 Similarly, if you want to make known to you values of its movement for two days, three, four and so on to ten - do it.
 Similarly, if you want for to have known and ready values of its movement for twenty days, thirty, forty and so on to a hundred - do it.
-This is clear and known once you know its movement in 1 day.</p>
+This is clear and known once you know its movement in one day.</p>
 </div>
 <div class="paragraph">
-<p>And you should have ready and known to you mean movement of the Sun for twenty-nine days and for three hundred and fifty-four (which is the number of days in the lunar year when its months are "regular" (TODO link), and it is called "regular year").
+<p>And you should have ready and known to you mean movement of the Sun for twenty-nine days and for three hundred and fifty-four (which is the number of days in the lunar year when its months are "regular", and it is called "regular year").
 The reason is: if you have those movement values ready, these calculations of the visibility of the moon will be easy, because there are twenty-nine complete days from the night of observation to the night of observation of the following month, and so it is every month: no less than twenty-nine days and no more.
-Since our sole desire in all those calculations is exclusively to determine visibility [of the moon].
-And between the night of sighting of this month and night of sighting of the same month next year there is either a regular year or a year and 1 day; and the same every year.
+Since our sole desire in all those calculations is exclusively to determine visibility <span class="add">of the moon</span>.
+And between the night of sighting of this month and night of sighting of the same month next year there is either a regular year or a year and one day; and the same every year.
 Mean movement of the Sun in twenty-nine days is twenty-eight degrees thirty-five minutes and one second, in symbols - 28°35′1″.
 Its movement in a regular year is three hundred forty-eight degrees, fifty-five minutes and fifteen seconds, in symbols - 348°55′15″.</p>
 </div>
@@ -1076,11 +1146,11 @@ It also follows that its movement in twenty-nine days is a bit more (TODO!) than
 </div>
 <div class="paragraph">
 <p>We already said that the epoch that our calculations start from is beginning of the night of the fifth day that is 3rd of Nisan of the year four thousand nine hundred thirty-eight from the Creation.
-Position of the Sun in its mean movement at the epoch was seven degrees three minutes and thirty-two seconds in the constellation of Ram (Tele), in symbols - 7°3′32″.
+Position of the Sun in its mean movement at the epoch was seven degrees three minutes and thirty-two seconds in the constellation of Ram, in symbols - 7°3′32″.
 Position of the Sun&#8217;s apogee at the epoch was twenty-six degrees forty-five minutes and eight seconds in the constellation of Twins, in symbols - 26°45′8″.</p>
 </div>
 <div class="paragraph">
-<p>When you want to know position of the Sun in its mean movement at any time you want, take the number of days from the epoch to the day that you want, and find out its mean movement during those days from the values we mentioned, add all of it to the epoch, adding each kind [of unit] with its kind, and the result is the position of the Sun in its mean movement on that day.</p>
+<p>When you want to know position of the Sun in its mean movement at any time you want, take the number of days from the epoch to the day that you want, and find out its mean movement during those days from the values we mentioned, add all of it to the epoch, adding each kind <span class="add">of unit</span> with its kind, and the result is the position of the Sun in its mean movement on that day.</p>
 </div>
 <div class="paragraph">
 <p>For example, if we wanted to know Sun&#8217;s mean position at the beginning of the night of Shabbat whose day is the fourteenth of Tammuz of this year, which is the year of the epoch - we find the number of days from the day of the epoch to the beginning of the day that we want to find Sun&#8217;s position on to be a hundred days.
@@ -1091,7 +1161,7 @@ So its position in its mean movement at the beginning of this night is in the co
 </div>
 <div class="paragraph">
 <p>Mean position thus calculated is sometimes exactly at the beginning of the night, sometimes an hour before sunset, and sometimes - an hour after sunset.
-This fact is not important for the Sun in the calculations of the observation [of the new Moon] since we compensate for this approximation when calculating mean Moon.</p>
+This fact is not important for the Sun in the calculations of the observation <span class="add">of the new moon</span> since we compensate for this approximation when calculating mean Moon.</p>
 </div>
 <div class="paragraph">
 <p>Do it the same way for whatever time you want whatsoever, even after a thousand years: when you add up all the reminders and add to the epoch, result you get is the mean position.
@@ -1102,7 +1172,7 @@ And the same you do for the mean Moon and mean of every planet: once you know wh
 </div>
 <div class="paragraph">
 <p>Also, if you want to make a different epoch from which to start, other that the epoch that we start from (which is this year), so that epoch is at the beginning of the year of a known cycle or at the beginning of a hundred-year period - you can do it.
-And if yuo want the epoch from which you start to be in the years that already passed before this epoch or many years after it - the way is known.</p>
+And if you want the epoch from which you start to be in the years that already passed before this epoch or many years after it - the way is known.</p>
 </div>
 <div class="paragraph">
 <p>What is this way?
@@ -1110,8 +1180,8 @@ You already know movement of the Sun in a regular year, and its movement in twen
 And it is known that year whose months are full is longer than the regular year by one day, and the year whose months are lacking is shorter than the regular year by one day.
 And the leap year: if its months are regular, it will be longer than the regular year by thirty days, and if its months are full, it will be longer than the regular one by thirty-one day, and if its months are lacking, it will be longer than the regular one by twenty-nine days.
 Once you know all those facts, calculate Sun&#8217;s mean movement for the years and days that you want, and add to the epoch that we made, and you&#8217;ll get its mean position for the day that you want from the coming years - and that you make into an epoch.
-Or subtract mean [movement] that you calculated form the epoch that we made, and you get an epoch for the day that you want from the years that passed, and make that mean [position] an epoch.
-And the same you shall do for the mean Moon and the rest of the planets if [their movements] will be known to you.
+Or subtract mean <span class="add">movement</span> that you calculated from the epoch that we made, and you get an epoch for the day that you want from the years that passed, and make that mean <span class="add">position</span> an epoch.
+And the same you shall do for the mean Moon and the rest of the planets if <span class="add">their movements</span> will be known to you.
 And it should be clear to you from the idea of our words that the same way you can find out mean Sun for any day you want from the coming days, you can calculate its mean for any day you want from the days that passed.</p>
 </div>
 </div>
@@ -1182,7 +1252,7 @@ and so is the parallax correction for two hundred - forty two minutes.</p>
 <h3 id="kh-13-6"><a class="anchor" href="#kh-13-6"></a><a class="link" href="#kh-13-6">Law 6</a></h3>
 <div class="paragraph">
 <p>Also, if the maslul was three hundred degrees, subtract it from three hundred and sixty - and sixty will remain.
-And you already know that parallax correction for sixty degrees [is] one degree and forty one minutes,
+And you already know that parallax correction for sixty degrees <span class="add">is</span> one degree and forty one minutes,
 and so is the parallax correction for three hundred degrees. And the same way - for every number.</p>
 </div>
 </div>
@@ -1231,7 +1301,7 @@ that does not surround all of the Earth. Moon&#8217;s movement on that small cir
 <div class="sect2">
 <h3 id="kh-14-2"><a class="anchor" href="#kh-14-2"></a><a class="link" href="#kh-14-2">Law 2</a></h3>
 <div class="paragraph">
-<p>Movement in mean lunar longitude in one day is 13°10′35″<sup class="footnote">[<a id="_footnoteref_8" class="footnote" href="#_footnotedef_8" title="View footnote.">8</a>]</sup>.</p>
+<p>Movement in mean lunar longitude in one day is 13°10′35″<sup class="footnote">[<a id="_footnoteref_6" class="footnote" href="#_footnotedef_6" title="View footnote.">6</a>]</sup>.</p>
 </div>
 <div class="paragraph">
 <p>For longer periods, (remainder) of the movement in mean lunar longitude is:</p>
@@ -1265,8 +1335,8 @@ way as you did for the mean solar longitude. TODO: reference</p>
 <div class="paragraph">
 <p>After you calculate mean lunar longitude at the
 beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
-constellation (zodiac) is it in<sup class="footnote">[<a id="_footnoteref_9" class="footnote" href="#_footnotedef_9" title="View footnote.">9</a>]</sup>.
-[This is the correction of the mean lunar longitude depending on
+constellation (zodiac) is it in<sup class="footnote">[<a id="_footnoteref_7" class="footnote" href="#_footnotedef_7" title="View footnote.">7</a>]</sup>.
+[TODO is this in the text? This is the correction of the mean lunar longitude depending on
 the mean solar longitude:]</p>
 </div>
 </div>
@@ -1283,13 +1353,13 @@ the mean solar longitude:]</p>
 <tr>
 <th class="tableblock halign-left valign-top">Solar Longitude on the Zodiac</th>
 <th class="tableblock halign-left valign-top">from</th>
-<th class="tableblock halign-left valign-top">to, not including<sup class="footnote">[<a id="_footnoteref_10" class="footnote" href="#_footnotedef_10" title="View footnote.">10</a>]</sup></th>
+<th class="tableblock halign-left valign-top">to, not including<sup class="footnote">[<a id="_footnoteref_8" class="footnote" href="#_footnotedef_8" title="View footnote.">8</a>]</sup></th>
 <th class="tableblock halign-left valign-top">Lunar longitude correction</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">middle of Pisces-middle of Taurus<sup class="footnote">[<a id="_footnoteref_11" class="footnote" href="#_footnotedef_11" title="View footnote.">11</a>]</sup></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">middle of Pisces-middle of Taurus<sup class="footnote">[<a id="_footnoteref_9" class="footnote" href="#_footnotedef_9" title="View footnote.">9</a>]</sup></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">315°</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">15°</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0°</p></td>
@@ -1339,7 +1409,7 @@ the mean solar longitude:]</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>The value of mean [lunar longitude]
+<p>The value of mean <span class="add">lunar longitude</span>
 after you add to it or subtract from it or leave it as
 it is - that is mean lunar longitude approximately a third of an hour after sunset on the
 date you are calculating it for. And this is what is called <a href="#mllo-term">mean lunar longitude at observation time</a>.</p>
@@ -1442,7 +1512,7 @@ And mean lunar longitude after you add to it or subtract from it is the
 <div class="sect2">
 <h3 id="kh-15-5"><a class="anchor" href="#kh-15-5"></a><a class="link" href="#kh-15-5">Law 5</a></h3>
 <div class="paragraph">
-<p>If the corrected anomaly is 180° or 360°, there is no visible anomaly, so mean lunar longitude at observation time is also true longitude.<sup class="footnote">[<a id="_footnoteref_12" class="footnote" href="#_footnotedef_12" title="View footnote.">12</a>]</sup></p>
+<p>If the corrected anomaly is 180° or 360°, there is no visible anomaly, so mean lunar longitude at observation time is also true longitude.<sup class="footnote">[<a id="_footnoteref_10" class="footnote" href="#_footnotedef_10" title="View footnote.">10</a>]</sup></p>
 </div>
 </div>
 <div class="sect2">
@@ -1481,7 +1551,7 @@ And mean lunar longitude after you add to it or subtract from it is the
 <dl>
 <dt><a id="gva-hashemesh"></a>solar apogee</dt>
 <dd>
-<p>Point on the orbit of the Sun where it is highest above the Earth.</p>
+<p>Point on the orbit of the Sun where it is highest above the Earth. - aphelion/perihelion</p>
 </dd>
 <dt><a id="solar-portion-term"></a>solar portion</dt>
 <dd>
@@ -1532,34 +1602,37 @@ And mean lunar longitude after you add to it or subtract from it is the
 <div class="ulist bibliography">
 <ul class="bibliography">
 <li>
-<p><a id="Vilno"></a>[Vilno] Rambam. Mishne Torah. Widow and Brothers Romm.</p>
+<p><a id="Vilno"></a>[Vilno] Rambam. Mishne Torah. Widow and Brothers Romm. Hebrew.</p>
 </li>
 <li>
-<p><a id="LaAm"></a>[LaAm]  Rambam. Mishne Torah. Rambam LaAm.</p>
+<p><a id="LaAm"></a>[LaAm]  Rambam. Mishne Torah. Rambam LaAm. Hebrew.</p>
 </li>
 <li>
-<p><a id="Eshkol"></a>[Eshkol] Rambam. Mishne Torah. Eshkol 1987.</p>
+<p><a id="Eshkol"></a>[Eshkol] Rambam. Mishne Torah. Eshkol 1987. Hebrew.</p>
 </li>
 <li>
-<p><a id="Kapach"></a>[Kapach] Rambam. Mishne Torah. Rabbi Kapach.</p>
+<p><a id="Kapach"></a>[Kapach] Rambam. Mishne Torah. Rabbi Kapach. Hebrew.</p>
 </li>
 <li>
-<p><a id="Frenkel"></a>[Frenkel] Rambam. Mishne Torah. Rabbi Frenkel.</p>
+<p><a id="Frenkel"></a>[Frenkel] Rambam. Mishne Torah. Rabbi Frenkel. Hebrew.</p>
 </li>
 <li>
-<p><a id="Bluming"></a>[Bluming] Rambam. Mishne Torah. Rambam HaAruch. Rabbi Y Bluming. 2005</p>
+<p><a id="Bluming"></a>[Bluming] Rambam. Mishne Torah. Rambam HaAruch. Rabbi Y Bluming. 2005. Hebrew.</p>
 </li>
 <li>
-<p><a id="Hazak"></a>[Hazak] Rambam. Mishne Torah. Rambam HaSholem. 2010</p>
+<p><a id="Hazak"></a>[Hazak] Rambam. Mishne Torah. HaSholem. Hazak. 2010. Hebrew.</p>
 </li>
 <li>
-<p><a id="Yale"></a>[Yale] Rambam. Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica Series, Vol. 11). Translator Solomon Gandz. Editor Julian Obermann. Yale. 1967</p>
+<p><a id="PardesHaMelech"></a>[PardesHaMelech] Rambam. Mishne Torah. Pardes HaMelech. Hazak. 2020. Hebrew.</p>
 </li>
 <li>
-<p><a id="Moznaim"></a>[Moznaim] Rambam. Mishne Torah. Translator Rabbi Touger.</p>
+<p><a id="HaMevuar"></a>[HaMevuar] Rambam. Mishne Torah. HaMevuar. Chitrik Edition. 2020. Hebrew.</p>
 </li>
 <li>
-<p><a id="HazonIsh"></a>[HazonIsh] Hazon Ish.</p>
+<p><a id="Yale"></a>[Yale] Rambam. Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica Series, Vol. 11). Translator Solomon Gandz. Editor Julian Obermann. Yale. 1956; 1967</p>
+</li>
+<li>
+<p><a id="Moznaim"></a>[Moznaim] Rambam. Mishne Torah. Translator Rabbi Touger. English translation of <a href="#LaAm">[LaAm]</a>.</p>
 </li>
 </ul>
 </div>
@@ -1571,19 +1644,34 @@ And mean lunar longitude after you add to it or subtract from it is the
 <div class="ulist bibliography">
 <ul class="bibliography">
 <li>
+<p><a id="Pirush"></a>[Pirush] Ovadia son of David son of Ovadia, 1325.</p>
+</li>
+<li>
+<p><a id="IbnHabib"></a>[IbnHabib] Levi ibn Habib, son of Jacob ibn Habib; MaHaRaLBaCh. d 1545. 1565, Venice.</p>
+</li>
+<li>
+<p><a id="HazonIsh"></a>[HazonIsh] Hazon Ish.</p>
+</li>
+<li>
 <p><a id="Losh"></a>[Losh] Sefer HaTchunah LeMatchil. Yosef Yitzchok Losh. 1988</p>
 </li>
 <li>
 <p><a id="Keller"></a>[Keller] Tchunat HaShamaim. Yosef Yitzchok Keller. 1988</p>
 </li>
 <li>
-<p><a id="Glitzenshtein"></a>[Glitzenshtein] Kidush HaChodesh LeHaRambam. Menachem Mendel Glitzenshtein. 1993</p>
+<p><a id="Glitzenshtein"></a>[Glitzenshtein] Kidush HaChodesh LeHaRambam. Menachem Mendel Glitzenshtein. 1993.</p>
 </li>
 <li>
-<p><a id="Tzikuni"></a>[Tzikuni] Hazon Shamaim (הזון שמים). Eitan Tzikuni. 2001</p>
+<p><a id="Tzikuni"></a>[Tzikuni] Hazon Shamaim (הזון שמים). Eitan Tzikuni. 4th edition. 2001. Hebrew.</p>
 </li>
 <li>
 <p><a id="HazonIshSine"></a>[HazonIshSine] Hazon Ish and the sine tables. <a href="http://www.biu.ac.il/JH/Parasha/pekudey/lev.html" class="bare">www.biu.ac.il/JH/Parasha/pekudey/lev.html</a></p>
+</li>
+<li>
+<p><a id="Baneth"></a>[Baneth] Maimuni&#8217;s Neumondsberechnung. Bericht uber die Lehranstalt fur die Wissenschaft des Judenthums 16 (1898), 17 (1899), 20 (1902), 21 (1903). Eduard Baneth. German.</p>
+</li>
+<li>
+<p><a id="Ajdler"></a>[Ajdler] Hilkhot Kiddush ha-Hodesh al-pi ha-Ramban. J. Jean Ajdler. Sifriati. 1996. Hebrew.</p>
 </li>
 </ul>
 </div>
@@ -1598,7 +1686,7 @@ And mean lunar longitude after you add to it or subtract from it is the
 <p><a id="Antiquity"></a>[Antiquity] The Exact Sciences in Antiquity. Otto Neugebauer. 2nd edition. Dover Publications. 1969. <a href="http://isbn.nu/0486223329" class="bare">isbn.nu/0486223329</a></p>
 </li>
 <li>
-<p><a id="Neugebauer"></a>[Neugebauer] Astronomy and History Selected Essays. Otto Neugebauer. Springer. August 8, 1983. <a href="http://isbn.nu/0387908447" class="bare">isbn.nu/0387908447</a></p>
+<p><a id="Neugebauer"></a>[Neugebauer] The Astronomy of Maimonides and Its Sources. Otto Neugebauer. Hebrew Union College Annual 22, 322-363, 1949. Reprinted in: Astronomy and History Selected Essays. Otto Neugebauer. 381-423 Springer. August 8, 1983. <a href="http://isbn.nu/0387908447" class="bare">isbn.nu/0387908447</a></p>
 </li>
 <li>
 <p><a id="Crowe"></a>[Crowe] Theories of the World from Antiquity to the Copernican Revolution. Michael J. Crowe. 2nd edition. Dover Publications. 2001. <a href="http://isbn.nu/0486414442" class="bare">isbn.nu/0486414442</a></p>
@@ -1709,55 +1797,43 @@ And mean lunar longitude after you add to it or subtract from it is the
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="bibliography-bibtex"><a class="anchor" href="#bibliography-bibtex"></a><a class="link" href="#bibliography-bibtex">Referenced</a></h2>
-<div class="sectionbody">
-
-</div>
-</div>
 </div>
 <div id="footnotes">
 <hr>
 <div class="footnote" id="_footnotedef_1">
-<a href="#_footnoteref_1">1</a>. It is not clear how did authoritative Yemenite texts acquire the same misprints as in the ashkenazic editions.
+<a href="#_footnoteref_1">1</a>. Bamidbar 28:14
 </div>
 <div class="footnote" id="_footnotedef_2">
-<a href="#_footnoteref_2">2</a>. Reprints the text and does not correct any of the misprints - surprising for a textbook on the subject (even introductory). TODO: Link to the scans of the appropriate pages - with the stuff highlighted.
+<a href="#_footnoteref_2">2</a>. Shemos 12:2
 </div>
 <div class="footnote" id="_footnotedef_3">
-<a href="#_footnoteref_3">3</a>. Bamidbar 28:14
+<a href="#_footnoteref_3">3</a>. Rosh Hashanah 20b; Menachot 29a
 </div>
 <div class="footnote" id="_footnotedef_4">
-<a href="#_footnoteref_4">4</a>. Shemos 12:2
+<a href="#_footnoteref_4">4</a>. Dvarim 16
 </div>
 <div class="footnote" id="_footnotedef_5">
-<a href="#_footnoteref_5">5</a>. Rosh Hashanah 20b; Menachot 29a
+<a href="#_footnoteref_5">5</a>. Megilla 5a; Nazir 7a
 </div>
 <div class="footnote" id="_footnotedef_6">
-<a href="#_footnoteref_6">6</a>. Dvarim 16
+<a href="#_footnoteref_6">6</a>. This is part of Law 1.
 </div>
 <div class="footnote" id="_footnotedef_7">
-<a href="#_footnoteref_7">7</a>. Megilla 5a; Nazir 7a
+<a href="#_footnoteref_7">7</a>. This is part of Law 4.
 </div>
 <div class="footnote" id="_footnotedef_8">
-<a href="#_footnoteref_8">8</a>. This is part of Law 1.
+<a href="#_footnoteref_8">8</a>. My understanding of the word usage in the original.
 </div>
 <div class="footnote" id="_footnotedef_9">
-<a href="#_footnoteref_9">9</a>. This is part of Law 4.
+<a href="#_footnoteref_9">9</a>. See Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)
 </div>
 <div class="footnote" id="_footnotedef_10">
-<a href="#_footnoteref_10">10</a>. My understanding of the word usage in the original.
-</div>
-<div class="footnote" id="_footnotedef_11">
-<a href="#_footnoteref_11">11</a>. See Chapter 11, Law 7 on the start of Jewish Zodiac. (TODO reference)
-</div>
-<div class="footnote" id="_footnotedef_12">
-<a href="#_footnoteref_12">12</a>. This is Law 5.
+<a href="#_footnoteref_10">10</a>. This is Law 5.
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.10.9<br>
+Version 0.1<br>
 </div>
 </div>
 <script type="text/x-mathjax-config">

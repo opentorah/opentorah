@@ -14,7 +14,6 @@ object MoonAnomalyMean extends Days2Rotation("mam",
   // KH 14:4
   Days.Year        -> "305° 0′13″"
 ):
+  val almagestValue = Rotation("13°3′53″56‴17′‴51″‴59‴‴")
 
-  final override val rambamValue: Rotation = Rotation("13°3′53″55‴49")
-
-  final override val almagestValue = Rotation("13°3′53″56‴17,51,59")
+  val rambamValue: Rotation = Rotation("13°3′53″55‴49′‴") // TODO ?

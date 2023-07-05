@@ -1,5 +1,6 @@
 package org.opentorah.metadata
 
+// TODO merge with util.WithValues
 // TODO after total ZIOfication this will get blended into Store, required etc.
 trait HasValues[+T]:
   def valuesSeq: Seq[T] // TODO switch to values: Array[Key] and eliminate

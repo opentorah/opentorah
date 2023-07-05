@@ -25,13 +25,14 @@ dependencies {
   //  nokogiri requires Ruby version >= 2.7.0. The current ruby version is 2.5.7.0
   // no idea where this comes from: ambient Ruby (which is not used) is 3.1, and JRuby version setting does not make a difference...
   // version 0.10.3 break spectacularly
-//  asciidoctorGems 'rubygems:asciidoctor-bibliography:0.10.3'
+//  asciidoctorGems 'rubygems:asciidoctor-bibliography:0.11.0'
 
   // Note: attempts to require this *sporadically* result in
   //   org.jruby.exceptions.LoadError: (LoadError) no such file to load -- asciidoctor-bibtex
   // This seems to be a bug: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/628
   // with a workaround - disabling build cache: ./gradlew clean asciidoctor --no-build-cache
   // that does not work for me (although this extension /did/ work for a while I think - and then stopped)...
+  // see https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/658
 //  asciidoctorGems 'rubygems:asciidoctor-bibtex:0.8.0'
 }
 
@@ -62,7 +63,7 @@ asciidoctor {
   outputDir asciidocOutputDir
   outputs.dir(asciidocOutputDir)
   outputOptions {
-    backends = [/*'pdf',*/ 'html5', 'multipage_html5']
+    backends = [/* TODO 'pdf',*/ 'html5', 'multipage_html5']
   }
 
   doLast {
@@ -70,16 +71,17 @@ asciidoctor {
       into paperDir
 
       from "$asciidocSourceDir/styles.css"
+      from "$asciidocOutputDir/multipage_html5"
       from "$asciidocOutputDir/html5/calendar/calendar.html"
       from "$asciidocOutputDir/html5/dream/dream.html"
       from "$asciidocOutputDir/html5/typesetting/typesetting.html"
-      from "$asciidocOutputDir/multipage_html5"
+      from "$asciidocOutputDir/pdf/calendar/calendar.pdf"
+      from "$asciidocOutputDir/pdf/dream/dream.pdf"
+      from "$asciidocOutputDir/pdf/typesetting/typesetting.pdf"
     }
   }
 
   asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
-//    version '2.0.16'
-//    jrubyVersion '9.4.2.0' // '9.2.7.0' //'9.4.2.0'
     modules.pdf.version '2.3.4'
     // modules.epub.version '???'
 
@@ -109,7 +111,12 @@ asciidoctor {
     'bibliography-database': "$asciidocSourceDir/bibliography.bib",
     'bibliography-style': 'apa',
     'bibtex-file': "$asciidocSourceDir/bibliography.bib",
-    'bibtex-style': 'university-of-york-ieee'
+//    'bibtex-style': 'university-of-york-ieee'
+//    'bibtex-style': 'chicago-author-date'
+//    'bibtex-style': 'din-1505-2-alphanumeric',
+    'bibtex-style': 'apa',
+    'bibtex-order': 'alphabetical',
+    'bibtex-throw': true
   ]
 }
 

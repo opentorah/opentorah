@@ -1,0 +1,29 @@
+[#colophon]
+[colophon]
+= Colophon
+
+Published by the http://www.opentorah.org[Open Torah Project].
+
+Corrections, additions and suggestions are welcome at dub@opentorah.org.
+
+The book is hosted by
+https://pages.github.com/[GitHub Pages] at
+http://www.opentorsh.org in multiple formats:
+link:/paper/calendar/calendar.html[chunked HTML],
+link:/paper/calendar.html[one HTML file],
+link:/paper/calendar.pdf[PDF].
+
+The sources of the paper and the code used to produce it are hosted by https://github.com[GitHub] at
+https://github.com/opentorah/opentorah.
+
+Book sources in https://docs.asciidoctor.org[Asciidoc] authored in
+https://www.jetbrains.com/idea/[IntelliJ Idea].
+Built with https://gradle.org/[Gradle] using
+https://asciidoctor.github.io/asciidoctor-gradle-plugin/development-3.x/user-guide/[Asciidoctor Gradle plugin].
+
+Copyright 1991-2023 by Leonid Dubinsky.
+
+The book is licensed under the
+https://creativecommons.org/licenses/by/4.0//[Creative Commons Attribution 4.0 International (CC BY 4.0)].
+
+image:https://licensebuttons.net/l/by/3.0/88x31.png[]

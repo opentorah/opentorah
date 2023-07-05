@@ -1,6 +1,7 @@
 = Digital Judaica Done Right
 :doctype: article
 :toc:
+:revnumber: 0.1
 
 // converted from DocBook file docs/src/main/docBook/dream.xml
 // which was renamed from      texts/src/main/docBook/dream.xml

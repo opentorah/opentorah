@@ -1,10 +1,10 @@
 package org.opentorah.astronomy
 
 import Zodiac.*
-import org.opentorah.astronomy.Angles.{Position, Rotation}
+import Angles.{Position, Rotation}
 
 // KH 17:8-9
-object MoonLatitudeSightingAdjustment extends MapTable[Zodiac, Rotation](
+object MoonLatitudeSightingAdjustment extends MapTable.ZodiacRotationMapTable(
   Aries       -> "0° 9′",
   Taurus      -> "0°10′",
   Gemini      -> "0°16′",
@@ -17,6 +17,4 @@ object MoonLatitudeSightingAdjustment extends MapTable[Zodiac, Rotation](
   Capricorn   -> "0°36′",
   Aquarius    -> "0°27′",
   Pisces      -> "0°12′"
-)(Rotation(_)):
-  
-  def calculate(moonLongitudeTrue: Position): Rotation = value(Zodiac.forPosition(moonLongitudeTrue))
+)

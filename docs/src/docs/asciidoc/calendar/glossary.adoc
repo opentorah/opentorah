@@ -5,7 +5,7 @@
 Astronomical Terms
 
 [glossary]
-[[gva-hashemesh]]solar apogee:: Point on the orbit of the Sun where it is highest above the Earth.
+[[gva-hashemesh]]solar apogee:: Point on the orbit of the Sun where it is highest above the Earth. - aphelion/perihelion
 
 [[solar-portion-term]]solar portion:: ???
 

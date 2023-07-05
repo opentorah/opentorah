@@ -1,6 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.numbers.{Digits, Numbers}
+import org.opentorah.util.WithValues
 
 trait Times extends Numbers.NonPeriodic:
 
@@ -9,6 +10,8 @@ trait Times extends Numbers.NonPeriodic:
     case HOURS extends TimesDigit("ʰ")
     case PARTS extends TimesDigit("ᵖ")
     case MOMENTS extends TimesDigit("ᵐ")
+
+  object TimesDigit extends WithValues[TimesDigit]
 
   final override type DigitType = TimesDigit
 

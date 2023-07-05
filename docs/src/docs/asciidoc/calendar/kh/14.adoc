@@ -34,7 +34,7 @@ way as you did for the mean solar longitude. TODO: reference
 After you calculate mean lunar longitude at the
 beginning of the night that you want, contemplate the sun (TODO: longitude?) and figure out which
 constellation (zodiac) is it infootnote:[This is part of Law 4.].
-[This is the correction of the mean lunar longitude depending on
+[TODO is this in the text? This is the correction of the mean lunar longitude depending on
 the mean solar longitude:]
 
 [#kh-14-6]
@@ -88,7 +88,7 @@ the mean solar longitude:]
 
 |===
 
-The value of mean [lunar longitude]
+The value of mean [.add]#lunar longitude#
 after you add to it or subtract from it or leave it as
 it is - that is mean lunar longitude approximately a third of an hour after sunset on the
 date you are calculating it for. And this is what is called <<mllo-term>>.

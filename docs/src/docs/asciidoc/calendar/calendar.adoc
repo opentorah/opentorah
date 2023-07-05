@@ -7,6 +7,13 @@
 :multipage-level: 2
 :srcDir: {docfile}/..
 :ltr: &#8206;
+:revnumber: 0.1
+
+include::{srcDir}/colophon.adoc[]
+
+// include::{srcDir}/dedication.adoc[]
+
+include::{srcDir}/acknowledgements.adoc[]
 
 include::{srcDir}/introduction.adoc[]
 

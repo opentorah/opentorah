@@ -37,8 +37,8 @@ object ScalaLibrary:
 
   object Scala2 extends Scala("scala-library"):
     override def versionMajor: Int = 2
-    val versionDefault13: Version = Version("2.13.10")
-    val versionDefault12: Version = Version("2.12.17")
+    val versionDefault13: Version = Version("2.13.11")
+    val versionDefault12: Version = Version("2.12.18")
 
     override def getScalaVersion(library: ScalaLibrary): Version =
       library.scala2.map(_.version).getOrElse(Scala3.scala2version(library.scala3.get.version))

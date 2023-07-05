@@ -31,7 +31,7 @@ class RotationTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers
     conversion("254° 0′")
 
   it should "round correctly" in:
-    Rotation("104°58′50″16‴39,59,43").roundToSeconds shouldBe Rotation("104°58′50″")
+    Rotation("104°58′50″16‴39′‴59″‴43‴‴").roundToSeconds shouldBe Rotation("104°58′50″")
     (Rotation("0°15′15″")*2).roundToMinutes shouldBe Rotation("0°31′")
     Rotation("-182°29′37″").roundToMinutes shouldBe Rotation("-182°30′")
 

@@ -1,11 +1,13 @@
 package org.opentorah.astronomy
 
-import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.numbers.Exactify
+import org.opentorah.numbers.BigRational
 import Angles.{Digit, Rotation}
 import Rotation.Interval
+import Days2Rotation.Days
+import scala.annotation.tailrec
 
 object Days2Rotation:
+
   enum Days(val number: Int) derives CanEqual:
     case One extends Days(1)
     case Ten extends Days(10)
@@ -16,140 +18,145 @@ object Days2Rotation:
     case Year extends Days(354)
 
   object Days:
-    val all: Seq[Days] = Seq(One, Ten, Month, Hundred, Year, Thousand, TenThousand)
-    val reconstructFrom: Seq[Days] = Seq(One, Ten, Hundred, Thousand)
+    val all: Seq[Days] = Seq(One, Ten,  Hundred, Thousand, TenThousand, Month, Year)
 
-  // multiplier to reconstruct from the key each of the values
-  private def reconstruct: Map[Days, Map[Days, Option[Int]]] = Map(
-    Days.One -> Map(
-      Days.Ten         -> Some(10),
-      Days.Month       -> Some(Days.Month.number),
-      Days.Hundred     -> Some(100),
-      Days.Year        -> Some(Days.Year.number),
-      Days.Thousand    -> Some(1000),
-      Days.TenThousand -> Some(10000)
-    ),
-    Days.Ten -> Map(
-      Days.Ten         -> None,
-      Days.Month       -> None,
-      Days.Hundred     -> Some(10),
-      Days.Year        -> None,
-      Days.Thousand    -> Some(100),
-      Days.TenThousand -> Some(1000)
-    ),
-    Days.Hundred -> Map(
-      Days.Ten         -> None,
-      Days.Month       -> None,
-      Days.Hundred     -> None,
-      Days.Year        -> None,
-      Days.Thousand    -> Some(10),
-      Days.TenThousand -> Some(100)
-    ),
-    Days.Thousand -> Map(
-      Days.Ten         -> None,
-      Days.Month       -> None,
-      Days.Hundred     -> None,
-      Days.Year        -> None,
-      Days.Thousand    -> None,
-      Days.TenThousand -> Some(10)
-    )
-  )
+  private val findInsideMaxLength: Int = 6
 
-abstract class Days2Rotation(val name: String, values: (Days2Rotation.Days, String)*)
-  extends MapTable[Days2Rotation.Days, Rotation](values*)(Rotation(_)):
-  import Days2Rotation.Days
+  enum IntervalRelationship derives CanEqual:
+    case Intersect(intersection: Interval)
+    case Separated(separator: Rotation)
+    case DoNotIntersect
 
+  object IntervalRelationship:
+    def get(a: Interval, b: Interval, length: Int): IntervalRelationship =
+      def maybeSeparated(to: Rotation, from: Rotation): IntervalRelationship =
+        require(to < from)
+        require(to.roundTo(length) == to)
+        require(from.roundTo(length) == from)
+        val separator: Rotation = to + Rotation.oneAtPosition(length)
+        if separator < from
+        then IntervalRelationship.Separated(separator)
+        else IntervalRelationship.DoNotIntersect
+
+      if a.to < b.from then maybeSeparated(a.to, b.from) else
+      if b.to < a.from then maybeSeparated(b.to, a.from) else
+        val from: Rotation = if a.from < b.from then b.from else a.from
+        val to  : Rotation = if a.to   > b.to   then b.to   else a.to
+        IntervalRelationship.Intersect(Interval(from, to))
+
+abstract class Days2Rotation(val name: String, values: (Days, String)*) extends MapTable.RotationMapTable[Days](values*):
   private def isOneDefined: Boolean = !value(Days.One).isZero
-
+  private def smallestDefined: Days = if isOneDefined then Days.One else Days.Ten
   final def all: Seq[Days] = if isOneDefined then Days.all else Days.all.tail
-  final def reconstructFrom: Seq[Days] = if isOneDefined then Days.reconstructFrom else Days.reconstructFrom.tail
-  final def exactify: Seq[Days] = if isOneDefined then Days.all else Seq(Days.Ten, Days.Hundred, Days.Thousand, Days.TenThousand)
-
-  val almagestValue: Rotation
-
-  val rambamValue: Rotation
-
-  final def calculate(days: Int): Rotation =
-    val tenThousands: Int =  days          / 10000
-    val thousands   : Int = (days % 10000) /  1000
-    val hundreds    : Int = (days %  1000) /   100
-    val lessThanHundred: Int = days % 100
-    val tens        : Int = (days %   100) /    10
-    val ones        : Int =  days %    10
-
-    value(Days.TenThousand)*tenThousands +
-    value(Days.Thousand)*thousands +
-    value(Days.Hundred)*hundreds +
-    (if lessThanHundred == 29 then value(Days.Month) else value(Days.Ten)*tens + value(Days.One)*ones)
-
-  final def reconstructed: Map[Days, Map[Days, Option[Int]]] = (
-    for from: Days <- reconstructFrom yield from -> {
-      for (to: Days, multiplier: Option[Int]) <- Days2Rotation.reconstruct(from) yield to -> multiplier.map { (multiplier: Int) =>
-        val reconstructedValue: Rotation = (value(from) * multiplier).canonical.roundTo(precision(to).position)
-        val signum: Int = (reconstructedValue - value(to)).signum
-        signum
-      }
-    }).toMap
-
-  final def nonReconstructable: Iterable[(Days, Days, Option[Int])] =
-    for
-      (from: Days, reconstructed: Map[Days, Option[Int]]) <- reconstructed
-      (to: Days, signum: Option[Int]) <- reconstructed
-      if signum.isDefined && !signum.contains(0)
-    yield
-      (from, to, signum)
-
-  private def exactificator(days: Days) = Exactify(Angles)(
-    small = value(exactify.head),
-    multiplier = days.number / exactify.head.number,
-    round = precision(days),
-    big = value(days)
-  )
-
-  final def exactified(maxLength: Int): Map[Days, (Int, Interval, Interval)] = (
-    for days <- exactify yield days -> {
-      val ex: Exactify = exactificator(days)
-      val first = ex.find(maxLength)
-      val precise = ex.findPrecise(maxLength)
-      val (minInterval: Interval, min: Int) = first.get.asInstanceOf[(Interval, Int)] // TODO yuck
-      val maxInterval: Interval = precise.get.asInstanceOf[Interval] // TODO yuck
-      (min, minInterval, maxInterval)
-    }).toMap
-
-  def findPrecise(days: Days, length: Int): Option[Angles.Vector.Interval] =
-    exactificator(days).findPrecise(length).asInstanceOf[Option[Angles.Vector.Interval]] // TODO yuck
-
-//  final def calculate(vector: Jewish.Vector): Rotation =
-//    val rational = vector.toRational
-//    calculate(rational.whole) + Rotation.fromRational(rational.fraction*value(Days.One).toRational, 6)
 
   protected def precision(days: Days): Angles.Digit = Digit.SECONDS
 
-//  final def calculateExact(days: Int): Rotation = rambamValue*days
-//
-//  final def calculateExact(vector: Jewish.Vector): Rotation =
-//    Rotation.fromRational(vector.toRational*value(Days.One).toRational, 6)
+  private def calculate(from: Rotation, multiplier: Int, precision: Int): Rotation =
+    (from * multiplier).canonical.roundTo(precision)
 
-//  final def exactify: Interval =
-//    val exact = Seq(10, 100, 1000, 10000) // all?
-//      .filterNot(value(_).isZero)
-//      .map(exactify)
-//      .reduce(_.intersect(_))
-//    println(s"exact: $exact")
-//    exact
-//
-//  private final def exactify(days: Days): Interval =
-//    val small = if !one.isZero then one else ten
-//    val big = value(days)
-//    val mult = days
-//    val exactificator = Exactify(Angles)(
-//      small,
-//      if !one.isZero then mult else mult/10,
-//      Angles.Digit.SECONDS.position,
-//      big
-//    )
-//    val (fit, fitLength) = exactificator.findFit
-//    val expanded = exactificator.expand(fit, fitLength, 6)
-//    println(s"$expanded (6)    $small * $mult -> $big: $fit ($fitLength)")
-//    expanded.asInstanceOf[Angles.Rotation.Interval] // TODO yuck...
-//
+  private def calculate(from: Rotation, to: Days, multiplier: Int): Rotation =
+    calculate(from, multiplier, precision(to).position)
+
+  final def calculate(from: Rotation, to: Days): Rotation =
+    calculate(from, to, to.number)
+
+  final def calculate(to: Days): Option[Rotation] =
+    val from: Days = smallestDefined
+    if (to.number == from.number) || (to.number % from.number != 0) then None else
+      val multiplier: Int = to.number/from.number
+      Some(calculate(value(from), to, multiplier))
+
+  final def calculate(days: Int): Rotation =
+    val tenThousands: Int = days / 10000
+    val thousands: Int = (days % 10000) / 1000
+    // TODO year!
+    val hundreds: Int = (days % 1000) / 100
+    val lessThanHundred: Int = days % 100
+    // TODO month!
+    val tens: Int = (days % 100) / 10
+    val ones: Int = days % 10
+
+    value(Days.TenThousand) * tenThousands +
+    value(Days.Thousand) * thousands +
+    value(Days.Hundred) * hundreds +
+    (if lessThanHundred == 29 then value(Days.Month) else value(Days.Ten) * tens + value(Days.One) * ones)
+
+  final lazy val exactMin: Map[Days, (Interval, Int)] =
+    Map.from(
+      for days <- Days.all yield
+        val exactRotation: ExactRotation = mkExactRotation(days)
+        val (interval: Interval, length: Int) = exactRotation.findInside(precision(days).position).get
+        days -> (exactRotation.expand(interval, length, length), length)
+    )
+
+  final lazy val exactMinLength: Int = exactMin.values.map(_._2).max
+
+  final def exact(maxLength: Int): Map[Days, Interval] =
+    require(maxLength >= exactMinLength)
+
+    Map.from(
+      for days <- Days.all yield
+        val (interval: Interval, length: Int) = exactMin(days)
+        days -> mkExactRotation(days).expand(interval, length, maxLength)
+    )
+
+  private def mkExactRotation(days: Days): ExactRotation = ExactRotation(
+    days = days.number,
+    precision = precision(days).position,
+    value = value(days)
+  )
+
+  private final class ExactRotation(
+    days: Int,
+    precision: Int,
+    value: Rotation
+  ):
+    private def reconstruct(from: Rotation): Rotation = calculate(from, days, precision)
+    private def isInside(from: Rotation): Boolean = reconstruct(from) == value
+
+    @tailrec def findInside(length: Int): Option[(Interval, Int)] =
+      val start: Rotation = if value.isZero then Rotation.oneAtPosition(length) else
+        // Note: with thanks to Tzikuni for pointing out that full periods need to be added before the division
+        val inDays: BigRational = Days2Rotation.this.value(smallestDefined).toRational * BigRational(days, smallestDefined.number)
+        val fullCircles: Rotation = Angles.period*(inDays/Angles.period.toRational).whole
+        (value + fullCircles) / (days, length)
+
+      val decrease: Boolean = reconstruct(start) > value
+
+      @tailrec def findInsideAt(current: Rotation): Option[Rotation] =
+        val comparison: Int = reconstruct(current).compare(value)
+        if comparison == 0 then Some(current) else
+          val overshot: Boolean = if decrease then comparison < 0 else comparison > 0
+          if overshot then None else
+            val step: Rotation = Rotation.oneAtPosition(length)
+            val next: Rotation = current + (if decrease then -step else step)
+            if next <= Rotation.zero then None else findInsideAt(next)
+
+      findInsideAt(start) match
+        case Some(result) => Some((Interval(result, result), length))
+        case None => if length >= Days2Rotation.findInsideMaxLength then None else findInside(length + 1)
+
+    @tailrec def expand(current: Interval, length: Int, maxLength: Int): Interval =
+      def expandAt(interval: Interval): Interval =
+        val step: Rotation = Rotation.oneAtPosition(length)
+
+        @tailrec def loop(current: Rotation, step: Rotation): Rotation =
+          require(isInside(current))
+          val next: Rotation = current + step
+          if !isInside(next) then current else loop(next, step)
+
+        require(isInside(interval.from))
+        require(isInside(interval.to))
+        val result: Interval = Interval(
+          loop(interval.from, step = -step),
+          loop(interval.to, step = step)
+        )
+        require(isInside(result.from))
+        require(!isInside(result.from - step))
+        require(isInside(result.to))
+        require(!isInside(result.to + step))
+        result
+
+      val next: Interval = expandAt(current)
+      if length >= maxLength then next else expand(next, length + 1, maxLength)
+

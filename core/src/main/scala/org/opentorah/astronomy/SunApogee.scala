@@ -13,10 +13,5 @@ object SunApogee extends Days2Rotation("sa",
   Days.Month       -> "0° 0′ 4″",
   Days.Year        -> "0° 0′53″"
 ):
-
-  protected override def precision(days: Days): Angles.Digit =
+  override protected def precision(days: Days): Angles.Digit =
     if days == Days.Ten then Digit.THIRDS else Digit.SECONDS
-
-  final override val rambamValue = Rotation(0)
-
-  final override val almagestValue = Rotation(0)

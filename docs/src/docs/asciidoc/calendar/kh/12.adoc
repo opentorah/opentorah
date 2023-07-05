@@ -1,0 +1,10 @@
+[#kh-12]
+== Chapter 12
+
+[#kh-12-1]
+=== Law 1
+include::12-1.adoc[]
+
+[#kh-12-2]
+=== Law 2
+include::12-2.adoc[]

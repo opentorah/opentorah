@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.11] - 2023-
 - cleanup: *Dependency* and friends
+- chore: minor dependency updates
+- chore: Scala XML 2.2.0 - finally!
+- docs: minor calendar paper changes
+- docs: solar theory
 
 ## [0.10.10] - 2023-05-31
 - cleanup: Node

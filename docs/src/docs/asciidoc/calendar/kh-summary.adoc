@@ -44,7 +44,7 @@ Pesach (15th of Nisan) must in the spring: not before the day of vernal equinox
 
 [#kh-summary-6]
 ==== Chapter 6: Conjunction. Lunar month and year. Leap year cycle.
-* Law 1: "Molad" - approximate conjunction (Sun. Moon and Earth on the same line).
+* Law 1: "Molad" - approximate conjunction (Sun, Moon and Earth on the same line).
 * Law 2: day = 24 hours; 1 hour = 1080 parts.
 * Law 3: Lunar month (between conjunctions) = 29d12h793p.
 * Law 4: Lunar year (12 lunar months) = 354d8h876p = 354d8h48m40s; Leap lunar year (13 lunar months) = 383d21h589p;
@@ -108,7 +108,7 @@ Every first year of the 19-year cycle.
 [#kh-summary-11]
 ==== Chapter 11. Approximation. Angles. Mean and true motions. Epoch and location.
 * Laws 1-4: Visibility calculations are deep. Fixed calendar can be appreciated even by school children in 3 or 4 days.
-* Laws 5-6: Calculations are simplified/approximated to not fluster the inexprerienced; result - visibility of the moon - is not affected.
+* Laws 5-6: Calculations are simplified/approximated to not fluster the inexperienced; result - visibility of the moon - is not affected.
 * Laws 7-9: 360 degrees; 60 minutes, seconds...; order of the 12 constellations.
 * Laws 10-12: adding/subtracting angles.
 * Laws 13-14: Velocities are constant. Earth encircled by all the spheres but isn't in the center. Notes 14,15 in Moznaim.
@@ -125,14 +125,14 @@ Note 11: position - at 6PM.
 
 [#kh-summary-13]
 ==== Chapter 13: True position of the sun. True seasons.
-* Laws 1-3: Tue position of the Sun.
+* Laws 1-3: True position of the Sun.
 * Law 4: Course correction table.
 * Laws 5-10: Examples.
 * Law 11: True seasons.
 
 [#kh-summary-14]
 ==== Chapter 14
-* Law 1: Moon: epicycle and deferent; movement as seen from Earth. See Moznaim notes!
+* Law 1: Moon: epicycle and deferrent; movement as seen from Earth. See Moznaim notes!
 * Law 2: Deferrent table.
 * Law 3: Epicycle table.
 * Law 4: Epoch.

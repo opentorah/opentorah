@@ -69,12 +69,12 @@ object ScalaDependency:
   ):
     final override def scala: ScalaLibrary.Scala = ScalaLibrary.Scala2
 
-    final override def isScalaVersionOfCorrectLength(scalaVersion: Version): Boolean = true // TODO
+    final override def isScalaVersionOfCorrectLength(scalaVersion: Version): Boolean = true
 
     final override def versionSuffix(scalaVersion: Version): String =
       if isScalaVersionFull
       then scalaVersion.version
-      else scalaVersion.majorAndMinor
+      else scalaVersion.majorAndMinorString
 
   open class Scala3(
     group: String,
@@ -87,7 +87,7 @@ object ScalaDependency:
   ):
     final override def scala: ScalaLibrary.Scala = ScalaLibrary.Scala3
 
-    final override def isScalaVersionOfCorrectLength(scalaVersion: Version): Boolean = true // TODO
+    final override def isScalaVersionOfCorrectLength(scalaVersion: Version): Boolean = true
 
     final override def versionSuffix(scalaVersion: Version): String =
       scalaVersion.major.toString
@@ -110,7 +110,6 @@ object ScalaDependency:
       findable.withScalaVersion(findable.scala.getScalaVersion(scalaLibrary))
 
     override protected def verify(found: Dependency.WithVersion, project: Project): Unit =
-    // TODO fix it!
     //    if found.dependency.isInstanceOf[Scala2Dependency] then // TODO get rid of casts
     //      val scalaVersion: String = getScalaVersion(found.dependency.asInstanceOf[Scala2Dependency])
     //      val version: Scala2Dependency.Version = found.version.asInstanceOf[Scala2Dependency.Version]
