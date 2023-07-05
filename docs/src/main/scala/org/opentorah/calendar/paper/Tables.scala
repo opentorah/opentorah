@@ -1,63 +1,90 @@
 package org.opentorah.calendar.paper
 
-import org.opentorah.astronomy.Angles.Rotation
-import org.opentorah.astronomy.{MoonAnomalyMean, MoonHeadMean, MoonLongitudeMean, SunApogee, SunLongitudeMean, Days2Rotation}
+import org.opentorah.astronomy.{Angles, Days2Rotation, MoonAnomalyMean, MoonHeadMean, MoonLongitudeMean, SunApogee, SunLongitudeMean}
+import Angles.Rotation
+import Rotation.Interval
 import Days2Rotation.Days
 import java.io.File
 
 object Tables:
 
-  private def printed(time2Rotation: Days2Rotation): Table[Days] =
-    Table[Days](time2Rotation.all)(
+  private def printed(days2Rotation: Days2Rotation): Table[Days] =
+    Table[Days](days2Rotation.all)(
       Table.Column("days"   , _.number),
-      Table.Column("printed", time2Rotation.value)
+      Table.Column("printed", days2Rotation.value)
     )
 
-  private def nonReconstructable(time2Rotation: Days2Rotation): Table[Days] =
-    val reconstructed = time2Rotation.reconstructed
-
-    def mkColumn(to: Days): Table.Column[Days] = Table.Column[Days](
-      to.number.toString,
-      from => reconstructed(from)(to) match
-        case None => " "
-        case Some(signum) => if signum > 0 then "+" else if signum < 0 then "-" else "="
-    )
-
-    Table[Days](time2Rotation.reconstructFrom)(
-      Table.Column("from", _.number),
-      mkColumn(Days.Ten),
-      mkColumn(Days.Month),
-      mkColumn(Days.Hundred),
-      mkColumn(Days.Year),
-      mkColumn(Days.Thousand),
-      mkColumn(Days.TenThousand),
-    )
-
-  private def exactified(time2Rotation: Days2Rotation, maxLength: Int): Table[Days] =
-    val data = time2Rotation.exactified(maxLength)
-    Table[Days](time2Rotation.exactify)(
+  private def printedAndCalculated(days2Rotation: Days2Rotation, calculate: Days => Option[Rotation]): Table[Days] =
+    Table[Days](days2Rotation.all)(
       Table.Column("days", _.number),
-      Table.Column("printed", time2Rotation.value),
-      Table.Column("min", data(_)._1),
-      Table.Column("length=min", data(_)._2),
-      Table.Column(s"length=$maxLength", data(_)._3)
+      Table.Column("printed", days2Rotation.value),
+      Table.Column("calculated", (to: Days) => calculate(to)
+        .getOrElse("")),
+      Table.Column("difference", (to: Days) => calculate(to)
+        .map(reconstructed => days2Rotation.value(to)-reconstructed)
+        .getOrElse(""))
     )
+
+  private def printedAndCalculatedForValue(days2Rotation: Days2Rotation, value: Rotation): Table[Days] =
+    printedAndCalculated(days2Rotation, (days: Days) => Some(days2Rotation.calculate(value, days)))
+
+  private def exactMin(days2Rotation: Days2Rotation): Table[Days] =
+    val data: Map[Days, (Interval, Int)] = days2Rotation.exactMin
+    Table[Days](Days.all)(
+      Table.Column("days", _.number),
+      Table.Column("precision", data(_)._2),
+      Table.Column("from", data(_)._1.from),
+      Table.Column("to", data(_)._1.to),
+    )
+
+  private def exact(data: Map[Days, Interval]): Table[Days] =
+    Table[Days](Days.all)(
+      Table.Column("days", _.number),
+      Table.Column("from", data(_).from),
+      Table.Column("to", data(_).to),
+    )
+
+  private def relationship(data: Map[Days, Interval], length: Int): Table[Days] =
+    def mkColumn(to: Days): Table.Column[Days] = Table.Column[Days](
+      heading = to.number.toString,
+      (from: Days) => if from.number <= to.number then "" else
+        Days2Rotation.IntervalRelationship.get(data(from), data(to), length) match
+          case Days2Rotation.IntervalRelationship.Intersect(_) => "*"
+          case Days2Rotation.IntervalRelationship.DoNotIntersect => "-"
+          case Days2Rotation.IntervalRelationship.Separated(separator) => separator.toString
+    )
+
+    Table[Days](Seq(Days.Ten, Days.Month, Days.Hundred, Days.Year, Days.Thousand, Days.TenThousand))(
+      Seq(Table.Column[Days]("days", _.number)) ++
+      Seq(Days.One, Days.Ten, Days.Month, Days.Hundred, Days.Year, Days.Thousand).map(mkColumn)
+    *)
 
   def main(args: Array[String]): Unit =
     val directory: File = File(if !args.isEmpty then args(0) else "/tmp/xxx/tables/")
     directory.mkdirs
 
-    for time2rotation <- List(SunLongitudeMean, SunApogee, MoonLongitudeMean, MoonHeadMean, MoonAnomalyMean) do
-      printed(time2rotation).writeAsciidoc(directory, s"${time2rotation.name}-printed")
-      nonReconstructable(time2rotation).writeAsciidoc(directory, s"${time2rotation.name}-reconstructed")
-      exactified(time2rotation, 6).writeAsciidoc(directory, s"${time2rotation.name}-exactified")
+    def writeTable(days2Rotation: Days2Rotation, suffix: String, table: Table[Days]): Unit =
+      table.writeAsciidoc(directory, s"${days2Rotation.name}-$suffix")
 
-//      printed(time2rotation).writeMarkdown(directory, s"${time2rotation.name}-printed")
-//      nonReconstructable(time2rotation).writeMarkdown(directory, s"${time2rotation.name}-reconstructed")
-//      exactified(time2rotation, 6).writeMarkdown(directory, s"${time2rotation.name}-exactified")
-//      printed(time2rotation).writeDocbook(directory, s"${time2rotation.name}-printed")
-//      nonReconstructable(time2rotation).writeDocbook(directory, s"${time2rotation.name}-reconstructed")
-//      exactified(time2rotation, 6).writeDocbook(directory, s"${time2rotation.name}-exactified")
+    def writePrintedAndCalculated(days2Rotation: Days2Rotation, suffix: String, value: Rotation): Unit =
+      writeTable(days2Rotation, suffix, printedAndCalculatedForValue(days2Rotation, value))
+
+    for days2Rotation: Days2Rotation <- List(SunLongitudeMean, SunApogee, MoonLongitudeMean, MoonHeadMean, MoonAnomalyMean) do
+      def write(suffix: String, table: Table[Days]): Unit = writeTable(days2Rotation, suffix, table)
+
+      write("printed", printed(days2Rotation))
+      write("printedAndCalculated", printedAndCalculated(days2Rotation, days2Rotation.calculate))
+      write("exactMin", exactMin(days2Rotation))
+      val exactData: Map[Days, Interval] = days2Rotation.exact(days2Rotation.exactMinLength)
+      write("exact", exact(exactData))
+      write("compatibility", relationship(exactData, days2Rotation.exactMinLength))
+      val exact6Data: Map[Days, Interval] = days2Rotation.exact(6)
+      write("exact6", exact(exact6Data))
+      write("compatibility6", relationship(exact6Data, 6))
+
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniPirush", SunLongitudeMean.alBattaniPirushValue)
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniNeugebauer", SunLongitudeMean.alBattaniNeugebauerValue)
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedRambam", SunLongitudeMean.rambamValue)
 
 //  private def mvaTables(data: Map[Angle, Angle]) = {
 //      def e(a: Angle, v: Angle) = {

@@ -12,8 +12,4 @@ object MoonHeadMean extends Days2Rotation("mhm",
   Days.TenThousand -> "169°31′40″",
   Days.Month       -> "  1°32′ 9″",
   Days.Year        -> " 18°44′42″"
-):
-
-  final override val rambamValue = Rotation(0)
-
-  final override val almagestValue = Rotation(0)
+)

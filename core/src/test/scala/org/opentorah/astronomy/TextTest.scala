@@ -1,14 +1,19 @@
 package org.opentorah.astronomy
 
 import org.opentorah.calendar.{Week, YearsCycle}
-import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle}
+import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Sun}
 import org.opentorah.numbers.BigRational
-import Angles.{Position, Rotation, headRange, range}
+import Angles.{Digit, Position, Rotation, headRange, range}
 import Jewish.{Day, Month, Year}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 class TextTest extends AnyFunSpec, Matchers:
+  describe("Metadata") {
+    it("Zodiacs should load correctly") {
+      Zodiac.Aries.names.hasName("Овен") shouldBe true
+    }
+  }
   describe("Chapter 11") {
     it("Law 7: angle units") {
       headRange shouldBe 360
@@ -42,12 +47,88 @@ class TextTest extends AnyFunSpec, Matchers:
       LeapYearsCycle.forNumber(4938) shouldBe YearsCycle.In(cycleNumber = 260, numberInCycle = 17)
       Epoch.Text.day shouldBe Year(4938).month(Month.Nisan).day(3)
       Epoch.Text.day.name shouldBe Week.Day.Chamishi
+      Epoch.Text.day.number shouldBe 1803407
     }
   }
 
   describe("Chapter 12") {
-    it("Law 2: mean Sun") {
-      val result = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
+    describe("Law 1: mean sun") {
+      it("intervals other than month and year are nested (precision 4)") {
+        val data: Map[Days2Rotation.Days, Rotation.Interval] = SunLongitudeMean.exact(6)
+        data(Days2Rotation.Days.One).contains(data(Days2Rotation.Days.Ten)) shouldBe true
+        data(Days2Rotation.Days.Ten).contains(data(Days2Rotation.Days.Hundred)) shouldBe true
+        data(Days2Rotation.Days.Hundred).contains(data(Days2Rotation.Days.Thousand)) shouldBe true
+        data(Days2Rotation.Days.Thousand).contains(data(Days2Rotation.Days.TenThousand)) shouldBe true
+      }
+      it("intervals other than month and year are nested (precision 6)") {
+        val data: Map[Days2Rotation.Days, Rotation.Interval] = SunLongitudeMean.exact(SunLongitudeMean.exactMinLength)
+        data(Days2Rotation.Days.One).contains(data(Days2Rotation.Days.Ten)) shouldBe true
+        data(Days2Rotation.Days.Ten).contains(data(Days2Rotation.Days.Hundred)) shouldBe true
+        data(Days2Rotation.Days.Hundred).contains(data(Days2Rotation.Days.Thousand)) shouldBe true
+        data(Days2Rotation.Days.Thousand).contains(data(Days2Rotation.Days.TenThousand)) shouldBe true
+      }
+      it("v(1000) = 10*v(100)") {
+        SunLongitudeMean.value(Days2Rotation.Days.Thousand) shouldBe (SunLongitudeMean.value(Days2Rotation.Days.Hundred)*10).canonical
+      }
+      it("v(10000) = 10*v(1000)") {
+        SunLongitudeMean.value(Days2Rotation.Days.TenThousand) shouldBe (SunLongitudeMean.value(Days2Rotation.Days.Thousand)*10).canonical
+      }
+      it("round to the same as Almagest") {
+        SunLongitudeMean.almagestValue.roundToSeconds shouldBe SunLongitudeMean.rambamValue.roundToSeconds
+      }
+//      it should "calculate for 29 days in two steps" in :
+//        (what.value(Days.Ten) * 3 - what.value(Days.One)) shouldBe what.value(Days.Month)
+//        (what.value(Days.Ten) * 3 - what.value(Days.One)) shouldBe Rotation("28°35′1″")
+//        (what.value(Days.Ten) * 2 + what.value(Days.One) * 9) shouldBe Rotation("28°34′58″")
+      it("makes a full circle in a year") {
+        assert(SunLongitudeMean.rambamValue * (Sun.RavAda.yearLength.toRational, Angles.maxLength) > Angles.period)
+        assert(SunLongitudeMean.rambamValue * (Sun.Shmuel.yearLength.toRational, Angles.maxLength) > Angles.period)
+      }
+      /*
+       Al-Battani, WikiPedia:
+
+       He was able to correct some of Ptolemy's results and compiled new tables of the Sun and Moon,
+       long accepted as authoritative. Al-Battānī rediscovered that the direction of the Sun's apogee,
+       as recorded by Ptolemy, was changing. (In modern heliocentric terms this is due to the changing
+       direction eccentricity vector of the Earth's orbit).
+       He also elaborated to a specified degree a number of trigonometric relations, the use of sines in
+       calculation, and partially that of tangents. He elaborated to a specified degree the work of an
+       Indian astronomer Aryabhata (476–550 CE) and a Greek astronomer Pythagoras (570 BC – c. 495 BC).
+       He also recalculated the values for the precession of the equinoxes (54.5" per year, or 1° in 66
+       years) and the obliquity of the ecliptic (23° 35'), which was an elaboration of Hipparchus' work.
+       */
+
+      it("from Rav Ada's year length") {
+        Sun.RavAda.yearLength shouldBe Jewish.Vector("365ᵈ5ʰ997ᵖ48ᵐ")
+        // too small to reproduce 1,10,100,1000 and 10000
+        SunLongitudeMean.fromSolarYearLength(Sun.RavAda.yearLength.toRational) shouldBe Rotation("0°59′8″17‴7′‴46″‴8‴‴")
+      }
+      describe("Pirush") {
+        it("Almagest") {
+          SunLongitudeMean.fromSolarYearLength(SunLongitudeMean.almagestSolarYearLength) shouldBe SunLongitudeMean.almagestValue
+        }
+        it("al-Battani") {
+          // NOT close to 0°59′8″20‴35 as Pirush mis-calculated?
+          SunLongitudeMean.fromSolarYearLength(SunLongitudeMean.alBattaniPirushSolarYearLength) shouldBe Rotation("0°59′8″21‴12′‴50″‴39‴‴")
+        }
+      }
+      describe("Tzikuni") {
+        it("exact value from v(10000)") {
+          val tenThousand = SunLongitudeMean.value(Days2Rotation.Days.TenThousand)
+          tenThousand shouldBe Rotation("136°28′20″")
+          val fullYears: Int = 10000 / 365
+          val exact1fourths = (tenThousand + Angles.period*fullYears)/(10000, 4)
+          exact1fourths shouldBe Rotation("0°59′8″19‴48′‴")
+          SunLongitudeMean.calculate(exact1fourths, Days2Rotation.Days.TenThousand) shouldBe tenThousand
+
+          val exact1thirds = exact1fourths.roundTo(Digit.THIRDS)
+          exact1thirds shouldBe Rotation("0°59′8″20‴")
+          SunLongitudeMean.calculate(exact1thirds , Days2Rotation.Days.TenThousand) shouldBe Rotation("136°28′53″") // != tenThousand
+        }
+      }
+    }
+    it("Law 2: mean Sun example") {
+      val result: Calculation = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
       result.day.name shouldBe Week.Day.Shabbos
       result.daysAfterEpoch shouldBe 100
       result.sunLongitudeMean shouldBe Position("105°37′25″")
@@ -57,7 +138,7 @@ class TextTest extends AnyFunSpec, Matchers:
 
   describe("Chapter 13") {
     it("Laws 9-10: true Sun") {
-      val result = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
+      val result: Calculation = Calculator.Text.calculate(Year(4938).month(Month.Tammuz).day(14))
       result.day.name shouldBe Week.Day.Shabbos
       result.sunLongitudeMean shouldBe Position("105°37′25″")
       result.sunApogee shouldBe Position("86°45′23″")

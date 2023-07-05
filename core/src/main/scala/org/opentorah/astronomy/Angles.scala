@@ -1,6 +1,7 @@
 package org.opentorah.astronomy
 
 import org.opentorah.numbers.{Digits, Numbers}
+import org.opentorah.util.WithValues
 
 object Angles extends Numbers.Periodic:
 
@@ -9,6 +10,11 @@ object Angles extends Numbers.Periodic:
     case MINUTES extends AnglesDigit("′")
     case SECONDS extends AnglesDigit("″")
     case THIRDS  extends AnglesDigit("‴")
+    case FOURTHS  extends AnglesDigit("′‴")
+    case FIFTHS  extends AnglesDigit("″‴")
+    case SIXTHS  extends AnglesDigit("‴‴")
+
+  object AnglesDigit extends WithValues[AnglesDigit]
 
   override type DigitType = AnglesDigit
 

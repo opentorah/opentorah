@@ -30,14 +30,14 @@ dependencies {
 
   compileOnly libs.bundles.xmlresolver
   compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
-  compileOnly libs.saxon11 // Saxon 11 (XSLT 2.0)
+  compileOnly libs.saxon12 // Saxon 12 (XSLT 2.0)
 
   testImplementation libs.zio.test
   //testImplementation libs.zio.prelude
   testImplementation libs.cats.core
   testImplementation libs.cats.laws
 
-  testRuntimeOnly libs.saxon11
+  testRuntimeOnly libs.saxon12
   testRuntimeOnly libs.bundles.xmlresolver
 }
 

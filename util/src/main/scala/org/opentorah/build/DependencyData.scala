@@ -24,13 +24,12 @@ trait DependencyData:
 object DependencyData:
   def fromGradleDependency(dependency: org.gradle.api.artifacts.Dependency): Option[DependencyData] = dependency match
     case dependency: org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency =>
-      // TODO how do I get the classifier and extension?
       Some(new DependencyData:
         override def group: Option[String] = Some(dependency.getGroup)
         override def artifactName: String = dependency.getName
         override def version: Version = Version(dependency.getVersion)
-        override def classifier: Option[String] = None // TODO
-        override def extension: Option[String] = Some("jar") // TODO
+        override def classifier: Option[String] = None
+        override def extension: Option[String] = Some("jar")
       )
     case _: org.gradle.api.internal.artifacts.dependencies.DefaultSelfResolvingDependency => None
     case _ => None
@@ -43,8 +42,6 @@ object DependencyData:
         override def group: Option[String] = None
         override def artifactName: String = name
         override def version: Version = Version(versionOpt.get)
-        // TODO how do I get the classifier if the name+version looks like 'gradle-versions-plugin-0.44.0'?
-        // I guess I can try recognizing the version by dots and stuff, and treat the last segment as classifier if it is not the version...
         override def classifier: Option[String] = None
         override def extension: Option[String] = fileExtension
       )

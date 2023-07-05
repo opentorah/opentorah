@@ -3,7 +3,7 @@ package org.opentorah.xml
 import org.opentorah.util.{Files, Strings}
 import org.xml.sax.{InputSource, XMLFilter, XMLReader}
 import java.net.URL
-import scala.xml.parsing.FactoryAdapter
+import scala.xml.XML
 
 object ScalaXml extends Xml:
 
@@ -30,21 +30,15 @@ object ScalaXml extends Xml:
     filters: Seq[XMLFilter],
     resolver: Option[Resolver],
     processIncludes: Xerces.ProcessIncludes = Xerces.ProcessIncludes.YesWithBases
-  ): Element = load0(
-      inputSource,
-      filters,
-      resolver,
-      processIncludes,
-      fixXercesXIncludes = true
-  )
+  ): Element =
+    load0(
+        inputSource,
+        filters,
+        resolver,
+        processIncludes,
+        fixXercesXIncludes = true
+    )
 
-  // TODO I'd like the following code to look this way: scala.xml.XML.withSAXParser(...).load(inputSource), but:
-  // - I need to filter the input, and XMLFilter only works with XMLReader, not SAXParser;
-  // - that is why I call getXMLReader() on the newly created SAXParse in Xerces;
-  // - XMLLoader uses SAXParser, not XMLReader;
-  // - there is no going back from the XMLReader to SAXParser... (?)
-  // So: file a pull request that will change XMLLoader from using SAXParser to XMLReader,
-  // which by default should be obtained from the SAXParser :)
   def load0(
     inputSource: InputSource,
     filters: Seq[XMLFilter],
@@ -59,18 +53,7 @@ object ScalaXml extends Xml:
       logger = Xml.logger // TODO globalize
     )
 
-    val adapter: scala.xml.parsing.FactoryAdapter = scala.xml.parsing.NoBindingFactoryAdapter()
-    adapter.scopeStack = scala.xml.TopScope :: adapter.scopeStack
-
-    xmlReader.setContentHandler(adapter)
-    xmlReader.setDTDHandler(adapter)
-    xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", adapter)
-
-    xmlReader.parse(inputSource)
-
-    adapter.scopeStack = adapter.scopeStack.tail
-    val result: Element = adapter.rootElem.asInstanceOf[Element]
-
+    val result: Element = XML.withXMLReader(xmlReader).load(inputSource)
     if !fixXercesXIncludes then result else fixXIncludeBug(result)
 
   override def isText(node: Node): Boolean = node.isInstanceOf[Text]

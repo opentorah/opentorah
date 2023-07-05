@@ -1,94 +1,213 @@
 [#solar-theory]
 == Solar Theory
-In his "Laws of the Sanctification of the Moon",  <<kh-12>>, <<kh-12-1>>, Rambam states: (TODO quote/reference)
 
-In table format:
-include::{tablesdir}/slm-printed.adoc[]
+[#solar-theory-longitude]
+=== Mean movement
+
+In his "Laws of the Sanctification of the Moon", <<kh-12>>, <<kh-12-1>>, Rambam states:
+
+[quote]
+____
+include::../kh/12-1.adoc[]
+____
+
+Simple reading of the text:
+
+[quote]
+movement in one day is ... it follows that movement in 10, 100, 1000, 10000 days is ... you can multiply and calculate movement for any number of days that you want ... movement for twenty-nine days and for three hundred and fifty-four ...
+
+suggests the assumption:
+
+_Values given by Rambam can be calculated by multiplying the value for one day that he gives by the number of days and discarding full circles as appropriate._
+
+If this assumption was true, it would present a difficulty for those that read literally Rambam's statement in the introduction to "Mishne Torah" that he only includes laws in the text: values that can be calculated are redundant and should not be included!
+
+Turns out, the values Rambam gives can _not_ be calculated from the value for one day, as is clear from the following table, where the values given by Rambam are listed alongside the values calculated from the value for one day and the difference between them:
+
+include::{tablesdir}/slm-printedAndCalculated.adoc[]
+
+As we see, calculated values are smaller than the values Rambam gives, so the values that Rambam included in the text are not redundant - if, of course, they are used in the calculations; we'll look into that when reading <<kh-12>>, <<kh-12-2>> in the <<solar-theory-aphelion>> section below.
+
+This prompts the change of assumption to:
+
+_Values given by Rambam, including the value for one day, can be calculated by multiplying the *exact* value for one day that he does not give by the number of days, discarding full circles as appropriate and rounding the remainder up to the seconds._
+
+The reading of the text then changes to:
+
+[quote]
+movement in one day [.add]#if rounded# is ... it follows that movement in 10, 100, 1000, 10000 days [.add]#calculated using the exact value and then rounded# is ... you can multiply [.add]#the exact value# and calculate movement for any number of days that you want ... movement for twenty-nine days and for three hundred and fifty-four [.add]#can also be calculated the same way# ...
+
+Our goal is to extract as much information about the exact value Rambam used as possible _from the text itself_.
+Of course, it is impossible to determine the exact value from the rounded results of multiplying it: the best we can do is to find the _interval_ of possible values for a given precision.
+
+To find the interval of possible exact values for a given precision we:
+
+- look for one value that reconstructs the values given by Rambam using step at the precision we want;
+- if none is found, increase the precision (and thus decrease the step);
+- construct an interval that contains just the value found;
+- expand it at its precision using the appropriate step;
+- expand it to the precision desired.
+
+This procedure is probably easier to understand in code than in words; the code is in the https://github.com/opentorah/opentorah/blob/master/core/src/main/scala/org/opentorah/astronomy/Days2Rotation.scala[org.opentorah.astronomy.Days2Rotation] class.
+
+First, let's see what intervals for the possible exact value that Rambam used we can extract from his table with the least precision possible for each line:
+
+include::{tablesdir}/slm-exactMin.adoc[]
+
+Now once more, with the same precision for _all_ the lines, the one sufficient for all off them - which happens to be four digits:
+
+include::{tablesdir}/slm-exact.adoc[]
+
+Contemplation of this table reveals a surprising fact: some pairs of the values are _incompatible_ in the sense that they can not be reconstructed from the same exact value by multiplication and rounding, and even though increasing the precision widens the intervals of the possible exact values, intervals for the incompatible values will never intersect, because there is a separating value for the pair such that the intervals of possible exact values are strictly on different sides of the separating value.
+Here is a table that gives those separating values:
+
+include::{tablesdir}/slm-compatibility.adoc[]
+
+We can see that 29 is incompatible with 354, 1000 and 10000, and 354 is incompatible with 29, 100, 1000 and 10000; so, we have the following options:
+
+[%autowidth]
+|===
+|option|reconstructed|exceptions
+
+|1
+|1, 10, 100, 1000, 10000
+|29, 365
+
+|2
+|1, 10, 100, 29
+|1000, 10000, 365
+
+|3
+|1, 10, 354
+|100, 1000, 10000, 29
+
+|===
+
+Since we are looking for a reading with the most of the values reconstructed from the exact one and the fewest exceptions, we choose the first option; our assumption now becomes:
+
+_Values given by Rambam, including the value for one day, can be calculated by multiplying the exact value for one day that he does not give by the number of days, discarding full circles as appropriate and rounding the remainder up to the seconds - except for the values for the month and the year, which can not be calculated this way._
+
+Accordingly, our reading of the text changes to:
+
+[quote]
+movement in one day [.add]#if rounded# is ... it follows that movement in 10, 100, 1000, 10000 days [.add]#calculated using the exact value and then rounded# is ... you can multiply [.add]#the exact value# and calculate movement for any number of days that you want ... movement for twenty-nine days and for three hundred and fifty-four [.add]#can not be calculated this way# ...
+
+Values for 29 and 354 are separated from the rest of the values in the text itself, and that is another argument (besides minimizing the number of exceptions) for choosing the reading where the exceptions are just 29 and 354: any other choice makes the reading even _more_ unnatural...
+
+Intervals for 1, 10, 100, 1000 and 10000 days nest within one another, so any number in the interval for 10000 days reconstructs all of them.
+
+For precision of four digits, that interval contains just one number: 0°59′8″19‴48′‴, so if the exact value Rambam used was of this precision (and not more precise; it could not have been less precise), it is this number.
+In a sense, this number "falls out of the text".
+Here are the values reconstructed from it, and how they compare with Rambam's values:
+
+include::{tablesdir}/slm-printedAndCalculatedRambam.adoc[]
+
+As expected, values for 29 and 354 are off.
+
+It seems that ancient and medieval authors liked the precision of six sexagesimal digits (minutes, seconds, thirds, fourths, fifths, sixths), although it is not clear how meaningful is precision of less than 1/46 billionth of a degree in this context.
+For completeness, here are the intervals for the exact values at precision of six digits:
+
+include::{tablesdir}/slm-exact6.adoc[]
+
+For our chosen interpretation, at this precision the exact value is in the interval from 0°59′8″19‴47′‴49″‴2‴‴ to 0°59′8″19‴48′‴10″‴37‴‴.
+
+Now that we saw what the text itself tells us, let's see what classic and modern authors have to say about it.
+
+The earliest remark that I am aware of belongs to <<Pirush>>:
+
+[quote]
+____
+Movement in one day of 0°59′8″ is according to al-Battani, who in his book gives the value close to 0°59′8″20‴35′‴; but according to Btolemeus [.add]#= Ptolemy#, it is 0°59′8″17‴13′‴12″‴31‴‴.
+For every opinion it corresponds with the length of the solar year on that opinion (which for Ptolemy is 365 and 1/4 days minus 1/300 of a day, and for al-Battani 365 and 1/4 days minus 3°40′ - where a day is 360°):
+movement in one day is obtained by dividing 360° (full circle) by the length of the solar year.
+
+Proof that Rambam follows al-Battani and not someone else is:
+the value for 10 days that he gives - 9°51′23″ - is 3″ bigger than what it would have been - 9°51′20″ - if it was obtained as he suggests previously [.add]#by multiplying the value for 1 day that he gives by 10#; but since movement in one day is bigger than 0°59′8″ by 20‴, and multiplied by 10 they come to 200‴, he took out 180‴ of them as 3″ and added them to 20″, obtaining 23″; remaining 20‴ he multiplied by 10 and took out of them 3″ and added them to the value for 100 days, which he gives as 98°33′53″ [.add]#3″ more than the value he gives for 10 days (9°51′23″) multiplied by 10 (98°33′50″)#.
+The same applies to the movement over a year and a month.
+(The way to multiply is clear once the rules explained in chapter 11 are understood.)
+____
+
+If we calculate movement in one day from the length of the solar year that <<Pirush>> attributes to Ptolemy, we get the value that <<Pirush>> gives; for al-Battani, we get 0°59′8″21‴12′‴50″‴39‴‴, which is *not* the value <<Pirush>> gives: there seems to be a mistake in <<Pirush>>'s calculation.
 
 
-Now let's see if the printed values can be recovered by multiplying the value for one day by the number of days (and discarding full circles as appropriate):
-include::{tablesdir}/slm-reconstructed.adoc[]
+<<IbnHabib>> writes:
 
-[#solar-model]
-=== Model (TODO)
-Figure out from the text directions of Sun's movements and what are the position angles from (look at the parallax correction stuff: subtract mean apogee from the mean Sun...).
+[quote]
+____
+<<Pirush>>'s statement that Rambam follows al-Battani's calculations and that is the reason he adds 3″ to the value for 10 days seems to me to be true, correct and unassailable.
+I have a difficulty, though: why didn't Rambam do the same with the value for 1000 days, where he should have also added 3″ resulting from [.add]#multiplying by 10# 20‴ remaining from the value for 100 days.
+The same applies to the value for 10000 days: in current time, which is more than 126000 days after Rambam's epoch, resulting discrepancy in the position of the sun is 7′... I need to look into this.
+I also have a difficulty with Rambam stating that movement of the sun during a regular year is 348°55′15″: it looks like Rambam added 7″ more than he should have based on the rate of movement mentioned.
+I need to look into this; although some thoughts that provide partial explanation of the Rambam's text did occur to me, they are not yet complete in my mind - and that is why I did not write them down.
+____
 
-TODO diagrams for the correction in Moznaim's Rambam.
+In the standard editions, in "3″ resulting from 20‴", 20‴ is misprinted as 2‴, which is hard to explain - unless it used to be written as a number instead of being spelled out, and somebody mistook chof for a bet. It is not clear to me how did IbnHabib arrive at the value 7′ for the discrepancy.
 
-[#exactification]
-=== Exactification (TODO)
-It is not clear how Rambam arrived at the values he gives.
-When value of the movement in one day given by Rambam is multiplied by 29, 100 etc., the result is smaller than that of Rambam.
-The following table compares printed and calculated values: TODO
+Let's compare the values reconstructed from the exact value that <<Pirush>> suggests with the values given by Rambam:
 
-Although the value of the movement of the mean solar longitude in one day given by <<Almagest>> III 1 (H209) (which, rounded to seconds, becomes Rambam's value) is bigger, it is not big enough, and Rambam's numbers (for more than 10 days) can not be explained by performing calculations with the long value from Almagest and then rounding the results to the precision of the Rambam's values.
+include::{tablesdir}/slm-printedAndCalculatedAlBattaniPirush.adoc[]
 
-<<Tzikuni>> (TODO p. XXX) gives the algorithm of such reconstruction: add to the remainder as many times 360 as there were full rotations in given time period, and then divide.
-It also gives a value reconstructed from the printed values for 10,000, 1000 and 100 days: 59′8.33″, or 0.9856472 degrees, and the current "scientific" value of 0.9856473 degrees.
-It seems that origins of the Rambam's value were questioned by his commentators, including "Pirush".
-Value that can be derived from the tradition that 19 years = 6939 days 16 hours and 595 parts is 0.9856348.
+<<IbnHabib>> questions the values for 1000, 10000 (which <<Pirush>> doesn't claim as explained by his suggestion) and 365 (which <<Pirush>> does claim as explained), affirms the value for 10 days and does not mention the values for 100 and 29 days. From the table above we can see that the only values that are explained by the <<Pirush>>'s suggestion are the values for 1 and 10 days; everything else is off (although the differences are not always what IbnHabib says they are).
 
-This algorithm can be modified to produce an interval of possible values, taking into account precision of the numbers.
+In its in-depth analysis, <<HaMevuar>>, pp. 116-117, quotes an alternative approach in the name of <<Ajdler>>, but as far as I can tell, it is from <<Neugebauer>>, p. 338-339 (398-399 in reprint), recapitulated in shorter and less aggressive form in <<Yale>>, p. 129:
 
-From the printed values it is possible to reconstruct the value of the movement in mean solar longitude in one day that Rambam used to calculate each of them:
+[quote]
+____
+These values are not consistent with one another in the sense that they are not exact multiples of 0°59′8″. The obvious explanation is, of course, that we are dealing here with rounded off multiples of a more exact initial value.
+Indeed, we can show even more.
+The values for 1, 10 and 29 days and for 354 days (erroneously assumed to be an error by <<Baneth>> p. 43 note 5) are identical with the corresponding values in Al-Battani's tables, which, in turn are rounded off from multiples of 0°59′8″20‴46′‴56″‴14‴‴. The values for 100, 1,000 and 10,000 are not included in Al-Battani's tables but can be derived directly from them as follows.
+We multiply the value for 30 days, given by Al-Battani as 29°34′10″, by 3 and add the value for 10 days, which is 9°51′23″. Then we obtain exactly Maimonides's value 98°33′53″. From this the values for 1,000 and for 10,000 days are obtained by multiplication by 10 and 100.
 
-Use it to calculate intervals for Rambam's values of the angular velocities.
+The insight into this procedure of Maimonides is historically not without interest.
+In order to obtain the value for 100 days he simply took the rounded-off values for 30 and for 10 days, thus comitting an error 3ε1+ε2 if ε1 and ε2 are the errors of rounding off committed by Al-Battani.
+This total error appears multiplied by 100 in the value for 10,000 days.
+It is an amusing accident that the result agrees much better with modern values than any other value from Ptolemy to Copernicus.
+<<Baneth>>, who did not realize how Maimonides's tables were constructed, praised this result "als ein glänzendes Ergebnis" [.add]#= a brilliant result# and conjectured that Maimonides compared observations of Al-Battani with results of Hipparchus.
+We see now that Maimonides not only did not have the slightest intention to deviate from Al-Battani but that he showed the same disregard for the cumulative effect of errors which can be recognized in almost all ancient and mediaeval astronomers.
+____
 
-<<Tzikuni>> quotes Rambam's value for 354 days as 348°55′15″, but calculated value as 348°55′9″, and notes that this "requires a little thought".
+The following table compares the values Rambam gives with the calculations based on the al-Battani's exact value given by <<Neugebauer>>:
 
-TODO About apogee, Rambam says "the same way", but doesn't give value for 1 day...
-Exactification requires extra attention, since there is no value for 1 day.
-SunApogee rambamValue and almagestValue.
+include::{tablesdir}/slm-printedAndCalculatedAlBattaniNeugebauer.adoc[]
 
-[#solar-movement-29]
-=== Angular movement for 29 days (TODO)
-Are Rambam's values reconstructible if value for 29 days is calculated as 3*v(10)-v(1), not 2*v(10)+9*v(1), nor 29*vexact(1)?
-For any tables other than SunLongitudeMean?
+We see that the values for 100, 1000 and 10000 days can not be obtained by multiplying and then rounding the exact value derived from al-Battani, just as <<Neugebauer>> says - but neither is the value for 29 days what it should be, while <<Neugebauer>> lists it among those "rounded off from multiples" of the exact value for one day!
 
-Values of the movement in one day apparently used by Rambam, if rounded to the seconds, give the "official" Rambam's value.
-Values calculated from the value reconstructed from the printed 10000 days movement, if rounded, produce the values Rambam published - except for 29 days, 354 days, and 10000 days which we use to calculate the exact value that Rambam used!
-TODO!
+<<Neugebauer>> p. 336 (396) says:
+[quote]
+Off hand, it is to be expected that Maimonides followed Arabic astronomers, even if he had Arabic translations of the Almagest at his disposal.
+Indeed, we shall show that there exist very close relations between Maimonides and AI-Battani. ... We shall confirm this result for the whole theory of the solar and lunar movement. The theory of visibility, however, deviates from AI-Battani ... I do not know the source of this special section.
 
-[#zeros]
-=== Zeros (TODO)
-Math.findZero(): Finish and test the code; use two separate lengths (precisions)?
+It seems that <<Neugebauer>> was so set in his preconception that Rambam must have copied his numbers from al Battani, that all the proof of that he needed is the numbers in al-Battani being the same as the ones given by Rambam, even though, as we already know, Rambam's numbers (except for the 29 and 353 days) can be reconstructed from an exact value for one day that is *different* from al-Battani's! So, <<Neugebauer>>'s statements that Rambam:
 
-[#sun-precise]
-=== Sun for a precise time (TODO)
-make possible calculations for a Moment, not just a Day (at least for the sun).
+* showed disregard for the cumulative effect of errors
+* did not have the slightest intention to deviate from al-Battani
+* obtained his value for 10000 days through an "amusing accident"
 
-[#sun-creation]
-=== Sun at Creation (TODO)
-Where and when was the Sun created?
-(Birchat Hachamo is on a different opinion.) Does it let us get more precise values of Sun's angular velocities?
+are incorrect unless Rambam copied all the numbers from al-Battani and calculated the missing value for 100, 1000, and 10000 days the way <<Neugebauer>> describes - assumption that is not supported by the text itself.
 
-[#true-seasons]
-=== True seasons (TODO)
-calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.
+The same preconception that Rambam must have copied his numbers from al-Battani if he did not copy them from Ptolemy was shared, as we saw, by <<Pirush>> and <<IbnHabib>>; it was also shared by the later writers (including <<LaAm>>) that produced increasingly convoluted "explanations" of Rambams calculations that attempt to preserve <<Pirush>>'s statements.
 
-SeasonsAstronomical.seasonForYear: should this always be Nisan?
+We focus on the Rambam's text itself, and feel no duty to satisfy any preconceived notions about the "history of ideas" and the "historical context", we choose the reading that minimizes the number of values Rambam gives that can not be reproduced from an exact value for one day - and as we already saw, there is an interval of values that result in just two exceptions: 29 and 354 days.
 
-[#year-lengths]
-=== Year lengths (TODO)
-Convert each year length mentioned in the fixed calendar to angular speed.
+We are not the first to choose this approach; <<HaMevuar>> ascribes it to: Shvilei HaRakia, Nove Kodosh, Moer Hodosh, Shekel Hakodesh etc.
+<<Baneth>> seems to favor this approach.
+<<Moznaim>> also follows it: it quotes (in 12:1 note 1, without giving any reference) the value for one day as 0°59′8″19.8‴, which is 0°59′8″19‴48′‴;
+<<Tzikuni>>, p. 44 also comes up with this value - if read charitably: the value he gives, 0°59′8.33″, is 0°59′8″20‴, is not precise enough, but the floating point number he gives is; again, no references are given.
+<<Glitzenshtein>> also gives this number, and also without references.
 
-What year length does value for mean anomaly velocity given by Moznaim correspond?
+On our approach, values for 29 and 354 days are exceptions not explained by multiplication and rounding; disturbingly, nobody writes that thevalue for 29 is an exception, not on the Rambam and not - lehavdil - on al-Battani. This needs attention ;)
 
-[#interesting]
-=== Interesting
-TODO От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции Рамбама в астрономии - https://www.yeshiva.org.il/midrash/11088[]
+<<HaMevuar>> quotes Moer Hodosh as suggesting that the value 348°55′15″ for 354 days got garbled during the transmission of the text, and should be corrected (restored) to 348°55′9″ (<<Glitzenshtein>> gives plausible explanation of how this garbling happened);
+<<HaMevuar>> quotes <<Ajdler>> as questioning a possibility of corruption for the value for 354 days in all five angular velocity tables: two for the sun and three for the moon.
+<<Ajdler>>'s question becomes stronger since 354 is not the only exception that we would like to explain away: we need to think of 29 also; at the same time, I do not see 354 as an exception in the second angular velocity table - the one we discuss in the following section, <<solar-theory-aphelion>>.
 
-[#interesting2]
-=== Check statements of Nove Kadosh / Ibn Ezra
-TODO От Корица:
+[#solar-theory-aphelion]
+=== Aphelion
 
-ודבר זה הלכה למשה מסיני הוא, שבזמן שיש סנהדרין קובעין על הראייה ובזמן שאין שם סנהדרין קובעין על חשבון זה שאנו מחשבין בו היום ואין נזקקין לראייה, אלא פעמים שיהיה יום שקובעין בו בחשבון זה הוא יום הראייה או קודם לו ביום או אחריו ביום, וזה שיהיה אחר הראייה ביום פלא הוא ובארצות שהן למערב ארץ ישראל.
-
-נאוה קודש הלכות קידוש החודש פרק ה הלכה ב כבר נתבאר לעיל בפרק ראשון הלכה ג' ע"פ ציור באיזה אופן שאפשר להיות קיבוץ האמתי קודם להאמצעי או שיהיה אחר האמצעי, ולפעמים יהיו קיבוץ האמתי והאמצעי ברגע אחד, והקדימה או האחירה של קיבוץ האמתי מהאמצעי לכל היותר הוא קרוב לי"ד שעות וכן דעת הר' אברהם אבן עזרא בפרשת בא דהיינו י"ג שעות ושלשה רביעיות שעה, ודוקא בתשרי אשר הוא במאזנים אזי אפשר שיקדים האמתי להאמצעי שיעור הנזכר אבל האיחור של קיבוץ האמתי מהאמצעי בתשרי לא יהיה כי אם קרוב לשש שעות ולא יותר ובחדש ניסן אשר הוא בטלה יהיה הדין בהפוך ר"ל לכל היותר לא תהיה הקדימה הנזכר כי אם קרוב לשש שעות, והאיחור יכול להיות קרוב לי"ד שעות, כל זה יתבאר בע"ה לקמן בדרך מופת, ומבואר שכל דברי רבינו של הלכה זו הולך וסובב על חדש תשרי אשר בו שייך כל הדחיות המבוארים לקמן בפרק ז' עיין שם,
-
-Не знаю, кто это; не верю, что средневековцы могли доказать теорему о максимальной дистанции; но чтобы проверить эти утверждения, чьи бы они ни были, надо считать не только через 15 минут после захода, а в любой момент :)
-
-ביוגרפיה - נאוה קדש רבי שמעון וואלטש היה מדרי העיר ברונשוויג שבאשכנז, את חכמת התכונה למד ממי שנחשב בדורו (שנות הת"ק) כאחד המומחים הגדולים בחכמה זו, הכונה לרבי ישכר בעריש בנו של הגאון הגדול רבי אריה ליב (בן הפנ"י) רבה הנודע של הנובר, אשר הסכים בהתלהבות לפרסום ספר "נאוה קודש", בפרט לאחר שכבר ניתנה הסכמתו של רבה הגדול של ברלין רבי צבי הירש לוין.
-ספר "נאוה קודש" הודפס בברלין בשנת תקמ"ו (1786). 53 דף. הספר הודפס שנית במהדורת צילום (בתוך ספר פועל ה' ח"ב) בשנת תשכ"ט (1969), ושוב בבני ברק בשנת תשנ"ח (1998) (בתוך ספר פועל ה' ח"ג).
-החידושים על הרמב"ם הוכנסו ממהדורת פרידברג ירושלים תשס"ו.
-
+// include::{tablesdir}/sa-printedAndCalculated.adoc[]
+//
+// include::{tablesdir}/sa-exactMin.adoc[]
+//
+// include::{tablesdir}/sa-exact.adoc[]
+//
+// include::{tablesdir}/sa-exact6.adoc[]

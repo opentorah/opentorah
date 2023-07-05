@@ -1,0 +1,16 @@
+[#misprints]
+== Misprints
+
+[%header, cols="2, 8, 8, 4"]
+|===
+|law
+|incorrect
+|correct
+|corrector
+
+|12:2
+|in twenty-nine days is a *bit more than* four seconds
+|in twenty-nine days is four seconds
+|
+
+|===

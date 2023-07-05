@@ -1,6 +1,7 @@
 = Typesetting classic Jewish texts
 :doctype: article
 :toc:
+:revnumber: 0.1
 
 Date: 9-10 Kislev 5768
 

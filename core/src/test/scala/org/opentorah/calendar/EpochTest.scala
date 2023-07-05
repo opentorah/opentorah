@@ -26,12 +26,14 @@ final class EpochTest extends AnyFlatSpec, Matchers:
   "Second Jewish year (of Creation)" should "be correct" in:
     val year2: Jewish.Year = Jewish.Year(2)
 
+    // man's creation: 14th hour of Friday, the sixth day of creation
     val year2newMoon: Jewish.Moment = year2.newMoon
     year2newMoon.day.name shouldBe Week.Day.Shishi
     year2newMoon.time shouldBe Jewish.TimeVector("0ᵈ14ʰ") // WeYaD 8:00am
 
     val year2firstDay: Jewish.Day = year2.firstDay
     year2firstDay.numberInYear shouldBe 1
+    year2firstDay.number shouldBe 355
 
     // Note: I had to suppress NewYear.delay() for years 2, 3 and 4 to recover the desired
     // outcome: molad of the year 2 falling out on the first of Tishrei;

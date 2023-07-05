@@ -7,39 +7,39 @@
 
 Various editions and translations of the original text.
 
-* [[[Vilno]]] Rambam. Mishne Torah. Widow and Brothers Romm.
-* [[[LaAm]]]  Rambam. Mishne Torah. Rambam LaAm.
-* [[[Eshkol]]] Rambam. Mishne Torah. Eshkol 1987.
-* [[[Kapach]]] Rambam. Mishne Torah. Rabbi Kapach.
-// TODO translation of Kapach's introduction: https://mhcny.org/pdf/Introduction%20to%20Mishneh%20Torah.pdf[]
-* [[[Frenkel]]] Rambam. Mishne Torah. Rabbi Frenkel.
-* [[[Bluming]]] Rambam. Mishne Torah. Rambam HaAruch. Rabbi Y Bluming. 2005
-* [[[Hazak]]] Rambam. Mishne Torah. Rambam HaSholem. 2010
-// TODO see p.37-41 for Hazak's list of the versions of Rambam with misprints corrected,
-// and the reason they chose the Kapach version: it being based solely on the Yemenite
-// manuscripts that were not affected by the censorship unlike the Ashkenazic ones
-// and the Frenkel version being combination of various manuscripts and editions
-// (which is funny, since Kapach repeats Askenazic misprints in the Laws of the
-// Sanctification of the Moon)
-
-* [[[Yale]]] Rambam. Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica Series, Vol. 11). Translator Solomon Gandz. Editor Julian Obermann. Yale. 1967
-* [[[Moznaim]]] Rambam. Mishne Torah. Translator Rabbi Touger.
-* [[[HazonIsh]]] Hazon Ish.
+* [[[Vilno]]] Rambam. Mishne Torah. Widow and Brothers Romm. Hebrew.
+* [[[LaAm]]]  Rambam. Mishne Torah. Rambam LaAm. Hebrew.
+* [[[Eshkol]]] Rambam. Mishne Torah. Eshkol 1987. Hebrew.
+* [[[Kapach]]] Rambam. Mishne Torah. Rabbi Kapach. Hebrew.
+* [[[Frenkel]]] Rambam. Mishne Torah. Rabbi Frenkel. Hebrew.
+* [[[Bluming]]] Rambam. Mishne Torah. Rambam HaAruch. Rabbi Y Bluming. 2005. Hebrew.
+* [[[Hazak]]] Rambam. Mishne Torah. HaSholem. Hazak. 2010. Hebrew.
+* [[[PardesHaMelech]]] Rambam. Mishne Torah. Pardes HaMelech. Hazak. 2020. Hebrew.
+* [[[HaMevuar]]] Rambam. Mishne Torah. HaMevuar. Chitrik Edition. 2020. Hebrew.
+* [[[Yale]]] Rambam. Code of Maimonides, Book 3, Treatise 8: Sanctification of the New Moon (Yale Judaica Series, Vol. 11). Translator Solomon Gandz. Editor Julian Obermann. Yale. 1956; 1967
+* [[[Moznaim]]] Rambam. Mishne Torah. Translator Rabbi Touger. English translation of <<LaAm>>.
 
 [bibliography]
 [#bibliography-jews-on-calendar]
 == Jewish Writings on Calendar
+
+* [[[Pirush]]] Ovadia son of David son of Ovadia, 1325.
+* [[[IbnHabib]]] Levi ibn Habib, son of Jacob ibn Habib; MaHaRaLBaCh. d 1545. 1565, Venice.
+* [[[HazonIsh]]] Hazon Ish.
 * [[[Losh]]] Sefer HaTchunah LeMatchil. Yosef Yitzchok Losh. 1988
 * [[[Keller]]] Tchunat HaShamaim. Yosef Yitzchok Keller. 1988
-* [[[Glitzenshtein]]] Kidush HaChodesh LeHaRambam. Menachem Mendel Glitzenshtein. 1993
-* [[[Tzikuni]]] Hazon Shamaim (הזון שמים). Eitan Tzikuni. 2001
+* [[[Glitzenshtein]]] Kidush HaChodesh LeHaRambam. Menachem Mendel Glitzenshtein. 1993.
+* [[[Tzikuni]]] Hazon Shamaim (הזון שמים). Eitan Tzikuni. 4th edition. 2001. Hebrew.
 * [[[HazonIshSine]]] Hazon Ish and the sine tables. http://www.biu.ac.il/JH/Parasha/pekudey/lev.html[]
+* [[[Baneth]]] Maimuni's Neumondsberechnung. Bericht uber die Lehranstalt fur die Wissenschaft des Judenthums 16 (1898), 17 (1899), 20 (1902), 21 (1903). Eduard Baneth. German.
+* [[[Ajdler]]] Hilkhot Kiddush ha-Hodesh al-pi ha-Ramban. J. Jean Ajdler. Sifriati. 1996. Hebrew.
+
 
 [bibliography]
 [#bibliography-greeks-on-astronomy]
 == Greeks on Astronomy
 * [[[Antiquity]]] The Exact Sciences in Antiquity. Otto Neugebauer. 2nd edition. Dover Publications. 1969. http://isbn.nu/0486223329[]
-* [[[Neugebauer]]] Astronomy and History Selected Essays. Otto Neugebauer. Springer. August 8, 1983. http://isbn.nu/0387908447[]
+* [[[Neugebauer]]] The Astronomy of Maimonides and Its Sources. Otto Neugebauer. Hebrew Union College Annual 22, 322-363, 1949. Reprinted in: Astronomy and History Selected Essays. Otto Neugebauer. 381-423 Springer. August 8, 1983. http://isbn.nu/0387908447[]
 * [[[Crowe]]] Theories of the World from Antiquity to the Copernican Revolution. Michael J. Crowe. 2nd edition. Dover Publications. 2001. http://isbn.nu/0486414442[]
 * [[[Evans]]] The History & Practice of Ancient Astronomy. James Evans. Oxford University Press. 1998. http://isbn.nu/0195095391[]
 * [[[Thurston]]] Early Astronomy. Hugh Thurston. Springer Verlag. 1996. http://isbn.nu/0387948228[]
@@ -78,6 +78,6 @@ Various editions and translations of the original text.
 * [[[Cairo]]] A primitive rabbinic calendar text from the Cairo Genizah. Sacha Stern. https://www.jjs-online.net/archives/fulltext/3259[]
 * [[[REP]]] The Reality of Epicycles and Eccentrics Denied. http://homepages.wmich.edu/~mcgrew/maimonides.htm[]
 
-[#bibliography-bibtex]
-== Referenced
+// [#bibliography-bibtex]
+// == Referenced
 // bibliography::[]

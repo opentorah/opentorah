@@ -1,5 +1,7 @@
 package org.opentorah.numbers
 
+import org.opentorah.util.WithValues
+
 /** Number System.
  *
  * Each number system `S` (derived from [[org.opentorah.numbers.Numbers]])
@@ -29,8 +31,6 @@ trait Numbers extends NumbersBase:
     lazy val position: Int = digitDescriptors.indexOf(this.asInstanceOf[DigitType]) // TODO ordinal?
 
   type DigitType <: Digit
-
-  private type WithValues[T] = { val values: Array[T] } // TODO move to Collections
 
   type DigitCompanionType <: WithValues[DigitType]
 
@@ -137,6 +137,8 @@ trait Numbers extends NumbersBase:
   trait NumberCompanion[N <: Number[N]]:
     final lazy val zero: N = apply(0)
 
+    final def oneAtPosition(position: Int): N = zero.set(position, 1)
+
     final def apply(digits: Int*): N = fromDigits(digits)
 
     final def apply(string: String): N = fromDigits(fromStringDigits(string))
@@ -157,12 +159,22 @@ trait Numbers extends NumbersBase:
 
       override def toString: String = s"[$from..$to]"
 
+      override def equals(other: Any): Boolean =
+        given CanEqual[N, N] = CanEqual.derived
+        other match
+          case that: Interval => from == that.from && to == that.to
+          case _ => false
+
+      override def hashCode(): Int = Seq(from, to).map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+
       def contains(value: N): Boolean = (from <= value) && (value <= to)
 
-      def intersect(that: Interval): Interval = Interval(
-        from = if this.from < that.from then that.from else this.from,
-        to =   if this.to   > that.to   then that.to   else this.to
-      )
+      def contains(that: Interval): Boolean = (this.from <= that.from) && (that.to <= this.to)
+
+//      def intersect(that: Interval): Option[Interval] =
+//        val from: N = if this.from < that.from then that.from else this.from
+//        val to  : N = if this.to   > that.to   then that.to   else this.to
+//        if from > to then None else Some(Interval(from = from, to = to))
 
   /** Vector from the number system. */
   abstract class VectorNumber(digits: Digits) extends Number[Vector](digits):
@@ -184,13 +196,18 @@ trait Numbers extends NumbersBase:
 
     /** Returns this Vector divided by the specified Int with up to length digits after the point. */
     @scala.annotation.targetName("divide")
-    final def /(n: Int, length: Int): Vector = this.*(BigRational(n).invert, length)
+    final def /(n: Int, length: Int): Vector = this./(BigRational(n), length)
 
     /** Returns this Vector multiplied by the specified [[org.opentorah.numbers.BigRational]]
       * with up to length digits after the point. */
     @scala.annotation.targetName("multiply")
     final def *(that: BigRational, length: Int): Vector =
       Vector.fromRational(this.toRational*that, math.max(this.length, length))
+
+    /** Returns this Vector divided by the specified [[org.opentorah.numbers.BigRational]]
+     * with up to length digits after the point. */
+    @scala.annotation.targetName("divide")
+    final def /(that: BigRational, length: Int): Vector = this.*(that.invert, length)
 
     /** Returns canonical representation of this Vector;
      * Vectors are not canonicalized by default even in the periodic number systems. */

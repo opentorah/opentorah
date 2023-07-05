@@ -52,7 +52,7 @@ and so is the parallax correction for two hundred - forty two minutes.
 [#kh-13-6]
 === Law 6
 Also, if the maslul was three hundred degrees, subtract it from three hundred and sixty - and sixty will remain.
-And you already know that parallax correction for sixty degrees [is] one degree and forty one minutes,
+And you already know that parallax correction for sixty degrees [.add]#is# one degree and forty one minutes,
 and so is the parallax correction for three hundred degrees. And the same way - for every number.
 
 [#kh-13-7]

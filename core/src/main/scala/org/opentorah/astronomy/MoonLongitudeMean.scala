@@ -14,7 +14,6 @@ object MoonLongitudeMean extends Days2Rotation("mlm",
   Days.Month       -> " 22° 6′56″",
   Days.Year        -> "344°26′43″"
 ):
+  val almagestValue = Rotation("13°10′34″58‴33′‴30″‴30‴‴")
 
-    final override val rambamValue = Rotation("13°10′35″1‴48,1")
-
-    final override val almagestValue = Rotation("13°10′34″58‴33,30,30")
+  val rambamValue = Rotation("13°10′35″1‴48′‴1″‴") // TODO ?

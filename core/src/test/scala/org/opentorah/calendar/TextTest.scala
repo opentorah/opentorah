@@ -12,6 +12,11 @@ import org.scalatest.matchers.should.Matchers
   * Tests based on the statements from the text itself.
   */
 class TextTest extends AnyFunSpec, Matchers:
+  describe("Metadata") {
+    it("Seasons should load correctly") {
+      Season.TkufasTishrei.names.hasName("осеннее равноденствие") shouldBe true
+    }
+  }
   describe("Chapter 6") {
     describe("Law 2: Time Units") {
       it("hours") {

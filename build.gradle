@@ -4,11 +4,11 @@ plugins {
   id 'base'
 }
 
+wrapper {
+  distributionType = Wrapper.DistributionType.ALL
+}
+
 idea {
-//  project {
-//    jdkName = '1.6'
-//    languageLevel = '1.5'
-//  }
   module {
     excludeDirs += [
       file('.idea'),
@@ -24,8 +24,4 @@ project.gradle.startParameter.excludedTaskNames.add('compileJava')
 subprojects {
   group = 'org.opentorah'
   version = '0.10.11'
-}
-
-tasks.named('wrapper') {
-  distributionType = Wrapper.DistributionType.ALL
 }

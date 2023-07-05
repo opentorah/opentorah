@@ -32,7 +32,7 @@ jib.container.mainClass = 'org.opentorah.collector.Collector'
 cloudRun.region = 'us-east4'
 cloudRun.serviceAccountKeyProperty ='cloud-run-deploy_alter-rebbe-2'
 
-tasks.register('cloudRunLocalFromLocalStore', org.podval.tools.cloudrun.RunLocalTask)
+tasks.register('cloudRunLocalFromLocalStore', org.podval.tools.cloudrun.CloudRunPlugin.RunLocalTask)
 cloudRunLocalFromLocalStore.additionalOptions = [
   '--volume', '/home/dub/OpenTorah/alter-rebbe.org/:/mnt/store/:Z',
   '--env'   , 'STORE=file:///mnt/store/'

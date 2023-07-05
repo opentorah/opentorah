@@ -11,3 +11,17 @@
 .verse {
     /*direction: rtl;*/
 }
+
+/* TODO enable/disable add/correct/source in JavaScript*/
+/*
+add {
+  color: red;
+}
+*/
+.add::before {
+  content: "[";
+}
+.add::after {
+  content: "]";
+}
+

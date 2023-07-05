@@ -1,0 +1,14 @@
+TODO Kapach and Hazak
+
+// TODO translation of Kapach's introduction: https://mhcny.org/pdf/Introduction%20to%20Mishneh%20Torah.pdf[]
+
+// TODO see p.37-41 for Hazak's list of the versions of Rambam with misprints corrected,
+// and the reason they chose the Kapach version: it being based solely on the Yemenite
+// manuscripts that were not affected by the censorship unlike the Ashkenazic ones
+// and the Frenkel version being combination of various manuscripts and editions
+// (which is funny, since Kapach repeats Askenazic misprints in the Laws of the
+// Sanctification of the Moon)
+
+// Both Chabad follow-ups to Hazak use the same "nusach".
+
+// Quaint: they solicit corrections... by fax :)
