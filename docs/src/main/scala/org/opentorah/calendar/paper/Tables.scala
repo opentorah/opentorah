@@ -1,6 +1,8 @@
 package org.opentorah.calendar.paper
 
 import org.opentorah.astronomy.{Angles, Days2Rotation, MoonAnomalyMean, MoonHeadMean, MoonLongitudeMean, SunApogee, SunLongitudeMean}
+import org.opentorah.metadata.Language
+import org.opentorah.numbers.BigRational
 import Angles.Rotation
 import Rotation.Interval
 import Days2Rotation.Days
@@ -15,6 +17,7 @@ object Tables:
     )
 
   private def printedAndCalculated(days2Rotation: Days2Rotation, calculate: Days => Option[Rotation]): Table[Days] =
+    // TODO the value used for the reconstruction should become the table's title...
     Table[Days](days2Rotation.all)(
       Table.Column("days", _.number),
       Table.Column("printed", days2Rotation.value),
@@ -25,8 +28,16 @@ object Tables:
         .getOrElse(""))
     )
 
-  private def printedAndCalculatedForValue(days2Rotation: Days2Rotation, value: Rotation): Table[Days] =
-    printedAndCalculated(days2Rotation, (days: Days) => Some(days2Rotation.calculate(value, days)))
+  private def printedAndCalculatedForValue(
+    days2Rotation: Days2Rotation,
+    from: Rotation,
+    roundUpTo: Option[Angles.Digit]
+  ): Table[Days] =
+    printedAndCalculated(days2Rotation, (to: Days) => Some(days2Rotation.calculate(
+      from,
+      to.number,
+      roundUpTo.getOrElse(days2Rotation.precision(to)).position
+    )))
 
   private def exactMin(days2Rotation: Days2Rotation): Table[Days] =
     val data: Map[Days, (Interval, Int)] = days2Rotation.exactMin
@@ -59,6 +70,46 @@ object Tables:
       Seq(Days.One, Days.Ten, Days.Month, Days.Hundred, Days.Year, Days.Thousand).map(mkColumn)
     *)
 
+  private def solarYearAndMovement: Table[SunLongitudeMean.Opinion] =
+    def emphasize(opinion: SunLongitudeMean.Opinion, what: AnyRef, isVelocity: Boolean): String =
+      val str: String = what.toString
+      if isVelocity == opinion.isBasedOnVelocity then s"_${str}_" else str
+
+    Table[SunLongitudeMean.Opinion](Seq(
+      SunLongitudeMean.Opinion.Shmuel,
+      SunLongitudeMean.Opinion.RavAda,
+      SunLongitudeMean.Opinion.Almagest,
+      SunLongitudeMean.Opinion.AlBattani.Pirush.FromYearLength,
+      SunLongitudeMean.Opinion.AlBattani.Pirush.FromMovement,
+      SunLongitudeMean.Opinion.AlBattani.Neugebauer,
+      SunLongitudeMean.Opinion.Rambam
+    ))(
+      Table.Column("opinion", _.name),
+      Table.Column("movement in one day", opinion => emphasize(
+        opinion,
+        opinion.movementInOneDay,
+        isVelocity = true
+      )),
+      Table.Column("year length in days", opinion => emphasize(
+        opinion,
+        s"365 1/4 - ${BigRational(365) + BigRational(1,4) - opinion.yearLengthRational}",
+        false
+      )),
+      Table.Column("year length", _.yearLength),
+      Table.Column("reconstructs", opinion => Days.all.filter(opinion.isReconstructable).map(_.number).mkString(" "))
+    )
+
+  private def sunAtCreation: Table[SunLongitudeMean.SunAtCreation] = Table[SunLongitudeMean.SunAtCreation](Seq(
+    SunLongitudeMean.SunAtCreation.Nisan,
+    SunLongitudeMean.SunAtCreation.Tishrei
+  ))(
+    Table.Column("on", _.day.toLanguageString(using Language.English.toSpec)),
+    Table.Column("season", _.season.name),
+    Table.Column("at", _.position),
+    Table.Column("from", _.velocity.from),
+    Table.Column("to", _.velocity.to)
+  )
+
   def main(args: Array[String]): Unit =
     val directory: File = File(if !args.isEmpty then args(0) else "/tmp/xxx/tables/")
     directory.mkdirs
@@ -66,8 +117,13 @@ object Tables:
     def writeTable(days2Rotation: Days2Rotation, suffix: String, table: Table[Days]): Unit =
       table.writeAsciidoc(directory, s"${days2Rotation.name}-$suffix")
 
-    def writePrintedAndCalculated(days2Rotation: Days2Rotation, suffix: String, value: Rotation): Unit =
-      writeTable(days2Rotation, suffix, printedAndCalculatedForValue(days2Rotation, value))
+    def writePrintedAndCalculated(
+      days2Rotation: Days2Rotation,
+      suffix: String,
+      from: Rotation,
+      roundUpTo: Option[Angles.Digit] = None
+    ): Unit =
+      writeTable(days2Rotation, suffix, printedAndCalculatedForValue(days2Rotation, from, roundUpTo))
 
     for days2Rotation: Days2Rotation <- List(SunLongitudeMean, SunApogee, MoonLongitudeMean, MoonHeadMean, MoonAnomalyMean) do
       def write(suffix: String, table: Table[Days]): Unit = writeTable(days2Rotation, suffix, table)
@@ -82,9 +138,14 @@ object Tables:
       write("exact6", exact(exact6Data))
       write("compatibility6", relationship(exact6Data, 6))
 
-    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniPirush", SunLongitudeMean.alBattaniPirushValue)
-    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniNeugebauer", SunLongitudeMean.alBattaniNeugebauerValue)
-    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedRambam", SunLongitudeMean.rambamValue)
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniPirush", SunLongitudeMean.Opinion.AlBattani.Pirush.FromMovement.movementInOneDay)
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedAlBattaniNeugebauer", SunLongitudeMean.Opinion.AlBattani.Neugebauer.movementInOneDay)
+    writePrintedAndCalculated(SunLongitudeMean, "printedAndCalculatedRambam", SunLongitudeMean.Opinion.Rambam.movementInOneDay)
+    solarYearAndMovement.writeAsciidoc(directory, "slm-opinions")
+    sunAtCreation.writeAsciidoc(directory, "slm-at-creation")
+
+    writePrintedAndCalculated(SunApogee, "printedAndCalculatedRambam", SunApogee.rambamValue)
+    writePrintedAndCalculated(SunApogee, "printedAndCalculatedRambam3", SunApogee.rambamValue, Some(Angles.Digit.THIRDS))
 
 //  private def mvaTables(data: Map[Angle, Angle]) = {
 //      def e(a: Angle, v: Angle) = {

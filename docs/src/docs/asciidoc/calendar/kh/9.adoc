@@ -1,0 +1,81 @@
+[#kh-9]
+== Chapter 9
+
+[#kh-9-1]
+=== Law 1
+[.add]#In regard the length of# the solar year:
+there are Jewish sages that say that it is three hundred sixty five days and a quarter of a day,
+which is six hours.
+There are among them that say that it is less than a quoter of a day.
+Likewise, among the scholars of Greece and Persia there is a disagreement about this matter.
+
+[#kh-9-2]
+=== Law 2
+Those that say that it is 365 days and a quarter of a day,
+remainder of each nineteen-year cycle is one hour and four hundred eighty five parts,
+as we said.
+Then, from season to season there is ninety one day and seven and a half hours.
+And once you know one season - in which day and in which hour it is -
+start counting to the second season that is after it, and from the second to the third -
+until the end of the world.
+
+[#kh-9-3]
+=== Law 3
+Season of Nisan is the hour and the part when the sun enters enters into the beginning of the constellation of Aries.
+And season of Tammuz is when the sun is at the start of the constellation of Cancer.
+And the season of Tishrei is when the sun is at the start of the constellation of Libra.
+And the season of Tevet is when the sun is at the start of the constellation of Capricorn.
+And the season of Nisan in the first year of Creation - according to this calculation
+[.add]#= opinion# - preceded the new moon of Nisan by seven days nine hours and
+six hundred and forty two part, in symbols - 7 9 642.
+
+[#kh-9-4]
+=== Law 4
+This is the way to calculate the season.
+First, figure out how many complete cycles [.add]#are there# from the year of the Creation
+till the cycle that you want.
+And take, for each of those cycles, one hour and 485 parts.
+Gather all the parts into hours, and all the hours into days,
+and subtract from the total seven days nine hours and six hundred and forty two parts,
+and what remains - add it to the new moon of Nisan of the first year of the cycle.
+You get in which hour and in which day of the month will be the season of Nisan
+of that first year of that cycle.
+And from it, start counting ninety one day and seven and a half hours
+for each subsequent season.
+
+And if you'd want to know the season of Nisan of the a year
+that is year number so-and-so of the cycle you are in,
+take for all the full cycles an hour and 485 for each cycle,
+and for all complete years that passed in the cycle,
+ten days and twenty one hours and two hundred and four parts for each year,
+and add everything up,
+and subtract from it seven days and nine hours and six hundred and forty two parts.
+And what remains, remove from it lunar months of twenty nine days and twelve hours
+and seven hundred ninety-three parts.
+And remainder less than a lunar month - add it to the new moon of Nisan of that year,
+and you'll know the time of the season of Nisan of that year,
+what day of the month is it and at what hour.
+
+TODO
+
+[#kh-9-5]
+=== Law 5
+TODO
+
+[#kh-9-6]
+=== Law 6
+TODO
+
+[#kh-9-7]
+=== Law 7
+TODO
+
+[#kh-9-8]
+=== Law 8
+TODO
+
+
+
+
+
+

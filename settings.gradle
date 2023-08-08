@@ -17,12 +17,12 @@ pluginManagement {
   }
 }
 
-final String scalaVersion      = '3.3.0'
+final String scalaVersion      = '3.3.1'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.15'
+final String zioVersion        = '2.0.16'
 final String flexmarkVersion   = '0.64.8'
-final String catsVersion       = '2.9.0'
+final String catsVersion       = '2.10.0'
 
 dependencyResolutionManagement {
   repositories {
@@ -43,7 +43,7 @@ dependencyResolutionManagement {
     library('zinc'         , 'org.scala-sbt:zinc_2.13:1.9.3')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.0')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.1')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
@@ -73,11 +73,11 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.7')
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.8')
 
     // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.7')
-    library('logback' , 'ch.qos.logback:logback-classic:1.4.8')
+    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.9')
+    library('logback' , 'ch.qos.logback:logback-classic:1.4.11')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.4')
 
     // Flexmark
@@ -90,7 +90,7 @@ dependencyResolutionManagement {
     library('zmanim', 'com.kosherjava:zmanim:2.5.0')
 
     // Testing
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.16")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.17")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
   }}
 }

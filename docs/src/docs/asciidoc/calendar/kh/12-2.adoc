@@ -1,41 +1,5 @@
-There is a point on the Sun's orbit (and on orbits of the other seven planets) such that when the planet is there it is the highest above Earth.
-This point of the Sun's orbit (and so for other planets, except for the moon) rotates with constant speed.
-Its movement every seventy years is approximately one degree.
-This point is called <<gva-hashemesh>>.
-Its movement in ten days is one and a half seconds, half a second being thirty thirds.
-It follows that its movement in a hundred days is fifteen seconds.
-Its movement in a thousand days is two minutes and thirty seconds.
-Its movement in ten thousand days is twenty-five minutes.
-It also follows that its movement in twenty-nine days is a bit more (TODO!) than four seconds; and its movement in a regular year is fifty-three seconds.
+[#kh-12-2-1]
+include::12-2-1.adoc[]
 
-We already said that the epoch that our calculations start from is beginning of the night of the fifth day that is 3rd of Nisan of the year four thousand nine hundred thirty-eight from the Creation.
-Position of the Sun in its mean movement at the epoch was seven degrees three minutes and thirty-two seconds in the constellation of Ram, in symbols - 7°3′32″.
-Position of the Sun's apogee at the epoch was twenty-six degrees forty-five minutes and eight seconds in the constellation of Twins, in symbols - 26°45′8″.
-
-When you want to know position of the Sun in its mean movement at any time you want, take the number of days from the epoch to the day that you want, and find out its mean movement during those days from the values we mentioned, add all of it to the epoch, adding each kind [.add]#of unit# with its kind, and the result is the position of the Sun in its mean movement on that day.
-
-For example, if we wanted to know Sun's mean position at the beginning of the night of Shabbat whose day is the fourteenth of Tammuz of this year, which is the year of the epoch - we find the number of days from the day of the epoch to the beginning of the day that we want to find Sun's position on to be a hundred days.
-We take its mean movement over a hundred days - which is 98°33′53″ - and add it to the epoch - which is 7°3′32″.
-Result of this calculation: one hundred and five degrees thirty seven minutes and twenty-five seconds.
-In symbols - 105°37′25″.
-So its position in its mean movement at the beginning of this night is in the constellation of Cancer, at fifteen degrees in it, and thirty-seven minutes of the sixteenth degree.
-
-Mean position thus calculated is sometimes exactly at the beginning of the night, sometimes an hour before sunset, and sometimes - an hour after sunset.
-This fact is not important for the Sun in the calculations of the observation [.add]#of the new moon# since we compensate for this approximation when calculating mean Moon.
-
-Do it the same way for whatever time you want whatsoever, even after a thousand years: when you add up all the reminders and add to the epoch, result you get is the mean position.
-And the same you do for the mean Moon and mean of every planet: once you know what is the movement in one day and what is the epoch that we start from, and you sum up its movement in the years and days that you want, and add it to the epoch - you get its position in mean movement.
-
-Do the same for the Sun's apogee: add its movement in those days or years to the epoch, and you get position of the Sun's apogee for the day that you want.
-
-Also, if you want to make a different epoch from which to start, other that the epoch that we start from (which is this year), so that epoch is at the beginning of the year of a known cycle or at the beginning of a hundred-year period - you can do it.
-And if you want the epoch from which you start to be in the years that already passed before this epoch or many years after it - the way is known.
-
-What is this way?
-You already know movement of the Sun in a regular year, and its movement in twenty-nine days, and its movement in one day.
-And it is known that year whose months are full is longer than the regular year by one day, and the year whose months are lacking is shorter than the regular year by one day.
-And the leap year: if its months are regular, it will be longer than the regular year by thirty days, and if its months are full, it will be longer than the regular one by thirty-one day, and if its months are lacking, it will be longer than the regular one by twenty-nine days.
-Once you know all those facts, calculate Sun's mean movement for the years and days that you want, and add to the epoch that we made, and you'll get its mean position for the day that you want from the coming years - and that you make into an epoch.
-Or subtract mean [.add]#movement# that you calculated from the epoch that we made, and you get an epoch for the day that you want from the years that passed, and make that mean [.add]#position# an epoch.
-And the same you shall do for the mean Moon and the rest of the planets if [.add]#their movements# will be known to you.
-And it should be clear to you from the idea of our words that the same way you can find out mean Sun for any day you want from the coming days, you can calculate its mean for any day you want from the days that passed.
+[#kh-12-2-2]
+include::12-2-2.adoc[]

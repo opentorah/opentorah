@@ -1,0 +1,9 @@
+There is a point on the Sun's orbit (and on orbits of the other seven planets) such that when the planet is there it is the highest above Earth.
+This point of the Sun's orbit (and so for other planets, except for the moon) rotates with constant speed.
+Its movement every seventy years is approximately one degree.
+This point is called <<gva-hashemesh>>.
+Its movement in ten days is one and a half seconds, half a second being thirty thirds.
+It follows that its movement in a hundred days is fifteen seconds.
+Its movement in a thousand days is two minutes and thirty seconds.
+Its movement in ten thousand days is twenty-five minutes.
+It also follows that its movement in twenty-nine days is a bit more (TODO!) than four seconds; and its movement in a regular year is fifty-three seconds.
