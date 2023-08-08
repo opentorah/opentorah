@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: Scala XML 2.2.0 - finally!
 - docs: minor calendar paper changes
 - docs: solar theory
+- docs: cleanup of the exact value calculations
+- docs: using [custom styles](https://docs.asciidoctor.org/asciidoc/latest/text/custom-inline-styles/) for the critical apparatus (add/correct/source)
 
 ## [0.10.10] - 2023-05-31
 - cleanup: Node

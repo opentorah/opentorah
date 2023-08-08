@@ -9,6 +9,8 @@ year begins. Explanation of this commandment is in these chapters.
 
 include::1.adoc[]
 
+include::9.adoc[]
+
 include::12.adoc[]
 
 include::13.adoc[]

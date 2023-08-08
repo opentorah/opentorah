@@ -2,6 +2,7 @@
 <Zodiac>
   <names>
     <name lang="en" n="Aries"/>
+    <!-- TODO Latin and English   -->
     <!--<name lang="en" n="Ram"/>-->
     <name lang="en" transliterated="yes" n="Tele"/>
     <name lang="he" n="טלה"/>

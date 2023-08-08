@@ -49,9 +49,9 @@ abstract class Days2Rotation(val name: String, values: (Days, String)*) extends 
   private def smallestDefined: Days = if isOneDefined then Days.One else Days.Ten
   final def all: Seq[Days] = if isOneDefined then Days.all else Days.all.tail
 
-  protected def precision(days: Days): Angles.Digit = Digit.SECONDS
+  def precision(days: Days): Angles.Digit = Digit.SECONDS
 
-  private def calculate(from: Rotation, multiplier: Int, precision: Int): Rotation =
+  def calculate(from: Rotation, multiplier: Int, precision: Int): Rotation =
     (from * multiplier).canonical.roundTo(precision)
 
   private def calculate(from: Rotation, to: Days, multiplier: Int): Rotation =
@@ -60,6 +60,8 @@ abstract class Days2Rotation(val name: String, values: (Days, String)*) extends 
   final def calculate(from: Rotation, to: Days): Rotation =
     calculate(from, to, to.number)
 
+  final def isReconstructable(from: Rotation, days: Days): Boolean = calculate(from, days) == value(days)
+  
   final def calculate(to: Days): Option[Rotation] =
     val from: Days = smallestDefined
     if (to.number == from.number) || (to.number % from.number != 0) then None else
@@ -106,7 +108,7 @@ abstract class Days2Rotation(val name: String, values: (Days, String)*) extends 
     value = value(days)
   )
 
-  private final class ExactRotation(
+  final class ExactRotation(
     days: Int,
     precision: Int,
     value: Rotation
@@ -124,7 +126,9 @@ abstract class Days2Rotation(val name: String, values: (Days, String)*) extends 
       val decrease: Boolean = reconstruct(start) > value
 
       @tailrec def findInsideAt(current: Rotation): Option[Rotation] =
-        val comparison: Int = reconstruct(current).compare(value)
+        val reconstructed: Rotation = reconstruct(current)
+        val comparison: Int = reconstructed.compare(value)
+//        println(s"days=$days precision=$precision value=$value decrease=$decrease current=$current comparison=$comparison")
         if comparison == 0 then Some(current) else
           val overshot: Boolean = if decrease then comparison < 0 else comparison > 0
           if overshot then None else
@@ -132,7 +136,9 @@ abstract class Days2Rotation(val name: String, values: (Days, String)*) extends 
             val next: Rotation = current + (if decrease then -step else step)
             if next <= Rotation.zero then None else findInsideAt(next)
 
-      findInsideAt(start) match
+      val found: Option[Rotation] = findInsideAt(start)
+//      println(s"found($start)=$found")
+      found match
         case Some(result) => Some((Interval(result, result), length))
         case None => if length >= Days2Rotation.findInsideMaxLength then None else findInside(length + 1)
 

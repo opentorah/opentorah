@@ -20,7 +20,7 @@ final class BigRational private(val numerator: BigInt, val denominator: BigInt)
   require(denominator > 0)
   require(numerator.gcd(denominator) == 1)
 
-  override def toString: String = s"$numerator/$denominator"
+  override def toString: String = if isZero then "0" else s"$numerator/$denominator"
 
   override def compare(that: BigRational): Int = (this - that).signum
 

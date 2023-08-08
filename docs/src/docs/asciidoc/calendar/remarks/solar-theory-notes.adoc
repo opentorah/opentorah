@@ -1,25 +1,14 @@
 [#sun-todo]
 TODO
 
-* convert each year length mentioned in the fixed calendar to angular speed and compare with the speed given by Rambam
-* what year length does value for mean anomaly velocity given by Moznaim correspond?
 * figure out from the text directions of Sun's movements and what are the position angles from (look at the parallax correction stuff: subtract mean apogee from the mean Sun...).
 * diagrams for the correction in Moznaim's Rambam.
-* Rambam's statement about inexactness: results are the same with the table as with the exact value?
 * Math.findZero(): Finish and test the code; use two separate lengths (precisions)?
 * make possible calculation of the sun's position for a Moment, not just a Day (at least for the sun).
 * calculate true seasons in SeasonsAstronomical; KH 10:7 says that real vernal equinox is approximately two days before the mean one; add a test.
 * SeasonsAstronomical.seasonForYear: should this always be Nisan?
 * Moznaim 9:4 footnote 7 there - about Pesach.
-
-[#sun-creation]
-=== Sun at Creation (TODO)
-
-According to Moznaim 9:3 footnote 5: the sun was created in the first hour of the fourth day of creation (if in Nissan); this is the first vernal equinox; the autumnal equinox half a year later took place on Wednesday, three hours after daybreak, 1 day and 23 hours before the conjunction of Tishrei.
-(Birchat Hachamo is on a different opinion.)
-Does it let us get more precise values of Sun's angular velocities?
-
-[#interesting]
+* Rambam's statement about inexactness: results are the same with the table as with the exact value?
 
 От Корица: интересный линк на тему благословения на солнце и в конце обсуждение концепции Рамбама в астрономии - https://www.yeshiva.org.il/midrash/11088[]
 
