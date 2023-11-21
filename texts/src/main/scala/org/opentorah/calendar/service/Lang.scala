@@ -11,14 +11,11 @@ object Lang:
   val codec: HttpCodec[HttpCodecType.Query, Language.Spec] = HttpCodec
     .query(queryParameterName)
     .optional
-    .transform[Language.Spec](
-      get,
-      (value: Language.Spec) => Some(value.language.get.toString)
-    )
+    .transform[Language.Spec](fromParameter)((value: Language.Spec) => Some(value.language.get.toString))
 
-  def get(request: Request): Language.Spec =
-    get(ServiceApp.queryParameter(request, queryParameterName))
+  def fromRequest(request: Request): Language.Spec =
+    fromParameter(ServiceApp.queryParameter(request, queryParameterName))
 
-  def get(parameter: Option[String]): Language.Spec =
+  def fromParameter(parameter: Option[String]): Language.Spec =
     parameter.map(Language.getForName).getOrElse(Language.English).toSpec
     

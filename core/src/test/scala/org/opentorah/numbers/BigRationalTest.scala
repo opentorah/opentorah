@@ -93,7 +93,7 @@ final class BigRationalTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks,
     )
 
   "toString()" should "be correct" in:
-    zero.toString shouldBe "0/1"
+    zero.toString shouldBe "0"
     oneHalf.toString shouldBe "1/2"
     minusThreeHalfs.toString shouldBe "-3/2"
 

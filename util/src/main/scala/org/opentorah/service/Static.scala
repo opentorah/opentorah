@@ -9,6 +9,7 @@ import java.time.{Instant, ZoneId, ZonedDateTime}
 object Static:
   // Inspired by https://github.com/http4s/http4s/blob/main/core/jvm/src/main/scala/org/http4s/StaticFile.scala
 
+  // TODO use Handler.fromResource()?!
   def resource(
     name: String,
     request: Option[Request] = None,

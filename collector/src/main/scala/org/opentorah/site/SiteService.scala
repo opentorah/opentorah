@@ -3,11 +3,11 @@ package org.opentorah.site
 import org.opentorah.service.{ServiceApp, Static}
 import ServiceApp.given
 import org.opentorah.files.GoogleCloudStorageSynchronizer
-import org.opentorah.store.{Path, Pure, Store}
-import org.opentorah.util.{Effects, Files, Strings}
-import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser}
+import org.opentorah.util.{Effects, Files}
+import org.opentorah.xml.{Element, From, Parser}
 import org.slf4j.Logger
-import zio.http.{->, /, App, Body, Charsets, Header, Headers, Http, HttpApp, MediaType, Method, Request, Response, Root}
+import zio.http.{Body, Charsets, handler, Header, Headers, HttpApp, MediaType, Method, Request, Response, Routes, Status}
+import zio.http.codec.PathCodec.empty
 import zio.{Chunk, Task, ZIO}
 import java.io.File
 import java.net.URL
@@ -65,9 +65,9 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
       result
     else getParameter("STORE", s"http://$bucketName/") // TODO switch to https
 
-    serve(routes(siteUrl).withDefaultErrorResponse)
+    serve(routes(siteUrl))
 
-  private def routes(siteUrl: String): HttpApp[Any, Throwable] =
+  private def routes(siteUrl: String): HttpApp[Any] =
     var cachedSite: Option[S] = None
     def getSite: Task[S] = cachedSite.map(ZIO.succeed(_)).getOrElse(readSite(siteUrl).map(result =>
       cachedSite = Some(result)
@@ -107,7 +107,9 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), ServiceApp:
         )
       ))
 
-    Http.collectZIO[Request] {
-      case request@Method.GET -> Root / "reset-cached-site" => reset(request)
-      case request => timed(get)(request)
-    }
+    Routes(
+      Method.GET / "reset-cached-site" -> handler { (request: Request) => reset(request) },
+      Method.GET / empty -> handler { (request: Request) => timed(get)(request) }
+    ).handleErrorCause { cause => // TODO push this up
+      Response(Status.InternalServerError, body = Body.fromString(cause.prettyPrint))
+    }.toHttpApp

@@ -8,9 +8,9 @@ pluginManagement {
     id 'com.github.ben-manes.versions' version '0.44.0'
     id 'com.github.maiflai.scalatest'  version '0.32'
     id 'org.podval.tools.scalajs'      version '0.4.9'
-    id 'com.google.cloud.tools.jib'    version '3.3.2'
+    id 'com.google.cloud.tools.jib'    version '3.4.0'
     id 'org.podval.tools.cloudrun'     version '0.4.0'
-    id 'com.gradle.plugin-publish'     version '1.1.0'
+    id 'com.gradle.plugin-publish'     version '1.2.1'
     id 'org.asciidoctor.jvm.gems'      version '4.0.0-alpha.1'
     id 'org.asciidoctor.jvm.convert'   version '4.0.0-alpha.1'
     id 'org.asciidoctor.jvm.pdf'       version '4.0.0-alpha.1'
@@ -20,7 +20,7 @@ pluginManagement {
 final String scalaVersion      = '3.3.1'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.16'
+final String zioVersion        = '2.0.19'
 final String flexmarkVersion   = '0.64.8'
 final String catsVersion       = '2.10.0'
 
@@ -40,25 +40,25 @@ dependencyResolutionManagement {
     // Scala
     library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
     library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.2.0")
-    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.9.3')
+    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.9.5')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.1')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.2')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
-    library('saxon12'      , 'net.sf.saxon:Saxon-HE:12.3')
+    library('saxon12'      , 'net.sf.saxon:Saxon-HE:12.4')
     library('saxon6'       , 'saxon:saxon:6.5.3')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.23.0') // TODO 2.25.0
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.30.1')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.0-RC2")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.0-RC4")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
