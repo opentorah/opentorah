@@ -2,7 +2,7 @@ package org.opentorah.service
 
 import org.opentorah.util.{Files, Logging}
 import org.slf4j.{Logger, LoggerFactory}
-import zio.http.{App, Body, Header, HttpApp, Method, Path, Request, Response, Server, Status}
+import zio.http.{Body, HttpApp, Method, Path, Request, Response, Server, Status}
 import zio.{ZIO, ZLayer}
 import ServiceApp.given
 
@@ -42,7 +42,7 @@ trait ServiceApp extends zio.ZIOAppDefault:
 
   protected def run(args: zio.Chunk[String]): ZIO[Any, Throwable, Any]
 
-  final protected def serve(app: App[Any]): ZIO[Any, Throwable, Nothing] =
+  final protected def serve(app: HttpApp[Any]): ZIO[Any, Throwable, Nothing] =
     val port: Int = getParameter("PORT", 8080.toString).toInt
     logger.warning(s"serviceName=$serviceName; port=$port") // TODO more information
 
@@ -110,7 +110,7 @@ object ServiceApp:
   given CanEqual[Path  , Path  ] = CanEqual.derived
   given CanEqual[Status, Status] = CanEqual.derived
 
-  def queryParameter(request: Request, name: String): Option[String] = request.url.queryParams.get(name).map(_.last)
+  def queryParameter(request: Request, name: String): Option[String] = request.url.queryParams.get(name)
 
   private def formatDuration(duration: zio.Duration): String =
     val millis: Long = duration.toMillis

@@ -15,16 +15,13 @@ object Location:
   val codec: HttpCodec[HttpCodecType.Query, Location] = HttpCodec
     .query(queryParameterName)
     .optional
-    .transform[Location](
-      get,
-      _.parameter
-    )
+    .transform[Location](fromParameter)(_.parameter)
 
-  def get(request: Request): Location =
-    get(ServiceApp.queryParameter(request, queryParameterName))
+  def fromRequest(request: Request): Location =
+    fromParameter(ServiceApp.queryParameter(request, queryParameterName))
 
-  def get(parameter: Option[String]): Location =
-    get(parameter.forall(_ == "true"))
+  def fromParameter(parameter: Option[String]): Location =
+    fromBoolean(parameter.forall(_ == "true"))
 
-  def get(inHolyLand: Boolean): Location =
+  def fromBoolean(inHolyLand: Boolean): Location =
     if inHolyLand then Location.HolyLand else Location.Diaspora
