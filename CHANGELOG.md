@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.11] - 2023-
+## [0.10.12] - 2023-
+- chore: latest ScalaJS plugin
+- chore: latest Gradle
+
+## [0.10.11] - 2023-12-11
 - cleanup: *Dependency* and friends
 - chore: minor dependency updates
 - chore: Scala XML 2.2.0 - finally!
