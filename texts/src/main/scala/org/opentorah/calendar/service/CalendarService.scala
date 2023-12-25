@@ -3,14 +3,14 @@ package org.opentorah.calendar.service
 import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.roman.Gregorian
-//import org.opentorah.metadata.Language
-import org.opentorah.service.{ServiceApp, Static}
-import ServiceApp.given
+import org.opentorah.gcp.{GCP, GCPLogger}
+import org.opentorah.metadata.Language
+import org.opentorah.util.Logging
+import org.slf4j.LoggerFactory
 import zio.http.codec.PathCodec
 import zio.http.codec.PathCodec.empty
-//import zio.http.endpoint.{Endpoint, EndpointMiddleware}
-import zio.http.{Body, Handler, handler, Header, Headers, MediaType, Method, Request, Response, Routes, string}
-import zio.ZIO
+import zio.http.{Body, Handler, handler, Header, Headers, HttpApp, MediaType, Method, Request, Response, Routes, Server, Status, string}
+import zio.{ZIO, ZLayer}
 
 /*
   There is currently no need for the polished, public UI.
@@ -29,12 +29,42 @@ import zio.ZIO
   - communicate selective applicability of Purim/Shushan Purim readings;
   - add Nassi, Tachanun, Maariv after Shabbos...
  */
-object CalendarService extends ServiceApp:
-  override protected def projectId: String = "???"
+object CalendarService extends zio.ZIOAppDefault:
+  private val serviceName: Option[String] = GCP.getServiceName
 
-  private val staticResourceExtensions: Seq[String] = Seq(".ico", ".css", ".js")
+  Logging.configureLogBack(useLogStash = serviceName.isDefined)
 
-  private def routes = Routes(
+  private lazy val logger: GCPLogger = GCPLogger("???", LoggerFactory.getLogger(this.getClass))
+
+  private def getParameter(name: String, defaultValue: String): String =
+    def result(value: String, message: String): String =
+      logger.info(message)
+      value
+
+    scala.util.Properties.envOrNone(name).map((value: String) =>
+      result(value, s"Value    for '$name' in the environment; using it     : '$value'")
+    ).getOrElse(
+      result(defaultValue, s"No value for '$name' in the environment; using default: '$defaultValue'")
+    )
+
+  final override def run: ZIO[Environment, Any, Any] = //  ZIO[Any, Throwable, Nothing]
+    val port: Int = getParameter("PORT", 8080.toString).toInt
+    logger.warning(s"serviceName=$serviceName; port=$port") // TODO more information
+
+    // Note: To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1.
+    val config: Server.Config = Server.Config.default.port(port)
+
+    val app: HttpApp[Any] = routes.sandbox.toHttpApp
+
+    Server.serve(app).provide(
+      Server.live,
+      ZLayer.succeed(config)
+    )
+
+  private def routes: Routes[Any, Throwable] = Routes(
+    Method.GET / "favicon.ico" -> Handler.fromResource("favicon.ico"),
+    Method.GET / "style.css"   -> Handler.fromResource("style.css"),
+
     Method.GET / empty ->
       handler { (request: Request) =>
         renderHtml(Renderer.renderRoot(Location.fromRequest(request), Lang.fromRequest(request)))
@@ -42,111 +72,34 @@ object CalendarService extends ServiceApp:
 
     Method.GET / string("calendarStr") ->
       handler { (calendarStr: String, request: Request) =>
-        renderHtml(Renderer(CalendarService.getCalendar(calendarStr), Location.fromRequest(request), Lang.fromRequest(request)).renderLanding)
+        renderHtml(calendarStr, request, _.renderLanding)
       },
 
     Method.GET / string("calendarStr") / string("year") ->
       handler { (calendarStr: String, year: String, request: Request) =>
-        val calendar: Calendar = CalendarService.getCalendar(calendarStr)
-        renderHtml(Renderer(calendar, Location.fromRequest(request), Lang.fromRequest(request)).renderYear(year))
+        renderHtml(calendarStr, request, _.renderYear(year))
       },
 
     Method.GET / string("calendarStr") / string("year") / string("month") ->
       handler { (calendarStr: String, year: String, month: String, request: Request) =>
-        val calendar: Calendar = CalendarService.getCalendar(calendarStr)
-        renderHtml(Renderer(calendar, Location.fromRequest(request), Lang.fromRequest(request)).renderMonth(year, month))
+        renderHtml(calendarStr, request, _.renderMonth(year, month))
       },
 
     Method.GET / string("calendarStr") / string("year") / string("month") / string("day") ->
       handler { (calendarStr: String, year: String, month: String, day: String, request: Request) =>
-        val calendar: Calendar = CalendarService.getCalendar(calendarStr)
-        renderHtml(Renderer(calendar, Location.fromRequest(request), Lang.fromRequest(request)).renderDay(year, month, day))
-      },
-
-    // TODO
-//    Method.GET ->
-//      handler { (request: Request) =>
-//        val path = request.path
-//        if staticResourceExtensions.exists(path.segments.last.endsWith)
-//        then ServiceApp.orNotFound(path.toString, Static.resource("/" + path, Some(request)))
-//        else Handler.notFound
-//      }
+        renderHtml(calendarStr, request, _.renderDay(year, month, day))
+      }
   )
 
-// TODO NG
-//  private val rootEndpoint = Endpoint
-//    .get(HttpCodec.empty)
-//    .query(Location.codec)
-//    .query(Lang.codec)
-//    .out[String]
-//
-//  private val calendarEndpoint = Endpoint
-//    .get(CalendarService.calendarCodec)
-//    .query(Location.codec)
-//    .query(Lang.codec)
-//    .out[String]
-//
-//  private val landingEndpoint =
-//    calendarEndpoint
-//
-//  private val yearCodec : PathCodec[String] = HttpCodec.string("year" )
-//  private val monthCodec: PathCodec[String] = HttpCodec.string("month")
-//  private val dayCodec  : PathCodec[String] = HttpCodec.string("day"  )
-//
-//  private val yearEndpoint =
-//    calendarEndpoint.path(yearCodec)
-//
-//  private val monthEndpoint =
-//    calendarEndpoint.path(yearCodec / monthCodec)
-//
-//  private val dayEndpoint =
-//    calendarEndpoint.path(yearCodec / monthCodec / dayCodec)
-//
-//  private val rootRoute: Route[Any, Nothing] = rootEndpoint.implement {
-//    case (location: Location, language: Language.Spec) =>
-//      ZIO.succeed(Renderer.renderRoot(location, language))
-//  }
-//
-//  private val landingRoute = landingEndpoint.implement {
-//    case (calendar: Calendar, location: Location, language: Language.Spec) =>
-//      ZIO.succeed(Renderer(calendar, location, language).renderLanding)
-//  }
-//
-//  private val yearRoute = yearEndpoint.implement {
-//    case (calendar: Calendar, location: Location, language: Language.Spec, year: String) =>
-//      ZIO.succeed(Renderer(calendar, location, language).renderYear(year))
-//  }
-//
-//  private val monthRoute = {
-//    case (calendar: Calendar, location: Location, language: Language.Spec, year: String, month: String) =>
-//      ZIO.succeed(Renderer(calendar, location, language).renderMonth(year, month))
-//  }
-//
-//  private val dayRoute = {
-//    case (calendar: Calendar, location: Location, language: Language.Spec, year: String, month: String, day: String) =>
-//      ZIO.succeed(Renderer(calendar, location, language).renderDay(year, month, day))
-//  }
-//
-//  private val routesNg =
-//    rootRoute ++ landingRoute ++ yearRoute ++ monthRoute ++ dayRoute
-
-  override protected def run(args: zio.Chunk[String]): ZIO[Any, Throwable, Any] = serve(
-    routes.toHttpApp
-//    routesNg.toApp
-  )
+  private def renderHtml(calendarStr: String, request: Request, render: Renderer => String): zio.UIO[Response] =
+    val calendar: Calendar = Seq(Jewish, Gregorian)
+      .find(_.name == calendarStr)
+      .getOrElse(throw IllegalArgumentException(s"Unrecognized calendar $calendarStr"))
+    val location: Location = Location.fromRequest(request)
+    val lang: Language.Spec = Lang.fromRequest(request)
+    renderHtml(render(Renderer(calendar, location, lang)))
 
   private def renderHtml(content: String): zio.UIO[Response] = ZIO.succeed(Response(
     headers = Headers(Header.ContentType(MediaType.text.html)), // TODO UTF-8?
     body = Body.fromString(content)
   ))
-
-//  private def calendarCodec: HttpCodec[HttpCodecType.Path, Calendar] = HttpCodec.string("calendar").transform[Calendar](
-//    getCalendar,
-//    _.name
-//  )
-
-  private def getCalendar(kindStr: String): Calendar = Seq(Jewish, Gregorian)
-    .find(_.name == kindStr)
-    .getOrElse(throw IllegalArgumentException(s"Unrecognized kind $kindStr"))
-
-//  private def getYear(calendar: Calendar, yearStr: String): calendar.Year = calendar.Year(yearStr.toInt)

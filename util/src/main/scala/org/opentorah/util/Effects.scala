@@ -27,6 +27,12 @@ object Effects:
   // this seems to be no longer necessary.
   // TODO how am I supposed to do unsafeRun?
   // The following is from https://www.reddit.com/r/scala/comments/vjrvux/zio_20_released/
+  // from ZIO Test documentation:
+  //Unsafe.unsafe { implicit unsafe =>
+  //  Runtime.default.unsafe.run(
+  //    Random.nextIntBounded(10)
+  //  ).getOrThrowFiberFailure()
+  //}
   implicit class RuntimeExtension(thiz: Runtime[Any]) extends AnyVal:
     def unsafeRun[E, A](prog: zio.IO[E, A]): A =
       zio.Unsafe.unsafe(implicit _ => thiz.unsafe.run(prog).getOrThrowFiberFailure())

@@ -1,8 +1,8 @@
-package org.opentorah.service
+package org.opentorah.gcp
 
 import com.google.auth.oauth2.ServiceAccountCredentials
 
-object Credentials:
+object GCPCredentials:
   def fromString(serviceAccountKey: String): ServiceAccountCredentials =
     ServiceAccountCredentials.fromStream(org.opentorah.util.Strings.string2stream(serviceAccountKey))
 
