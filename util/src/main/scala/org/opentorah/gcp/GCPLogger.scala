@@ -1,4 +1,4 @@
-package org.opentorah.service
+package org.opentorah.gcp
 
 import net.logstash.logback.argument.{StructuredArgument, StructuredArguments}
 import zio.http.Request

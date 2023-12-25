@@ -1,6 +1,6 @@
 package org.opentorah.calendar.service
 
-import org.opentorah.service.ServiceApp
+import org.opentorah.gcp.GCP
 import zio.http.Request
 import zio.http.codec.{HttpCodec, HttpCodecType}
 
@@ -18,7 +18,7 @@ object Location:
     .transform[Location](fromParameter)(_.parameter)
 
   def fromRequest(request: Request): Location =
-    fromParameter(ServiceApp.queryParameter(request, queryParameterName))
+    fromParameter(request.url.queryParams.get(queryParameterName))
 
   def fromParameter(parameter: Option[String]): Location =
     fromBoolean(parameter.forall(_ == "true"))

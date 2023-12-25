@@ -1,11 +1,11 @@
-package org.opentorah.files
+package org.opentorah.gcp
 
 import com.google.api.gax.paging.Page
 import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions}
 import com.google.common.hash.Hashing
-import org.opentorah.service.Credentials
+import org.opentorah.gcp.GCPCredentials
 import org.opentorah.util.{Files, Strings}
 import org.slf4j.{Logger, LoggerFactory}
 import java.io.File
@@ -29,7 +29,7 @@ final class GoogleCloudStorageSynchronizer(
   private def log(message: String): Unit = logger.info(message)
 
   private val storage: Storage = StorageOptions.newBuilder()
-    .setCredentials(Credentials.fromString(serviceAccountKey))
+    .setCredentials(GCPCredentials.fromString(serviceAccountKey))
     .build()
     .getService
 

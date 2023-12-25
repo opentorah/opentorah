@@ -20,7 +20,7 @@ pluginManagement {
 final String scalaVersion      = '3.3.1'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.19'
+final String zioVersion        = '2.0.20'
 final String flexmarkVersion   = '0.64.8'
 final String catsVersion       = '2.10.0'
 
@@ -77,7 +77,7 @@ dependencyResolutionManagement {
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.9')
-    library('logback' , 'ch.qos.logback:logback-classic:1.4.11')
+    library('logback' , 'ch.qos.logback:logback-classic:1.4.14')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.4')
 
     // Flexmark

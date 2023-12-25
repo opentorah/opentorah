@@ -29,8 +29,8 @@ object Gregorian extends Roman:
   // TODO move into Gregorian.MomentCompanion
   def fromLocalDateTime(value: LocalDateTime): Moment = Gregorian
     .Year(value.getYear)
-    .month(value.getMonthValue-1)
-    .day(value.getDayOfMonth-1)
+    .month(value.getMonthValue)
+    .day(value.getDayOfMonth)
     .toMoment
     .hours(value.getHour)
     .minutes(value.getMinute)
