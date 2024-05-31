@@ -7,22 +7,23 @@ pluginManagement {
   plugins {
     id 'com.github.ben-manes.versions' version '0.44.0'
     id 'com.github.maiflai.scalatest'  version '0.32'
-    id 'org.podval.tools.scalajs'      version '0.4.10'
-    id 'com.google.cloud.tools.jib'    version '3.4.0'
+    id 'org.podval.tools.scalajs'      version '0.4.11'
+    id 'com.google.cloud.tools.jib'    version '3.4.3'
     id 'org.podval.tools.cloudrun'     version '0.4.0'
     id 'com.gradle.plugin-publish'     version '1.2.1'
+    // TODO upgrade to '4.0.2' or later and make it work
     id 'org.asciidoctor.jvm.gems'      version '4.0.0-alpha.1'
     id 'org.asciidoctor.jvm.convert'   version '4.0.0-alpha.1'
     id 'org.asciidoctor.jvm.pdf'       version '4.0.0-alpha.1'
   }
 }
 
-final String scalaVersion      = '3.3.1'
+final String scalaVersion      = '3.4.2'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.0.20'
+final String zioVersion        = '2.1.1'
 final String flexmarkVersion   = '0.64.8'
-final String catsVersion       = '2.10.0'
+final String catsVersion       = '2.12.0'
 
 dependencyResolutionManagement {
   repositories {
@@ -39,11 +40,11 @@ dependencyResolutionManagement {
   versionCatalogs {libs {
     // Scala
     library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
-    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.2.0")
-    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.9.5')
+    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.3.0")
+    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.10.0')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:5.2.2')
+    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:6.0.4')
     library('jing'         , 'org.relaxng:jing:20220510')
     bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
@@ -52,19 +53,19 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.30.1')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.39.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.0-RC4")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.0-RC8")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
     library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion")
     library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:$catsVersion")
-    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.2.0")
+    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.3.0")
 
     // Paiges
     library('paiges'       , "org.typelevel:paiges-core_$scalaVersionMajor:0.4.3")
@@ -76,8 +77,8 @@ dependencyResolutionManagement {
     library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.8')
 
     // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.9')
-    library('logback' , 'ch.qos.logback:logback-classic:1.4.14')
+    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.13')
+    library('logback' , 'ch.qos.logback:logback-classic:1.5.6')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:7.4')
 
     // Flexmark
@@ -90,8 +91,8 @@ dependencyResolutionManagement {
     library('zmanim', 'com.kosherjava:zmanim:2.5.0')
 
     // Testing
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.17")
-    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.17.0")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.18")
+    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.18.0")
   }}
 }
 

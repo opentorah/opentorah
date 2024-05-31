@@ -6,10 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.12] - 2023-
+## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin
-- chore: latest Gradle
 - cleanup: dissolved ServiceApp
+- feature: Julian calendar served
+- chore: dependency updates
+- chore: Scala default versions bumped
+- there is no org.gradle.api.internal.artifacts.dependencies.DefaultSelfResolvingDependency in Gradle 8.7
+- chore: Gradle 8.8-rc-2
 
 ## [0.10.11] - 2023-12-11
 - cleanup: *Dependency* and friends

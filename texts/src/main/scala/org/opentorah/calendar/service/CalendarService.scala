@@ -51,10 +51,8 @@ object CalendarService extends zio.ZIOAppDefault:
 
     // Note: To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1.
     val config: Server.Config = Server.Config.default.port(port)
-
-    val app: HttpApp[Any] = routes.sandbox.toHttpApp
-
-    Server.serve(app).provide(
+    
+    Server.serve(routes.sandbox).provide(
       Server.live,
       ZLayer.succeed(config)
     )

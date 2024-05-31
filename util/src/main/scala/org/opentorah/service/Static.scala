@@ -2,6 +2,7 @@ package org.opentorah.service
 
 import org.opentorah.util.{Effects, Files}
 import zio.http.{Body, Header, Headers, MediaType, Request, Response, Status}
+import zio.schema.codec.JsonCodec.zioJsonBinaryCodec
 import zio.ZIO
 import java.time.{Instant, ZoneId, ZonedDateTime}
 

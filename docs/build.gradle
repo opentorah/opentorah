@@ -82,6 +82,10 @@ asciidoctor {
   }
 
   asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
+//    version = '2.5.13'
+//    jrubyVersion = '9.4.7.0'
+//    modules.pdf.version '2.3.15'
+
     modules.pdf.version '2.3.4'
     // modules.epub.version '???'
 

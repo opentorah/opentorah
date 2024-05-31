@@ -10,7 +10,7 @@ final class Resolver(catalogFile: File, logger: Logger) extends URIResolver, Ent
 
   logger.info(s"Resolver(catalogFile = $catalogFile)")
 
-  private val parentResolver: org.xmlresolver.Resolver =
+  private val parentResolver: org.xmlresolver.XMLResolver =
     val configuration: org.xmlresolver.XMLResolverConfiguration = org.xmlresolver.XMLResolverConfiguration()
 
     configuration.setFeature[java.util.List[String]](org.xmlresolver.ResolverFeature.CATALOG_FILES,
@@ -22,10 +22,10 @@ final class Resolver(catalogFile: File, logger: Logger) extends URIResolver, Ent
     // To enable validation:
     //configuration.setFeature[java.lang.String](org.xmlresolver.ResolverFeature.CATALOG_LOADER_CLASS, "org.xmlresolver.loaders.ValidatingXmlLoader")
 
-    org.xmlresolver.Resolver(configuration)
+    org.xmlresolver.XMLResolver(configuration)
 
   override def resolve(href: String, base: String): Source = resolve[Source](
-    call = _.resolve(href, base),
+    call = _.getURIResolver.resolve(href, base),
     parameters = s"Resolver.resolve(href=$href, base=$base)",
     id = _.getSystemId,
     // `file:`-based URIs are not resolved: calling parser will arrive at the same result.
@@ -33,14 +33,14 @@ final class Resolver(catalogFile: File, logger: Logger) extends URIResolver, Ent
   )
 
   override def resolveEntity(publicId: String, systemId: String): InputSource = resolve[InputSource](
-    call = _.resolveEntity(publicId, systemId),
+    call = _.getEntityResolver.resolveEntity(publicId, systemId),
     parameters = s"Resolver.resolveEntity(publicId=$publicId, systemId=$systemId)",
     id = _.getSystemId,
     ignoreUnresolved = systemId.startsWith("file:")
   )
 
   private def resolve[R](
-    call: org.xmlresolver.Resolver => R,
+    call: org.xmlresolver.XMLResolver => R,
     parameters: String,
     id: R => String,
     ignoreUnresolved: Boolean

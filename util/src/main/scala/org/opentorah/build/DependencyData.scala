@@ -31,7 +31,6 @@ object DependencyData:
         override def classifier: Option[String] = None
         override def extension: Option[String] = Some("jar")
       )
-    case _: org.gradle.api.internal.artifacts.dependencies.DefaultSelfResolvingDependency => None
     case _ => None
 
   def fromFile(file: File): Option[DependencyData] =
