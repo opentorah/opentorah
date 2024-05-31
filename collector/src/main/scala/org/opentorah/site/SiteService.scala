@@ -7,6 +7,7 @@ import org.opentorah.xml.{Element, From, Parser}
 import zio.http.{Body, Charsets, Header, Headers, HttpApp, MediaType, Method, Path, Request, Response, Route, Routes,
   Server, Status, handler, trailing}
 import zio.{Chunk, Task, ZIO, ZLayer}
+import zio.schema.codec.JsonCodec.zioJsonBinaryCodec
 import java.io.File
 import java.net.URL
 
@@ -76,16 +77,14 @@ abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefa
       logger.info(s"siteUri argument supplied: $result")
       result
     else getParameter("STORE", s"http://$bucketName/") // TODO switch to https
-
-    val app: HttpApp[Any] = routes(siteUrl).sandbox.toHttpApp
-
+    
     val port: Int = getParameter("PORT", 8080.toString).toInt
     logger.warning(s"serviceName=$serviceName; port=$port") // TODO more information
 
     // Note: To be accessible when running in a docker container the server must bind to all IPs, not just 127.0.0.1.
     val config: Server.Config = Server.Config.default.port(port)
 
-    Server.serve(app).provide(
+    Server.serve(routes(siteUrl).sandbox).provide(
       Server.live,
       ZLayer.succeed(config)
     )

@@ -13,7 +13,7 @@ object Lang:
     .transform[Language.Spec](fromParameter)((value: Language.Spec) => Some(value.language.get.toString))
 
   def fromRequest(request: Request): Language.Spec =
-    fromParameter(request.url.queryParams.get(queryParameterName))
+    fromParameter(request.url.queryParams.queryParam(queryParameterName))
 
   def fromParameter(parameter: Option[String]): Language.Spec =
     parameter.map(Language.getForName).getOrElse(Language.English).toSpec

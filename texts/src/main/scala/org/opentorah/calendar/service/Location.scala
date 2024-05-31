@@ -17,7 +17,7 @@ object Location:
     .transform[Location](fromParameter)(_.parameter)
 
   def fromRequest(request: Request): Location =
-    fromParameter(request.url.queryParams.get(queryParameterName))
+    fromParameter(request.url.queryParams.queryParam(queryParameterName))
 
   def fromParameter(parameter: Option[String]): Location =
     fromBoolean(parameter.forall(_ == "true"))
