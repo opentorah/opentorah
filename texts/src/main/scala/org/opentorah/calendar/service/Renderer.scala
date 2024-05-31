@@ -2,7 +2,7 @@ package org.opentorah.calendar.service
 
 import org.opentorah.calendar.{Calendar, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, NewYear, Season, Shemittah, SpecialDay, Sun, YearType}
-import org.opentorah.calendar.roman.Gregorian
+import org.opentorah.calendar.roman.{Gregorian, Julian}
 import org.opentorah.metadata.{Language, Named}
 import org.opentorah.schedule.rambam.RambamSchedule
 import org.opentorah.schedule.tanach.{Chitas, Schedule}
@@ -11,7 +11,6 @@ import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.util.Collections
 import org.opentorah.xml.{A, PrettyPrinter, ScalaXml}
-import zio.http.codec.{HttpCodec, HttpCodecType}
 
 final class Renderer(
   val calendar: Calendar,
@@ -33,7 +32,7 @@ final class Renderer(
 
   def renderLanding: String = renderHtml(
     url(),
-    dayLinks(Gregorian.fromLocalDateTime(java.time.LocalDateTime.now()).to(calendar).day)
+    dayLinks(Gregorian.fromLocalDateTime(java.time.LocalDateTime.now()).to(calendar).day, calendar)
   )
 
   // TODO move into CalendarService
@@ -71,14 +70,26 @@ final class Renderer(
       </div>
     )
 
+  private def dayLinks(day: calendar.Day, calendarTo: Calendar): ScalaXml.Element =
+    val rendererTo: Renderer = Renderer(
+      calendarTo,
+      location,
+      spec
+    )
+    rendererTo.dayLinks(day.to(calendarTo).asInstanceOf[rendererTo.calendar.Day]) // TODO cast...
+
   private def dayLinks(day: calendar.Day): ScalaXml.Element =
-    <span>
-    {yearLink(day.year)}
-    {monthNameLink(day.month)}
-    {if day.number > 1 then dayLink(day.prev, text = Some("<")) else <span>{Renderer.earlyGregorianMessage} </span>}
-    {dayLink(day)}
-    {dayLink(day.next, text = Some(">"))}
-    </span>
+    <div>
+      <span>
+        {calendar.name}
+        {yearLink(day.year)}
+        {monthNameLink(day.month)}
+        {if day.number > 1 then dayLink(day.prev, text = Some("<")) else <span>{Renderer.earlyGregorianMessage} </span>}
+        {dayLink(day)}
+        {dayLink(day.next, text = Some(">"))}
+        {day.name.toLanguageString}
+      </span>
+    </div>
 
   // TODO move into CalendarService
   def renderDay(yearStr: String, monthStr: String, dayStr: String): String =
@@ -89,22 +100,13 @@ final class Renderer(
       case _: Jewish.type => day.asInstanceOf[Jewish.Day] // TODO cast...
       case _ => day.to(Jewish)
 
-    val other: Renderer = Renderer(
-      calendar match
-        case _: Jewish.type => Gregorian
-        case _ => Jewish,
-      location,
-      spec
-    )
-
-    val otherDay: other.calendar.Day = day.to(other.calendar).asInstanceOf[other.calendar.Day] // TODO cast...
+    val calendars: Seq[Calendar] = calendar +: Renderer.calendars.filterNot(_.name == calendar.name)
 
     val daySchedule = Schedule.get(jewishDay, inHolyLand = location.inHolyLand)
 
     renderHtml(dayUrl(day),
       <div>
-        <div>{this.dayLinks(day)} {day.name.toLanguageString}</div>
-        <div>{other.dayLinks(otherDay)} {otherDay.name.toLanguageString}</div>
+        {for calendar <- calendars yield dayLinks(day, calendar)}
         <div>{daySchedule.dayNames.map((named: Named) => <span class="name">{named.names.doFind(spec).name}</span>)}</div>
         {renderOptionalReading("Morning", daySchedule.morning)}
         {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
@@ -136,7 +138,7 @@ final class Renderer(
     )
 
     <table><tbody>
-      <tr>{renderFragment(chitas.first)}</tr> +:
+      <tr>{renderFragment(chitas.first)}</tr>
       {chitas.second.fold(Seq.empty[ScalaXml.Element])(fragment => Seq(<tr>{renderFragment(fragment)}</tr>))}
     </tbody></table>
 
@@ -378,15 +380,13 @@ final class Renderer(
     )
 
 object Renderer:
+  val calendars: Seq[Calendar] = Seq(Jewish, Gregorian, Julian)
+
   private val earlyGregorianMessage: String = "Gregorian dates before year 1 are not supported!"
 
   def renderRoot(location: Location, spec: Language.Spec): String = renderHtml(
     url = Seq.empty,
-    content =
-      <div>
-        <div>{A(Seq(Jewish.name))(text = Jewish.name)}</div>,
-        <div>{A(Seq(Gregorian.name))(text = Gregorian.name)}</div>
-      </div>,
+    content = <div>{for calendar <- calendars yield <div>{A(Seq(calendar.name))(text = calendar.name)}</div>}</div>,
     location = location,
     spec = spec
   )

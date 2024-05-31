@@ -1,8 +1,6 @@
 package org.opentorah.calendar.service
 
 import org.opentorah.calendar.Calendar
-import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.gcp.{GCP, GCPLogger}
 import org.opentorah.metadata.Language
 import org.opentorah.util.Logging
@@ -92,7 +90,8 @@ object CalendarService extends zio.ZIOAppDefault:
   )
 
   private def renderHtml(calendarStr: String, request: Request, render: Renderer => String): zio.UIO[Response] =
-    val calendar: Calendar = Seq(Jewish, Gregorian)
+    val calendar: Calendar = Renderer
+      .calendars
       .find(_.name == calendarStr)
       .getOrElse(throw IllegalArgumentException(s"Unrecognized calendar $calendarStr"))
     val location: Location = Location.fromRequest(request)
