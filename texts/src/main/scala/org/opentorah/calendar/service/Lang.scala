@@ -1,6 +1,5 @@
 package org.opentorah.calendar.service
 
-import org.opentorah.gcp.GCP
 import org.opentorah.metadata.Language
 import zio.http.Request
 import zio.http.codec.{HttpCodec, HttpCodecType}
