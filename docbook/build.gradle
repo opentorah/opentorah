@@ -19,7 +19,7 @@ dependencies {
   implementation project(':opentorah-util')
 
   implementation libs.bundles.xmlresolver
-  implementation libs.saxon6
+//  implementation libs.saxon6
   implementation libs.saxon11
   implementation libs.bundles.fop
 //    // FOP
