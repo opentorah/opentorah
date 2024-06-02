@@ -95,10 +95,11 @@ sealed abstract class Saxon(name: String):
   protected def sourceParserClassAttribute: String
 
 object Saxon:
-  object Saxon6 extends Saxon("Saxon 6"):
-    override protected def newTransformerFactory: SAXTransformerFactory = com.icl.saxon.TransformerFactoryImpl()
-    override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
-    override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
+// was used only by DocBook code
+//  object Saxon6 extends Saxon("Saxon 6"):
+//    override protected def newTransformerFactory: SAXTransformerFactory = com.icl.saxon.TransformerFactoryImpl()
+//    override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
+//    override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
 
   object Saxon11 extends Saxon("Saxon 11"):
     override protected def newTransformerFactory: SAXTransformerFactory = net.sf.saxon.TransformerFactoryImpl()

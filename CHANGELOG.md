@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.13] - 2024-
+- chore: Gradle 8.8
+- removing Saxon 6 that was used only by the DocBook code
+- chore: Asciidoctor update
+
 ## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin
 - cleanup: dissolved ServiceApp

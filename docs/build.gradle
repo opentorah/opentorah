@@ -19,7 +19,7 @@ dependencies {
   implementation project(':opentorah-core')
   implementation libs.logback
 
-  asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.16'
+  asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.19'
 
   // Note: version 0.11.0 results in
   //  nokogiri requires Ruby version >= 2.7.0. The current ruby version is 2.5.7.0
