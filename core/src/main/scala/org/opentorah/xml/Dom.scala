@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-import org.slf4j.Logger
 import org.xml.sax.{InputSource, XMLFilter}
 import java.net.URL
 
@@ -21,7 +20,7 @@ object Dom extends Xml:
   ): Element =
     val result: javax.xml.transform.dom.DOMResult = new javax.xml.transform.dom.DOMResult
 
-    Saxon.Saxon11.transform(
+    Saxon.transform(
       filters = filters,
       resolver = resolver,
       stylesheetFile = None,

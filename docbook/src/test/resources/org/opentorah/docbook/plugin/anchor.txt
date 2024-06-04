@@ -1,2 +1,0 @@
-Anchor to find the project root from within the tests
-without assuming the current directory (which turned out to be different in the ScalaTest plugin and my ScalaJS).

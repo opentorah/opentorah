@@ -29,8 +29,7 @@ dependencies {
   compileOnly libs.caffeine
 
   compileOnly libs.bundles.xmlresolver
-//  compileOnly libs.saxon6  // Saxon  6 (XSLT 1.0)
-  compileOnly libs.saxon12 // Saxon 12 (XSLT 2.0)
+  compileOnly libs.saxon12
 
   testImplementation libs.zio.test
   //testImplementation libs.zio.prelude

@@ -2,27 +2,12 @@ package org.opentorah.xml
 
 import org.slf4j.Logger
 import org.xml.sax.{InputSource, XMLFilter}
-import java.io.{File, FileWriter}
+import java.io.File
 import javax.xml.transform.{ErrorListener, Transformer, TransformerException}
 import javax.xml.transform.sax.{SAXSource, SAXTransformerFactory}
-import javax.xml.transform.stream.StreamResult
 
-// Note: DocBook XSLT uses Saxon 6 XSLT 1.0 extensions and doesn't work on later Saxon versions
-// ("Don't know how to chunk with Saxonica").
-// According to https://www.saxonica.com/html/documentation/extensions/instructions/output.html,
-//   "Saxon 9.9 reintroduces saxon6:output (in the original Saxon 6.5.5 namespace,
-//   which differs from the usual Saxon namespace, so here we use a different prefix)
-//   so that the DocBook 1.0 stylesheets can now be executed with a modern Saxon release.
-//   Note that the specification is not identical with the Saxon 6.5.5 original,
-//   but it serves the purpose in supporting DocBook."
-// I am not sure what I can do to set up DocBook XSLT 1 processing with Saxon 10 // TODO try 11!
-// (it didn't work out of the box for me), but I'd love to get rid of the Saxon 6, since it:
-// - produces unmodifiable DOM - unlike Saxon 10+,
-// - carries within it obsolete org.w3c.dom classes (Level 2), which cause IDE to highlight
-//   as errors uses of the (Level 3) method org.w3c.dom.Node.getTextContent()...
-sealed abstract class Saxon(name: String):
-
-  final override def toString: String = name
+object Saxon:
+  final override def toString: String = "Saxon 11"
 
   def transform(
     filters: Seq[XMLFilter],
@@ -69,7 +54,7 @@ sealed abstract class Saxon(name: String):
     )
 
   private def getTransformerFactory(resolver: Option[Resolver], logger: Logger): SAXTransformerFactory =
-    val result: SAXTransformerFactory = newTransformerFactory
+    val result: SAXTransformerFactory = net.sf.saxon.TransformerFactoryImpl()
 
     result.setErrorListener(Saxon.errorListener(logger))
 
@@ -83,43 +68,14 @@ sealed abstract class Saxon(name: String):
     // Classpath-based discovery is unstable (order changes from one Gradle version to another) and ugly.
     // Tell Saxon to use Xerces parser explicitly:
     // TODO now that XMLReader is supplied explicitly, maybe this is not needed?
-    result.setAttribute(styleParserClassAttribute, Xerces.saxParserName)
-    result.setAttribute(sourceParserClassAttribute, Xerces.saxParserName)
+    result.setAttribute(net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS, Xerces.saxParserName)
+    result.setAttribute(net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS, Xerces.saxParserName)
 
     result
 
-  protected def newTransformerFactory: SAXTransformerFactory
-
-  protected def styleParserClassAttribute: String
-
-  protected def sourceParserClassAttribute: String
-
-object Saxon:
-// was used only by DocBook code
-//  object Saxon6 extends Saxon("Saxon 6"):
-//    override protected def newTransformerFactory: SAXTransformerFactory = com.icl.saxon.TransformerFactoryImpl()
-//    override protected def styleParserClassAttribute: String = com.icl.saxon.FeatureKeys.STYLE_PARSER_CLASS
-//    override protected def sourceParserClassAttribute: String = com.icl.saxon.FeatureKeys.SOURCE_PARSER_CLASS
-
-  object Saxon11 extends Saxon("Saxon 11"):
-    override protected def newTransformerFactory: SAXTransformerFactory = net.sf.saxon.TransformerFactoryImpl()
-    override protected def styleParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.STYLE_PARSER_CLASS
-    override protected def sourceParserClassAttribute: String = net.sf.saxon.lib.FeatureKeys.SOURCE_PARSER_CLASS
-
   private def errorListener(logger: Logger): ErrorListener = new ErrorListener:
+    private def message(exception: TransformerException): String = exception.getMessageAndLocation
+
     override def warning   (exception: TransformerException): Unit = logger.warn (message(exception))
     override def error     (exception: TransformerException): Unit = logger.error(message(exception))
     override def fatalError(exception: TransformerException): Unit = logger.error(message(exception))
-
-    private def message(exception: TransformerException): String = exception.getMessageAndLocation
-
-  // do not output the 'main' file when chunking in XSLT 1.0
-  def result(usesRootFile: Boolean, outputFile: File): StreamResult =
-    val result = new StreamResult
-    if usesRootFile then
-      result.setSystemId(outputFile)
-      result.setWriter(FileWriter(outputFile))
-    else
-      result.setSystemId("dev-null")
-      result.setOutputStream((_: Int) => {})
-    result
