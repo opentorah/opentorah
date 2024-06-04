@@ -1,8 +1,5 @@
 plugins {
   id 'scala'
-  id 'org.asciidoctor.jvm.convert'
-  id 'org.asciidoctor.jvm.gems'
-  id 'org.asciidoctor.jvm.pdf'
 }
 
 description = 'OpenTorah Documentation'
@@ -11,29 +8,12 @@ apply from: '../configure.gradle'
 
 repositories {
   mavenCentral()
-  ruby.gems()
 }
 
 dependencies {
   implementation project(':opentorah-util')
   implementation project(':opentorah-core')
   implementation libs.logback
-
-  asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.19'
-
-  // Note: version 0.11.0 results in
-  //  nokogiri requires Ruby version >= 2.7.0. The current ruby version is 2.5.7.0
-  // no idea where this comes from: ambient Ruby (which is not used) is 3.1, and JRuby version setting does not make a difference...
-  // version 0.10.3 break spectacularly
-//  asciidoctorGems 'rubygems:asciidoctor-bibliography:0.11.0'
-
-  // Note: attempts to require this *sporadically* result in
-  //   org.jruby.exceptions.LoadError: (LoadError) no such file to load -- asciidoctor-bibtex
-  // This seems to be a bug: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/628
-  // with a workaround - disabling build cache: ./gradlew clean asciidoctor --no-build-cache
-  // that does not work for me (although this extension /did/ work for a while I think - and then stopped)...
-  // see https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/658
-//  asciidoctorGems 'rubygems:asciidoctor-bibtex:0.8.0'
 }
 
 final File tablesDir = file("$buildDir/docs/tables")
@@ -49,24 +29,78 @@ final File asciidocSourceDir = file("$projectDir/src/docs/asciidoc/")
 final File asciidocOutputDir = file("$buildDir/docs/asciidoc")
 final File paperDir = file("$projectDir/paper")
 
-asciidoctor {
-  dependsOn(generateTables, asciidoctorGemsPrepare)
+final List<String> asciidoctorArgs = [
+  "--source-dir=$asciidocSourceDir",
+  '--verbose',
+  '--trace',
+  "--require=asciidoctor-bibtex",
+  "--attribute=tablesdir=$tablesDir",
+  "--attribute=reproducible=true",
+  "--attribute=linkcss=true",
+  "--attribute=multipage-disable-css=true",
+  "--attribute=copycss=$asciidocSourceDir/styles.css",
+  "--attribute=stylesdir=.",
+  "--attribute=stylesheet=styles.css",
+  "--attribute=docinfo=shared",
+  "--attribute=docinfodir=$asciidocSourceDir",
+  "--attribute=author=Leonid Dubinsky",
+  "--attribute=email=dub@opentorah.org",
+  "--attribute=toclevels=1",
+  "--attribute=multipage-level=1",
+  "--attribute=sectlinks=true",
+  "--attribute=sectanchors=true",
+  "--attribute=hide-uri-scheme=true",
+//    'bibliography-database': "$asciidocSourceDir/bibliography.bib",
+//    'bibliography-style': 'apa',
+  "--attribute=bibtex-file=$asciidocSourceDir/bibliography.bib",
+  "--attribute=bibtex-order=alphabetical",
+  "--attribute=bibtex-throw=true",
+  "--attribute=bibtex-style=apa",
+////    'bibtex-style': 'university-of-york-ieee'
+////    'bibtex-style': 'chicago-author-date'
+////    'bibtex-style': 'din-1505-2-alphanumeric',
 
-  sourceDir asciidocSourceDir
-  inputs.dir(asciidocSourceDir)
-  sources {
-    include 'calendar/calendar.adoc'
-    include 'typesetting/typesetting.adoc'
-    include 'dream/dream.adoc'
+  // Note: only when both the `--source-dir` is specified *and* there is a glob in the input files
+  // does Asciidoctor preserve the directory structure: https://github.com/asciidoctor/asciidoctor/issues/1394
+  "**/calendar/calendar.adoc",
+  "**/typesetting/typesetting.adoc",
+  "**/dream/dream.adoc"
+]
+
+ext.asciidoctorRun = { additionalArguments ->
+  exec {
+    executable = "asciidoctor"
+    args = additionalArguments + asciidoctorArgs
   }
+}
 
-  outputDir asciidocOutputDir
+tasks.register('asciidoctorExternal') {
+  group = 'documentation'
+
+  dependsOn(generateTables)
+
   outputs.dir(asciidocOutputDir)
-  outputOptions {
-    backends = [/* TODO 'pdf',*/ 'html5', 'multipage_html5']
-  }
+  inputs.dir(asciidocSourceDir)
 
   doLast {
+    // Note: there seems to be no analogue for the Asciidoctor Gradle plugin's
+    // `separateOutputDirs` (https://asciidoctor.github.io/asciidoctor-gradle-plugin/development-3.x/user-guide/),
+    // so I am running Asciidoctor separately for each backend with appropriate `--destination-dir`.
+    asciidoctorRun([
+      "--destination-dir=$asciidocOutputDir/multipage_html5",
+      "--require=asciidoctor-multipage",
+      "--backend=multipage_html5"
+    ])
+    asciidoctorRun([
+      "--destination-dir=$asciidocOutputDir/html5",
+      "--backend=html5"
+    ])
+//    asciidoctorRun([
+//      "--destination-dir=$asciidocOutputDir/pdf",
+//      "--require=asciidoctor-pdf",
+//      "--backend=pdf"
+//    ])
+
     project.copy {
       into paperDir
 
@@ -80,54 +114,12 @@ asciidoctor {
       from "$asciidocOutputDir/pdf/typesetting/typesetting.pdf"
     }
   }
-
-  asciidoctorj {  // asciidoctorjs for AsciiDoctor.js
-//    version = '2.5.13'
-//    jrubyVersion = '9.4.7.0'
-//    modules.pdf.version '2.3.15'
-
-    modules.pdf.version '2.3.4'
-    // modules.epub.version '???'
-
-    requires 'asciidoctor-multipage'
-
-//    requires 'asciidoctor-bibliography'
-//    requires 'asciidoctor-bibtex'
-  }
-
-  attributes = [
-    tablesdir: tablesDir,
-    reproducible: true,
-    linkcss: true,
-    'multipage-disable-css': true,
-    copycss: "$asciidocSourceDir/styles.css",
-    stylesdir: '.',
-    stylesheet: 'styles.css',
-    docinfo: 'shared',
-    docinfodir: asciidocSourceDir,
-    author: 'Leonid Dubinsky',
-    email: 'dub@opentorah.org',
-    toclevels: 1,
-    'multipage-level': 1,
-    sectlinks: true,
-    sectanchors: true,
-    'hide-uri-scheme': true,
-    'bibliography-database': "$asciidocSourceDir/bibliography.bib",
-    'bibliography-style': 'apa',
-    'bibtex-file': "$asciidocSourceDir/bibliography.bib",
-//    'bibtex-style': 'university-of-york-ieee'
-//    'bibtex-style': 'chicago-author-date'
-//    'bibtex-style': 'din-1505-2-alphanumeric',
-    'bibtex-style': 'apa',
-    'bibtex-order': 'alphabetical',
-    'bibtex-throw': true
-  ]
 }
 
 tasks.register('site') {
   description = 'Generate project website'
   group = 'documentation'
-  dependsOn(asciidoctor /*, mdoc*/)
+  dependsOn(asciidoctorExternal /*, mdoc*/)
 }
 
 tasks.named('build') {

@@ -11,10 +11,6 @@ pluginManagement {
     id 'com.google.cloud.tools.jib'    version '3.4.3'
     id 'org.podval.tools.cloudrun'     version '0.4.0'
     id 'com.gradle.plugin-publish'     version '1.2.1'
-    // TODO upgrade to '4.0.2' or later and make it work
-    id 'org.asciidoctor.jvm.gems'      version '4.0.0-alpha.1'
-    id 'org.asciidoctor.jvm.convert'   version '4.0.0-alpha.1'
-    id 'org.asciidoctor.jvm.pdf'       version '4.0.0-alpha.1'
   }
 }
 

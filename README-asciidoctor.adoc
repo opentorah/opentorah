@@ -1,0 +1,138 @@
+= Asciidoctor
+:toc:
+
+TODO consolidate with the DocBook -> AsciiDoc move remark
+
+TODO if AsciiDoc conversion could be handled without a Gradle plugin,
+I could have used something like PanDoc to process DocBook I guess...
+But AsciiDoc still seems nicer :)
+
+== Gradle Plugin - not!
+When I switched from Docbook to AciiDoc,
+I started using AsciiDoctor Gradle plugin.
+Attempts to use https://github.com/asciidoctor/asciidoctor-bibtex[asciidoc-bibtex] extension,
+I encountered
+https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/658#issuecomment-1637346784[problems] with the Gradle plugin;
+those problems were
+https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/658#issuecomment-1872372268[seemingly fixed]
+in https://github.com/asciidoctor/asciidoctor-gradle-plugin/releases/tag/release_4_0_0[v4.0], but the latest release (v4.0.2) is:
+
+- https://github.com/asciidoctor/asciidoctor-gradle-plugin/pull/726[incompatible]
+with the current version of Gradle (v8.8)
+- https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/684[incompatible] with Java >= 17
+
+I do not see fundamental problems with the plugin being fixed in a timely manner,
+so I am switching away from it and to calling Asciidoctor directly from Gradle
+build script.
+Yes, I lose the ability that the plugin provides to install Ruby Gems from the build,
+but I am running Asciidoctor only on my machine, not in the CI pipelines,
+so adding `Gemfile` and running `bundle` manually works for me.
+Yes, I have to reconstruct certain conventions that the plugin provides,
+like per-backend output directories, but this way I can actually run Asciidoctor
+(and use the `bibtex` extension :).
+
+My current setup is in link:docs/build.gradle[docs/build.gradle];
+just in case, I document here the setup using the Asciidoctor Gardle plugin.
+
+=== Historical Plugin Setup
+
+In `settings.gradle`:
+[source,groovy]
+plugins {
+  id 'org.asciidoctor.jvm.gems'      version '4.0.2'
+  id 'org.asciidoctor.jvm.convert'   version '4.0.2'
+  id 'org.asciidoctor.jvm.pdf'       version '4.0.2'
+}
+
+The rest is in the `docs/build.gradle`.
+
+[source, groovy]
+plugins {
+  id 'org.asciidoctor.jvm.convert'
+  id 'org.asciidoctor.jvm.gems'
+  id 'org.asciidoctor.jvm.pdf'
+}
+
+[source, groovy]
+repositories {
+  ruby.gems()
+}
+
+[source, groovy]
+dependencies {
+  asciidoctorGems 'rubygems:asciidoctor-multipage:0.0.19'
+}
+
+[source, groovy]
+----
+asciidoctor {
+  dependsOn(generateTables, asciidoctorGemsPrepare)
+
+  sourceDir asciidocSourceDir
+  inputs.dir(asciidocSourceDir)
+  sources {
+    include 'calendar/calendar.adoc'
+    include 'typesetting/typesetting.adoc'
+    include 'dream/dream.adoc'
+  }
+
+  outputDir asciidocOutputDir
+  outputs.dir(asciidocOutputDir)
+  outputOptions {
+    backends = ['html5', 'multipage_html5']
+  }
+
+  asciidoctorj {
+    version = '2.5.13'
+    jrubyVersion = '9.4.7.0'
+    modules.pdf.version '2.3.15'
+
+    requires 'asciidoctor-multipage'
+    requires 'asciidoctor-bibtex'
+  }
+
+  attributes = [
+    tablesdir: tablesDir,
+    reproducible: true,
+    linkcss: true,
+    'multipage-disable-css': true,
+    copycss: "$asciidocSourceDir/styles.css",
+    stylesdir: '.',
+    stylesheet: 'styles.css',
+    docinfo: 'shared',
+    docinfodir: asciidocSourceDir,
+    author: 'Leonid Dubinsky',
+    email: 'dub@opentorah.org',
+    toclevels: 1,
+    'multipage-level': 1,
+    sectlinks: true,
+    sectanchors: true,
+    'hide-uri-scheme': true,
+    'bibtex-file': "$asciidocSourceDir/bibliography.bib",
+    'bibtex-order': 'alphabetical',
+    'bibtex-throw': true,
+    'bibtex-style': 'apa',
+  ]
+}
+----
+
+== Bibliograhy
+
+TODO
+
+  // Note: version 0.11.0 results in
+  //  nokogiri requires Ruby version >= 2.7.0. The current ruby version is 2.5.7.0
+  // no idea where this comes from: ambient Ruby (which is not used) is 3.1, and JRuby version setting does not make a difference...
+  // version 0.10.3 break spectacularly
+//  asciidoctorGems 'rubygems:asciidoctor-bibliography:0.11.0'
+
+  // Note: attempts to require this *sporadically* result in
+  //   org.jruby.exceptions.LoadError: (LoadError) no such file to load -- asciidoctor-bibtex
+  // This seems to be a bug: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/628
+  // with a workaround - disabling build cache: ./gradlew clean asciidoctor --no-build-cache
+  // that does not work for me (although this extension /did/ work for a while I think - and then stopped)...
+  // see https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/658
+//  asciidoctorGems 'rubygems:asciidoctor-bibtex:0.8.0'
+
+    'bibliography-database': "$asciidocSourceDir/bibliography.bib",
+    'bibliography-style': 'apa',

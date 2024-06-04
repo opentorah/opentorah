@@ -1,5 +1,7 @@
 # Digital Judaica Done Right :)
 
+TODO convert READMEs to AsciiDoc and move them into /docs
+
 ![](https://github.com/opentorah/opentorah/workflows/CI/badge.svg)
 
 [Writings](http://www.opentorah.org) on the subject.
