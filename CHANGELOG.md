@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.13] - 2024-
 - chore: Gradle 8.8
-- removing Saxon 6 that was used only by the DocBook code
-- chore: Asciidoctor update
+- cleanup: switching from Asciidoctor Gradle plugin to calling external
+- cleanup: remove some more traces of DocBook
 
 ## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin

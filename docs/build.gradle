@@ -16,7 +16,8 @@ dependencies {
   implementation libs.logback
 }
 
-final File tablesDir = file("$buildDir/docs/tables")
+final File buildDirectory = layout.buildDirectory.asFile.get()
+final File tablesDir = file("$buildDirectory/docs/tables")
 tasks.register('generateTables', JavaExec) {
   group = 'documentation'
   outputs.dir(tablesDir)
@@ -26,7 +27,7 @@ tasks.register('generateTables', JavaExec) {
 }
 
 final File asciidocSourceDir = file("$projectDir/src/docs/asciidoc/")
-final File asciidocOutputDir = file("$buildDir/docs/asciidoc")
+final File asciidocOutputDir = file("$buildDirectory/docs/asciidoc")
 final File paperDir = file("$projectDir/paper")
 
 final List<String> asciidoctorArgs = [
