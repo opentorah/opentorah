@@ -8,11 +8,12 @@
 .nav-footer{text-align: center; margin-top: auto;}
 .nav-footer > p > a {white-space: nowrap;}
 
+/* [.verse]#Hebrew text#{ltr} */
 .verse {
     /*direction: rtl;*/
 }
 
-/* TODO enable/disable add/correct/source in JavaScript*/
+/* TODO enable/disable add/del/see in JavaScript*/
 /*
 add {
   color: red;
@@ -25,3 +26,19 @@ add {
   content: "]";
 }
 
+.del::before {
+  content: "(";
+}
+.del::after {
+  content: ")";
+}
+
+.see {
+  font-size: smaller;
+}
+.see::before {
+  content: "<";
+}
+.see::after {
+  content: ">";
+}

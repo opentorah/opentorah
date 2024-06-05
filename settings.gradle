@@ -17,7 +17,7 @@ pluginManagement {
 final String scalaVersion      = '3.4.2'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.1.1'
+final String zioVersion        = '2.1.2'
 final String flexmarkVersion   = '0.64.8'
 final String catsVersion       = '2.12.0'
 
@@ -48,7 +48,7 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.39.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.40.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")

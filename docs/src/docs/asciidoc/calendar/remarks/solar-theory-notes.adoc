@@ -24,3 +24,10 @@ TODO
 ספר "נאוה קודש" הודפס בברלין בשנת תקמ"ו (1786). 53 דף. הספר הודפס שנית במהדורת צילום (בתוך ספר פועל ה' ח"ב) בשנת תשכ"ט (1969), ושוב בבני ברק בשנת תשנ"ח (1998) (בתוך ספר פועל ה' ח"ג).
 החידושים על הרמב"ם הוכנסו ממהדורת פרידברג ירושלים תשס"ו.
 
+Another one bites the Neu49 dust:
+https://u.cs.biu.ac.il/~belenka/mimo.pdf
+
+Analyzing numerous tables in the second part of the Sanctification of the New Moon
+containing the mean velocities which Maimonides assumed for the sun and moon,
+Otto Neugebauer convincingly proved that these values were copied exactly, or
+rounded up from, the manuscript of Muhammad al-Battânî.
