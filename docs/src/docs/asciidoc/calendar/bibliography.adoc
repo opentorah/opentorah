@@ -78,6 +78,6 @@ Various editions and translations of the original text.
 * [[[Cairo]]] A primitive rabbinic calendar text from the Cairo Genizah. Sacha Stern. https://www.jjs-online.net/archives/fulltext/3259[]
 * [[[REP]]] The Reality of Epicycles and Eccentrics Denied. http://homepages.wmich.edu/~mcgrew/maimonides.htm[]
 
-// [#bibliography-bibtex]
-// == Referenced
-// bibliography::[]
+[#bibliography-bibtex]
+== Referenced
+bibliography::[]

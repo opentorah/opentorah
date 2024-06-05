@@ -162,7 +162,10 @@ We also see that <<Pirush>> and <<IbnHabib>> insist that Rambam must have copied
 
 TODO why it is ok to disagree with Pirush.
 
-<<HaMevuar>> credits <<Ajdler>> with quoting an alternative approach attributed to some unnamed "later sages"; as far as I can tell, it is actually from <<Neugebauer>>, p. 338-339 (398-399 in reprint) (recapitulated in shorter and less aggressive form in <<Yale>>, p. 129):
+<<HaMevuar>> credits <<Ajdler>> with quoting an alternative approach attributed to
+some unnamed "later sages"; as far as I can tell, it is actually from
+cite:[Neu83(398-399)], (p. 338-339 in the original publication)
+(recapitulated in shorter and less aggressive form in <<Yale>>, p. 129):
 
 [quote]
 ____
@@ -225,7 +228,7 @@ TODO quote opinions about the second movement being included in the table fro th
 
 <<Pirush>> describes the correspondence between the length of the solar year and the movement of the sun in one day; since observable (true) movement of the sun is different from the mean one, it is not obvious to me that the correspondence described by <<Pirush>> is correct; nevertheless, let's bring together various opinions on the length of the solar year (and hence, angular velocity of the sun) that we encountered so far.
 
-In the following table, the value that is primary according to the opinion (year length or velocity) is highlighted.
+In the following table, the value that is primary according to the opinion (year length or velocity) is highlighted - TODO!.
 We also list the values of the movement of the sun that Rambam gives that each opinion reconstructs correctly (by multiplication and rounding).
 Opinion "al-Battani - Pirush (year)" uses the value for the length of the year that Pirush mentions (the one that does _not_ correspond the value for the velocity that he gives).
 
