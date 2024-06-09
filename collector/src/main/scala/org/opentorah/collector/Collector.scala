@@ -4,7 +4,7 @@ import org.opentorah.site.{LinksResolver, Site, SiteCommon, SiteService}
 import org.opentorah.store.{Alias, Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, Tei, Unclear, Entity as TeiEntity}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Caching, Element, Html, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Caching, Element, Html, Parsable, Parser, Unparser, Xml}
 import zio.{UIO, ZIO}
 import java.net.URL
 
@@ -186,7 +186,7 @@ final class Collector(
     for
       allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](nodes =>
         ZIO.foreach(EntityType.values.toIndexedSeq)(entityType =>
-          ScalaXml.descendants(nodes, entityType.nameElement, EntityReference)
+            Xml.descendants(nodes, entityType.nameElement, EntityReference)
         )
           .map(_.flatten) // TODO toIndexSeq?
       )
@@ -205,17 +205,17 @@ final class Collector(
     logger.info("Writing unclears.")
     for
       allUnclears: Seq[WithSource[Unclear.Value]] <- allWithSource[Unclear.Value](
-        nodes => ScalaXml.descendants(nodes, Unclear.element.elementName, Unclear.element)
+        nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
       )
       _ <- Effects.effect(unclears.write(allUnclears.sortBy(_.source)))
     yield ()
 
   // TODO retrieve TEI(?) references from notes.
-  private def allWithSource[T](finder: ScalaXml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] =
+  private def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] =
     def forPaths[S, R](
       getter: Caching.Parser[Seq[Path]],
       retriever: S => Caching.Parser[R],
-      extractor: R => ScalaXml.Nodes
+      extractor: R => Xml.Nodes
     ): Caching.Parser[Seq[WithSource[T]]] = for
       paths: Seq[Path] <- getter
       result: Seq[Seq[WithSource[T]]] <- ZIO.foreach(paths)((path: Path) =>
@@ -223,7 +223,7 @@ final class Collector(
           from: R <- retriever(Path.last[S](path))
           pathShortener: Path.Shortener <- pathShortener
           source: String = Files.mkUrl(Path.structureNames(pathShortener(path)))
-          nodes: ScalaXml.Nodes = extractor(from)
+          nodes: Xml.Nodes = extractor(from)
           found: Seq[T] <- finder(nodes)
         yield found.map(new WithSource[T](source, _))
       )
@@ -233,7 +233,7 @@ final class Collector(
       fromEntities: Seq[WithSource[T]] <- forPaths[Entity, TeiEntity](
         getter = entityPaths,
         retriever = _.getTei(this),
-        extractor = _.content.scalaXml
+        extractor = _.content.nodes
       )
 
       fromHierarchicals: Seq[WithSource[T]] <- forPaths[Hierarchical, Hierarchical](
@@ -241,7 +241,7 @@ final class Collector(
         retriever = ZIO.succeed,
         extractor = (hierarchical: Hierarchical) =>
           Seq(Some(hierarchical.title), hierarchical.description, hierarchical.body)
-            .flatten.flatMap(_.content.scalaXml)
+            .flatten.flatMap(_.content.nodes)
       )
 
       fromDocuments: Seq[WithSource[T]] <- forPaths[TextFacet, Tei](
@@ -262,7 +262,7 @@ final class Collector(
           else findEntityByName(ref, _
             .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">$name< """))(named =>
               if named.entityType == reference.entityType then None
-              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${name.scalaXml} [$ref]")
+              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${name.nodes} [$ref]")
             )
           )
         )

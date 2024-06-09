@@ -19,10 +19,10 @@ abstract class Element[A](val elementName: String) extends Elements[A]:
   final override protected def elementByValue(value: A): Element[?] = this
 
   // TODO allow declaring this element's namespace...
-  final override def xmlElement(value: A): ScalaXml.Element =
-    ScalaXml.setAttributes(
+  final override def xmlElement(value: A): Xml.Element =
+    Attribute.set(
       attributes = contentParsable.unparser.attributes(value),
-      element = contentParsable.unparser.namespace.fold(<elem/>)(namespace => ScalaXml.declareNamespace(namespace.default, <elem/>))
+      element = contentParsable.unparser.namespace.fold(<elem/>)(namespace => namespace.default.declare(<elem/>))
     ).copy(
       label = elementName,
       child = contentParsable.unparser.content(value)
@@ -41,17 +41,13 @@ object Element:
 
   final class AndParser[A](val element: Element[?], val parser: Parser[A])
 
-  // TODO move to the top level?
-  final class Nodes(val xml: Xml)(val nodes: xml.Nodes) {
-    // TODO: if xml != ScalaXml, this will fail *at run-time*...
-    def scalaXml: ScalaXml.Nodes = nodes.asInstanceOf[ScalaXml.Nodes]
-
-    override def toString: String = xml.toString(nodes)
-  }
+  // TODO remove
+  final class Nodes(val nodes: Xml.Nodes):
+    override def toString: String = Xml.toString(nodes)
 
   val nodes: Parsable[Nodes] = new Parsable[Nodes]:
     override protected def parser: Parser[Nodes] = Parsing.allNodes
-    override def unparser: Unparser[Nodes] = Unparser[Nodes](content = _.scalaXml)
+    override def unparser: Unparser[Nodes] = Unparser[Nodes](content = _.nodes)
 
   final class FromUrl(
     val url: URL,

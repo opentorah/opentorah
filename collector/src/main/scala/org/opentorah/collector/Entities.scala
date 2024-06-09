@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.tei.Entity as TeiEntity
 import org.opentorah.store.{By, Context, Directory, Path, Store}
-import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Caching, Element, From, Parsable, Parser, Unparser, Xml}
 import java.net.URL
 import zio.ZIO
 
@@ -22,11 +22,11 @@ final class Entities(
   override protected def loadFile(url: URL): Parser[TeiEntity] = TeiEntity.parse(From.url(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
     allEntities: Seq[Entity] <- stores
-    lines: Seq[ScalaXml.Element] <- ZIO.foreach(Entity.sort(allEntities))((entity: Entity) =>
+    lines: Seq[Xml.Element] <- ZIO.foreach(Entity.sort(allEntities))((entity: Entity) =>
       entity.line(context)
     )
   yield

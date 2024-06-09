@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Date, Editor, EntityReference, EntityType, Pb, Tei}
 import org.opentorah.store.{Context, Directory, Path, Terminal}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 final class Document(
@@ -26,11 +26,11 @@ final class Document(
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
-  def getDate: Seq[ScalaXml.Element] = date.toSeq.map(Date.xmlElement)
-  def getDescription: ScalaXml.Nodes = description.toSeq.flatMap(_.content.scalaXml)
-  def getAuthors: ScalaXml.Nodes = ScalaXml.multi(authors.flatMap(_.content.scalaXml))
-  def getAddressee: Seq[ScalaXml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
-  def getTranscribers: ScalaXml.Nodes = ScalaXml.multi(editors
+  def getDate: Seq[Xml.Element] = date.toSeq.map(Date.xmlElement)
+  def getDescription: Xml.Nodes = description.toSeq.flatMap(_.content.nodes)
+  def getAuthors: Xml.Nodes = Xml.multi(authors.flatMap(_.content.nodes))
+  def getAddressee: Seq[Xml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
+  def getTranscribers: Xml.Nodes = Xml.multi(editors
     .filter(_.role.contains("transcriber"))
     .flatMap(_.persName)
     .map(EntityReference.xmlElement))
@@ -52,12 +52,12 @@ final class Document(
 object Document extends Element[Document]("document"), Directory.EntryMaker[Tei, Document]:
 
   override def apply(name: String, tei: Tei): Parser[Document] = for
-    pbs: Seq[Pb] <- ScalaXml.descendants(tei.text.body.content.scalaXml, Pb.elementName, Pb)
+    pbs: Seq[Pb] <- Xml.descendants(tei.text.body.content.nodes, Pb.elementName, Pb)
     lang: Option[String] = tei.text.lang
     language: Option[String] = splitLang(name)._2
     _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
-    persNames: Seq[EntityReference] <- ScalaXml.descendants(
-      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content.scalaXml).getOrElse(Seq.empty),
+    persNames: Seq[EntityReference] <- Xml.descendants(
+      nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content.nodes).getOrElse(Seq.empty),
       elementName = EntityType.Person.nameElement,
       elements = EntityReference
     )
@@ -76,7 +76,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
   def forDisplay(date: Date): Date = Date(
     when = date.when,
     calendar = date.calendar,
-    xml = Element.Nodes(ScalaXml)(Seq(ScalaXml.mkText(date.when)))
+    xml = Element.Nodes(Seq(Xml.mkText(date.when)))
   )
 
   private def splitLang(name: String): (String, Option[String]) =

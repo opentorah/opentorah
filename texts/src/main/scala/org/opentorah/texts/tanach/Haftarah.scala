@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Language, Names}
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...

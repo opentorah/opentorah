@@ -6,7 +6,7 @@ import org.opentorah.calendar.roman.{Gregorian, Julian}
 import org.opentorah.metadata.Language
 import org.opentorah.tei.{Date, EntityName, EntityType, Pb, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Attribute, Element, Html, Namespace, ScalaXml, Xml}
+import org.opentorah.xml.{A, Attribute, Html, Namespace, Xml}
 import zio.ZIO
 import java.net.URI
 
@@ -15,11 +15,11 @@ import java.net.URI
 object TeiToHtml:
   // TODO handle table/tr/td systematically
 
-  private def isFootnote(element: ScalaXml.Element): ZIO[Any, Effects.Error, Boolean] =
-    for place <- placeAttribute.get(ScalaXml)(element)
-    yield (ScalaXml.getName(element) == "note") && place.contains("end")
+  private def isFootnote(element: Xml.Element): ZIO[Any, Effects.Error, Boolean] =
+    for place <- placeAttribute.get(element)
+    yield (Xml.getName(element) == "note") && place.contains("end")
 
-  private def isFootnotesContainer(element: ScalaXml.Element): Boolean = false
+  private def isFootnotesContainer(element: Xml.Element): Boolean = false
 
   private val targetAttribute: Attribute.Required[String] = Attribute("target").required
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
@@ -34,37 +34,37 @@ object TeiToHtml:
   // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
   // based on the 'rendition' itself.
   // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
-  private def elementToHtml(element: ScalaXml.Element): ZIO[LinksResolver, Effects.Error, ScalaXml.Element] =
-    val children: ScalaXml.Nodes = ScalaXml.getChildren(element)
+  private def elementToHtml(element: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] =
+    val children: Xml.Nodes = Xml.getChildren(element)
 
-    ScalaXml.getName(element) match
+    Xml.getName(element) match
       case label if EntityType.isName(label) =>
-        require(!ScalaXml.isEmpty(children), element)
+        require(!Xml.isEmpty(children), element)
         for
-          ref: Option[String] <- EntityName.refAttribute.get(ScalaXml)(element)
-          result: ScalaXml.Element <- if ref.isEmpty then ZIO.succeed(TeiToHtml.namespace(A.empty(children))) else
+          ref: Option[String] <- EntityName.refAttribute.get(element)
+          result: Xml.Element <- if ref.isEmpty then ZIO.succeed(TeiToHtml.namespace(A.empty(children))) else
             ZIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get))
               .map(_.getOrElse(A(ref.toSeq))(children))
               .map(TeiToHtml.namespace)
-        yield result    
+        yield result
 
       case "ref" =>
-        require(!ScalaXml.isEmpty(children), element)
+        require(!Xml.isEmpty(children), element)
         reference(element).map(_(children))
           .map(TeiToHtml.namespace)
 
       case "ptr" =>
-        require(ScalaXml.isEmpty(children), element)
+        require(Xml.isEmpty(children), element)
         reference(element).map(_(Seq.empty))
           .map(TeiToHtml.namespace)
 
       // TODO feed pageId through State to obtain unique id
       case Pb.elementName =>
-        require(ScalaXml.isEmpty(children), element)
+        require(Xml.isEmpty(children), element)
         for
-          n: String <- Pb.nAttribute.get(ScalaXml)(element)
+          n: String <- Pb.nAttribute.get(element)
           pageId: String = Pb.pageId(n)
-          result: ScalaXml.Element <- ZIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
+          result: Xml.Element <- ZIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
             .getOrElse(A(Seq(pageId)))
             .setId(pageId)
             (text = facsimileSymbol)
@@ -74,21 +74,21 @@ object TeiToHtml:
 
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
-        require(ScalaXml.isEmpty(children), element)
-        for url: String <- urlAttribute.get(ScalaXml)(element)
+        require(Xml.isEmpty(children), element)
+        for url: String <- urlAttribute.get(element)
         yield TeiToHtml.namespace(<img src={url}/>)
 
       //      case "table" => ZIO.succeed(Html.table(children))
       // Note: before the first row there can be <head>HEAD</head>;
       // it should become <caption>transform(HEAD)</caption>.
       case "row" => ZIO.succeed(TeiToHtml.tr(children))
-      case "cell" => for cols: Option[String] <- colsAttribute.get(ScalaXml)(element) yield TeiToHtml.td(cols, children)
-      case "date" => for tooltip: ScalaXml.Nodes <- dateTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
-      case "gap" => for tooltip: ScalaXml.Nodes <- gapTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
+      case "cell" => for cols: Option[String] <- colsAttribute.get(element) yield TeiToHtml.td(cols, children)
+      case "date" => for tooltip: Xml.Nodes <- dateTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
+      case "gap" => for tooltip: Xml.Nodes <- gapTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
       case _ => ZIO.succeed(element)
 
-  private def reference(element: ScalaXml.Element): ZIO[LinksResolver, Effects.Error, A] = for
-    target <- targetAttribute.get(ScalaXml)(element)
+  private def reference(element: Xml.Element): ZIO[LinksResolver, Effects.Error, A] = for
+    target <- targetAttribute.get(element)
     uri: URI = URI(target)
     result: A <-
       // TODO maybe just call up regardless?
@@ -99,8 +99,8 @@ object TeiToHtml:
       )
   yield result
 
-  private def gapTooltip(element: ScalaXml.Element): ZIO[Any, Effects.Error, ScalaXml.Nodes] =
-    for reason: Option[String] <- reasonAttribute.get(ScalaXml)(element) yield reason.fold(Seq.empty)(ScalaXml.mkText)
+  private def gapTooltip(element: Xml.Element): ZIO[Any, Effects.Error, Xml.Nodes] =
+    for reason: Option[String] <- reasonAttribute.get(element) yield reason.fold(Seq.empty)(Xml.mkText)
 
   // TODO move into Calendar
   private final class DateInterval(
@@ -148,10 +148,10 @@ object TeiToHtml:
       val numbers: Seq[Int] = parseNumbers(when)
       if numbers.length == 3 then Right(from(numbers)) else Left(DateInterval(from(numbers), to(numbers)))
 
-  private def dateTooltip(element: ScalaXml.Element): ZIO[Any, Effects.Error, ScalaXml.Nodes] =
+  private def dateTooltip(element: Xml.Element): ZIO[Any, Effects.Error, Xml.Nodes] =
     for
-      when: String <- Date.whenAttribute.get(ScalaXml)(element)
-      calendarName: Option[String] <- Date.calendarAttribute.get(ScalaXml)(element)
+      when: String <- Date.whenAttribute.get(element)
+      calendarName: Option[String] <- Date.calendarAttribute.get(element)
     yield
     try
       val defaultCalendarIsJulian: Boolean = true // TODO get default from content
@@ -160,12 +160,12 @@ object TeiToHtml:
 
       val displayLanguage: Language.Spec = Language.Russian.toSpec // TODO get from context
 
-      def display(date: Calendar#Day): ScalaXml.Element =
+      def display(date: Calendar#Day): Xml.Element =
         <td>
           {date.toLanguageString(using displayLanguage)}
         </td>
 
-      def displayInterval(interval: DateInterval): Seq[ScalaXml.Element] =
+      def displayInterval(interval: DateInterval): Seq[Xml.Element] =
         Seq(display(interval.from), display(interval.to))
 
       parse(when, calendar) match {
@@ -173,7 +173,7 @@ object TeiToHtml:
           <table xmlns={Html.namespace.uri}>
             <tr>
               <th>Calendar</th> <th>Date</th>
-            </tr>{ScalaXml.conditional(useJulian)(
+            </tr>{Xml.conditional(useJulian)(
             <tr>
               <td>Julian</td>{display(date)}
             </tr>)}<tr>
@@ -188,7 +188,7 @@ object TeiToHtml:
           <table xmlns={Html.namespace.uri}>
             <tr>
               <th>Calendar</th> <th>From</th> <th>To</th>
-            </tr>{ScalaXml.conditional(useJulian)(
+            </tr>{Xml.conditional(useJulian)(
             <tr>
               <td>Julian</td>{displayInterval(interval)}
             </tr>)}<tr>
@@ -204,88 +204,88 @@ object TeiToHtml:
       case e => throw IllegalArgumentException(s"Exception processing when=$when", e)
 
 
-  private def isInNamespace(element: ScalaXml.Element): Boolean =
-    ScalaXml.getNamespace(element) == Tei.namespace.default
+  private def isInNamespace(element: Xml.Element): Boolean =
+    Namespace.get(element) == Tei.namespace.default
 
   private def addPrefix(name: String): String = s"${Html.namespace.getPrefix.get}-$name"
 
-  def toHtml(element: ScalaXml.Element): ZIO[LinksResolver, Effects.Error, ScalaXml.Element] =
+  def toHtml(element: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] =
     for
       footnotesDone <- processFootnotes(element).provideSomeLayer[LinksResolver](Footnotes.empty)
       html <- elementsToHtml(footnotesDone)
     yield
       html
 
-  private def processFootnotes(element: ScalaXml.Element): ZIO[Footnotes & LinksResolver, Effects.Error, ScalaXml.Element] = for
+  private def processFootnotes(element: Xml.Element): ZIO[Footnotes & LinksResolver, Effects.Error, Xml.Element] = for
     isEmpty: Boolean <- Footnotes.isEmpty
     doPush: Boolean = isEmpty || (isInNamespace(element) && isFootnotesContainer(element))
     _ <- if !doPush then ZIO.succeed(()) else Footnotes.push
     isFootnote <- isFootnote(element)
-    newElement: ScalaXml.Element <-
+    newElement: Xml.Element <-
       if isInNamespace(element) && isFootnote
       then Footnotes.footnote(element)
       else transformChildren(processFootnotes, element)
-    result: ScalaXml.Element <-
+    result: Xml.Element <-
       if !doPush
       then ZIO.succeed(newElement)
       else processLevels(newElement, Seq.empty)
   yield result
 
   private def processLevels(
-    newElement: ScalaXml.Element,
-    levels: Seq[Seq[ScalaXml.Element]]
-  ): ZIO[Footnotes & LinksResolver, Effects.Error, ScalaXml.Element] = for
-    footnotes: Seq[ScalaXml.Element] <- Footnotes.get
-    result: ScalaXml.Element <-
+    newElement: Xml.Element,
+    levels: Seq[Seq[Xml.Element]]
+  ): ZIO[Footnotes & LinksResolver, Effects.Error, Xml.Element] = for
+    footnotes: Seq[Xml.Element] <- Footnotes.get
+    result: Xml.Element <-
       if footnotes.isEmpty then for
         _ <- Footnotes.pop
       yield
         if levels.isEmpty
         then newElement
-        else ScalaXml.appendChildren(newElement,
+        else Xml.appendChildren(newElement,
           (for (level, depth) <- levels.zipWithIndex yield TeiToHtml.footnoteLevel(level, depth)).flatten
         )
       else for
-        nextLevel: Seq[ScalaXml.Element] <- ZIO.foreach(footnotes)(processFootnotes)
+        nextLevel: Seq[Xml.Element] <- ZIO.foreach(footnotes)(processFootnotes)
         result <- processLevels(newElement, levels :+ nextLevel)
       yield result
   yield result
 
-  private def elementsToHtml(oldElement: ScalaXml.Element): ZIO[LinksResolver, Effects.Error, ScalaXml.Element] = for
-    element: ScalaXml.Element <- transformChildren(elementsToHtml, oldElement)
-    result: ScalaXml.Element <- if !isInNamespace(element) then ZIO.succeed(element) else
+  private def elementsToHtml(oldElement: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] = for
+    element: Xml.Element <- transformChildren(elementsToHtml, oldElement)
+    result: Xml.Element <- if !isInNamespace(element) then ZIO.succeed(element) else
 
       val attributes: Attribute.StringValues =
-        for attribute: Attribute.Value[String] <- ScalaXml.getAttributes(element) yield
+        for attribute: Attribute.Value[String] <- Attribute.get(element) yield
           TeiToHtml.xml2htmlAttribute.get(attribute.attribute).map(_.optional.withValue(attribute.value)).getOrElse {
             val name: String = attribute.attribute.name
             if !TeiToHtml.reservedAttributes.contains(name) then attribute
             else Attribute(addPrefix(name)).optional.withValue(attribute.value)
           }
 
-      for newElement: ScalaXml.Element <- elementToHtml(element) yield
+      for newElement: Xml.Element <- elementToHtml(element) yield
         if isInNamespace(newElement) then
-          val name: String = ScalaXml.getName(newElement)
-          ScalaXml.setAttributes(
-            element = if !TeiToHtml.reservedElements.contains(name) then newElement else ScalaXml.rename(newElement, addPrefix(name)),
+          val name: String = Xml.getName(newElement)
+          Attribute.set(
+            element = if !TeiToHtml.reservedElements.contains(name) then newElement else Xml.rename(newElement, addPrefix(name)),
             attributes = attributes
           )
         else
-          ScalaXml.addAttributes(
+          Attribute.add(
             element = newElement,
-            attributes = Html.classAttribute.required.withValue(ScalaXml.getName(element)) +: attributes
+            attributes = Html.classAttribute.required.withValue(Xml.getName(element)) +: attributes
           )
 
   yield result
 
   private def transformChildren[T](
-    transform: ScalaXml.Element => ZIO[T, Effects.Error, ScalaXml.Element],
-    element: ScalaXml.Element
-  ): ZIO[T, Effects.Error, ScalaXml.Element] = for
-    children: ScalaXml.Nodes <- ZIO.foreach(ScalaXml.getChildren(element))((node: ScalaXml.Node) =>
-      if !ScalaXml.isElement(node) then ZIO.succeed(node) else transform(ScalaXml.asElement(node))
+    transform: Xml.Element => ZIO[T, Effects.Error, Xml.Element],
+    element: Xml.Element
+  ): ZIO[T, Effects.Error, Xml.Element] = for
+    children: Xml.Nodes <- ZIO.foreach(Xml.getChildren(element))((node: Xml.Node) =>
+      if !Xml.isElement(node) then ZIO.succeed(node) else transform(Xml.asElement(node))
     )
-  yield ScalaXml.setChildren(element, children)
+  yield Xml.setChildren(element, children)
 
   private val xml2htmlAttribute: Map[Attribute[String], Attribute[String]] = Map(
     Xml.idAttribute   -> Html.idAttribute,
@@ -294,8 +294,8 @@ object TeiToHtml:
   )
 
   // TODO eliminate
-  def namespace(element: ScalaXml.Element): ScalaXml.Element =
-    ScalaXml.declareNamespace(Html.namespace.default, element)
+  def namespace(element: Xml.Element): Xml.Element =
+    Html.namespace.default.declare(element)
 
   /*
   I tried to define CSS namespaces like this:
@@ -319,43 +319,43 @@ object TeiToHtml:
 
   private val reservedAttributes: Set[String] = Set("class", "target", "lang", "frame")
 
-  private def tooltip(content: ScalaXml.Nodes): ScalaXml.Element =
+  private def tooltip(content: Xml.Nodes): Xml.Element =
     <span xmlns={Html.namespace.uri} class="tooltip">
       {content}
     </span>
 
-  private def addTooltip(content: ScalaXml.Nodes, element: ScalaXml.Element): ScalaXml.Element =
-    ScalaXml.prependChildren(element, tooltip(content))
+  private def addTooltip(content: Xml.Nodes, element: Xml.Element): Xml.Element =
+    Xml.prependChildren(element, tooltip(content))
 
-  def footnote(contentId: String, srcId: String, symbol: String, content: ScalaXml.Nodes): ScalaXml.Element =
+  def footnote(contentId: String, srcId: String, symbol: String, content: Xml.Nodes): Xml.Element =
     <span xmlns={Html.namespace.uri} class="footnote" id={contentId}>
       <a href={s"#$srcId"} class="footnote-backlink">
         {symbol}
       </a>{content}
     </span>
 
-  def footnoteRef(contentId: String, srcId: String, symbol: String): ScalaXml.Element =
+  def footnoteRef(contentId: String, srcId: String, symbol: String): Xml.Element =
     <a xmlns={Html.namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>
       {symbol}
     </a>
 
-  private def footnoteLevel(content: Seq[ScalaXml.Element], depth: Int): ScalaXml.Nodes =
+  private def footnoteLevel(content: Seq[Xml.Element], depth: Int): Xml.Nodes =
       <hr class="footnotes-line"/> ++
       <div xmlns={Html.namespace.uri} class="footnotes">
         {content}
       </div>
 
-  def table(children: ScalaXml.Nodes): ScalaXml.Element =
+  def table(children: Xml.Nodes): Xml.Element =
     <table xmlns={Html.namespace.uri}>
       {children}
     </table>
 
-  def tr(children: ScalaXml.Nodes): ScalaXml.Element =
+  def tr(children: Xml.Nodes): Xml.Element =
     <tr xmlns={Html.namespace.uri}>
       {children}
     </tr>
 
-  def td(colspan: Option[String], children: ScalaXml.Nodes): ScalaXml.Element =
+  def td(colspan: Option[String], children: Xml.Nodes): Xml.Element =
     <td xmlns={Html.namespace.uri} colspan={colspan.orNull}>
       {children}
     </td>

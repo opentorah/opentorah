@@ -28,16 +28,10 @@ dependencies {
 
   compileOnly libs.caffeine
 
-  compileOnly libs.bundles.xmlresolver
-  compileOnly libs.saxon12
-
   testImplementation libs.zio.test
   //testImplementation libs.zio.prelude
   testImplementation libs.cats.core
   testImplementation libs.cats.laws
-
-  testRuntimeOnly libs.saxon12
-  testRuntimeOnly libs.bundles.xmlresolver
 }
 
 //test {

@@ -9,7 +9,7 @@ trait Elements[A]:
 
   protected def elementByValue(value: A): Element[?]
 
-  def xmlElement(value: A): ScalaXml.Element =
+  def xmlElement(value: A): Xml.Element =
     elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
   private def optionalParser: Parser[Option[A]] = Parsing.optional(this)
@@ -29,21 +29,21 @@ object Elements:
   sealed abstract class Parsable[A, C] extends org.opentorah.xml.Parsable[A]:
     def xml(value: A): C
 
-  final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[ScalaXml.Element]]:
+  final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[Xml.Element]]:
     override protected def parser: Parser[Option[A]] = elements.optionalParser
-    override def xml(value: Option[A]): Option[ScalaXml.Element] = value.map(elements.xmlElement)
+    override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Option[A]] = Unparser[Option[A]](
       content = value => xml(value).toSeq
     )
 
-  final class Required[A](elements: Elements[A]) extends Parsable[A, ScalaXml.Element]:
+  final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element]:
     override protected def parser: Parser[A] = Effects.required(elements.optionalParser, elements)
-    override def xml(value: A): ScalaXml.Element = elements.xmlElement(value)
+    override def xml(value: A): Xml.Element = elements.xmlElement(value)
     override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
     )
 
-  final class Sequence[A](elements: Elements[A]) extends Parsable[Seq[A], Seq[ScalaXml.Element]]:
+  final class Sequence[A](elements: Elements[A]) extends Parsable[Seq[A], Seq[Xml.Element]]:
     override protected def parser: Parser[Seq[A]] = all(Seq.empty)
     private def all(acc: Seq[A]): Parser[Seq[A]] = for
       next: Option[A] <- elements.optionalParser
@@ -51,7 +51,7 @@ object Elements:
         .map(next => all(acc :+ next))
         .getOrElse(ZIO.succeed(acc))
     yield result
-    override def xml(value: Seq[A]): Seq[ScalaXml.Element] = value.map(elements.xmlElement)
+    override def xml(value: Seq[A]): Seq[Xml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Seq[A]] = Unparser[Seq[A]](
       content = value => xml(value)
     )

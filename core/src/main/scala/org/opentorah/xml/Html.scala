@@ -1,13 +1,14 @@
 package org.opentorah.xml
 
-object Html extends Dialect, Doctype:
+// TODO move to the html package
+object Html extends Dialect:
 
   override val namespace: Namespace = Namespace(uri = "http://www.w3.org/1999/xhtml", prefix = "xhtml")
 
   override val mimeType: String = "text/html" // Note: and not "application/xhtml+xml"
 
-  override val doctype: String = Doctype.string("html")
-
+  override val rootElementName: String = "html"
+  
   val idAttribute: Attribute[String] = Attribute("id")
   val langAttribute: Attribute[String] = Attribute("lang")
   val classAttribute: Attribute[String] = Attribute("class")

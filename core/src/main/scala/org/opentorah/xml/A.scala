@@ -1,29 +1,26 @@
 package org.opentorah.xml
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{Html, RawXml, ScalaXml}
 import java.net.URI
 
 // HTML anchor element
+// TODO move to the html package
 final class A(
   uri: Option[URI] = None,
   target: Option[String] = None,
   id: Option[String] = None,
-  classes: Seq[String] = Seq.empty,
-  declareNamespace: Boolean = false // TODO eliminate; add to the <a> xmlns={namespace.uri}
+  classes: Seq[String] = Seq.empty
 ):
   private def copy(
     uri: Option[URI] = uri,
     target: Option[String] = target,
     id: Option[String] = id,
-    classes: Seq[String] = classes,
-    declareNamespace: Boolean = declareNamespace
+    classes: Seq[String] = classes
   ): A = new A(
     uri,
     target,
     id,
-    classes,
-    declareNamespace
+    classes
   )
 
   def setId(value: String): A = copy(id = Some(value))
@@ -33,9 +30,7 @@ final class A(
   def setTarget(value: String): A = copy(target = Some(value))
 
   def addClass(value: String): A = copy(classes = classes :+ value)
-
-  def withNamespace: A = copy(declareNamespace = true)
-
+  
   def setFragment(value: String): A = copy(uri = Some(
     uri.fold(URI(null, null, null, null, value))
     (uri => URI(uri.getScheme, uri.getAuthority, uri.getPath, uri.getQuery, value))
@@ -46,22 +41,19 @@ final class A(
     (uri => URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
   ))
 
-  def apply(text: String): ScalaXml.Element = apply(Seq(ScalaXml.mkText(text)))
+  def apply(text: String): Xml.Element = apply(Seq(Xml.mkText(text)))
 
-  def apply(element: ScalaXml.Element): ScalaXml.Element = apply(Seq(element))
+  def apply(element: Xml.Element): Xml.Element = apply(Seq(element))
 
-  def apply(xml: RawXml#Value): ScalaXml.Element = apply(xml.content.scalaXml)
+  def apply(xml: RawXml#Value): Xml.Element = apply(xml.content.nodes)
 
-  def apply(children: ScalaXml.Nodes): ScalaXml.Element =
-    val result: ScalaXml.Element =
-      <a
-      href={uri.map(_.toString).orNull}
-      target={target.orNull}
-      class={if classes.isEmpty then null else classes.mkString(" ")}
-      id={id.orNull}
-      >{children}</a>
-
-    if !declareNamespace then result else ScalaXml.declareNamespace(Html.namespace.default, result)
+  def apply(children: Xml.Nodes): Xml.Element =
+    <a
+    href={uri.map(_.toString).orNull}
+    target={target.orNull}
+    class={if classes.isEmpty then null else classes.mkString(" ")}
+    id={id.orNull}
+    >{children}</a>
 
 object A:
   def apply(path: Seq[String]): A = apply(URI(null, null, Files.mkUrl(path), null))

@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Path, Pure}
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
-import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 // TODO derive it from By (with a transparent Selector)!
@@ -26,10 +26,10 @@ final class EntityList(
   override def storesPure: Seq[Entity] = entities
 
   override def htmlHeadTitle: Option[String] = Some(title.content.toString)
-  override def htmlBodyTitle: Option[ScalaXml.Nodes] = Some(title.content.scalaXml)
+  override def htmlBodyTitle: Option[Xml.Nodes] = Some(title.content.nodes)
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
-    for lines: Seq[ScalaXml.Element] <- ZIO.foreach(getEntities)((entity: Entity) =>
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+    for lines: Seq[Xml.Element] <- ZIO.foreach(getEntities)((entity: Entity) =>
       entity.line(context)
     )
     yield <list>{lines}</list>

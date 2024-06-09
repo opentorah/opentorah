@@ -3,7 +3,7 @@ package org.opentorah.texts.rambam
 import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
 
 // TODO parse the names of the book itself! (and probably do the same for Tanach?)
 object MishnehTorah:

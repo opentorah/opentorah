@@ -44,7 +44,35 @@ sealed trait Namespace derives CanEqual:
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
+  def declare(element: Xml.Element): Xml.Element =
+    element.copy(scope = scala.xml.NamespaceBinding(getPrefix.orNull, getUri.get, element.scope))
+    
 object Namespace:
+  def get(element: Xml.Element): Namespace = Namespace(
+    prefix = element.prefix,
+    uri = element.getNamespace(element.prefix)
+  )
+
+  private given CanEqual[scala.xml.NamespaceBinding, scala.xml.NamespaceBinding] = CanEqual.derived
+
+  // Note: maybe support re-definitions of the namespace bindings - like in  scala.xml.NamespaceBinding.shadowRedefined()?
+  def getAll(element: Xml.Element): Seq[Namespace] =
+    @scala.annotation.tailrec
+    def get(result: Seq[Namespace], namespaceBinding: scala.xml.NamespaceBinding): Seq[Namespace] =
+      if namespaceBinding == scala.xml.TopScope then result else
+        val namespace: Namespace = Namespace(
+          prefix = namespaceBinding.prefix,
+          uri = namespaceBinding.uri
+        )
+        get(result :+ namespace, namespaceBinding.parent)
+
+    get(Seq.empty, element.scope)
+    
+  def remove(nodes: Xml.Nodes): Seq[Xml.Node] = nodes.map(remove)
+
+  def remove(node: Xml.Node): Xml.Node = if !Xml.isElement(node) then node else
+    val element = Xml.asElement(node)
+    element.copy(scope = scala.xml.TopScope, child = remove(Xml.getChildren(element)))
 
   class Prefixed(prefix: String, override val uri: String) extends Namespace:
     require((prefix != null) && prefix.nonEmpty)

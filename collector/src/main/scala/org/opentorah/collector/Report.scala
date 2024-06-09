@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.store.{Context, Path, Terminal, WithSource}
 import org.opentorah.util.Strings
-import org.opentorah.xml.{A, Caching, ScalaXml}
+import org.opentorah.xml.{A, Caching, Xml}
 import zio.ZIO
 
 import java.net.URI
@@ -13,11 +13,11 @@ import java.net.URI
 sealed abstract class Report[T](name: String, val title: String) extends Terminal:
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
-  final override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+  final override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
-  final override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+  final override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
     lines: Seq[T] <- lines(Collector.get(context))
-    result: Seq[ScalaXml.Element] <- ZIO.foreach(lines)((line: T) => 
+    result: Seq[Xml.Element] <- ZIO.foreach(lines)((line: T) => 
       lineToXml(line, context)
     )
   yield
@@ -25,7 +25,7 @@ sealed abstract class Report[T](name: String, val title: String) extends Termina
 
   protected def lines(collector: Collector): Caching.Parser[Seq[T]]
 
-  protected def lineToXml(line: T, context: Context): Caching.Parser[ScalaXml.Element]
+  protected def lineToXml(line: T, context: Context): Caching.Parser[Xml.Element]
 
 object Report:
 
@@ -36,7 +36,7 @@ object Report:
     override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[EntityReference]]] =
       collector.getNoRefs
 
-    override protected def lineToXml(reference: WithSource[EntityReference], context: Context): Caching.Parser[ScalaXml.Element] =
+    override protected def lineToXml(reference: WithSource[EntityReference], context: Context): Caching.Parser[Xml.Element] =
       val source: String = reference.source
       ZIO.succeed(<l>{reference.value.name.toString} в {A(URI(source))(text = source)}</l>)
 
@@ -47,7 +47,7 @@ object Report:
     override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[Unclear.Value]]] =
       collector.getUnclears
 
-    override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context): Caching.Parser[ScalaXml.Element] =
+    override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context): Caching.Parser[Xml.Element] =
       val source: String = unclear.source
       ZIO.succeed(<l>{unclear.value.content.toString} в {A(URI(source))(text = source)}</l>)
 
@@ -61,7 +61,7 @@ object Report:
         .sortBy(_.name)
       )
 
-    override protected def lineToXml(entity: Entity, context: Context): Caching.Parser[ScalaXml.Element] =
+    override protected def lineToXml(entity: Entity, context: Context): Caching.Parser[Xml.Element] =
       for a: A <- context.a(entity)
       yield <l>{a(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
 

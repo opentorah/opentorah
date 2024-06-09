@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.site.TeiToHtml
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{A, Caching, ScalaXml}
+import org.opentorah.xml.{A, Caching, Xml}
 import zio.ZIO
 
 final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends
@@ -13,20 +13,20 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
     val that: TextFacet = other.asInstanceOf[TextFacet]
     (this.collection == that.collection) && (this.document == that.document)
   
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
     tei: Tei <- getTei
   yield
     <div>
-      {tei.text.body.content.scalaXml}
+      {tei.text.body.content.nodes}
     </div>
 
   override protected def moreNavigationLinks(
     collectionPath: Path,
     context: Context
-  ): Caching.Parser[Seq[ScalaXml.Element]] = for
+  ): Caching.Parser[Seq[Xml.Element]] = for
     translations: Seq[Document] <- collection.translations(document)
     translationsToLink: Seq[Document] = if document.isTranslation then Seq.empty else translations
-    translationLinks: Seq[ScalaXml.Element] <- ZIO.foreach(translationsToLink)((translation: Document) =>
+    translationLinks: Seq[Xml.Element] <- ZIO.foreach(translationsToLink)((translation: Document) =>
       for textFacetA: A <- translation.textFacetLink(context, collectionPath)
       yield textFacetA(s"[${translation.lang}]")
     )

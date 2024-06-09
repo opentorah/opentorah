@@ -1,16 +1,16 @@
 package org.opentorah.tei
 
 import org.opentorah.site.{LinksResolver, TeiToHtml}
-import org.opentorah.xml.{A, From, Parser, Parsing, ScalaXml}
+import org.opentorah.xml.{A, From, Parser, Xml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import zio.{UIO, URIO, ZIO, ZLayer}
+import zio.{UIO, ZIO, ZLayer}
 
 final class TeiTest extends AnyFlatSpec, Matchers:
 
   def unsafeRun[A](parser: Parser[A]): A = Parser.unsafeRun(parser)
 
-  def fromResource(name: String): From = From.resourceNamed(Tei, name, ScalaXml)
+  def fromResource(name: String): From = From.resourceNamed(Tei, name)
 
   def unsafeRun(name: String): Tei = unsafeRun(Tei.parse(fromResource(name)))
 
@@ -25,7 +25,7 @@ final class TeiTest extends AnyFlatSpec, Matchers:
     result.role shouldBe Some("jew")
     result.name shouldBe "Израиль из Мезбича"
 
-  private def tei2html(element: ScalaXml.Element): ScalaXml.Element =
+  private def tei2html(element: Xml.Element): Xml.Element =
     //    println(Xhtml.prettyPrinter.render(element))
     val resolver: LinksResolver = new LinksResolver:
       override def resolve(path: Seq[String]): UIO[Option[A]] = ZIO.none
@@ -39,6 +39,6 @@ final class TeiTest extends AnyFlatSpec, Matchers:
 
   "905" should "work" in:
     val tei: Tei = unsafeRun("905")
-    val html: ScalaXml.Element = tei2html(Tei.xmlElement(tei))
+    val html: Xml.Element = tei2html(Tei.xmlElement(tei))
     //println(Tei.prettyPrinter.render(ScalaXml)(html))
 

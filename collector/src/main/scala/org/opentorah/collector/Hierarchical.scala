@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.store.{Context, Path, Pure, Store}
-import org.opentorah.xml.{A, Caching, Element, Elements, Parsable, ScalaXml}
+import org.opentorah.xml.{A, Caching, Element, Elements, Parsable, Xml}
 import zio.ZIO
 
 // TODO push Hierarchical/ByHierarchy into Site;
@@ -22,13 +22,13 @@ abstract class Hierarchical(
   final def titleString: String = title.content.toString
 
   final override def htmlHeadTitle: Option[String] = Some(titleString)
-  final override def htmlBodyTitle: Option[ScalaXml.Nodes] = None
+  final override def htmlBodyTitle: Option[Xml.Nodes] = None
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
-  final def descriptionNodes: ScalaXml.Nodes = description.toSeq.map(Abstract.element.xmlElement)
+  final def descriptionNodes: Xml.Nodes = description.toSeq.map(Abstract.element.xmlElement)
 
-  final def reference(context: Context, path: Path): Caching.Parser[ScalaXml.Element] =
+  final def reference(context: Context, path: Path): Caching.Parser[Xml.Element] =
     for a: A <- context.a(path) yield a(text = displayTitle)
     
   final def pathHeaderHorizontal(path: Path): String =
@@ -41,24 +41,24 @@ abstract class Hierarchical(
 
     pathHeaderHorizontal(path, Seq.empty).mkString(", ")
 
-  final def pathHeaderVertical(context: Context, path: Path): Caching.Parser[Seq[ScalaXml.Element]] =
+  final def pathHeaderVertical(context: Context, path: Path): Caching.Parser[Seq[Xml.Element]] =
     def pathHeaderVertical(
       path: Path,
       pathTail: Path,
-      result: Seq[ScalaXml.Element]
-    ): Caching.Parser[Seq[ScalaXml.Element]] = if pathTail.isEmpty then ZIO.succeed(result) else
+      result: Seq[Xml.Element]
+    ): Caching.Parser[Seq[Xml.Element]] = if pathTail.isEmpty then ZIO.succeed(result) else
       val pathNew: Path = path ++ pathTail.take(2)
       val hierarchical: Hierarchical = pathTail.tail.head.asInstanceOf[Hierarchical]
       for
         a: A <- context.a(pathNew)
         // TODO drop the colon if the title is empty
-        line: ScalaXml.Element =
+        line: Xml.Element =
           <l>
             {Hierarchical.displayName(pathTail.head)}
             {a(text = Hierarchical.displayName(hierarchical))}:
-            {hierarchical.title.content.scalaXml}
+            {hierarchical.title.content.nodes}
           </l>
-        result: Seq[ScalaXml.Element] <- pathHeaderVertical(
+        result: Seq[Xml.Element] <- pathHeaderVertical(
           path = pathNew,
           pathTail = pathTail.drop(2),
           result = result :+ line
@@ -68,18 +68,18 @@ abstract class Hierarchical(
 
     pathHeaderVertical(path = Seq.empty, pathTail = path, result = Seq.empty)
 
-  final override def header(path: Path, context: Context): Caching.Parser[Option[ScalaXml.Element]] = for
-    pathHeader: Seq[ScalaXml.Element] <- pathHeaderVertical(context, path.dropRight(2))
+  final override def header(path: Path, context: Context): Caching.Parser[Option[Xml.Element]] = for
+    pathHeader: Seq[Xml.Element] <- pathHeaderVertical(context, path.dropRight(2))
   yield Some(
     <div class="store-header">
       {pathHeader}
       <head xmlns={Tei.namespace.uri}>
         {Hierarchical.displayName(path.init.last)}
         {Hierarchical.displayName(this)}:
-        {title.content.scalaXml}
+        {title.content.nodes}
       </head>
       {descriptionNodes}
-      {body.toSeq.map(_.content.scalaXml)}
+      {body.toSeq.map(_.content.nodes)}
     </div>
   )
 

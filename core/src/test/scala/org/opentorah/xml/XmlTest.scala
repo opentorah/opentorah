@@ -3,14 +3,15 @@ package org.opentorah.xml
 import org.opentorah.util.Effects
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import java.net.URL
 
 final class XmlTest extends AnyFlatSpec, Matchers:
 
   def unsafeRun[A](parser: Parser[A]): A = Parser.unsafeRun(parser)
 
-  def loadResource(xml: Xml, name: String): xml.Element =
-    Effects.unsafeRun(From.resourceNamed(Xml, name, xml).load.map(_.asInstanceOf[xml.Element]))
+  def loadResource(name: String, fixXercesXIncludes: Boolean = true): Xml.Element =
+    Effects.unsafeRun(From.resourceNamed(Xml, name, fixXercesXIncludes).load)
+
+  private def loadSite(fixXercesXIncludes: Boolean) = loadResource("site/site", fixXercesXIncludes)
 
   "text parsing" should "work" in:
     unsafeRun(
@@ -20,7 +21,7 @@ final class XmlTest extends AnyFlatSpec, Matchers:
         override def contentParsable: Parsable[String] = new Parsable[String]:
           override def parser: Parser[String] = Text().required()
           override def unparser: Unparser[String] = ???
-      }.parse(From.scalaXml("test", <a>asdjkh</a>))
+      }.parse(From.xml("test", <a>asdjkh</a>))
     ) shouldBe "asdjkh"
 
   it should "fail the right way" in:
@@ -32,24 +33,16 @@ final class XmlTest extends AnyFlatSpec, Matchers:
           override def parser: Parser[Option[String]] = Text().optional()
           override def unparser: Unparser[Option[String]] = ???
       }
-        .parse(From.scalaXml("test", <s><a>asdjkh</a></s>))
+        .parse(From.xml("test", <s><a>asdjkh</a></s>))
     ).either).isLeft shouldBe true
 
   "XInclude" should "work" in:
-    loadResource(ScalaXml, "includer").toString shouldBe
+    loadResource("includer").toString shouldBe
       s"""|<includer>
           |  <includee xml:base="includee.xml">
           |  <content>Blah!</content>
           |</includee>
           |</includer>""".stripMargin
-
-  private def loadSite(fixXercesXIncludes: Boolean) = ScalaXml.load0(
-    inputSource = Sax.url2inputSource(Parsing.getClass.getResource("site/site.xml")),
-    filters = Seq.empty,
-    resolver = None,
-    processIncludes = Xerces.ProcessIncludes.YesWithBases,
-    fixXercesXIncludes = fixXercesXIncludes
-  )
 
   it should "manifest a bug in Xerces" in:
     // xml:base on the third level of includes is wrong:
@@ -75,26 +68,21 @@ final class XmlTest extends AnyFlatSpec, Matchers:
           |</site>""".stripMargin
 
   "Attribute.get()" should "work" in:
-    Attribute("id").optional.getStringOption(ScalaXml)(<x id="2"/>) shouldBe Some("2")
-    Attribute("id", Xml.namespace).optional.getStringOption(ScalaXml)(<x xml:id="3"/>) shouldBe Some("3")
-    Dom.getAttributes(loadResource(Dom, name = "namespace")) shouldBe empty
+    unsafeRun(Attribute("id").optional.get(<x id="2"/>)) shouldBe Some("2")
+    unsafeRun(Attribute("id", Xml.namespace).optional.get(<x xml:id="3"/>)) shouldBe Some("3")
 
   private val teiNamespace: Namespace = Namespace(prefix = "tei", uri = "http://www.tei-c.org/ns/1.0")
 
   "ScalaXml.getNamespace()" should "work" in:
-    ScalaXml.getNamespace(<TEI/>) shouldBe Namespace.No
-    ScalaXml.getNamespace(<TEI xml:id="3"/>) shouldBe Namespace.No
-    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace, <tei:TEI/>)) shouldBe teiNamespace
-    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace, <TEI/>)) shouldBe Namespace.No
-    ScalaXml.getNamespace(ScalaXml.declareNamespace(teiNamespace.default, <TEI/>)) shouldBe teiNamespace.default
-    ScalaXml.getNamespace(<TEI xmlns={teiNamespace.uri}/>) shouldBe teiNamespace.default
+    Namespace.get(<TEI/>) shouldBe Namespace.No
+    Namespace.get(<TEI xml:id="3"/>) shouldBe Namespace.No
+    Namespace.get(teiNamespace.declare(<tei:TEI/>)) shouldBe teiNamespace
+    Namespace.get(teiNamespace.declare(<TEI/>)) shouldBe Namespace.No
+    Namespace.get(teiNamespace.default.declare(<TEI/>)) shouldBe teiNamespace.default
+    Namespace.get(<TEI xmlns={teiNamespace.uri}/>) shouldBe teiNamespace.default
+    Namespace.get(<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/></TEI>) shouldBe teiNamespace.default
+    Namespace.get(loadResource("namespace")) shouldBe teiNamespace.default
+    Namespace.get(firstElement(loadResource("namespace"))) shouldBe teiNamespace.default
 
-    ScalaXml.getNamespace(<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/></TEI>) shouldBe teiNamespace.default
-
-    ScalaXml.getNamespace(loadResource(ScalaXml, "namespace")) shouldBe teiNamespace.default
-    ScalaXml.getNamespace(firstElement(loadResource(ScalaXml, "namespace"))) shouldBe teiNamespace.default
-
-    Dom.getNamespace(loadResource(Dom, "namespace")) shouldBe teiNamespace.default
-
-  private def firstElement(element: ScalaXml.Element): ScalaXml.Element =
-    ScalaXml.getChildren(element).filter(ScalaXml.isElement).map(ScalaXml.asElement).head
+  private def firstElement(element: Xml.Element): Xml.Element =
+    Xml.getChildren(element).filter(Xml.isElement).map(Xml.asElement).head

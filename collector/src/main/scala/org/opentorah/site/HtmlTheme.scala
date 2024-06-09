@@ -1,19 +1,19 @@
 package org.opentorah.site
 
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, Html, ScalaXml}
+import org.opentorah.xml.{Attribute, Html, Xml}
 import org.opentorah.xml.Namespace.XLink
 
 object HtmlTheme:
   def fullContent(
      wrapperCssClass: String,
-     header: Option[ScalaXml.Element],
-     bodyTitle: Option[ScalaXml.Nodes],
-     content: ScalaXml.Element
-  ): ScalaXml.Element =
+     header: Option[Xml.Element],
+     bodyTitle: Option[Xml.Nodes],
+     content: Xml.Element
+  ): Xml.Element =
     <div class={wrapperCssClass}>
-      {ScalaXml.optional(header)((header: ScalaXml.Element) =>
-      header)}{ScalaXml.optional(bodyTitle)((title: ScalaXml.Nodes) =>
+      {Xml.optional(header)((header: Xml.Element) =>
+      header)}{Xml.optional(bodyTitle)((title: Xml.Nodes) =>
       <header class="post-header">
         <h1 class="post-title">
           {title}
@@ -31,27 +31,27 @@ object HtmlTheme:
     cssFileName: String,
     viewer: String,
     viewerDefault: String,
-    navigationLinks: Seq[ScalaXml.Element], // normally, <a>s
-    content: ScalaXml.Element
-  ): ScalaXml.Element =
+    navigationLinks: Seq[Xml.Element], // normally, <a>s
+    content: Xml.Element
+  ): Xml.Element =
 
     <html>
       <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>{ScalaXml.optional(headTitle)(title =>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>{Xml.optional(headTitle)(title =>
         <title>
           {title}
         </title>)}
         <link rel="stylesheet" href={s"/css/$cssFileName.css"}/>
-        {ScalaXml.optional(siteHtml.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
+        {Xml.optional(siteHtml.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
       </head>
       <body>
         <header class="site-header" role="banner">
           <div class="wrapper">
-            {ScalaXml.optional(siteHtml.title)(title =>
+            {Xml.optional(siteHtml.title)(title =>
             <a class="site-title" rel="author" target={viewerDefault} href="/">
-              {title.content.scalaXml}
+              {title.content.nodes}
             </a>)}<nav class="site-nav">
             <input type="checkbox" id="nav-trigger" class="nav-trigger"/>
             <label for="nav-trigger">
@@ -62,7 +62,7 @@ object HtmlTheme:
               </span>
             </label>
             <div class="trigger">
-              {navigationLinks.map(pageLinkClass.set(ScalaXml))}
+              {navigationLinks.map(pageLinkClass.set)}
             </div>
           </nav>
           </div>
@@ -80,10 +80,10 @@ object HtmlTheme:
             <div class="footer-col-wrapper">
               <div class="footer-col footer-col-1">
                 <ul class="contact-list">
-                  {ScalaXml.optional(siteHtml.url)(url =>
+                  {Xml.optional(siteHtml.url)(url =>
                   <li class="p-name">
                     {url}
-                  </li>)}{ScalaXml.optional(siteHtml.email)(email =>
+                  </li>)}{Xml.optional(siteHtml.email)(email =>
                   <li>
                     <a class="u-email" href={s"mailto:$email"}>
                       {email}
@@ -105,9 +105,9 @@ object HtmlTheme:
                     </a>
                   </li>}
                 </ul>
-              </div>{ScalaXml.optional(siteHtml.footer)(footer =>
+              </div>{Xml.optional(siteHtml.footer)(footer =>
               <div class="footer-col footer-col-3">
-                {footer.content.scalaXml}
+                {footer.content.nodes}
               </div>)}
             </div>
           </div>
