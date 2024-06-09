@@ -1,5 +1,6 @@
 package org.opentorah.site
 
+import org.opentorah.util.Effects
 import org.opentorah.xml.{ScalaXml, Xml}
 import zio.{URIO, ZIO, ZLayer}
 
@@ -44,10 +45,11 @@ object Footnotes:
 
   def empty: ZLayer[Any, Nothing, Footnotes] = ZLayer.succeed(new Footnotes)
 
-  def footnote(element: ScalaXml.Element): URIO[Footnotes, ScalaXml.Element] = for
+  def footnote(element: ScalaXml.Element): ZIO[Footnotes, Effects.Error, ScalaXml.Element] = for
   // TODO get two ids, one for the actual content at the end
     idNumber: Int <- ZIO.environmentWith[Footnotes](_.get.takeNextIdNumber)
-    srcId: String = Xml.idAttribute.optional.get(ScalaXml)(element).getOrElse(s"footnote_src_$idNumber")
+    id: Option[String] <- Xml.idAttribute.optional.get(ScalaXml)(element)
+    srcId: String = id.getOrElse(s"footnote_src_$idNumber")
     contentId: String = s"footnote_$idNumber"
     number: Int <- ZIO.environmentWith[Footnotes](_.get.getNextNumber)
     symbol: String = number.toString

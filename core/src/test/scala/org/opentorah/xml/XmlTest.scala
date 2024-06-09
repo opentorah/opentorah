@@ -75,8 +75,8 @@ final class XmlTest extends AnyFlatSpec, Matchers:
           |</site>""".stripMargin
 
   "Attribute.get()" should "work" in:
-    Attribute("id").optional.get(ScalaXml)(<x id="2"/>) shouldBe Some("2")
-    Attribute("id", Xml.namespace).optional.get(ScalaXml)(<x xml:id="3"/>) shouldBe Some("3")
+    Attribute("id").optional.getStringOption(ScalaXml)(<x id="2"/>) shouldBe Some("2")
+    Attribute("id", Xml.namespace).optional.getStringOption(ScalaXml)(<x xml:id="3"/>) shouldBe Some("3")
     Dom.getAttributes(loadResource(Dom, name = "namespace")) shouldBe empty
 
   private val teiNamespace: Namespace = Namespace(prefix = "tei", uri = "http://www.tei-c.org/ns/1.0")

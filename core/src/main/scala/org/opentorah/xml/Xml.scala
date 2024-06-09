@@ -7,6 +7,7 @@ import java.net.URL
 import zio.{URIO, ZIO}
 
 // This abstracts over the XML model, allowing parsing and pretty-printing of both Scala XML and DOM.
+// TODO remove DOM and collapse the hierarchy
 trait Xml extends XmlAttributes:
   type Node
   given CanEqual[scala.collection.immutable.Nil.type, Nodes] = CanEqual.derived // Note: just for case matching of Nil against Nodes...
@@ -55,9 +56,9 @@ trait Xml extends XmlAttributes:
   final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
 
-  final def allBases(element: Element): Seq[String] =
-    Xml.baseAttribute.optional.get(this)(element).toSeq ++
-    getChildren(element).filter(isElement).map(asElement).flatMap(allBases)
+//  final def allBases(element: Element): Seq[String] =
+//    Xml.baseAttribute.optional.getOption(this)(element).toSeq ++
+//    getChildren(element).filter(isElement).map(asElement).flatMap(allBases)
 
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(f)

@@ -172,7 +172,7 @@ object ScalaXml extends Xml:
   // What a nightmare...
   private def fixXIncludeBug(element: ScalaXml.Element): ScalaXml.Element =
     def fix(current: Option[String], level: Int, element: ScalaXml.Element): ScalaXml.Element =
-      val base: Option[String] = Xml.baseAttribute.optional.get(ScalaXml)(element)
+      val base: Option[String] = Xml.baseAttribute.optional.getStringOption(ScalaXml)(element)
 
       val (baseFixed: Option[String], levelNew: Int) = base match
         case None => (current, level)

@@ -1,7 +1,5 @@
 package org.opentorah.xml
 
-import org.opentorah.xml.{Attribute, Dialect, Doctype, Namespace, PrettyPrinter}
-
 object Html extends Dialect, Doctype:
 
   override val namespace: Namespace = Namespace(uri = "http://www.w3.org/1999/xhtml", prefix = "xhtml")

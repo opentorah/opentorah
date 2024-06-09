@@ -1,7 +1,8 @@
 package org.opentorah.site
 
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, Html, ScalaXml, XLink}
+import org.opentorah.xml.{Attribute, Html, ScalaXml}
+import org.opentorah.xml.Namespace.XLink
 
 object HtmlTheme:
   def fullContent(
@@ -96,7 +97,7 @@ object HtmlTheme:
                   <li>
                     <a href={s"${service.serviceUrl}/$username"}>
                       <svg class="svg-icon">
-                        <use xmlns:xlink={XLink.namespace.uri} xlink:href={service.iconUrl}/>
+                        <use xmlns:xlink={XLink.uri} xlink:href={service.iconUrl}/>
                       </svg>
                       <span class="username">
                         {username}
