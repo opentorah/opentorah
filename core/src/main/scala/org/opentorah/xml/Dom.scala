@@ -70,7 +70,7 @@ object Dom extends Xml:
       )
 
   override def isNamespaceDeclared(namespace: Namespace, attributes: Attributes): Boolean =
-    namespace.attribute.get(Dom)(attributes) == namespace.getUri
+    namespace.attribute.getStringOption(Dom)(attributes) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
     namespace.attributeValue.set(Dom)(element)

@@ -44,7 +44,7 @@ object Sax extends XmlAttributes:
       )
 
   override def isNamespaceDeclared(namespace: Namespace, attributes: Attributes): Boolean =
-    namespace.attribute.get(Sax)(attributes) == namespace.getUri
+    namespace.attribute.getStringOption(Sax)(attributes) == namespace.getUri
 
   override def declareNamespace(namespace: Namespace, element: Element): Element =
     namespace.attributeValue.set(Sax)(element)

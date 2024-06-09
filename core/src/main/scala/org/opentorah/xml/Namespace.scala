@@ -46,7 +46,7 @@ sealed trait Namespace derives CanEqual:
 
 object Namespace:
 
-  final class Prefixed(prefix: String, override val uri: String) extends Namespace:
+  class Prefixed(prefix: String, override val uri: String) extends Namespace:
     require((prefix != null) && prefix.nonEmpty)
     require((uri != null) && uri.nonEmpty)
 
@@ -101,3 +101,7 @@ object Namespace:
     prefix = Option(prefix),
     uri = Option(uri)
   )
+
+  object XInclude extends Prefixed(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
+
+  object XLink extends Prefixed(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")

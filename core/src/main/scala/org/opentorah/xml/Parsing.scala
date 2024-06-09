@@ -177,7 +177,7 @@ private[xml] object Parsing:
     result: Option[A] <- nextElementOpt.fold(ZIO.none) { (nextElement: NextElement[A]) =>
       for
         parentBase: Option[URL] <- nextElement.xml.parentBase
-        base: Option[String] = Xml.baseAttribute.optional.get(nextElement.xml)(nextElement.xmlElement)
+        base: Option[String] <- Xml.baseAttribute.optional.get(nextElement.xml)(nextElement.xmlElement)
         fromUrl: Option[URL] = base.map(Files.subUrl(parentBase, _))
 
         nextElementWithoutBase: NextElement[A] = fromUrl match

@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.13] - 2024-
 - chore: Gradle 8.8
-- cleanup: switching from Asciidoctor Gradle plugin to calling external
-- cleanup: remove some more traces of DocBook
+- cleanup: switching from Asciidoctor Gradle plugin to calling external Asciidoctor
+- cleanup: switching bibliography to asciidoctor-bibtex
+- cleanup: remove traces of DocBook processing code
+- cleanup: ZIO-ified XML Attributes a bit more
 
 ## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin
