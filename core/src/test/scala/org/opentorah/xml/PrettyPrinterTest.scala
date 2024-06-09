@@ -11,14 +11,14 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
       width,
       indent = 2,
       clingyElements = Set("note")
-    ).render(ScalaXml)(Effects.unsafeRun(from.load.map(_.asInstanceOf[ScalaXml.Element])))
+    ).render(element = Effects.unsafeRun(from.load))
 
   private def check(from: From, width: Int, expected: String): Unit =
     val result = render(from, width)
     result shouldBe expected.stripMargin + "\n"
 
-  private def check(xml: ScalaXml.Element, width: Int, expected: String): Unit =
-    check(From.scalaXml("test XML", xml), width, expected)
+  private def check(xml: Xml.Element, width: Int, expected: String): Unit =
+    check(From.xml("test XML", xml), width, expected)
 
   "Chunking" should "work" in:
     check(<a>X<b/> </a>, 120, expected =
@@ -117,28 +117,28 @@ final class PrettyPrinterTest extends AnyFlatSpec, Matchers:
          |</p>""")
 
     check(
-      <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(false)}
+      <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                       xmlns:db="http://docbook.org/ns/docbook"
                       exclude-result-prefixes="db">
         <!-- Customizations go here. -->
         <!-- dummy -->
       </xsl:stylesheet>,
       width = 120, expected =
-        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="${Xsl.namespace.uri}" version="1.0"
+        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
             |exclude-result-prefixes="db">
             |  <!-- Customizations go here. -->
             |  <!-- dummy -->
             |</xsl:stylesheet>""")
 
     check(
-      <xsl:stylesheet xmlns:xsl={Xsl.namespace.uri} version={Xsl.version(false)}
+      <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                       xmlns:db="http://docbook.org/ns/docbook"
                       exclude-result-prefixes="db">
         <xsl:param value="x"/>
         <d:y xmlns:y="zzz"/>
       </xsl:stylesheet>,
       width = 120, expected =
-        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="${Xsl.namespace.uri}" version="1.0"
+        s"""|<xsl:stylesheet xmlns:db="http://docbook.org/ns/docbook" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
             |exclude-result-prefixes="db">
             |  <xsl:param value="x"/>
             |  <d:y xmlns:y="zzz"/>

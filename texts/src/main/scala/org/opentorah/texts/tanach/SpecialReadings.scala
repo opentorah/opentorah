@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
-import org.opentorah.xml.{Elements, From, Parser, ScalaXml}
+import org.opentorah.xml.{Elements, From, Parser, Xml}
 import Torah.{Fragment, Maftir}
 
 /* All the special readings and their rules are here.
@@ -14,15 +14,15 @@ import Torah.{Fragment, Maftir}
  */
 object SpecialReadings:
 
-  private def parseTorah(element: ScalaXml.Element): Torah = parse(Torah.torahParsable, "Torah", element)
+  private def parseTorah(element: Xml.Element): Torah = parse(Torah.torahParsable, "Torah", element)
 
-  private def parseMaftir(element: ScalaXml.Element): Maftir = parse(Torah.Maftir, "Maftir", element)
+  private def parseMaftir(element: Xml.Element): Maftir = parse(Torah.Maftir, "Maftir", element)
 
-  private def parseHaftarah(element: ScalaXml.Element, full: Boolean = true): Haftarah.Customs =
+  private def parseHaftarah(element: Xml.Element, full: Boolean = true): Haftarah.Customs =
     parse(Haftarah.element(full), "Haftarah", element)
 
-  private def parse[R](fromXml: Elements[R], what: String, element: ScalaXml.Element): R =
-    Parser.unsafeRun(fromXml.parse(From.scalaXml(what, element)))
+  private def parse[R](fromXml: Elements[R], what: String, element: Xml.Element): R =
+    Parser.unsafeRun(fromXml.parse(From.xml(what, element)))
 
   private def fromDay(named: Named, torah: Torah): Torah = torah.fromWithNumbers(named)
 

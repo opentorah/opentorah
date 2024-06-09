@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, HasValues, Names}
-import org.opentorah.store.{By, Pure, Store}
+import org.opentorah.metadata.{HasName, Names}
+import org.opentorah.store.{By, Pure}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
 
 trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
 

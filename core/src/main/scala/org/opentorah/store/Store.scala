@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Named
-import org.opentorah.xml.{Caching, ScalaXml}
+import org.opentorah.xml.{Caching, Xml}
 import zio.ZIO
 
 /*
@@ -29,11 +29,11 @@ trait Store extends Named:
 
   def htmlHeadTitle: Option[String] = None
 
-  def navigationLinks(path: Path, context: Context): Caching.Parser[Seq[ScalaXml.Element]] = ZIO.succeed(Seq.empty)
+  def navigationLinks(path: Path, context: Context): Caching.Parser[Seq[Xml.Element]] = ZIO.succeed(Seq.empty)
 
-  def header(path: Path, context: Context): Caching.Parser[Option[ScalaXml.Element]] = ZIO.none
+  def header(path: Path, context: Context): Caching.Parser[Option[Xml.Element]] = ZIO.none
 
-  def htmlBodyTitle: Option[ScalaXml.Nodes] = None
+  def htmlBodyTitle: Option[Xml.Nodes] = None
 
-  def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+  def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
     throw IllegalAccessException(s"Called unimplemented Store.content($path, $context) on $this")

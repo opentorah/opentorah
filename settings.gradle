@@ -40,11 +40,7 @@ dependencyResolutionManagement {
     library('zinc'         , 'org.scala-sbt:zinc_2.13:1.10.0')
 
     // XML
-    library('xmlresolver'  , 'org.xmlresolver:xmlresolver:6.0.4')
-    library('jing'         , 'org.relaxng:jing:20220510')
-    bundle('xmlresolver', ['xmlresolver', 'jing'])
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
-    library('saxon12'      , 'net.sf.saxon:Saxon-HE:12.4')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud

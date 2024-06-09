@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.tei.Tei
 import org.opentorah.store.{By, Context, Path, Pure}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 final class EntityLists(
@@ -26,29 +26,29 @@ final class EntityLists(
   override def storesPure: Seq[EntityList] = lists
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] =
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
     val nonEmptyLists: Seq[EntityList] = lists.filter(_.getEntities.nonEmpty)
     for
       tocA: A <- context.a(path)
-      toc: Seq[ScalaXml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+      toc: Seq[Xml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
         for contentA: A <- context.a(list) yield
           <l>
             {tocA.setFragment(list.names.name)(xml = list.title)}
             {contentA(EntityLists.expand)}
           </l>
       )
-      content: Seq[ScalaXml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+      content: Seq[Xml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
         for
           a: A <- context.a(list)
-          lines: Seq[ScalaXml.Element] <- ZIO.foreach(list.getEntities)((entity: Entity) =>
+          lines: Seq[Xml.Element] <- ZIO.foreach(list.getEntities)((entity: Entity) =>
             entity.line(context)
           )
         yield
           <list id={list.names.name}>
             <head xmlns={Tei.namespace.uri}>
-              {list.title.content.scalaXml}
+              {list.title.content.nodes}
               {a(EntityLists.expand)}
             </head>
             {lines}

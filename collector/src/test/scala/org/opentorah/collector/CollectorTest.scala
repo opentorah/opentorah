@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.site.Site
 import org.opentorah.store.{Path, Store}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Element, From, ScalaXml}
+import org.opentorah.xml.{Caching, Element, From}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.io.File

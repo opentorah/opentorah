@@ -4,7 +4,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Caching, Doctype, Element, From, Html, Parser, PrettyPrinter, Sax, ScalaXml, Xerces, Xml}
+import org.opentorah.xml.{A, Caching, Element, From, Html, Parser, PrettyPrinter, Xerces, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
 import java.net.URL
@@ -90,12 +90,12 @@ abstract class Site(
   protected def content(path: Path, extension: Option[String]): Caching.Parser[Site.Response]
 
   final def render(path: Path): Caching.Parser[String] = for
-    siteNavigationLinks: Seq[ScalaXml.Element] <- getNavigationLinks
+    siteNavigationLinks: Seq[Xml.Element] <- getNavigationLinks
     store: Store = path.last
-    storeNavigationLinks: Seq[ScalaXml.Element] <- store.navigationLinks(path, this)
-    content: ScalaXml.Element <- resolveLinks(path)
+    storeNavigationLinks: Seq[Xml.Element] <- store.navigationLinks(path, this)
+    content: Xml.Element <- resolveLinks(path)
   yield
-    val result: ScalaXml.Element = HtmlTheme.toHtml(
+    val result: Xml.Element = HtmlTheme.toHtml(
       siteHtml = common.getHtml,
       headTitle = store.htmlHeadTitle,
       cssFileName = style(store),
@@ -104,7 +104,7 @@ abstract class Site(
       navigationLinks = siteNavigationLinks ++ storeNavigationLinks,
       content = content
     )
-    Site.prettyPrinter.render(ScalaXml, doctype = Some(Html))(result)
+    Site.prettyPrinter.render(doctype = Some(Html.doctype), result)
 
   def viewerDefault: String
 
@@ -112,29 +112,29 @@ abstract class Site(
 
   def wrapperCssClass(store: Store): String
 
-  final protected def resolveLinks(path: Path): Caching.Parser[ScalaXml.Element] = for
+  final protected def resolveLinks(path: Path): Caching.Parser[Xml.Element] = for
     store: Store <- ZIO.succeed(path.last)
-    header: Option[ScalaXml.Element] <- store.header(path, this)
-    content: ScalaXml.Element <- store.content(path, this)
-    fullContent: ScalaXml.Element = HtmlTheme.fullContent(
+    header: Option[Xml.Element] <- store.header(path, this)
+    content: Xml.Element <- store.content(path, this)
+    fullContent: Xml.Element = HtmlTheme.fullContent(
       wrapperCssClass(store),
       header,
       store.htmlBodyTitle,
       content
     )
-    result: ScalaXml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path)))
+    result: Xml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path)))
   yield result
 
   protected def linkResolver(path: Path): LinksResolver
 
-  final protected def renderTei(tei: Tei): String = Tei.prettyPrinter.renderWithHeader(ScalaXml)(
-    Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
+  final protected def renderTei(tei: Tei): String = Tei.prettyPrinter.renderWithHeader(
+    element = Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(PublicationStmt(
-          publisher = common.getHtml.url.map(url => Publisher.Value(ScalaXml.toNodes(<ptr target={s"http://$url"}/>))),
+          publisher = common.getHtml.url.map(url => Publisher.Value(Xml.toNodes(<ptr target={s"http://$url"}/>))),
           availability = Some(Availability(
             status = Some("free"),
-            xml = ScalaXml.toNodes(ScalaXml.optional(common.license)(license =>
+            xml = Xml.toNodes(Xml.optional(common.license)(license =>
               <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>))
           ))
         )),
@@ -151,7 +151,7 @@ abstract class Site(
     )))
   )
 
-  private def getNavigationLinks: Caching.Parser[Seq[ScalaXml.Element]] = caching.getCached("navigationLinks",
+  private def getNavigationLinks: Caching.Parser[Seq[Xml.Element]] = caching.getCached("navigationLinks",
     ZIO.foreach(common.pages)((url: String) => for
       pathOpt: Option[Path] <- resolveUrl(url)
       path: Path = pathOpt.get
@@ -192,17 +192,23 @@ abstract class Site(
     for
       prettyPrintTei    : Seq[URL]  <- prettyPrintTei
       prettyPrintStores : Seq[URL]  <- prettyPrintStores
-    yield
-      prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None)
-      prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None)
+      _ <- prettyPrint(prettyPrintTei   , Tei.prettyPrinter      , doctype = None)
+      _ <- prettyPrint(prettyPrintStores, Site.storePrettyPrinter, doctype = None)
+    yield ()
 
-  private def prettyPrint(urls: Seq[URL], prettyPrinter: PrettyPrinter, doctype: Option[Doctype]): Unit =
-    for url <- urls do
-      val content: ScalaXml.Element = ScalaXml.load(Sax.url2inputSource(url), processIncludes = Xerces.ProcessIncludes.No)
-      Files.write(
+  private def prettyPrint(
+    urls: Seq[URL],
+    prettyPrinter: PrettyPrinter,
+    doctype: Option[String]
+  ): ZIO[Any, Effects.Error, Unit] =
+    def one(url: URL): ZIO[Any, Effects.Error, Unit] = for
+      content: Xml.Element <- From.url(url, processIncludes = Xerces.ProcessIncludes.No).load
+      _ <- ZIO.succeed(Files.write(
         file = Files.url2file(url),
-        content = prettyPrinter.renderWithHeader(ScalaXml, doctype)(content)
-      )
+        content = prettyPrinter.renderWithHeader(doctype, content)
+      ))
+    yield ()
+    ZIO.collectAllDiscard(urls.map(one))
 
   protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 

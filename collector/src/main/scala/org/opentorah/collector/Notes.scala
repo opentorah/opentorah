@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.site.Markdown
 import org.opentorah.store.{By, Context, Directory, Path}
-import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.{UIO, ZIO}
 import java.net.URL
 
@@ -22,11 +22,11 @@ final class Notes(
   override protected def loadFile(url: URL): UIO[Markdown] = ZIO.succeed(Markdown(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[ScalaXml.Nodes] = htmlHeadTitle.map(ScalaXml.mkText)
+  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
     notes: Seq[Note] <- stores
-    lines: Seq[ScalaXml.Element] <- ZIO.foreach(notes.sortBy(_.title))((note: Note) =>
+    lines: Seq[Xml.Element] <- ZIO.foreach(notes.sortBy(_.title))((note: Note) =>
       for a: A <- context.a(path :+ note) yield
         <l>{a(text = note.title.getOrElse("NO TITLE"))}</l>
     )

@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
-import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, Unparser}
 
 object SeferHamitzvosLessons:
 

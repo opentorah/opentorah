@@ -32,8 +32,7 @@ object Entity extends EntityRelated[Entity](
   elementName = _.element,
   entityType = _.entityType
 ):
-  // TODO: with this, in Scala 3 I get 'Double definition' error:
-  // override def toString: String = "Entity"
+  override def toString: String = "Entity"
 
   override protected def contentType: Element.ContentType = Element.ContentType.Elements
 

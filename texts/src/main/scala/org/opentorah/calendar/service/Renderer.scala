@@ -10,7 +10,7 @@ import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
 import org.opentorah.texts.tanach.Tanach.Psalms
 import org.opentorah.texts.tanach.{Custom, Haftarah, Reading, Span, Torah}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{A, PrettyPrinter, ScalaXml}
+import org.opentorah.xml.{A, PrettyPrinter, Xml}
 
 final class Renderer(
   val calendar: Calendar,
@@ -39,7 +39,7 @@ final class Renderer(
   def renderYear(yearStr: String): String = renderYear(getYear(yearStr))
 
   def renderYear(year: calendar.Year): String =
-    val yearInformation: Seq[ScalaXml.Element] = calendar match
+    val yearInformation: Seq[Xml.Element] = calendar match
       case _: Jewish.type => renderJewishYearInformation(year.asInstanceOf[Jewish.Year]) // TODO cast
       case _ => Seq.empty
 
@@ -70,7 +70,7 @@ final class Renderer(
       </div>
     )
 
-  private def dayLinks(day: calendar.Day, calendarTo: Calendar): ScalaXml.Element =
+  private def dayLinks(day: calendar.Day, calendarTo: Calendar): Xml.Element =
     val rendererTo: Renderer = Renderer(
       calendarTo,
       location,
@@ -78,7 +78,7 @@ final class Renderer(
     )
     rendererTo.dayLinks(day.to(calendarTo).asInstanceOf[rendererTo.calendar.Day]) // TODO cast...
 
-  private def dayLinks(day: calendar.Day): ScalaXml.Element =
+  private def dayLinks(day: calendar.Day): Xml.Element =
     <div>
       <span>
         {calendar.name}
@@ -110,7 +110,7 @@ final class Renderer(
         <div>{daySchedule.dayNames.map((named: Named) => <span class="name">{named.names.doFind(spec).name}</span>)}</div>
         {renderOptionalReading("Morning", daySchedule.morning)}
         {renderOptionalReading("Purim morning alternative", daySchedule.purimAlternativeMorning)}
-        {if !jewishDay.isShabbosMevarchim then Seq.empty[ScalaXml.Element] else renderShabbosMevarchim(jewishDay.month.next)}
+        {if !jewishDay.isShabbosMevarchim then Seq.empty[Xml.Element] else renderShabbosMevarchim(jewishDay.month.next)}
         <span class="heading">Chitas</span>
         {renderChitas(daySchedule.chitas)}
         <span class="heading">Tehillim</span>
@@ -121,7 +121,7 @@ final class Renderer(
       </div>
     )
 
-  private def renderShabbosMevarchim(month: Jewish.Month): Seq[ScalaXml.Element] = Seq(
+  private def renderShabbosMevarchim(month: Jewish.Month): Seq[Xml.Element] = Seq(
     <span class="subheading">Shabbos Mevarchim</span>,
     <table><tr>
       <td>{month.name.toLanguageString}</td>
@@ -131,18 +131,18 @@ final class Renderer(
     </tr></table>
   )
 
-  private def renderChitas(chitas: Chitas): ScalaXml.Element =
-    def renderFragment(fragment: Torah.Fragment): Seq[ScalaXml.Element] = Seq(
+  private def renderChitas(chitas: Chitas): Xml.Element =
+    def renderFragment(fragment: Torah.Fragment): Seq[Xml.Element] = Seq(
       <td><span>{fragment.toLanguageString}</span></td>,
       <td>{renderSource(fragment.source)}</td>
     )
 
     <table><tbody>
       <tr>{renderFragment(chitas.first)}</tr>
-      {chitas.second.fold(Seq.empty[ScalaXml.Element])(fragment => Seq(<tr>{renderFragment(fragment)}</tr>))}
+      {chitas.second.fold(Seq.empty[Xml.Element])(fragment => Seq(<tr>{renderFragment(fragment)}</tr>))}
     </tbody></table>
 
-  private def renderTehillim(day: Jewish.Day): ScalaXml.Element =
+  private def renderTehillim(day: Jewish.Day): Xml.Element =
     val forDayOfMonth: Span =
       if (day.numberInMonth == 29) && day.month.length == 29 then Span(Psalms.days(29 - 1).from, Psalms.days(30 - 1).to)
       else Psalms.days(day.numberInMonth - 1)
@@ -155,7 +155,7 @@ final class Renderer(
       <tr><td>for day of week</td> <td><span>{forDayOfWeek.toLanguageString}</span></td></tr>
     </table>
 
-  private def renderRambam(schedule: RambamSchedule): Seq[ScalaXml.Element] = Seq(
+  private def renderRambam(schedule: RambamSchedule): Seq[Xml.Element] = Seq(
     <span class="subheading">3 chapters</span>,
     <table>
       <tr><td>Cycle</td> <td>Lesson</td></tr>
@@ -192,14 +192,14 @@ final class Renderer(
     </table>
   )
 
-  private def renderRambamChapter(chapter: MishnehTorah.Chapter): Seq[ScalaXml.Element] = Seq(
+  private def renderRambamChapter(chapter: MishnehTorah.Chapter): Seq[Xml.Element] = Seq(
     <td>{chapter.part.book.toLanguageString}</td>,
     <td>{chapter.part.toLanguageString}</td>,
     <td>{chapter.toLanguageString}</td>
   )
 
-  private def renderOptionalReading(name: String, reading: Option[Reading]): Seq[ScalaXml.Element] =
-    reading.fold(Seq.empty[ScalaXml.Element])(reading => Seq(<div>
+  private def renderOptionalReading(name: String, reading: Option[Reading]): Seq[Xml.Element] =
+    reading.fold(Seq.empty[Xml.Element])(reading => Seq(<div>
       <span class="heading">{name}</span>
       {
         val maftirCommonOnly = reading.maftir.commonOnly
@@ -210,7 +210,7 @@ final class Renderer(
 
         <div>
           {renderCustoms("Torah", reading.torah, renderTorah)}
-          {if noMaftirHaftarah then Seq.empty[ScalaXml.Element] else
+          {if noMaftirHaftarah then Seq.empty[Xml.Element] else
             if varyingMaftirAndHaftarah then
               renderCustoms("Maftir and Haftarah", reading.maftirAndHaftarah, renderMaftirAndHaftarah)
             else
@@ -221,7 +221,7 @@ final class Renderer(
       }
     </div>))
 
-  private def renderTorah(torah: Torah): Seq[ScalaXml.Element] =
+  private def renderTorah(torah: Torah): Seq[Xml.Element] =
     torah.spans.zipWithIndex map ((fragment, index) =>
       <tr>
         <td>{spec.toString(index + 1)}</td>
@@ -230,7 +230,7 @@ final class Renderer(
       </tr>
     )
 
-  private def renderMaftir(maftir: Option[Torah.Maftir]): Seq[ScalaXml.Element] =
+  private def renderMaftir(maftir: Option[Torah.Maftir]): Seq[Xml.Element] =
     Seq(maftir.fold(<tr><td>None</td></tr>)(maftir =>
       <tr>
         <td>{maftir.toLanguageString}</td>
@@ -238,7 +238,7 @@ final class Renderer(
       </tr>
     ))
 
-  private def renderHaftarah(haftarah: Option[Haftarah]): Seq[ScalaXml.Element] =
+  private def renderHaftarah(haftarah: Option[Haftarah]): Seq[Xml.Element] =
     haftarah.fold(Seq(<tr>
       <td>None</td>
     </tr>))(haftarah =>
@@ -256,7 +256,7 @@ final class Renderer(
         </tr>
       ))
 
-  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah]): Seq[ScalaXml.Element] =
+  private def renderMaftirAndHaftarah(maftirAndHaftarah: Option[Reading.MaftirAndHaftarah]): Seq[Xml.Element] =
     renderMaftir(maftirAndHaftarah.flatMap(_.maftir)) ++
     renderHaftarah(maftirAndHaftarah.map(_.haftarah))
 
@@ -266,8 +266,8 @@ final class Renderer(
   private def renderCustoms[T](
     what: String,
     customs: Custom.Of[T],
-    renderer: T => Seq[ScalaXml.Element]
-  ): Seq[ScalaXml.Element] =
+    renderer: T => Seq[Xml.Element]
+  ): Seq[Xml.Element] =
     <span class="subheading">{what}</span> +:
     customs.customs.toSeq.map((custom: Custom, valueForCustom /*: T*/) =>
       <table class="custom">
@@ -276,7 +276,7 @@ final class Renderer(
       </table>
     )
 
-  private def yearLink(year: Calendar#Year, text: Option[String] = None): ScalaXml.Element =
+  private def yearLink(year: Calendar#Year, text: Option[String] = None): Xml.Element =
     navLink(yearUrl(year), text.getOrElse(year.toLanguageString))
 
   private def yearUrl(year: Calendar#Year): Seq[String] =
@@ -285,16 +285,16 @@ final class Renderer(
   private def monthUrl(month: Calendar#Month): Seq[String] =
     url(month.year.number.toString, month.numberInYear.toString)
 
-  private def monthLink(month: Calendar#Month): ScalaXml.Element =
+  private def monthLink(month: Calendar#Month): Xml.Element =
     navLink(monthUrl(month), month.numberInYearToLanguageString)
 
-  private def monthNameLink(month: Calendar#Month, text: Option[String] = None): ScalaXml.Element =
+  private def monthNameLink(month: Calendar#Month, text: Option[String] = None): Xml.Element =
     navLink(monthNameUrl(month), text.getOrElse(month.name.toLanguageString))
 
   private def monthNameUrl(month: Calendar#Month): Seq[String] =
     url(month.year.number.toString, month.name.toLanguageString)
 
-  private def dayLink(day: Calendar#Day, text: Option[String] = None): ScalaXml.Element =
+  private def dayLink(day: Calendar#Day, text: Option[String] = None): Xml.Element =
     navLink(dayUrl(day), text.getOrElse(day.numberInMonthToLanguageString))
 
   private def dayUrl(day: Calendar#Day): Seq[String] =
@@ -302,16 +302,16 @@ final class Renderer(
 
   private def url(parts: String*): Seq[String] = calendar.name +: parts
 
-  private def navLink(url: Seq[String], text: String): ScalaXml.Element =
+  private def navLink(url: Seq[String], text: String): Xml.Element =
     A(url).setQuery(Renderer.suffix(location, spec)).addClass("nav")(text)
 
-  private def renderHtml(url: Seq[String], content: ScalaXml.Element): String =
+  private def renderHtml(url: Seq[String], content: Xml.Element): String =
     Renderer.renderHtml(url, content, location, spec)
 
-  private def renderJewishYearInformation(year: Jewish.Year): Seq[ScalaXml.Element] =
+  private def renderJewishYearInformation(year: Jewish.Year): Seq[Xml.Element] =
     val delay: NewYear.Delay = year.newYearDelay
 
-    val numbers: ScalaXml.Element =
+    val numbers: Xml.Element =
       <table>
         <tr><td>from creation</td> <td>{year.toLanguageString}</td></tr>
         <tr><td>is leap</td> <td>{year.isLeap.toString}</td></tr>
@@ -322,7 +322,7 @@ final class Renderer(
         <tr><td>New Year Delay</td> <td>{s"$delay (${delay.days})"}</td></tr>
       </table>
 
-    def cycle(name: String, yearsCycle: YearsCycle): ScalaXml.Element =
+    def cycle(name: String, yearsCycle: YearsCycle): Xml.Element =
       val in = yearsCycle.forYear(Jewish)(year)
       <tr>
         <td>{name}</td>
@@ -330,7 +330,7 @@ final class Renderer(
         <td>{spec.toString(in.numberInCycle)}</td>
       </tr>
 
-    val cycles: ScalaXml.Element =
+    val cycles: Xml.Element =
       <table>
         <tr><td>Cycle"</td> <td>Number</td> <td>In Cycle"</td></tr>
         {cycle("Leap Years", LeapYearsCycle)}
@@ -338,7 +338,7 @@ final class Renderer(
         {cycle("Birchas Hachamo", Sun.Shmuel)}
       </table>
 
-    val tkufot: ScalaXml.Element =
+    val tkufot: Xml.Element =
       def tkufa(flavor: Season.ForYear, season: Season): String =
         flavor.seasonForYear(season, year).toLanguageString
 
@@ -358,7 +358,7 @@ final class Renderer(
         .map(specialDay => specialDay -> specialDay.correctedDate(year))
         .toSeq.sortBy(_._2)
 
-    val festivals: ScalaXml.Element =
+    val festivals: Xml.Element =
       <table>
         {festivalDays.map((specialDay, day) =>
         <tr>
@@ -393,17 +393,17 @@ object Renderer:
 
   def renderHtml(
     url: Seq[String],
-    content: ScalaXml.Element,
+    content: Xml.Element,
     location: Location,
     spec: Language.Spec
   ): String =
-    val languages: Seq[ScalaXml.Element] = Language.valuesSeq.map(_.toSpec).map(spec1 =>
+    val languages: Seq[Xml.Element] = Language.valuesSeq.map(_.toSpec).map(spec1 =>
       val languageName = spec1.languageName
       if spec1.language == spec.language then <span class="picker">{languageName}</span>
       else A(url).setQuery(suffix(location, spec1)).addClass("picker")(text = languageName)
     )
 
-    val locations: Seq[ScalaXml.Element] = Seq(Location.HolyLand, Location.Diaspora).map(location1 =>
+    val locations: Seq[Xml.Element] = Seq(Location.HolyLand, Location.Diaspora).map(location1 =>
       if location1 == location then <span class="picker">{location1.name}</span>
       else A(url).setQuery(suffix(location1, spec)).addClass("picker")(text = location1.name)
     )
@@ -415,7 +415,7 @@ object Renderer:
         <body>{languages}{locations}{content}</body>
       </html>
 
-    PrettyPrinter.default.render(ScalaXml)(result)
+    PrettyPrinter.default.render(element = result)
 
   private def direction(spec: Language.Spec): String =
     if spec.language.contains(Language.Hebrew) then "rtl" else "ltr" // TODO add a method to Language...

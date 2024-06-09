@@ -32,6 +32,14 @@ abstract class Attribute[T](
     case Some(result) => ZIO.succeed(result)
     case None => ZIO.fail(Effects.Error(s"Invalid value for attribute $this: $value"))
 
+  final def get(element: Xml.Element): Option[String] = {
+    if namespace.isDefault then element.attribute(name)
+    else element.attribute(namespace.uri, name)
+  }.map(_.text)
+  
+  final def remove(element: Xml.Element): Xml.Element =
+    Attribute.set(Attribute.get(element).filterNot(_.attribute.name == name), element)
+
 object Attribute:
 
   final class Value[T](
@@ -42,8 +50,14 @@ object Attribute:
 
     override def toString: String = s"""$attribute="${valueEffective.getOrElse("<default>")}""""
 
-    def set(xml: XmlAttributes)(element: xml.Element): xml.Element = xml.setAttribute(this, element)
+    // TODO rework
+    def add(element: Xml.Element): Xml.Element = Attribute.add(Seq(this), element)
 
+    // TODO add() doesn't modify existing attributes; this should...
+    def set(element: Xml.Element): Xml.Element = valueEffective match
+      case None => element
+      case _ => Attribute.add(Seq(this), element)
+      
     def valueEffective: Option[String] =
       val result: Option[T] =
         if !attributeParsable.isSetDefault
@@ -57,18 +71,49 @@ object Attribute:
 
   def allAttributes: Parser[StringValues] = Parsing.allAttributes
 
+  def get(element: Xml.Element): StringValues = element.attributes.toSeq
+    .filter(_.isInstanceOf[scala.xml.Attribute])
+    .map(_.asInstanceOf[scala.xml.Attribute])
+    .map(attribute =>
+      Attribute(
+        name = attribute.key,
+        namespace = Namespace(
+          prefix = attribute.pre,
+          uri = attribute.getNamespace(element)
+        )
+      ).optional.withValue(Option(attribute.value).map(_.text))
+    )
+  
+  // TODO rework
+  final def add(attributes: Values, element: Xml.Element): Xml.Element =
+    val existing: Attribute.Values = get(element)
+    val toAdd: Attribute.Values = attributes
+      .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
+
+    set(existing ++ toAdd, element)
+
+  def set(attributes: Attribute.Values, element: Xml.Element): Xml.Element =
+    element.copy(attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null)(
+      (attributeValue, next) => toMetaData(attributeValue, next))
+    )
+
+  private def toMetaData[T](attributeValue: Attribute.Value[T], next: scala.xml.MetaData): scala.xml.MetaData =
+    val attribute: Attribute[T] = attributeValue.attribute
+    scala.xml.Attribute(
+      pre = attribute.namespace.getPrefix.orNull,
+      key = attribute.name,
+      value = attributeValue.valueEffective.map(Xml.mkText).map(Seq(_)).orNull,
+      next = next
+    )  
+    
   // TODO A is either T or Option[T]; are there any type-level tricks I can use to enforce this?
   sealed abstract class Parsable[T, A](val attribute: Attribute[T])(using CanEqual[T, T]) extends org.opentorah.xml.Parsable[A]:
     final override protected def parser: Parser[A] =
       Parsing.takeAttribute(attribute).flatMap(fromStringOption)
 
-    final def get(xml: XmlAttributes)(attributes: xml.Attributes): Effects.IO[A] =
-      fromStringOption(getStringOption(xml)(attributes))
-
-    // This is exposed to avoid turning everything to do with the namespace and base attributes into ZIOs for now :)
-    final def getStringOption(xml: XmlAttributes)(attributes: xml.Attributes): Option[String] =
-      xml.getAttribute(attribute, attributes).filter(_.nonEmpty)
-
+    final def get(element: Xml.Element): Effects.IO[A] =
+      fromStringOption(attribute.get(element).filter(_.nonEmpty))
+    
     private def fromStringOption(stringOption: Option[String]): ZIO[Any, Effects.Error, A] = for
       option: Option[T] <- stringOption match
         case None => ZIO.none
@@ -102,7 +147,7 @@ object Attribute:
     override protected val toOption: T => Option[T] = Some(_)
     override protected def fromOption(option: Option[T]): Effects.IO[T] = Effects.required(ZIO.succeed(option), attribute)
 
-  final class StringAttribute(
+  private final class StringAttribute(
     name: String,
     namespace: Namespace = Namespace.No,
     default: String = ""
@@ -167,7 +212,5 @@ object Attribute:
     getName: T => String
   )(using CanEqual[T, T]) extends Attribute[T](name, namespace, default):
     override protected def toString(value: T): String = getName(value)
-    override protected def fromString(value: String): Effects.IO[T] = fromString(
-      value => values.find(getName(_) == value)
-    )(value)
-
+    override protected def fromString(value: String): Effects.IO[T] =
+      fromString(value => values.find(getName(_) == value))(value)

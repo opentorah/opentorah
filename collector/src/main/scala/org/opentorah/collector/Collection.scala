@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.store.{By, Context, Path, Selector, Store}
-import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, ScalaXml, Unparser}
+import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 final class Collection(
@@ -60,7 +60,7 @@ final class Collection(
   override def findByName(name: String): Caching.Parser[Option[Store]] =
     textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(ZIO.some)) // TODO ZIO.someOrElseM?
 
-  override def content(path: Path, context: Context): Caching.Parser[ScalaXml.Element] = for
+  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
     directory: Documents.All <- documents.getDirectory
     columns: Seq[Collection.Column] = Seq(
       Collection.descriptionColumn,
@@ -73,9 +73,9 @@ final class Collection(
           documentTranslations: Seq[Document] <- translations(document)
           translationLinks <- ZIO.foreach(documentTranslations)((translation: Document) =>
             for textFacetA: A <- translation.textFacetLink(context, path)
-            yield Seq(ScalaXml.mkText(" "), textFacetA(text = translation.lang)))
+            yield Seq(Xml.mkText(" "), textFacetA(text = translation.lang)))
         yield
-          Seq(ScalaXml.mkText(document.lang)) ++ translationLinks.flatten
+          Seq(Xml.mkText(document.lang)) ++ translationLinks.flatten
       ),
 
       Collection.Column("Документ", "document", (document: Document) =>
@@ -89,29 +89,29 @@ final class Collection(
             page.reference(context, document, path)
           )
         yield
-          ScalaXml.multi(separator = " ", nodes = nodes)
+          Xml.multi(separator = " ", nodes = nodes)
       ),
 
       Collection.transcribersColumn
     )
 
-    rows: Seq[ScalaXml.Nodes] <- ZIO.foreach(directory.parts)(part =>
+    rows: Seq[Xml.Nodes] <- ZIO.foreach(directory.parts)(part =>
       ZIO.foreach(part.documents)(document =>
         for
           cells <- ZIO.foreach(columns)(column =>
-            for value: ScalaXml.Nodes <- column.value(document)
+            for value: Xml.Nodes <- column.value(document)
             yield <td class={column.cssClass}>{value}</td>
           )
         yield <tr>{cells}</tr>
       )
-        .map(documentRows => part.title.fold[ScalaXml.Nodes](Seq.empty)(title =>
-          <tr><td colspan={columns.length.toString}><span class="part-title">{title.content.scalaXml}</span></td></tr>
+        .map(documentRows => part.title.fold[Xml.Nodes](Seq.empty)(title =>
+          <tr><td colspan={columns.length.toString}><span class="part-title">{title.content.nodes}</span></td></tr>
         ) ++ documentRows)
     )
   yield
     val missingPages: Seq[Page] = directory.stores.sortBy(_.name).flatMap(_.pages(pageType)).filter(_.pb.isMissing)
 
-    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[ScalaXml.Element] =
+    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] =
       val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
       if missing.isEmpty then Seq.empty
       else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
@@ -134,7 +134,7 @@ final class Collection(
     Collection.transcribersColumn
   )
 
-  def documentHeader(document: Document): Caching.Parser[ScalaXml.Element] =
+  def documentHeader(document: Document): Caching.Parser[Xml.Element] =
     ZIO.foreach(documentHeaderColumns)(column => column.value(document).map(value =>
       <tr>
         <td class="heading">{column.heading}</td>
@@ -147,14 +147,14 @@ object Collection extends Element[Collection]("collection"):
   private class Column(
     val heading: String,
     val cssClass: String,
-    val value: Document => Caching.Parser[ScalaXml.Nodes]
+    val value: Document => Caching.Parser[Xml.Nodes]
   ):
     override def toString: String = heading
 
   private class PureColumn(
     heading: String,
     cssClass: String,
-    value: Document => ScalaXml.Nodes
+    value: Document => Xml.Nodes
   ) extends Column(
     heading,
     cssClass,

@@ -27,6 +27,6 @@ open class RawXml(
 
       override def unparser: Unparser[Value] = Unparser(
         attributes = _.attributes,
-        content = _.content.scalaXml,
+        content = _.content.nodes,
         namespace = namespace
       )

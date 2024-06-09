@@ -20,6 +20,10 @@ object Tei extends Element[Tei]("TEI"), Dialect:
 
   override val mimeType: String = "application/tei+xml"
 
+  override val rootElementName: String = "TEI"
+
+  override val dtdId: Option[String] = Some("-//TEI P5")
+
   /////  """<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>\n"""
   override val prettyPrinter: PrettyPrinter = PrettyPrinter(
     doNotStackElements = Set("choice"),
