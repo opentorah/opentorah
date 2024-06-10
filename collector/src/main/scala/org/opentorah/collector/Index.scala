@@ -1,8 +1,9 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Path, Selector, Terminal}
-import org.opentorah.xml.{A, Caching, Parser, Xml}
+import org.opentorah.xml.{Caching, Parser, Xml}
 import zio.ZIO
 
 sealed abstract class Index(name: String, selectorName: String) extends Terminal:

@@ -1,10 +1,11 @@
 package org.opentorah.collector
 
+import org.opentorah.html.{A, Html}
 import org.opentorah.site.{LinksResolver, Site, SiteCommon, SiteService}
 import org.opentorah.store.{Alias, Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, Tei, Unclear, Entity as TeiEntity}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Caching, Element, Html, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.{UIO, ZIO}
 import java.net.URL
 

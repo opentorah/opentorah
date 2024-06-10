@@ -1,8 +1,9 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.tei.Pb
 import org.opentorah.store.{Context, Path}
-import org.opentorah.xml.{A, Attribute, Caching, Xml}
+import org.opentorah.xml.{Attribute, Caching, Xml}
 import zio.ZIO
 
 sealed abstract class Page(val pb: Pb):

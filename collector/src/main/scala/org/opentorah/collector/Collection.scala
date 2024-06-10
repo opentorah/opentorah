@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
 import org.opentorah.store.{By, Context, Path, Selector, Store}
-import org.opentorah.xml.{A, Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 final class Collection(

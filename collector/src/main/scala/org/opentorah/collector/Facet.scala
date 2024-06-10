@@ -1,10 +1,11 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.metadata.Names
 import org.opentorah.site.Site
 import org.opentorah.store.{Context, Path, Terminal}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{A, Caching, Xml}
+import org.opentorah.xml.{Caching, Xml}
 import zio.ZIO
 
 abstract class Facet(val document: Document, val collectionFacet: CollectionFacet) extends Terminal:

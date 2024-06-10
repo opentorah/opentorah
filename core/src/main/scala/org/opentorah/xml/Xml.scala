@@ -65,11 +65,7 @@ object Xml:
   
   final def isEmpty(element: Element): Boolean = isEmpty(getChildren(element))
   final def isEmpty(nodes: Nodes): Boolean = nodes.forall(isWhitespace)
-
-//  final def allBases(element: Element): Seq[String] =
-//    baseAttribute.optional.getOption(this)(element).toSeq ++
-//    getChildren(element).filter(isElement).map(asElement).flatMap(allBases)
-
+  
   final def optional[T](option: Option[T])(f: T => Nodes): Nodes =
     option.fold[Nodes](Seq.empty)(f)
 
@@ -88,5 +84,3 @@ object Xml:
     case n :: n1 :: ns if isElement(n) && isElement(n1) => Seq(n, mkText(separator)) ++ multi(n1 :: ns, separator)
     case n :: ns => Seq(n) ++ multi(ns, separator)
     case n => n
-
-

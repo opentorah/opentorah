@@ -19,7 +19,7 @@ abstract class Element[A](val elementName: String) extends Elements[A]:
   final override protected def elementByValue(value: A): Element[?] = this
 
   // TODO allow declaring this element's namespace...
-  final override def xmlElement(value: A): Xml.Element =
+  final def xmlElement(value: A): Xml.Element =
     Attribute.set(
       attributes = contentParsable.unparser.attributes(value),
       element = contentParsable.unparser.namespace.fold(<elem/>)(namespace => namespace.default.declare(<elem/>))

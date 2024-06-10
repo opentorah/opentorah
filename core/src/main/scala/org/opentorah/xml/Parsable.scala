@@ -1,6 +1,5 @@
 package org.opentorah.xml
 
-// TODO generalize with conversions
 trait Parsable[T]:
   protected def parser: Parser[T]
 

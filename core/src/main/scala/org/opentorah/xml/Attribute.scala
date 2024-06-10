@@ -4,7 +4,8 @@ import org.opentorah.util.Effects
 import zio.ZIO
 
 // Type-safe XML attribute get/set - for use in DOM and SAX;
-// inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends.
+// inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends
+// (see https://github.com/rototor/jeuclid/blob/master/jeuclid-core/src/main/java/net/sourceforge/jeuclid/context/Parameter.java).
 abstract class Attribute[T](
   val name: String,
   val namespace: Namespace,
@@ -28,14 +29,17 @@ abstract class Attribute[T](
   protected def toString(value: T): String = value.toString
   protected def fromString(value: String): Effects.IO[T]
 
-  protected final def fromString(toOption: String => Option[T])(value: String): ZIO[Any, Effects.Error, T] = toOption(value) match
+  protected final def fromString(value: String, toOption: String => Option[T]): ZIO[Any, Effects.Error, T] = toOption(value) match
     case Some(result) => ZIO.succeed(result)
     case None => ZIO.fail(Effects.Error(s"Invalid value for attribute $this: $value"))
 
-  final def get(element: Xml.Element): Option[String] = {
-    if namespace.isDefault then element.attribute(name)
+  final def get(element: Xml.Element): Option[String] = (
+    if namespace.isDefault
+    then element.attribute(name)
     else element.attribute(namespace.uri, name)
-  }.map(_.text)
+  )
+    .map(_.toSeq) // Note: Scala XML breakage...
+    .map(Xml.toString)
   
   final def remove(element: Xml.Element): Xml.Element =
     Attribute.set(Attribute.get(element).filterNot(_.attribute.name == name), element)
@@ -69,7 +73,7 @@ object Attribute:
 
   type StringValues = Seq[Value[String]]
 
-  def allAttributes: Parser[StringValues] = ParserState.allAttributes
+  def all: Parser[StringValues] = ParserState.allAttributes
 
   def get(element: Xml.Element): StringValues = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
@@ -168,7 +172,7 @@ object Attribute:
     override protected def fromString(value: String): Effects.IO[Boolean] = value match
       case "yes" => ZIO.succeed(true)
       case "no"  => ZIO.succeed(false)
-      case value => fromString(_.toBooleanOption)(value)
+      case value => fromString(value, _.toBooleanOption)
 
   abstract class IntAttributeBase(
     name: String,
@@ -176,7 +180,7 @@ object Attribute:
     default: Int
   ) extends Attribute[Int](name, namespace, default):
     protected final def int(value: String, mustBePositive: Boolean): Effects.IO[Int] = for
-      n <- fromString(_.toIntOption)(value)
+      n <- fromString(value, _.toIntOption)
       result <-
         if !mustBePositive || (n > 0)
         then ZIO.succeed(n)
@@ -202,7 +206,7 @@ object Attribute:
     namespace: Namespace = Namespace.No,
     default: Float = 0.0f
   ) extends Attribute[Float](name, namespace, default):
-    override protected def fromString(value: String): Effects.IO[Float] = fromString(_.toFloatOption)(value)
+    override protected def fromString(value: String): Effects.IO[Float] = fromString(value, _.toFloatOption)
 
   final class EnumeratedAttribute[T](
     name: String,
@@ -213,4 +217,4 @@ object Attribute:
   )(using CanEqual[T, T]) extends Attribute[T](name, namespace, default):
     override protected def toString(value: T): String = getName(value)
     override protected def fromString(value: String): Effects.IO[T] =
-      fromString(value => values.find(getName(_) == value))(value)
+      fromString(value, value => values.find(getName(_) == value))

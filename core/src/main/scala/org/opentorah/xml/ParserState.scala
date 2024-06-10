@@ -157,7 +157,7 @@ final class ParserState:
     (elems.map(Xml.asElement), if characters.isEmpty then None else Some(characters))
 
 private[xml] object ParserState:
-  private final class NextElement[A](val xmlElement: Xml.Element, val elementAndParser: Element.AndParser[A])
+  private final case class NextElement[A](xmlElement: Xml.Element, elementAndParser: Element.AndParser[A])
 
   def empty: ParserState = new ParserState
 
@@ -183,21 +183,17 @@ private[xml] object ParserState:
 
   def optional[A](elements: Elements[A]): Parser[Option[A]] = for
     // TODO take namespace into account!
-    // TODO tidy up
     nextElementOpt: Option[NextElement[A]] <- accessZIO(_.nextElement(elements))
     result: Option[A] <- nextElementOpt.fold(ZIO.none) { (nextElement: NextElement[A]) =>
       for
         parentBase: Option[URL] <- parentBase
         base: Option[String] <- Xml.baseAttribute.optional.get(nextElement.xmlElement)
         fromUrl: Option[URL] = base.map(Files.subUrl(parentBase, _))
-
-        nextElementWithoutBase: NextElement[A] = fromUrl match
-          case None => nextElement
-          case Some(_) => NextElement(Xml.baseAttribute.remove(nextElement.xmlElement), nextElement.elementAndParser)
-
-        result <- nested(
+        result: A <- nested(
           from = fromUrl.map(From.include),
-          nextElement = nextElementWithoutBase
+          nextElement = fromUrl match
+            case None => nextElement
+            case _ => nextElement.copy(xmlElement = Xml.baseAttribute.remove(nextElement.xmlElement))
         )
       yield Some(result)
     }
@@ -221,7 +217,7 @@ private[xml] object ParserState:
     nextElement: NextElement[A]
   ): Parser[A] = for
     _ <- accessZIO(_.push(from, nextElement))
-    result <- nextElement.elementAndParser.parser
+    result: A <- nextElement.elementAndParser.parser
     _ <- accessZIO(_.checkNoLeftovers)
     _ <- access(_.pop())
   yield result

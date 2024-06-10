@@ -9,7 +9,7 @@ trait Elements[A]:
 
   protected def elementByValue(value: A): Element[?]
 
-  def xmlElement(value: A): Xml.Element =
+  private final def xmlElement(value: A): Xml.Element =
     elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
   private def parseOption: Parser[Option[A]] = ParserState.optional(this)
@@ -57,6 +57,8 @@ object Elements:
     )
 
   abstract class Union[A] extends Elements[A]:
+    final def xmlElement(value: A): Xml.Element = super.xmlElement(value)
+
     protected def elements: Seq[Element[? <: A]]
 
     final override def elementAndParser(name: String): Option[Element.AndParser[A]] =

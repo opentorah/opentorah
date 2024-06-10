@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.tei.Tei
 import org.opentorah.store.{By, Context, Path, Pure}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{A, Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 
 final class EntityLists(

@@ -1,7 +1,8 @@
 package org.opentorah.site
 
+import org.opentorah.html.Html
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, Html, Xml}
+import org.opentorah.xml.{Attribute, Xml}
 import org.opentorah.xml.Namespace.XLink
 
 object HtmlTheme:

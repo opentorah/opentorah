@@ -1,6 +1,7 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{A, Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser}
+import org.opentorah.html.A
+import org.opentorah.xml.{Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser}
 
 final class Tei(
   val teiHeader: TeiHeader,

@@ -1,7 +1,8 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.store.{By, Context, Path, Pure}
-import org.opentorah.xml.{A, Caching, Parser, Xml}
+import org.opentorah.xml.{Caching, Parser, Xml}
 import zio.ZIO
 
 object Reports extends

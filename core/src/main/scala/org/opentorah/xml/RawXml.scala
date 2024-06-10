@@ -18,7 +18,7 @@ open class RawXml(
 
     override def contentParsable: Parsable[Value] = new Parsable[Value]:
       override def parser: Parser[Value] = for
-        attributes: Attribute.Values <- if attributesAllowed then Attribute.allAttributes else ZIO.succeed(Seq.empty)
+        attributes: Attribute.Values <- if attributesAllowed then Attribute.all else ZIO.succeed(Seq.empty)
         content: Xml.Nodes <- Xml.nodes()
       yield Value(
         content,

@@ -23,9 +23,3 @@ object Text:
 
   def apply(): Text = new Text
 
-//  final class TextElement(elementName: String) extends Element[String](elementName):
-//    override def toString: String = s"text element $elementName"
-//    override def contentType: Element.ContentType = Element.ContentType.Characters
-//    override def contentParsable: Parsable[String] = Text().required
-//
-//  def apply(elementName: String): TextElement = TextElement(elementName)

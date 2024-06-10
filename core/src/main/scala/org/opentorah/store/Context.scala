@@ -1,6 +1,7 @@
 package org.opentorah.store
 
-import org.opentorah.xml.{A, Caching}
+import org.opentorah.html.A
+import org.opentorah.xml.Caching
 
 trait Context:
   // TODO eliminate?

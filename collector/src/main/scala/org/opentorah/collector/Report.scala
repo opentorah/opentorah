@@ -1,12 +1,12 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.store.{Context, Path, Terminal, WithSource}
 import org.opentorah.util.Strings
-import org.opentorah.xml.{A, Caching, Xml}
+import org.opentorah.xml.{Caching, Xml}
 import zio.ZIO
-
 import java.net.URI
 
 // TODO Reports is ApparatusViewer, but Report - DefaultViewer (Hierarchy)?!

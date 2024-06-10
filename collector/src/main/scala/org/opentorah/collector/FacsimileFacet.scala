@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.site.Site
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Pb
-import org.opentorah.xml.{A, Caching, Xml}
+import org.opentorah.xml.{Caching, Xml}
 import zio.ZIO
 
 final class FacsimileFacet(document: Document, collectionFacet: CollectionFacet) extends
