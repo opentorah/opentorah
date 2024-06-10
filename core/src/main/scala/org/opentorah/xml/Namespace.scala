@@ -37,10 +37,11 @@ sealed trait Namespace derives CanEqual:
   final def isDefault: Boolean = getPrefix.isEmpty
 
   final def default: Namespace = if isDefault then this else Namespace(prefix = None, uri = getUri)
-
-  // Note: empty string attribute name is used for default namespace attributes;
-  // it is processed specially by Namespace.Xmlns.qName()
-  final def attribute: Attribute.Optional[String] = Attribute(getPrefix.getOrElse(""), Namespace.Xmlns).optional
+  
+  final def attribute: Attribute.Optional[String] = Attribute(
+    name = getPrefix.getOrElse(Namespace.defaultNamespaceAttributeName),
+    namespace = Namespace.Xmlns
+  ).optional
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
@@ -48,6 +49,10 @@ sealed trait Namespace derives CanEqual:
     element.copy(scope = scala.xml.NamespaceBinding(getPrefix.orNull, getUri.get, element.scope))
     
 object Namespace:
+  // Note: empty string attribute name is used for default namespace attributes;
+  // it is processed specially by Namespace.Xmlns.qName()
+  private val defaultNamespaceAttributeName: String = ""
+  
   def get(element: Xml.Element): Namespace = Namespace(
     prefix = element.prefix,
     uri = element.getNamespace(element.prefix)
@@ -68,40 +73,19 @@ object Namespace:
 
     get(Seq.empty, element.scope)
     
-  def remove(nodes: Xml.Nodes): Seq[Xml.Node] = nodes.map(remove)
+  def remove(nodes: Xml.Nodes): Xml.Nodes = nodes.map(remove)
 
   def remove(node: Xml.Node): Xml.Node = if !Xml.isElement(node) then node else
     val element = Xml.asElement(node)
     element.copy(scope = scala.xml.TopScope, child = remove(Xml.getChildren(element)))
-
-  class Prefixed(prefix: String, override val uri: String) extends Namespace:
-    require((prefix != null) && prefix.nonEmpty)
-    require((uri != null) && uri.nonEmpty)
-
-    override def getPrefix: Option[String] = Some(prefix)
-    override def getUri: Option[String] = Some(uri)
-    override def qName(localName: String): String =
-      require(localName.nonEmpty)
-      prefix + ":" + localName
-
-  final class Default(override val uri: String) extends Namespace:
-    require((uri != null) && uri.nonEmpty)
-
-    override def getPrefix: Option[String] = None
-    override def getUri: Option[String] = Some(uri)
-    override def qName(localName: String): String =
-      require(localName.nonEmpty)
-      localName
 
   object Xmlns extends Namespace:
     val prefix: String = "xmlns"
     override def getPrefix: Option[String] = Some(prefix)
     override def uri: String = "http://www.w3.org/2000/xmlns/"
     override def getUri: Option[String] = Some(uri)
-
-    // Note: empty string attribute name is used for default namespace attributes.
-    def qName(localName: String): String =
-      prefix + (if localName.isEmpty then "" else ":" + localName)
+    def qName(localName: String): String = 
+      prefix + (if localName.isEmpty then defaultNamespaceAttributeName else ":" + localName)
 
   object No extends Namespace:
     override def toString: String = "<No Namespace>"
@@ -113,6 +97,23 @@ object Namespace:
       require(localName.nonEmpty)
       localName
 
+  private final class Default(override val uri: String) extends Namespace:
+    require((uri != null) && uri.nonEmpty)
+    override def getPrefix: Option[String] = None
+    override def getUri: Option[String] = Some(uri)
+    override def qName(localName: String): String =
+      require(localName.nonEmpty)
+      localName
+
+  class Prefixed(prefix: String, override val uri: String) extends Namespace:
+    require((prefix != null) && prefix.nonEmpty)
+    require((uri != null) && uri.nonEmpty)
+    override def getPrefix: Option[String] = Some(prefix)
+    override def getUri: Option[String] = Some(uri)
+    override def qName(localName: String): String =
+      require(localName.nonEmpty)
+      prefix + ":" + localName
+      
   object XInclude extends Prefixed(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
 
   object XLink extends Prefixed(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")

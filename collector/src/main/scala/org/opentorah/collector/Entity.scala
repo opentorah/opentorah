@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as TeiEntity}
 import org.opentorah.store.{Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{A, Attribute, Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, Unparser, Xml}
 import zio.ZIO
 import java.net.URL
 
@@ -76,7 +77,7 @@ final class Entity(
 
       fromCollectionsResult: Seq[Xml.Element] <- ZIO.foreach(byCollection){
         case (collection: Collection, (collectionPath: Path, texts: Seq[TextFacet])) =>
-          for pageLinks: Seq[Xml.Node] <- ZIO.foreach(texts)(
+          for pageLinks: Xml.Nodes <- ZIO.foreach(texts)(
             (text: TextFacet) =>
               for textFacetA: A <- text.document.textFacetLink(context, collectionPath)
               yield textFacetA(text = text.document.baseName)

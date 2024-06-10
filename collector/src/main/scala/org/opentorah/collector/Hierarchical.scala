@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.store.{Context, Path, Pure, Store}
-import org.opentorah.xml.{A, Caching, Element, Elements, Parsable, Xml}
+import org.opentorah.xml.{Caching, Element, Elements, Parsable, Xml}
 import zio.ZIO
 
 // TODO push Hierarchical/ByHierarchy into Site;

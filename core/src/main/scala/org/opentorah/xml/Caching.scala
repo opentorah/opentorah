@@ -8,7 +8,8 @@ import java.net.URL
 import java.time.Duration
 
 trait Caching:
-  def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Caching.Parser[T]): Caching.Parser[T]
+  def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Caching.Parser[T]): Caching.Parser[T] =
+    getCached[T](url, load(url))
 
   def getCached[T <: AnyRef](key: AnyRef, load: => Caching.Parser[T]): Caching.Parser[T]
 
@@ -30,7 +31,8 @@ object Caching:
 
   private val log: Logger = LoggerFactory.getLogger(classOf[Caching.type])
 
-  // TODO introduce Caching.None.
+  final class Zero extends Caching:
+    def getCached[T <: AnyRef](key: AnyRef, load: => Caching.Parser[T]): Caching.Parser[T] = load
 
   final class Simple extends Caching:
     private val cache: Cache[AnyRef, AnyRef] = Caffeine.newBuilder
@@ -40,9 +42,6 @@ object Caching:
       .build[AnyRef, AnyRef]
 
     var logEnabled: Boolean = true
-
-    override def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Parser[T]): Parser[T] =
-      getCached[T](url, load(url))
 
     def getCached[T <: AnyRef](key: AnyRef, load: => Caching.Parser[T]): Caching.Parser[T] =
       Option[AnyRef](cache.getIfPresent(key))

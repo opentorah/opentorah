@@ -1,9 +1,10 @@
 package org.opentorah.collector
 
+import org.opentorah.html.A
 import org.opentorah.site.TeiToHtml
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{A, Caching, Xml}
+import org.opentorah.xml.{Caching, Xml}
 import zio.ZIO
 
 final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends

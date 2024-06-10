@@ -1,10 +1,10 @@
-package org.opentorah.xml
+package org.opentorah.html
 
 import org.opentorah.util.Files
+import org.opentorah.xml.{RawXml, Xml}
 import java.net.URI
 
 // HTML anchor element
-// TODO move to the html package
 final class A(
   uri: Option[URI] = None,
   target: Option[String] = None,

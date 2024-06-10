@@ -1,10 +1,11 @@
 package org.opentorah.site
 
+import org.opentorah.html.{A, Html}
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Caching, Element, From, Html, Parser, PrettyPrinter, Xerces, Xml}
+import org.opentorah.xml.{Caching, Element, From, Parser, PrettyPrinter, Xerces, Xml}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
 import java.net.URL

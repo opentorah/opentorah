@@ -11,12 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - cleanup: switching from Asciidoctor Gradle plugin to calling external Asciidoctor
 - cleanup: switching bibliography to asciidoctor-bibtex
 - cleanup: ZIO-ified XML Attributes a bit more
+- cleanup: moved HTML classes into html package
+- cleanup: removed Element.Nodes
 - cleanup: remove traces of DocBook processing code
 - cleanup: removed more DocBook-related stuff and collapsed unrequitted generality:
-  - removed Sax, Dom, Saxon
-  - folded XmlAttributes and ScalaXml into Xml
+  - removed Sax, Dom, Saxon, Xsl, Catalog, Resolver
+  - removed Saxon and XML Resolver dependencies - folded XmlAttributes and ScalaXml into Xml
   - Xml.Attributes is the same as Xml.Element
   - pruned some unused methods and parameters
+  - relocated methods from the XML object to where they belong
+  - folded Doctype into Dialect
+  - removed TracingFilter
 
 ## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin

@@ -3,10 +3,11 @@ package org.opentorah.site
 import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish
 import org.opentorah.calendar.roman.{Gregorian, Julian}
+import org.opentorah.html.{A, Html}
 import org.opentorah.metadata.Language
 import org.opentorah.tei.{Date, EntityName, EntityType, Pb, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{A, Attribute, Html, Namespace, Xml}
+import org.opentorah.xml.{Attribute, Namespace, Xml}
 import zio.ZIO
 import java.net.URI
 
