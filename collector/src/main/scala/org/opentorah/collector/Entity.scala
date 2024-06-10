@@ -100,7 +100,7 @@ final class Entity(
           {fromCollectionsResult}
         </p>
 
-      TeiEntity.xmlElement(entity.copy(content = Xml.toNodes(entity.content.nodes :+ mentions)))
+      TeiEntity.xmlElement(entity.copy(content = entity.content :+ mentions))
 
 object Entity extends EntityRelated[Entity](
   elementName = _.element,

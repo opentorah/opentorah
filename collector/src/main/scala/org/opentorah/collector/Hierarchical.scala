@@ -56,7 +56,7 @@ abstract class Hierarchical(
           <l>
             {Hierarchical.displayName(pathTail.head)}
             {a(text = Hierarchical.displayName(hierarchical))}:
-            {hierarchical.title.content.nodes}
+            {hierarchical.title.content}
           </l>
         result: Seq[Xml.Element] <- pathHeaderVertical(
           path = pathNew,
@@ -76,10 +76,10 @@ abstract class Hierarchical(
       <head xmlns={Tei.namespace.uri}>
         {Hierarchical.displayName(path.init.last)}
         {Hierarchical.displayName(this)}:
-        {title.content.nodes}
+        {title.content}
       </head>
       {descriptionNodes}
-      {body.toSeq.map(_.content.nodes)}
+      {body.toSeq.map(_.content)}
     </div>
   )
 

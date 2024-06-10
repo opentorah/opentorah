@@ -8,7 +8,7 @@ open class RawXml(
   attributesAllowed: Boolean = false
 ):
 
-  final class Value(val content: Element.Nodes, val attributes: Attribute.Values = Seq.empty)
+  final class Value(val content: Xml.Nodes, val attributes: Attribute.Values = Seq.empty)
 
   object element extends Element[Value](elementName):
 
@@ -19,7 +19,7 @@ open class RawXml(
     override def contentParsable: Parsable[Value] = new Parsable[Value]:
       override def parser: Parser[Value] = for
         attributes: Attribute.Values <- if attributesAllowed then Attribute.allAttributes else ZIO.succeed(Seq.empty)
-        content: Element.Nodes <- Element.nodes()
+        content: Xml.Nodes <- Xml.nodes()
       yield Value(
         content,
         attributes
@@ -27,6 +27,6 @@ open class RawXml(
 
       override def unparser: Unparser[Value] = Unparser(
         attributes = _.attributes,
-        content = _.content.nodes,
+        content = _.content,
         namespace = namespace
       )

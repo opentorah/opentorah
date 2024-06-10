@@ -131,11 +131,11 @@ abstract class Site(
     element = Tei.xmlElement(tei.copy(teiHeader = tei.teiHeader.copy(
       fileDesc = tei.teiHeader.fileDesc.copy(
         publicationStmt = Some(PublicationStmt(
-          publisher = common.getHtml.url.map(url => Publisher.Value(Xml.toNodes(<ptr target={s"http://$url"}/>))),
+          publisher = common.getHtml.url.map(url => Publisher.Value(<ptr target={s"http://$url"}/>)),
           availability = Some(Availability(
             status = Some("free"),
-            xml = Xml.toNodes(Xml.optional(common.license)(license =>
-              <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>))
+            xml = Xml.optional(common.license)(license =>
+              <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)
           ))
         )),
         sourceDesc = common.getTei.sourceDesc

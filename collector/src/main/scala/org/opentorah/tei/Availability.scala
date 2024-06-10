@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class Availability(
   val status: Option[String],
-  val xml: Element.Nodes
+  val xml: Xml.Nodes
 )
 
 object Availability extends Element[Availability]("availability"):
@@ -14,7 +14,7 @@ object Availability extends Element[Availability]("availability"):
   override def contentParsable: Parsable[Availability] = new Parsable[Availability]:
     override def parser: Parser[Availability] = for
       status: Option[String] <- statusAttribute()
-      xml: Element.Nodes <- Element.nodes()
+      xml: Xml.Nodes <- Xml.nodes()
     yield Availability(
       status,
       xml
@@ -22,5 +22,5 @@ object Availability extends Element[Availability]("availability"):
 
     override val unparser: Unparser[Availability] = Tei.concat(
       statusAttribute(_.status),
-      Element.nodes(_.xml)
+      Xml.nodes(_.xml)
     )

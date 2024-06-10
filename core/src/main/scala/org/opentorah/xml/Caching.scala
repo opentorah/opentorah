@@ -14,7 +14,7 @@ trait Caching:
 
 object Caching:
 
-  type Parser[+A] = ZIO[Caching & Parsing, Effects.Error, A]
+  type Parser[+A] = ZIO[Caching & ParserState, Effects.Error, A]
 
   def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Parser[T]): Parser[T] =
     ZIO.environmentWithZIO[Caching](_.get.getCachedByUrl[T](url, load))
@@ -26,7 +26,7 @@ object Caching:
     org.opentorah.xml.Parser.unsafeRun(provide(caching, parser))
 
   def provide[T](caching: Caching, parser: Parser[T]): org.opentorah.xml.Parser[T] =
-    parser.provideSomeLayer[Parsing](ZLayer.succeed(caching))
+    parser.provideSomeLayer[ParserState](ZLayer.succeed(caching))
 
   private val log: Logger = LoggerFactory.getLogger(classOf[Caching.type])
 

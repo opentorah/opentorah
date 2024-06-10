@@ -45,6 +45,10 @@ object Xml:
     case node: Node => node.text
   )
 
+  val nodes: Parsable[Xml.Nodes] = new Parsable[Xml.Nodes]:
+    override protected def parser: Parser[Xml.Nodes] = ParserState.allNodes
+    override def unparser: Unparser[Xml.Nodes] = Unparser[Xml.Nodes](content = identity)
+    
   final def toString(nodes: Nodes): String = nodes.map(toString).mkString(" ")
 
   def isElement(node: Node): Boolean = node.isInstanceOf[Element]
@@ -55,9 +59,7 @@ object Xml:
 
   def getChildren(element: Element): Nodes = element.child
   def setChildren(element: Element, children: Nodes): Element = element.copy(child = children)
-
-  def toNodes(nodes: Nodes): Element.Nodes = Element.Nodes(nodes)
-
+  
   final def prependChildren(element: Element, nodes: Nodes): Element = setChildren(element, nodes ++ getChildren(element))
   final def appendChildren(element: Element, nodes: Nodes): Element = setChildren(element, getChildren(element) ++ nodes)
   

@@ -113,6 +113,10 @@ object Namespace:
       require(localName.nonEmpty)
       localName
 
+  object XInclude extends Prefixed(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
+
+  object XLink extends Prefixed(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")
+  
   def apply(
     prefix: Option[String],
     uri: Option[String]
@@ -130,6 +134,3 @@ object Namespace:
     uri = Option(uri)
   )
 
-  object XInclude extends Prefixed(uri = "http://www.w3.org/2001/XInclude", prefix = "xi")
-
-  object XLink extends Prefixed(uri = "http://www.w3.org/1999/xlink", prefix = "xlink")

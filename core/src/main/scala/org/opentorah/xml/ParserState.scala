@@ -4,7 +4,7 @@ import org.opentorah.util.{Effects, Files}
 import java.net.URL
 import zio.ZIO
 
-final class Parsing private:
+final class ParserState:
 
   // Note: using case classes Empty, Characters, Elements and Mixed (in the spirit of "parse, do not validate")
   // leads to much verbosity, since copy method is only available on case classes, which shouldn't be inherited from...
@@ -66,7 +66,7 @@ final class Parsing private:
 
   private def push(
     from: Option[From],
-    nextElement: Parsing.NextElement[?]
+    nextElement: ParserState.NextElement[?]
   ): Effects.IO[Unit] =
     val contentType: Element.ContentType = nextElement.elementAndParser.element.contentType
     val xmlElement: Xml.Element = nextElement.xmlElement
@@ -109,7 +109,7 @@ final class Parsing private:
     modifyCurrent(current.copy(attributes = Seq.empty))
     current.attributes
 
-  private def nextElement[A](elements: Elements[A]): Parser[Option[Parsing.NextElement[A]]] =
+  private def nextElement[A](elements: Elements[A]): Parser[Option[ParserState.NextElement[A]]] =
     val current: Current = stack.head
     Effects.check(current.contentType.elementsAllowed, s"No element in $current") *>
     ZIO.succeed {
@@ -118,7 +118,7 @@ final class Parsing private:
         noLeadingWhitespace.headOption.filter(Xml.isElement).map(Xml.asElement)
       headElement.map(Xml.getName).flatMap(elements.elementAndParser).map { (result: Element.AndParser[A]) =>
         modifyCurrent(current.copy(nodes = noLeadingWhitespace.tail, nextElementNumber = current.nextElementNumber + 1))
-        Parsing.NextElement(headElement.get, result)
+        ParserState.NextElement(headElement.get, result)
       }
     }
 
@@ -143,12 +143,12 @@ final class Parsing private:
           characters
         }
 
-  private def allNodes: Parser[Element.Nodes] =
+  private def allNodes: Parser[Xml.Nodes] =
     val current: Current = stack.head
     Effects.check(current.contentType.elementsAllowed, s"No nodes in $current") *>
     ZIO.succeed {
       modifyCurrent(current.copy(nodes = Seq.empty))
-      Element.Nodes(current.nodes)
+      current.nodes
     }
 
   private def partition(nodes: Xml.Nodes): (Seq[Xml.Element], Option[String]) =
@@ -156,32 +156,31 @@ final class Parsing private:
     val characters: String = nonElems.map(Xml.toString).mkString.trim
     (elems.map(Xml.asElement), if characters.isEmpty then None else Some(characters))
 
-private[xml] object Parsing:
+private[xml] object ParserState:
   private final class NextElement[A](val xmlElement: Xml.Element, val elementAndParser: Element.AndParser[A])
 
-  def empty: Parsing = new Parsing
+  def empty: ParserState = new ParserState
 
-  private def access[T](f: Parsing => T): Parser[T] = ZIO.service[Parsing].map(f)
-  private def accessZIO[T](f: Parsing => Parser[T]): Parser[T] = ZIO.service[Parsing].flatMap(f)
+  private def access[T](f: ParserState => T): Parser[T] = ZIO.service[ParserState].map(f)
+  private def accessZIO[T](f: ParserState => Parser[T]): Parser[T] = ZIO.service[ParserState].flatMap(f)
 
   def fromUrl: Parser[Element.FromUrl] = access(_.currentFromUrl)
   def currentBaseUrl: Parser[Option[URL]] = access(_.currentBaseUrl)
-  def initialBaseUrl: Parser[Option[URL]] = access(_.initialBaseUrl)
+  def allNodes: Parser[Xml.Nodes] = accessZIO(_.allNodes)
   def allAttributes: Parser[Attribute.StringValues] = access(_.allAttributes)
   def takeAttribute(attribute: Attribute[?]): Parser[Option[String]] = access(_.takeAttribute(attribute))
-  def allNodes: Parser[Element.Nodes] = accessZIO(_.allNodes)
   def takeCharacters: Parser[Option[String]] = accessZIO(_.takeCharacters)
   def checkEmpty: Parser[Unit] = access(_.checkEmpty())
 
-  def addErrorTrace(error: Effects.Error): zio.URIO[Parsing, Effects.Error] =
-    ZIO.service[Parsing].map(_.addErrorTrace(error))
+  def addErrorTrace(error: Effects.Error): zio.URIO[ParserState, Effects.Error] =
+    ZIO.service[ParserState].map(_.addErrorTrace(error))
 
   // Since I essentially "fix" xml:base attributes above
   // to be relative to the initial document and not to the including one
   // (which is incorrect, but what else can I do?)
   // I need to supply that initial URL for the subUrl calculations...
-  private def parentBase: Parser[Option[URL]] = initialBaseUrl
-  
+  private def parentBase: Parser[Option[URL]] = access(_.initialBaseUrl)
+
   def optional[A](elements: Elements[A]): Parser[Option[A]] = for
     // TODO take namespace into account!
     // TODO tidy up

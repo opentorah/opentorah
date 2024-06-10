@@ -69,7 +69,7 @@ object Attribute:
 
   type StringValues = Seq[Value[String]]
 
-  def allAttributes: Parser[StringValues] = Parsing.allAttributes
+  def allAttributes: Parser[StringValues] = ParserState.allAttributes
 
   def get(element: Xml.Element): StringValues = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
@@ -109,7 +109,7 @@ object Attribute:
   // TODO A is either T or Option[T]; are there any type-level tricks I can use to enforce this?
   sealed abstract class Parsable[T, A](val attribute: Attribute[T])(using CanEqual[T, T]) extends org.opentorah.xml.Parsable[A]:
     final override protected def parser: Parser[A] =
-      Parsing.takeAttribute(attribute).flatMap(fromStringOption)
+      ParserState.takeAttribute(attribute).flatMap(fromStringOption)
 
     final def get(element: Xml.Element): Effects.IO[A] =
       fromStringOption(attribute.get(element).filter(_.nonEmpty))

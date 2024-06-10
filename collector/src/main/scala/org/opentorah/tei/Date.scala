@@ -1,11 +1,11 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class Date(
   val when: String,
   val calendar: Option[String],
-  val xml: Element.Nodes
+  val xml: Xml.Nodes
 )
 
 object Date extends Element[Date]("date"):
@@ -18,7 +18,7 @@ object Date extends Element[Date]("date"):
     override def parser: Parser[Date] = for
       when: String <- whenAttribute()
       calendar: Option[String] <- calendarAttribute()
-      xml: Element.Nodes <- Element.nodes()
+      xml: Xml.Nodes <- Xml.nodes()
     yield Date(
       when,
       calendar,
@@ -28,5 +28,5 @@ object Date extends Element[Date]("date"):
     override val unparser: Unparser[Date] = Tei.concat(
       whenAttribute(_.when),
       calendarAttribute(_.calendar),
-      Element.nodes(_.xml)
+      Xml.nodes(_.xml)
     )
