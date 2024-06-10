@@ -17,7 +17,7 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
     tei: Tei <- getTei
   yield
     <div>
-      {tei.text.body.content.nodes}
+      {tei.text.body.content}
     </div>
 
   override protected def moreNavigationLinks(

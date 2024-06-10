@@ -12,9 +12,9 @@ trait Elements[A]:
   def xmlElement(value: A): Xml.Element =
     elementByValue(value).asInstanceOf[Element[A]].xmlElement(value)
 
-  private def optionalParser: Parser[Option[A]] = Parsing.optional(this)
+  private def parseOption: Parser[Option[A]] = ParserState.optional(this)
 
-  final def parse(from: From): Parser[A] = Parsing.required(this, from)
+  final def parse(from: From): Parser[A] = ParserState.required(this, from)
 
   final def optional: Elements.Optional[A] = Elements.Optional[A](this)
   final def required: Elements.Required[A] = Elements.Required[A](this)
@@ -30,14 +30,14 @@ object Elements:
     def xml(value: A): C
 
   final class Optional[A](elements: Elements[A]) extends Parsable[Option[A], Option[Xml.Element]]:
-    override protected def parser: Parser[Option[A]] = elements.optionalParser
+    override protected def parser: Parser[Option[A]] = elements.parseOption
     override def xml(value: Option[A]): Option[Xml.Element] = value.map(elements.xmlElement)
     override def unparser: Unparser[Option[A]] = Unparser[Option[A]](
       content = value => xml(value).toSeq
     )
 
   final class Required[A](elements: Elements[A]) extends Parsable[A, Xml.Element]:
-    override protected def parser: Parser[A] = Effects.required(elements.optionalParser, elements)
+    override protected def parser: Parser[A] = Effects.required(elements.parseOption, elements)
     override def xml(value: A): Xml.Element = elements.xmlElement(value)
     override def unparser: Unparser[A] = Unparser[A](
       content = value => Seq(xml(value))
@@ -46,7 +46,7 @@ object Elements:
   final class Sequence[A](elements: Elements[A]) extends Parsable[Seq[A], Seq[Xml.Element]]:
     override protected def parser: Parser[Seq[A]] = all(Seq.empty)
     private def all(acc: Seq[A]): Parser[Seq[A]] = for
-      next: Option[A] <- elements.optionalParser
+      next: Option[A] <- elements.parseOption
       result: Seq[A] <- next
         .map(next => all(acc :+ next))
         .getOrElse(ZIO.succeed(acc))

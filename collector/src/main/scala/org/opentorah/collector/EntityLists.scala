@@ -48,7 +48,7 @@ final class EntityLists(
         yield
           <list id={list.names.name}>
             <head xmlns={Tei.namespace.uri}>
-              {list.title.content.nodes}
+              {list.title.content}
               {a(EntityLists.expand)}
             </head>
             {lines}

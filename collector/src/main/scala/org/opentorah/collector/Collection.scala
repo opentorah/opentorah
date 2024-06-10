@@ -105,7 +105,7 @@ final class Collection(
         yield <tr>{cells}</tr>
       )
         .map(documentRows => part.title.fold[Xml.Nodes](Seq.empty)(title =>
-          <tr><td colspan={columns.length.toString}><span class="part-title">{title.content.nodes}</span></td></tr>
+          <tr><td colspan={columns.length.toString}><span class="part-title">{title.content}</span></td></tr>
         ) ++ documentRows)
     )
   yield

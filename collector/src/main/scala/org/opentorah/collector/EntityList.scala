@@ -26,7 +26,7 @@ final class EntityList(
   override def storesPure: Seq[Entity] = entities
 
   override def htmlHeadTitle: Option[String] = Some(title.content.toString)
-  override def htmlBodyTitle: Option[Xml.Nodes] = Some(title.content.nodes)
+  override def htmlBodyTitle: Option[Xml.Nodes] = Some(title.content)
 
   override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
     for lines: Seq[Xml.Element] <- ZIO.foreach(getEntities)((entity: Entity) =>

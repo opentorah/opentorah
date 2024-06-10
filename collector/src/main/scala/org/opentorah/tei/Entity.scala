@@ -8,7 +8,7 @@ final class Entity(
   val entityType: EntityType,
   val role: Option[String],
   val names: Seq[EntityName],
-  val content: Element.Nodes // TODO rename body?
+  val content: Xml.Nodes // TODO rename body?
 ):
   def name: String = names.head.name
 
@@ -19,7 +19,7 @@ final class Entity(
     entityType: EntityType = entityType,
     role: Option[String] = role,
     names: Seq[EntityName] = names,
-    content: Element.Nodes = content
+    content: Xml.Nodes = content
   ): Entity = Entity(
     id,
     entityType,
@@ -47,7 +47,7 @@ object Entity extends EntityRelated[Entity](
       role: Option[String] <- roleAttribute()
       names: Seq[EntityName] <- namesParsable()
       _ <- Effects.check(names.nonEmpty, s"No names in $id")
-      content: Element.Nodes <- Element.nodes()
+      content: Xml.Nodes <- Xml.nodes()
     yield Entity(
       id,
       entityType,
@@ -60,5 +60,5 @@ object Entity extends EntityRelated[Entity](
       idAttribute(_.id),
       roleAttribute(_.role),
       namesParsable(_.names),
-      Element.nodes(_.content)
+      Xml.nodes(_.content)
     )

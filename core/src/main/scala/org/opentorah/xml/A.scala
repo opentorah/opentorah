@@ -45,7 +45,7 @@ final class A(
 
   def apply(element: Xml.Element): Xml.Element = apply(Seq(element))
 
-  def apply(xml: RawXml#Value): Xml.Element = apply(xml.content.nodes)
+  def apply(xml: RawXml#Value): Xml.Element = apply(xml.content)
 
   def apply(children: Xml.Nodes): Xml.Element =
     <a

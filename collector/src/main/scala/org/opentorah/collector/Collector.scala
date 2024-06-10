@@ -233,7 +233,7 @@ final class Collector(
       fromEntities: Seq[WithSource[T]] <- forPaths[Entity, TeiEntity](
         getter = entityPaths,
         retriever = _.getTei(this),
-        extractor = _.content.nodes
+        extractor = _.content
       )
 
       fromHierarchicals: Seq[WithSource[T]] <- forPaths[Hierarchical, Hierarchical](
@@ -241,7 +241,7 @@ final class Collector(
         retriever = ZIO.succeed,
         extractor = (hierarchical: Hierarchical) =>
           Seq(Some(hierarchical.title), hierarchical.description, hierarchical.body)
-            .flatten.flatMap(_.content.nodes)
+            .flatten.flatMap(_.content)
       )
 
       fromDocuments: Seq[WithSource[T]] <- forPaths[TextFacet, Tei](
@@ -256,13 +256,13 @@ final class Collector(
     for
       errorOpts: Seq[Option[String]] <- ZIO.foreach(references)(value =>
         val reference: EntityReference = value.value
-        val name: Element.Nodes = reference.name
+        val name: Xml.Nodes = reference.name
         reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
           if ref.contains(" ") then ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
           else findEntityByName(ref, _
-            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">$name< """))(named =>
+            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${Xml.toString(name)}< """))(named =>
               if named.entityType == reference.entityType then None
-              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${name.nodes} [$ref]")
+              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${Xml.toString(name)} [$ref]")
             )
           )
         )

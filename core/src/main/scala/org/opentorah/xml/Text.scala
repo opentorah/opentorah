@@ -5,7 +5,7 @@ import org.opentorah.util.Effects
 final class Text:
   override def toString: String = s"element text"
 
-  private def optionalParser: Parser[Option[String]] = Parsing.takeCharacters
+  private def optionalParser: Parser[Option[String]] = ParserState.takeCharacters
 
   def optional: Parsable[Option[String]] = new Parsable[Option[String]]:
     override protected def parser: Parser[Option[String]] = optionalParser

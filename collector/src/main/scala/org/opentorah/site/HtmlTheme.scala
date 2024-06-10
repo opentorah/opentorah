@@ -51,7 +51,7 @@ object HtmlTheme:
           <div class="wrapper">
             {Xml.optional(siteHtml.title)(title =>
             <a class="site-title" rel="author" target={viewerDefault} href="/">
-              {title.content.nodes}
+              {title.content}
             </a>)}<nav class="site-nav">
             <input type="checkbox" id="nav-trigger" class="nav-trigger"/>
             <label for="nav-trigger">
@@ -107,7 +107,7 @@ object HtmlTheme:
                 </ul>
               </div>{Xml.optional(siteHtml.footer)(footer =>
               <div class="footer-col footer-col-3">
-                {footer.content.nodes}
+                {footer.content}
               </div>)}
             </div>
           </div>

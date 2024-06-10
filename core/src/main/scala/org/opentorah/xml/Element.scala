@@ -41,14 +41,6 @@ object Element:
 
   final class AndParser[A](val element: Element[?], val parser: Parser[A])
 
-  // TODO remove
-  final class Nodes(val nodes: Xml.Nodes):
-    override def toString: String = Xml.toString(nodes)
-
-  val nodes: Parsable[Nodes] = new Parsable[Nodes]:
-    override protected def parser: Parser[Nodes] = Parsing.allNodes
-    override def unparser: Unparser[Nodes] = Unparser[Nodes](content = _.nodes)
-
   final class FromUrl(
     val url: URL,
     val inline: Boolean
@@ -58,4 +50,4 @@ object Element:
     trait With:
       def fromUrl: FromUrl
 
-  def fromUrl: Parser[FromUrl] = Parsing.fromUrl
+  def fromUrl: Parser[FromUrl] = ParserState.fromUrl

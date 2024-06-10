@@ -4,7 +4,7 @@ import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
 
 final class EntityReference(
   val entityType: EntityType,
-  val name: Element.Nodes,
+  val name: Xml.Nodes,
   val id: Option[String],
   val role: Option[String],
   val ref: Option[String]
@@ -27,7 +27,7 @@ object EntityReference extends EntityRelated[EntityReference](
       role: Option[String] <- roleAttribute()
       ref: Option[String] <- refAttribute()
       _ <- typeAttribute() // We don't do anything with the type yet...
-      name: Element.Nodes <- Element.nodes()
+      name: Xml.Nodes <- Xml.nodes()
     yield EntityReference(
       entityType,
       name,
@@ -40,5 +40,5 @@ object EntityReference extends EntityRelated[EntityReference](
       refAttribute(_.ref),
       idAttribute(_.id),
       roleAttribute(_.role),
-      Element.nodes(_.name)
+      Xml.nodes(_.name)
     )
