@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Pure}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, From, Parsable, Parser, Unparser}
 
 trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
 
@@ -16,7 +16,7 @@ trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are 
 private[tanach] object TanachBook:
   def valuesSeq: Seq[TanachBook] = Tanach.Book.valuesSeq
 
-  private object Parsed extends Element[Parsed]("book"):
+  private object Parsed extends ElementTo[Parsed]("book"):
     override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
       override def parser: Parser[Parsed] = for
         names: Names <- Names.withDefaultNameParsable()

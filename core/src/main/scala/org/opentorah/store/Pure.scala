@@ -1,11 +1,11 @@
 package org.opentorah.store
 
-import org.opentorah.xml.Caching
+import org.opentorah.xml.Parser
 import zio.ZIO
 
 // TODO maybe pre-calculate a lazy map from all names to stores?
 trait Pure[+T <: Store] extends Stores[T]:
-  final override def stores: Caching.Parser[Seq[T]] = ZIO.succeed(storesPure)
+  final override def stores: Parser[Seq[T]] = ZIO.succeed(storesPure)
 
   protected def storesPure: Seq[T]
 

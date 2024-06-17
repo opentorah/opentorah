@@ -3,19 +3,19 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Path, Pure}
 import org.opentorah.tei.{EntityRelated, EntityType, Title}
-import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Elements, FromUrl, Nodes, Parsable, Parser, Unparser}
 import zio.ZIO
 
 // TODO derive it from By (with a transparent Selector)!
 final class EntityList(
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   override val names: Names,
   val entityType: EntityType,
   val role: Option[String],
   val title: Title.Value,
 ) extends
   Pure[Entity],
-  Element.FromUrl.With:
+  FromUrl.With:
   private var entities: Seq[Entity] = Seq.empty
 
   def setEntities(value: Seq[Entity]): Unit =
@@ -26,10 +26,10 @@ final class EntityList(
   override def storesPure: Seq[Entity] = entities
 
   override def htmlHeadTitle: Option[String] = Some(title.content.toString)
-  override def htmlBodyTitle: Option[Xml.Nodes] = Some(title.content)
+  override def htmlBodyTitle: Option[Nodes] = Some(title.content)
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
-    for lines: Seq[Xml.Element] <- ZIO.foreach(getEntities)((entity: Entity) =>
+  override def content(path: Path, context: Context): Parser[Element] =
+    for lines: Elements <- ZIO.foreach(getEntities)((entity: Entity) =>
       entity.line(context)
     )
     yield <list>{lines}</list>
@@ -38,13 +38,13 @@ object EntityList extends EntityRelated[EntityList](
   elementName = _.listElement,
   entityType = _.entityType
 ):
-  override protected def contentType: Element.ContentType = Element.ContentType.Elements
+  override protected def contentType: ContentType = ContentType.Elements
 
   override protected def parsable(entityType: EntityType): Parsable[EntityList] = new Parsable[EntityList]:
     private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
 
     override def parser: Parser[EntityList] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       names: Names <- Names.withDefaultNameParsable()
       role: Option[String] <- roleAttribute()
       title: Title.Value <- Title.element.required()

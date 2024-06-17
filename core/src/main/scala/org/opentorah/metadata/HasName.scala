@@ -2,7 +2,7 @@ package org.opentorah.metadata
 
 import org.opentorah.platform.Platform
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Elements, From, Parser}
+import org.opentorah.xml.{ElementsTo, From, Parser}
 
 trait HasName(nameOverride: Option[String]):
   final def name: String = nameOverride.getOrElse(defaultName)
@@ -21,7 +21,7 @@ object HasName:
 
   def load[K <: HasName, M](
     from: From,
-    content: Elements[M],
+    content: ElementsTo[M],
     keys: Seq[K],
     hasName: (M, String) => Boolean
   ): Parser[Map[K, M]] = for
@@ -38,7 +38,7 @@ object HasName:
 
   def load[M](
     from: From,
-    content: Elements[M]
+    content: ElementsTo[M]
   ): Parser[Seq[M]] = content.wrappedSeq(from.name).parse(from)
 
   def bind[K, M](

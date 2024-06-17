@@ -12,14 +12,14 @@ final class ParserState:
     val from: Option[From],
     val name: String,
     val attributes: Attribute.StringValues,
-    val contentType: Element.ContentType,
-    val nodes: Xml.Nodes,
+    val contentType: ContentType,
+    val nodes: Nodes,
     val characters: Option[String],
     val nextElementNumber: Int
   ):
     def copy(
       attributes: Attribute.StringValues = attributes,
-      nodes: Xml.Nodes = nodes,
+      nodes: Nodes = nodes,
       characters: Option[String] = characters,
       nextElementNumber: Int = nextElementNumber
     ): Current = Current(
@@ -35,66 +35,120 @@ final class ParserState:
   private var stack: List[Current] = List.empty
 
   // TODO report error better: effect.tapCause(cause => console.putStrLn(cause.prettyPrint))?
-  private def addErrorTrace(error: Effects.Error): Effects.Error = Effects.Error(
+  def addErrorTrace(error: Effects.Error): Effects.Error = Effects.Error(
     message = error.getMessage + "\n" + stack.flatMap(_.from).map(_.url),
     cause = error.getCause
   )
 
-  private def modifyCurrent(newCurrent: Current): Unit =
-    stack = newCurrent :: stack.tail
-
-  private def checkEmpty(): Unit =
+  def checkEmpty(): Unit =
     if stack.nonEmpty then throw IllegalStateException(s"Non-empty $this!")
 
   private def checkNoLeftovers: Effects.IO[Unit] =
     stack.headOption.fold(Effects.ok)((current: Current) =>
       Effects.check(current.attributes.isEmpty, s"Unparsed attributes: ${current.attributes}") *>
       Effects.check(current.characters.isEmpty, s"Unparsed characters: ${current.characters.get}") *>
-      Effects.check(current.nodes.forall(Xml.isWhitespace), s"Unparsed nodes: ${current.nodes}")
+      Effects.check(current.nodes.forall(Atom.isWhitespace), s"Unparsed nodes: ${current.nodes}")
     )
 
-  private def currentFromUrl: Element.FromUrl = Element.FromUrl(
-    url = currentBaseUrl.get,
+  def fromUrl: FromUrl = FromUrl(
+    url = stack.flatMap(_.from).head.url.get,
     inline = stack.head.from.isEmpty
   )
 
-  private def currentBaseUrl: Option[URL] =
-    stack.flatMap(_.from).head.url
+  private def modifyCurrent(newCurrent: Current): Unit =
+    stack = newCurrent :: stack.tail
 
-  private def initialBaseUrl: Option[URL] =
-    stack.flatMap(_.from).last.url
+  // TODO take namespace into account!
+  def optional[A](
+    elementsTo: ElementsTo[A]
+  ): Parser[Option[A]] =
+    val current: Current = stack.head
+    for
+      _ <- Effects.check(current.contentType.elementsAllowed, s"No element in $current")
+      noLeadingWhitespace: Nodes = current.nodes.dropWhile(Atom.isWhitespace)
+      result: Option[A] <- noLeadingWhitespace
+        .headOption
+        .filter(Element.is)
+        .map(Element.as)
+        .fold(ZIO.none)((xmlElement: Element) => elementsTo
+          .elementByName(Element.getName(xmlElement))
+          .fold(ZIO.none){ (elementTo: ElementTo[? <: elementsTo.ElementType]) =>
+            modifyCurrent(current.copy(
+              nodes = noLeadingWhitespace.tail,
+              nextElementNumber = current.nextElementNumber + 1
+            ))
 
-  private def push(
+            for
+              // Since I essentially "fix" xml:base attributes above
+              // to be relative to the initial document and not to the including one
+              // (which is incorrect, but what else can I do?)
+              // I need to supply that initial URL for the subUrl calculations...
+              base: Option[String] <- Xml.baseAttribute.optional.get(xmlElement)
+              fromUrl: Option[URL] = base.map(Files.subUrl(stack.flatMap(_.from).last.url, _))
+              result: A <- nested(
+                fromUrl.map(From.include),
+                elementsTo,
+                elementTo,
+                Xml.baseAttribute.remove(xmlElement)
+              )
+            yield Some(result)
+          }
+        )
+    yield result
+
+  def required[A](
+    elementsTo: ElementsTo[A],
+    from: From
+  ): Parser[A] = for
+    xmlElement: Element <- from.load
+    xmlElementName: String = Element.getName(xmlElement)
+    elementTo: ElementTo[? <: elementsTo.ElementType] <- Effects.required(
+      ZIO.succeed(elementsTo.elementByName(xmlElementName)),
+      s"$elementsTo; found '$xmlElementName' instead"
+    )
+    _ <- checkNoLeftovers
+    result: A <- nested(
+      Some(from),
+      elementsTo,
+      elementTo,
+      xmlElement
+    )
+  yield result
+
+  private def nested[A](
     from: Option[From],
-    nextElement: ParserState.NextElement[?]
-  ): Effects.IO[Unit] =
-    val contentType: Element.ContentType = nextElement.elementAndParser.element.contentType
-    val xmlElement: Xml.Element = nextElement.xmlElement
+    elementsTo: ElementsTo[A],
+    elementTo: ElementTo[? <: elementsTo.ElementType],
+    xmlElement: Element
+  ): Parser[A] =
+    val contentType: ContentType = elementTo.contentType
+
     // Note: skip comments.
-    val nodes: Xml.Nodes = Xml.getChildren(xmlElement).filterNot(Xml.isComment)
-    val (elements: Seq[Xml.Element], characters: Option[String]) = partition(nodes)
+    val nodes: Nodes = Element.getChildren(xmlElement).filterNot(Comment.is)
+    val (elements: Elements, characters: Option[String]) = partition(nodes)
 
-    Effects.check(contentType.elementsAllowed  || elements.isEmpty  , s"Spurious elements: $elements") *>
-    Effects.check(contentType.charactersAlowed || characters.isEmpty, s"Spurious characters: '${characters.get}'") *>
-    ZIO.succeed {
-      val newCurrent: Current = Current(
-        from = from,
-        name = Xml.getName(xmlElement),
-        attributes = Attribute.get(xmlElement),
-        contentType = contentType,
-        nodes = if contentType.elementsAllowed then nodes else Seq.empty,
-        characters = if contentType == Element.ContentType.Characters then characters else None,
-        nextElementNumber = 0
-      )
-      stack = newCurrent :: stack
-    }
-
-  private def pop(): Unit =
-    stack = stack.tail
+    for
+      _ <- Effects.check(contentType.elementsAllowed   || elements  .isEmpty, s"Spurious elements: $elements")
+      _ <- Effects.check(contentType.charactersAllowed || characters.isEmpty, s"Spurious characters: '${characters.get}'")
+      _ =
+        val newCurrent: Current = Current(
+          from = from,
+          name = Element.getName(xmlElement),
+          attributes = Attribute.get(xmlElement),
+          contentType = contentType,
+          nodes = if contentType.elementsAllowed then nodes else Seq.empty,
+          characters = if contentType == ContentType.Characters then characters else None,
+          nextElementNumber = 0
+        )
+        stack = newCurrent :: stack
+      result: A <- elementsTo.map(elementTo, elementTo.contentParsable())
+      _ <- checkNoLeftovers
+      _ = stack = stack.tail // pop
+    yield result
 
   // TODO maybe take namespace into account?
   // TODO handle repeated attributes?
-  private def takeAttribute(attribute: Attribute[?]): Option[String] =
+  def attribute(attribute: Attribute[?]): Option[String] =
     // TODO Attribute is (and must be!) invariant in T, but here we need to compare
     given CanEqual[Attribute[?], Attribute[String]] = CanEqual.derived
 
@@ -104,122 +158,43 @@ final class ParserState:
     modifyCurrent(current.copy(attributes = leave))
     take.headOption.flatMap(_.value)
 
-  private def allAttributes: Attribute.StringValues =
+  def attributes: Attribute.StringValues =
     val current: Current = stack.head
     modifyCurrent(current.copy(attributes = Seq.empty))
     current.attributes
 
-  private def nextElement[A](elements: Elements[A]): Parser[Option[ParserState.NextElement[A]]] =
+  def nodes: Parser[Nodes] =
     val current: Current = stack.head
-    Effects.check(current.contentType.elementsAllowed, s"No element in $current") *>
-    ZIO.succeed {
-      val noLeadingWhitespace: Xml.Nodes = current.nodes.dropWhile(Xml.isWhitespace)
-      val headElement: Option[Xml.Element] =
-        noLeadingWhitespace.headOption.filter(Xml.isElement).map(Xml.asElement)
-      headElement.map(Xml.getName).flatMap(elements.elementAndParser).map { (result: Element.AndParser[A]) =>
-        modifyCurrent(current.copy(nodes = noLeadingWhitespace.tail, nextElementNumber = current.nextElementNumber + 1))
-        ParserState.NextElement(headElement.get, result)
-      }
-    }
+    for _ <- Effects.check(current.contentType.elementsAllowed, s"No nodes in $current") yield
+      modifyCurrent(current.copy(nodes = Seq.empty))
+      current.nodes
 
-  private def takeCharacters: Parser[Option[String]] =
+  def characters: Parser[Option[String]] =
     val current: Current = stack.head
 
     current.contentType match
-      case Element.ContentType.Empty | Element.ContentType.Elements =>
+      case ContentType.Empty | ContentType.Elements =>
         Effects.fail(s"No characters in $current")
 
-      case Element.ContentType.Characters =>
+      case ContentType.Characters =>
         ZIO.succeed {
           modifyCurrent(current.copy(characters = None))
           current.characters
         }
 
-      case Element.ContentType.Mixed =>
-        val (elements: Seq[Xml.Element], characters: Option[String]) = partition(current.nodes)
-        Effects.check(elements.isEmpty, s"Elements in $current") *>
-        ZIO.succeed {
+      case ContentType.Mixed =>
+        val (elements: Elements, characters: Option[String]) = partition(current.nodes)
+        for _ <- Effects.check(elements.isEmpty, s"Elements in $current") yield
           modifyCurrent(current.copy(nodes = Seq.empty))
           characters
-        }
 
-  private def allNodes: Parser[Xml.Nodes] =
-    val current: Current = stack.head
-    Effects.check(current.contentType.elementsAllowed, s"No nodes in $current") *>
-    ZIO.succeed {
-      modifyCurrent(current.copy(nodes = Seq.empty))
-      current.nodes
-    }
-
-  private def partition(nodes: Xml.Nodes): (Seq[Xml.Element], Option[String]) =
-    val (elems, nonElems) = nodes.partition(Xml.isElement)
-    val characters: String = nonElems.map(Xml.toString).mkString.trim
-    (elems.map(Xml.asElement), if characters.isEmpty then None else Some(characters))
+  private def partition(nodes: Nodes): (Elements, Option[String]) =
+    val (elems, nonElems) = nodes.partition(Element.is)
+    val characters: String = nonElems.map(Node.toString).mkString.trim
+    (elems.map(Element.as), if characters.isEmpty then None else Some(characters))
 
 private[xml] object ParserState:
-  private final case class NextElement[A](xmlElement: Xml.Element, elementAndParser: Element.AndParser[A])
-
   def empty: ParserState = new ParserState
 
-  private def access[T](f: ParserState => T): Parser[T] = ZIO.service[ParserState].map(f)
-  private def accessZIO[T](f: ParserState => Parser[T]): Parser[T] = ZIO.service[ParserState].flatMap(f)
-
-  def fromUrl: Parser[Element.FromUrl] = access(_.currentFromUrl)
-  def currentBaseUrl: Parser[Option[URL]] = access(_.currentBaseUrl)
-  def allNodes: Parser[Xml.Nodes] = accessZIO(_.allNodes)
-  def allAttributes: Parser[Attribute.StringValues] = access(_.allAttributes)
-  def takeAttribute(attribute: Attribute[?]): Parser[Option[String]] = access(_.takeAttribute(attribute))
-  def takeCharacters: Parser[Option[String]] = accessZIO(_.takeCharacters)
-  def checkEmpty: Parser[Unit] = access(_.checkEmpty())
-
-  def addErrorTrace(error: Effects.Error): zio.URIO[ParserState, Effects.Error] =
-    ZIO.service[ParserState].map(_.addErrorTrace(error))
-
-  // Since I essentially "fix" xml:base attributes above
-  // to be relative to the initial document and not to the including one
-  // (which is incorrect, but what else can I do?)
-  // I need to supply that initial URL for the subUrl calculations...
-  private def parentBase: Parser[Option[URL]] = access(_.initialBaseUrl)
-
-  def optional[A](elements: Elements[A]): Parser[Option[A]] = for
-    // TODO take namespace into account!
-    nextElementOpt: Option[NextElement[A]] <- accessZIO(_.nextElement(elements))
-    result: Option[A] <- nextElementOpt.fold(ZIO.none) { (nextElement: NextElement[A]) =>
-      for
-        parentBase: Option[URL] <- parentBase
-        base: Option[String] <- Xml.baseAttribute.optional.get(nextElement.xmlElement)
-        fromUrl: Option[URL] = base.map(Files.subUrl(parentBase, _))
-        result: A <- nested(
-          from = fromUrl.map(From.include),
-          nextElement = fromUrl match
-            case None => nextElement
-            case _ => nextElement.copy(xmlElement = Xml.baseAttribute.remove(nextElement.xmlElement))
-        )
-      yield Some(result)
-    }
-  yield result
-
-  final def required[A](elements: Elements[A], from: From): Parser[A] = for
-    xmlElement: Xml.Element <- from.load
-    xmlElementName: String = Xml.getName(xmlElement)
-    elementAndParserOpt: Option[Element.AndParser[A]] = elements.elementAndParser(xmlElementName)
-    _ <- Effects.check(elementAndParserOpt.isDefined, s"$elements required, but '$xmlElementName' found")
-    elementAndParser: Element.AndParser[A] = elementAndParserOpt.get
-    _ <- accessZIO(_.checkNoLeftovers)
-    result: A <- nested(
-      from = Some(from),
-      nextElement = NextElement(xmlElement, elementAndParser)
-    )
-  yield result
-
-  private def nested[A](
-    from: Option[From],
-    nextElement: NextElement[A]
-  ): Parser[A] = for
-    _ <- accessZIO(_.push(from, nextElement))
-    result: A <- nextElement.elementAndParser.parser
-    _ <- accessZIO(_.checkNoLeftovers)
-    _ <- access(_.pop())
-  yield result
-
-
+  def access[T](f: ParserState => T): Parser[T] = ZIO.service[ParserState].map(f)
+  def accessZIO[T](f: ParserState => Parser[T]): Parser[T] = ZIO.service[ParserState].flatMap(f)

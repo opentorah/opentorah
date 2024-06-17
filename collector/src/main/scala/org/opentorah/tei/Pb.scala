@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, ElementTo, Parsable, Parser, Unparser, Xml}
 
 final class Pb(
   val n: String,
@@ -9,12 +9,12 @@ final class Pb(
   val isMissing: Boolean = false,
   val isEmpty: Boolean = false
 ):
-  def addAttributes(element: Xml.Element): Xml.Element = Attribute.set(Attribute.get(element) ++ Seq(
+  def addAttributes(element: Element): Element = Attribute.set(Attribute.get(element) ++ Seq(
     Pb.missingAttribute.withValue(isMissing),
     Pb.emptyAttribute.withValue(isEmpty)
   ), element)
 
-object Pb extends Element[Pb]("pb"):
+object Pb extends ElementTo[Pb]("pb"):
 
   def pageId(n: String): String = s"p$n"
 
@@ -24,7 +24,7 @@ object Pb extends Element[Pb]("pb"):
   private val emptyAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("empty").orDefault
   private val facsAttribute: Attribute.Optional[String] = Attribute("facs").optional
 
-  override def contentType: Element.ContentType = Element.ContentType.Empty
+  override def contentType: ContentType = ContentType.Empty
 
   override def contentParsable: Parsable[Pb] = new Parsable[Pb]:
     override val parser: Parser[Pb] = for

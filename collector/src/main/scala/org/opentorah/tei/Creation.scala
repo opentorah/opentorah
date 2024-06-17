@@ -1,18 +1,18 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{ElementTo, Nodes, Parsable, Parser, Unparser}
 
 final class Creation(
   val date: Date,
-  val xml: Xml.Nodes
+  val xml: Nodes
 )
 
-object Creation extends Element[Creation]("creation"):
+object Creation extends ElementTo[Creation]("creation"):
 
   override def contentParsable: Parsable[Creation] = new Parsable[Creation]:
     override def parser: Parser[Creation] = for
       date: Date <- Date.required()
-      xml: Xml.Nodes <- Xml.nodes()
+      xml: Nodes <- Nodes.all()
     yield Creation(
       date,
       xml
@@ -20,5 +20,5 @@ object Creation extends Element[Creation]("creation"):
 
     override val unparser: Unparser[Creation] = Tei.concat(
       Date.required(_.date),
-      Xml.nodes(_.xml)
+      Nodes.all(_.xml)
     )

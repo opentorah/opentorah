@@ -1,17 +1,17 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Elements, Parsable}
+import org.opentorah.xml.{ContentType, ElementTo, ElementsTo, Parsable}
 
 abstract class EntityRelated[E](
   elementName: EntityType => String,
   entityType: E => EntityType
-) extends Elements.Union[E]:
-  protected def contentType: Element.ContentType
+) extends ElementsTo.Union[E]:
+  protected def contentType: ContentType
 
   protected def parsable(entityType: EntityType): Parsable[E]
 
-  sealed class ForEntityType(entityType: EntityType) extends Element[E](elementName(entityType)):
-    override def contentType: Element.ContentType = EntityRelated.this.contentType
+  sealed class ForEntityType(entityType: EntityType) extends ElementTo[E](elementName(entityType)):
+    override def contentType: ContentType = EntityRelated.this.contentType
     override def contentParsable: Parsable[E] = EntityRelated.this.parsable(entityType)
 
   object Person       extends ForEntityType(EntityType.Person      )
@@ -20,9 +20,9 @@ abstract class EntityRelated[E](
 
   final override protected val elements: Seq[ForEntityType] = Seq(Person, Place, Organization)
 
-  final override protected def elementByValue(value: E): Element[? <: E] = forEntityType(entityType(value))
+  final override protected def elementByValue(value: E): ElementTo[E] = forEntityType(entityType(value))
 
-  final def forEntityType(entityType: EntityType): Element[E] = entityType match
+  final def forEntityType(entityType: EntityType): ElementTo[E] = entityType match
     case EntityType.Person       => Person
     case EntityType.Place        => Place
     case EntityType.Organization => Organization

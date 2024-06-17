@@ -1,7 +1,7 @@
 package org.opentorah.html
 
 import org.opentorah.util.Files
-import org.opentorah.xml.{RawXml, Xml}
+import org.opentorah.xml.{Atom, Element, Nodes, RawXml}
 import java.net.URI
 
 // HTML anchor element
@@ -41,13 +41,13 @@ final class A(
     (uri => URI(uri.getScheme, uri.getAuthority, uri.getPath, value, uri.getFragment))
   ))
 
-  def apply(text: String): Xml.Element = apply(Seq(Xml.mkText(text)))
+  def apply(text: String): Element = apply(Seq(Atom(text)))
 
-  def apply(element: Xml.Element): Xml.Element = apply(Seq(element))
+  def apply(element: Element): Element = apply(Seq(element))
 
-  def apply(xml: RawXml#Value): Xml.Element = apply(xml.content)
+  def apply(xml: RawXml#Value): Element = apply(xml.content)
 
-  def apply(children: Xml.Nodes): Xml.Element =
+  def apply(children: Nodes): Element =
     <a
     href={uri.map(_.toString).orNull}
     target={target.orNull}

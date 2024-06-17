@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Elements, From, Parser}
 
 // TODO rename HasNames
 trait Named:

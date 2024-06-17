@@ -2,7 +2,7 @@ package org.opentorah.tei
 
 import org.opentorah.html.A
 import org.opentorah.site.{LinksResolver, TeiToHtml}
-import org.opentorah.xml.{From, Parser, Xml}
+import org.opentorah.xml.{Element, From, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import zio.{UIO, ZIO, ZLayer}
@@ -26,7 +26,7 @@ final class TeiTest extends AnyFlatSpec, Matchers:
     result.role shouldBe Some("jew")
     result.name shouldBe "Израиль из Мезбича"
 
-  private def tei2html(element: Xml.Element): Xml.Element =
+  private def tei2html(element: Element): Element =
     //    println(Xhtml.prettyPrinter.render(element))
     val resolver: LinksResolver = new LinksResolver:
       override def resolve(path: Seq[String]): UIO[Option[A]] = ZIO.none
@@ -40,6 +40,6 @@ final class TeiTest extends AnyFlatSpec, Matchers:
 
   "905" should "work" in:
     val tei: Tei = unsafeRun("905")
-    val html: Xml.Element = tei2html(Tei.xmlElement(tei))
+    val html: Element = tei2html(Tei.xmlElement(tei))
     //println(Tei.prettyPrinter.render(ScalaXml)(html))
 

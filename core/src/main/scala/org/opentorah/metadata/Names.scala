@@ -2,7 +2,7 @@ package org.opentorah.metadata
 
 import org.opentorah.platform.Platform
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class Names(val names: Seq[Name]) extends Language.ToString:
@@ -79,7 +79,7 @@ object Names:
     override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = false)
     override def unparser: Unparser[Names] = Name.seq[Names](_.names)
 
-  object NamesMetadata extends Element[Names]("names"):
+  object NamesMetadata extends ElementTo[Names]("names"):
     override def contentParsable: Parsable[Names] = withoutDefaultNameParsable
 
   abstract class Loader[Key <: HasName](resourceNameOverride: Option[String] = None) extends HasValues[Key]:

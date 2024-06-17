@@ -45,7 +45,7 @@ sealed trait Namespace derives CanEqual:
 
   final def attributeValue: Attribute.Value[String] = attribute.withValue(getUri)
 
-  def declare(element: Xml.Element): Xml.Element =
+  def declare(element: Element): Element =
     element.copy(scope = scala.xml.NamespaceBinding(getPrefix.orNull, getUri.get, element.scope))
     
 object Namespace:
@@ -53,7 +53,7 @@ object Namespace:
   // it is processed specially by Namespace.Xmlns.qName()
   private val defaultNamespaceAttributeName: String = ""
   
-  def get(element: Xml.Element): Namespace = Namespace(
+  def get(element: Element): Namespace = Namespace(
     prefix = element.prefix,
     uri = element.getNamespace(element.prefix)
   )
@@ -61,7 +61,7 @@ object Namespace:
   private given CanEqual[scala.xml.NamespaceBinding, scala.xml.NamespaceBinding] = CanEqual.derived
 
   // Note: maybe support re-definitions of the namespace bindings - like in  scala.xml.NamespaceBinding.shadowRedefined()?
-  def getAll(element: Xml.Element): Seq[Namespace] =
+  def getAll(element: Element): Seq[Namespace] =
     @scala.annotation.tailrec
     def get(result: Seq[Namespace], namespaceBinding: scala.xml.NamespaceBinding): Seq[Namespace] =
       if namespaceBinding == scala.xml.TopScope then result else
@@ -73,11 +73,11 @@ object Namespace:
 
     get(Seq.empty, element.scope)
     
-  def remove(nodes: Xml.Nodes): Xml.Nodes = nodes.map(remove)
+  def remove(nodes: Nodes): Nodes = nodes.map(remove)
 
-  def remove(node: Xml.Node): Xml.Node = if !Xml.isElement(node) then node else
-    val element = Xml.asElement(node)
-    element.copy(scope = scala.xml.TopScope, child = remove(Xml.getChildren(element)))
+  def remove(node: Node): Node = if !Element.is(node) then node else
+    val element = Element.as(node)
+    element.copy(scope = scala.xml.TopScope, child = remove(Element.getChildren(element)))
 
   object Xmlns extends Namespace:
     val prefix: String = "xmlns"

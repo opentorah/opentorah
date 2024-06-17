@@ -52,18 +52,18 @@ final class PrettyPrinter(
 
   def render(
     doctype: Option[String] = None,
-    element: Xml.Element
+    element: Element
   ): String = render(addXmlHeader = false, doctype = doctype, element)
 
   def renderWithHeader(
     doctype: Option[String] = None,
-    element: Xml.Element
+    element: Element
   ): String =  render(addXmlHeader = true, doctype = doctype, element)
 
   private def render(
     addXmlHeader: Boolean,
     doctype: Option[String],
-    element: Xml.Element
+    element: Element
   ): String =
     val prefix: String =
       (if !addXmlHeader then "" else Xml.header + "\n") +
@@ -84,21 +84,21 @@ final class PrettyPrinter(
     file: File,
     replace: Boolean = true,
     doctype: Option[String] = None,
-    element: Xml.Element
+    element: Element
   ): Unit = Files.write(
     file,
     replace,
     content = renderWithHeader(doctype, element)
   )
 
-  private def fromPreformattedElement(element: Xml.Element, parent: Option[Xml.Element]): Seq[String] =
+  private def fromPreformattedElement(element: Element, parent: Option[Element]): Seq[String] =
     val attributeValues: Attribute.StringValues = getAttributeValues(element, parent)
     val attributes: String = if attributeValues.isEmpty then "" else attributeValues
       .map(attributeValue =>  attributeValue.attribute.qName + "=\"" + attributeValue.valueEffective.get + "\"")
       .mkString(" ", ", ", "")
 
     val children: Seq[String] =
-      Xml.getChildren(element).flatMap(node => fromPreformattedNode(node, Some(element)))
+      Element.getChildren(element).flatMap(node => fromPreformattedNode(node, Some(element)))
 
     val name: String = getName(element)
 
@@ -107,8 +107,8 @@ final class PrettyPrinter(
     else Seq(s"<$name$attributes>" + children.head) ++ children.tail.init ++ Seq(children.last + s"</$name>")
 
   private def fromElement(
-    element: Xml.Element,
-    parent: Option[Xml.Element],
+    element: Element,
+    parent: Option[Element],
     canBreakLeft: Boolean,
     canBreakRight: Boolean
   ): Doc =
@@ -122,13 +122,13 @@ final class PrettyPrinter(
         Doc.text("\"" + encodeXmlSpecials(attributeValue.valueEffective.get) + "\"")
       ))
 
-    val nodes: Xml.Nodes = atomize(Seq.empty, Xml.getChildren(element))
-    val whitespaceLeft: Boolean = nodes.headOption.exists(Xml.isWhitespace)
-    val whitespaceRight: Boolean = nodes.lastOption.exists(Xml.isWhitespace)
-    val charactersLeft: Boolean = nodes.headOption.exists(Xml.isCharacters)
-    val charactersRight: Boolean = nodes.lastOption.exists(Xml.isCharacters)
-    val chunks: Seq[Xml.Nodes] = chunkify(Seq.empty, Seq.empty, nodes, flush = false)
-    val noText: Boolean = chunks.forall(_.forall(!Xml.isText(_)))
+    val nodes: Nodes = atomize(Seq.empty, Element.getChildren(element))
+    val whitespaceLeft: Boolean = nodes.headOption.exists(Atom.isWhitespace)
+    val whitespaceRight: Boolean = nodes.lastOption.exists(Atom.isWhitespace)
+    val charactersLeft: Boolean = nodes.headOption.exists(Atom.isCharacters)
+    val charactersRight: Boolean = nodes.lastOption.exists(Atom.isCharacters)
+    val chunks: Seq[Nodes] = chunkify(Seq.empty, Seq.empty, nodes, flush = false)
+    val noText: Boolean = chunks.forall(_.forall(!Atom.is(_)))
 
     val children: Seq[Doc] =
       val canBreakLeft1 = canBreakLeft || whitespaceLeft
@@ -142,7 +142,7 @@ final class PrettyPrinter(
         chunks.tail.init.map(chunk => fromChunk(chunk, Some(element), canBreakLeft = true, canBreakRight = true)) :+
         fromChunk(chunks.last, Some(element), canBreakLeft = true, canBreakRight = canBreakRight1)
 
-    val label: String = Xml.getName(element)
+    val label: String = Element.getName(element)
     val name: String = getName(element)
 
     if children.isEmpty then
@@ -178,56 +178,56 @@ final class PrettyPrinter(
           end
         ))
 
-  private def getName(element: Xml.Element): String =
-    Xml.getPrefix(element).fold("")(_ + ":") + Xml.getName(element)
+  private def getName(element: Element): String =
+    Element.getPrefix(element).fold("")(_ + ":") + Element.getName(element)
 
-  private def getAttributeValues(element: Xml.Element, parent: Option[Xml.Element]): Attribute.StringValues =
+  private def getAttributeValues(element: Element, parent: Option[Element]): Attribute.StringValues =
     val parentNamespaces: Seq[Namespace] = parent.fold[Seq[Namespace]](Seq.empty)(Namespace.getAll)
     Namespace.getAll(element).filterNot(parentNamespaces.contains).map(_.attributeValue) ++
     Attribute.get(element).filterNot(_.value.isEmpty)
 
   @scala.annotation.tailrec
-  private def atomize(result: Xml.Nodes, nodes: Xml.Nodes): Xml.Nodes =
+  private def atomize(result: Nodes, nodes: Nodes): Nodes =
     if nodes.isEmpty then result else
-      val (texts: Xml.Nodes, tail: Xml.Nodes) = nodes.span(Xml.isText)
+      val (texts: Nodes, tail: Nodes) = nodes.span(Atom.is)
 
-      val newResult: Xml.Nodes = if texts.isEmpty then result else result ++
+      val newResult: Nodes = if texts.isEmpty then result else result ++
         processText(Seq.empty,
-          Strings.squashBigWhitespace(texts.map(Xml.asText).map(Xml.getText).mkString("")))
+          Strings.squashBigWhitespace(texts.map(Atom.as).map(Atom.text).mkString("")))
 
       if tail.isEmpty then newResult else atomize(newResult :+ tail.head, tail.tail)
 
   @scala.annotation.tailrec
-  private def processText(result: Seq[Xml.Text], text: String): Seq[Xml.Text] =
+  private def processText(result: Seq[Atom], text: String): Seq[Atom] =
     if text.isEmpty then result else
       val (spaces: String, tail: String) = text.span(_ == ' ')
-      val newResult = if spaces.isEmpty then result else result :+ Xml.mkText(" ")
+      val newResult = if spaces.isEmpty then result else result :+ Atom(" ")
       val (word: String, tail2: String) = tail.span(_ != ' ')
 
-      if word.isEmpty then newResult else processText(newResult :+ Xml.mkText(word), tail2)
+      if word.isEmpty then newResult else processText(newResult :+ Atom(word), tail2)
 
   @scala.annotation.tailrec
   private def chunkify(
-    result: Seq[Xml.Nodes],
-    current: Xml.Nodes,
-    nodes: Xml.Nodes,
+    result: Seq[Nodes],
+    current: Nodes,
+    nodes: Nodes,
     flush: Boolean
-  ): Seq[Xml.Nodes] =
+  ): Seq[Nodes] =
     if flush then chunkify(result :+ current.reverse, Nil, nodes, flush = false) else (current, nodes) match
-      case (Nil    , Nil    )                                         => result
-      case (_      , Nil    )                                         => chunkify(result, current     , Nil     , flush = true )
-      case (Nil    , n :: ns) if  Xml.isWhitespace(n)                 => chunkify(result, Nil         , ns      , flush = false)
-      case (_      , n :: ns) if  Xml.isWhitespace(n)                 => chunkify(result, current     , ns      , flush = true )
-      case (Nil    , n :: ns) if !Xml.isWhitespace(n)                 => chunkify(result, n :: Nil    , ns      , flush = false)
-      case (c :: cs, n :: ns) if !Xml.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns      , flush = false)
-      case (c :: _ , n :: ns) if !Xml.isWhitespace(n) && !cling(c, n) => chunkify(result, current     , n :: ns , flush = true )
+      case (Nil    , Nil    )                                          => result
+      case (_      , Nil    )                                          => chunkify(result, current     , Nil     , flush = true )
+      case (Nil    , n :: ns) if  Atom.isWhitespace(n)                 => chunkify(result, Nil         , ns      , flush = false)
+      case (_      , n :: ns) if  Atom.isWhitespace(n)                 => chunkify(result, current     , ns      , flush = true )
+      case (Nil    , n :: ns) if !Atom.isWhitespace(n)                 => chunkify(result, n :: Nil    , ns      , flush = false)
+      case (c :: cs, n :: ns) if !Atom.isWhitespace(n) &&  cling(c, n) => chunkify(result, n :: c :: cs, ns      , flush = false)
+      case (c :: _ , n :: ns) if !Atom.isWhitespace(n) && !cling(c, n) => chunkify(result, current     , n :: ns , flush = true )
 
-  private def cling(c: Xml.Node, n: Xml.Node): Boolean = Xml.isText(c) || Xml.isText(n) ||
-    (Xml.isElement(n) && clingyElements.contains(Xml.getName(Xml.asElement(n))))
+  private def cling(c: Node, n: Node): Boolean = Atom.is(c) || Atom.is(n) ||
+    (Element.is(n) && clingyElements.contains(Element.getName(Element.as(n))))
 
   private def fromChunk(
-    nodes: Xml.Nodes,
-    parent: Option[Xml.Element],
+    nodes: Nodes,
+    parent: Option[Element],
     canBreakLeft: Boolean,
     canBreakRight: Boolean
   ): Doc =
@@ -240,27 +240,27 @@ final class PrettyPrinter(
       fromNode(nodes.last, parent, canBreakLeft = false, canBreakRight)
     )
 
-  private def fromPreformattedNode(node: Xml.Node, parent: Option[Xml.Element]): Seq[String] =
-    if Xml.isElement(node) then fromPreformattedElement(Xml.asElement(node), parent)
-    else if Xml.isText(node) then preformattedLines(Xml.getText(Xml.asText(node)))
-    else preformattedLines(Xml.toString(node))
+  private def fromPreformattedNode(node: Node, parent: Option[Element]): Seq[String] =
+    if Element.is(node) then fromPreformattedElement(Element.as(node), parent)
+    else if Atom.is(node) then preformattedLines(Atom.text(Atom.as(node)))
+    else preformattedLines(Node.toString(node))
 
   private def fromNode(
-    node: Xml.Node,
-    parent: Option[Xml.Element],
+    node: Node,
+    parent: Option[Element],
     canBreakLeft: Boolean,
     canBreakRight: Boolean
   ): Doc =
-    if Xml.isElement(node) then
-      val element: Xml.Element = Xml.asElement(node)
-      if preformattedElements.contains(Xml.getName(element)) then
+    if Element.is(node) then
+      val element: Element = Element.as(node)
+      if preformattedElements.contains(Element.getName(element)) then
         Doc.text(fromPreformattedElement(element, parent).mkString(PrettyPrinter.hiddenNewline))
       else
         val result: Doc = fromElement(element, parent, canBreakLeft, canBreakRight)
         // Note: suppressing extra hardLine when lb is in stack is non-trivial - and not worth it :)
-        if canBreakRight && Xml.getName(element) == "lb" then result + Doc.hardLine else result
-    else if Xml.isText(node) then Doc.text(encodeXmlSpecials(Xml.getText(Xml.asText(node))))
-    else Doc.paragraph(Xml.toString(node))
+        if canBreakRight && Element.getName(element) == "lb" then result + Doc.hardLine else result
+    else if Atom.is(node) then Doc.text(encodeXmlSpecials(Atom.text(Atom.as(node))))
+    else Doc.paragraph(Node.toString(node))
 
   private def preformattedLines(string: String): Seq[String] =
     encodeXmlSpecials(string).split("\n").toSeq

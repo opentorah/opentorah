@@ -1,17 +1,17 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Text, Unparser}
+import org.opentorah.xml.{Attribute, ContentType, ElementTo, Parsable, Parser, Text, Unparser}
 
 final class Name(val name: String, val languageSpec: Language.Spec):
   def satisfies(spec: Language.Spec): Boolean =
     def satisfies[T](f: Language.Spec => Option[T])(using CanEqual[T, T]): Boolean = f(spec).isEmpty || (f(languageSpec) == f(spec))
     satisfies(_.language) && satisfies(_.isTransliterated) && satisfies(_.flavour)
 
-object Name extends Element[Name]("name"):
+object Name extends ElementTo[Name]("name"):
   private val nAttribute: Attribute[String] = Attribute("n")
 
-  override def contentType: Element.ContentType = Element.ContentType.Characters
+  override def contentType: ContentType = ContentType.Characters
 
   override def contentParsable: Parsable[Name] = new Parsable[Name]:
     override def parser: Parser[Name] = for
@@ -30,4 +30,3 @@ object Name extends Element[Name]("name"):
       nAttribute.required(_.name),
       Language.Spec(_.languageSpec)
     )
-

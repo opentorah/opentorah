@@ -54,5 +54,5 @@ object Effects:
   // TODO is this something from ZIO already?
   def required[R, A](optional: ZIO[R, Error, Option[A]], what: AnyRef): ZIO[R, Error, A] = for
     result <- optional
-    _ <- check(result.isDefined, s"Required $what is missing")
+    _ <- check(result.isDefined, s"Missing required $what")
   yield result.get

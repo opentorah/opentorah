@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.tei.{CalendarDesc, SourceDesc}
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 class SiteTei(
   val facsimilesUrl: Option[String],
@@ -9,7 +9,7 @@ class SiteTei(
   val calendarDesc: Option[CalendarDesc.Value]
 )
 
-object SiteTei extends Element[SiteTei]("tei"):
+object SiteTei extends ElementTo[SiteTei]("tei"):
   val empty: SiteTei = SiteTei(
     facsimilesUrl = None,
     sourceDesc = None,

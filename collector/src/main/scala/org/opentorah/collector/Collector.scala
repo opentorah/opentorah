@@ -5,12 +5,12 @@ import org.opentorah.site.{LinksResolver, Site, SiteCommon, SiteService}
 import org.opentorah.store.{Alias, Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.tei.{EntityReference, EntityType, Tei, Unclear, Entity as TeiEntity}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{FromUrl, Nodes, Parsable, Parser, Unparser}
 import zio.{UIO, ZIO}
 import java.net.URL
 
 final class Collector(
-  fromUrl: Element.FromUrl,
+  fromUrl: FromUrl,
   common: SiteCommon,
   val entities: Entities,
   val entityLists: EntityLists,
@@ -21,7 +21,7 @@ final class Collector(
   fromUrl,
   common
 ):
-  def collectionPaths: Caching.Parser[Seq[Path]] = Caching.getCached(
+  def collectionPaths: Parser[Seq[Path]] = Parser.getCached(
     key = "collectionPaths",
     load = by.getPaths(include = _.isInstanceOf[Collection], stop = _.isInstanceOf[Collection])
   )
@@ -48,17 +48,17 @@ final class Collector(
     case _: FacsimileFacet => "facsimileWrapper"
     case _ => null
 
-  private def findEntityByName[T](name: String, action: Option[Entity] => T): Caching.Parser[T] =
+  private def findEntityByName[T](name: String, action: Option[Entity] => T): Parser[T] =
     entities.findByName(name).map(action)
 
-  private def store2alias: Caching.Parser[Map[Store, Alias]] = Caching.getCached(
+  private def store2alias: Parser[Map[Store, Alias]] = Parser.getCached(
     key = "store2alias",
     load = ZIO.foreach(aliases)((alias: Alias) =>
       for toPath: Path <- resolve(alias.to) yield toPath.last -> alias
     ).map(_.toMap)
   )
 
-  override def pathShortener: Caching.Parser[Path.Shortener] =
+  override def pathShortener: Parser[Path.Shortener] =
     def useAliases(path: Path, store2alias: Map[Store, Alias]): Path =
       val aliasedIndex: Int = path.indexWhere(store2alias.contains)
       if aliasedIndex < 0 then path else store2alias(path(aliasedIndex)) +: path.drop(aliasedIndex+1)
@@ -87,7 +87,7 @@ final class Collector(
     name = "references",
     value = EntityReference
   )
-  def getNoRefs: Caching.Parser[Seq[WithSource[EntityReference]]] = noRefs.get
+  def getNoRefs: Parser[Seq[WithSource[EntityReference]]] = noRefs.get
 
   // TODO move into the report
   private val unclears: ListFile[WithSource[Unclear.Value], Seq[WithSource[Unclear.Value]]] = WithSource(
@@ -95,7 +95,7 @@ final class Collector(
     name = "unclears",
     value = Unclear.element
   )
-  def getUnclears: Caching.Parser[Seq[WithSource[Unclear.Value]]] = unclears.get
+  def getUnclears: Parser[Seq[WithSource[Unclear.Value]]] = unclears.get
 
   // TODO ZIOify logging!
   //info(request, storePath.fold(s"--- ${Files.mkUrl(path)}")(storePath => s"YES ${storePath.mkString("")}"))
@@ -103,7 +103,7 @@ final class Collector(
   override protected def content(
     path: Path,
     extension: Option[String]
-  ): Caching.Parser[Site.Response] = path.last match
+  ): Parser[Site.Response] = path.last match
     case textFacet: TextFacet if extension.nonEmpty && extension.contains("xml") =>
       for
         tei: Tei <- textFacet.getTei
@@ -117,7 +117,7 @@ final class Collector(
         for content: String <- render(path)
         yield Site.Response(content, Html.mimeType)
 
-  override protected def initializeResolve: Caching.Parser[Unit] = entityLists.setUp(this)
+  override protected def initializeResolve: Parser[Unit] = entityLists.setUp(this)
 
   override protected def linkResolver(path: Path): LinksResolver =
     val facsUrl: Option[Path] = path.last match
@@ -126,7 +126,7 @@ final class Collector(
 
     new LinksResolver:
       def toUIO(
-        pathFinder: Caching.Parser[Option[Path]],
+        pathFinder: Parser[Option[Path]],
         error: => String,
         modifier: A => A = identity,
       ): UIO[Option[A]] = toTask(
@@ -157,37 +157,37 @@ final class Collector(
         modifier = _.setFragment(pageId)
       )
 
-  override protected def directoriesToWrite: Caching.Parser[Seq[Directory[?, ?, ?]]] =
+  override protected def directoriesToWrite: Parser[Seq[Directory[?, ?, ?]]] =
     for collectionPaths: Seq[Path] <- collectionPaths
     yield Seq(entities, notes) ++ collectionPaths.map(_.last.asInstanceOf[Collection].documents)
 
-  private def notePaths: Caching.Parser[Seq[Path]] =
+  private def notePaths: Parser[Seq[Path]] =
     notes.getPaths(include = _.isInstanceOf[Note], stop = _.isInstanceOf[Note])
 
-  private def entityPaths: Caching.Parser[Seq[Path]] =
+  private def entityPaths: Parser[Seq[Path]] =
     entities.getPaths(include = _.isInstanceOf[Entity], stop = _.isInstanceOf[Entity])
 
-  private def hierarchyPaths: Caching.Parser[Seq[Path]] =
+  private def hierarchyPaths: Parser[Seq[Path]] =
     by.getPaths(include = _.isInstanceOf[Hierarchical], stop = _.isInstanceOf[Collection])
 
   // TODO must include translations!
-  private def textFacetPaths: Caching.Parser[Seq[Path]] = by.getPaths(include = _.isInstanceOf[TextFacet], stop = {
+  private def textFacetPaths: Parser[Seq[Path]] = by.getPaths(include = _.isInstanceOf[TextFacet], stop = {
     case _: TextFacet => true
     case collectionFacet: CollectionFacet => !collectionFacet.isText
     case _ => false
   })
 
-  override protected def innerBuild: Caching.Parser[Unit] = for
+  override protected def innerBuild: Parser[Unit] = for
     _ <- writeReferences
     _ <- writeUnclears
   yield ()
 
-  private def writeReferences: Caching.Parser[Unit] =
+  private def writeReferences: Parser[Unit] =
     logger.info("Writing references.")
     for
       allReferences: Seq[WithSource[EntityReference]] <- allWithSource[EntityReference](nodes =>
         ZIO.foreach(EntityType.values.toIndexedSeq)(entityType =>
-            Xml.descendants(nodes, entityType.nameElement, EntityReference)
+            EntityReference.descendants(nodes, entityType.nameElement)
         )
           .map(_.flatten) // TODO toIndexSeq?
       )
@@ -202,29 +202,29 @@ final class Collector(
       _ <- ZIO.foreachDiscard(allEntities)((entity: Entity) => Effects.effect(entity.writeReferences(allReferences, this)))
     yield ()
 
-  private def writeUnclears: Caching.Parser[Unit] =
+  private def writeUnclears: Parser[Unit] =
     logger.info("Writing unclears.")
     for
       allUnclears: Seq[WithSource[Unclear.Value]] <- allWithSource[Unclear.Value](
-        nodes => Xml.descendants(nodes, Unclear.element.elementName, Unclear.element)
+        nodes => Unclear.element.descendants(nodes, Unclear.element.elementName)
       )
       _ <- Effects.effect(unclears.write(allUnclears.sortBy(_.source)))
     yield ()
 
   // TODO retrieve TEI(?) references from notes.
-  private def allWithSource[T](finder: Xml.Nodes => Parser[Seq[T]]): Caching.Parser[Seq[WithSource[T]]] =
+  private def allWithSource[T](finder: Nodes => Parser[Seq[T]]): Parser[Seq[WithSource[T]]] =
     def forPaths[S, R](
-      getter: Caching.Parser[Seq[Path]],
-      retriever: S => Caching.Parser[R],
-      extractor: R => Xml.Nodes
-    ): Caching.Parser[Seq[WithSource[T]]] = for
+      getter: Parser[Seq[Path]],
+      retriever: S => Parser[R],
+      extractor: R => Nodes
+    ): Parser[Seq[WithSource[T]]] = for
       paths: Seq[Path] <- getter
       result: Seq[Seq[WithSource[T]]] <- ZIO.foreach(paths)((path: Path) =>
         for
           from: R <- retriever(Path.last[S](path))
           pathShortener: Path.Shortener <- pathShortener
           source: String = Files.mkUrl(Path.structureNames(pathShortener(path)))
-          nodes: Xml.Nodes = extractor(from)
+          nodes: Nodes = extractor(from)
           found: Seq[T] <- finder(nodes)
         yield found.map(new WithSource[T](source, _))
       )
@@ -252,18 +252,18 @@ final class Collector(
       )
     yield fromEntities ++ fromHierarchicals ++ fromDocuments
 
-  override protected def verify: Caching.Parser[Unit] =
+  override protected def verify: Parser[Unit] =
     logger.info("Verifying site.")
     for
       errorOpts: Seq[Option[String]] <- ZIO.foreach(references)(value =>
         val reference: EntityReference = value.value
-        val name: Xml.Nodes = reference.name
-        reference.ref.fold[Caching.Parser[Option[String]]](ZIO.none)(ref =>
+        val name: Nodes = reference.name
+        reference.ref.fold[Parser[Option[String]]](ZIO.none)(ref =>
           if ref.contains(" ") then ZIO.some(s"""Value of the ref attribute contains spaces: ref="$ref" """)
           else findEntityByName(ref, _
-            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${Xml.toString(name)}< """))(named =>
+            .fold[Option[String]](Some(s"""Unresolvable reference: Name ref="$ref">${Nodes.toString(name)}< """))(named =>
               if named.entityType == reference.entityType then None
-              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${Xml.toString(name)} [$ref]")
+              else Some(s"${reference.entityType} reference to ${named.entityType} ${named.name}: ${Nodes.toString(name)} [$ref]")
             )
           )
         )
@@ -278,13 +278,13 @@ final class Collector(
       _ <- verifyLinks(textFacetPaths)
     yield ()
 
-  private def verifyLinks(getter: Caching.Parser[Seq[Path]]): Caching.Parser[Unit] = for
+  private def verifyLinks(getter: Parser[Seq[Path]]): Parser[Unit] = for
     paths: Seq[Path] <- getter
     // TODO separate verification from actual resolution
     _ <- ZIO.foreachDiscard(paths)(resolveLinks)
   yield ()
 
-  override protected def prettyPrintTei: Caching.Parser[Seq[URL]] = for
+  override protected def prettyPrintTei: Parser[Seq[URL]] = for
     entityPaths <- entityPaths
     textFacetPaths <- textFacetPaths
   yield
@@ -292,11 +292,11 @@ final class Collector(
     textFacetPaths.map(_.last.asInstanceOf[TextFacet])
       .map(textFacet => textFacet.collection.documents.fileUrl(textFacet.document))
 
-  override protected def prettyPrintStores: Caching.Parser[Seq[URL]] = for
+  override protected def prettyPrintStores: Parser[Seq[URL]] = for
     hierarchyPaths <- hierarchyPaths
   yield
     //Seq(fromUrl.url) ++ // leave the site.xml file alone :)
-    hierarchyPaths.map(_.last.asInstanceOf[Element.FromUrl.With].fromUrl).filterNot(_.inline).map(_.url)
+    hierarchyPaths.map(_.last.asInstanceOf[FromUrl.With].fromUrl).filterNot(_.inline).map(_.url)
 
 object Collector extends SiteService[Collector]:
   // TODO I sacrificed type-safety: HtmlContent lost type parameter S <: Site[S] and got merged into Store;
@@ -312,7 +312,7 @@ object Collector extends SiteService[Collector]:
 
   override def contentParsable: Parsable[Collector] = new Parsable[Collector]:
     override def parser: Parser[Collector] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       common: SiteCommon <- SiteCommon.required()
       entities: Entities <- Entities.required()
       entityLists: EntityLists <- EntityLists.required()

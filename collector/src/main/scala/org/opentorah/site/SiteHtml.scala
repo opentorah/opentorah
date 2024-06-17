@@ -1,6 +1,6 @@
 package org.opentorah.site
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, RawXml, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, RawXml, Unparser}
 
 final class SiteHtml(
   val url: Option[String],
@@ -13,7 +13,7 @@ final class SiteHtml(
 ):
   def getSocial: SiteSocial = social.getOrElse(SiteSocial.empty  )
 
-object SiteHtml extends Element[SiteHtml]("html"):
+object SiteHtml extends ElementTo[SiteHtml]("html"):
 
   val empty: SiteHtml = SiteHtml(
     url = None,

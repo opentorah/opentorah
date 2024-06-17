@@ -1,13 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 final class Editor(
   val role: Option[String],
   val persName: Option[EntityReference]
 )
 
-object Editor extends Element[Editor]("editor"):
+object Editor extends ElementTo[Editor]("editor"):
 
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
 

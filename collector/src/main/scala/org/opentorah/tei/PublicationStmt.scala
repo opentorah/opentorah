@@ -1,13 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 
 final class PublicationStmt(
   val publisher: Option[Publisher.Value],
   val availability: Option[Availability]
 )
 
-object PublicationStmt extends Element[PublicationStmt]("publicationStmt"):
+object PublicationStmt extends ElementTo[PublicationStmt]("publicationStmt"):
 
   override def contentParsable: Parsable[PublicationStmt] = new Parsable[PublicationStmt]:
     override val parser: Parser[PublicationStmt] = for

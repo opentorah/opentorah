@@ -1,12 +1,12 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 
 final class HandNotes(
   val handNotes: Seq[HandNote.Value]
 )
 
-object HandNotes extends Element[HandNotes]("handNotes"):
+object HandNotes extends ElementTo[HandNotes]("handNotes"):
   def empty: HandNotes = HandNotes(
     handNotes = Seq.empty
   )

@@ -3,12 +3,12 @@ package org.opentorah.collector
 import org.opentorah.html.A
 import org.opentorah.site.Markdown
 import org.opentorah.store.{By, Context, Directory, Path}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Atom, Element, ElementTo, Elements, FromUrl, Nodes, Parsable, Parser, Unparser}
 import zio.{UIO, ZIO}
 import java.net.URL
 
 final class Notes(
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   selectorName: String,
   override val directory: String
 ) extends
@@ -23,23 +23,23 @@ final class Notes(
   override protected def loadFile(url: URL): UIO[Markdown] = ZIO.succeed(Markdown(url))
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Nodes] = htmlHeadTitle.map(Atom.apply)
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
+  override def content(path: Path, context: Context): Parser[Element] = for
     notes: Seq[Note] <- stores
-    lines: Seq[Xml.Element] <- ZIO.foreach(notes.sortBy(_.title))((note: Note) =>
+    lines: Elements <- ZIO.foreach(notes.sortBy(_.title))((note: Note) =>
       for a: A <- context.a(path :+ note) yield
         <l>{a(text = note.title.getOrElse("NO TITLE"))}</l>
     )
   yield <div>{lines}</div>
 
-object Notes extends Element[Notes]("notes"):
+object Notes extends ElementTo[Notes]("notes"):
 
   final class All(name2entry: Map[String, Note]) extends Directory.Wrapper[Note](name2entry)
 
   override def contentParsable: Parsable[Notes] = new Parsable[Notes]:
     override def parser: Parser[Notes] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       selectorName: String <- By.selectorParser
       directory: String <- Directory.directoryAttribute()
     yield Notes(

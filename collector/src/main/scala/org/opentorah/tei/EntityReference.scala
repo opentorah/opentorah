@@ -1,10 +1,10 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Nodes, Parsable, Parser, Unparser, Xml}
 
 final class EntityReference(
   val entityType: EntityType,
-  val name: Xml.Nodes,
+  val name: Nodes,
   val id: Option[String],
   val role: Option[String],
   val ref: Option[String]
@@ -14,7 +14,7 @@ object EntityReference extends EntityRelated[EntityReference](
   elementName = _.nameElement,
   entityType = _.entityType
 ):
-  override protected def contentType: Element.ContentType = Element.ContentType.Mixed
+  override protected def contentType: ContentType = ContentType.Mixed
 
   private val idAttribute: Attribute.Optional[String] = Xml.idAttribute.optional
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
@@ -27,7 +27,7 @@ object EntityReference extends EntityRelated[EntityReference](
       role: Option[String] <- roleAttribute()
       ref: Option[String] <- refAttribute()
       _ <- typeAttribute() // We don't do anything with the type yet...
-      name: Xml.Nodes <- Xml.nodes()
+      name: Nodes <- Nodes.all()
     yield EntityReference(
       entityType,
       name,
@@ -40,5 +40,5 @@ object EntityReference extends EntityRelated[EntityReference](
       refAttribute(_.ref),
       idAttribute(_.id),
       roleAttribute(_.role),
-      Xml.nodes(_.name)
+      Nodes.all(_.name)
     )

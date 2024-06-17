@@ -1,13 +1,13 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 abstract class Chapter(override val number: Int, from: Int, to: Int) extends NumberedStore, Pure[?]:
   def length: Int = to - from + 1
   override def storesPure: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
 
-object Chapter extends Element[WithNumber[Int]]("chapter"):
+object Chapter extends ElementTo[WithNumber[Int]]("chapter"):
 
   final class ByVerse(override val minNumber: Int, override val maxNumber: Int) extends
     By.WithSelector[Verse]("verse"),

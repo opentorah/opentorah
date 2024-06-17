@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.util.Effects
-import org.opentorah.xml.Xml
+import org.opentorah.xml.{Element, Elements, Xml}
 import zio.{URIO, ZIO, ZLayer}
 
 class Footnotes:
@@ -13,7 +13,7 @@ class Footnotes:
     result
 
   // Stack of footnote lists for each of the nested containers; head is the current one.
-  private var footnotes: Seq[Seq[Xml.Element]] = Seq.empty
+  private var footnotes: Seq[Elements] = Seq.empty
 
   def isEmpty: Boolean = footnotes.isEmpty
 
@@ -24,11 +24,11 @@ class Footnotes:
 
   private def getNextNumber: Int = footnotes.head.length + 1
 
-  def add(footnote: Xml.Element): Unit =
+  def add(footnote: Element): Unit =
     footnotes = (footnotes.head :+ footnote) +: footnotes.tail
 
-  def get: Seq[Xml.Element] =
-    val result: Seq[Xml.Element] = footnotes.head
+  def get: Elements =
+    val result: Elements = footnotes.head
     footnotes = Seq.empty +: footnotes.tail
     result
 
@@ -41,11 +41,11 @@ object Footnotes:
   def push: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.push())
   def pop: URIO[Footnotes, Unit] = ZIO.environmentWith(_.get.pop())
 
-  def get: URIO[Footnotes, Seq[Xml.Element]] = ZIO.environmentWith(_.get.get)
+  def get: URIO[Footnotes, Elements] = ZIO.environmentWith(_.get.get)
 
   def empty: ZLayer[Any, Nothing, Footnotes] = ZLayer.succeed(new Footnotes)
 
-  def footnote(element: Xml.Element): ZIO[Footnotes, Effects.Error, Xml.Element] = for
+  def footnote(element: Element): ZIO[Footnotes, Effects.Error, Element] = for
   // TODO get two ids, one for the actual content at the end
     idNumber: Int <- ZIO.environmentWith[Footnotes](_.get.takeNextIdNumber)
     id: Option[String] <- Xml.idAttribute.optional.get(element)
@@ -53,7 +53,7 @@ object Footnotes:
     contentId: String = s"footnote_$idNumber"
     number: Int <- ZIO.environmentWith[Footnotes](_.get.getNextNumber)
     symbol: String = number.toString
-    footnote: Xml.Element = TeiToHtml.footnote(contentId, srcId, symbol, Xml.getChildren(element))
+    footnote: Element = TeiToHtml.footnote(contentId, srcId, symbol, Element.getChildren(element))
     _ <- ZIO.environmentWith[Footnotes](_.get.add(footnote))
   yield
     TeiToHtml.footnoteRef(contentId, srcId, symbol)

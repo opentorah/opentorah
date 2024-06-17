@@ -7,7 +7,7 @@ import org.opentorah.html.{A, Html}
 import org.opentorah.metadata.Language
 import org.opentorah.tei.{Date, EntityName, EntityType, Pb, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Attribute, Namespace, Xml}
+import org.opentorah.xml.{Atom, Attribute, Element, Elements, Namespace, Node, Nodes, Xml}
 import zio.ZIO
 import java.net.URI
 
@@ -16,11 +16,11 @@ import java.net.URI
 object TeiToHtml:
   // TODO handle table/tr/td systematically
 
-  private def isFootnote(element: Xml.Element): ZIO[Any, Effects.Error, Boolean] =
+  private def isFootnote(element: Element): ZIO[Any, Effects.Error, Boolean] =
     for place <- placeAttribute.get(element)
-    yield (Xml.getName(element) == "note") && place.contains("end")
+    yield (Element.getName(element) == "note") && place.contains("end")
 
-  private def isFootnotesContainer(element: Xml.Element): Boolean = false
+  private def isFootnotesContainer(element: Element): Boolean = false
 
   private val targetAttribute: Attribute.Required[String] = Attribute("target").required
   private val urlAttribute: Attribute.Required[String] = Attribute("url").required
@@ -35,37 +35,37 @@ object TeiToHtml:
   // class attribute by augmenting Html.To - but I do not see the need: CSS styling can be applied
   // based on the 'rendition' itself.
   // TEI allows for in-element styling using attribute `style` - and browsers apply CSS from there too!
-  private def elementToHtml(element: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] =
-    val children: Xml.Nodes = Xml.getChildren(element)
+  private def elementToHtml(element: Element): ZIO[LinksResolver, Effects.Error, Element] =
+    val children: Nodes = Element.getChildren(element)
 
-    Xml.getName(element) match
+    Element.getName(element) match
       case label if EntityType.isName(label) =>
-        require(!Xml.isEmpty(children), element)
+        require(!Nodes.isEmpty(children), element)
         for
           ref: Option[String] <- EntityName.refAttribute.get(element)
-          result: Xml.Element <- if ref.isEmpty then ZIO.succeed(TeiToHtml.namespace(A.empty(children))) else
+          result: Element <- if ref.isEmpty then ZIO.succeed(TeiToHtml.namespace(A.empty(children))) else
             ZIO.environmentWithZIO[LinksResolver](_.get.findByRef(ref.get))
               .map(_.getOrElse(A(ref.toSeq))(children))
               .map(TeiToHtml.namespace)
         yield result
 
       case "ref" =>
-        require(!Xml.isEmpty(children), element)
+        require(!Nodes.isEmpty(children), element)
         reference(element).map(_(children))
           .map(TeiToHtml.namespace)
 
       case "ptr" =>
-        require(Xml.isEmpty(children), element)
+        require(Nodes.isEmpty(children), element)
         reference(element).map(_(Seq.empty))
           .map(TeiToHtml.namespace)
 
       // TODO feed pageId through State to obtain unique id
       case Pb.elementName =>
-        require(Xml.isEmpty(children), element)
+        require(Nodes.isEmpty(children), element)
         for
           n: String <- Pb.nAttribute.get(element)
           pageId: String = Pb.pageId(n)
-          result: Xml.Element <- ZIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
+          result: Element <- ZIO.environmentWithZIO[LinksResolver](_.get.facs(pageId)).map(_
             .getOrElse(A(Seq(pageId)))
             .setId(pageId)
             (text = facsimileSymbol)
@@ -75,7 +75,7 @@ object TeiToHtml:
 
       case "graphic" =>
         // Note: in TEI <graphic> can contain <desc>, but we are treating it as empty.
-        require(Xml.isEmpty(children), element)
+        require(Nodes.isEmpty(children), element)
         for url: String <- urlAttribute.get(element)
         yield TeiToHtml.namespace(<img src={url}/>)
 
@@ -84,11 +84,11 @@ object TeiToHtml:
       // it should become <caption>transform(HEAD)</caption>.
       case "row" => ZIO.succeed(TeiToHtml.tr(children))
       case "cell" => for cols: Option[String] <- colsAttribute.get(element) yield TeiToHtml.td(cols, children)
-      case "date" => for tooltip: Xml.Nodes <- dateTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
-      case "gap" => for tooltip: Xml.Nodes <- gapTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
+      case "date" => for tooltip: Nodes <- dateTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
+      case "gap" => for tooltip: Nodes <- gapTooltip(element) yield TeiToHtml.addTooltip(tooltip, element)
       case _ => ZIO.succeed(element)
 
-  private def reference(element: Xml.Element): ZIO[LinksResolver, Effects.Error, A] = for
+  private def reference(element: Element): ZIO[LinksResolver, Effects.Error, A] = for
     target <- targetAttribute.get(element)
     uri: URI = URI(target)
     result: A <-
@@ -100,8 +100,8 @@ object TeiToHtml:
       )
   yield result
 
-  private def gapTooltip(element: Xml.Element): ZIO[Any, Effects.Error, Xml.Nodes] =
-    for reason: Option[String] <- reasonAttribute.get(element) yield reason.fold(Seq.empty)(Xml.mkText)
+  private def gapTooltip(element: Element): ZIO[Any, Effects.Error, Nodes] =
+    for reason: Option[String] <- reasonAttribute.get(element) yield reason.fold(Seq.empty)(Atom.apply)
 
   // TODO move into Calendar
   private final class DateInterval(
@@ -149,7 +149,7 @@ object TeiToHtml:
       val numbers: Seq[Int] = parseNumbers(when)
       if numbers.length == 3 then Right(from(numbers)) else Left(DateInterval(from(numbers), to(numbers)))
 
-  private def dateTooltip(element: Xml.Element): ZIO[Any, Effects.Error, Xml.Nodes] =
+  private def dateTooltip(element: Element): ZIO[Any, Effects.Error, Nodes] =
     for
       when: String <- Date.whenAttribute.get(element)
       calendarName: Option[String] <- Date.calendarAttribute.get(element)
@@ -161,12 +161,12 @@ object TeiToHtml:
 
       val displayLanguage: Language.Spec = Language.Russian.toSpec // TODO get from context
 
-      def display(date: Calendar#Day): Xml.Element =
+      def display(date: Calendar#Day): Element =
         <td>
           {date.toLanguageString(using displayLanguage)}
         </td>
 
-      def displayInterval(interval: DateInterval): Seq[Xml.Element] =
+      def displayInterval(interval: DateInterval): Elements =
         Seq(display(interval.from), display(interval.to))
 
       parse(when, calendar) match {
@@ -174,7 +174,7 @@ object TeiToHtml:
           <table xmlns={Html.namespace.uri}>
             <tr>
               <th>Calendar</th> <th>Date</th>
-            </tr>{Xml.conditional(useJulian)(
+            </tr>{Nodes.conditional(useJulian)(
             <tr>
               <td>Julian</td>{display(date)}
             </tr>)}<tr>
@@ -189,7 +189,7 @@ object TeiToHtml:
           <table xmlns={Html.namespace.uri}>
             <tr>
               <th>Calendar</th> <th>From</th> <th>To</th>
-            </tr>{Xml.conditional(useJulian)(
+            </tr>{Nodes.conditional(useJulian)(
             <tr>
               <td>Julian</td>{displayInterval(interval)}
             </tr>)}<tr>
@@ -205,56 +205,56 @@ object TeiToHtml:
       case e => throw IllegalArgumentException(s"Exception processing when=$when", e)
 
 
-  private def isInNamespace(element: Xml.Element): Boolean =
+  private def isInNamespace(element: Element): Boolean =
     Namespace.get(element) == Tei.namespace.default
 
   private def addPrefix(name: String): String = s"${Html.namespace.getPrefix.get}-$name"
 
-  def toHtml(element: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] =
+  def toHtml(element: Element): ZIO[LinksResolver, Effects.Error, Element] =
     for
       footnotesDone <- processFootnotes(element).provideSomeLayer[LinksResolver](Footnotes.empty)
       html <- elementsToHtml(footnotesDone)
     yield
       html
 
-  private def processFootnotes(element: Xml.Element): ZIO[Footnotes & LinksResolver, Effects.Error, Xml.Element] = for
+  private def processFootnotes(element: Element): ZIO[Footnotes & LinksResolver, Effects.Error, Element] = for
     isEmpty: Boolean <- Footnotes.isEmpty
     doPush: Boolean = isEmpty || (isInNamespace(element) && isFootnotesContainer(element))
     _ <- if !doPush then ZIO.succeed(()) else Footnotes.push
     isFootnote <- isFootnote(element)
-    newElement: Xml.Element <-
+    newElement: Element <-
       if isInNamespace(element) && isFootnote
       then Footnotes.footnote(element)
       else transformChildren(processFootnotes, element)
-    result: Xml.Element <-
+    result: Element <-
       if !doPush
       then ZIO.succeed(newElement)
       else processLevels(newElement, Seq.empty)
   yield result
 
   private def processLevels(
-    newElement: Xml.Element,
-    levels: Seq[Seq[Xml.Element]]
-  ): ZIO[Footnotes & LinksResolver, Effects.Error, Xml.Element] = for
-    footnotes: Seq[Xml.Element] <- Footnotes.get
-    result: Xml.Element <-
+    newElement: Element,
+    levels: Seq[Elements]
+  ): ZIO[Footnotes & LinksResolver, Effects.Error, Element] = for
+    footnotes: Elements <- Footnotes.get
+    result: Element <-
       if footnotes.isEmpty then for
         _ <- Footnotes.pop
       yield
         if levels.isEmpty
         then newElement
-        else Xml.appendChildren(newElement,
+        else Element.appendChildren(newElement,
           (for (level, depth) <- levels.zipWithIndex yield TeiToHtml.footnoteLevel(level, depth)).flatten
         )
       else for
-        nextLevel: Seq[Xml.Element] <- ZIO.foreach(footnotes)(processFootnotes)
+        nextLevel: Elements <- ZIO.foreach(footnotes)(processFootnotes)
         result <- processLevels(newElement, levels :+ nextLevel)
       yield result
   yield result
 
-  private def elementsToHtml(oldElement: Xml.Element): ZIO[LinksResolver, Effects.Error, Xml.Element] = for
-    element: Xml.Element <- transformChildren(elementsToHtml, oldElement)
-    result: Xml.Element <- if !isInNamespace(element) then ZIO.succeed(element) else
+  private def elementsToHtml(oldElement: Element): ZIO[LinksResolver, Effects.Error, Element] = for
+    element: Element <- transformChildren(elementsToHtml, oldElement)
+    result: Element <- if !isInNamespace(element) then ZIO.succeed(element) else
 
       val attributes: Attribute.StringValues =
         for attribute: Attribute.Value[String] <- Attribute.get(element) yield
@@ -264,29 +264,29 @@ object TeiToHtml:
             else Attribute(addPrefix(name)).optional.withValue(attribute.value)
           }
 
-      for newElement: Xml.Element <- elementToHtml(element) yield
+      for newElement: Element <- elementToHtml(element) yield
         if isInNamespace(newElement) then
-          val name: String = Xml.getName(newElement)
+          val name: String = Element.getName(newElement)
           Attribute.set(
-            element = if !TeiToHtml.reservedElements.contains(name) then newElement else Xml.rename(newElement, addPrefix(name)),
-            attributes = attributes
+            element = if !TeiToHtml.reservedElements.contains(name) then newElement else Element.rename(newElement, addPrefix(name)),
+            values = attributes
           )
         else
           Attribute.add(
             element = newElement,
-            attributes = Html.classAttribute.required.withValue(Xml.getName(element)) +: attributes
+            values = Html.classAttribute.required.withValue(Element.getName(element)) +: attributes
           )
 
   yield result
 
   private def transformChildren[T](
-    transform: Xml.Element => ZIO[T, Effects.Error, Xml.Element],
-    element: Xml.Element
-  ): ZIO[T, Effects.Error, Xml.Element] = for
-    children: Xml.Nodes <- ZIO.foreach(Xml.getChildren(element))((node: Xml.Node) =>
-      if !Xml.isElement(node) then ZIO.succeed(node) else transform(Xml.asElement(node))
+    transform: Element => ZIO[T, Effects.Error, Element],
+    element: Element
+  ): ZIO[T, Effects.Error, Element] = for
+    children: Nodes <- ZIO.foreach(Element.getChildren(element))((node: Node) =>
+      if !Element.is(node) then ZIO.succeed(node) else transform(Element.as(node))
     )
-  yield Xml.setChildren(element, children)
+  yield Element.setChildren(element, children)
 
   private val xml2htmlAttribute: Map[Attribute[String], Attribute[String]] = Map(
     Xml.idAttribute   -> Html.idAttribute,
@@ -295,7 +295,7 @@ object TeiToHtml:
   )
 
   // TODO eliminate
-  def namespace(element: Xml.Element): Xml.Element =
+  def namespace(element: Element): Element =
     Html.namespace.default.declare(element)
 
   /*
@@ -320,43 +320,43 @@ object TeiToHtml:
 
   private val reservedAttributes: Set[String] = Set("class", "target", "lang", "frame")
 
-  private def tooltip(content: Xml.Nodes): Xml.Element =
+  private def tooltip(content: Nodes): Element =
     <span xmlns={Html.namespace.uri} class="tooltip">
       {content}
     </span>
 
-  private def addTooltip(content: Xml.Nodes, element: Xml.Element): Xml.Element =
-    Xml.prependChildren(element, tooltip(content))
+  private def addTooltip(content: Nodes, element: Element): Element =
+    Element.prependChildren(element, tooltip(content))
 
-  def footnote(contentId: String, srcId: String, symbol: String, content: Xml.Nodes): Xml.Element =
+  def footnote(contentId: String, srcId: String, symbol: String, content: Nodes): Element =
     <span xmlns={Html.namespace.uri} class="footnote" id={contentId}>
       <a href={s"#$srcId"} class="footnote-backlink">
         {symbol}
       </a>{content}
     </span>
 
-  def footnoteRef(contentId: String, srcId: String, symbol: String): Xml.Element =
+  def footnoteRef(contentId: String, srcId: String, symbol: String): Element =
     <a xmlns={Html.namespace.uri} href={s"#$contentId"} class="footnote-link" id={srcId}>
       {symbol}
     </a>
 
-  private def footnoteLevel(content: Seq[Xml.Element], depth: Int): Xml.Nodes =
+  private def footnoteLevel(content: Elements, depth: Int): Nodes =
       <hr class="footnotes-line"/> ++
       <div xmlns={Html.namespace.uri} class="footnotes">
         {content}
       </div>
 
-  def table(children: Xml.Nodes): Xml.Element =
+  def table(children: Nodes): Element =
     <table xmlns={Html.namespace.uri}>
       {children}
     </table>
 
-  def tr(children: Xml.Nodes): Xml.Element =
+  def tr(children: Nodes): Element =
     <tr xmlns={Html.namespace.uri}>
       {children}
     </tr>
 
-  def td(colspan: Option[String], children: Xml.Nodes): Xml.Element =
+  def td(colspan: Option[String], children: Nodes): Element =
     <td xmlns={Html.namespace.uri} colspan={colspan.orNull}>
       {children}
     </td>

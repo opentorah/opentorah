@@ -1,7 +1,7 @@
 package org.opentorah.tei
 
 import org.opentorah.html.A
-import org.opentorah.xml.{Dialect, Element, Namespace, Parsable, Parser, PrettyPrinter, Unparser}
+import org.opentorah.xml.{Dialect, ElementTo, Namespace, Parsable, Parser, PrettyPrinter, Unparser}
 
 final class Tei(
   val teiHeader: TeiHeader,
@@ -15,7 +15,7 @@ final class Tei(
     text
   )
 
-object Tei extends Element[Tei]("TEI"), Dialect:
+object Tei extends ElementTo[Tei]("TEI"), Dialect:
 
   override val namespace: Namespace = Namespace(uri = "http://www.tei-c.org/ns/1.0", prefix="tei")
 

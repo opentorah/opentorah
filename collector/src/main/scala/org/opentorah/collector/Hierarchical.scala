@@ -4,32 +4,32 @@ import org.opentorah.html.A
 import org.opentorah.metadata.{Language, Names}
 import org.opentorah.tei.{Abstract, Body, Tei, Title}
 import org.opentorah.store.{Context, Path, Pure, Store}
-import org.opentorah.xml.{Caching, Element, Elements, Parsable, Xml}
+import org.opentorah.xml.{Element, ElementTo, Elements, ElementsTo, FromUrl, Nodes, Parsable, Parser}
 import zio.ZIO
 
 // TODO push Hierarchical/ByHierarchy into Site;
 // TODO push up Collector-specific stuff (if any);
 // TODO do 'texts' site!
 abstract class Hierarchical(
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   override val names: Names,
   val title: Title.Value,
   val description: Option[Abstract.Value],
   val body: Option[Body.Value],
 ) extends
-  Element.FromUrl.With,
+  FromUrl.With,
   Pure[Store]:
 
   final def titleString: String = title.content.toString
 
   final override def htmlHeadTitle: Option[String] = Some(titleString)
-  final override def htmlBodyTitle: Option[Xml.Nodes] = None
+  final override def htmlBodyTitle: Option[Nodes] = None
 
   final def displayTitle: String = Hierarchical.displayName(this) + ": " + titleString
 
-  final def descriptionNodes: Xml.Nodes = description.toSeq.map(Abstract.element.xmlElement)
+  final def descriptionNodes: Nodes = description.toSeq.map(Abstract.element.xmlElement)
 
-  final def reference(context: Context, path: Path): Caching.Parser[Xml.Element] =
+  final def reference(context: Context, path: Path): Parser[Element] =
     for a: A <- context.a(path) yield a(text = displayTitle)
     
   final def pathHeaderHorizontal(path: Path): String =
@@ -42,24 +42,24 @@ abstract class Hierarchical(
 
     pathHeaderHorizontal(path, Seq.empty).mkString(", ")
 
-  final def pathHeaderVertical(context: Context, path: Path): Caching.Parser[Seq[Xml.Element]] =
+  final def pathHeaderVertical(context: Context, path: Path): Parser[Elements] =
     def pathHeaderVertical(
       path: Path,
       pathTail: Path,
-      result: Seq[Xml.Element]
-    ): Caching.Parser[Seq[Xml.Element]] = if pathTail.isEmpty then ZIO.succeed(result) else
+      result: Elements
+    ): Parser[Elements] = if pathTail.isEmpty then ZIO.succeed(result) else
       val pathNew: Path = path ++ pathTail.take(2)
       val hierarchical: Hierarchical = pathTail.tail.head.asInstanceOf[Hierarchical]
       for
         a: A <- context.a(pathNew)
         // TODO drop the colon if the title is empty
-        line: Xml.Element =
+        line: Element =
           <l>
             {Hierarchical.displayName(pathTail.head)}
             {a(text = Hierarchical.displayName(hierarchical))}:
             {hierarchical.title.content}
           </l>
-        result: Seq[Xml.Element] <- pathHeaderVertical(
+        result: Elements <- pathHeaderVertical(
           path = pathNew,
           pathTail = pathTail.drop(2),
           result = result :+ line
@@ -69,8 +69,8 @@ abstract class Hierarchical(
 
     pathHeaderVertical(path = Seq.empty, pathTail = path, result = Seq.empty)
 
-  final override def header(path: Path, context: Context): Caching.Parser[Option[Xml.Element]] = for
-    pathHeader: Seq[Xml.Element] <- pathHeaderVertical(context, path.dropRight(2))
+  final override def header(path: Path, context: Context): Parser[Option[Element]] = for
+    pathHeader: Elements <- pathHeaderVertical(context, path.dropRight(2))
   yield Some(
     <div class="store-header">
       {pathHeader}
@@ -86,17 +86,17 @@ abstract class Hierarchical(
 
   def getBy: Option[ByHierarchy]
 
-object Hierarchical extends Elements.Union[Hierarchical]:
-  protected def elements: Seq[Element[? <: Hierarchical]] = Seq(Hierarchy, Collection)
+object Hierarchical extends ElementsTo.Union[Hierarchical]:
+  protected def elements: Seq[ElementTo[? <: Hierarchical]] = Seq(Hierarchy, Collection)
 
-  override protected def elementByValue(value: Hierarchical): Element[?] = value match
+  override protected def elementByValue(value: Hierarchical): ElementTo[? <: Hierarchical] = value match
     case _: Hierarchy  => Hierarchy
     case _: Collection => Collection
 
   val namesParsable: Parsable[Names] = Names.withDefaultNameParsable
-  val titleElement: Elements.Required[Title.Value] = Title.element.required
-  val descriptionElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
-  val bodyElement: Elements.Optional[Body.Value] = Body.element.optional
+  val titleElement: ElementsTo.Required[Title.Value] = Title.element.required
+  val descriptionElement: ElementsTo.Optional[Abstract.Value] = Abstract.element.optional
+  val bodyElement: ElementsTo.Optional[Body.Value] = Body.element.optional
 
   // TODO move
   def displayName(store: Store): String = store.names.doFind(Language.Russian.toSpec).name

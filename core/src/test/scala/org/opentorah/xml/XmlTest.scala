@@ -8,15 +8,15 @@ final class XmlTest extends AnyFlatSpec, Matchers:
 
   def unsafeRun[A](parser: Parser[A]): A = Parser.unsafeRun(parser)
 
-  def loadResource(name: String, fixXercesXIncludes: Boolean = true): Xml.Element =
+  def loadResource(name: String, fixXercesXIncludes: Boolean = true): Element =
     Effects.unsafeRun(From.resourceNamed(Xml, name, fixXercesXIncludes).load)
 
   private def loadSite(fixXercesXIncludes: Boolean) = loadResource("site/site", fixXercesXIncludes)
 
   "text parsing" should "work" in:
     unsafeRun(
-      new Element[String]("a") {
-        override def contentType: Element.ContentType = Element.ContentType.Characters
+      new ElementTo[String]("a") {
+        override def contentType: ContentType = ContentType.Characters
 
         override def contentParsable: Parsable[String] = new Parsable[String]:
           override def parser: Parser[String] = Text().required()
@@ -26,8 +26,8 @@ final class XmlTest extends AnyFlatSpec, Matchers:
 
   it should "fail the right way" in:
     unsafeRun((
-      new Element[Option[String]]("a") {
-        override def contentType: Element.ContentType = Element.ContentType.Elements
+      new ElementTo[Option[String]]("a") {
+        override def contentType: ContentType = ContentType.Elements
 
         override def contentParsable: Parsable[Option[String]] = new Parsable[Option[String]]:
           override def parser: Parser[Option[String]] = Text().optional()
@@ -84,5 +84,5 @@ final class XmlTest extends AnyFlatSpec, Matchers:
     Namespace.get(loadResource("namespace")) shouldBe teiNamespace.default
     Namespace.get(firstElement(loadResource("namespace"))) shouldBe teiNamespace.default
 
-  private def firstElement(element: Xml.Element): Xml.Element =
-    Xml.getChildren(element).filter(Xml.isElement).map(Xml.asElement).head
+  private def firstElement(element: Element): Element =
+    Element.getChildren(element).filter(Element.is).map(Element.as).head

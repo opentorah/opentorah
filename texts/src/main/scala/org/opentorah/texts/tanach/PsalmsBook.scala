@@ -2,8 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.calendar.Week
 import org.opentorah.metadata.Names
-import org.opentorah.store.{By, Store}
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.store.By
+import org.opentorah.xml.{ContentType, ElementTo, Parsable, Parser, Unparser}
 import zio.ZIO
 import Tanach.Psalms
 
@@ -68,8 +68,8 @@ object PsalmsBook:
     _ <- WithNumber.checkNumber(numbered, number, name)
   yield SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 
-  private final class SpanParsable(name: String) extends Element[WithNumber[SpanParsed]](name):
-    override def contentType: Element.ContentType = Element.ContentType.Empty
+  private final class SpanParsable(name: String) extends ElementTo[WithNumber[SpanParsed]](name):
+    override def contentType: ContentType = ContentType.Empty
 
     override def contentParsable: Parsable[WithNumber[SpanParsed]] = new Parsable[WithNumber[SpanParsed]]:
       override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)

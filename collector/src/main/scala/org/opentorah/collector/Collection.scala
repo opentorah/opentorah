@@ -2,13 +2,13 @@ package org.opentorah.collector
 
 import org.opentorah.html.A
 import org.opentorah.metadata.Names
-import org.opentorah.tei.{Abstract, Body, Pb, Tei, Title}
-import org.opentorah.store.{By, Context, Path, Selector, Store}
-import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
+import org.opentorah.tei.{Abstract, Body, Title}
+import org.opentorah.store.{Context, Path, Selector, Store}
+import org.opentorah.xml.{Atom, Attribute, Element, ElementTo, Elements, FromUrl, Nodes, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class Collection(
-  fromUrl: Element.FromUrl,
+  fromUrl: FromUrl,
   names: Names,
   title: Title.Value,
   description: Option[Abstract.Value],
@@ -39,10 +39,10 @@ final class Collection(
 
   override def getBy: Option[ByHierarchy] = None
 
-  def siblings(document: Document): Caching.Parser[(Option[Document], Option[Document])] =
+  def siblings(document: Document): Parser[(Option[Document], Option[Document])] =
     documents.getDirectory.map(_.siblings(document.baseName))
 
-  def translations(document: Document): Caching.Parser[Seq[Document]] =
+  def translations(document: Document): Parser[Seq[Document]] =
     documents.getDirectory.map(_.translations.getOrElse(document.baseName, Seq.empty))
 
   val textFacet: CollectionFacet = new CollectionFacet(this):
@@ -58,10 +58,10 @@ final class Collection(
   override def storesPure: Seq[CollectionFacet] = Seq(textFacet, facsimileFacet)
 
   // With no facet, "document" is assumed
-  override def findByName(name: String): Caching.Parser[Option[Store]] =
+  override def findByName(name: String): Parser[Option[Store]] =
     textFacet.findByName(name).flatMap(_.fold(super.findByName(name))(ZIO.some)) // TODO ZIO.someOrElseM?
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
+  override def content(path: Path, context: Context): Parser[Element] = for
     directory: Documents.All <- documents.getDirectory
     columns: Seq[Collection.Column] = Seq(
       Collection.descriptionColumn,
@@ -74,9 +74,9 @@ final class Collection(
           documentTranslations: Seq[Document] <- translations(document)
           translationLinks <- ZIO.foreach(documentTranslations)((translation: Document) =>
             for textFacetA: A <- translation.textFacetLink(context, path)
-            yield Seq(Xml.mkText(" "), textFacetA(text = translation.lang)))
+            yield Seq(Atom(" "), textFacetA(text = translation.lang)))
         yield
-          Seq(Xml.mkText(document.lang)) ++ translationLinks.flatten
+          Seq(Atom(document.lang)) ++ translationLinks.flatten
       ),
 
       Collection.Column("Документ", "document", (document: Document) =>
@@ -90,29 +90,29 @@ final class Collection(
             page.reference(context, document, path)
           )
         yield
-          Xml.multi(separator = " ", nodes = nodes)
+          Nodes.multi(separator = " ", nodes = nodes)
       ),
 
       Collection.transcribersColumn
     )
 
-    rows: Seq[Xml.Nodes] <- ZIO.foreach(directory.parts)(part =>
+    rows: Seq[Nodes] <- ZIO.foreach(directory.parts)(part =>
       ZIO.foreach(part.documents)(document =>
         for
           cells <- ZIO.foreach(columns)(column =>
-            for value: Xml.Nodes <- column.value(document)
+            for value: Nodes <- column.value(document)
             yield <td class={column.cssClass}>{value}</td>
           )
         yield <tr>{cells}</tr>
       )
-        .map(documentRows => part.title.fold[Xml.Nodes](Seq.empty)(title =>
+        .map(documentRows => part.title.fold[Nodes](Seq.empty)(title =>
           <tr><td colspan={columns.length.toString}><span class="part-title">{title.content}</span></td></tr>
         ) ++ documentRows)
     )
   yield
     val missingPages: Seq[Page] = directory.stores.sortBy(_.name).flatMap(_.pages(pageType)).filter(_.pb.isMissing)
 
-    def listMissing(flavour: String, isMissing: Page => Boolean): Seq[Xml.Element] =
+    def listMissing(flavour: String, isMissing: Page => Boolean): Elements =
       val missing: Seq[String] = missingPages.filter(isMissing).map(_.displayName)
       if missing.isEmpty then Seq.empty
       else Seq(<p>Отсутствуют фотографии {missing.length} {flavour} страниц: {missing.mkString(" ")}</p>)
@@ -135,7 +135,7 @@ final class Collection(
     Collection.transcribersColumn
   )
 
-  def documentHeader(document: Document): Caching.Parser[Xml.Element] =
+  def documentHeader(document: Document): Parser[Element] =
     ZIO.foreach(documentHeaderColumns)(column => column.value(document).map(value =>
       <tr>
         <td class="heading">{column.heading}</td>
@@ -143,19 +143,19 @@ final class Collection(
       </tr>
     )).map(rows => <table class="document-header">{rows}</table>)
 
-object Collection extends Element[Collection]("collection"):
+object Collection extends ElementTo[Collection]("collection"):
 
   private class Column(
     val heading: String,
     val cssClass: String,
-    val value: Document => Caching.Parser[Xml.Nodes]
+    val value: Document => Parser[Nodes]
   ):
     override def toString: String = heading
 
   private class PureColumn(
     heading: String,
     cssClass: String,
-    value: Document => Xml.Nodes
+    value: Document => Nodes
   ) extends Column(
     heading,
     cssClass,
@@ -172,7 +172,7 @@ object Collection extends Element[Collection]("collection"):
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
 
     override def parser: Parser[Collection] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       names: Names <- Hierarchical.namesParsable()
       title: Title.Value <- Hierarchical.titleElement()
       description: Option[Abstract.Value] <- Hierarchical.descriptionElement()

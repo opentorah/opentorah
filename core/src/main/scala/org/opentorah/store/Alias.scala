@@ -1,11 +1,11 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 final class Alias(override val names: Names, val to: String) extends Terminal
 
-object Alias extends Element[Alias]("alias"):
+object Alias extends ElementTo[Alias]("alias"):
   override def contentParsable: Parsable[Alias] = new Parsable[Alias]:
     private val toAttribute: Attribute.Required[String] = Attribute("to").required
 

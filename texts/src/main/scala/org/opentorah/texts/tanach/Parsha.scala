@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, HasValues, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ContentType, ElementTo, Parsable, Parser, Unparser}
 import Tanach.Chumash
 
 enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
@@ -172,7 +172,7 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
         ).head
       )
 
-  final class WeekParsable(book: ChumashBook) extends Element[Parsed]("week"):
+  final class WeekParsable(book: ChumashBook) extends ElementTo[Parsed]("week"):
     override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
       override def parser: Parser[Parsed] = Parsha.parser(book)
       override def unparser: Unparser[Parsed] = ???
@@ -202,7 +202,7 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
     val isCombined: Boolean
   )
 
-  private object DayParsed extends Element[DayParsed]("day"):
+  private object DayParsed extends ElementTo[DayParsed]("day"):
     override def contentParsable: Parsable[DayParsed] = new Parsable[DayParsed]:
       override def parser: Parser[DayParsed] = for
         span: Torah.Numbered <- numberedParser
@@ -219,14 +219,14 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
   private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
-  object Aliyah extends Element[Torah.Numbered]("aliyah"):
-    override def contentType: Element.ContentType = Element.ContentType.Empty
+  object Aliyah extends ElementTo[Torah.Numbered]("aliyah"):
+    override def contentType: ContentType = ContentType.Empty
 
     override def contentParsable: Parsable[Torah.Numbered] = new Parsable[Torah.Numbered]:
       override def parser: Parser[Torah.Numbered] = numberedParser
       override def unparser: Unparser[Torah.Numbered] = ???
 
-  object Maftir extends Element[SpanSemiResolved]("maftir"):
+  object Maftir extends ElementTo[SpanSemiResolved]("maftir"):
     override def contentParsable: Parsable[SpanSemiResolved] = new Parsable[SpanSemiResolved]:
       override def parser: Parser[SpanSemiResolved] = semiResolvedParser
       override def unparser: Unparser[SpanSemiResolved] = ???

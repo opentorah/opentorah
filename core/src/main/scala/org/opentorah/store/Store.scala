@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Named
-import org.opentorah.xml.{Caching, Xml}
+import org.opentorah.xml.{Element, Elements, Nodes, Parser}
 import zio.ZIO
 
 /*
@@ -14,7 +14,7 @@ trait Store extends Named:
     path: Path = Seq.empty,
     include: Store => Boolean,
     stop: Store => Boolean
-  ): Caching.Parser[Seq[Path]] =
+  ): Parser[Seq[Path]] =
     val selfPath: Path = path :+ this
     val self: Seq[Path] = if include(this) then Seq(selfPath) else Seq.empty
     this match
@@ -29,11 +29,11 @@ trait Store extends Named:
 
   def htmlHeadTitle: Option[String] = None
 
-  def navigationLinks(path: Path, context: Context): Caching.Parser[Seq[Xml.Element]] = ZIO.succeed(Seq.empty)
+  def navigationLinks(path: Path, context: Context): Parser[Elements] = ZIO.succeed(Seq.empty)
 
-  def header(path: Path, context: Context): Caching.Parser[Option[Xml.Element]] = ZIO.none
+  def header(path: Path, context: Context): Parser[Option[Element]] = ZIO.none
 
-  def htmlBodyTitle: Option[Xml.Nodes] = None
+  def htmlBodyTitle: Option[Nodes] = None
 
-  def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  def content(path: Path, context: Context): Parser[Element] =
     throw IllegalAccessException(s"Called unimplemented Store.content($path, $context) on $this")

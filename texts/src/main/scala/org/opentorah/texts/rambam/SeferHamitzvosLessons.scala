@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
-import org.opentorah.xml.{Attribute, Element, Elements, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, ElementsTo, From, Parsable, Parser, Unparser}
 
 object SeferHamitzvosLessons:
 
@@ -13,7 +13,7 @@ object SeferHamitzvosLessons:
     val parts: Seq[Part]
   )
 
-  object Lesson extends Element[Lesson]("lesson"):
+  object Lesson extends ElementTo[Lesson]("lesson"):
     override def contentParsable: Parsable[Lesson] = new Parsable[Lesson]:
       override def parser: Parser[Lesson] = for
         number: Int <- nAttribute()
@@ -27,22 +27,22 @@ object SeferHamitzvosLessons:
 
   sealed trait Part extends Named
 
-  private object Part extends Elements.Union[Part]:
-    override protected val elements: Seq[Element[? <: Part]] = Seq(Positive, Negative, NamedPart)
+  private object Part extends ElementsTo.Union[Part]:
+    override protected val elements: Seq[ElementTo[? <: Part]] = Seq(Positive, Negative, NamedPart)
 
-    override protected def elementByValue(value: Part): Element[? <: Part] = value match
+    override protected def elementByValue(value: Part): ElementTo[? <: Part] = value match
       case _: Positive  => Positive
       case _: Negative  => Negative
       case _: NamedPart => NamedPart
 
   final case class NamedPart(override val names: Names) extends Part
 
-  object NamedPart extends Element[NamedPart]("named"):
+  object NamedPart extends ElementTo[NamedPart]("named"):
     override def contentParsable: Parsable[NamedPart] = new Parsable[NamedPart]:
       override def parser: Parser[NamedPart] = Names.withoutDefaultNameParsable().map(NamedPart.apply)
       override def unparser: Unparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
 
-  private class Numbered(elementName: String) extends Element[Positive](elementName):
+  private class Numbered(elementName: String) extends ElementTo[Positive](elementName):
     def selector: Selector = Selector.getForName(elementName)
 
     override def contentParsable: Parsable[Positive] = new Parsable[Positive]:

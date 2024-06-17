@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Language, Names}
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
@@ -20,7 +20,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   override protected def getBook(name: String): Tanach.Prophets = Tanach.Prophets.forName(name)
 
-  object Week extends Element[(String, Customs)]("week"):
+  object Week extends ElementTo[(String, Customs)]("week"):
     private val elementParser = Haftarah.parser(full = true)
 
     override def contentParsable: Parsable[(String, Customs)] = new Parsable[(String, Customs)]:
@@ -38,7 +38,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     hasName = (metadata: (String, Customs), name: String) => metadata._1 == name
   )))(_._2)
 
-  def element(full: Boolean): Element[Customs] = new Element[Customs]("haftarah"):
+  def element(full: Boolean): ElementTo[Customs] = new ElementTo[Customs]("haftarah"):
     override def contentParsable: Parsable[Customs] = new Parsable[Customs]:
       override def parser: Parser[Customs] = Haftarah.parser(full)
       override def unparser: Unparser[Haftarah.Customs] = ???
@@ -61,7 +61,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
-  final class CustomElement(ancestorSpan: BookSpanParsed) extends Element[(Set[Custom], Haftarah)]("custom"):
+  final class CustomElement(ancestorSpan: BookSpanParsed) extends ElementTo[(Set[Custom], Haftarah)]("custom"):
     override def contentParsable: Parsable[(Set[Custom], Haftarah)] = new Parsable[(Set[Custom], Haftarah)]:
       override def parser: Parser[(Set[Custom], Haftarah)] = for
         n: String <- Attribute("n").required()
@@ -72,7 +72,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
       override def unparser: Unparser[(Set[Custom], Haftarah)] = ???
 
-  private final class PartElement(ancestorSpan: BookSpanParsed) extends Element[WithNumber[BookSpan]]("part"):
+  private final class PartElement(ancestorSpan: BookSpanParsed) extends ElementTo[WithNumber[BookSpan]]("part"):
     override def contentParsable: Parsable[WithNumber[BookSpan]] = new Parsable[WithNumber[BookSpan]]:
       override def parser: Parser[WithNumber[BookSpan]] =
         WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))

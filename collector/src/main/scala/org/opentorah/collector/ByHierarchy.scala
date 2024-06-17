@@ -1,17 +1,17 @@
 package org.opentorah.collector
 
 import org.opentorah.store.{By, Context, Path, Pure}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Element, Elements, ElementTo, FromUrl, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class ByHierarchy(
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   selectorName: String,
   val hierarchyStores: Seq[Hierarchical]
 ) extends
   By.WithSelector[Hierarchical](selectorName),
   Pure[Hierarchical],
-  Element.FromUrl.With:
+  FromUrl.With:
 
   override def toString: String = s"ByHierarchy $selectorName [${fromUrl.url}]"
 
@@ -20,7 +20,7 @@ final class ByHierarchy(
   // TODO generate hierarchy root index and reference it from the summary.
   // TODO allow viewing tree indexes rooted in intermediate ByHierarchys.
 
-  def oneLevelIndex(context: Context, path: Path): Caching.Parser[Xml.Element] =
+  def oneLevelIndex(context: Context, path: Path): Parser[Element] =
     for
       content <- ZIO.foreach(hierarchyStores)((hierarchical: Hierarchical) =>
         val hierarchicalPath: Path = path :+ hierarchical
@@ -33,13 +33,13 @@ final class ByHierarchy(
         <ul>{content}</ul>
       </p>
 
-  def treeIndex(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  def treeIndex(path: Path, context: Context): Parser[Element] =
     for
       content <- ZIO.foreach(hierarchyStores)((hierarchical: Hierarchical) =>
         val hierarchicalPath: Path = path :+ hierarchical
         for
-          reference: Xml.Element <- hierarchical.reference(context, hierarchicalPath)
-          tree: Seq[Xml.Element] <- ZIO.foreach(hierarchical.getBy.toSeq)((by: ByHierarchy) =>
+          reference: Element <- hierarchical.reference(context, hierarchicalPath)
+          tree: Elements <- ZIO.foreach(hierarchical.getBy.toSeq)((by: ByHierarchy) =>
             by.treeIndex(hierarchicalPath :+ by, context)
           )
         yield
@@ -56,10 +56,10 @@ final class ByHierarchy(
         </ul>
       </div>
 
-object ByHierarchy extends Element[ByHierarchy]("by"):
+object ByHierarchy extends ElementTo[ByHierarchy]("by"):
   override def contentParsable: Parsable[ByHierarchy] = new Parsable[ByHierarchy]:
     override def parser: Parser[ByHierarchy] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       selectorName: String <- By.selectorParser
       hierarchyStores: Seq[Hierarchical] <- Hierarchical.seq()
     yield ByHierarchy(

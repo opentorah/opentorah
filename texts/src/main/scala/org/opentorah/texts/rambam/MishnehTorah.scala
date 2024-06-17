@@ -3,7 +3,7 @@ package org.opentorah.texts.rambam
 import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
 import org.opentorah.store.Selector
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 
 // TODO parse the names of the book itself! (and probably do the same for Tanach?)
 object MishnehTorah:
@@ -25,7 +25,7 @@ object MishnehTorah:
 
     def chapters: Seq[Chapter]
 
-  object Part extends Element[Part]("part"):
+  object Part extends ElementTo[Part]("part"):
     private val nAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("n").required
     private val chaptersAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("chapters").required
 
@@ -69,7 +69,7 @@ object MishnehTorah:
     private[MishnehTorah] def setPart(value: PartWithNamedChapters): Unit = part_ = Some(value)
     override def part: PartWithNamedChapters = part_.get
 
-  object NamedChapter extends Element[NamedChapter]("chapter"):
+  object NamedChapter extends ElementTo[NamedChapter]("chapter"):
     override def contentParsable: Parsable[NamedChapter] = new Parsable[NamedChapter]:
       override def parser: Parser[NamedChapter] = for
         names <- Names.withoutDefaultNameParsable()
@@ -77,7 +77,7 @@ object MishnehTorah:
 
       override def unparser: Unparser[NamedChapter] = Names.withoutDefaultNameParsable(_.names)
 
-  object Book extends Element[Book]("book"):
+  object Book extends ElementTo[Book]("book"):
     private val nAttribute: Attribute.Required[Int] = Attribute.IntAttribute("n").required
 
     override def contentParsable: Parsable[Book] = new Parsable[Book]:
