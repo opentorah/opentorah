@@ -3,7 +3,7 @@ package org.opentorah.collector
 import org.opentorah.site.Site
 import org.opentorah.store.{Path, Store}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Element, From}
+import org.opentorah.xml.{Caching, FromUrl, Parser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.io.File
@@ -28,7 +28,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
 
     def getStoreUrl(pathString: String): String =
       val path: Path = Effects.unsafeRun(collector.toTask(collector.resolveUrl(pathString))).get
-      path.last.asInstanceOf[Element.FromUrl.With].fromUrl.url.toString
+      path.last.asInstanceOf[FromUrl.With].fromUrl.url.toString
 
     getStoreUrl("/rgada") should endWith("archive/rgada/category/VII/inventory/2/case/3140.xml")
     getStoreUrl("/archive/rgada/") should endWith("/archive/rgada.xml")
@@ -67,7 +67,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
   }
 
   "Store.getPath()" should "work" in {
-    val reportPaths: Seq[Path] = Caching.unsafeRun(new Caching.Simple, Reports.getPaths(
+    val reportPaths: Seq[Path] = Parser.unsafeRun(caching = new Caching.Simple, parser = Reports.getPaths(
       include = _.isInstanceOf[Report[?]],
       stop = _.isInstanceOf[Report[?]]
     ))

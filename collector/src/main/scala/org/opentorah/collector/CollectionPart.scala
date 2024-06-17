@@ -2,7 +2,7 @@ package org.opentorah.collector
 
 import org.opentorah.metadata.Names
 import org.opentorah.tei.Title
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 final class CollectionPart(
   val names: Names,
@@ -15,7 +15,7 @@ final class CollectionPart(
     if documents.head.baseName != from then throw IllegalArgumentException("Incorrect 'from' document")
     CollectionPart.Part(Some(title), documents)
 
-object CollectionPart extends Element[CollectionPart]("part"):
+object CollectionPart extends ElementTo[CollectionPart]("part"):
 
   final class Part(
     val title: Option[Title.Value],

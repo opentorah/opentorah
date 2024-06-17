@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.{HasName, HasValues, Named, Names}
-import org.opentorah.xml.{Attribute, Element, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 
 // TODO introduce transparent (optional) selectors.
 final class Selector(
@@ -9,7 +9,7 @@ final class Selector(
   val title: Option[String] // TODO replace with plural? Eliminate?
 ) extends Named
 
-object Selector extends Element[Selector]("selector"), HasValues.FindByName[Selector]:
+object Selector extends ElementTo[Selector]("selector"), HasValues.FindByName[Selector]:
 
   private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional
 

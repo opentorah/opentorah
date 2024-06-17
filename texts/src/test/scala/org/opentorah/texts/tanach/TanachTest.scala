@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.store.Path
 import org.opentorah.texts.TestBase
-import org.opentorah.xml.Caching
+import org.opentorah.xml.Parser
 
 final class TanachTest extends TestBase(Tanach):
   // TODO put into common base class in tanach package if I am going to make - say - separate PsalmsTest:
@@ -67,7 +67,7 @@ final class TanachTest extends TestBase(Tanach):
     checkName("/book/Psalms/day of the week/Friday/chapter/119/verse/150", "150")
 
   it should "be walkable" in:
-    val paths: Seq[Path] = Caching.unsafeRun(caching, Tanach.getPaths(
+    val paths: Seq[Path] = Parser.unsafeRun(caching = caching, parser = Tanach.getPaths(
       include = _.isInstanceOf[TanachBook],
       stop = _.isInstanceOf[TanachBook]
     ))

@@ -1,53 +1,20 @@
 package org.opentorah.xml
 
-import java.net.URL
+type Element = scala.xml.Elem
 
-abstract class Element[A](val elementName: String) extends Elements[A]:
+object Element extends Node.Companion[Element]:
+  def getName(element: Element): String = element.label
+  def rename(element: Element, name: String): Element = element.copy(label = name)
 
-  override def toString: String = s"element '$elementName' [$contentType]"
+  def getPrefix(element: Element): Option[String] = Option(element.prefix)
 
-  def contentType: Element.ContentType = Element.ContentType.Elements
+  def getChildren(element: Element): Nodes = element.child
+  def setChildren(element: Element, children: Nodes): Element = element.copy(child = children)
 
-  def contentParsable: Parsable[A]
+  def prependChildren(element: Element, nodes: Nodes): Element = setChildren(element, nodes ++ getChildren(element))
+  def appendChildren (element: Element, nodes: Nodes): Element = setChildren(element, getChildren(element) ++ nodes)
 
-  final override def elementAndParser(elementName: String): Option[Element.AndParser[A]] =
-    if this.elementName != elementName then None else Some(Element.AndParser(
-      element = this,
-      parser = contentParsable()
-    ))
+  def isEmpty(element: Element): Boolean = Nodes.isEmpty(getChildren(element))
 
-  final override protected def elementByValue(value: A): Element[?] = this
-
-  // TODO allow declaring this element's namespace...
-  final def xmlElement(value: A): Xml.Element =
-    Attribute.set(
-      attributes = contentParsable.unparser.attributes(value),
-      element = contentParsable.unparser.namespace.fold(<elem/>)(namespace => namespace.default.declare(<elem/>))
-    ).copy(
-      label = elementName,
-      child = contentParsable.unparser.content(value)
-    )
-
-object Element:
-
-  enum ContentType(
-    val elementsAllowed: Boolean,
-    val charactersAlowed: Boolean
-  ) derives CanEqual:
-    case Empty      extends ContentType(elementsAllowed = false, charactersAlowed = false)
-    case Characters extends ContentType(elementsAllowed = false, charactersAlowed = true )
-    case Elements   extends ContentType(elementsAllowed = true , charactersAlowed = false)
-    case Mixed      extends ContentType(elementsAllowed = true , charactersAlowed = true )
-
-  final class AndParser[A](val element: Element[?], val parser: Parser[A])
-
-  final class FromUrl(
-    val url: URL,
-    val inline: Boolean
-  )
-
-  object FromUrl:
-    trait With:
-      def fromUrl: FromUrl
-
-  def fromUrl: Parser[FromUrl] = ParserState.fromUrl
+  override def is(node: Node): Boolean = node.isInstanceOf[Element]
+  override def as(node: Node): Element = node.asInstanceOf[Element]

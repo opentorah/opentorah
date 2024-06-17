@@ -2,19 +2,19 @@ package org.opentorah.site
 
 import org.opentorah.html.Html
 import org.opentorah.util.Json
-import org.opentorah.xml.{Attribute, Xml}
+import org.opentorah.xml.{Attribute, Element, Elements, Nodes}
 import org.opentorah.xml.Namespace.XLink
 
 object HtmlTheme:
   def fullContent(
      wrapperCssClass: String,
-     header: Option[Xml.Element],
-     bodyTitle: Option[Xml.Nodes],
-     content: Xml.Element
-  ): Xml.Element =
+     header: Option[Element],
+     bodyTitle: Option[Nodes],
+     content: Element
+  ): Element =
     <div class={wrapperCssClass}>
-      {Xml.optional(header)((header: Xml.Element) =>
-      header)}{Xml.optional(bodyTitle)((title: Xml.Nodes) =>
+      {Nodes.optional(header)((header: Element) =>
+      header)}{Nodes.optional(bodyTitle)((title: Nodes) =>
       <header class="post-header">
         <h1 class="post-title">
           {title}
@@ -32,25 +32,25 @@ object HtmlTheme:
     cssFileName: String,
     viewer: String,
     viewerDefault: String,
-    navigationLinks: Seq[Xml.Element], // normally, <a>s
-    content: Xml.Element
-  ): Xml.Element =
+    navigationLinks: Elements, // normally, <a>s
+    content: Element
+  ): Element =
 
     <html>
       <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>{Xml.optional(headTitle)(title =>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>{Nodes.optional(headTitle)(title =>
         <title>
           {title}
         </title>)}
         <link rel="stylesheet" href={s"/css/$cssFileName.css"}/>
-        {Xml.optional(siteHtml.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
+        {Nodes.optional(siteHtml.favicon)(favicon => <link rel="icon" href={s"/$favicon"}/>)}
       </head>
       <body>
         <header class="site-header" role="banner">
           <div class="wrapper">
-            {Xml.optional(siteHtml.title)(title =>
+            {Nodes.optional(siteHtml.title)(title =>
             <a class="site-title" rel="author" target={viewerDefault} href="/">
               {title.content}
             </a>)}<nav class="site-nav">
@@ -81,10 +81,10 @@ object HtmlTheme:
             <div class="footer-col-wrapper">
               <div class="footer-col footer-col-1">
                 <ul class="contact-list">
-                  {Xml.optional(siteHtml.url)(url =>
+                  {Nodes.optional(siteHtml.url)(url =>
                   <li class="p-name">
                     {url}
-                  </li>)}{Xml.optional(siteHtml.email)(email =>
+                  </li>)}{Nodes.optional(siteHtml.email)(email =>
                   <li>
                     <a class="u-email" href={s"mailto:$email"}>
                       {email}
@@ -106,7 +106,7 @@ object HtmlTheme:
                     </a>
                   </li>}
                 </ul>
-              </div>{Xml.optional(siteHtml.footer)(footer =>
+              </div>{Nodes.optional(siteHtml.footer)(footer =>
               <div class="footer-col footer-col-3">
                 {footer.content}
               </div>)}

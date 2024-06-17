@@ -4,7 +4,7 @@ import org.opentorah.html.A
 import org.opentorah.tei.{EntityReference, EntityRelated, EntityType, Entity as TeiEntity}
 import org.opentorah.store.{Context, Directory, ListFile, Path, Store, WithSource}
 import org.opentorah.util.{Collections, Files}
-import org.opentorah.xml.{Attribute, Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ContentType, Element, Elements, Nodes, Parsable, Parser, Unparser}
 import zio.ZIO
 import java.net.URL
 
@@ -33,19 +33,19 @@ final class Entity(
     )
 
   override def htmlHeadTitle: Option[String] = Some(mainName)
-  override def htmlBodyTitle: Option[Xml.Nodes] = None
+  override def htmlBodyTitle: Option[Nodes] = None
 
-  def getTei(collector: Collector): Caching.Parser[TeiEntity] = collector.entities.getFile(this)
+  def getTei(collector: Collector): Parser[TeiEntity] = collector.entities.getFile(this)
 
   // TODO dissolve?
-  def line(context: Context): Caching.Parser[Xml.Element] =
+  def line(context: Context): Parser[Element] =
     for result <- reference(context) yield <l>{result}</l>
 
   // TODO eliminate
-  private def reference(context: Context): Caching.Parser[Xml.Element] =
+  private def reference(context: Context): Parser[Element] =
     for a: A <- context.a(this) yield a(mainName)
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  override def content(path: Path, context: Context): Parser[Element] =
     val collector: Collector = Collector.get(context)
     for
       entity: TeiEntity <- getTei(collector)
@@ -59,7 +59,7 @@ final class Entity(
         sources.filter(_.isInstanceOf[Entity]).map(_.asInstanceOf[Entity])
       )(_.id).sortBy(_.mainName)
 
-      fromEntitiesResult: Seq[Xml.Element] <- ZIO.foreach(fromEntities)((fromEntity: Entity) =>
+      fromEntitiesResult: Elements <- ZIO.foreach(fromEntities)((fromEntity: Entity) =>
         fromEntity.reference(context)
       )
 
@@ -75,27 +75,27 @@ final class Entity(
         texts: Seq[TextFacet] = Collections.removeConsecutiveDuplicatesWith(textsOpt.get)(_.document.name).sortBy(_.document.name)
       yield collection -> (path, texts)
 
-      fromCollectionsResult: Seq[Xml.Element] <- ZIO.foreach(byCollection){
+      fromCollectionsResult: Elements <- ZIO.foreach(byCollection){
         case (collection: Collection, (collectionPath: Path, texts: Seq[TextFacet])) =>
-          for pageLinks: Xml.Nodes <- ZIO.foreach(texts)(
+          for pageLinks: Nodes <- ZIO.foreach(texts)(
             (text: TextFacet) =>
               for textFacetA: A <- text.document.textFacetLink(context, collectionPath)
               yield textFacetA(text = text.document.baseName)
             )
           yield
             <l>
-              {collection.pathHeaderHorizontal(collectionPath)}: {Xml.multi(separator = " ", nodes = pageLinks)}
+              {collection.pathHeaderHorizontal(collectionPath)}: {Nodes.multi(separator = " ", nodes = pageLinks)}
             </l>
       }
 
     yield
 
-      val mentions: Xml.Element =
+      val mentions: Element =
         <p class="mentions">
           {if fromEntities.isEmpty then Seq.empty else
           <l>
             <em>{collector.entityLists.selector.title.get}:</em>
-            {Xml.multi(nodes = fromEntitiesResult)}
+            {Nodes.multi(nodes = fromEntitiesResult)}
           </l>
           }
           {fromCollectionsResult}
@@ -115,7 +115,7 @@ object Entity extends EntityRelated[Entity](
     entity.names.head.name
   ))
 
-  override protected def contentType: Element.ContentType = Element.ContentType.Elements
+  override protected def contentType: ContentType = ContentType.Elements
 
   private val roleAttribute: Attribute.Optional[String] = Attribute("role").optional
   private val mainNameAttribute: Attribute.Required[String] = Attribute("name").required

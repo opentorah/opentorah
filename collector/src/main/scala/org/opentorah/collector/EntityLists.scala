@@ -3,8 +3,7 @@ package org.opentorah.collector
 import org.opentorah.html.A
 import org.opentorah.tei.Tei
 import org.opentorah.store.{By, Context, Path, Pure}
-import org.opentorah.util.Effects
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Atom, Element, ElementTo, Elements, Nodes, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class EntityLists(
@@ -14,7 +13,7 @@ final class EntityLists(
   By.WithSelector[EntityList](selectorName),
   Pure[EntityList]:
   
-  def setUp(collector: Collector): Caching.Parser[Unit] = for
+  def setUp(collector: Collector): Parser[Unit] = for
     entities: Seq[Entity] <- collector.entities.stores
   yield
     for list: EntityList <- lists do list.setEntities(
@@ -27,23 +26,23 @@ final class EntityLists(
   override def storesPure: Seq[EntityList] = lists
 
   override def htmlHeadTitle: Option[String] = selector.title
-  override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  override def htmlBodyTitle: Option[Nodes] = htmlHeadTitle.map(Atom.apply)
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  override def content(path: Path, context: Context): Parser[Element] =
     val nonEmptyLists: Seq[EntityList] = lists.filter(_.getEntities.nonEmpty)
     for
       tocA: A <- context.a(path)
-      toc: Seq[Xml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+      toc: Elements <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
         for contentA: A <- context.a(list) yield
           <l>
             {tocA.setFragment(list.names.name)(xml = list.title)}
             {contentA(EntityLists.expand)}
           </l>
       )
-      content: Seq[Xml.Element] <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
+      content: Elements <- ZIO.foreach(nonEmptyLists)((list: EntityList) =>
         for
           a: A <- context.a(list)
-          lines: Seq[Xml.Element] <- ZIO.foreach(list.getEntities)((entity: Entity) =>
+          lines: Elements <- ZIO.foreach(list.getEntities)((entity: Entity) =>
             entity.line(context)
           )
         yield
@@ -62,7 +61,7 @@ final class EntityLists(
       </div>
 
 
-object EntityLists extends Element[EntityLists]("entityLists"):
+object EntityLists extends ElementTo[EntityLists]("entityLists"):
   // TODO gather all arrows and other symbols in one place
   val expand: String = "⇗"
 

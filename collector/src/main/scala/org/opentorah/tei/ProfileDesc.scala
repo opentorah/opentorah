@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Elements, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, ElementsTo, Parsable, Parser, Unparser}
 
 final class ProfileDesc(
   val documentAbstract: Option[Abstract.Value],
@@ -32,7 +32,7 @@ final class ProfileDesc(
     listTranspose
   )
 
-object ProfileDesc extends Element[ProfileDesc]("profileDesc"):
+object ProfileDesc extends ElementTo[ProfileDesc]("profileDesc"):
 
   def empty: ProfileDesc = ProfileDesc(
     documentAbstract = None,
@@ -47,7 +47,7 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc"):
 
   override def contentParsable: Parsable[ProfileDesc] = new Parsable[ProfileDesc]:
     override val parser: Parser[ProfileDesc] = for
-      values <- Elements.choices(Seq(
+      choices: ElementsTo.Choices <- ElementsTo.choices(
         Abstract.element,
         Creation,
         LangUsage,
@@ -56,15 +56,15 @@ object ProfileDesc extends Element[ProfileDesc]("profileDesc"):
         CalendarDesc.element,
         HandNotes,
         ListTranspose.element
-      ))
-      documentAbstract: Option[Abstract.Value] <- values.optional(Abstract.element)
-      creation: Option[Creation] <- values.optional(Creation)
-      langUsage: Option[LangUsage] <- values.optional(LangUsage)
-      textClass: Option[TextClass.Value] <- values.optional(TextClass.element)
-      correspDesc: Option[CorrespDesc.Value] <- values.optional(CorrespDesc.element)
-      calendarDesc: Option[CalendarDesc.Value] <- values.optional(CalendarDesc.element)
-      handNotes: Option[HandNotes] <- values.optional(HandNotes)
-      listTranspose: Option[ListTranspose.Value] <- values.optional(ListTranspose.element)
+      )
+      documentAbstract: Option[Abstract.Value] <- choices(Abstract.element)
+      creation: Option[Creation] <- choices(Creation)
+      langUsage: Option[LangUsage] <- choices(LangUsage)
+      textClass: Option[TextClass.Value] <- choices(TextClass.element)
+      correspDesc: Option[CorrespDesc.Value] <- choices(CorrespDesc.element)
+      calendarDesc: Option[CalendarDesc.Value] <- choices(CalendarDesc.element)
+      handNotes: Option[HandNotes] <- choices(HandNotes)
+      listTranspose: Option[ListTranspose.Value] <- choices(ListTranspose.element)
     yield ProfileDesc(
       documentAbstract,
       creation,

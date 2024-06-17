@@ -3,8 +3,8 @@ package org.opentorah.xml
 import org.opentorah.util.Effects
 import zio.ZIO
 
-// Type-safe XML attribute get/set - for use in DOM and SAX;
-// inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends
+// Type-safe XML attribute get/set.
+// Inspired by JEuclid's net.sourceforge.jeuclid.context.Parameter and friends
 // (see https://github.com/rototor/jeuclid/blob/master/jeuclid-core/src/main/java/net/sourceforge/jeuclid/context/Parameter.java).
 abstract class Attribute[T](
   val name: String,
@@ -29,23 +29,24 @@ abstract class Attribute[T](
   protected def toString(value: T): String = value.toString
   protected def fromString(value: String): Effects.IO[T]
 
-  protected final def fromString(value: String, toOption: String => Option[T]): ZIO[Any, Effects.Error, T] = toOption(value) match
+  protected final def fromString(value: String, toOption: String => Option[T]): Effects.IO[T] = toOption(value) match
     case Some(result) => ZIO.succeed(result)
     case None => ZIO.fail(Effects.Error(s"Invalid value for attribute $this: $value"))
 
-  final def get(element: Xml.Element): Option[String] = (
+  final def get(element: Element): Option[String] = (
     if namespace.isDefault
     then element.attribute(name)
     else element.attribute(namespace.uri, name)
   )
     .map(_.toSeq) // Note: Scala XML breakage...
-    .map(Xml.toString)
+    .map(Nodes.toString)
   
-  final def remove(element: Xml.Element): Xml.Element =
-    Attribute.set(Attribute.get(element).filterNot(_.attribute.name == name), element)
+  final def remove(element: Element): Element = Attribute.set(element = element, values = Attribute
+    .get(element)
+    .filterNot(_.attribute.name == name)
+  )
 
 object Attribute:
-
   final class Value[T](
     val attributeParsable: Parsable[T, ?],
     val value: Option[T]
@@ -54,13 +55,7 @@ object Attribute:
 
     override def toString: String = s"""$attribute="${valueEffective.getOrElse("<default>")}""""
 
-    // TODO rework
-    def add(element: Xml.Element): Xml.Element = Attribute.add(Seq(this), element)
-
-    // TODO add() doesn't modify existing attributes; this should...
-    def set(element: Xml.Element): Xml.Element = valueEffective match
-      case None => element
-      case _ => Attribute.add(Seq(this), element)
+    def set(element: Element): Element = Attribute.add(Seq(this), element)
       
     def valueEffective: Option[String] =
       val result: Option[T] =
@@ -73,52 +68,49 @@ object Attribute:
 
   type StringValues = Seq[Value[String]]
 
-  def all: Parser[StringValues] = ParserState.allAttributes
-
-  def get(element: Xml.Element): StringValues = element.attributes.toSeq
+  def get(element: Element): StringValues = element.attributes.toSeq
     .filter(_.isInstanceOf[scala.xml.Attribute])
     .map(_.asInstanceOf[scala.xml.Attribute])
-    .map(attribute =>
+    .map((attribute: scala.xml.Attribute) =>
       Attribute(
         name = attribute.key,
         namespace = Namespace(
           prefix = attribute.pre,
           uri = attribute.getNamespace(element)
         )
-      ).optional.withValue(Option(attribute.value).map(_.text))
+      )
+        .required // Note: preserve default values that were set explicitly
+        .withValueOption(Option(attribute.value).map(_.text))
     )
   
-  // TODO rework
-  final def add(attributes: Values, element: Xml.Element): Xml.Element =
-    val existing: Attribute.Values = get(element)
-    val toAdd: Attribute.Values = attributes
-      .filterNot(toAdd => existing.exists(existing => existing.attribute.name == toAdd.attribute.name))
+  def add(values: Values, element: Element): Element = set(element = element, values = get(element)
+    .filterNot(value => values.exists(_.attribute.name == value.attribute.name)) ++ values
+  )
 
-    set(existing ++ toAdd, element)
-
-  def set(attributes: Attribute.Values, element: Xml.Element): Xml.Element =
-    element.copy(attributes = attributes.foldRight[scala.xml.MetaData](scala.xml.Null)(
-      (attributeValue, next) => toMetaData(attributeValue, next))
+  def set(values: Values, element: Element): Element = element.copy(attributes =
+    values.foldRight[scala.xml.MetaData](scala.xml.Null)(
+      (attributeValue: Value[?], next: scala.xml.MetaData) => toMetaData(attributeValue, next)
     )
+  )
 
-  private def toMetaData[T](attributeValue: Attribute.Value[T], next: scala.xml.MetaData): scala.xml.MetaData =
-    val attribute: Attribute[T] = attributeValue.attribute
+  private def toMetaData[T](value: Value[T], next: scala.xml.MetaData): scala.xml.MetaData =
+    val attribute: Attribute[T] = value.attribute
     scala.xml.Attribute(
       pre = attribute.namespace.getPrefix.orNull,
       key = attribute.name,
-      value = attributeValue.valueEffective.map(Xml.mkText).map(Seq(_)).orNull,
+      value = value.valueEffective.map(Atom.apply).map(Seq(_)).orNull,
       next = next
     )  
     
   // TODO A is either T or Option[T]; are there any type-level tricks I can use to enforce this?
   sealed abstract class Parsable[T, A](val attribute: Attribute[T])(using CanEqual[T, T]) extends org.opentorah.xml.Parsable[A]:
     final override protected def parser: Parser[A] =
-      ParserState.takeAttribute(attribute).flatMap(fromStringOption)
+      ParserState.access(_.attribute(attribute)).flatMap(fromStringOption)
 
-    final def get(element: Xml.Element): Effects.IO[A] =
+    final def get(element: Element): Effects.IO[A] =
       fromStringOption(attribute.get(element).filter(_.nonEmpty))
     
-    private def fromStringOption(stringOption: Option[String]): ZIO[Any, Effects.Error, A] = for
+    private def fromStringOption(stringOption: Option[String]): Effects.IO[A] = for
       option: Option[T] <- stringOption match
         case None => ZIO.none
         case Some(value) => attribute.fromString(value).map(Some(_))
@@ -127,7 +119,7 @@ object Attribute:
 
     final override def unparser: Unparser[A] = Unparser(attributes = value => Seq(withValue(value)))
 
-    final def withValueOption(value: Option[T]): Value[T] = Attribute.Value[T](this, value)
+    final def withValueOption(value: Option[T]): Value[T] = Value[T](this, value)
     final def withValue(value: A): Value[T] = withValueOption(toOption(value))
 
     def isSetDefault: Boolean

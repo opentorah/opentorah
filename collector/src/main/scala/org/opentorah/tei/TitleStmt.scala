@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 
 final class TitleStmt(
   val titles: Seq[Title.Value],
@@ -12,7 +12,7 @@ final class TitleStmt(
   val respStmts: Seq[RespStmt.Value]
 )
 
-object TitleStmt extends Element[TitleStmt]("titleStmt"):
+object TitleStmt extends ElementTo[TitleStmt]("titleStmt"):
 
   def empty: TitleStmt = TitleStmt(
     titles = Seq.empty,

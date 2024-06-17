@@ -4,12 +4,12 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.Directory
 import org.opentorah.tei.Tei
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, From, Parser}
+import org.opentorah.xml.{From, FromUrl, Parser}
 import java.net.URL
 
 final class Documents(
   collection: Collection,
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   directory: String,
   parts: Seq[CollectionPart]
 ) extends Directory[Tei, Document, Documents.All](

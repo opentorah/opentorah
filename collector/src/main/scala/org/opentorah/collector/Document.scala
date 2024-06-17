@@ -1,12 +1,10 @@
 package org.opentorah.collector
 
 import org.opentorah.html.A
-import org.opentorah.metadata.Names
 import org.opentorah.tei.{Abstract, Author, Date, Editor, EntityReference, EntityType, Pb, Tei}
-import org.opentorah.store.{Context, Directory, Path, Terminal}
+import org.opentorah.store.{Context, Directory, Path}
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parsable, Parser, Unparser, Xml}
-import zio.ZIO
+import org.opentorah.xml.{Atom, Attribute, ElementTo, Elements, ElementsTo, Nodes, Parsable, Parser, Unparser}
 
 final class Document(
   override val name: String,
@@ -27,21 +25,21 @@ final class Document(
 
   def nameWithLang(lang: String): String = s"$baseName-$lang"
 
-  def getDate: Seq[Xml.Element] = date.toSeq.map(Date.xmlElement)
-  def getDescription: Xml.Nodes = description.toSeq.flatMap(_.content)
-  def getAuthors: Xml.Nodes = Xml.multi(authors.flatMap(_.content))
-  def getAddressee: Seq[Xml.Element] = addressee.toSeq.map(EntityReference.xmlElement)
-  def getTranscribers: Xml.Nodes = Xml.multi(editors
+  def getDate: Elements = date.toSeq.map(Date.xmlElement)
+  def getDescription: Nodes = description.toSeq.flatMap(_.content)
+  def getAuthors: Nodes = Nodes.multi(authors.flatMap(_.content))
+  def getAddressee: Elements = addressee.toSeq.map(EntityReference.xmlElement)
+  def getTranscribers: Nodes = Nodes.multi(editors
     .filter(_.role.contains("transcriber"))
     .flatMap(_.persName)
     .map(EntityReference.xmlElement))
 
   def pages(pageType: Page.Type): Seq[Page] = pbs.map(pageType(_))
 
-  def textFacetLink(context: Context, collectionPath: Path): Caching.Parser[A] =
+  def textFacetLink(context: Context, collectionPath: Path): Parser[A] =
     facetLink(context, collectionPath, Path.last[Collection](collectionPath).textFacet)
 
-  def facetLink(context: Context, collectionPath: Path, collectionFacet: CollectionFacet): Caching.Parser[A] =
+  def facetLink(context: Context, collectionPath: Path, collectionFacet: CollectionFacet): Parser[A] =
     context.a(facetPath(collectionPath, collectionFacet))
 
   def facetPath(
@@ -50,17 +48,16 @@ final class Document(
   ): Path =
     collectionPath ++ Seq(collectionFacet, collectionFacet.of(this))
 
-object Document extends Element[Document]("document"), Directory.EntryMaker[Tei, Document]:
+object Document extends ElementTo[Document]("document"), Directory.EntryMaker[Tei, Document]:
 
   override def apply(name: String, tei: Tei): Parser[Document] = for
-    pbs: Seq[Pb] <- Xml.descendants(tei.text.body.content, Pb.elementName, Pb)
+    pbs: Seq[Pb] <- Pb.descendants(tei.text.body.content, Pb.elementName)
     lang: Option[String] = tei.text.lang
     language: Option[String] = splitLang(name)._2
     _ <- Effects.check(language.isEmpty || language == lang, s"Wrong language in $name: $lang != $language")
-    persNames: Seq[EntityReference] <- Xml.descendants(
+    persNames: Seq[EntityReference] <- EntityReference.descendants(
       nodes = tei.teiHeader.profileDesc.flatMap(_.correspDesc).map(_.content).getOrElse(Seq.empty),
-      elementName = EntityType.Person.nameElement,
-      elements = EntityReference
+      elementName = EntityType.Person.nameElement
     )
   yield new Document(
     name,
@@ -77,7 +74,7 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
   def forDisplay(date: Date): Date = Date(
     when = date.when,
     calendar = date.calendar,
-    xml = Seq(Xml.mkText(date.when))
+    xml = Seq(Atom(date.when))
   )
 
   private def splitLang(name: String): (String, Option[String]) =
@@ -87,12 +84,12 @@ object Document extends Element[Document]("document"), Directory.EntryMaker[Tei,
 
   private val isTranslationAttribute: Attribute.OrDefault[Boolean] = Attribute.BooleanAttribute("isTranslation").orDefault
   private val langAttribute: Attribute.Required[String] = Attribute("lang").required
-  private val dateElement: Elements.Optional[Date] = Date.optional
-  private val editorsElement: Elements.Sequence[Editor] = Editor.seq
-  private val abstractElement: Elements.Optional[Abstract.Value] = Abstract.element.optional
-  private val authorsElement: Elements.Sequence[Author.Value] = Author.element.seq
-  private val addresseeElement: Elements.Optional[EntityReference] = EntityReference.optional
-  private val pbsElement: Elements.Sequence[Pb] = Pb.seq
+  private val dateElement: ElementsTo.Optional[Date] = Date.optional
+  private val editorsElement: ElementsTo.Sequence[Editor] = Editor.seq
+  private val abstractElement: ElementsTo.Optional[Abstract.Value] = Abstract.element.optional
+  private val authorsElement: ElementsTo.Sequence[Author.Value] = Author.element.seq
+  private val addresseeElement: ElementsTo.Optional[EntityReference] = EntityReference.optional
+  private val pbsElement: ElementsTo.Sequence[Pb] = Pb.seq
 
   override def contentParsable: Parsable[Document] = new Parsable[Document]:
     override def parser: Parser[Document] = for

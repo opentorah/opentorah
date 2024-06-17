@@ -1,6 +1,6 @@
 package org.opentorah.store
 
-import org.opentorah.xml.{Attribute, Element, Elements, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, ElementsTo, Parsable, Parser, Unparser}
 import java.net.URL
 
 // TODO site?
@@ -8,8 +8,8 @@ final class WithSource[T](val source: String, val value: T)
 
 object WithSource:
 
-  final class Of[T](elements: Elements[T]) extends Element[WithSource[T]]("withSource"):
-    private val valueElement: Elements.Required[T] = elements.required
+  final class Of[T](elementsTo: ElementsTo[T]) extends ElementTo[WithSource[T]]("withSource"):
+    private val valueElement: ElementsTo.Required[T] = elementsTo.required
 
     override def contentParsable: Parsable[WithSource[T]] = new Parsable[WithSource[T]]:
       override protected def parser: Parser[WithSource[T]] = for
@@ -30,7 +30,7 @@ object WithSource:
   def apply[T](
     url: URL,
     name: String,
-    value: Elements[T]
+    value: ElementsTo[T]
   ): ListFile[WithSource[T], Seq[WithSource[T]]] = ListFile[WithSource[T], Seq[WithSource[T]]](
     url,
     name,

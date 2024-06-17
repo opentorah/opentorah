@@ -123,9 +123,10 @@ tasks.register('site') {
   dependsOn(asciidoctorExternal /*, mdoc*/)
 }
 
-tasks.named('build') {
-  dependsOn(site)
-}
+// Note: external asciidoctor is not available in GitHub CI pipeline
+//tasks.named('build') {
+//  dependsOn(site)
+//}
 
 final String httpPort = '8080'
 tasks.register('serveSite', Exec) {

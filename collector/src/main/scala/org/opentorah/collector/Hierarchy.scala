@@ -3,11 +3,11 @@ package org.opentorah.collector
 import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.{Abstract, Body, Title}
-import org.opentorah.xml.{Caching, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Element, ElementTo, FromUrl, Parsable, Parser, Unparser}
 import zio.ZIO
 
 final class Hierarchy(
-  fromUrl: Element.FromUrl,
+  fromUrl: FromUrl,
   names: Names,
   title: Title.Value,
   description: Option[Abstract.Value],
@@ -26,13 +26,13 @@ final class Hierarchy(
 
   override def getBy: Option[ByHierarchy] = Some(by)
 
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  override def content(path: Path, context: Context): Parser[Element] =
     by.oneLevelIndex(context, path :+ by)
 
-object Hierarchy extends Element[Hierarchy]("store"):
+object Hierarchy extends ElementTo[Hierarchy]("store"):
   override def contentParsable: Parsable[Hierarchy] = new Parsable[Hierarchy]:
     override def parser: Parser[Hierarchy] = for
-      fromUrl: Element.FromUrl <- Element.fromUrl
+      fromUrl: FromUrl <- FromUrl.get
       names: Names <- Hierarchical.namesParsable()
       title: Title.Value <- Hierarchical.titleElement()
       description: Option[Abstract.Value] <- Hierarchical.descriptionElement()

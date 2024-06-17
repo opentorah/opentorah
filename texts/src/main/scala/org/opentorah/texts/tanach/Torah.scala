@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
 import org.opentorah.util.Effects
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -58,7 +58,7 @@ object Torah extends WithBookSpans[Chumash]:
       _ <- Effects.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
     yield Torah(spans.map(inBook(bookSpan.book, _)))
 
-  object torahParsable extends Element[Torah]("torah"):
+  object torahParsable extends ElementTo[Torah]("torah"):
     override def contentParsable: Parsable[Torah] = new Parsable[Torah]:
       override def parser: Parser[Torah] = for
         bookSpan: BookSpan <- spanParser.map(_.resolve)
@@ -68,14 +68,14 @@ object Torah extends WithBookSpans[Chumash]:
 
       override def unparser: Unparser[Torah] = ???
 
-  private final class AliyahParsable(bookSpan: BookSpan) extends Element[Numbered]("aliyah"):
+  private final class AliyahParsable(bookSpan: BookSpan) extends ElementTo[Numbered]("aliyah"):
     override def contentParsable: Parsable[Numbered] = new Parsable[Numbered]:
       override def parser: Parser[WithNumber[SpanSemiResolved]] =
         WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
 
       override def unparser: Unparser[Numbered] = ???
 
-  object Maftir extends Element[BookSpan]("maftir"):
+  object Maftir extends ElementTo[BookSpan]("maftir"):
     override def contentParsable: Parsable[BookSpan] = new Parsable[BookSpan]:
       override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
       override def unparser: Unparser[BookSpan] = ???

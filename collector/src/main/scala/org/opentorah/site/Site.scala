@@ -5,17 +5,18 @@ import org.opentorah.metadata.Names
 import org.opentorah.store.{Context, Directory, Path, Pure, Store, Stores}
 import org.opentorah.tei.{Availability, LangUsage, Language, ProfileDesc, PublicationStmt, Publisher, Tei}
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.{Caching, Element, From, Parser, PrettyPrinter, Xerces, Xml}
+import org.opentorah.xml.{Caching, Element, Elements, From, FromUrl, Nodes, Parser, PrettyPrinter}
 import org.slf4j.{Logger, LoggerFactory}
 import zio.{Task, ZIO, ZLayer}
+
 import java.net.URL
 
 // TODO consolidate all js, css etc. files in `asset` (singular)
 // TODO fix favicon to the default `favicon.ico` and convert the Alter Rebbe picture.
 abstract class Site(
-  override val fromUrl: Element.FromUrl,
+  override val fromUrl: FromUrl,
   val common: SiteCommon
-) extends Context, Pure[Store], Element.FromUrl.With:
+) extends Context, Pure[Store], FromUrl.With:
 
   final override def names: Names = common.names
 
@@ -23,7 +24,7 @@ abstract class Site(
 
   final val caching: Caching.Simple = new Caching.Simple
 
-  final def toTask[T](parser: Caching.Parser[T]): Task[T] = Parser.toTask(Caching.provide(caching, parser))
+  final def toTask[T](parser: Parser[T]): Task[T] = Parser.toTask(parser, caching)
 
   final private val staticPaths: Set[String] =
     Set("assets", "css", "js", "sass", "robots.txt") ++ common.getHtml.favicon.toSet
@@ -42,14 +43,14 @@ abstract class Site(
   protected val allowedExtensions: Set[String] = Set("html", "xml")
 
   // TODO verify the extension?
-  def resolveUrl(url: String): Caching.Parser[Option[Path]] =
+  def resolveUrl(url: String): Parser[Option[Path]] =
     resolveUrl(Files.splitAndDecodeUrl(url))
 
-  def resolveUrl(url: Seq[String]): Caching.Parser[Option[Path]] =
+  def resolveUrl(url: Seq[String]): Parser[Option[Path]] =
     resolveRaw(url).map((pathAndExtension: Site.PathAndExtension) => Some(pathAndExtension.path)).orElse(ZIO.none)
 
   // Path returned is nonEmpty.
-  private def resolveRaw(pathRaw: Seq[String]): Caching.Parser[Site.PathAndExtension] =
+  private def resolveRaw(pathRaw: Seq[String]): Parser[Site.PathAndExtension] =
     val (path: Seq[String], mustBeNonTerminal: Boolean, extension: Option[String]) =
       if pathRaw.isEmpty then (pathRaw, false, None) else
         val last: String = pathRaw.last
@@ -68,7 +69,7 @@ abstract class Site(
 
         (path, mustBeNonTerminal, extensionRequested)
 
-    val result: Caching.Parser[Path] =
+    val result: Parser[Path] =
       if path.isEmpty && index.nonEmpty then ZIO.succeed(index.get) else for
         _ <- if initializeResolveDone then Effects.ok else
           initializeResolveDone = true
@@ -84,19 +85,19 @@ abstract class Site(
 
   private var initializeResolveDone: Boolean = false
 
-  protected def initializeResolve: Caching.Parser[Unit] = Effects.ok
+  protected def initializeResolve: Parser[Unit] = Effects.ok
 
   protected def index: Option[Path] = None
 
-  protected def content(path: Path, extension: Option[String]): Caching.Parser[Site.Response]
+  protected def content(path: Path, extension: Option[String]): Parser[Site.Response]
 
-  final def render(path: Path): Caching.Parser[String] = for
-    siteNavigationLinks: Seq[Xml.Element] <- getNavigationLinks
+  final def render(path: Path): Parser[String] = for
+    siteNavigationLinks: Elements <- getNavigationLinks
     store: Store = path.last
-    storeNavigationLinks: Seq[Xml.Element] <- store.navigationLinks(path, this)
-    content: Xml.Element <- resolveLinks(path)
+    storeNavigationLinks: Elements <- store.navigationLinks(path, this)
+    content: Element <- resolveLinks(path)
   yield
-    val result: Xml.Element = HtmlTheme.toHtml(
+    val result: Element = HtmlTheme.toHtml(
       siteHtml = common.getHtml,
       headTitle = store.htmlHeadTitle,
       cssFileName = style(store),
@@ -113,17 +114,17 @@ abstract class Site(
 
   def wrapperCssClass(store: Store): String
 
-  final protected def resolveLinks(path: Path): Caching.Parser[Xml.Element] = for
+  final protected def resolveLinks(path: Path): Parser[Element] = for
     store: Store <- ZIO.succeed(path.last)
-    header: Option[Xml.Element] <- store.header(path, this)
-    content: Xml.Element <- store.content(path, this)
-    fullContent: Xml.Element = HtmlTheme.fullContent(
+    header: Option[Element] <- store.header(path, this)
+    content: Element <- store.content(path, this)
+    fullContent: Element = HtmlTheme.fullContent(
       wrapperCssClass(store),
       header,
       store.htmlBodyTitle,
       content
     )
-    result: Xml.Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path)))
+    result: Element <- TeiToHtml.toHtml(fullContent).provideLayer(ZLayer.succeed(linkResolver(path)))
   yield result
 
   protected def linkResolver(path: Path): LinksResolver
@@ -135,7 +136,7 @@ abstract class Site(
           publisher = common.getHtml.url.map(url => Publisher.Value(<ptr target={s"http://$url"}/>)),
           availability = Some(Availability(
             status = Some("free"),
-            xml = Xml.optional(common.license)(license =>
+            xml = Nodes.optional(common.license)(license =>
               <licence><ab><ref n="license" target={license.url}>{license.name}</ref></ab></licence>)
           ))
         )),
@@ -152,7 +153,7 @@ abstract class Site(
     )))
   )
 
-  private def getNavigationLinks: Caching.Parser[Seq[Xml.Element]] = caching.getCached("navigationLinks",
+  private def getNavigationLinks: Parser[Elements] = caching.getCached("navigationLinks",
     ZIO.foreach(common.pages)((url: String) => for
       pathOpt: Option[Path] <- resolveUrl(url)
       path: Path = pathOpt.get
@@ -173,7 +174,7 @@ abstract class Site(
     yield ()
   }
 
-  private def writeDirectories: Caching.Parser[Unit] =
+  private def writeDirectories: Parser[Unit] =
     logger.info("Writing site lists.")
 
     for
@@ -181,13 +182,13 @@ abstract class Site(
       _ <- ZIO.foreachDiscard(directoriesToWrite)(_.writeDirectory())
     yield ()
 
-  protected def directoriesToWrite: Caching.Parser[Seq[Directory[?, ?, ?]]] = ZIO.succeed(Seq.empty)
+  protected def directoriesToWrite: Parser[Seq[Directory[?, ?, ?]]] = ZIO.succeed(Seq.empty)
 
-  protected def innerBuild: Caching.Parser[Unit] = Effects.ok
+  protected def innerBuild: Parser[Unit] = Effects.ok
 
-  protected def verify: Caching.Parser[Unit] = Effects.ok
+  protected def verify: Parser[Unit] = Effects.ok
 
-  private def prettyPrint: Caching.Parser[Unit] =
+  private def prettyPrint: Parser[Unit] =
     logger.info("Pretty-printing site.")
 
     for
@@ -203,7 +204,7 @@ abstract class Site(
     doctype: Option[String]
   ): ZIO[Any, Effects.Error, Unit] =
     def one(url: URL): ZIO[Any, Effects.Error, Unit] = for
-      content: Xml.Element <- From.url(url, processIncludes = Xerces.ProcessIncludes.No).load
+      content: Element <- From.url(url, processIncludes = From.ProcessIncludes.No).load
       _ <- ZIO.succeed(Files.write(
         file = Files.url2file(url),
         content = prettyPrinter.renderWithHeader(doctype, content)
@@ -211,9 +212,9 @@ abstract class Site(
     yield ()
     ZIO.collectAllDiscard(urls.map(one))
 
-  protected def prettyPrintTei: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
+  protected def prettyPrintTei: Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 
-  protected def prettyPrintStores: Caching.Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
+  protected def prettyPrintStores: Parser[Seq[URL]] = ZIO.succeed(Seq.empty)
 
 object Site:
 

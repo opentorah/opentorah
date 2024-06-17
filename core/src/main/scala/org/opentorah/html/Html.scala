@@ -15,10 +15,8 @@ object Html extends Dialect:
   val classAttribute: Attribute[String] = Attribute("class")
 
   override val prettyPrinter: PrettyPrinter = PrettyPrinter(
-    alwaysStackElements =
-      Set("nav", "header", "main", "div"),
-    clingyElements =
-      Set("a"),
+    alwaysStackElements = Set("nav", "header", "main", "div"),
+    clingyElements = Set("a"),
     // Some elements are mis-processed when they are empty, e.g. <script .../> ...
     allowEmptyElements = false,
     // ... except, some elements are mis-processed when they *are* non-empty (e.g., <br>),

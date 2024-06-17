@@ -1,13 +1,13 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser, Xml}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser, Xml}
 
 final class Text(
   val lang: Option[String],
   val body: Body.Value
 )
 
-object Text extends Element[Text]("text"):
+object Text extends ElementTo[Text]("text"):
 
   private val langAttribute: Attribute.Optional[String] = Xml.langAttribute.optional
 

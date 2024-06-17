@@ -1,6 +1,6 @@
 package org.opentorah.site
 
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 final class SiteSocial(
   val github : Option[String],
@@ -14,7 +14,7 @@ final class SiteSocial(
   private def optional(service:SiteSocial.Service, username: Option[String]): Option[(SiteSocial.Service, String)] =
     username.map(username => service -> username)
 
-object SiteSocial extends Element[SiteSocial]("social"):
+object SiteSocial extends ElementTo[SiteSocial]("social"):
 
   enum Service(val serviceUrl: String, val iconUrl: String):
     case GitHub  extends Service(serviceUrl = "https://github.com"     , iconUrl = "/assets/icons.svg#github" )

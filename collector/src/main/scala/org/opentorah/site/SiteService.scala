@@ -3,7 +3,7 @@ package org.opentorah.site
 import org.opentorah.gcp.{GCP, GCPLogger, GoogleCloudStorageSynchronizer}
 import org.opentorah.service.Static
 import org.opentorah.util.{Effects, Files, Logging}
-import org.opentorah.xml.{Element, From, Parser}
+import org.opentorah.xml.{ElementTo, From, Parser}
 import zio.http.{Body, Charsets, Header, Headers, HttpApp, MediaType, Method, Path, Request, Response, Route, Routes,
   Server, Status, handler, trailing}
 import zio.{Chunk, Task, ZIO, ZLayer}
@@ -16,7 +16,7 @@ import java.net.URL
 // - auto-time (as opposed to the current manual approach with timed()) all requests (not just GETs);
 // - turn failures into appropriate responses (ala orNotFound()).
 // TODO use Zio logging with logstash
-abstract class SiteService[S <: Site] extends Element[S]("site"), zio.ZIOAppDefault:
+abstract class SiteService[S <: Site] extends ElementTo[S]("site"), zio.ZIOAppDefault:
   // TODO HTTP GET from http://metadata.google.internal/computeMetadata/v1/project/project-id
   // with `Metadata-Flavor: Google` header;
   // or do I even need it for logging?

@@ -4,13 +4,13 @@ import org.opentorah.html.A
 import org.opentorah.site.Site
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Pb
-import org.opentorah.xml.{Caching, Xml}
+import org.opentorah.xml.{Element, Elements, Parser}
 import zio.ZIO
 
 final class FacsimileFacet(document: Document, collectionFacet: CollectionFacet) extends
   Facet(document, collectionFacet):
   
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] =
+  override def content(path: Path, context: Context): Parser[Element] =
     val collectionPath: Path = Collector.collectionPath(path)
     val facsimileUrl: String =
       val pathStr: String = Path.structureNames(collectionPath).mkString("/")
@@ -18,7 +18,7 @@ final class FacsimileFacet(document: Document, collectionFacet: CollectionFacet)
 
     for
       // TODO generate lists of images and check for missing ones and orphans
-      pageLinks: Seq[Xml.Element] <- ZIO.foreach(document.pages(collection.pageType).filterNot(_.pb.isMissing))((page: Page) =>
+      pageLinks: Elements <- ZIO.foreach(document.pages(collection.pageType).filterNot(_.pb.isMissing))((page: Page) =>
         val n: String = page.pb.n
         val pageId: String = Pb.pageId(n)
         for textFacetA: A <- document.textFacetLink(context, collectionPath) yield
@@ -42,7 +42,7 @@ final class FacsimileFacet(document: Document, collectionFacet: CollectionFacet)
   override protected def moreNavigationLinks(
     collectionPath: Path,
     context: Context
-  ): Caching.Parser[Seq[Xml.Element]] =
+  ): Parser[Elements] =
     for
       textFacetA: A <- document.textFacetLink(context, collectionPath)
     yield Seq(textFacetA(text = Site.Navigation.text))

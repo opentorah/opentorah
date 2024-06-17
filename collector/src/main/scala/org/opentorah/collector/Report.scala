@@ -5,7 +5,7 @@ import org.opentorah.metadata.Names
 import org.opentorah.tei.{EntityReference, Unclear}
 import org.opentorah.store.{Context, Path, Terminal, WithSource}
 import org.opentorah.util.Strings
-import org.opentorah.xml.{Caching, Xml}
+import org.opentorah.xml.{Atom, Element, Elements, Nodes, Parser}
 import zio.ZIO
 import java.net.URI
 
@@ -13,19 +13,19 @@ import java.net.URI
 sealed abstract class Report[T](name: String, val title: String) extends Terminal:
   final override def names: Names = Names(name)
   final override def htmlHeadTitle: Option[String] = Some(title)
-  final override def htmlBodyTitle: Option[Xml.Nodes] = htmlHeadTitle.map(Xml.mkText)
+  final override def htmlBodyTitle: Option[Nodes] = htmlHeadTitle.map(Atom.apply)
 
-  final override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
+  final override def content(path: Path, context: Context): Parser[Element] = for
     lines: Seq[T] <- lines(Collector.get(context))
-    result: Seq[Xml.Element] <- ZIO.foreach(lines)((line: T) => 
+    result: Elements <- ZIO.foreach(lines)((line: T) =>
       lineToXml(line, context)
     )
   yield
     <div>{result}</div>
 
-  protected def lines(collector: Collector): Caching.Parser[Seq[T]]
+  protected def lines(collector: Collector): Parser[Seq[T]]
 
-  protected def lineToXml(line: T, context: Context): Caching.Parser[Xml.Element]
+  protected def lineToXml(line: T, context: Context): Parser[Element]
 
 object Report:
 
@@ -33,10 +33,10 @@ object Report:
     name = "no-refs",
     title = "Имена без атрибута /ref/"
   ):
-    override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[EntityReference]]] =
+    override protected def lines(collector: Collector): Parser[Seq[WithSource[EntityReference]]] =
       collector.getNoRefs
 
-    override protected def lineToXml(reference: WithSource[EntityReference], context: Context): Caching.Parser[Xml.Element] =
+    override protected def lineToXml(reference: WithSource[EntityReference], context: Context): Parser[Element] =
       val source: String = reference.source
       ZIO.succeed(<l>{reference.value.name.toString} в {A(URI(source))(text = source)}</l>)
 
@@ -44,10 +44,10 @@ object Report:
     name = "unclears",
     title = "Неясности"
   ):
-    override protected def lines(collector: Collector): Caching.Parser[Seq[WithSource[Unclear.Value]]] =
+    override protected def lines(collector: Collector): Parser[Seq[WithSource[Unclear.Value]]] =
       collector.getUnclears
 
-    override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context): Caching.Parser[Xml.Element] =
+    override protected def lineToXml(unclear: WithSource[Unclear.Value], context: Context): Parser[Element] =
       val source: String = unclear.source
       ZIO.succeed(<l>{unclear.value.content.toString} в {A(URI(source))(text = source)}</l>)
 
@@ -55,13 +55,13 @@ object Report:
     name = "misnamed-entities",
     title = "Неправильно названные файлы с именами"
   ):
-    override protected def lines(collector: Collector): Caching.Parser[Seq[Entity]] =
+    override protected def lines(collector: Collector): Parser[Seq[Entity]] =
       collector.entities.stores.map(_
         .filterNot((entity: Entity) => entity.id == getExpectedId(entity))
         .sortBy(_.name)
       )
 
-    override protected def lineToXml(entity: Entity, context: Context): Caching.Parser[Xml.Element] =
+    override protected def lineToXml(entity: Entity, context: Context): Parser[Element] =
       for a: A <- context.a(entity)
       yield <l>{a(text = entity.id)} {s"должен по идее называться '${getExpectedId(entity)}'"}</l>
 

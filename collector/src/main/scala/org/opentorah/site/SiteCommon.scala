@@ -1,7 +1,7 @@
 package org.opentorah.site
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 
 final class SiteCommon(
   val names: Names,
@@ -14,7 +14,7 @@ final class SiteCommon(
   def getHtml: SiteHtml = html.getOrElse(SiteHtml.empty)
   def getTei : SiteTei  = tei .getOrElse(SiteTei .empty)
 
-object SiteCommon extends Element[SiteCommon]("common"):
+object SiteCommon extends ElementTo[SiteCommon]("common"):
 
   override def contentParsable: Parsable[SiteCommon] = new Parsable[SiteCommon]:
     private val isStaticAttribute: Attribute.Optional[Boolean] = new Attribute.BooleanAttribute("isStatic").optional

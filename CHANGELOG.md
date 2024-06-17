@@ -7,21 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.10.13] - 2024-
-- chore: Gradle 8.8
+- chore: Gradle 8.9
+- chore: dependencies update
 - cleanup: switching from Asciidoctor Gradle plugin to calling external Asciidoctor
 - cleanup: switching bibliography to asciidoctor-bibtex
 - cleanup: ZIO-ified XML Attributes a bit more
 - cleanup: moved HTML classes into html package
 - cleanup: removed Element.Nodes
-- cleanup: remove traces of DocBook processing code
-- cleanup: removed more DocBook-related stuff and collapsed unrequitted generality:
+- cleanup: removed traces of DocBook processing code
+- cleanup: removed more DocBook-related stuff and collapsed unrequited generality:
   - removed Sax, Dom, Saxon, Xsl, Catalog, Resolver
-  - removed Saxon and XML Resolver dependencies - folded XmlAttributes and ScalaXml into Xml
+  - removed Saxon and XML Resolver dependencies
+  - folded XmlAttributes and ScalaXml into Xml
   - Xml.Attributes is the same as Xml.Element
   - pruned some unused methods and parameters
   - relocated methods from the XML object to where they belong
   - folded Doctype into Dialect
   - removed TracingFilter
+- cleanup: merged Xerces into From
+- cleanup: every Parser is a Caching.Parser, but some have Zero Caching
+- cleanup: renamed Element(s) as Element(s)To
+- cleanup: FromUrl, ContentType, Element, Elements, Node, Nodes, Atom, Comment on the top level
+- fix: do not wipe out default attribute values when removing an attribute
 
 ## [0.10.12] - 2024-06-01
 - chore: latest ScalaJS plugin

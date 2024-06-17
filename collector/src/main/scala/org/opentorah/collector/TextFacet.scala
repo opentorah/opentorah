@@ -4,7 +4,7 @@ import org.opentorah.html.A
 import org.opentorah.site.TeiToHtml
 import org.opentorah.store.{Context, Path}
 import org.opentorah.tei.Tei
-import org.opentorah.xml.{Caching, Xml}
+import org.opentorah.xml.{Element, Elements, Parser}
 import zio.ZIO
 
 final class TextFacet(document: Document, collectionFacet: CollectionFacet) extends
@@ -14,7 +14,7 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
     val that: TextFacet = other.asInstanceOf[TextFacet]
     (this.collection == that.collection) && (this.document == that.document)
   
-  override def content(path: Path, context: Context): Caching.Parser[Xml.Element] = for
+  override def content(path: Path, context: Context): Parser[Element] = for
     tei: Tei <- getTei
   yield
     <div>
@@ -24,10 +24,10 @@ final class TextFacet(document: Document, collectionFacet: CollectionFacet) exte
   override protected def moreNavigationLinks(
     collectionPath: Path,
     context: Context
-  ): Caching.Parser[Seq[Xml.Element]] = for
+  ): Parser[Elements] = for
     translations: Seq[Document] <- collection.translations(document)
     translationsToLink: Seq[Document] = if document.isTranslation then Seq.empty else translations
-    translationLinks: Seq[Xml.Element] <- ZIO.foreach(translationsToLink)((translation: Document) =>
+    translationLinks: Elements <- ZIO.foreach(translationsToLink)((translation: Document) =>
       for textFacetA: A <- translation.textFacetLink(context, collectionPath)
       yield textFacetA(s"[${translation.lang}]")
     )

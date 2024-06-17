@@ -2,7 +2,7 @@ package org.opentorah.store
 
 import org.opentorah.metadata.{Named, Names}
 import org.opentorah.util.Files
-import org.opentorah.xml.{Attribute, Caching, Element, Elements, Parser}
+import org.opentorah.xml.{Attribute, ElementsTo, FromUrl, Parser}
 import zio.ZIO
 import java.net.URL
 
@@ -21,7 +21,7 @@ abstract class Directory[
   fileExtension: String,
   entryMaker: Directory.EntryMaker[T, M],
   wrapper: Map[String, M] => W
-) extends Stores[M], Element.FromUrl.With:
+) extends Stores[M], FromUrl.With:
 
   final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
 
@@ -32,21 +32,21 @@ abstract class Directory[
     wrapper = (entries: Seq[M]) => wrapper(entries.map(entry => entry.name -> entry).toMap)
   )
 
-  final def writeDirectory(): Caching.Parser[Unit] =
+  final def writeDirectory(): Parser[Unit] =
     ZIO.foreach(
       Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
     )(name => getFile(name).flatMap(file => entryMaker(name, file)))
       .map(listFile.write)
 
-  override def findByName(name: String): Caching.Parser[Option[M]] = getDirectory.map(_.findByName(name))
+  override def findByName(name: String): Parser[Option[M]] = getDirectory.map(_.findByName(name))
 
-  override def stores: Caching.Parser[Seq[M]] = getDirectory.map(_.stores)
+  override def stores: Parser[Seq[M]] = getDirectory.map(_.stores)
 
   // TODO rename getWrapper?
-  final def getDirectory: Caching.Parser[W] = listFile.get
+  final def getDirectory: Parser[W] = listFile.get
 
-  final def getFile(entry: M): Caching.Parser[T] = getFile(entry.name)
-  private def getFile(name: String): Caching.Parser[T] = Caching.getCachedByUrl[T](fileUrl(name), loadFile)
+  final def getFile(entry: M): Parser[T] = getFile(entry.name)
+  private def getFile(name: String): Parser[T] = Parser.getCachedByUrl[T](fileUrl(name), loadFile)
 
   final def fileUrl(entry: M): URL = fileUrl(entry.name)
   final def fileUrl(name: String): URL = Files.fileInDirectory(directoryUrl, name + "." + fileExtension)
@@ -71,7 +71,7 @@ object Directory:
   ) extends Terminal:
     final override val names: Names = Names(name)
 
-  trait EntryMaker[T, M <: Entry] extends Elements[M]:
+  trait EntryMaker[T, M <: Entry] extends ElementsTo[M]:
     def apply(name: String, content: T): Parser[M]
 
   val directoryAttribute: Attribute.Required[String] = Attribute("directory").required

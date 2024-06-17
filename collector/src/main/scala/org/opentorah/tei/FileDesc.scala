@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 
 // PublicationStmt and SourceDesc are mandatory (TEI Guidelines),
 // but I made them optional so that they can be removed from the editable pre-TEI files
@@ -32,7 +32,7 @@ final class FileDesc(
     sourceDesc
   )
 
-object FileDesc extends Element[FileDesc]("fileDesc"):
+object FileDesc extends ElementTo[FileDesc]("fileDesc"):
 
   override def contentParsable: Parsable[FileDesc] = new Parsable[FileDesc]:
     override def parser: Parser[FileDesc] = for

@@ -1,6 +1,6 @@
 package org.opentorah.tei
 
-import org.opentorah.xml.{Element, Parsable, Parser, Unparser}
+import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
 
 final class TeiHeader(
   val fileDesc: FileDesc,
@@ -23,7 +23,7 @@ final class TeiHeader(
     revisionDesc
   )
 
-object TeiHeader extends Element[TeiHeader]("teiHeader"):
+object TeiHeader extends ElementTo[TeiHeader]("teiHeader"):
 
   override def contentParsable: Parsable[TeiHeader] = new Parsable[TeiHeader]:
     override val parser: Parser[TeiHeader] = for
