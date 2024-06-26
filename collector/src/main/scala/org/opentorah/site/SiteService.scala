@@ -4,10 +4,9 @@ import org.opentorah.gcp.{GCP, GCPLogger, GoogleCloudStorageSynchronizer}
 import org.opentorah.service.Static
 import org.opentorah.util.{Effects, Files, Logging}
 import org.opentorah.xml.{ElementTo, From, Parser}
-import zio.http.{Body, Charsets, Header, Headers, HttpApp, MediaType, Method, Path, Request, Response, Route, Routes,
+import zio.http.{Body, Charsets, Header, Headers, MediaType, Method, Path, Request, Response, Route, Routes,
   Server, Status, handler, trailing}
 import zio.{Chunk, Task, ZIO, ZLayer}
-import zio.schema.codec.JsonCodec.zioJsonBinaryCodec
 import java.io.File
 import java.net.URL
 
@@ -149,7 +148,7 @@ abstract class SiteService[S <: Site] extends ElementTo[S]("site"), zio.ZIOAppDe
               Header.ContentType(MediaType.parseCustomMediaType(siteResponse.mimeType).get),
               Header.ContentLength(bytes.length.toLong)
             ),
-            body = Body.fromStream(zio.stream.ZStream.fromChunk(Chunk.fromArray(bytes)))
+            body = Body.fromArray(bytes)
           )
         )
       ))
