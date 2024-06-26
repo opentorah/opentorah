@@ -20,7 +20,7 @@ abstract class Hierarchical(
   FromUrl.With,
   Pure[Store]:
 
-  final def titleString: String = title.content.toString
+  final def titleString: String = Nodes.toString(title.content)
 
   final override def htmlHeadTitle: Option[String] = Some(titleString)
   final override def htmlBodyTitle: Option[Nodes] = None

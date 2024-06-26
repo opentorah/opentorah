@@ -2,7 +2,6 @@ package org.opentorah.service
 
 import org.opentorah.util.{Effects, Files}
 import zio.http.{Body, Header, Headers, MediaType, Request, Response, Status}
-import zio.schema.codec.JsonCodec.zioJsonBinaryCodec
 import zio.ZIO
 import java.time.{Instant, ZoneId, ZonedDateTime}
 
@@ -47,6 +46,8 @@ object Static:
         yield
           val lastModifiedHeader: Header.LastModified = Header.LastModified(lastModified)
 
+          // TODO remove: set from the Body;
+          // see https://github.com/zio/zio-http/blob/main/docs/reference/body/body.md#from-zio-streams
           val contentLengthHeader: Header =
             if contentLength >= 0
             then Header.ContentLength(contentLength)
@@ -69,6 +70,6 @@ object Static:
             ) ++
               contentTypeHeader.toSeq
             ),
-            body = Body.fromStream(zio.stream.ZStream.fromInputStream(inputStream))
+            body = Body.fromStreamChunked(zio.stream.ZStream.fromInputStream(inputStream))
           )
     yield result
