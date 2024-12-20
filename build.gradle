@@ -21,7 +21,5 @@ idea {
 project.gradle.startParameter.excludedTaskNames.add('compileJava')
 
 // TODO is this needed?
-subprojects {
-  group = 'org.opentorah'
-  version = '0.10.13'
-}
+group = 'org.opentorah'
+version = '0.10.13'

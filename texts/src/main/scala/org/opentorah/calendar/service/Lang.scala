@@ -8,7 +8,7 @@ object Lang:
   val queryParameterName: String = "lang"
   
   val codec: HttpCodec[HttpCodecType.Query, Language.Spec] = HttpCodec
-    .query(queryParameterName)
+    .query[String](queryParameterName)
     .optional
     .transform[Language.Spec](fromParameter)((value: Language.Spec) => Some(value.language.get.toString))
 

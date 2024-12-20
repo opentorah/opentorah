@@ -6,9 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.13] - 2024-
-- chore: Gradle 8.9
-- chore: dependencies update
+## [0.10.13] - 2024-12-22
+- chore: Gradle 8.12 and related updates
+- chore: dependency updates
+- chore: Scala 3.6.2
+- no more `com.github.maiflai.scalatest` plugin;
 - cleanup: switching from Asciidoctor Gradle plugin to calling external Asciidoctor
 - cleanup: switching bibliography to asciidoctor-bibtex
 - cleanup: ZIO-ified XML Attributes a bit more

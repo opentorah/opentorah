@@ -12,7 +12,7 @@ object Location:
   val queryParameterName: String = "inHolyLand"
 
   val codec: HttpCodec[HttpCodecType.Query, Location] = HttpCodec
-    .query(queryParameterName)
+    .query[String](queryParameterName)
     .optional
     .transform[Location](fromParameter)(_.parameter)
 

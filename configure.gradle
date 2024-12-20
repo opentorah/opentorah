@@ -53,8 +53,8 @@ if (project.name != 'docs' && project.name != 'opentorah-docbook') {
   jar {
     // From https://github.com/GoogleContainerTools/jib/tree/master/examples/multi-module
     //   Since this library is included as a jar in our jib projects, we want the jar to built reproducibly.
-    preserveFileTimestamps false
-    reproducibleFileOrder true
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 
     // Because why not?
     manifest {

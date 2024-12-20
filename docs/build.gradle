@@ -68,8 +68,15 @@ final List<String> asciidoctorArgs = [
   "**/dream/dream.adoc"
 ]
 
+// see https://docs.gradle.org/current/userguide/service_injection.html#execoperations
+
+interface InjectedExecOps {
+  @Inject //@javax.inject.Inject
+  ExecOperations getExecOps()
+}
+
 ext.asciidoctorRun = { additionalArguments ->
-  exec {
+  project.objects.newInstance(InjectedExecOps).execOps.exec {
     executable = "asciidoctor"
     args = additionalArguments + asciidoctorArgs
   }

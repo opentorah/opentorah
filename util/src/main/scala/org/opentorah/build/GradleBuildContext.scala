@@ -5,13 +5,13 @@ import org.gradle.api.artifacts.{Configuration, Dependency}
 import org.gradle.api.artifacts.repositories.{ArtifactRepository, IvyArtifactRepository, IvyPatternRepositoryLayout}
 import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.SourceSet
-import org.gradle.process.JavaExecSpec
+import org.gradle.process.{ExecOperations, JavaExecSpec}
 import org.slf4j.Logger
 import java.io.File
 import Gradle.getMainSourceSet
 import scala.jdk.CollectionConverters.*
 
-final class GradleBuildContext(project: Project) extends BuildContext:
+final class GradleBuildContext(project: Project, execOperations: ExecOperations) extends BuildContext:
   override def frameworks: File = project.getGradle.getGradleUserHomeDir
 
   override def lifecycle(message: String): Unit = project.getLogger.lifecycle(message)
@@ -83,7 +83,7 @@ final class GradleBuildContext(project: Project) extends BuildContext:
   override def javaexec(mainClass: String, args: String*): Unit =
     getLogger.info(s"Running $mainClass(${args.mkString(", ")})")
 
-    project.javaexec((exec: JavaExecSpec) =>
+    execOperations.javaexec((exec: JavaExecSpec) =>
       exec.setClasspath(project.getMainSourceSet.getRuntimeClasspath)
       exec.getMainClass.set(mainClass)
       exec.args(args*)

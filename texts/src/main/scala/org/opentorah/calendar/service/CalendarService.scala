@@ -7,7 +7,7 @@ import org.opentorah.util.Logging
 import org.slf4j.LoggerFactory
 import zio.http.codec.PathCodec
 import zio.http.codec.PathCodec.empty
-import zio.http.{Body, Handler, handler, Header, Headers, HttpApp, MediaType, Method, Request, Response, Routes, Server, Status, string}
+import zio.http.{Body, Handler, handler, Header, Headers, MediaType, Method, Request, Response, Routes, Server, Status, string}
 import zio.{ZIO, ZLayer}
 
 /*
