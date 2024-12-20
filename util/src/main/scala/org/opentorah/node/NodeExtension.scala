@@ -4,12 +4,14 @@ import org.gradle.api.{DefaultTask, Project}
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.provider.{ListProperty, Property}
 import org.gradle.api.tasks.{Input, TaskAction}
+import org.gradle.process.ExecOperations
 import org.opentorah.build.{Gradle, GradleBuildContext, Version}
 import javax.inject.Inject
 import java.io.File
 import Gradle.*
 
-abstract class NodeExtension @Inject(project: Project):
+// TODO eliminate the use of Task.getProject!
+abstract class NodeExtension @Inject(project: Project, execOperations: ExecOperations):
   def getVersion: Property[String]
   def version: Option[String] = getVersion.toOption
 
@@ -23,7 +25,7 @@ abstract class NodeExtension @Inject(project: Project):
         NodeInstallation.fromOs.get
       case Some(version) =>
         NodeDependency.withVersion(Version(version)).getInstallation(
-          GradleBuildContext(project),
+          GradleBuildContext(project, execOperations),
           installIfDoesNotExist = installIfDoesNotExist,
           mustExist = true
         )
@@ -52,8 +54,8 @@ abstract class NodeExtension @Inject(project: Project):
 object NodeExtension:
   def addTo(project: Project): Unit =
     project.getExtensions.create("node", classOf[NodeExtension])
-    project.getTasks.create("npm" , classOf[NpmTask])
-    project.getTasks.create("node", classOf[NodeTask])
+    project.getTasks.register("npm" , classOf[NpmTask])
+    project.getTasks.register("node", classOf[NodeTask])
 
   def get(project: Project): NodeExtension = project.getExtensions.getByType(classOf[NodeExtension])
 

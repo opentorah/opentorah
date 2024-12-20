@@ -3,11 +3,7 @@ plugins {
   id 'scala'
   id 'maven-publish'
   id 'signing'
-  id 'com.github.maiflai.scalatest'
-// TODO: when scalajs plugin is applied here, Gradle errors out
-// failing to load 'org/opentorah/build/Gradle$' - is it because this is the project that has it?
-//  id 'org.podval.tools.scalajs'
-// as a result, this is the only subproject of the 'opentorah' that uses maifli ScalaTest plugin...
+  id 'org.podval.tools.scalajs'
 }
 
 description = 'Open Torah Util'
@@ -27,10 +23,6 @@ dependencies {
 
   // Needed to compile classes using Gradle, but does not become a dependency:
   compileOnly gradleApi()
-
-  // for scalatest reports when using maiflai ScalaTest plugin:
-  testImplementation libs.flexmark.core
-  testImplementation libs.flexmark.profile.pegdown
 
   testImplementation libs.zio.test
   //testImplementation libs.zio.prelude
