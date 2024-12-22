@@ -20,6 +20,8 @@ idea {
 // There is no Java in the project :)
 project.gradle.startParameter.excludedTaskNames.add('compileJava')
 
-// TODO is this needed?
-group = 'org.opentorah'
-version = '0.10.13'
+// TODO eliminate the use of `subprojects` - move this into `configure.gradle`?
+subprojects {
+  group = 'org.opentorah'
+  version = '0.10.13'
+}

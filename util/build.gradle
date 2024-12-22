@@ -3,7 +3,9 @@ plugins {
   id 'scala'
   id 'maven-publish'
   id 'signing'
-  id 'org.podval.tools.scalajs'
+  // TODO this still breaks *sometimes*, but I do not want to use maiflai plugin any more
+  // (also, it is not compatible with Gradle 8.11...)
+//  id 'org.podval.tools.scalajs'
 }
 
 description = 'Open Torah Util'
