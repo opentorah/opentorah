@@ -36,7 +36,7 @@ dependencyResolutionManagement {
     // Scala
     library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
     library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.3.0")
-    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.10.5')
+    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.10.7')
 
     // XML
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
@@ -68,7 +68,7 @@ dependencyResolutionManagement {
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.16')
-    library('logback' , 'ch.qos.logback:logback-classic:1.5.15')
+    library('logback' , 'ch.qos.logback:logback-classic:1.5.16')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:8.0')
 
     // Flexmark

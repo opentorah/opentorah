@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.14] - 2025-01-07
+- chore: dependency updates
+- fix: OS detection fails in macOS  https://github.com/opentorah/opentorah/issues/341
+
 ## [0.10.13] - 2024-12-22
 - chore: Gradle 8.12 and related updates
 - chore: dependency updates
