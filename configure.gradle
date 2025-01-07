@@ -1,4 +1,6 @@
-// Scala
+project.version = '0.10.14'
+project.group = 'org.opentorah'
+
 dependencies {
   implementation libs.scala.library
 
@@ -44,7 +46,7 @@ test {
 
 // library: all projects are configured as a library (except for the docs one);
 // with the latest Gradle plugin publishing plugin, uploading of it as a library started failing, so I disabled it...
-if (project.name != 'docs' && project.name != 'opentorah-docbook') {
+if (project.name != 'docs') {
   final String gitHubRepository = "opentorah/opentorah"
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String orgName = 'Open Torah Project'
