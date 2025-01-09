@@ -1,15 +1,14 @@
 package org.opentorah.build
 
 import org.opentorah.util.{Files, Strings}
-import scala.jdk.CollectionConverters.*
 import java.io.File
 
 trait DependencyData:
   def group: Option[String]
   def artifactName: String
-  def version: Version
   def classifier: Option[String]
   def extension: Option[String]
+  def version: Version
 
   final def dependencyNotation: String =
     val classifierStr: String = Strings.prefix(":", classifier)

@@ -101,10 +101,7 @@ object Gradle:
         )
 
     result
-
-  def log(project: Project, logLevel: LogLevel): String => Unit =
-    (message: String) => project.getLogger.log(logLevel, message)
-
+  
   def findOnClassPath(obj: AnyRef, name: String): URL =
     var result: Option[URL] = None
 

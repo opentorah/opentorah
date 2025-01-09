@@ -6,7 +6,7 @@ pluginManagement {
 
   plugins {
     id 'com.github.ben-manes.versions' version '0.44.0'
-    id 'org.podval.tools.scalajs'      version '0.4.13'
+    id 'org.podval.tools.scalajs'      version '0.4.15'
     id 'com.google.cloud.tools.jib'    version '3.4.4'
     id 'org.podval.tools.cloudrun'     version '0.4.0'
     id 'com.gradle.plugin-publish'     version '1.2.1'
@@ -43,7 +43,7 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.46.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.47.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")

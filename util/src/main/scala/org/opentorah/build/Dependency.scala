@@ -8,7 +8,7 @@ trait Dependency extends DependencyCoordinates:
 
   def artifactName: String
 
-  def withVersion(version: Version): Dependency.WithVersion =
+  final def withVersion(version: Version): Dependency.WithVersion =
     Dependency.WithVersion(dependency = this, version)
 
 object Dependency:
