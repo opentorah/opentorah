@@ -1,82 +1,26 @@
 package org.opentorah.node
 
-import org.gradle.api.{DefaultTask, Project}
-import org.gradle.api.logging.LogLevel
+import org.gradle.api.Project
 import org.gradle.api.provider.{ListProperty, Property}
-import org.gradle.api.tasks.{Input, TaskAction}
 import org.gradle.process.ExecOperations
-import org.opentorah.build.{Gradle, GradleBuildContext, Version}
+import org.opentorah.build.Gradle.*
+import org.opentorah.build.GradleBuildContext
 import javax.inject.Inject
-import java.io.File
-import Gradle.*
 
-// TODO eliminate the use of Task.getProject!
 abstract class NodeExtension @Inject(project: Project, execOperations: ExecOperations):
   def getVersion: Property[String]
-  def version: Option[String] = getVersion.toOption
 
   def getModules: ListProperty[String]
-  def modules: List[String] = getModules.toList
 
-  def node: Node = node(installIfDoesNotExist = false)
-  def node(installIfDoesNotExist: Boolean): Node =
-    val installation: NodeInstallation = version match
-      case None =>
-        NodeInstallation.fromOs.get
-      case Some(version) =>
-        NodeDependency.withVersion(Version(version)).getInstallation(
-          GradleBuildContext(project, execOperations),
-          installIfDoesNotExist = installIfDoesNotExist,
-          mustExist = true
-        )
-
-    installation.getNode(nodeModulesParent = project.getProjectDir)
-
-  def node(arguments: String): Unit = node(arguments, LogLevel.LIFECYCLE)
-  def node(arguments: String, logLevel: LogLevel): Unit = node.node(arguments, Gradle.log(project, logLevel))
-
-  def npm(arguments: String): Unit = npm(arguments, LogLevel.LIFECYCLE)
-  def npm(arguments: String, logLevel: LogLevel): Unit = node.npm(arguments, Gradle.log(project, logLevel))
-
-  def setUpProject(requiredModules: List[String]): Unit =
-    val isProjectSetUp: Boolean = File(project.getProjectDir, "package.json").exists
-
-    // Initialize Node project
-    if !isProjectSetUp then npm(arguments = "init private")
-
-    // Install Node modules
-    node.mkNodeModules()
-    npm(
-      arguments = "install " + (requiredModules ++ modules).mkString(" "),
-      logLevel = if isProjectSetUp then LogLevel.INFO else LogLevel.LIFECYCLE
-    )
+  def ensureNodeIsInstalled(): Unit = NodeDependency.getInstalledOrInstall(
+    version = getVersion.toOption,
+    context = GradleBuildContext(project, execOperations)
+  )
 
 object NodeExtension:
   def addTo(project: Project): Unit =
     project.getExtensions.create("node", classOf[NodeExtension])
-    project.getTasks.register("npm" , classOf[NpmTask])
-    project.getTasks.register("node", classOf[NodeTask])
+    project.getTasks.register("npm" , classOf[NodeTask.NpmRunTask])
+    project.getTasks.register("node", classOf[NodeTask.NodeRunTask])
 
   def get(project: Project): NodeExtension = project.getExtensions.getByType(classOf[NodeExtension])
-
-  class NodeTask extends DefaultTask:
-    setGroup("other")
-    setDescription("Run commands with 'node'")
-
-    private var arguments: String = ""
-    @TaskAction def execute(): Unit = get(getProject).node(arguments)
-    @Input def getArguments: String = arguments
-
-    @org.gradle.api.tasks.options.Option(option = "node-arguments", description = "The command to execute with 'node'")
-    def setArguments(value: String): Unit = arguments = value
-
-  class NpmTask extends DefaultTask:
-    setGroup("other")
-    setDescription("Run commands with 'npm'")
-
-    private var arguments: String = ""
-    @TaskAction def execute(): Unit = get(getProject).npm(arguments)
-    @Input def getArguments: String = arguments
-
-    @org.gradle.api.tasks.options.Option(option = "npm-arguments", description = "The command to execute with 'npm'")
-    def setArguments(value: String): Unit = arguments = value

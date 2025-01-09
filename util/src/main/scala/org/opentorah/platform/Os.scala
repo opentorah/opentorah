@@ -6,13 +6,15 @@ trait Os derives CanEqual:
   def is(name: String): Boolean
 
 object Os:
+  private def isLinux(name: String): Boolean = name.startsWith("Lin")
+  
+  private def isAndroid: Boolean = System.getProperty("java.specification.vendor").contains("Android")
+  
   case object Android extends Os:
-    override def is(name: String): Boolean = 
-      Linux.is(name) &&
-      System.getProperty("java.specification.vendor").contains("Android")
+    override def is(name: String): Boolean = isLinux(name) && isAndroid
 
   case object Linux extends Os:
-    override def is(name: String): Boolean = name.startsWith("Lin")
+    override def is(name: String): Boolean = isLinux(name) && !isAndroid
     override def hasUname: Boolean = true
 
   case object Mac extends Os:
@@ -32,7 +34,6 @@ object Os:
   case object SunOS extends Os:
     override def is(name: String): Boolean = name.startsWith("Sun")
 
-  // Android is always Linux and thus has to be earlier in the list:
   val values: Seq[Os] = Seq(Android, Linux, Mac, Windows, Aix, FreeBSD, SunOS)
 
   def getName: String = System.getProperty("os.name")

@@ -16,7 +16,7 @@ final class Node(
   val nodeEnv: Seq[(String, String)] = Seq(("NODE_PATH", nodeModules.getAbsolutePath))
 
   def node(arguments: String, log: String => Unit): String = run(
-    command = installation.nodeExec,
+    command = installation.node,
     commandName = "node",
     arguments,
     cwd = None,
@@ -25,13 +25,13 @@ final class Node(
   )
 
   def npm(arguments: String, log: String => Unit): String = run(
-    command = installation.npmExec,
+    command = installation.npm,
     commandName = "npm",
     arguments,
     // in local mode, npm puts packages into node_modules under the current working directory
     cwd = Some(nodeModulesParent),
     // TODO do I need the system path here?
-    extraEnv = nodeEnv ++ Seq(("PATH", installation.getBin.getAbsolutePath + ":" + System.getenv("PATH"))),
+    extraEnv = nodeEnv ++ Seq(("PATH", installation.bin.getAbsolutePath + ":" + System.getenv("PATH"))),
     log
   )
 

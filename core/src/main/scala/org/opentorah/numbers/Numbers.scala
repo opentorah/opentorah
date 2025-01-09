@@ -24,6 +24,8 @@ import org.opentorah.util.WithValues
  * Indeed, there is not much difference between the two when we are talking about angles.
  * However, for dates (`Point`s) it makes sense to ask what year/month the date is in -
  * but not for time intervals (`Vector`s)!
+ * 
+ * TODO look at https://antoine-doeraene.medium.com/fun-with-types-all-types-of-physics-computations-fb2967245ff3
  */
 trait Numbers extends NumbersBase:
 

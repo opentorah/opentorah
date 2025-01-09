@@ -1,7 +1,7 @@
 package org.opentorah.node
 
 import org.opentorah.build.{Dependency, InstallableDependency, Repository, Version}
-import org.opentorah.platform.{Architecture, Os}
+import org.opentorah.platform.{Architecture, Exec, Os}
 import org.opentorah.util.Strings
 import java.io.File
 import java.nio.file.{Files, Path, Paths}
@@ -11,7 +11,7 @@ import java.nio.file.{Files, Path, Paths}
 // and I do not want to apply Node plugin to every project that uses DocBook, for instance.
 // Also, I want to be able to run npm from within my code without creating tasks.
 // Also, I would like to be able to use Node available via GraalVM's polyglot support.
-// My simplified Node support is under 200 lines.
+// My simplified Node support is under 300 lines.
 
 // Describes Node distribution's packaging and structure.
 object NodeDependency extends Dependency.Simple(
@@ -86,20 +86,28 @@ object NodeDependency extends Dependency.Simple(
     val bin: File = if !isWindows then File(root, "bin") else root
 
     NodeInstallation(
-      nodeExec = File(bin, if isWindows then "node.exe" else "node"),
-      npmExec  = File(bin, if isWindows then "npm.cmd"  else "npm" )
+      node = File(bin, if isWindows then "node.exe" else "node"),
+      npm  = File(bin, if isWindows then "npm.cmd"  else "npm" )
     )
 
   override def exists(installation: NodeInstallation): Boolean =
-    installation.nodeExec.exists && installation.npmExec.exists
+    installation.node.exists && installation.npm.exists
 
   override def fixup(installation: NodeInstallation): Unit = if !isWindows then
-    val npm: Path = installation.npmExec.toPath
+    val npm: Path = installation.npm.toPath
     val deleted: Boolean = Files.deleteIfExists(npm)
     if deleted then
-      val root: File = installation.getRoot
-      val npmCliJs: String = File(root, s"lib/node_modules/npm/bin/npm-cli.js").getAbsolutePath
+      val npmCliJs: String = File(installation.root, s"lib/node_modules/npm/bin/npm-cli.js").getAbsolutePath
       Files.createSymbolicLink(
         npm,
         npm.getParent.relativize(Paths.get(npmCliJs))
       )
+
+  override def fromOs: Option[NodeInstallation] = if Os.get == Os.Windows then None else
+    for
+      node <- Exec.which("node")
+      npm <- Exec.which("npm")
+    yield NodeInstallation(
+      node,
+      npm
+    )
