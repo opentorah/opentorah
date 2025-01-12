@@ -94,17 +94,12 @@ Historically, thematically cohesive packages were relegated to separate Gradle m
 separate repositories. This approach helps enforce layered architecture: no imports of the higher layer types in the
 lower layers. It also helps to trim down unneeded dependencies when using specific subset of the functionality.
 
-Since I am just about the only user of the code, the latter reason is not compelling: nobody is using just the FOP
-functionality, and it doesn't really matter if the DocBook plugin drags in the Jewish calendar code that it
-does not use, since it is not deployed in any resources-constrained service.
+Since I am just about the only user of the code, the latter reason is not compelling.
 
 The first reason is not that compelling either: Gradle doesn't block cyclical inter-module dependencies completely.
 Besides, relying on Gradle in this respect means putting every cohesive package in a separate module, which seems excessive.
 
 As a result, I currently use the fewest number of modules approach: code is separated in a module only if it needs
-to be deployed separately, as a website (docs), a plugin (docbook), or a service (collector, texts).
-
-If it turns out that the amount of DocBook-related code that gets moved into the core module and ends up being
-included in the services I run is problematic, I'll think about splitting it out.
+to be deployed separately, as a website (docs), or a service (collector, texts).
 
 If users that need just the calendar code appear, I'll think about splitting that ;)

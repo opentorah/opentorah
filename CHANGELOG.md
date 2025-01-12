@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.16] - 2025-01-17
+- cleanup: remove more mentions of DocBook
+- fix: eliminated invalid call to Project.afterEvaluate() in TaskWithNode
+- chore: Java 21
+- chore: removed calls to deprecated URL constructors
+- chore: Scala 3.6.3/2.13.16
+- chore: Gradle cleanup
+
 ## [0.10.15] - 2025-01-11
 - cleanup: util: build, node
 - fix: eliminated calls to Task.getProject() during task execution

@@ -1,4 +1,4 @@
-project.version = '0.10.15'
+project.version = '0.10.16'
 project.group = 'org.opentorah'
 
 dependencies {
@@ -18,8 +18,7 @@ dependencies {
 
 // Note: starting with Gradle 8.0, without explicit toolchain specification, Java 8 gets picked up
 // even when Gradle itself runs on Java 11?!
-// TODO it seems that this causes `bad option '-target:11' was ignored` from the Scala compiler though...
-java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 tasks.withType(ScalaCompile).configureEach {
   scalaCompileOptions.with {
