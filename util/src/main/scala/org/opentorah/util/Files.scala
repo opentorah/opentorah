@@ -58,17 +58,17 @@ object Files:
 
   def string2url(string: String): URL = URI.create(string).toURL
 
-  def subdirectory(url: URL, subdirectoryName: String): URL = URL(url, subdirectoryName + "/")
+  def subdirectory(url: URL, subdirectoryName: String): URL = subUrl(url, subdirectoryName + "/")
 
-  def fileInDirectory(url: URL, fileName: String): URL = URL(url, fileName)
+  def fileInDirectory(url: URL, fileName: String): URL = subUrl(url, fileName)
 
-  def pathUnder(url: URL, path: String): URL = URL(url, if path.startsWith("/") then path.drop(1) else path)
+  def pathUnder(url: URL, path: String): URL = subUrl(url, if path.startsWith("/") then path.drop(1) else path)
+
+  def subUrl(base: Option[URL], url: String): URL = base.fold(URI(url).toURL)(subUrl(_, url))
+
+  private def subUrl(base: URL, url: String): URL = base.toURI.resolve(url).toURL
 
   //def getParent(url: URL): URL = new URL(url, "..")
-
-  def subUrl(base: Option[URL], url: String): URL = base.fold(URL(url))(new URL(_, url))
-  private def subUrl(base: URL, url: String): URL = URL(base, url)
-  def subFile(base: URL, url: String): File = url2file(subUrl(base, url))
 
   def splitUrl(urlRaw: String): Seq[String] =
     val url: String = if urlRaw.isEmpty then "/" else urlRaw

@@ -8,8 +8,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.SourceSet
 import org.gradle.process.{ExecOperations, JavaExecSpec}
 import java.io.File
-import Gradle.getMainSourceSet
-import scala.jdk.CollectionConverters.*
+import Gradle.getSourceSet
 
 final class GradleBuildContext(project: Project, execOperations: ExecOperations)
   extends GradleBuildContextCore(
@@ -82,7 +81,7 @@ final class GradleBuildContext(project: Project, execOperations: ExecOperations)
     info(s"Running $mainClass(${args.mkString(", ")})")
 
     execOperations.javaexec((exec: JavaExecSpec) =>
-      exec.setClasspath(project.getMainSourceSet.getRuntimeClasspath)
+      exec.setClasspath(project.getSourceSet(SourceSet.MAIN_SOURCE_SET_NAME).getRuntimeClasspath)
       exec.getMainClass.set(mainClass)
       exec.args(args*)
       ()

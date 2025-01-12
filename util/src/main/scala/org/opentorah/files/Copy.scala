@@ -4,7 +4,7 @@ import org.opentorah.util.Files
 import java.io.File
 
 // This is a replacement for Gradle-supplied Ant functionality for copying a bunch of files
-// with or without substitutions. I need this since I want DocBook functionality to be usable
+// with or without substitutions. I need this since I wanted DocBook functionality to be usable
 // outside of Gradle.
 // Also, black-boxiness of the Ant stuff with its `"tokens" => ...` was just too much; good riddance!
 private class Copy(substitutions: Map[String, String]):

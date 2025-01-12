@@ -7,20 +7,17 @@ import org.gradle.api.tasks.Input
 import org.opentorah.build.GradleBuildContextCore
 import org.opentorah.build.Gradle.*
 import java.io.File
+import scala.jdk.CollectionConverters.ListHasAsScala
 
 trait TaskWithNode extends Task:
+  // To avoid invoking Task.getProject at execution time, some things are set at task creation:
   @Input def getVersion: Property[String]
+  getVersion.set(NodeExtension.get(getProject).getVersion)
   @Input def getModules: ListProperty[String]
-  // To avoid invoking Task.getProject at execution time, some things are at task creation:
+  getModules.set(NodeExtension.get(getProject).getModules)
   private val gradleUserHomeDir: File = getProject.getGradle.getGradleUserHomeDir
   private val projectDir: File = getProject.getProjectDir
 
-  getProject.afterEvaluate((project: Project) =>
-    val nodeExtension: NodeExtension = NodeExtension.get(project)
-    getVersion.set(nodeExtension.getVersion)
-    getModules.set(nodeExtension.getModules)
-  )
-  
   def node: Node = NodeDependency
     .getInstalled(
       version = getVersion.toOption, 
@@ -43,6 +40,6 @@ trait TaskWithNode extends Task:
     // Install Node modules
     node.mkNodeModules()
     npm(
-      arguments = "install " + (requiredModules ++ getModules.toList).mkString(" "),
+      arguments = "install " + (requiredModules ++ getModules.get.asScala.toList).mkString(" "),
       logLevel = if isProjectSetUp then LogLevel.INFO else LogLevel.LIFECYCLE
     )
