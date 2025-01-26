@@ -9,10 +9,6 @@ object Strings:
     case -1 => (what, None)
     case index => (what.substring(0, index), Some(what.substring(index+1)))
 
-  def splitRight(what: String, on: Char): (Option[String], String) = what.lastIndexOf(on) match
-    case -1 => (None, what)
-    case index => (Some(what.substring(0, index)), what.substring(index+1))
-
   def squashBigWhitespace(what: String): String = what
     .replace('\n', ' ')
     .replace('\t', ' ')
@@ -43,10 +39,7 @@ object Strings:
     val sb = new scala.collection.mutable.StringBuilder
     f(sb)
     sb.toString
-
-  def empty2none(string: String): Option[String] =
-    if string == null || string.isEmpty then None else Some(string)
-
+  
   def string2stream(string: String): InputStream = ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))
 
   def drop(from: String, prefix: String): String =
@@ -61,16 +54,3 @@ object Strings:
     val sb: scala.collection.mutable.StringBuilder = scala.collection.mutable.StringBuilder(2 * bytes.length)
     for b: Byte <- bytes do sb.append(hexDigits((b >> 4) & 0xf)).append(hexDigits(b & 0xf))
     sb.toString
-
-  def toList(string: Option[String]): List[String] = string.fold(List.empty)(toList)
-  def toList(string: String): List[String] = string.split(",").toList.map(_.trim).filterNot(_.isEmpty)
-
-  def fromListOption(strings: List[String]): Option[String] =
-    if strings.nonEmpty then Some(fromList(strings)) else None
-    
-  def fromList(strings: List[String]): String = strings.mkString(",")
-
-  def toMap(string: String): Map[String, String] = toList(string).map(substitution =>
-    val (name: String, value: Option[String]) = split(substitution, '=')
-    (name, value.get)
-  ).toMap

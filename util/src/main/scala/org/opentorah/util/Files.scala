@@ -67,9 +67,7 @@ object Files:
   def subUrl(base: Option[URL], url: String): URL = base.fold(URI(url).toURL)(subUrl(_, url))
 
   private def subUrl(base: URL, url: String): URL = base.toURI.resolve(url).toURL
-
-  //def getParent(url: URL): URL = new URL(url, "..")
-
+  
   def splitUrl(urlRaw: String): Seq[String] =
     val url: String = if urlRaw.isEmpty then "/" else urlRaw
     val startsWithSlash: Boolean = url.startsWith("/")

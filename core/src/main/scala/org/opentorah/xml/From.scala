@@ -1,7 +1,6 @@
 package org.opentorah.xml
 
-import org.opentorah.platform.Platform
-import org.opentorah.util.{Effects, Files}
+import org.opentorah.util.{ClassName, Effects, Files}
 import org.xml.sax.{ErrorHandler, InputSource, SAXParseException, XMLReader}
 import org.slf4j.{Logger, LoggerFactory}
 import scala.xml.XML
@@ -92,7 +91,7 @@ object From:
 
   def resourceNamed(obj: AnyRef, name: String, fixXercesXIncludes: Boolean = true): From =
     FromResource(obj.getClass, name, fixXercesXIncludes)
-  def resource(obj: AnyRef): From = resourceNamed(obj, Platform.className(obj))
+  def resource(obj: AnyRef): From = resourceNamed(obj, ClassName.get(obj))
 
   private def read(
     processIncludes: ProcessIncludes,
