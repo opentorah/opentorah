@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.platform.Platform
-import org.opentorah.util.Effects
+import org.opentorah.util.{ClassName, Effects}
 import org.opentorah.xml.{ElementsTo, From, Parser}
 
 trait HasName(nameOverride: Option[String]):
@@ -17,7 +16,7 @@ object HasName:
 
   trait NonEnum extends HasName:
     self: HasName =>
-    final override protected def defaultName: String = Platform.className(this)
+    final override protected def defaultName: String = ClassName.get(this)
 
   def load[K <: HasName, M](
     from: From,

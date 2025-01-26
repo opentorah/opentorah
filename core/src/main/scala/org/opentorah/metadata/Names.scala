@@ -1,7 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.platform.Platform
-import org.opentorah.util.{Collections, Effects}
+import org.opentorah.util.{ClassName, Collections, Effects}
 import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 import zio.ZIO
 
@@ -86,7 +85,7 @@ object Names:
     // This is lazy to allow correct initialization:
     // Language metadata file references Language instances by name :)
     final lazy val toNames: Map[Key, Names] = Parser.unsafeRun(HasName.load[Key, Names](
-      from = From.resourceNamed(this, resourceNameOverride.getOrElse(Platform.className(this))),
+      from = From.resourceNamed(this, resourceNameOverride.getOrElse(ClassName.get(this))),
       content = Names.NamesMetadata,
       keys = valuesSeq,
       hasName = (metadata: Names, name: String) => metadata.hasName(name)
