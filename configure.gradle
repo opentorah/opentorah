@@ -1,11 +1,9 @@
 project.version = '0.10.16'
 project.group = 'org.opentorah'
 
+scala.scalaVersion = '3.7.4'
+
 dependencies {
-  implementation libs.scala.library
-
-  zinc libs.zinc
-
   compileOnly     libs.slf4j
   testRuntimeOnly libs.logback
 
@@ -143,8 +141,8 @@ if (project.name != 'docs') {
 
   signing {
     useInMemoryPgpKeys(
-      findProperty('gnupg.dub-opentorah-org.key').toString(),
-      findProperty('gnupg.dub-opentorah-org.password').toString()
+      findProperty('signingKey').toString(),
+      findProperty('signingPassword').toString()
     )
     sign publishing.publications.library
   }

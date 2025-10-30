@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.10.17] - 2025-01-
-- chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin
+## [0.10.17] - 2025-
+- chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin;
+- chore: dependency updates;
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook
