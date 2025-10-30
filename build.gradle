@@ -2,6 +2,7 @@ plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
+  id 'com.gradleup.nmcp.aggregation' version '1.2.0'
 }
 
 wrapper {
@@ -19,3 +20,30 @@ idea {
 
 // There is no Java in the project :)
 project.gradle.startParameter.excludedTaskNames.add('compileJava')
+
+// ./gradlew nmcpZipAggregation - to see what will be published
+// ./gradlew publishAggregationToCentralPortal - to publish
+// https://central.sonatype.com/publishing/deployments - to release
+nmcpAggregation {
+  // Publish all projects that apply the 'maven-publish' plugin
+  publishAllProjectsProbablyBreakingProjectIsolation()
+
+  centralPortal {
+    publishingType = "USER_MANAGED"
+    username = findProperty('mavenCentralUsername') as String
+    password = findProperty('mavenCentralPassword') as String
+  }
+}
+
+def isNonStable = { String version ->
+    boolean stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    String regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+// dependencyUpdates.revision = 'release'
+tasks.named("dependencyUpdates").configure {
+  rejectVersionIf {
+    isNonStable(it.candidate.version)
+  }
+}

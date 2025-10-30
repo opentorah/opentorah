@@ -1,9 +1,9 @@
 plugins {
   id 'java-library'
   id 'scala'
-  id 'org.podval.tools.scalajs'
   id 'maven-publish'
   id 'signing'
+  id 'org.podval.tools.scalajs'
 }
 
 description = 'Jewish Texts, Readings and Learning Schedules'

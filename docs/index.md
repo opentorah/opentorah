@@ -7,9 +7,9 @@ The Open Torah project produces a number of websites, papers and code packages.
 ## Websites ##
 
 In addition to the main website www.opentorah.org, the project maintains:
-- digital edition of Rabbi Wichnin's Chumash Questions book: www.chumashquestions.org;
+- digital edition of Rabbi Wichnin's Chumash Questions book: [www.chumashquestions.org](https://www.chumashquestions.org);
 - archive documents from the early history of Chabad
- (including the arrests of the Alter Rebbe in 1798 and 1800): www.alter-rebbe.org.
+ (including the arrests of the Alter Rebbe in 1798 and 1800): [www.alter-rebbe.org](https://www.alter-rebbe.org).
 
 ## Papers ##
 - [paper](/paper/calendar/calendar.html) on Rambam's Laws of the Sanctification of the Moon;

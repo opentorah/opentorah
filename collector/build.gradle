@@ -30,7 +30,7 @@ jib.from.image = 'adoptopenjdk:11'
 jib.container.mainClass = 'org.opentorah.collector.Collector'
 
 cloudRun.region = 'us-east4'
-cloudRun.serviceAccountKeyProperty ='cloud-run-deploy_alter-rebbe-2'
+cloudRun.serviceAccountKeyProperty ='CLOUD_RUN_DEPLOY_KEY'
 
 tasks.register('cloudRunLocalFromLocalStore', org.podval.tools.cloudrun.CloudRunPlugin.RunLocalTask)
 cloudRunLocalFromLocalStore.additionalOptions = [

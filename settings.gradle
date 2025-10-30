@@ -5,20 +5,19 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.44.0'
-    id 'org.podval.tools.scalajs'      version '0.4.15'
-    id 'com.google.cloud.tools.jib'    version '3.4.4'
-    id 'org.podval.tools.cloudrun'     version '0.4.1'
+    id 'com.github.ben-manes.versions' version '0.53.0'
+    id 'org.podval.tools.scalajs'      version '0.9.14'
+    id 'com.google.cloud.tools.jib'    version '3.4.5'
+    id 'org.podval.tools.cloudrun'     version '0.4.2'
     id 'com.gradle.plugin-publish'     version '1.2.1'
   }
 }
 
-final String scalaVersion      = '3.6.3'
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.1.14'
+final String zioVersion        = '2.1.22'
 final String flexmarkVersion   = '0.64.8'
-final String catsVersion       = '2.12.0'
+final String catsVersion       = '2.13.0'
 
 dependencyResolutionManagement {
   repositories {
@@ -34,22 +33,20 @@ dependencyResolutionManagement {
   // - this way both plugin and dependency versions are in the same file.
   versionCatalogs {libs {
     // Scala
-    library('scala-library', "org.scala-lang:scala3-library_3:$scalaVersion")
-    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.3.0")
-    library('zinc'         , 'org.scala-sbt:zinc_2.13:1.10.7')
+    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.4.0")
 
     // XML
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.47.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.60.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.0.1")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.5.1")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
@@ -64,12 +61,12 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.1.8')
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.2.3')
 
     // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.16')
-    library('logback' , 'ch.qos.logback:logback-classic:1.5.16')
-    library('logstash', 'net.logstash.logback:logstash-logback-encoder:8.0')
+    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.17')
+    library('logback' , 'ch.qos.logback:logback-classic:1.5.21')
+    library('logstash', 'net.logstash.logback:logstash-logback-encoder:9.0')
 
     // Flexmark
     library('flexmark-core'           , "com.vladsch.flexmark:flexmark:$flexmarkVersion")
@@ -82,7 +79,7 @@ dependencyResolutionManagement {
 
     // Testing
     library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.19")
-    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.18.1")
+    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.19.0")
   }}
 }
 
