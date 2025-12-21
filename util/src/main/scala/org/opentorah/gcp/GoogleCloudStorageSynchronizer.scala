@@ -1,7 +1,6 @@
 package org.opentorah.gcp
 
 import com.google.api.gax.paging.Page
-import com.google.auth.oauth2.ServiceAccountCredentials
 import com.google.cloud.WriteChannel
 import com.google.cloud.storage.{Blob, BlobId, BlobInfo, Storage, StorageOptions}
 import com.google.common.hash.Hashing
@@ -28,9 +27,10 @@ final class GoogleCloudStorageSynchronizer(
 
   private def log(message: String): Unit = logger.info(message)
 
-  private val storage: Storage = StorageOptions.newBuilder()
+  private val storage: Storage = StorageOptions
+    .newBuilder
     .setCredentials(GCPCredentials.fromString(serviceAccountKey))
-    .build()
+    .build
     .getService
 
   private def isDirectory(blob: Blob): Boolean = blob.getName.endsWith("/")
