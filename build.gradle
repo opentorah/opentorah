@@ -2,7 +2,7 @@ plugins {
   id 'com.github.ben-manes.versions'
   id 'idea'
   id 'base'
-  id 'com.gradleup.nmcp.aggregation' version '1.2.0'
+  id 'com.gradleup.nmcp.aggregation' version '1.4.4'
 }
 
 wrapper {
@@ -21,9 +21,11 @@ idea {
 // There is no Java in the project :)
 project.gradle.startParameter.excludedTaskNames.add('compileJava')
 
+// https://gradleup.com/nmcp/
 // ./gradlew nmcpZipAggregation - to see what will be published
 // ./gradlew publishAggregationToCentralPortal - to publish
 // https://central.sonatype.com/publishing/deployments - to release
+// TODO move to settings.gradle
 nmcpAggregation {
   // Publish all projects that apply the 'maven-publish' plugin
   publishAllProjectsProbablyBreakingProjectIsolation()
