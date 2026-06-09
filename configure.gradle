@@ -1,7 +1,7 @@
 project.version = '0.10.16'
 project.group = 'org.opentorah'
 
-scala.scalaVersion = '3.8.2'
+scala.scalaVersion = '3.8.4'
 
 dependencies {
   compileOnly     libs.slf4j
