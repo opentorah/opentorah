@@ -5,8 +5,8 @@ pluginManagement {
   }
 
   plugins {
-    id 'com.github.ben-manes.versions' version '0.53.0'
-    id 'org.podval.tools.scalajs'      version '1.0.0'
+    id 'com.github.ben-manes.versions' version '0.54.0'
+    id 'org.podval.tools.scalajs'      version '1.0.3'
     id 'com.google.cloud.tools.jib'    version '3.5.3'
     id 'org.podval.tools.cloudrun'     version '0.4.3'
     id 'com.gradle.plugin-publish'     version '1.2.1'
@@ -15,7 +15,7 @@ pluginManagement {
 
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.1.24'
+final String zioVersion        = '2.1.26'
 final String flexmarkVersion   = '0.64.8'
 final String catsVersion       = '2.13.0'
 
@@ -46,7 +46,7 @@ dependencyResolutionManagement {
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.10.1")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.2")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
@@ -61,11 +61,11 @@ dependencyResolutionManagement {
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,
     // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.2.3')
+    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.2.4')
 
     // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.17')
-    library('logback' , 'ch.qos.logback:logback-classic:1.5.32')
+    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.18')
+    library('logback' , 'ch.qos.logback:logback-classic:1.5.34')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:9.0')
 
     // Flexmark
@@ -78,7 +78,7 @@ dependencyResolutionManagement {
     library('zmanim', 'com.kosherjava:zmanim:2.5.0')
 
     // Testing
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.19")
+    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.20")
     library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.19.0")
   }}
 }
