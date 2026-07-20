@@ -2,7 +2,7 @@
 layout: post
 author: Leonid Dubinsky
 title:  "Welcome to alter-rebbe.org!"
-date:   2019-11-03 14:00:00 -0400
+date:   2019-11-03
 tags: [alter-rebbe.org]
 ---
 

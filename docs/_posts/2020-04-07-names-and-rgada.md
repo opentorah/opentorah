@@ -2,7 +2,7 @@
 layout: post
 author: Leonid Dubinsky
 title:  "Документы РГАДА готовы!"
-date:   2020-04-07 16:00:00 -0500
+date:   2020-04-07
 tags: [alter-rebbe.org, РГАДА]
 ---
 

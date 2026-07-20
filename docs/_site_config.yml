@@ -1,0 +1,13 @@
+title: "the Open Torah Project"
+description: "code, papers, books and historical documents"
+url: "http://www.opentorah.org"
+author: "Leonid Dubinsky"
+email: dub@opentorah.org
+timezone: "America/New_York"
+
+social:
+  github:  dubinsky
+  twitter: theopentorah
+
+#asciidoctor-extensions:
+#  - asciidoctor-bibtex

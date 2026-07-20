@@ -2,7 +2,7 @@
 layout: post
 author: Michael Koritz
 title:  "Новые фотографии"
-date:   2020-01-22 12:00:00 -0400
+date:   2020-01-22
 tags: [alter-rebbe.org]
 ---
 Добавлены (но еще не расшифрованы) фотографии нескольких дел из

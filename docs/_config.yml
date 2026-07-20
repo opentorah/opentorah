@@ -13,21 +13,11 @@ timezone: America/New_York
 github_username: dubinsky
 twitter_username: theopentorah
 
-# TODO Google Analytics?
-# google_analytics: UA-NNNNNNNN-N
-
 markdown: kramdown
 theme: minima
 
 plugins:
-#  - jekyll-avatar
-#  - jekyll-feed
-#  - jekyll-sitemap
 - jekyll-asciidoc
-
-# TODO add back the tags for the blog?
-#header_pages:
-#  - tags.html
 
 exclude:
   - build.gradle
