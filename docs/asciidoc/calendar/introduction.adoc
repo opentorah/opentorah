@@ -1,6 +1,6 @@
 [#introduction]
 [preface]
-== Introduction
+= Introduction
 
 In the "Laws of Sanctification of the Moon", Rambam gives algorithmic description of two calendars: fixed ("arithmetic") and observational ("astronomical").
 Both calendars are described in a form ready to be implemented, but the reasons for the calculation steps - especially for the astronomical calendar - are not always given: what are the models - and the formulae resulting from them - that reproduce the numbers?

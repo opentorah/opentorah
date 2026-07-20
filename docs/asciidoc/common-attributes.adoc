@@ -1,0 +1,26 @@
+// TODO set this in the publisher from metadata
+:author: Leonid Dubinsky
+:email: dub@opentorah.org
+// this has to be coordinated with the `build.gradle`
+:tablesdir: {docdir}/../../build/tables
+:commonDir: {docdir}/..
+:bibtex-file: {commonDir}/bibliography.bib
+:bibtex-order: alphabetical
+:bibtex-throw: true
+:bibtex-style: apa
+:toclevels: 1
+:sectlinks: true
+:sectanchors: true
+:hide-uri-scheme: true
+:reproducible: true
+:multipage-disable-css: true
+:linkcss: true
+:copycss: {commonDir}/styles.css
+:stylesdir: .
+:stylesheet: styles.css
+:docinfo: shared
+:docinfodir: {commonDir}
+
+
+
+

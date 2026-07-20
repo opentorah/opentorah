@@ -17,7 +17,7 @@ dependencies {
 }
 
 final File buildDirectory = layout.buildDirectory.asFile.get()
-final File tablesDir = file("$buildDirectory/docs/tables")
+final File tablesDir = file("$buildDirectory/tables")
 tasks.register('generateTables', JavaExec) {
   group = 'documentation'
   outputs.dir(tablesDir)
@@ -26,7 +26,7 @@ tasks.register('generateTables', JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
 }
 
-final File asciidocSourceDir = file("$projectDir/src/docs/asciidoc/")
+final File asciidocSourceDir = file("$projectDir/asciidoc/")
 final File asciidocOutputDir = file("$buildDirectory/docs/asciidoc")
 final File paperDir = file("$projectDir/paper")
 
@@ -35,31 +35,6 @@ final List<String> asciidoctorArgs = [
   '--verbose',
   '--trace',
   "--require=asciidoctor-bibtex",
-  "--attribute=tablesdir=$tablesDir",
-  "--attribute=reproducible=true",
-  "--attribute=linkcss=true",
-  "--attribute=multipage-disable-css=true",
-  "--attribute=copycss=$asciidocSourceDir/styles.css",
-  "--attribute=stylesdir=.",
-  "--attribute=stylesheet=styles.css",
-  "--attribute=docinfo=shared",
-  "--attribute=docinfodir=$asciidocSourceDir",
-  "--attribute=author=Leonid Dubinsky",
-  "--attribute=email=dub@opentorah.org",
-  "--attribute=toclevels=1",
-  "--attribute=multipage-level=1",
-  "--attribute=sectlinks=true",
-  "--attribute=sectanchors=true",
-  "--attribute=hide-uri-scheme=true",
-//    'bibliography-database': "$asciidocSourceDir/bibliography.bib",
-//    'bibliography-style': 'apa',
-  "--attribute=bibtex-file=$asciidocSourceDir/bibliography.bib",
-  "--attribute=bibtex-order=alphabetical",
-  "--attribute=bibtex-throw=true",
-  "--attribute=bibtex-style=apa",
-////    'bibtex-style': 'university-of-york-ieee'
-////    'bibtex-style': 'chicago-author-date'
-////    'bibtex-style': 'din-1505-2-alphanumeric',
 
   // Note: only when both the `--source-dir` is specified *and* there is a glob in the input files
   // does Asciidoctor preserve the directory structure: https://github.com/asciidoctor/asciidoctor/issues/1394

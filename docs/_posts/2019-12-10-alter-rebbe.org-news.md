@@ -2,7 +2,7 @@
 layout: post
 author: Michael Koritz
 title:  "Письмо вдовы Алтер Ребе"
-date:   2019-12-10 13:00:00 -0400
+date:   2019-12-10
 tags: [alter-rebbe.org]
 ---
 Новости сайта:

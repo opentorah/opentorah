@@ -1,0 +1,33 @@
+---
+chunk: true
+tags: [jewish, calendar]
+pdf: true
+---
+include::{docfile}/../../common-attributes.adoc[]
+
+= Rambam on Calendar
+:description: Rambam's laws of the sanctification of the Moon, translated, with some remarks
+:keywords: Rambam, calendar, astronomy
+:doctype: book
+:stem: latexmath
+:toc:
+:ltr: &#8206;
+:revnumber: 0.1
+
+include::colophon.adoc[]
+
+// include::dedication.adoc[]
+
+include::acknowledgements.adoc[]
+
+include::introduction.adoc[]
+
+include::remarks/remarks.adoc[leveloffset=+1]
+
+// include::kh-summary.adoc[]
+
+include::kh/kh.adoc[leveloffset=+1]
+
+include::glossary.adoc[]
+
+include::bibliography.adoc[leveloffset=+1]
