@@ -7,7 +7,7 @@ pluginManagement {
   plugins {
     id 'com.github.ben-manes.versions' version '0.54.0'
     id 'org.podval.tools.scalajs'      version '1.0.3'
-    id 'com.google.cloud.tools.jib'    version '3.5.3'
+    id 'com.google.cloud.tools.jib'    version '3.5.4'
     id 'org.podval.tools.cloudrun'     version '0.4.3'
     id 'com.gradle.plugin-publish'     version '1.2.1'
   }
@@ -40,13 +40,13 @@ dependencyResolutionManagement {
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.64.0')
+    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.70.0')
 
     // ZIO
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.2")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.3")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
@@ -65,7 +65,7 @@ dependencyResolutionManagement {
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.18')
-    library('logback' , 'ch.qos.logback:logback-classic:1.5.34')
+    library('logback' , 'ch.qos.logback:logback-classic:1.5.38')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:9.0')
 
     // Flexmark
