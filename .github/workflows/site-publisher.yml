@@ -48,10 +48,12 @@ jobs:
       - name: Generate Site using Site Publisher
         run: |
           cd $SITE_PUBLISHER_ROOT
-          ./gradlew run --args="$GITHUB_WORKSPACE --treat-errors-as-warnings=true"
+          ./gradlew run --args="$GITHUB_WORKSPACE/docs --treat-errors-as-warnings=true"
 
       - name: Upload GitHub Pages from './_site' as an Artifact
         uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/_site/
 
   # Deployment job
   deploy:

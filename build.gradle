@@ -1,5 +1,5 @@
 plugins {
-  id 'com.github.ben-manes.versions'
+  id 'io.github.ben-manes.versions'
   id 'idea'
   id 'base'
   id 'com.gradleup.nmcp.aggregation' version '1.6.1'
