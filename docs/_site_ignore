@@ -1,8 +1,5 @@
-paper
-asciidoc/docinfo.html
-asciidoc/common-attributes.adoc
-asciidoc/calendar/*
-!asciidoc/calendar/calendar.adoc
-!asciidoc/calendar/sun.svg
-#asciidoc/dream/*
-#asciidoc/typesetting/*
+paper/docinfo.html
+paper/common-attributes.adoc
+paper/calendar/*
+!paper/calendar/calendar.adoc
+!paper/calendar/sun.svg

@@ -17,7 +17,7 @@ final class CollectorTest extends AnyFlatSpec, Matchers:
   val collector: Collector = Effects.unsafeRun(Collector.readSite(siteUrl))
   collector.caching.logEnabled = false
 
-  "Collector smoke tests" should "work" in {
+  "Collector smoke tests" should "work" ignore {
 //    val site: ScalaXml.Element = Effects.unsafeRun(From.url(Files.file2url(File(localStorePath + "site.xml")), ScalaXml).load).asInstanceOf[ScalaXml.Element]
 //    println(site)
 

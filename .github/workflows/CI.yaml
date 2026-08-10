@@ -20,6 +20,9 @@ jobs:
           distribution: 'oracle'
           java-version: '21'
 
+      - name: "Build and test"
+        run: ./gradlew --no-daemon build
+
 #  disabled while working on fast-changing Markdown files...
 #      - name: "Build and push container image to GCR and deploy Cloud Run service"
 #        env:

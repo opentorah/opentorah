@@ -1,5 +1,3 @@
-include::{docfile}/../../common-attributes.adoc[]
-
 = Typesetting classic Jewish texts
 :doctype: article
 :toc:

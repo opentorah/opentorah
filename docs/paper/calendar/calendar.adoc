@@ -3,7 +3,8 @@ chunk: true
 tags: [jewish, calendar]
 pdf: true
 ---
-include::{docfile}/../../common-attributes.adoc[]
+
+:tablesdir: {docdir}/../../build/tables
 
 = Rambam on Calendar
 :description: Rambam's laws of the sanctification of the Moon, translated, with some remarks
