@@ -28,32 +28,17 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v6
 
-      # Site Publisher Steps
-
-      - name: Set up Java 21 used by the Site Publisher
-        uses: actions/setup-java@v5
+      - name: Generate Site
+        uses: dubinsky/site-publisher/.github/actions/generate@master
+        id: site
         with:
-          distribution: 'oracle'
-          java-version: '21'
-
-      - name: Set SITE_PUBLISHER_ROOT environment variable
-        run: echo "SITE_PUBLISHER_ROOT=.site_publisher" >> $GITHUB_ENV
-
-      - name: Check Out Site Publisher
-        uses: actions/checkout@v6
-        with:
-          repository: 'dubinsky/site-publisher'
-          path: ${{ env.SITE_PUBLISHER_ROOT }}
-
-      - name: Generate Site using Site Publisher
-        run: |
-          cd $SITE_PUBLISHER_ROOT
-          ./gradlew run --args="$GITHUB_WORKSPACE/docs --treat-errors-as-warnings=true"
+          source: 'docs'
+          treat-errors-as-warnings: true
 
       - name: Upload GitHub Pages from './_site' as an Artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: docs/_site/
+          path: ${{ steps.site.outputs.site-path }}
 
   # Deployment job
   deploy:

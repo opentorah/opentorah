@@ -1,3 +1,8 @@
+---
+chunk: true
+pdf: true
+---
+
 = Typesetting classic Jewish texts
 :doctype: article
 :toc:
