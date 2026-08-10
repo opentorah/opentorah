@@ -14,9 +14,7 @@ dependencies {
   testImplementation libs.algebraLaws
 }
 
-// Note: starting with Gradle 8.0, without explicit toolchain specification, Java 8 gets picked up
-// even when Gradle itself runs on Java 11?!
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 tasks.withType(ScalaCompile).configureEach {
   scalaCompileOptions.with {

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin;
 - chore: dependency updates;
 - chore: switch from Jekyll to Podval Site Publisher;
+- chore: Java 25
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook
