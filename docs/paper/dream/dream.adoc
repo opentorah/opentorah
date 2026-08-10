@@ -1,5 +1,3 @@
-include::{docfile}/../../common-attributes.adoc[]
-
 = Digital Judaica Done Right
 :doctype: article
 :toc:
