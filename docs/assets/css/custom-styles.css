@@ -1,0 +1,34 @@
+/* [.verse]#Hebrew text#{ltr} */
+.verse {
+    /*direction: rtl;*/
+}
+
+/* TODO enable/disable add/del/see in JavaScript*/
+/*
+add {
+  color: red;
+}
+*/
+.add::before {
+    content: "[";
+}
+.add::after {
+    content: "]";
+}
+
+.del::before {
+    content: "(";
+}
+.del::after {
+    content: ")";
+}
+
+.see {
+    font-size: smaller;
+}
+.see::before {
+    content: "<";
+}
+.see::after {
+    content: ">";
+}

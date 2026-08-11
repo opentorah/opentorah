@@ -8,6 +8,3 @@ timezone: "America/New_York"
 social:
   github:  dubinsky
   twitter: theopentorah
-
-#asciidoctor-extensions:
-#  - asciidoctor-bibtex
