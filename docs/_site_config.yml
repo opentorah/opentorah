@@ -4,6 +4,7 @@ url: "http://www.opentorah.org"
 author: "Leonid Dubinsky"
 email: dub@opentorah.org
 timezone: "America/New_York"
+favicon: favicon.ico
 
 social:
   github:  dubinsky
