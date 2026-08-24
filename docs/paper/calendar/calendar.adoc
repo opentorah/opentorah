@@ -12,7 +12,6 @@ pdf: true
 :doctype: book
 :stem: latexmath
 :toc:
-:ltr: &#8206;
 :revnumber: 0.1
 
 include::colophon.adoc[]
