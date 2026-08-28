@@ -132,7 +132,12 @@ trait Numbers extends NumbersBase:
     final override def compare(that: N): Int = compareDigits(that)
 
     /** Are the two numbers equal? */
-    final override def equals(other: Any): Boolean = this.compare(other.asInstanceOf[N]) == 0
+    final override def equals(other: Any): Boolean = other match
+      // the class check is what erasure leaves us: Number[?] alone would still
+      // let a number of one kind be compared with another and throw
+      case that: Number[?] if this.getClass eq that.getClass =>
+        this.compare(that.asInstanceOf[N]) == 0
+      case _ => false
 
     final override def hashCode: Int = digits.hashCode
 

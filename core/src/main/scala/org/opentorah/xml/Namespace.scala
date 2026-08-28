@@ -30,9 +30,10 @@ sealed trait Namespace derives CanEqual:
 
   override def toString: String = attributeValue.toString
 
-  override def equals(other: Any): Boolean =
-    val that = other.asInstanceOf[Namespace]
-    (this.getUri == that.getUri) && (this.getPrefix == that.getPrefix)
+  override def equals(other: Any): Boolean = other match
+    case that: Namespace =>
+      (this.getUri == that.getUri) && (this.getPrefix == that.getPrefix)
+    case _ => false
 
   final def isDefault: Boolean = getPrefix.isEmpty
 

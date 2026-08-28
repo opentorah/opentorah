@@ -28,9 +28,10 @@ trait WithBookSpans[Book <: TanachBook]:
 
     override def hashCode(): Int = book.hashCode()*37 + span.hashCode() + 73
 
-    override def equals(obj: Any): Boolean =
-      val that: BookSpan = obj.asInstanceOf[BookSpan]
-      (this.book == that.book) && (this.span == that.span)
+    override def equals(obj: Any): Boolean = obj match
+      case that: BookSpan =>
+        (this.book == that.book) && (this.span == that.span)
+      case _ => false
 
     override def toLanguageString(using spec: Language.Spec): String =
       book.toLanguageString + " " + span.toLanguageString

@@ -6,7 +6,9 @@ trait Numbered[T] extends Ordered[Numbered[T]]:
 
   override def compare(that: Numbered[T]): Int = this.number - that.number
 
-  final override def equals(other: Any): Boolean = compare(other.asInstanceOf[Numbered[T]]) == 0
+  final override def equals(other: Any): Boolean = other match
+    case that: Numbered[?] => this.number == that.number
+    case _ => false
 
   final override def hashCode: Int = number
 

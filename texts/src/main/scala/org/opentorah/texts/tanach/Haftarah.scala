@@ -7,7 +7,9 @@ import zio.ZIO
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
 final case class Haftarah(override val spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) derives CanEqual:
-  override def equals(other: Any): Boolean = this.spans == other.asInstanceOf[Haftarah].spans
+  override def equals(other: Any): Boolean = other match
+    case that: Haftarah => this.spans == that.spans
+    case _ => false
 
 object Haftarah extends WithBookSpans[Tanach.Prophets]:
   override type Many = Haftarah
