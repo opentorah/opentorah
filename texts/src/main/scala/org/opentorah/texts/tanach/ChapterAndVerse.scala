@@ -10,7 +10,9 @@ final class ChapterAndVerse(val chapter: Int, val verse: Int) extends Ordered[Ch
     val result = this.chapter - that.chapter
     if result != 0 then result else this.verse - that.verse
 
-  override def equals(other: Any): Boolean = compare(other.asInstanceOf[ChapterAndVerse]) == 0
+  override def equals(other: Any): Boolean = other match
+    case that: ChapterAndVerse => compare(that) == 0
+    case _ => false
 
   override def toLanguageString(using spec: Language.Spec): String =
     spec.toString(chapter) + ":" + spec.toString(verse)

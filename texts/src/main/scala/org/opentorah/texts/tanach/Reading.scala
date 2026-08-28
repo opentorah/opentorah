@@ -34,9 +34,10 @@ object Reading:
     val maftir: Option[Maftir],
     val haftarah: Haftarah
   ) derives CanEqual:
-    override def equals(other: Any): Boolean =
-      val that: MaftirAndHaftarah = other.asInstanceOf[MaftirAndHaftarah]
-      (this.maftir == that.maftir) && (this.haftarah == that.haftarah)
+    override def equals(other: Any): Boolean = other match
+      case that: MaftirAndHaftarah =>
+        (this.maftir == that.maftir) && (this.haftarah == that.haftarah)
+      case _ => false
 
   final class ReadingCustom(
     val torah: Torah,

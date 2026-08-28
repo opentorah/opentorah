@@ -24,7 +24,9 @@ final class BigRational private(val numerator: BigInt, val denominator: BigInt)
 
   override def compare(that: BigRational): Int = (this - that).signum
 
-  override def equals(other: Any): Boolean = compare(other.asInstanceOf[BigRational]) == 0
+  override def equals(other: Any): Boolean = other match
+    case that: BigRational => compare(that) == 0
+    case _ => false
 
   def signum: Int = numerator.signum
 

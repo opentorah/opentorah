@@ -14,9 +14,10 @@ abstract class Attribute[T](
   require((name != null) && !name.contains(":"))
   require(name.nonEmpty || (namespace == Namespace.Xmlns))
 
-  final override def equals(other: Any): Boolean =
-    val that: Attribute[T] = other.asInstanceOf[Attribute[T]]
-    (name == that.name) && (namespace.getUri == that.namespace.getUri)
+  final override def equals(other: Any): Boolean = other match
+    case that: Attribute[?] =>
+      (name == that.name) && (namespace.getUri == that.namespace.getUri)
+    case _ => false
 
   final override def toString: String = qName
 

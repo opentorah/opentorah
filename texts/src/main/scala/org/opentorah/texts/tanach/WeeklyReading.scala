@@ -4,9 +4,10 @@ import org.opentorah.metadata.{Named, Names}
 import org.opentorah.texts.tanach.Parsha.{Mattos, Nitzavim}
 
 final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) extends Named derives CanEqual:
-  override def equals(other: Any): Boolean =
-    val that: WeeklyReading = other.asInstanceOf[WeeklyReading]
-    (this.parsha == that.parsha) && (this.secondParsha == that.secondParsha)
+  override def equals(other: Any): Boolean = other match
+    case that: WeeklyReading =>
+      (this.parsha == that.parsha) && (this.secondParsha == that.secondParsha)
+    case _ => false
 
   def isCombined: Boolean = secondParsha.isDefined
 

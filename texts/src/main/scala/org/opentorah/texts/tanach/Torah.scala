@@ -8,7 +8,9 @@ import Tanach.Chumash
 // Other than on Simchas Torah, aliyot are from the same book.
 // TODO de-case - and figure out why object Torah's creation becomes impossible if 'case' is removed here...
 final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Spans(spans) derives CanEqual:
-  override def equals(other: Any): Boolean = this.spans == other.asInstanceOf[Torah].spans
+  override def equals(other: Any): Boolean = other match
+    case that: Torah => this.spans == that.spans
+    case _ => false
 
   def drop(toDrop: Set[Int]): Torah =
     def drop(what: Seq[(Torah.Aliyah, Boolean)]): Seq[Torah.Aliyah] = what match

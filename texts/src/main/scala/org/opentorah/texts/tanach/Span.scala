@@ -5,9 +5,10 @@ import org.opentorah.metadata.Language
 final class Span(val from: ChapterAndVerse, val to: ChapterAndVerse) extends Language.ToString derives CanEqual:
   require(from <= to, s"Empty span: $from..$to")
 
-  override def equals(other: Any): Boolean =
-    val that: Span = other.asInstanceOf[Span]
-    (this.from == that.from) && (this.to == that.to)
+  override def equals(other: Any): Boolean = other match
+    case that: Span =>
+      (this.from == that.from) && (this.to == that.to)
+    case _ => false
 
   def contains(chapterAndVerse: ChapterAndVerse): Boolean = (from <= chapterAndVerse) && (chapterAndVerse <= to)
 
