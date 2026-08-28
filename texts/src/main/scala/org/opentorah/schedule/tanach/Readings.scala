@@ -207,6 +207,15 @@ object Readings:
           case Pesach8 => SpecialReadings.Pesach8
           case Shavuos1 => SpecialReadings.Shavuos1
           case Shavuos2 => SpecialReadings.Shavuos2
+          // The public fasts are read with Vayechal in the morning as well as
+          // at Mincha; SpecialReadings defines a weekday reading for each of
+          // them, and Tisha BeAv its own. Without these cases the throw below
+          // was reached, so no fast on a weekday could be scheduled at all.
+          case FastOfGedalia => SpecialReadings.FastOfGedalia
+          case FastOfTeves => SpecialReadings.FastOfTeves
+          case FastOfEster => SpecialReadings.FastOfEster
+          case FastOfTammuz => SpecialReadings.FastOfTammuz
+          case TishaBeAv => SpecialReadings.TishaBeAv
           case _ => throw IllegalArgumentException("Must have weekday reading!")
         reading.weekday(day)
     }
