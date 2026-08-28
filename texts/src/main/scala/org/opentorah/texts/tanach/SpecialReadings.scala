@@ -883,6 +883,25 @@ object SpecialReadings:
         readingCustom.replaceHaftarah(haftarah)
     )
 
+  /**
+   * The three haftarot of rebuke belong to the three Shabbosim between the
+   * Fast of Tammuz and Tisha BeAv, not to the parshiyos they usually fall on.
+   * When Mattos and Masei are combined there is one Shabbos fewer, and the
+   * sequence shifts a week earlier: Pinchas -- which then falls after the
+   * 17th of Tammuz -- reads Mattos's haftarah, and the combined week reads
+   * Masei's, as noted in Haftarah.xml:
+   *   <week n="Pinchas" ...> <!-- In 3 weeks - Mattos -->
+   * Pinchas's own haftarah is read only in the years when it falls before the
+   * fast. The shift is stated in terms of the parshiyos rather than of the
+   * rebukes, so it holds for the customs that do not follow that scheme.
+   */
+  def correctPinchas(reading: Reading, isPinchas: Boolean, isAfterFastOfTammuz: Boolean): Reading =
+    if !isPinchas || !isAfterFastOfTammuz then reading else reading.transform[Haftarah](
+      Parsha.Mattos.haftarah,
+      (_: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
+        readingCustom.replaceHaftarah(haftarah)
+    )
+
   def correctKiSeitzei(reading: Reading, isMonthElul: Boolean, dayNumber: Int): Reading =
     val isKiSeitzei: Boolean = isMonthElul && (dayNumber == 14)
     if !isKiSeitzei then reading else
