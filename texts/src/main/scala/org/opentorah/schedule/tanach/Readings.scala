@@ -27,8 +27,10 @@ object Readings:
     val numAliyot: Int =
       if specialDay.contains(SimchasTorah) then 7 else
       if specialDay.contains(SheminiAtzeresAndSimchasTorahInHolyLand) then 7 else
-      if specialDay.contains(YomKippur) then 6 else
+      // Shabbos is seven whatever else the day is; Yom Kippur is six only
+      // when it falls on a weekday.
       if isShabbos then 7 else
+      if specialDay.contains(YomKippur) then 6 else
       if specialDay.exists(_.isInstanceOf[Festival]) then 5 else
       if specialDay.exists(_.isInstanceOf[Intermediate]) then 4 else
       if day.isRoshChodesh then 4 else
