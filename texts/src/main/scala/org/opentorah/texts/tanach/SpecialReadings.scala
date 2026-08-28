@@ -865,6 +865,24 @@ object SpecialReadings:
         </custom>
       </haftarah>)
 
+  /**
+   * Shabbos Shuvah -- the Shabbos between Rosh Hashanah and Yom Kippur -- has
+   * its own haftarah, which Haftarah.xml stores on Vayeilech:
+   *   <week n="Vayeilech"> <!-- = Shabbos Shuvah -->
+   * That identification holds only in the years when Vayeilech is the parsha
+   * of that week. When Nitzavim and Vayeilech are combined they are read
+   * *before* Rosh Hashanah, Haazinu falls on Shabbos Shuvah, and it keeps its
+   * own haftarah (Shiras David), which belongs to it only in the years when it
+   * falls after Yom Kippur. Attach the haftarah to the week rather than to the
+   * parsha, so it is read on Shabbos Shuvah either way.
+   */
+  def correctShabbosShuvah(reading: Reading, isShabbosShuvah: Boolean): Reading =
+    if !isShabbosShuvah then reading else reading.transform[Haftarah](
+      Parsha.Vayeilech.haftarah,
+      (_: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
+        readingCustom.replaceHaftarah(haftarah)
+    )
+
   def correctKiSeitzei(reading: Reading, isMonthElul: Boolean, dayNumber: Int): Reading =
     val isKiSeitzei: Boolean = isMonthElul && (dayNumber == 14)
     if !isKiSeitzei then reading else
