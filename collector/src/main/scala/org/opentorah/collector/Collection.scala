@@ -15,7 +15,9 @@ final class Collection(
   body: Option[Body.Value],
   val pageType: Page.Type,
   val directory: String,
-  val parts: Seq[CollectionPart]
+  val parts: Seq[CollectionPart],
+  // Site Publisher collection short name; live routing still uses site.xml <alias>.
+  val alias: Option[String]
 ) extends Hierarchical(
   fromUrl,
   names,
@@ -170,6 +172,7 @@ object Collection extends ElementTo[Collection]("collection"):
 
   override def contentParsable: Parsable[Collection] = new Parsable[Collection]:
     private val directoryAttribute: Attribute.OrDefault[String] = Attribute("directory", default = "tei").orDefault
+    private val aliasAttribute: Attribute.Optional[String] = Attribute("alias").optional
 
     override def parser: Parser[Collection] = for
       fromUrl: FromUrl <- FromUrl.get
@@ -179,6 +182,7 @@ object Collection extends ElementTo[Collection]("collection"):
       body: Option[Body.Value] <- Hierarchical.bodyElement()
       pageType: Page.Type <- Page.typeAttribute()
       directory: String <- directoryAttribute()
+      alias: Option[String] <- aliasAttribute()
       parts: Seq[CollectionPart] <- CollectionPart.seq()
     yield Collection(
       fromUrl,
@@ -188,7 +192,8 @@ object Collection extends ElementTo[Collection]("collection"):
       body,
       pageType,
       directory,
-      parts
+      parts,
+      alias
     )
 
     override def unparser: Unparser[Collection] = Unparser.concat(
@@ -198,5 +203,6 @@ object Collection extends ElementTo[Collection]("collection"):
       Hierarchical.bodyElement(_.body),
       Page.typeAttribute(_.pageType),
       directoryAttribute(_.directory),
+      aliasAttribute(_.alias),
       CollectionPart.seq(_.parts)
     )
