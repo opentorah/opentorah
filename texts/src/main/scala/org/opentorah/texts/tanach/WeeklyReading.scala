@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Named, Names}
-import org.opentorah.texts.tanach.Parsha.{Mattos, Nitzavim}
+import org.opentorah.texts.tanach.Parsha.Nitzavim
 
 final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) extends Named derives CanEqual:
   override def equals(other: Any): Boolean = other match
@@ -17,7 +17,10 @@ final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) 
     )
 
   def getMorningReading: Reading =
-    val haftarahParsha = if isCombined && (parsha != Mattos) && (parsha != Nitzavim) then secondParsha.get else parsha
+    // Nitzavim-Vayeilech keeps Nitzavim's haftarah; every other combined
+    // week follows its second parsha. Mattos-Masei used to be excepted here
+    // too, which dropped Masei's haftarah -- see Readings.correctPinchas.
+    val haftarahParsha = if isCombined && (parsha != Nitzavim) then secondParsha.get else parsha
     Reading(
       torah = (if isCombined then parsha.daysCombined.get else parsha.days).map(_.fromWithNumbers(this)),
       maftir = Some((if isCombined then secondParsha.get else parsha).maftir.from(this)),

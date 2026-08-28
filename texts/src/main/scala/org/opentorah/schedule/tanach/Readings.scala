@@ -6,7 +6,7 @@ import org.opentorah.calendar.jewish.Jewish.Month.*
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay.*
 import org.opentorah.metadata.Named
-import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
+import org.opentorah.texts.tanach.{Parsha, Reading, SpecialReadings, WeeklyReading}
 
 object Readings:
   final def getMorningReading(
@@ -68,18 +68,23 @@ object Readings:
 
     val weekly: Reading = specialDay.fold {
       require(weeklyReading.isDefined)
-      SpecialReadings.correctShabbosShuvah(
-        reading = SpecialReadings.correctKiSeitzei(
-          reading = weeklyReading.get.getMorningReading,
-          isMonthElul = day.month.name == Elul,
-          dayNumber = day.numberInMonth
+      SpecialReadings.correctPinchas(
+        reading = SpecialReadings.correctShabbosShuvah(
+          reading = SpecialReadings.correctKiSeitzei(
+            reading = weeklyReading.get.getMorningReading,
+            isMonthElul = day.month.name == Elul,
+            dayNumber = day.numberInMonth
+          ),
+          // the Shabbos between Rosh Hashanah (1 Tishrei) and Yom Kippur (10th).
+          // The first Shabbos after the 1st is at most the 8th; the 1st and 2nd
+          // are Rosh Hashanah itself, a specialDay, so they never reach here.
+          // In practice only the 3rd, 5th, 6th and 8th occur.
+          isShabbosShuvah = (day.month.name == Tishrei) &&
+            (day.numberInMonth >= 3) && (day.numberInMonth <= 8)
         ),
-        // the Shabbos between Rosh Hashanah (1 Tishrei) and Yom Kippur (10th).
-        // The first Shabbos after the 1st is at most the 8th; the 1st and 2nd
-        // are Rosh Hashanah itself, a specialDay, so they never reach here.
-        // In practice only the 3rd, 5th, 6th and 8th occur.
-        isShabbosShuvah = (day.month.name == Tishrei) &&
-          (day.numberInMonth >= 3) && (day.numberInMonth <= 8)
+        isPinchas = weeklyReading.get.parsha == Parsha.Pinchas,
+        // equivalently: the years in which Mattos and Masei are combined
+        isAfterFastOfTammuz = day.number > FastOfTammuz.date(day.year).number
       )
     } (specialDay => getShabbosMorningReading(specialDay, weeklyReading, roshChodeshDay))
 
