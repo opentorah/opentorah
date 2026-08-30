@@ -780,7 +780,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = parseHaftarah(
       <haftarah book="Habakkuk">
         <custom n="Ashkenaz" fromChapter="3" fromVerse="1" toVerse="19"/>
-        <custom n="Sefard" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
+        <custom n="Sefard, Italki" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
       </haftarah>)
 
   object Fast:
