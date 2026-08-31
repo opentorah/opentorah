@@ -30,4 +30,17 @@
   <custom n="Teiman"         parent="Sefard"/>
   <custom n="Baladi"         parent="Teiman"/>
   <custom n="Shami"          parent="Teiman"/>
+
+  <!--
+    Romania is neither Ashkenaz nor Sefard. hamichlol notes that its readings
+    follow the old Erets Yisrael rite, "לעומת מנהגי שאר העדות שמבוססים על המנהג
+    הבבלי": as against the other rites, which follow the Babylonian custom.
+    Parenting it to either would make its fallback claim the wrong tradition, so
+    it hangs off Common and states its own readings.
+
+    It says the same again of a particular reading: "ונראה שמנהג זה מבוסס על
+    מסורה ארצישראלית, כמו רוב ההפטרות של רומניא": it appears this practice
+    rests on an Erets Yisrael tradition, as do most of the Romania haftarot.
+  -->
+  <custom n="Romania"        parent="Common"/>
 </CustomTree>

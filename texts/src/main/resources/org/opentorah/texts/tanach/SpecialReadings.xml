@@ -250,9 +250,11 @@
       <maftir book="Exodus" fromChapter="30" fromVerse="11" toVerse="16"/>
     </reading>
     <reading n="haftarah">
-      <haftarah book="II Kings">
-        <custom n="Ashkenaz, Italki, Teiman, Chabad" fromChapter="12" fromVerse="1" toVerse="17"/>
-        <custom n="Sefard" fromChapter="11" fromVerse="17" toChapter="12" toVerse="17"/>
+      <haftarah>
+        <custom n="Romania" book="Ezekiel" fromChapter="45" fromVerse="12"
+                toChapter="46" toVerse="5" sources="michlol"/>
+        <custom n="Ashkenaz, Italki, Teiman, Chabad" book="II Kings" fromChapter="12" fromVerse="1" toVerse="17"/>
+        <custom n="Sefard" book="II Kings" fromChapter="11" fromVerse="17" toChapter="12" toVerse="17"/>
       </haftarah>
     </reading>
   </day>
@@ -266,6 +268,7 @@
         <custom n="Sefard" fromChapter="15" fromVerse="1" toVerse="34"/>
         <custom n="Teiman" fromChapter="14" fromVerse="52" toChapter="15" toVerse="33"/>
         <custom n="Poznan" fromChapter="15" fromVerse="2" toVerse="33" sources="michlol, poznan-pinkas"/>
+        <custom n="Romania" fromChapter="15" fromVerse="2" toVerse="22" sources="michlol"/>
       </haftarah>
     </reading>
   </day>
@@ -282,9 +285,10 @@
       <maftir book="Numbers" fromChapter="19" fromVerse="1" toVerse="22"/>
     </reading>
     <reading n="haftarah">
-      <haftarah book="Ezekiel" fromChapter="36" fromVerse="16">
-        <custom n="Ashkenaz, Italki" toVerse="38"/>
-        <custom n="Sefard" toVerse="36"/>
+      <haftarah book="Ezekiel">
+        <custom n="Ashkenaz, Italki" fromChapter="36" fromVerse="16" toVerse="38"/>
+        <custom n="Sefard" fromChapter="36" fromVerse="16" toVerse="36"/>
+        <custom n="Romania" fromChapter="36" fromVerse="25" toChapter="37" toVerse="7" sources="michlol"/>
       </haftarah>
     </reading>
   </day>
@@ -299,6 +303,7 @@
         <custom n="Sefard, Poznan" fromVerse="18" toVerse="15"
                 comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
         <custom n="Teiman" fromVerse="9" toVerse="11"/>
+        <custom n="Romania" fromVerse="21" toVerse="13" sources="michlol"/>
       </haftarah>
     </reading>
   </day>
@@ -366,7 +371,10 @@
           <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> <!-- piece 1 -->
           <part n="2" fromChapter="6" fromVerse="27"/> <!-- piece 2 -->
         </custom>
-        <custom n="Frankfurt, Hagra" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> <!-- piece 1 -->
+        <custom n="Frankfurt, Hagra, Romania" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"
+                sources="michlol"
+                comment="hamichlol gives Romania the bare piece 1, the same as Frankfurt
+                         and Hagra read."/> <!-- piece 1 -->
       </haftarah>
     </reading>
   </day>
@@ -439,7 +447,8 @@
   <day n="Shavuos2">
     <reading n="haftarah">
       <haftarah book="Habakkuk">
-        <custom n="Ashkenaz" fromChapter="3" fromVerse="1" toVerse="19"/>
+        <custom n="Ashkenaz, Romania" fromChapter="3" fromVerse="1" toVerse="19" sources="michlol"
+                comment="hamichlol groups Romania with Ashkenaz here."/>
         <custom n="Sefard, Italki" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
       </haftarah>
     </reading>
@@ -452,7 +461,7 @@
     </reading>
     <reading n="defaultAfternoonHaftarah" full="false">
       <haftarah>
-        <custom n="Ashkenaz, Chabad, Algiers" book="Isaiah" fromChapter="55"
+        <custom n="Ashkenaz, Chabad, Algiers, Romania" book="Isaiah" fromChapter="55"
                 fromVerse="6" toChapter="56" toVerse="8" sources="michlol"
                 comment="On these fasts hamichlol keeps only the city of Algiers with
                          Ashkenaz and Italki on Dirshu, against the rest of the Maghreb
@@ -503,24 +512,30 @@
         exceptions to that one.
       -->
       <haftarah>
-        <custom n="Ashkenaz, Chabad" book="Isaiah" fromChapter="55" fromVerse="6"
+        <custom n="Ashkenaz, Chabad, Romania" book="Isaiah" fromChapter="55" fromVerse="6"
                 toChapter="56" toVerse="8" sources="michlol, chabad-org"
                 comment="hamichlol for Ashkenaz; chabad.org for Chabad, which reads
                          Dirshu here rather than following Sefard. hamichlol names no
                          Chabad practice at this occasion, but its rite key nests
-                         Chabad under Ashkenaz, so it implies the same."/>
+                         Chabad under Ashkenaz, so it implies the same. For Romania it
+                         says only 'קצת רומ'', some of Romania, on the strength of the
+                         Machzor of Romania (Venice 5283): 'יש קהלות שמפטירין דרשו,
+                         ורבינו האיי כת' שמפטירין' -- there are communities that read
+                         Dirshu, and Rabbeinu Hai wrote that they read. What the rest
+                         of Romania reads is not stated."/>
         <custom n="Sefard" sources="michlol">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
         <custom n="Italki, Teiman" book="Hosea" fromChapter="14" fromVerse="2"
                 toVerse="10" sources="michlol"
-                comment="For Teiman hamichlol notes that the old Yemenite siddurim
-                         record no Mincha haftarah here at all; the practice was
-                         taken up in most communities in recent centuries, the
-                         Dor Daim excepted, and R. Yosef Kapach held in Siach
-                         Yerushalayim that those who do read it should not say the
-                         brachos, which was not accepted in practice."/>
+                comment="hamichlol cites its own sources for both. For Italki, Machzor
+                         Shadal vol. 1, 189b. For Teiman it notes that the old Yemenite
+                         siddurim record no Mincha haftarah here at all; the practice
+                         was taken up in most communities in recent centuries, the Dor
+                         Daim excepted, and R. Yosef Kapach held in Siach Yerushalayim
+                         that those who do read it should not say the brachos, which
+                         was not accepted in practice."/>
       </haftarah>
     </reading>
   </day>
