@@ -452,18 +452,17 @@
     </reading>
     <reading n="defaultAfternoonHaftarah" full="false">
       <haftarah>
-        <custom n="Ashkenaz, Chabad, Morocco, Algiers" book="Isaiah" fromChapter="55"
-                fromVerse="6" toChapter="56" toVerse="8" sources="1"
-                comment="hamichlol puts the city of Algiers with Ashkenaz and Italki on
-                         Dirshu, against the rest of Algeria below: 'א, איט, קהילת העיר
-                         אלג'יר, רומ''. The city is a custom of its own for this reading
-                         alone."/> <!-- = Vayeilech Italki -->
-        <custom n="Algeria" sources="1"
-                comment="The country apart from the city of Algiers. hamichlol has
-                         Hosea followed by Micah 7:18-20 here, not Joel; the Joel
-                         ending is unsourced and still to be checked."> <!-- = Vayeilech Ashkenaz variant 2 -->
+        <custom n="Ashkenaz, Chabad, Algiers" book="Isaiah" fromChapter="55"
+                fromVerse="6" toChapter="56" toVerse="8" sources="michlol"
+                comment="On these fasts hamichlol keeps only the city of Algiers with
+                         Ashkenaz and Italki on Dirshu, against the rest of the Maghreb
+                         below: 'א, איט, קהילת העיר אלג'יר, רומ''. The Fast of Gedalia
+                         is the exception -- see there."/> <!-- = Vayeilech Italki -->
+        <custom n="Morocco, Algeria" sources="michlol"
+                comment="Morocco and Algeria apart from the city of Algiers, on these
+                         fasts but not on the Fast of Gedalia.">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
-          <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
+          <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/> <!-- = Vayeilech Sefard -->
         </custom>
       </haftarah>
     </reading>
@@ -471,10 +470,12 @@
   <day n="FastOfGedalia">
     <reading n="afternoonHaftarahExceptions" full="false">
       <haftarah>
-        <custom n="Morocco"> <!-- = Vayeilech Ashkenaz variant 2 -->
-          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
-          <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
-        </custom>
+        <custom n="Morocco, Algeria" book="Isaiah" fromChapter="55" fromVerse="6"
+                toChapter="56" toVerse="8" sources="michlol"
+                comment="hamichlol gives the Fast of Gedalia its own entry, in which
+                         Morocco and Algeria read Dirshu with Ashkenaz and Italki --
+                         'א, איט, חלק מסמג (בעיקר מרוקו ואלג'יריה)' -- rather than the
+                         Hosea reading they have on the other public fasts."/>
       </haftarah>
     </reading>
   </day>
