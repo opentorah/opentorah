@@ -95,8 +95,10 @@
         <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
         <custom n="Teiman, Bavlim, Magreb, Persia, Libya, Pure Sephardim"
                 book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14" sources="michlol"
-                comment="hamichlol lists Algiers here too; it already reads this by way of
-                         Algeria and Magreb, so it is not named again."/>
+                comment="hamichlol lists Algeria here too; it already reads this by way of
+                         Magreb, so it is not named again. Its rite code סאל is Algerian
+                         Jewry as a whole; the city of Algiers is named only in prose,
+                         and only for the fast Mincha readings."/>
     </week>
     <week n="Va'eira" book="Ezekiel">
         <custom n="Common" fromChapter="28" fromVerse="25" toChapter="29" toVerse="21"/>
