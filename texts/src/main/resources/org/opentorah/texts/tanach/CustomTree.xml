@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The custom hierarchy. A custom with no `parent` is a root; every other
+  custom inherits a reading from its parent when it states none of its own
+  (see Custom.Of.find). Kept here rather than in the enum so the tree can be
+  read and changed as data; Custom.scala checks this file covers every value.
+-->
+<CustomTree>
+  <custom n="Common"/>
+  <custom n="Ashkenaz"       parent="Common"/>
+  <custom n="Italki"         parent="Ashkenaz"/>
+  <custom n="Frankfurt"      parent="Ashkenaz"/>
+  <custom n="Lita"           parent="Ashkenaz"/>
+  <custom n="Chayey Odom"    parent="Lita"/>
+  <custom n="Hagra"          parent="Ashkenaz"/>
+  <custom n="Sefard"         parent="Common"/>
+  <custom n="Chabad"         parent="Sefard"/>
+  <custom n="Magreb"         parent="Sefard"/>
+  <custom n="Algeria"        parent="Magreb"/>
+  <custom n="Toshbim"        parent="Magreb"/>
+  <custom n="Djerba"         parent="Magreb"/>
+  <custom n="Morocco"        parent="Magreb"/>
+  <custom n="Fes"            parent="Morocco"/>
+  <custom n="Bavlim"         parent="Sefard"/>
+  <custom n="Teiman"         parent="Sefard"/>
+  <custom n="Baladi"         parent="Teiman"/>
+  <custom n="Shami"          parent="Teiman"/>
+</CustomTree>
