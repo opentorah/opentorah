@@ -4,6 +4,10 @@ We are moving towards making the site dynamic, so that we can add:
 - search functionality;
 - ability to modify the site.
 
+In August 2026, we starting moving the site to static using Podval Site Publisher.
+
+Collector code was removed on 2026/08/31.
+
 ## Project Setup ##
 
 - activated free Google Cloud Platform trial for `dub@opentorah.org` account (6/14/2020); 
