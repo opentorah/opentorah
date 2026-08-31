@@ -54,6 +54,16 @@ final class NewRitesTest extends AnyFlatSpec, Matchers:
     weekly(Parsha.Shemos, Custom.Algiers) shouldBe "Ezekiel 16:1-16:14"
     weekly(Parsha.Shemos, Custom.Algiers) shouldBe weekly(Parsha.Shemos, Custom.Magreb)
 
+  "the city of Algiers" should "read Dirshu on a fast, where the country does not" in:
+    val afternoon = SpecialReadings.FastOfTeves.afternoon(Parsha.Bereishis)
+    def haftarahOf(custom: Custom): Option[String] =
+      afternoon.doFind(custom).maftirAndHaftarah.map(mh => spans(mh.haftarah))
+    haftarahOf(Custom.Algiers) shouldBe Some("Isaiah 55:6-56:8")
+    haftarahOf(Custom.Ashkenaz) shouldBe haftarahOf(Custom.Algiers)
+    haftarahOf(Custom.Algeria) should not be haftarahOf(Custom.Algiers)
+    // most Sefardim read no haftarah at Mincha at all
+    haftarahOf(Custom.Sefard) shouldBe None
+
   "the new rites" should "cite hamichlol" in:
     ReadingSources.forParsha(Parsha.Chukas, Custom.Poznan).map(_.key) should contain ("michlol")
     ReadingSources.forParsha(Parsha.Shemos, Custom.Persia).map(_.key) should contain ("michlol")
