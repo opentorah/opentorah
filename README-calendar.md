@@ -47,6 +47,13 @@ Enhancements being considered are:
   - [GData Java library](http://code.google.com/apis/gdata/client-java.html)
 
 
+## Calendar Web Application
+
+Any pretence at such was removed on 2026/08/31;
+use https://hebrewcalendar.net!
+
+TODO ask for it to provide an API...
+
 ## Schedule ##
 
 There are some schedule-related issues to look into:
