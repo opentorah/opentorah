@@ -40,4 +40,9 @@
 
   <source n="steinsaltz" kind="chumash" name="Chumash Steinsaltz"
           publication="Koren Publishers, Jerusalem 2023"/>
+
+  <!-- hamichlol's own source for the Poznan readings, named in the footnote on
+       its rite code rather than on any one reading, so it stands behind them all. -->
+  <source n="poznan-pinkas" kind="study" name="Pinkas Beis HaKnesses de-Kehilas Pozna"
+          publication="in Berakhah le-Menachem, St. Louis 1955, p. 262"/>
 </ReadingSources>
