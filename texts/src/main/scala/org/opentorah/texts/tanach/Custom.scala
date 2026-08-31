@@ -2,36 +2,69 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, HasValues, Named, Names}
 import org.opentorah.util.Collections
+import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
 
-// Assumptions: no cycles; only Common doesn't have parent.
-enum Custom(val parent: Option[Custom], nameOverride: Option[String] = None)
+// The hierarchy lives in CustomTree.xml, not here. Assumptions: no cycles;
+// only Common has no parent.
+enum Custom(nameOverride: Option[String] = None)
   extends Named.ByLoader[Custom](loader = Custom, nameOverride), HasName.Enum derives CanEqual:
+  // lazy: resolving a parent needs the names, which the loader reads lazily.
+  lazy val parent: Option[Custom] = Custom.parentOf(this)
+
   lazy val children: Set[Custom] = Custom.valuesSeq.filter(_.parent.contains(this)).toSet
 
   def level: Int = parent.fold(0)(parent => parent.level+1)
 
-  case Common extends Custom(None)
-    case Ashkenaz extends Custom(Some(Common))
-      case Italki extends Custom(Some(Ashkenaz))
-      case Frankfurt extends Custom(Some(Ashkenaz))
-      case Lita extends Custom(Some(Ashkenaz))
-        case ChayeyOdom extends Custom(Some(Lita), nameOverride = Some("Chayey Odom"))
-      case Hagra extends Custom(Some(Ashkenaz))
-    case Sefard extends Custom(Some(Common))
-      case Chabad extends Custom(Some(Sefard))
-      case Magreb extends Custom(Some(Sefard))
-        case Algeria extends Custom(Some(Magreb))
-        case Toshbim extends Custom(Some(Magreb))
-        case Djerba extends Custom(Some(Magreb))
-        case Morocco extends Custom(Some(Magreb))
-          case Fes extends Custom(Some(Morocco))
-      case Bavlim extends Custom(Some(Sefard))
-      case Teiman extends Custom(Some(Sefard))
-        case Baladi extends Custom(Some(Teiman))
-        case Shami extends Custom(Some(Teiman))
+  case Common extends Custom()
+    case Ashkenaz extends Custom()
+      case Italki extends Custom()
+      case Frankfurt extends Custom()
+      case Lita extends Custom()
+        case ChayeyOdom extends Custom(nameOverride = Some("Chayey Odom"))
+      case Hagra extends Custom()
+    case Sefard extends Custom()
+      case Chabad extends Custom()
+      case Magreb extends Custom()
+        case Algeria extends Custom()
+        case Toshbim extends Custom()
+        case Djerba extends Custom()
+        case Morocco extends Custom()
+          case Fes extends Custom()
+      case Bavlim extends Custom()
+      case Teiman extends Custom()
+        case Baladi extends Custom()
+        case Shami extends Custom()
 
 object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
   override val valuesSeq: Seq[Custom] = values.toIndexedSeq
+
+  /**
+   * The hierarchy, read from CustomTree.xml rather than declared in the enum,
+   * so that it can be edited as data. Lazy for the same reason the names are:
+   * resolving an entry needs the names, which the loader reads on demand.
+   */
+  private object TreeEntry extends ElementTo[(String, Option[String])]("custom"):
+    override def contentParsable: Parsable[(String, Option[String])] =
+      new Parsable[(String, Option[String])]:
+        override def parser: Parser[(String, Option[String])] = for
+          name: String <- Attribute("n").required()
+          parent: Option[String] <- Attribute("parent").optional()
+        yield (name, parent)
+        override def unparser: Unparser[(String, Option[String])] = ???
+
+  private lazy val parents: Map[Custom, Option[Custom]] =
+    val from: From = From.resourceNamed(this, "CustomTree")
+    val entries: Seq[(String, Option[String])] =
+      Parser.unsafeRun(TreeEntry.wrappedSeq(from.name).parse(from))
+    val byName: Map[String, Custom] = valuesSeq.map(custom => custom.name -> custom).toMap
+    val missing: Seq[String] = valuesSeq.map(_.name).filterNot(entries.map(_._1).contains)
+    require(missing.isEmpty, s"CustomTree.xml does not mention: ${missing.mkString(", ")}")
+    entries.map((name, parent) =>
+      val custom: Custom = byName.getOrElse(name, throw IllegalArgumentException(s"Unknown custom: $name"))
+      custom -> parent.map(p => byName.getOrElse(p, throw IllegalArgumentException(s"Unknown parent: $p")))
+    ).toMap
+
+  private[tanach] def parentOf(custom: Custom): Option[Custom] = parents(custom)
 
   val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 
