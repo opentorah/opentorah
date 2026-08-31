@@ -19,7 +19,7 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
   yield (day \@ "n", reading \@ "n")
 
   "SpecialReadings.xml" should "hold every reading, and each of them once" in:
-    readings.size shouldBe 59
+    readings.size shouldBe 60
     readings.distinct shouldBe readings
 
   it should "give every reading a day and a name" in:
