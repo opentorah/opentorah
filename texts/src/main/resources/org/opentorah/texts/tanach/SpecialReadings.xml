@@ -265,6 +265,7 @@
         <custom n="Ashkenaz, Chabad" fromChapter="15" fromVerse="2" toVerse="34"/>
         <custom n="Sefard" fromChapter="15" fromVerse="1" toVerse="34"/>
         <custom n="Teiman" fromChapter="14" fromVerse="52" toChapter="15" toVerse="33"/>
+        <custom n="Poznan" fromChapter="15" fromVerse="2" toVerse="33" sources="michlol, poznan-pinkas"/>
       </haftarah>
     </reading>
   </day>
@@ -295,7 +296,8 @@
       <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
         <custom n="Ashkenaz" fromVerse="16" toVerse="18"/>
         <custom n="Italki" fromVerse="18" toVerse="11"/>
-        <custom n="Sefard" fromVerse="18" toVerse="15"/>
+        <custom n="Sefard, Poznan" fromVerse="18" toVerse="15"
+                comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
         <custom n="Teiman" fromVerse="9" toVerse="11"/>
       </haftarah>
     </reading>
@@ -376,6 +378,12 @@
           <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
         </custom>
         <custom n="Italki" fromChapter="23" fromVerse="21" toVerse="30"/>
+        <custom n="Poznan" sources="michlol, poznan-pinkas"
+                comment="kuntres Poznan says they finish at 'vayamlichu tachtav'; which
+                         verses are skipped in the middle, if any, is not stated.">
+          <part n="1" fromChapter="23" fromVerse="4" toVerse="9"/>
+          <part n="2" fromChapter="23" fromVerse="21" toVerse="30"/>
+        </custom>
         <custom n="Teiman">
           <part n="1" fromChapter="22" fromVerse="1" toVerse="7"/>
           <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
