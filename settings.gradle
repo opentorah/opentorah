@@ -94,7 +94,4 @@ project(':core'     ).name = 'opentorah-core'
 include ':texts'
 project(':texts'    ).name = 'opentorah-texts'
 
-include ':collector'
-project(':collector').name = 'opentorah-collector'
-
 include ':docs'
