@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: dependency updates;
 - chore: switch from Jekyll to Podval Site Publisher;
 - chore: Java 25
-- collector: accept optional `alias` on `<collection>` (Site Publisher short names; live routing still uses `site.xml` `<alias>`)
+- cleanup: removed Collector;
+- cleanup: removed CalendarServer;
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook

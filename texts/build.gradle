@@ -10,11 +10,6 @@ description = 'Jewish Texts, Readings and Learning Schedules'
 
 apply from: '../configure.gradle'
 
-//jib {
-//  to { image = 'gcr.io/calendar/calendar' }
-//  container { mainClass = 'org.opentorah.calendar.service.CalendarService' }
-//}
-
 tasks.register('serveCalendar', JavaExec) {
   group = 'publishing'
   mainClass.set('org.opentorah.calendar.service.CalendarService')
@@ -28,11 +23,6 @@ dependencies {
 
   testImplementation libs.caffeine
   implementation libs.zio.http
-  implementation libs.logback
-  implementation libs.logstash
+//  implementation libs.logback
+//  implementation libs.logstash
 }
-
-//test {
-//  maxParallelForks = 1
-//}
-
