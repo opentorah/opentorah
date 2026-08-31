@@ -33,6 +33,7 @@ final class CustomTreeTest extends AnyFlatSpec, Matchers:
   "the tree" should "put the rites where the readings expect them" in:
     Custom.Italki.parent shouldBe Some(Custom.Ashkenaz)
     Custom.Chabad.parent shouldBe Some(Custom.Sefard)
+    Custom.Algiers.parent shouldBe Some(Custom.Algeria)
     Custom.Fes.parent shouldBe Some(Custom.Morocco)
     Custom.ChayeyOdom.parent shouldBe Some(Custom.Lita)
     Custom.Common.level shouldBe 0

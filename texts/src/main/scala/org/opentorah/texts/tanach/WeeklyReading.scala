@@ -1,7 +1,6 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Named, Names}
-import org.opentorah.texts.tanach.Parsha.Nitzavim
 
 final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) extends Named derives CanEqual:
   override def equals(other: Any): Boolean = other match
@@ -17,14 +16,18 @@ final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) 
     )
 
   def getMorningReading: Reading =
-    // Nitzavim-Vayeilech keeps Nitzavim's haftarah; every other combined
-    // week follows its second parsha. Mattos-Masei used to be excepted here
-    // too, which dropped Masei's haftarah -- see Readings.correctPinchas.
-    val haftarahParsha = if isCombined && (parsha != Nitzavim) then secondParsha.get else parsha
+    // A combined week follows its second parsha, except for the customs whose
+    // first parsha claims precedenceWhenCombined -- the whole tree for
+    // Nitzavim-Vayeilech, Chabad alone for Acharei-Kedoshim. Mattos-Masei used
+    // to be excepted here too, which dropped Masei's haftarah -- see
+    // Readings.correctPinchas.
+    val haftarah: Haftarah.Customs =
+      if !isCombined then parsha.haftarah
+      else secondParsha.get.haftarah.graft(parsha.haftarah, Haftarah.precedenceWhenCombined(parsha))
     Reading(
       torah = (if isCombined then parsha.daysCombined.get else parsha.days).map(_.fromWithNumbers(this)),
       maftir = Some((if isCombined then secondParsha.get else parsha).maftir.from(this)),
-      haftarah = haftarahParsha.haftarah
+      haftarah = haftarah
     )
 
   def getAfternoonReading: Reading =

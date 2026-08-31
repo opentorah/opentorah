@@ -58,7 +58,12 @@
     </week>
     <week n="Vayeitzei" >
         <custom n="Ashkenaz" book="Hosea" fromChapter="12" fromVerse="13"
-                toChapter="14" toVerse="10"/> <!-- includes Vayeilech -->
+                toChapter="14" toVerse="10" sources="torah-temimah, michlol, torat-chaim, steinsaltz"
+                comment="Torah Temimah ends at Hosea 14:10. hamichlol gives Ashkenaz
+                         the same reading followed by Joel 2:26-27; Torat Chaim and
+                         Steinsaltz print those two verses only as יש מוסיפים, without
+                         saying which communities add them, so they are kept below
+                         under Lita rather than given to Ashkenaz."/> <!-- includes Vayeilech -->
         <custom n="Lita">
           <part n="1" book="Hosea" fromChapter="12" fromVerse="13" toChapter="14" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="26"
@@ -126,8 +131,8 @@
     <week n="Terumah" book="I Kings" fromChapter="5" fromVerse="26" toChapter="6" toVerse="13"/>
     <week n="Tetzaveh" book="Ezekiel" fromChapter="43" fromVerse="10" toVerse="27"/>
     <week n="Ki Sisa" book="I Kings" fromChapter="18">
-        <custom n="Ashkenaz, Chabad" fromVerse="1" toVerse="39"/>
-        <custom n="Sefard, Italki" fromVerse="20" toVerse="39"/>
+        <custom n="Ashkenaz" fromVerse="1" toVerse="39"/>
+        <custom n="Sefard, Italki, Chabad" sources="chabad-org, chitas" fromVerse="20" toVerse="39"/>
         <custom n="Teiman" fromVerse="1" toVerse="45"/>
     </week>
     <week n="Vayakhel" book="I Kings" fromChapter="7">
@@ -176,16 +181,26 @@
             <part n="2" fromChapter="13" fromVerse="23"/>
         </custom>
     </week>
-    <week n="Acharei">
-        <custom n="Ashkenaz, Chabad" book="Amos" fromChapter="9" fromVerse="7" toVerse="15"/>
-        <custom n="Sefard, Italki" book="Ezekiel" fromChapter="22" fromVerse="1"
-                toVerse="16"/> <!-- = Kedoshim:Ashkenaz, Lita -->
+    <week n="Acharei" precedenceWhenCombined="Chabad" sources="steinsaltz"
+          comment="Chabad reads this parsha's haftarah when Acharei and Kedoshim
+                   combine, rather than Kedoshim's as the other customs do.">
+        <custom n="Common" book="Ezekiel" fromChapter="22" fromVerse="1"
+                toVerse="16" sources="torah-temimah, steinsaltz"/> <!-- = Kedoshim:Lita -->
+        <custom n="Chabad" book="Amos" fromChapter="9" fromVerse="7"
+                toVerse="15" sources="chitas"/> <!-- = Kedoshim:Ashkenaz -->
     </week>
-    <week n="Kedoshim" book="Ezekiel">
-        <custom n="Ashkenaz, Lita" fromChapter="22" fromVerse="1" toVerse="16"/> <!-- Lita: Ahkenaz when Acharei - rosh hodesh Iyar -->
-        <custom n="Sefard" fromChapter="20" fromVerse="2" toVerse="20"/>  <!-- this one when Acharei & Kedoshim combine -->
-        <custom n="Italki, Teiman" fromChapter="20" fromVerse="1" toVerse="20"/>
-        <custom n="Baladi" fromChapter="20" fromVerse="1" toVerse="15"/>
+    <week n="Kedoshim">
+        <custom n="Ashkenaz" book="Amos" fromChapter="9" fromVerse="7"
+                toVerse="15" sources="torah-temimah, steinsaltz"/>
+        <custom n="Lita" book="Ezekiel" fromChapter="22" fromVerse="1" toVerse="16"
+                comment="Unverified. Torah Temimah does not distinguish the Ashkenazi
+                         sub-customs, so it cannot settle this one; hamichlol gives
+                         this reading to Frankfurt rather than to Lita. Kept as
+                         inherited pending a source that speaks to it."/>
+        <custom n="Sefard" book="Ezekiel" fromChapter="20" fromVerse="2"
+                toVerse="20" sources="torah-temimah, steinsaltz"/> <!-- and this one for everyone but Chabad when Acharei & Kedoshim combine -->
+        <custom n="Italki, Teiman" book="Ezekiel" fromChapter="20" fromVerse="1" toVerse="20"/>
+        <custom n="Baladi" book="Ezekiel" fromChapter="20" fromVerse="1" toVerse="15"/>
     </week>
     <week n="Emor" book="Ezekiel" fromChapter="44" fromVerse="15" toVerse="31"/>
     <week n="Behar" book="Jeremiah" >
@@ -262,15 +277,30 @@
           <custom n="Common" book="Isaiah" fromChapter="60" fromVerse="1" toVerse="22"/>
           <custom n="Italki" book="Joshua" fromChapter="8" fromVerse="30" toChapter="9" toVerse="27"/>
     </week>
-    <week n="Nitzavim">
+    <week n="Nitzavim" precedenceWhenCombined="Common"
+          comment="Nitzavim-Vayeilech is the one combined week where the first
+                   parsha's haftarah takes precedence for every custom.">
           <custom n="Common" book="Isaiah" fromChapter="61" fromVerse="10" toChapter="63" toVerse="9"/>
           <custom n="Italki" book="Joshua" fromChapter="24" fromVerse="1"  toVerse="18"/>
           <custom n="Teiman" book="Isaiah" fromChapter="61" fromVerse="9" toChapter="63" toVerse="9"/>
     </week>
     <week n="Vayeilech"> <!-- = Shabbos Shuvah -->
-        <custom n="Ashkenaz"> <!-- = Fast afternoon Algeria; Fast of Gedalia afternoon Morocco -->
+        <custom n="Ashkenaz" sources="michlol, torat-chaim, steinsaltz"
+                comment="Torah Temimah prints Hosea, Joel and Micah together without
+                         saying which custom reads which, so it does not settle this;
+                         hamichlol and Torat Chaim both give Ashkenaz Joel 2:15.
+                         Steinsaltz adds that some Ashkenazim read both the Joel and
+                         the Micah passages.">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/> <!-- = Sefard part 1; Teiman -->
-          <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
+          <part n="2" book="Joel" fromChapter="2" fromVerse="15" toVerse="27"/>
+        </custom>
+        <custom n="Ashkenaz" variant="2" sources="steinsaltz"
+                comment="Steinsaltz reports that some Ashkenazim begin at Joel 2:11
+                         and most at 2:15, without saying which communities add
+                         2:11-14, so this is recorded rather than assigned.">
+          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+          <part n="2" book="Joel" fromChapter="2" fromVerse="11"
+                toVerse="27"/> <!-- = Fast afternoon Algeria; Fast of Gedalia afternoon Morocco -->
         </custom>
         <custom n="Sefard">
             <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
@@ -279,7 +309,7 @@
         </custom>
         <custom n="Italki" book="Isaiah" fromChapter="55" fromVerse="6" toChapter="56"
                 toVerse="8"/> <!-- Fast afternoon Ashkenaz, Chabad, Morocco -->
-        <custom n="Teiman" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+        <custom n="Teiman" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10" sources="torat-chaim"/>
     </week>
     <week n="Haazinu">
           <custom n="Common" book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
