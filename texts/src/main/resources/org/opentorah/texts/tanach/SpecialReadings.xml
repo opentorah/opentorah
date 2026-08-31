@@ -495,5 +495,33 @@
         </custom>
       </haftarah>
     </reading>
+    <reading n="afternoonHaftarah" full="false">
+      <!--
+        hamichlol gives Tisha BeAv Mincha its own section, not the one shared by
+        the other public fasts: there Teiman and most of Sefard read nothing at
+        all, here everyone reads. So this is a table of its own, not a set of
+        exceptions to that one.
+      -->
+      <haftarah>
+        <custom n="Ashkenaz, Chabad" book="Isaiah" fromChapter="55" fromVerse="6"
+                toChapter="56" toVerse="8" sources="michlol, chabad-org"
+                comment="hamichlol for Ashkenaz; chabad.org for Chabad, which reads
+                         Dirshu here rather than following Sefard. hamichlol names no
+                         Chabad practice at this occasion, but its rite key nests
+                         Chabad under Ashkenaz, so it implies the same."/>
+        <custom n="Sefard" sources="michlol">
+          <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+          <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
+        </custom>
+        <custom n="Italki, Teiman" book="Hosea" fromChapter="14" fromVerse="2"
+                toVerse="10" sources="michlol"
+                comment="For Teiman hamichlol notes that the old Yemenite siddurim
+                         record no Mincha haftarah here at all; the practice was
+                         taken up in most communities in recent centuries, the
+                         Dor Daim excepted, and R. Yosef Kapach held in Siach
+                         Yerushalayim that those who do read it should not say the
+                         brachos, which was not accepted in practice."/>
+      </haftarah>
+    </reading>
   </day>
 </specialReadings>

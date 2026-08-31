@@ -567,10 +567,7 @@ object SpecialReadings:
   sealed trait Fast extends WeekdayReading, AfternoonReading:
     override def afternoon(day: Named): Reading =
       val torah: Torah = fromDay(day, Fast.torah)
-      val fastAfternoonHaftarah: Haftarah.Customs =
-        afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah)(afternoonHaftarahExceptions =>
-          Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions)
-      val haftarah: Haftarah.Customs = fromDay(day, fastAfternoonHaftarah)
+      val haftarah: Haftarah.Customs = fromDay(day, afternoonHaftarah)
       new Reading(
         customs = haftarah.lift[Reading.ReadingCustom]((_: Custom, haftarah: Option[Haftarah]) =>
           haftarah.fold(Reading.ReadingCustom(torah, None))((haftarah: Haftarah) =>
@@ -581,6 +578,18 @@ object SpecialReadings:
           )
         ).customs
       )
+
+    /**
+     * What is read at Mincha. Most fasts share one table and differ from it in
+     * places, which is what afternoonHaftarahExceptions is for; Tisha BeAv has
+     * a table of its own, and overrides this instead. Layering it on the shared
+     * one would be wrong rather than merely verbose: the exceptions can add and
+     * replace but not take away, and the customs that read nothing on an
+     * ordinary fast do read on Tisha BeAv.
+     */
+    protected def afternoonHaftarah: Haftarah.Customs =
+      afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah)(afternoonHaftarahExceptions =>
+        Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions)
 
     protected def afternoonHaftarahExceptions: Option[Haftarah.Customs] = None
 
@@ -606,6 +615,9 @@ object SpecialReadings:
     private val torah: Torah = torahFor("TishaBeAv", "torah")
 
     private val haftarah: Haftarah.Customs = haftarahFor("TishaBeAv", "haftarah")
+
+    override protected val afternoonHaftarah: Haftarah.Customs =
+      haftarahFor("TishaBeAv", "afternoonHaftarah")
 
   /**
    * Shabbos Shuvah -- the Shabbos between Rosh Hashanah and Yom Kippur -- has
