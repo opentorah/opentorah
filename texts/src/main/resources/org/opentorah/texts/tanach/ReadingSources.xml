@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The works the readings are attested in. An entry in Haftarah.xml or
+  SpecialReadings.xml names them in its `sources` attribute, by the `n` here.
+
+  kind: chumash, siddur, halachah, study, website, or reconstruction.
+  A reconstruction is not a work of its own: it is a reading established by
+  combining others, which it names in `combines`.
+-->
+<ReadingSources>
+  <source n="michlol" kind="website" name="hamichlol"
+          where="הפטרה"
+          url="https://www.hamichlol.org.il/הפטרה"/>
+
+  <source n="torah-temimah" kind="chumash" name="Chumash Torah Temimah"
+          publication="Hebrew Publishing Company, New York 1928"/>
+
+  <source n="chabad-org" kind="website" name="chabad.org"
+          url="https://www.chabad.org"/>
+
+  <source n="finkelstein" kind="study" name="Louis Finkelstein"
+          where="The Prophetic Readings According to the Palestinian, Byzantine, and Karaite Rites, HUCA vol. 17 (1942-1943) p. 423"
+          url="https://www.jstor.org/stable/23506442"/>
+
+  <source n="opensiddur" kind="study"
+          name="Sedarim and Hafṭarot according to the nusaḥ Erets Yisrael"
+          where="St. Petersburg Manuscript, NLR Ms. EVR II B 42; ed. Isaac Gantwerk Mayer, CC BY-SA 4.0"
+          url="https://opensiddur.org/readings-and-sourcetexts/reading-schedules/sedarim-and-haftarot-according-to-the-nusah-erets-yisrael-as-recorded-in-the-st-petersburg-manuscript-nlr-ms-evr-ii-b-42/"/>
+
+  <source n="romania-reconstruction" kind="reconstruction"
+          name="Romania readings reconstructed from the Erets Yisrael sedarim"
+          where="the haftarah of the first complete seder falling within each parsha, per michlol's account of how Romania chose one reading from the three parallel sedarim"
+          combines="finkelstein, opensiddur"/>
+
+  <source n="chitas" kind="chumash" name="Sefer Chitas"
+          publication="Kehot Publication Society, Brooklyn NY, 2019"/>
+
+  <source n="torat-chaim" kind="chumash" name="Chumash Torat Chaim"
+          publication="Mossad Harav Kook, Jerusalem 1993"/>
+
+  <source n="steinsaltz" kind="chumash" name="Chumash Steinsaltz"
+          publication="Koren Publishers, Jerusalem 2023"/>
+</ReadingSources>

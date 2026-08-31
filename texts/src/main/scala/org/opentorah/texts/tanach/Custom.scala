@@ -13,19 +13,28 @@ enum Custom(nameOverride: Option[String] = None)
 
   lazy val children: Set[Custom] = Custom.valuesSeq.filter(_.parent.contains(this)).toSet
 
+  /** Is this the given custom, or one that inherits from it? */
+  def isUnder(ancestor: Custom): Boolean =
+    (this == ancestor) || parent.exists(_.isUnder(ancestor))
+
   def level: Int = parent.fold(0)(parent => parent.level+1)
 
   case Common extends Custom()
   case Ashkenaz extends Custom()
   case Italki extends Custom()
   case Frankfurt extends Custom()
+  case Poznan extends Custom()
   case Lita extends Custom()
   case ChayeyOdom extends Custom(nameOverride = Some("Chayey Odom"))
   case Hagra extends Custom()
   case Sefard extends Custom()
   case Chabad extends Custom()
+  case PureSephardim extends Custom(nameOverride = Some("Pure Sephardim"))
+  case Persia extends Custom()
+  case Libya extends Custom()
   case Magreb extends Custom()
   case Algeria extends Custom()
+  case Algiers extends Custom()
   case Toshbim extends Custom()
   case Djerba extends Custom()
   case Morocco extends Custom()
@@ -34,6 +43,7 @@ enum Custom(nameOverride: Option[String] = None)
   case Teiman extends Custom()
   case Baladi extends Custom()
   case Shami extends Custom()
+
 
 object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
   override val valuesSeq: Seq[Custom] = values.toIndexedSeq
@@ -122,6 +132,18 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
 
     @scala.annotation.targetName("append")
     final def ++(other: Of[T]): Of[T] = new Of[T](customs ++ other.customs, full = false)
+
+    /**
+     * This, but with the subtree under each of `at` taken from `other` instead:
+     * used where one custom follows a different reading from everyone else, as
+     * Chabad does when Acharei and Kedoshim combine. Everything at or below a
+     * grafted custom comes from `other`, so grafting at Common replaces the lot.
+     */
+    final def graft(other: Of[T], at: Set[Custom]): Of[T] = if at.isEmpty then this else
+      val grafted: Customs[T] = at.foldLeft(Map.empty[Custom, T])((acc, root) =>
+        acc ++ other.customs.filter((custom, _) => custom.isUnder(root)) + (root -> other.doFind(root))
+      )
+      new Of[T](customs.filterNot((custom, _) => at.exists(custom.isUnder)) ++ grafted, full = false)
 
     @scala.annotation.targetName("multiply")
     final def *(other: Of[T]): Of[(T, Option[T])] =

@@ -95,4 +95,29 @@
     <name n="Шами" lang="ru"/>
     <name n="שאמי" lang="he"/>
   </names>
+  <names>
+    <name n="Poznan" lang="en" transliterated="true"/>
+    <name n="Познанский" lang="ru"/>
+    <name n="פוזנא" lang="he"/>
+  </names>
+  <names>
+    <name n="Pure Sephardim" lang="en" transliterated="true"/>
+    <name n="Чистые сефарды" lang="ru"/>
+    <name n="ספרדים טהורים" lang="he"/>
+  </names>
+  <names>
+    <name n="Persia" lang="en" transliterated="true"/>
+    <name n="Персия и Бухара" lang="ru"/>
+    <name n="פרס ובוכרה" lang="he"/>
+  </names>
+  <names>
+    <name n="Libya" lang="en" transliterated="true"/>
+    <name n="Ливийский" lang="ru"/>
+    <name n="לוב" lang="he"/>
+  </names>
+  <names>
+    <name n="Algiers" lang="en" transliterated="true"/>
+    <name n="Алжир" lang="ru"/>
+    <name n="אלג׳יר" lang="he"/>
+  </names>
 </Custom>

@@ -350,11 +350,16 @@
     </reading>
     <reading n="haftarah">
       <haftarah book="Joshua">
-        <custom n="Ashkenaz, Chabad">
+        <custom n="Ashkenaz, Chabad" sources="steinsaltz">
           <part n="1" fromChapter="3" fromVerse="5" toVerse="7"/>
           <part n="2" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> <!-- piece 1 -->
           <part n="3" fromChapter="6" fromVerse="27"/> <!-- piece 2 -->
         </custom>
+        <custom n="Ashkenaz" variant="2" sources="michlol" fromChapter="5" fromVerse="2"
+                toChapter="6" toVerse="1"
+                comment="hamichlol gives Ashkenaz the bare piece 1, without 3:5-7 or
+                         6:27; it gives the same to Romania. Same text as the
+                         Frankfurt and Hagra reading below."/>
         <custom n="Sefard">
           <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> <!-- piece 1 -->
           <part n="2" fromChapter="6" fromVerse="27"/> <!-- piece 2 -->
@@ -441,7 +446,7 @@
       <haftarah>
         <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6"
                 toChapter="56" toVerse="8"/> <!-- = Vayeilech Italki -->
-        <custom n="Algeria"> <!-- = Vayeilech Ashkenaz -->
+        <custom n="Algeria"> <!-- = Vayeilech Ashkenaz variant 2 -->
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
@@ -451,7 +456,7 @@
   <day n="FastOfGedalia">
     <reading n="afternoonHaftarahExceptions" full="false">
       <haftarah>
-        <custom n="Morocco"> <!-- = Vayeilech Ashkenaz -->
+        <custom n="Morocco"> <!-- = Vayeilech Ashkenaz variant 2 -->
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>

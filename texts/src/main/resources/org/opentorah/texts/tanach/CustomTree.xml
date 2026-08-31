@@ -10,13 +10,18 @@
   <custom n="Ashkenaz"       parent="Common"/>
   <custom n="Italki"         parent="Ashkenaz"/>
   <custom n="Frankfurt"      parent="Ashkenaz"/>
+  <custom n="Poznan"         parent="Ashkenaz"/>
   <custom n="Lita"           parent="Ashkenaz"/>
   <custom n="Chayey Odom"    parent="Lita"/>
   <custom n="Hagra"          parent="Ashkenaz"/>
   <custom n="Sefard"         parent="Common"/>
   <custom n="Chabad"         parent="Sefard"/>
+  <custom n="Pure Sephardim" parent="Sefard"/>
+  <custom n="Persia"         parent="Sefard"/>
+  <custom n="Libya"          parent="Sefard"/>
   <custom n="Magreb"         parent="Sefard"/>
   <custom n="Algeria"        parent="Magreb"/>
+  <custom n="Algiers"        parent="Algeria"/>
   <custom n="Toshbim"        parent="Magreb"/>
   <custom n="Djerba"         parent="Magreb"/>
   <custom n="Morocco"        parent="Magreb"/>
