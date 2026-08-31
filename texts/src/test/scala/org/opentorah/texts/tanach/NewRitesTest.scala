@@ -64,6 +64,17 @@ final class NewRitesTest extends AnyFlatSpec, Matchers:
     // most Sefardim read no haftarah at Mincha at all
     haftarahOf(Custom.Sefard) shouldBe None
 
+  "Morocco and Algeria" should "read Dirshu on the Fast of Gedalia, Hosea on the rest" in:
+    def haftarahOn(fast: SpecialReadings.Fast, custom: Custom): Option[String] =
+      fast.afternoon(Parsha.Bereishis).doFind(custom).maftirAndHaftarah.map(mh => spans(mh.haftarah))
+    for custom <- Seq(Custom.Morocco, Custom.Algeria) do withClue(s"$custom: "):
+      haftarahOn(SpecialReadings.FastOfGedalia, custom) shouldBe Some("Isaiah 55:6-56:8")
+      haftarahOn(SpecialReadings.FastOfTeves, custom) shouldBe
+        Some("Hosea 14:2-14:10; Micah 7:18-7:20")
+    // the city keeps Dirshu on both
+    haftarahOn(SpecialReadings.FastOfTeves, Custom.Algiers) shouldBe Some("Isaiah 55:6-56:8")
+    haftarahOn(SpecialReadings.FastOfGedalia, Custom.Algiers) shouldBe Some("Isaiah 55:6-56:8")
+
   "the new rites" should "cite hamichlol" in:
     ReadingSources.forParsha(Parsha.Chukas, Custom.Poznan).map(_.key) should contain ("michlol")
     ReadingSources.forParsha(Parsha.Shemos, Custom.Persia).map(_.key) should contain ("michlol")
