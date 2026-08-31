@@ -144,6 +144,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     parts: Seq[WithNumber[BookSpan]] <- PartElement(bookSpanParsed).seq()
     partsOpt: Option[Haftarah] <- if parts.isEmpty then ZIO.none else partsParser(parts).map(Some(_))
     parsed: Seq[CustomParsed] <- CustomElement(bookSpanParsed).seq()
+    standalone: Seq[(Set[Custom], Annotation)] <- AnnotationElement.seq()
   yield
     // a variant stands beside the reading rather than being one of them, so it
     // takes no part in building the map that customs resolve through
@@ -157,10 +158,13 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
     val customsElements: Seq[(Set[Custom], Haftarah)] = parsedCustoms.map(p => (p.customs, p.haftarah))
     // one annotation may cover several customs: `<custom n="Sefard, Italki" sources="1"/>`
-    val annotations: Annotations = parsedCustoms
-      .filterNot(_.annotation.isEmpty)
-      .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation))
-      .groupMapReduce((custom, _) => custom)((_, annotation) => annotation)(_ ++ _)
+    val annotations: Annotations = (
+      parsedCustoms
+        .filterNot(_.annotation.isEmpty)
+        .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation)) ++
+      standalone
+        .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation))
+    ).groupMapReduce((custom, _) => custom)((_, annotation) => annotation)(_ ++ _)
 
     val customs: Custom.Of[Haftarah] = Custom.Of(customsElements, full = false)
     val common: Option[Haftarah] = if parts.isEmpty && customsElements.isEmpty then Some(oneSpan(bookSpanParsed)) else partsOpt
@@ -196,6 +200,25 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
         yield CustomParsed(Custom.parse(n), result, annotation(sources, comment), variant.map(_.trim.toInt))
 
         override def unparser: Unparser[CustomParsed] = ???
+
+  /**
+   * What is known about a custom's reading, where the custom has no reading of
+   * its own: `<annotation n="Chabad" sources="chitas"/>`. A custom that follows
+   * its parent has nowhere to carry a source, and giving it an entry to hold one
+   * would assert a distinction that is not being made -- and be rejected, since
+   * two entries cannot hold the same reading. This attaches the source to the
+   * custom without touching what it reads.
+   */
+  private object AnnotationElement extends ElementTo[(Set[Custom], Annotation)]("annotation"):
+    override def contentParsable: Parsable[(Set[Custom], Annotation)] =
+      new Parsable[(Set[Custom], Annotation)]:
+        override def parser: Parser[(Set[Custom], Annotation)] = for
+          n: String <- Attribute("n").required()
+          sources: Option[String] <- sourcesAttribute.optional()
+          comment: Option[String] <- commentAttribute.optional()
+        yield (Custom.parse(n), annotation(sources, comment))
+
+        override def unparser: Unparser[(Set[Custom], Annotation)] = ???
 
   private final class PartElement(ancestorSpan: BookSpanParsed) extends ElementTo[WithNumber[BookSpan]]("part"):
     override def contentParsable: Parsable[WithNumber[BookSpan]] = new Parsable[WithNumber[BookSpan]]:
