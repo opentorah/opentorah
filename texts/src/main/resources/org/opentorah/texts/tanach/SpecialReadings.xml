@@ -452,9 +452,16 @@
     </reading>
     <reading n="defaultAfternoonHaftarah" full="false">
       <haftarah>
-        <custom n="Ashkenaz, Chabad, Morocco" book="Isaiah" fromChapter="55" fromVerse="6"
-                toChapter="56" toVerse="8"/> <!-- = Vayeilech Italki -->
-        <custom n="Algeria"> <!-- = Vayeilech Ashkenaz variant 2 -->
+        <custom n="Ashkenaz, Chabad, Morocco, Algiers" book="Isaiah" fromChapter="55"
+                fromVerse="6" toChapter="56" toVerse="8" sources="1"
+                comment="hamichlol puts the city of Algiers with Ashkenaz and Italki on
+                         Dirshu, against the rest of Algeria below: 'א, איט, קהילת העיר
+                         אלג'יר, רומ''. The city is a custom of its own for this reading
+                         alone."/> <!-- = Vayeilech Italki -->
+        <custom n="Algeria" sources="1"
+                comment="The country apart from the city of Algiers. hamichlol has
+                         Hosea followed by Micah 7:18-20 here, not Joel; the Joel
+                         ending is unsourced and still to be checked."> <!-- = Vayeilech Ashkenaz variant 2 -->
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Joel" fromChapter="2" fromVerse="11" toVerse="27"/>
         </custom>
