@@ -123,10 +123,12 @@ object SpecialReadings:
     private val shabbosAdditionalHaftarah: Haftarah.Customs = haftarahFor("ErevRoshChodesh", "shabbosAdditionalHaftarah")
 
   object RoshChodesh extends WeekdayReading:
+    // Ashkenaz and Sefard divide these aliyot the same way, so the division is
+    // stated once for Common: naming the two of them instead would leave any
+    // custom that hangs off Common directly -- Romania -- without a reading.
     def weekday(day: Named): Reading = readingByCutom(day,
-      Custom.Ashkenaz -> ashkenazSefard,
-      Custom.Sefard   -> ashkenazSefard,
-      Custom.Hagra    -> hagra
+      Custom.Common -> ashkenazSefard,
+      Custom.Hagra  -> hagra
     )
 
     private val torah: Seq[Fragment] = torahFor("RoshChodesh", "torah").spans
@@ -269,8 +271,11 @@ object SpecialReadings:
       val ashkenazAndChabad: Torah = Torah.aliyot(korbanot(n), korbanot(n+1), korbanot(n+2), today)
       val sefard: Torah = Torah.aliyot(today, today, today, today)
 
+      // Chabad follows Ashkenaz here rather than Sefard, so it keeps its own
+      // entry; the Ashkenaz division is stated for Common so that a custom
+      // hanging off Common directly -- Romania -- has one too.
       readingByCutom(day,
-        Custom.Ashkenaz -> ashkenazAndChabad,
+        Custom.Common -> ashkenazAndChabad,
         Custom.Chabad -> ashkenazAndChabad,
         Custom.Sefard -> sefard
       )
@@ -364,7 +369,7 @@ object SpecialReadings:
       require(sefard.length == 3)
 
       roshChodeshDay.fold(readingByCutom(day,
-        Custom.Ashkenaz -> Torah(ashkenazAndChabad),
+        Custom.Common -> Torah(ashkenazAndChabad),
         Custom.Chabad -> Torah(ashkenazAndChabad),
         Custom.Sefard -> Torah(sefard)
       ))(roshChodeshDay => Reading(RoshChodesh.in3aliyot(roshChodeshDay) :+ fromDay(day, full(dayNumber))))

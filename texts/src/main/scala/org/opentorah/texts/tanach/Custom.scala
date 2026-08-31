@@ -43,6 +43,7 @@ enum Custom(nameOverride: Option[String] = None)
   case Teiman extends Custom()
   case Baladi extends Custom()
   case Shami extends Custom()
+  case Romania extends Custom()
 
 
 object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:

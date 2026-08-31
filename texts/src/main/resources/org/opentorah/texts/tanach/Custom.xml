@@ -120,4 +120,9 @@
     <name n="Алжир" lang="ru"/>
     <name n="אלג׳יר" lang="he"/>
   </names>
+  <names>
+    <name n="Romania" lang="en" transliterated="true"/>
+    <name n="Румыния (нусах романия)" lang="ru"/>
+    <name n="רומניא" lang="he"/>
+  </names>
 </Custom>

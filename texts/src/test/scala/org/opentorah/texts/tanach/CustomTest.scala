@@ -9,13 +9,15 @@ final class CustomTest extends AnyFlatSpec, Matchers:
   "Customs" should "load correctly" in:
     Custom.ChayeyOdom.names.hasName("Хаей адам") shouldBe true
 
+  // Ashkenaz and Sefard no longer cover the tree between them: Romania hangs
+  // off Common directly, so a map naming only those two is not full.
   "minimize()" should "remove redundant children" in:
     check(
-      Map(Ashkenaz -> "X", Chabad -> "X", Sefard -> "X"),
+      Map(Ashkenaz -> "X", Chabad -> "X", Sefard -> "X", Romania -> "X"),
       Map(Common -> "X")
     )
     check(
-      Map(Ashkenaz -> "X", Sefard -> "X"),
+      Map(Ashkenaz -> "X", Sefard -> "X", Romania -> "X"),
       Map(Common -> "X")
     )
 
