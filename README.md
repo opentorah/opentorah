@@ -103,3 +103,11 @@ As a result, I currently use the fewest number of modules approach: code is sepa
 to be deployed separately, as a website (docs), or a service (collector, texts).
 
 If users that need just the calendar code appear, I'll think about splitting that ;)
+
+## TODO
+
+- rename CustomTree.xml -> Custom.xml
+- align customs in Custom.scala vertically
+- remove Scala XML dependency;
+- reading of specials is lazy, but parsing should be rager!
+- later change: The keys are the object names, not SpecialDay's own. Mapping them across is what collapses the 41-arm match in schedule/tanach/Readings.scala into a lookup — a change that touches the schedule module, better on its own than buried in a move this wide.
