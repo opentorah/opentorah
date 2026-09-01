@@ -11,7 +11,6 @@ repositories {
 }
 
 dependencies {
-  implementation project(':opentorah-util')
   implementation project(':opentorah-core')
   implementation libs.logback
 }

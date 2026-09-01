@@ -8,11 +8,11 @@ import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser
  * differences are the part most likely to be questioned, so an entry in
  * Haftarah.xml can name the sources it rests on:
  *
- *   <week n="Vayeilech" sources="1 2">
+ *   <week n="Vayeilech" sources="michlol chitas">
  *     <custom n="Ashkenaz" sources="2"> ... </custom>
  *   </week>
  *
- * The numbers are indices into [[ReadingSources.sources]]. A `sources` on a
+ * A `sources` on a
  * `custom` applies to that custom; one on the `week` applies to the whole
  * entry, and both are reported for a custom that carries its own.
  *

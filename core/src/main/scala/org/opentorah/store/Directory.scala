@@ -23,8 +23,6 @@ abstract class Directory[
   wrapper: Map[String, M] => W
 ) extends Stores[M], FromUrl.With:
 
-  final def directoryUrl: URL = Files.subdirectory(fromUrl.url, directory)
-
   private val listFile: ListFile[M, W] = ListFile[M, W](
     url = Files.fileInDirectory(fromUrl.url, directory + "-list-generated.xml"),
     name = "directory",
@@ -32,32 +30,12 @@ abstract class Directory[
     wrapper = (entries: Seq[M]) => wrapper(entries.map(entry => entry.name -> entry).toMap)
   )
 
-  final def writeDirectory(): Parser[Unit] =
-    ZIO.foreach(
-      Files.filesWithExtensions(Files.url2file(directoryUrl), fileExtension).sorted
-    )(name => getFile(name).flatMap(file => entryMaker(name, file)))
-      .map(listFile.write)
-
   override def findByName(name: String): Parser[Option[M]] = getDirectory.map(_.findByName(name))
 
   override def stores: Parser[Seq[M]] = getDirectory.map(_.stores)
 
   // TODO rename getWrapper?
-  final def getDirectory: Parser[W] = listFile.get
-
-  final def getFile(entry: M): Parser[T] = getFile(entry.name)
-  private def getFile(name: String): Parser[T] = Parser.getCachedByUrl[T](fileUrl(name), loadFile)
-
-  final def fileUrl(entry: M): URL = fileUrl(entry.name)
-  final def fileUrl(name: String): URL = Files.fileInDirectory(directoryUrl, name + "." + fileExtension)
-
-  final def writeFile(entry: M, content: String): Unit = Files.write(
-    file = Files.url2file(fileUrl(entry)),
-    content
-  )
-
-  // TODO abstract over Xml?
-  protected def loadFile(url: URL): Parser[T]
+  private final def getDirectory: Parser[W] = listFile.get
 
 object Directory:
 
