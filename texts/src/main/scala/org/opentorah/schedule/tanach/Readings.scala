@@ -6,7 +6,7 @@ import org.opentorah.calendar.jewish.Jewish.Month.*
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay.*
 import org.opentorah.metadata.Named
-import org.opentorah.texts.tanach.{Parsha, Reading, SpecialReadings, WeeklyReading}
+import org.opentorah.texts.tanach.{Custom, Parsha, Reading, SpecialReadings, Torah, WeeklyReading}
 
 object Readings:
   final def getMorningReading(
@@ -231,6 +231,12 @@ object Readings:
       )
 
   // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
+  /** Only Simchas Torah is read at night, and only by some customs; the rest
+    * are given None by the reading itself rather than by this returning None. */
+  def getEveningReading(specialDay: Option[SpecialDay]): Option[SpecialReadings.Evening] =
+    specialDay collect:
+      case SimchasTorah => SpecialReadings.SimchasTorah.evening(SimchasTorah)
+
   def getAfternoonReading(
     day: Day,
     specialDay: Option[SpecialDay],

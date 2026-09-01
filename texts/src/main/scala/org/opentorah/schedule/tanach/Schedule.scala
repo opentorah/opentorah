@@ -4,7 +4,7 @@ import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.metadata.Named
-import org.opentorah.texts.tanach.{Reading, WeeklyReading}
+import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
 import org.opentorah.util.{Cache, Collections}
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
@@ -23,6 +23,9 @@ object Schedule:
     val morning: Option[Reading],
     val purimAlternativeMorning: Option[Reading],
     val afternoon: Option[Reading],
+    /** Read at night, after maariv: Simchas Torah only, and only by some
+      * customs, which the reading itself says by giving the rest None. */
+    val evening: Option[SpecialReadings.Evening],
     val chitas: Chitas
   )
 
@@ -93,6 +96,7 @@ object Schedule:
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
         ),
+        evening = Readings.getEveningReading(specialDay = specialDay),
         chitas = Chitas(day, currentWeeklyReadings.get(day), inHolyLand)
       )
 

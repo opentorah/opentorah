@@ -71,6 +71,30 @@ object SpecialReadings:
   sealed trait AfternoonReading:
     def afternoon(day: Named): Reading
 
+  /**
+   * Read at night, after maariv. Only Simchas Torah has one, and only some
+   * read it -- so the customs that do not read are given None at the root
+   * rather than left out. The map stays full: every custom resolves, and
+   * "reads nothing" is an answer rather than a hole. A Reading cannot say
+   * this, since it must give every custom a Torah; and there is no maftir or
+   * haftarah at night anyway.
+   */
+  sealed trait EveningReading:
+    def evening(day: Named): Evening
+
+  /**
+   * A night reading. The practices are nested rather than alternative, so the
+   * longer one is given and the note says where the shorter stops: showing all
+   * five aliyot and saying that some read only the first three tells the whole
+   * of it, where showing three and mentioning a longer one would not.
+   */
+  final class Evening(
+    val torah: Custom.Of[Option[Torah]],
+    /** Whom the reading belongs to, how far the shorter practice goes, and
+      * what settles it. Meant to be shown beside the reading. */
+    val note: String
+  )
+
   sealed trait ShabbosAndWeekdayReading extends ShabbosReading, WeekdayReading:
     final override def weekday(day: Named): Reading = getReading(weekdayTorah, day)
 
@@ -302,7 +326,7 @@ object SpecialReadings:
      It is possible that this is a difference between chassidim and litaim." */
     override protected val haftarah: Haftarah.Customs = haftarahFor("SheminiAtzeres", "haftarah")
 
-  object SimchasTorah extends WeekdayReading:
+  object SimchasTorah extends WeekdayReading, EveningReading:
     final override def weekday(day: Named): Reading = Reading(
       torah(day),
       Some(fromDay(day, maftir)),
@@ -317,6 +341,26 @@ object SpecialReadings:
     private def maftir: Maftir = SheminiAtzeres.maftir
 
     private def haftarah: Haftarah.Customs = Parsha.VezosHaberachah.haftarah
+
+    /**
+     * The night reading, after the hakafos: Ashkenaz only, and not all of
+     * them. Some read the first three aliyot of Vezos Haberachah and some the
+     * first five; the split does not follow rite lines and is fragmented, so
+     * both are recorded rather than one being chosen. Nitei Gavriel, Hilchos
+     * Sukkos. Not a Custom.Of variant: the two belong to the same custom, and
+     * the Torah readings carry no variant of their own the way haftarot do.
+     */
+    override def evening(day: Named): Evening = Evening(
+      torah = eveningAliyot(day, 5),
+      note = "Read by Ashkenaz, and not by all of them. Some read only the " +
+             "first three of these aliyot. The split does not follow rite " +
+             "lines. Nitei Gavriel, Hilchos Sukkos."
+    )
+
+    private def eveningAliyot(day: Named, count: Int): Custom.Of[Option[Torah]] =
+      val ashkenaz: Torah = Parsha.VezosHaberachah.days.doFind(Custom.Ashkenaz)
+      val torah: Torah = fromDay(day, Torah(ashkenaz.spans.take(count)))
+      Custom.Of(Map(Custom.Common -> None, Custom.Ashkenaz -> Some(torah)))
 
 
   object SheminiAtzeresAndSimchasTorahInHolyLand extends WeekdayReading, ShabbosReading:

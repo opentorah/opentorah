@@ -43,6 +43,10 @@
 
   <!-- hamichlol's own source for the Poznan readings, named in the footnote on
        its rite code rather than on any one reading, so it stands behind them all. -->
+  <source n="nitei-gavriel" kind="halachah" name="Nitei Gavriel"
+          where="Hilchot Sukkot"
+          publication="Hotzaat Shemesh, Jerusalem 2002"/>
+
   <source n="poznan-pinkas" kind="study" name="Pinkas Beis HaKnesses de-Kehilas Pozna"
           publication="in Berakhah le-Menachem, St. Louis 1955, p. 262"/>
 </ReadingSources>
