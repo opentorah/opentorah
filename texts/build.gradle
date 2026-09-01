@@ -19,7 +19,6 @@ tasks.register('serveCalendar', JavaExec) {
 
 dependencies {
   implementation project(':opentorah-core')
-  implementation project(':opentorah-util')
 
   testImplementation libs.caffeine
   implementation libs.zio.http

@@ -2,7 +2,7 @@ plugins {
   id 'io.github.ben-manes.versions'
   id 'idea'
   id 'base'
-  id 'com.gradleup.nmcp.aggregation' version '1.6.1'
+  id 'com.gradleup.nmcp.aggregation' version '1.6.2'
 }
 
 wrapper {

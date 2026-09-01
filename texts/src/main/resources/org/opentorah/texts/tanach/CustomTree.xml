@@ -4,6 +4,8 @@
   custom inherits a reading from its parent when it states none of its own
   (see Custom.Of.find). Kept here rather than in the enum so the tree can be
   read and changed as data; Custom.scala checks this file covers every value.
+  
+  TODO merge with Custo.xml?
 -->
 <CustomTree>
   <custom n="Common"/>

@@ -6,7 +6,7 @@ pluginManagement {
 
   plugins {
     id 'io.github.ben-manes.versions' version '0.61.0'
-    id 'org.podval.tools.scalajs'      version '1.0.3'
+    id 'org.podval.tools.scalajs'      version '1.0.4'
     id 'com.google.cloud.tools.jib'    version '3.5.4'
     id 'org.podval.tools.cloudrun'     version '0.4.3'
     id 'com.gradle.plugin-publish'     version '1.2.1'
@@ -46,7 +46,7 @@ dependencyResolutionManagement {
     library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
     library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
     library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.3")
+    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.4")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
@@ -65,7 +65,7 @@ dependencyResolutionManagement {
 
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.18')
-    library('logback' , 'ch.qos.logback:logback-classic:1.6.1')
+    library('logback' , 'ch.qos.logback:logback-classic:1.6.3')
     library('logstash', 'net.logstash.logback:logstash-logback-encoder:9.0')
 
     // Flexmark
@@ -79,7 +79,7 @@ dependencyResolutionManagement {
 
     // Testing
     library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.20")
-    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.19.0")
+    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.20.0")
   }}
 }
 

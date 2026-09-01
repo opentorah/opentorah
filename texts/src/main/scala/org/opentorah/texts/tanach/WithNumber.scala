@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Parser}
 
-// TODO move into texts
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber:

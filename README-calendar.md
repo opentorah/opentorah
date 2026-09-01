@@ -132,4 +132,5 @@ by Edward M. Reingold and Nachum Dershowitz
 - The Erets Yisrael reconstruction from the St Petersburg sedarim is not cited. It agrees with hamichlol on the opening verse in only 3 of the 14 weeks it derives — Bereishis is Isaiah 65:16–66:11 against Isaiah 65:17–24, Beshalach is Joshua 24 against Isaiah 65, Vezos Haberachah is I Kings 8 against Joshua 1 — so it is a second account rather than corroboration, and recording it belongs in variant entries.
 
 - Also worth its own change: require(isFull) gives no indication of which custom failed to resolve. Naming it would turn this class of failure from a bisect into a one-line diagnosis.
-- 
+
+- <torah> in SpecialReadings.xml takes no custom and no variant, unlike <haftarah>, which now takes sources, comment and variant. Per-custom aliyot exist in the weekly readings (<day custom="Chabad"> in Genesis.xml and the rest) and in Scala for the special ones (readingByCutom), but not in that element. It does not block this, since the night reading derives from Parsha.VezosHaberachah rather than restating spans, but it is the remaining gap between the two kinds of reading data.

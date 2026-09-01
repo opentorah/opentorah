@@ -51,8 +51,7 @@ final class ParserState:
     )
 
   def fromUrl: FromUrl = FromUrl(
-    url = stack.flatMap(_.from).head.url.get,
-    inline = stack.head.from.isEmpty
+    url = stack.flatMap(_.from).head.url.get
   )
 
   private def modifyCurrent(newCurrent: Current): Unit =
