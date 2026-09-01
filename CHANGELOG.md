@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: Java 25
 - cleanup: removed Collector;
 - cleanup: removed CalendarServer;
+- cleanup: merged 'util' into 'core'
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook

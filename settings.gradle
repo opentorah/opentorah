@@ -85,9 +85,6 @@ dependencyResolutionManagement {
 
 rootProject.name = 'opentorah'
 
-include ':util'
-project(':util'     ).name = 'opentorah-util'
-
 include ':core'
 project(':core'     ).name = 'opentorah-core'
 
