@@ -124,3 +124,12 @@ by Edward M. Reingold and Nachum Dershowitz
 , וכן בכל יום; וכן נוהגין (הגהות מיימוני פי"ח);
 ביום שמיני מתחילין: ביום (ד) השמיני, וגומרין כל הסדר,
   וקורין פרשה ראשונה של בהעלותך (ונוהגים לסיים כן עשה את המנורה) (מנהגים
+
+## TODO
+
+- reading of specials is lazy, but parsing should be rager!
+- later change: The keys are the object names, not SpecialDay's own. Mapping them across is what collapses the 41-arm match in schedule/tanach/Readings.scala into a lookup — a change that touches the schedule module, better on its own than buried in a move this wide.
+- The Erets Yisrael reconstruction from the St Petersburg sedarim is not cited. It agrees with hamichlol on the opening verse in only 3 of the 14 weeks it derives — Bereishis is Isaiah 65:16–66:11 against Isaiah 65:17–24, Beshalach is Joshua 24 against Isaiah 65, Vezos Haberachah is I Kings 8 against Joshua 1 — so it is a second account rather than corroboration, and recording it belongs in variant entries.
+
+- Also worth its own change: require(isFull) gives no indication of which custom failed to resolve. Naming it would turn this class of failure from a bisect into a one-line diagnosis.
+- 
