@@ -1,8 +1,9 @@
 package org.opentorah.util
 
+import org.slf4j.{Logger, LoggerFactory}
+
 import java.io.{BufferedWriter, File, FileWriter}
 import java.net.{URI, URL, URLDecoder}
-import org.slf4j.{Logger, LoggerFactory}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import scala.io.Source
