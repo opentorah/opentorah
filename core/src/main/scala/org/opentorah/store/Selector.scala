@@ -1,33 +1,52 @@
 package org.opentorah.store
 
-import org.opentorah.metadata.{HasName, HasValues, Named, Names}
-import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
+import org.opentorah.metadata.{HasValues, Named, Names}
+import org.podval.xml.{XmlAst, XmlCodec, XmlParser}
 
 // TODO introduce transparent (optional) selectors.
-final class Selector(
+final case class Selector(
   override val names: Names,
-  val title: Option[String] // TODO replace with plural? Eliminate?
-) extends Named
+  title: Option[String] // TODO replace with plural? Eliminate?
+) extends Named derives CanEqual
 
-object Selector extends ElementTo[Selector]("selector"), HasValues.FindByName[Selector]:
+object Selector extends HasValues.FindByName[Selector]:
+  // TODO why so much stuff? org.podval.xml not powerful enough?
+  val codec: XmlCodec[Selector] = new XmlCodec[Selector]:
+    override def elementName: String = "selector"
+    override def isRecordLike: Boolean = true
 
-  private val titleAttribute: Attribute.Optional[String] = Attribute("title").optional
+    override def unsafeDecode[E: XmlAst](element: E): Selector =
+      Selector(
+        names = Names.fromDefaultName(element.get("n"), NameChildren.decode(element)),
+        title = element.get("title")
+      )
 
-  override def contentParsable: Parsable[Selector] = new Parsable[Selector]:
-    override val parser: Parser[Selector] = for
-      names: Names <- Names.withDefaultNameParsable()
-      title: Option[String] <- titleAttribute()
-    yield Selector(
-      names,
-      title
-    )
-
-    override val unparser: Unparser[Selector] = Unparser.concat(
-      Names.withDefaultNameParsable(_.names),
-      titleAttribute(_.title)
-    )
+    override def encodeNamed[E: XmlAst](elName: String, value: Selector): E =
+      NameChildren.encode(elName, value.names, value.title.toSeq.map("title" -> _))
 
   def valuesSeq: Seq[Selector] = values.toIndexedSeq
 
-  // Note: this is lazy because Selector needs to be initialized when it is passed as a parameter to load:
-  lazy val values: Seq[Selector] = Parser.unsafeRun(HasName.load(From.resource(this), this))
+  lazy val values: Seq[Selector] = XmlParser.parseCatalog(
+    classOf[Selector],
+    "Selector.xml",
+    "Selector",
+    codec
+  ).fold(error => throw error, identity)
+
+// TODO why so much stuff? org.podval.xml not powerful enough?
+private[store] object NameChildren:
+  def decode[E: XmlAst](element: E): Seq[org.opentorah.metadata.Name] =
+    org.opentorah.metadata.Name.codec.decodeChildren(element).fold(error => throw error, identity)
+
+  def encode[E: XmlAst](
+    elName: String,
+    names: Names,
+    extraAttributes: Seq[(String, String)]
+  ): E =
+    val ast: XmlAst[E] = summon[XmlAst[E]]
+    val default: Option[String] = names.getDefaultName
+    val attributes: Seq[(String, String)] = default.toSeq.map("n" -> _) ++ extraAttributes
+    val children: ast.Nodes =
+      if default.isDefined then Seq.empty
+      else names.names.map(name => org.opentorah.metadata.Name.codec.encode(name))
+    ast.element(elName, attributes, children)
