@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Element, ElementsTo, From, Parser}
+import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
 import Torah.{Fragment, Maftir}
 
 /* All the special readings and their rules are here.
@@ -14,20 +14,18 @@ import Torah.{Fragment, Maftir}
  I am not sure that coding all those relationships will increase clarity, so they are left in the comments.
  */
 object SpecialReadings:
+  private given xmlAst: XmlAst[ZioXml.Element] = ZioXml
 
-  private def parseTorah(element: Element): Torah = parse(Torah.torahParsable, "Torah", element)
+  private def parseTorah(element: ZioXml.Element): Torah = Torah.decode(element)
 
-  private def parseMaftir(element: Element): Maftir = parse(Torah.Maftir, "Maftir", element)
+  private def parseMaftir(element: ZioXml.Element): Maftir = Torah.decodeMaftir(element)
 
-  private def parseHaftarah(element: Element, full: Boolean = true): Haftarah.Customs =
-    parse(Haftarah.element(full), "Haftarah", element)
+  private def parseHaftarah(element: ZioXml.Element, full: Boolean = true): Haftarah.Customs =
+    Haftarah.decode(element, full)
 
-  /** A reading in which a custom may read nothing at all; see Haftarah.NoneElement. */
-  private def parseHaftarahOptional(element: Element): Haftarah.OptionalCustoms =
-    parse(Haftarah.optionalElement(full = false), "Haftarah", element)
-
-  private def parse[R](fromXml: ElementsTo[R], what: String, element: Element): R =
-    Parser.unsafeRun(fromXml.parse(From.xml(what, element)))
+  /** A reading in which a custom may read nothing at all; see `<none>`. */
+  private def parseHaftarahOptional(element: ZioXml.Element): Haftarah.OptionalCustoms =
+    Haftarah.decodeOptional(element, full = false)
 
   /**
    * The readings live in SpecialReadings.xml, keyed by the occasion and by the
@@ -36,13 +34,15 @@ object SpecialReadings:
    * them. Lazy, so that loading happens on first use rather than during the
    * initialisation of the objects below.
    */
-  private lazy val readings: Map[(String, String), (Element, Boolean)] =
-    val root: Element = Parser.unsafeRun(From.resourceNamed(this, "SpecialReadings").load)
-    val parsed: Seq[((String, String), (Element, Boolean))] = for
-      day: scala.xml.Node <- (root \ "day").toSeq
-      reading: scala.xml.Node <- (day \ "reading").toSeq
-      element: Element <- reading.child.collect { case elem: Element => elem }
-    yield (day \@ "n", reading \@ "n") -> (element, (reading \@ "full") != "false")
+  private lazy val readings: Map[(String, String), (ZioXml.Element, Boolean)] =
+    val root: ZioXml.Element = XmlParser.parseResource(getClass, "SpecialReadings.xml")
+      .fold(error => throw error, identity)
+    val parsed: Seq[((String, String), (ZioXml.Element, Boolean))] = for
+      day <- XmlDecode.childrenNamed(root, "day")
+      reading <- XmlDecode.childrenNamed(day, "reading")
+      element <- reading.getChildren.flatMap(_.asElement)
+    yield (XmlDecode.requireAttr(day, "n"), XmlDecode.requireAttr(reading, "n")) ->
+      (element, !reading.get("full").contains("false"))
     Collections.checkNoDuplicates(parsed.map(_._1), "special readings")
     parsed.toMap
 
@@ -54,12 +54,12 @@ object SpecialReadings:
    * Pesach by theirs, one table by all the fasts.
    */
   lazy val recorded: Map[(String, String), Haftarah.Recorded] = readings
-    .collect { case (key, (element: Element, full: Boolean)) if element.label == "haftarah" =>
-      key -> parse(Haftarah.recordedIn(full), "Haftarah", element)
+    .collect { case (key, (element, full)) if element.localName == "haftarah" =>
+      key -> Haftarah.decodeRecorded(element, full)
     }
     .filterNot((_, recorded) => recorded.isEmpty)
 
-  private def readingFor(day: String, name: String): (Element, Boolean) = readings.getOrElse(
+  private def readingFor(day: String, name: String): (ZioXml.Element, Boolean) = readings.getOrElse(
     (day, name),
     throw IllegalArgumentException(s"SpecialReadings.xml has no '$name' for '$day'")
   )
@@ -69,7 +69,7 @@ object SpecialReadings:
   private def maftirFor(day: String, name: String): Maftir = parseMaftir(readingFor(day, name)._1)
 
   private def haftarahFor(day: String, name: String): Haftarah.Customs =
-    val (element: Element, full: Boolean) = readingFor(day, name)
+    val (element: ZioXml.Element, full: Boolean) = readingFor(day, name)
     parseHaftarah(element, full)
 
   private def haftarahOptionalFor(day: String, name: String): Haftarah.OptionalCustoms =

@@ -2,7 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
 import org.opentorah.util.Effects
-import org.opentorah.xml.{ElementTo, Parsable, Parser, Unparser}
+import org.opentorah.xml.Parser
+import org.podval.xml.XmlAst
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -60,27 +61,19 @@ object Torah extends WithBookSpans[Chumash]:
       _ <- Effects.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
     yield Torah(spans.map(inBook(bookSpan.book, _)))
 
-  object torahParsable extends ElementTo[Torah]("torah"):
-    override def contentParsable: Parsable[Torah] = new Parsable[Torah]:
-      override def parser: Parser[Torah] = for
-        bookSpan: BookSpan <- spanParser.map(_.resolve)
-        spans: Seq[Numbered] <- AliyahParsable(bookSpan).seq()
-        result: Torah <- parseAliyot(bookSpan, spans, number = None)
-      yield result
+  def decode[E: XmlAst](element: E): Torah =
+    XmlDecode.requireName(element, "torah")
+    XmlDecode.requireNoOther(element, Set("aliyah"))
+    val bookSpan: BookSpan = decodeSpan(element).resolve
+    val spans: Seq[Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(el =>
+      WithNumber.decode(el, e => SpanParsed.decode(e).defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
+    )
+    Parser.unsafeRun(parseAliyot(bookSpan, spans, number = None))
 
-      override def unparser: Unparser[Torah] = ???
-
-  private final class AliyahParsable(bookSpan: BookSpan) extends ElementTo[Numbered]("aliyah"):
-    override def contentParsable: Parsable[Numbered] = new Parsable[Numbered]:
-      override def parser: Parser[WithNumber[SpanSemiResolved]] =
-        WithNumber.parse(SpanParsed.parser.map(_.defaultFromChapter(bookSpan.span.from.chapter).semiResolve))
-
-      override def unparser: Unparser[Numbered] = ???
-
-  object Maftir extends ElementTo[BookSpan]("maftir"):
-    override def contentParsable: Parsable[BookSpan] = new Parsable[BookSpan]:
-      override def parser: Parser[BookSpan] = spanParser.map(_.resolve)
-      override def unparser: Unparser[BookSpan] = ???
+  def decodeMaftir[E: XmlAst](element: E): Maftir =
+    XmlDecode.requireName(element, "maftir")
+    XmlDecode.requireNoOther(element, Set.empty)
+    decodeSpan(element).resolve
 
   def inBook(book: Chumash, span: Span): BookSpan = BookSpan(book, span)
 

@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Language, Names}
-import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
-import zio.ZIO
+import org.opentorah.metadata.{HasName, Language}
+import org.opentorah.util.Collections
+import org.opentorah.xml.Parser
+import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
 final case class Haftarah(override val spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) derives CanEqual:
@@ -21,39 +21,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       ).mkString("; ")
 
   override protected def getBook(name: String): Tanach.Prophets = Tanach.Prophets.forName(name)
-
-  /**
-   * The sources an entry rests on, by name: `sources="michlol, chitas"`; see
-   * [[ReadingSources]]. Comma-separated, as `n` lists customs. Allowed on
-   * `week` and on `custom`, not on `part`: the parts of one reading are
-   * attested together.
-   */
-  private val sourcesAttribute: Attribute[String] = Attribute("sources")
-
-  /**
-   * What the sources do not settle, said in words: `comment="..."`. For where
-   * they disagree, or agree only with a qualification -- a chumash that prints
-   * verses as "some add" is not the same as one that prints them plainly.
-   * Allowed alongside `sources`, on `week` and on `custom`.
-   */
-  private val commentAttribute: Attribute[String] = Attribute("comment")
-
-  /**
-   * Customs for which this parsha's haftarah takes precedence when it is
-   * combined with the next, instead of the second parsha's as combined weeks
-   * otherwise do: `precedenceWhenCombined="Chabad"`. Names a custom and
-   * everything under it, so `Common` means the whole tree.
-   */
-  private val precedenceWhenCombinedAttribute: Attribute[String] = Attribute("precedenceWhenCombined")
-
-  /**
-   * A reading recorded beside the custom's own, not instead of it:
-   * `variant="2"`. For where the sources report a practice without settling
-   * who follows it -- a variant is never resolved to, so nothing reads it by
-   * accident; it is there to be shown next to the primary reading and to keep
-   * what is known from being thrown away. Numbered from 2, the primary being 1.
-   */
-  private val variantAttribute: Attribute[String] = Attribute("variant")
 
   private def parseSources(value: Option[String]): Seq[String] = value
     .fold(Seq.empty[String])(_.split(',').toSeq)
@@ -78,7 +45,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   /**
    * A reading in which a custom may read nothing at all: `None` is a value
    * here, not a missing entry, so a custom can read nothing where its parent
-   * reads something. See [[NoneElement]].
+   * reads something. See `<none>`.
    */
   type OptionalCustoms = Custom.Of[Option[Haftarah]]
 
@@ -96,32 +63,27 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     precedenceWhenCombined: Set[Custom]
   )
 
-  private object Week extends ElementTo[WeekMetadata]("week"):
-    private val elementParser = Haftarah.parserWithAnnotations(full = true)
+  private val codec: XmlCodec[WeekMetadata] = new XmlCodec[WeekMetadata]:
+    override def elementName: String = "week"
+    override def isRecordLike: Boolean = true
 
-    override def contentParsable: Parsable[WeekMetadata] = new Parsable[WeekMetadata]:
-      override def parser: Parser[WeekMetadata] = for
-        name: String <- Names.defaultNameAttribute.required()
-        weekSources: Option[String] <- sourcesAttribute.optional()
-        weekComment: Option[String] <- commentAttribute.optional()
-        keep: Option[String] <- precedenceWhenCombinedAttribute.optional()
-        result: (Customs, Annotations, Variants, Set[Custom]) <- elementParser
-      yield
-        val forWeek: Annotation = annotation(weekSources, weekComment)
-        // an annotation on the week itself stands for the entry as a whole
-        val annotations: Annotations =
-          if forWeek.isEmpty then result._2
-          else result._2.updated(Custom.Common, result._2.getOrElse(Custom.Common, Annotation()) ++ forWeek)
-        WeekMetadata(name, result._1, annotations, result._3, keep.fold(Set.empty)(Custom.parse))
+    override def unsafeDecode[E: XmlAst](element: E): WeekMetadata = decodeWeek(element)
 
-      override def unparser: Unparser[WeekMetadata] = ???
+    override def encodeNamed[E: XmlAst](elName: String, value: WeekMetadata): E =
+      throw XmlError("Haftarah week is decode-only")
 
-  private lazy val loaded: Map[Parsha, WeekMetadata] = Parser.unsafeRun(HasName.load(
-    from = From.resource(this),
-    content = Week,
-    keys = Parsha.valuesSeq,
-    hasName = (metadata: WeekMetadata, name: String) => metadata.name == name
-  ))
+  private lazy val loaded: Map[Parsha, WeekMetadata] =
+    val parsed: Seq[WeekMetadata] = XmlParser.parseCatalog(
+      getClass,
+      "Haftarah.xml",
+      "Haftarah",
+      codec
+    ).fold(error => throw error, identity)
+    Parser.unsafeRun(HasName.mapByName(
+      keys = Parsha.valuesSeq,
+      metadatas = parsed,
+      hasName = (metadata: WeekMetadata, name: String) => metadata.name == name
+    ))
 
   lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(loaded)(_.customs)
 
@@ -142,45 +104,75 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   final case class Recorded(annotations: Annotations, variants: Variants):
     def isEmpty: Boolean = annotations.isEmpty && variants.isEmpty
 
-  /** The annotations of one `<haftarah>`, for callers that key it themselves. */
-  def recordedIn(full: Boolean): ElementTo[Recorded] = new ElementTo[Recorded]("haftarah"):
-    override def contentParsable: Parsable[Recorded] = new Parsable[Recorded]:
-      override def parser: Parser[Recorded] =
-        Haftarah.parserWithAnnotations(full).map((_, annotations, variants, _) =>
-          Recorded(annotations, variants))
+  def decode[E: XmlAst](element: E, full: Boolean): Customs =
+    XmlDecode.requireName(element, "haftarah")
+    val parsed: Parsed = withAnnotations(element, full)
+    require(parsed.nones.isEmpty, "<none> in a reading that is not optional")
+    parsed.customs
 
-      override def unparser: Unparser[Recorded] = ???
+  def decodeRecorded[E: XmlAst](element: E, full: Boolean): Recorded =
+    XmlDecode.requireName(element, "haftarah")
+    val parsed: Parsed = withAnnotations(element, full)
+    Recorded(parsed.annotations, parsed.variants)
 
-  def element(full: Boolean): ElementTo[Customs] = new ElementTo[Customs]("haftarah"):
-    override def contentParsable: Parsable[Customs] = new Parsable[Customs]:
-      override def parser: Parser[Customs] = Haftarah.parserWithAnnotations(full).map(parsed =>
-        require(parsed._4.isEmpty, "<none> in a reading that is not optional")
-        parsed._1
-      )
+  /** A reading in which a custom may read nothing; see `<none>`. */
+  def decodeOptional[E: XmlAst](element: E, full: Boolean): OptionalCustoms =
+    XmlDecode.requireName(element, "haftarah")
+    val parsed: Parsed = withAnnotations(element, full = false)
+    val reading: Map[Custom, Option[Haftarah]] =
+      Collections.mapValues(parsed.customs.customs)(Some(_)) ++ parsed.nones.map(_ -> None)
+    new Custom.Of[Option[Haftarah]](reading, full = full)
 
-      override def unparser: Unparser[Haftarah.Customs] = ???
+  private final case class Parsed(
+    customs: Customs,
+    annotations: Annotations,
+    variants: Variants,
+    nones: Set[Custom]
+  )
 
-  /** A reading in which a custom may read nothing; see [[NoneElement]]. */
-  def optionalElement(full: Boolean): ElementTo[OptionalCustoms] =
-    new ElementTo[OptionalCustoms]("haftarah"):
-      override def contentParsable: Parsable[OptionalCustoms] = new Parsable[OptionalCustoms]:
-        override def parser: Parser[OptionalCustoms] =
-          Haftarah.parserWithAnnotations(full = false).map((customs, _, _, nones) =>
-            val reading: Map[Custom, Option[Haftarah]] =
-              Collections.mapValues(customs.customs)(Some(_)) ++ nones.map(_ -> None)
-            new Custom.Of[Option[Haftarah]](reading, full = full)
-          )
+  private def decodeWeek[E: XmlAst](element: E): WeekMetadata =
+    XmlDecode.requireName(element, "week")
+    val name: String = XmlDecode.requireAttr(element, "n")
+    val forWeek: Annotation = annotationOf(element)
+    val keep: Set[Custom] = element.get("precedenceWhenCombined").map(_.trim).filter(_.nonEmpty)
+      .fold(Set.empty)(Custom.parse)
+    val result: Parsed = withAnnotations(element, full = true)
+    // an annotation on the week itself stands for the entry as a whole
+    val annotations: Annotations =
+      if forWeek.isEmpty then result.annotations
+      else result.annotations.updated(Custom.Common, result.annotations.getOrElse(Custom.Common, Annotation()) ++ forWeek)
+    WeekMetadata(name, result.customs, annotations, result.variants, keep)
 
-        override def unparser: Unparser[OptionalCustoms] = ???
-
-  private def parserWithAnnotations(full: Boolean): Parser[(Customs, Annotations, Variants, Set[Custom])] = for
-    bookSpanParsed: BookSpanParsed <- spanParser
-    parts: Seq[WithNumber[BookSpan]] <- PartElement(bookSpanParsed).seq()
-    partsOpt: Option[Haftarah] <- if parts.isEmpty then ZIO.none else partsParser(parts).map(Some(_))
-    parsed: Seq[CustomParsed] <- CustomElement(bookSpanParsed).seq()
-    standalone: Seq[(Set[Custom], Annotation)] <- AnnotationElement.seq()
-    nones: Seq[(Set[Custom], Annotation)] <- NoneElement.seq()
-  yield
+  /**
+   * `sources="michlol, chitas"`: the sources an entry rests on, by name; see
+   * [[ReadingSources]]. Comma-separated, as `n` lists customs. Allowed on
+   * `week` and on `custom`, not on `part`: the parts of one reading are
+   * attested together.
+   *
+   * `comment="..."`: what the sources do not settle, said in words. For where
+   * they disagree, or agree only with a qualification -- a chumash that prints
+   * verses as "some add" is not the same as one that prints them plainly.
+   * Allowed alongside `sources`, on `week` and on `custom`.
+   *
+   * `precedenceWhenCombined="Chabad"`: customs for which this parsha's
+   * haftarah takes precedence when it is combined with the next, instead of
+   * the second parsha's as combined weeks otherwise do. Names a custom and
+   * everything under it, so `Common` means the whole tree.
+   *
+   * `variant="2"`: a reading recorded beside the custom's own, not instead of
+   * it. For where the sources report a practice without settling who follows
+   * it -- a variant is never resolved to, so nothing reads it by accident; it
+   * is there to be shown next to the primary reading and to keep what is known
+   * from being thrown away. Numbered from 2, the primary being 1.
+   */
+  private def withAnnotations[E: XmlAst](element: E, full: Boolean): Parsed =
+    XmlDecode.requireNoOther(element, Set("part", "custom", "annotation", "none"))
+    val bookSpanParsed: BookSpanParsed = decodeSpan(element)
+    val parts: Seq[WithNumber[BookSpan]] = XmlDecode.childrenNamed(element, "part").map(decodePart(bookSpanParsed, _))
+    val partsOpt: Option[Haftarah] = if parts.isEmpty then None else Some(partsHaftarah(parts))
+    val parsed: Seq[CustomParsed] = XmlDecode.childrenNamed(element, "custom").map(decodeCustom(bookSpanParsed, _))
+    val standalone: Seq[(Set[Custom], Annotation)] = XmlDecode.childrenNamed(element, "annotation").map(decodeNamedAnnotation)
+    val noneEntries: Seq[(Set[Custom], Annotation)] = XmlDecode.childrenNamed(element, "none").map(decodeNamedAnnotation)
     // a variant stands beside the reading rather than being one of them, so it
     // takes no part in building the map that customs resolve through
     val (variantsParsed: Seq[CustomParsed], parsedCustoms: Seq[CustomParsed]) =
@@ -199,7 +191,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
         .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation)) ++
       standalone
         .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation)) ++
-      nones
+      noneEntries
         .filterNot((_, annotation) => annotation.isEmpty)
         .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation))
     ).groupMapReduce((custom, _) => custom)((_, annotation) => annotation)(_ ++ _)
@@ -212,7 +204,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       customs.customs.updated(Custom.Common, common)
     )
 
-    (new Custom.Of(result, full = full), annotations, variants, nones.flatMap(_._1).toSet)
+    Parsed(new Custom.Of(result, full = full), annotations, variants, noneEntries.flatMap(_._1).toSet)
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
@@ -223,67 +215,39 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     variant: Option[Int]
   )
 
-  private final class CustomElement(ancestorSpan: BookSpanParsed)
-    extends ElementTo[CustomParsed]("custom"):
-    override def contentParsable: Parsable[CustomParsed] =
-      new Parsable[CustomParsed]:
-        override def parser: Parser[CustomParsed] = for
-          n: String <- Attribute("n").required()
-          sources: Option[String] <- sourcesAttribute.optional()
-          comment: Option[String] <- commentAttribute.optional()
-          variant: Option[String] <- variantAttribute.optional()
-          bookSpanParsed: BookSpanParsed <- spanParser.map(_.inheritFrom(ancestorSpan))
-          parts: Seq[WithNumber[BookSpan]] <- PartElement(bookSpanParsed).seq()
-          result: Haftarah <- if parts.isEmpty then ZIO.succeed[Haftarah](oneSpan(bookSpanParsed)) else partsParser(parts)
-        yield CustomParsed(Custom.parse(n), result, annotation(sources, comment), variant.map(_.trim.toInt))
-
-        override def unparser: Unparser[CustomParsed] = ???
+  private def decodeCustom[E: XmlAst](ancestorSpan: BookSpanParsed, element: E): CustomParsed =
+    XmlDecode.requireNoOther(element, Set("part"))
+    val n: String = XmlDecode.requireAttr(element, "n")
+    val bookSpanParsed: BookSpanParsed = decodeSpan(element).inheritFrom(ancestorSpan)
+    val parts: Seq[WithNumber[BookSpan]] = XmlDecode.childrenNamed(element, "part").map(decodePart(bookSpanParsed, _))
+    val result: Haftarah = if parts.isEmpty then oneSpan(bookSpanParsed) else partsHaftarah(parts)
+    CustomParsed(Custom.parse(n), result, annotationOf(element), XmlDecode.intOpt(element, "variant"))
 
   /**
-   * What is known about a custom's reading, where the custom has no reading of
-   * its own: `<annotation n="Chabad" sources="chitas"/>`. A custom that follows
+   * `<annotation n="Chabad" sources="chitas"/>`: what is known about a custom's
+   * reading, where the custom has no reading of its own. A custom that follows
    * its parent has nowhere to carry a source, and giving it an entry to hold one
    * would assert a distinction that is not being made -- and be rejected, since
    * two entries cannot hold the same reading. This attaches the source to the
    * custom without touching what it reads.
-   */
-  /**
-   * A custom that reads no haftarah at all: `<none n="Agadir"/>`. Absence
+   *
+   * `<none n="Agadir"/>`: a custom that reads no haftarah at all. Absence
    * expressed by leaving a custom out of the map means "inherit from the
    * parent", so it cannot say this; and a hole is silent, where a value has to
    * be written down to exist. Only readings parsed as [[OptionalCustoms]] may
    * carry it -- the weekly readings are full, and everyone reads something.
    */
-  private object NoneElement extends ElementTo[(Set[Custom], Annotation)]("none"):
-    override def contentParsable: Parsable[(Set[Custom], Annotation)] =
-      new Parsable[(Set[Custom], Annotation)]:
-        override def parser: Parser[(Set[Custom], Annotation)] = for
-          n: String <- Attribute("n").required()
-          sources: Option[String] <- sourcesAttribute.optional()
-          comment: Option[String] <- commentAttribute.optional()
-        yield (Custom.parse(n), annotation(sources, comment))
+  private def decodeNamedAnnotation[E: XmlAst](element: E): (Set[Custom], Annotation) =
+    XmlDecode.requireNoOther(element, Set.empty)
+    (Custom.parse(XmlDecode.requireAttr(element, "n")), annotationOf(element))
 
-        override def unparser: Unparser[(Set[Custom], Annotation)] = ???
+  private def decodePart[E: XmlAst](ancestorSpan: BookSpanParsed, element: E): WithNumber[BookSpan] =
+    WithNumber.decode(element, el => decodeSpan(el).inheritFrom(ancestorSpan).resolve)
 
-  private object AnnotationElement extends ElementTo[(Set[Custom], Annotation)]("annotation"):
-    override def contentParsable: Parsable[(Set[Custom], Annotation)] =
-      new Parsable[(Set[Custom], Annotation)]:
-        override def parser: Parser[(Set[Custom], Annotation)] = for
-          n: String <- Attribute("n").required()
-          sources: Option[String] <- sourcesAttribute.optional()
-          comment: Option[String] <- commentAttribute.optional()
-        yield (Custom.parse(n), annotation(sources, comment))
+  private def partsHaftarah(parts: Seq[WithNumber[BookSpan]]): Haftarah =
+    require(parts.map(_.n) == (1 to parts.length), s"Wrong part numbers: $parts")
+    require(parts.length > 1, "too short")
+    Haftarah(WithNumber.dropNumbers(parts))
 
-        override def unparser: Unparser[(Set[Custom], Annotation)] = ???
-
-  private final class PartElement(ancestorSpan: BookSpanParsed) extends ElementTo[WithNumber[BookSpan]]("part"):
-    override def contentParsable: Parsable[WithNumber[BookSpan]] = new Parsable[WithNumber[BookSpan]]:
-      override def parser: Parser[WithNumber[BookSpan]] =
-        WithNumber.parse(spanParser.map(_.inheritFrom(ancestorSpan).resolve))
-
-      override def unparser: Unparser[WithNumber[BookSpan]] = ???
-
-  private def partsParser(parts: Seq[WithNumber[BookSpan]]): Parser[Haftarah] = for
-    _ <- WithNumber.checkConsecutive(parts, "part")
-    _ <- Effects.check(parts.length > 1, "too short")
-  yield Haftarah(WithNumber.dropNumbers(parts))
+  private def annotationOf[E: XmlAst](element: E): Annotation =
+    annotation(element.get("sources"), element.get("comment"))

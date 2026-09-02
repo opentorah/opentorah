@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.xml.{From, Parser}
+import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -10,32 +10,35 @@ import org.scalatest.matchers.should.Matchers
  * that exists -- now has to be checked.
  */
 final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
+  private given xmlAst: XmlAst[ZioXml.Element] = ZioXml
 
-  private val root = Parser.unsafeRun(From.resourceNamed(SpecialReadings, "SpecialReadings").load)
+  private val root: ZioXml.Element = XmlParser.parseResource(
+    SpecialReadings.getClass,
+    "SpecialReadings.xml"
+  ).fold(error => throw error, identity)
 
-  private val readings: Seq[(String, String)] = for
-    day <- (root \ "day").toSeq
-    reading <- (day \ "reading").toSeq
-  yield (day \@ "n", reading \@ "n")
+  private val days: Seq[ZioXml.Element] = XmlDecode.childrenNamed(root, "day")
+
+  private val readings: Seq[(String, String, ZioXml.Element)] = for
+    day <- days
+    reading <- XmlDecode.childrenNamed(day, "reading")
+  yield (XmlDecode.requireAttr(day, "n"), XmlDecode.requireAttr(reading, "n"), reading)
 
   "SpecialReadings.xml" should "hold every reading, and each of them once" in:
-    readings.size shouldBe 60
-    readings.distinct shouldBe readings
+    val keys: Seq[(String, String)] = readings.map((day, name, _) => (day, name))
+    keys.size shouldBe 60
+    keys.distinct shouldBe keys
 
   it should "give every reading a day and a name" in:
-    for (day, name) <- readings do
+    for (day, name, _) <- readings do
       withClue(s"'$day'/'$name': ")((day.nonEmpty && name.nonEmpty) shouldBe true)
 
   it should "wrap exactly one torah, maftir or haftarah in each reading" in:
-    for
-      day <- (root \ "day").toSeq
-      reading <- (day \ "reading").toSeq
-    do
-      val elements = reading.child.collect { case elem: scala.xml.Elem => elem }
-      withClue(s"${day \@ "n"}/${reading \@ "n"}: ")
-        (elements.map(_.label) should have size 1)
-      withClue(s"${day \@ "n"}/${reading \@ "n"}: ")
-        (Seq("torah", "maftir", "haftarah") should contain (elements.head.label))
+    for (day, name, reading) <- readings do
+      val elements = reading.getChildren.flatMap(_.asElement)
+      withClue(s"$day/$name: ")(elements.map(_.localName) should have size 1)
+      withClue(s"$day/$name: ")
+        (Seq("torah", "maftir", "haftarah") should contain (elements.head.localName))
 
   "the readings" should "all still parse and resolve" in:
     // forcing SpecialReadings parses every one of them; before the move, a
