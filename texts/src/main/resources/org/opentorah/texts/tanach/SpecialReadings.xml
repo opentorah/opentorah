@@ -499,6 +499,9 @@
                          Morocco and Algeria read Dirshu with Ashkenaz and Italki --
                          'א, איט, חלק מסמג (בעיקר מרוקו ואלג'יריה)' -- rather than the
                          Hosea reading they have on the other public fasts."/>
+        <none n="Agadir" sources="asulin"
+              comment="Agadir and southern Morocco read no haftarah on the fasts,
+                       where the rest of Morocco reads Dirshu on this one."/>
       </haftarah>
     </reading>
   </day>
@@ -552,9 +555,7 @@
                          was not accepted in practice."/>
         <annotation n="Agadir" sources="asulin"
                     comment="Agadir and southern Morocco read Shuva here without the
-                             Micah ending that the rest of Sefard adds. On the other
-                             fasts they read nothing at all, which is why Agadir hangs
-                             off Magreb rather than Morocco."/>
+                             Micah ending that the rest of Sefard adds."/>
       </haftarah>
     </reading>
   </day>
