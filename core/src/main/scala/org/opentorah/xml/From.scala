@@ -17,7 +17,7 @@ sealed abstract class From(val name: String):
 
 
 object From:
-  enum ProcessIncludes derives CanEqual:
+  private enum ProcessIncludes derives CanEqual:
     case No
     case YesWithBases
     case YesWithoutBases
@@ -34,21 +34,6 @@ object From:
 
   def xml(name: String, elem: Element): From = FromXml(name, elem)
 
-  private final class FromString(
-    name: String,
-    string: String
-  ) extends From(name):
-    override def isInclude: Boolean = false
-    override def toString: String = s"From.string($name)"
-    override def url: Option[URL] = None
-    override def load: Effects.IO[Element] = read(
-      processIncludes = ProcessIncludes.YesWithBases,
-      inputSource = InputSource(StringReader(string)),
-      fixXercesXIncludes = true
-    )
-
-  def string(name: String, string: String): From = FromString(name, string)
-
   private final class FromUrl(
     fromUrl: URL,
     override val isInclude: Boolean,
@@ -61,12 +46,7 @@ object From:
       inputSource = InputSource(fromUrl.toString),
       fixXercesXIncludes = true
     )
-
-  def url(url: URL, processIncludes: ProcessIncludes = ProcessIncludes.YesWithBases): From = From.FromUrl(
-    fromUrl = url,
-    isInclude = false,
-    processIncludes = processIncludes
-  )
+  
   private[xml] def include(url: URL): From = From.FromUrl(
     fromUrl = url,
     isInclude = true,
