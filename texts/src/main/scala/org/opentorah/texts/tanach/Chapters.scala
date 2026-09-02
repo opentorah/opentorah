@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
-import org.opentorah.xml.Parser
+import org.podval.xml.XmlAst
 
 final class Chapters(chapters: Seq[Int]):
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -84,7 +84,8 @@ object Chapters:
       override def oneOf: NumberedStores[NumberedStore] = BySpan.this
       override def storesPure: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
 
-  val parser: Parser[Chapters] = for
-    chapters: Seq[WithNumber[Int]] <- Chapter.seq()
-    _ <- WithNumber.checkConsecutive(chapters, "chapter")
-  yield Chapters(WithNumber.dropNumbers(chapters))
+  def decode[E: XmlAst](element: E): Chapters =
+    val chapters: Seq[WithNumber[Int]] = XmlDecode.childrenNamed(element, "chapter").map(Chapter.decode)
+    // TODO WithNumber.checkConsecutive(chapters, "chapter")
+    require(chapters.map(_.n) == (1 to chapters.length), s"Wrong chapter numbers: $chapters")
+    Chapters(WithNumber.dropNumbers(chapters))

@@ -3,7 +3,8 @@ package org.opentorah.texts.tanach
 import org.opentorah.calendar.Week
 import org.opentorah.metadata.Names
 import org.opentorah.store.By
-import org.opentorah.xml.{ContentType, ElementTo, Parsable, Parser, Unparser}
+import org.opentorah.xml.Parser
+import org.podval.xml.XmlAst
 import zio.ZIO
 import Tanach.Psalms
 
@@ -27,8 +28,8 @@ trait PsalmsBook extends NachBook:
         .orElse(Week.Day.forDefaultName(name).map(_.ordinal + 1))
   )
 
-  override def parser(names: Names, chapters: Chapters): Parser[PsalmsBook.Parsed] =
-    PsalmsBook.parser(this, names, chapters)
+  override def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): PsalmsBook.Parsed =
+    PsalmsBook.parse(this, names, chapters, element)
 
 object PsalmsBook:
   final class Metadata(
@@ -51,27 +52,20 @@ object PsalmsBook:
       books
     ))
 
-  def parser(book: PsalmsBook, names: Names, chapters: Chapters): Parser[Parsed] = for
-    days: Seq[Span] <- spansParser(chapters, "day", 30)
-    weekDays: Seq[Span] <- spansParser(chapters, "weekDay", 7)
-    books: Seq[Span] <- spansParser(chapters, "book", 5)
-  yield Parsed(
-    names,
-    chapters,
-    days,
-    weekDays,
-    books
-  )
+  def parse[E: XmlAst](book: PsalmsBook, names: Names, chapters: Chapters, element: E): Parsed =
+    XmlDecode.requireNoOther(element, Set("name", "chapter", "day", "weekDay", "book"))
+    Parsed(
+      names,
+      chapters,
+      days = spans(element, "day", 30, chapters),
+      weekDays = spans(element, "weekDay", 7, chapters),
+      books = spans(element, "book", 5, chapters)
+    )
 
-  private def spansParser(chapters: Chapters, name: String, number: Int): Parser[Seq[Span]] = for
-    numbered: Seq[WithNumber[SpanParsed]] <- SpanParsable(name).seq()
-    _ <- WithNumber.checkNumber(numbered, number, name)
-  yield SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
-
-  private final class SpanParsable(name: String) extends ElementTo[WithNumber[SpanParsed]](name):
-    override def contentType: ContentType = ContentType.Empty
-
-    override def contentParsable: Parsable[WithNumber[SpanParsed]] = new Parsable[WithNumber[SpanParsed]]:
-      override def parser: Parser[WithNumber[SpanParsed]] = WithNumber.parse(SpanParsed.parser)
-      override def unparser: Unparser[WithNumber[SpanParsed]] = ???
+  private def spans[E: XmlAst](element: E, name: String, number: Int, chapters: Chapters): Seq[Span] =
+    val numbered: Seq[WithNumber[SpanParsed]] =
+      XmlDecode.childrenNamed(element, name).map(el => WithNumber.decode(el, SpanParsed.decode))
+    require(numbered.map(_.n) == (1 to numbered.length), s"Wrong $name numbers: $numbered")
+    require(numbered.length == number, s"Wrong number of ${name}s: ${numbered.length} != $number")
+    SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 

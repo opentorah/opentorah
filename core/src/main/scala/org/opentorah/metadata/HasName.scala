@@ -67,6 +67,12 @@ object HasName:
     hasName = (names: Names, name: String) => names.hasName(name)
   )
 
+  def findByNames[K <: HasName](keys: Seq[K], names: Names): K =
+    val result: Seq[K] = keys.filter(key => names.hasName(key.name))
+    require(result.nonEmpty, s"Unmatched metadata: $names")
+    require(result.length == 1, s"Metadata matched multiple keys: $names")
+    result.head
+
   private def find[K <: HasName, M](
     keys: Seq[K],
     metadata: M,

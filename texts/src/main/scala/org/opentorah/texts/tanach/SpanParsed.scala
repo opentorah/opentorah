@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.xml.Parser
+import org.podval.xml.XmlAst
 
 final class SpanParsed(val from: VerseParsed, val to: VerseParsed):
 
@@ -37,6 +38,11 @@ final class SpanParsed(val from: VerseParsed, val to: VerseParsed):
     to.chapter.getOrElse(fromResolved.chapter)
 
 object SpanParsed:
+
+  def decode[E: XmlAst](element: E): SpanParsed = SpanParsed(
+    from = VerseParsed.decodeFrom(element),
+    to = VerseParsed.decodeTo(element)
+  )
 
   val parser: Parser[SpanParsed] = for
     from: VerseParsed <- VerseParsed.fromParser

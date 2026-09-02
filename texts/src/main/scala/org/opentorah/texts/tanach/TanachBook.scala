@@ -3,7 +3,8 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Pure}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{ElementTo, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.Parser
+import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
 
@@ -11,34 +12,39 @@ trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are 
 
   override def storesPure: Seq[By[?]] = Seq(chapters.byChapter)
 
-  private[tanach] def parser(names: Names, chapters: Chapters): Parser[TanachBook.Parsed]
+  private[tanach] def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): TanachBook.Parsed
 
 private[tanach] object TanachBook:
   def valuesSeq: Seq[TanachBook] = Tanach.Book.valuesSeq
 
-  private object Parsed extends ElementTo[Parsed]("book"):
-    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
-      override def parser: Parser[Parsed] = for
-        names: Names <- Names.withDefaultNameParsable()
-        chapters: Chapters <- Chapters.parser
-        book: TanachBook <- HasName.find[TanachBook](valuesSeq, names)
-        result: Parsed <- book.parser(names, chapters)
-      yield result
+  private val codec: XmlCodec[Parsed] = new XmlCodec[Parsed]:
+    override def elementName: String = "book"
+    override def isRecordLike: Boolean = true
 
-      override def unparser: Unparser[Parsed] = ???
+    override def unsafeDecode[E: XmlAst](element: E): Parsed =
+      val names: Names = XmlDecode.namesOf(element)
+      val chapters: Chapters = Chapters.decode(element)
+      val book: TanachBook = HasName.findByNames(valuesSeq, names)
+      book.parse(names, chapters, element)
+
+    override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =
+      throw XmlError("Tanach book is decode-only")
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   // ... but it started manifesting only with the switch to ZIO 2.0!
-  private lazy val book2parsed: Map[TanachBook, Parsed] = Parser.unsafeRun(
-    HasName.load(
-      from = From.resource(Tanach),
-      content = Parsed
-    ).flatMap(HasName.bind[TanachBook, Parsed](
-      keys = valuesSeq,
-      _,
-      getKey = _.book
-    ))
-  )
+  private lazy val book2parsed: Map[TanachBook, Parsed] =
+    val parsed: Seq[Parsed] = XmlParser.parseCatalog(
+      Tanach.getClass,
+      "Tanach.xml",
+      "Tanach",
+      codec,
+      xinclude = true
+    ).fold(error => throw error, identity)
+    val result: Map[TanachBook, Parsed] = parsed.map(metadata => metadata.book -> metadata).toMap
+    val unmatched: Set[TanachBook] = valuesSeq.toSet -- result.keySet
+    require(unmatched.isEmpty, s"Unmatched keys: $unmatched")
+    require(result.size == parsed.length, s"Duplicate books in Tanach.xml")
+    result
 
   def names(book: TanachBook): Names = book2parsed(book).names
 
