@@ -7,6 +7,17 @@ private[tanach] object XmlDecode:
   def childrenNamed[E: XmlAst](element: E, name: String): Seq[E] =
     element.getChildren.flatMap(_.asElement).filter(_.localName == name)
 
+  def requireName[E: XmlAst](element: E, name: String): Unit =
+    if element.localName != name then throw XmlError(s"Expected '$name', found '${element.getName}'")
+
+  def requireAttr[E: XmlAst](element: E, name: String): String =
+    element.get(name).map(_.trim).filter(_.nonEmpty).getOrElse:
+      throw XmlError(s"Missing attribute '$name'")
+
+  def intOpt[E: XmlAst](element: E, name: String): Option[Int] =
+    element.get(name).map(_.trim).filter(_.nonEmpty).map: raw =>
+      raw.toIntOption.getOrElse(throw XmlError(s"Invalid integer for $name: $raw"))
+
   def requireNoOther[E: XmlAst](element: E, allowed: Set[String]): Unit =
     val extra: Seq[String] = element.getChildren.flatMap(_.asElement).map(_.localName).filterNot(allowed.contains)
     if extra.nonEmpty then throw XmlError(s"Unparsed elements: $extra")

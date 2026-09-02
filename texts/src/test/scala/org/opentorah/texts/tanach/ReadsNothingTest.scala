@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.xml.{From, Parser}
+import org.podval.xml.{XmlParser, Xml as ZioXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -12,12 +12,14 @@ import org.scalatest.matchers.should.Matchers
  */
 final class ReadsNothingTest extends AnyFlatSpec, Matchers:
 
-  private val table: Haftarah.OptionalCustoms = Parser.unsafeRun(
-    Haftarah.optionalElement(full = false).parse(From.xml("test",
-      <haftarah>
-        <custom n="Magreb" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
-        <none n="Morocco" comment="reads nothing, though Magreb above it reads Hosea"/>
-      </haftarah>)))
+  private val table: Haftarah.OptionalCustoms =
+    val xml = XmlParser.parseXml(
+      """<haftarah>
+        |  <custom n="Magreb" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
+        |  <none n="Morocco" comment="reads nothing, though Magreb above it reads Hosea"/>
+        |</haftarah>""".stripMargin
+    ).fold(error => throw error, identity)
+    Haftarah.decodeOptional(xml, full = false)(using ZioXml)
 
   "a custom with <none>" should "read nothing rather than its parent's reading" in:
     table.find(Custom.Morocco) shouldBe Some(None)

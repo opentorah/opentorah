@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Language, Named}
-import org.opentorah.xml.{Attribute, Parser}
+import org.podval.xml.XmlAst
 
 trait WithBookSpans[Book <: TanachBook]:
 
@@ -52,10 +52,10 @@ trait WithBookSpans[Book <: TanachBook]:
 
     def resolve: BookSpan = BookSpan(getBook(book.get), span.resolve)
 
-  val spanParser: Parser[BookSpanParsed] = for
-    book: Option[String] <- Attribute("book").optional()
-    spanParsed: SpanParsed <- SpanParsed.parser
-  yield BookSpanParsed(book, spanParsed)
+  def decodeSpan[E: XmlAst](element: E): BookSpanParsed = BookSpanParsed(
+    book = element.get("book").map(_.trim).filter(_.nonEmpty),
+    span = SpanParsed.decode(element)
+  )
 
   protected def getBook(name: String): Book
 

@@ -235,17 +235,18 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   ([zio#1841](https://github.com/zio/zio/issues/1841)). `Torah.torahParsable` /
   `spanParser` stay `ElementTo` for PR 8 (Haftarah / SpecialReadings).
 
-### PR 8 — Haftarah and special readings
+### PR 8 — Haftarah and special readings (done)
 
 - **Repo:** opentorah.org `texts`
 - **Depends on:** PR 7
-- **Files:** `Haftarah.scala`, `SpecialReadings.scala`, `Haftarah.xml`,
-  `SpecialReadings.xml`; related tests
-- **Work:** the largest combinator. Model `<haftarah>` / `<week>` as a record
-  of sibling sequences (`part`, `custom`, `none`, `annotation`) plus span
-  attributes; keep `parserWithAnnotations` *logic* as a function on the DTO,
-  not as `ParserState` consumption. Preserve `sources` / `comment` /
-  `variant` / `precedenceWhenCombined` / `<none>` semantics.
+- **Files:** `Haftarah.scala`, `SpecialReadings.scala`, `Torah.scala`,
+  `WithBookSpans.scala`; tests `ReadsNothingTest`, `SpecialReadingsDataTest`
+- **Work:** `<haftarah>` / `<week>` decode as sibling sequences (`part`,
+  `custom`, `none`, `annotation`) plus span attributes; `withAnnotations`
+  is a function on the DTO, not `ParserState`. `sources` / `comment` /
+  `variant` / `precedenceWhenCombined` / `<none>` kept. Torah and maftir
+  decode for SpecialReadings.xml. `HasName.mapByName` still binds weeks
+  to parshiyos.
 
 ### PR 9 — Delete `org.opentorah.xml`
 
