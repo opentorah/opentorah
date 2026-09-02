@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- chore: include site-publisher as a Gradle composite build when the checkout is present; `core` then depends on `org.podval:org.podval.xml`
+- docs: plan to replace `org.opentorah.xml` parsers/unparsers with `org.podval.xml` codecs (`xml-codec-plan.md`)
 
 ## [0.10.17] - 2026-
 - chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin;
