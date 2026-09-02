@@ -49,4 +49,10 @@
 
   <source n="poznan-pinkas" kind="study" name="Pinkas Beis HaKnesses de-Kehilas Pozna"
           publication="in Berakhah le-Menachem, St. Louis 1955, p. 262"/>
+  <source n="asulin" kind="website" name="R. Avraham Asulin"
+          where="Moroccan customs, on moreshet-morocco.com"
+          url="https://moreshet-morocco.com/2015/07/12/הלכות-ט-באב-הרב-אברה-אסולין/"/>
+
+  <source n="nahagu-haam" kind="halachah" name="Nahagu HaAm"
+          publication="Machon le-Hotzaat Sefarim ve-Khitvei Yad, Jerusalem 2000"/>
 </ReadingSources>
