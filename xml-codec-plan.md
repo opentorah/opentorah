@@ -191,15 +191,15 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   (calendar / astronomy / texts loaders get this for free). `ElementTo` /
   `Parsable` remain for Selector / Alias / texts until later PRs.
 
-### PR 4 — `core` store: `Selector`, `Alias`
+### PR 4 — `core` store: `Selector`, `Alias` (done)
 
 - **Repo:** opentorah.org `core`
 - **Depends on:** PR 3 (`Names`)
 - **Files:** `store/Selector.scala`, `Alias.scala`; `Selector.xml`;
-  `SelectorTest`
-- **Work:** same pattern as publisher `Selector`, but keep OpenTorah `Named` /
-  `HasValues.FindByName` (display-name rules stay here). `Alias` is a small
-  record (`names` + `to`).
+  `SelectorTest`; `Names.fromDefaultName`
+- **Work:** codecs; catalog via `parseCatalog`. `Named` / `HasValues.FindByName`
+  stay. `n` on the parent is the default name (same as `withDefaultNameParsable`).
+  `ElementTo` dropped; store XML that still used it waits for later PRs.
 
 ### PR 5 — Calendar / astronomy catalogs (done with PR 3)
 

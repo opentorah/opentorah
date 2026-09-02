@@ -1,23 +1,23 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Names
-import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlError}
 
-final class Alias(override val names: Names, val to: String) extends Terminal
+// TODO remove
+final case class Alias(override val names: Names, to: String) extends Terminal derives CanEqual
 
-object Alias extends ElementTo[Alias]("alias"):
-  override def contentParsable: Parsable[Alias] = new Parsable[Alias]:
-    private val toAttribute: Attribute.Required[String] = Attribute("to").required
+object Alias:
+  val codec: XmlCodec[Alias] = new XmlCodec[Alias]:
+    override def elementName: String = "alias"
+    override def isRecordLike: Boolean = true
 
-    override def parser: Parser[Alias] = for
-      names: Names <- Names.withDefaultNameParsable()
-      alias: String <- toAttribute()
-    yield Alias(
-      names,
-      alias
-    )
+    override def unsafeDecode[E: XmlAst](element: E): Alias =
+      val to: String = element.get("to").map(_.trim).filter(_.nonEmpty).getOrElse:
+        throw XmlError("Missing attribute 'to'")
+      Alias(
+        names = Names.fromDefaultName(element.get("n"), NameChildren.decode(element)),
+        to = to
+      )
 
-    override def unparser: Unparser[Alias] = Unparser.concat(
-      Names.withDefaultNameParsable(_.names),
-      toAttribute(_.to)
-    )
+    override def encodeNamed[E: XmlAst](elName: String, value: Alias): E =
+      NameChildren.encode(elName, value.names, Seq("to" -> value.to))

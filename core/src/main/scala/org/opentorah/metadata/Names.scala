@@ -2,7 +2,7 @@ package org.opentorah.metadata
 
 import org.opentorah.util.{ClassName, Collections, Effects}
 import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
-import org.podval.xml.{XmlAst, XmlCodec, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 import zio.ZIO
 
 final case class Names(names: Seq[Name]) extends Language.ToString:
@@ -39,6 +39,19 @@ object Names:
   // TODO create a mix-in for Named that overrides names as a val with this as a value?
   def apply(name: String): Names = Names(Seq(Name(name, Language.Spec.empty)))
 
+  /** Parent `n` as the default name, plus child `<name>` elements (Selector / Alias). */
+  def fromDefaultName(n: Option[String], names: Seq[Name]): Names =
+    val merged: Seq[Name] = mergeDefaultName(n, names)
+    if merged.isEmpty then throw XmlError("No names and no default name")
+    Names(merged)
+
+  private def mergeDefaultName(n: Option[String], names: Seq[Name]): Seq[Name] =
+    val defaultName: Option[Name] = n.map(_.trim).filter(_.nonEmpty).map(Name(_, Language.Spec.empty))
+    if names.isEmpty then defaultName.toSeq else
+      defaultName.fold(names)(defaultName =>
+        if names.exists(_.name == defaultName.name) then names else names :+ defaultName
+      )
+
   val codec: XmlCodec[Names] = new XmlCodec[Names]:
     override def elementName: String = "names"
     override def isRecordLike: Boolean = true
@@ -69,15 +82,9 @@ object Names:
 
   def parser(isDefaultNameAllowed: Boolean): Parser[Names] = for
     n <- if !isDefaultNameAllowed then ZIO.none else defaultNameAttribute.optional()
-    defaultName = n.map(Name(_, Language.Spec.empty))
     nonDefaultNames <- Name.seq()
-    _ <- Effects.check(nonDefaultNames.nonEmpty || defaultName.isDefined, s"No names and no default name")
-  yield
-    val names = if nonDefaultNames.isEmpty then Seq(defaultName.get) else
-      defaultName.fold(nonDefaultNames)(defaultName =>
-      if nonDefaultNames.exists(_.name == defaultName.name) then nonDefaultNames else nonDefaultNames :+ defaultName
-    )
-    new Names(names)
+    _ <- Effects.check(nonDefaultNames.nonEmpty || n.isDefined, s"No names and no default name")
+  yield Names(mergeDefaultName(n, nonDefaultNames))
 
   val withDefaultNameParsable: Parsable[Names] = new Parsable[Names]:
     override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = true)
