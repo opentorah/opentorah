@@ -37,6 +37,8 @@ dependencyResolutionManagement {
 
     // XML
     library('xerces'       , 'xerces:xercesImpl:2.12.2')
+    // Substituted from the site-publisher composite build when that checkout is present.
+    library('podval-xml'   , 'org.podval:org.podval.xml:0.0.1')
     // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
@@ -89,3 +91,17 @@ include ':texts'
 project(':texts'    ).name = 'opentorah-texts'
 
 include ':docs'
+
+// Composite: substitute org.podval:org.podval.xml from the local site-publisher
+// checkout. GitHub Actions has no Podval tree, so skip when the directory is
+// missing and omit the core dependency (see core/build.gradle). Override with
+// -PsitePublisherDir=/path/to/site-publisher.
+final File sitePublisherDir = file(
+  providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
+)
+final boolean includeSitePublisher =
+  sitePublisherDir.isDirectory() && new File(sitePublisherDir, 'settings.gradle').isFile()
+gradle.ext.includeSitePublisher = includeSitePublisher
+if (includeSitePublisher) {
+  includeBuild(sitePublisherDir)
+}

@@ -21,6 +21,10 @@ I did not immediately realize that ZIO actually has state monad built-in, so I r
 using Cats; that was a major improvement :) When I finally understood how to use ZIO's state monad,
 I rewrote the code again using ZIO - what a pleasure!
 
+The next switch is off handmade `ElementTo`/`Parser`/`Unparser` onto derived
+[`org.podval.xml.XmlCodec`](https://github.com/dubinsky/site-publisher) codecs.
+See [xml-codec-plan.md](xml-codec-plan.md).
+
 ### XML generation ###
 
 In web-apps, I need to generate XML. I tried using [ScalaTags](https://com-lihaoyi.github.io/scalatags/) for that,
