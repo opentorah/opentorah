@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- cleanup: `Name` / `Names` / `Language.Spec` codecs; `Names.Loader` reads catalogs via `org.podval.xml` (`parseCatalog`)
+- chore: `core` depends on `org.podval:org.podval.xml`; CI checks out site-publisher for the composite build
 - chore: include site-publisher as a Gradle composite build when the checkout is present; `core` then depends on `org.podval:org.podval.xml`
 - docs: plan to replace `org.opentorah.xml` parsers/unparsers with `org.podval.xml` codecs (`xml-codec-plan.md`)
 

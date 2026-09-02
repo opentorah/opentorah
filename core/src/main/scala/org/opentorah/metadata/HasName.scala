@@ -25,6 +25,14 @@ object HasName:
     hasName: (M, String) => Boolean
   ): Parser[Map[K, M]] = for
     metadatas: Seq[M] <- load[M](from, content)
+    result: Map[K, M] <- mapByName(keys, metadatas, hasName)
+  yield result
+
+  def mapByName[K <: HasName, M](
+    keys: Seq[K],
+    metadatas: Seq[M],
+    hasName: (M, String) => Boolean
+  ): Parser[Map[K, M]] = for
     result: Seq[(K, M)] <- Effects.collectAll(metadatas.map(metadata =>
       find(
         keys,

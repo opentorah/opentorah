@@ -14,11 +14,7 @@ dependencies {
   api libs.scala.xml
   api libs.zio.core
   api libs.zio.streams // TODO ?
-
-  // Only when settings.gradle includeBuild found site-publisher (local layout).
-  if (gradle.ext.has('includeSitePublisher') && gradle.ext.includeSitePublisher) {
-    api libs.podval.xml
-  }
+  api libs.podval.xml
 
   implementation libs.xerces
 
