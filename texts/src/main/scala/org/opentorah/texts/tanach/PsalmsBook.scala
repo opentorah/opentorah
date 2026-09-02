@@ -63,7 +63,6 @@ object PsalmsBook:
 
   private def spans(numberedDto: Seq[NumberedSpanDto], name: String, number: Int, chapters: Chapters): Seq[Span] =
     val numbered: Seq[WithNumber[SpanParsed]] = numberedDto.map(_.numbered)
-    require(numbered.map(_.n) == (1 to numbered.length), s"Wrong $name numbers: $numbered")
-    require(numbered.length == number, s"Wrong number of ${name}s: ${numbered.length} != $number")
+    WithNumber.requireNumber(numbered, number, name)
     SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)
 

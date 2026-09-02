@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
-import org.opentorah.util.Effects
-import org.podval.xml.XmlAst
+import org.opentorah.util.Collections
+import org.podval.xml.{XmlAst, XmlDecode}
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -50,15 +50,14 @@ object Torah extends WithBookSpans[Chumash]:
     bookSpan: BookSpan,
     aliyot: Seq[Numbered],
     number: Option[Int]
-  ): Effects.IO[Torah] =
+  ): Torah =
     val span: Span = bookSpan.span
     val chapters: Chapters = bookSpan.book.chapters
     val with1: Seq[Numbered] = addImplied1(aliyot, span, chapters)
-    for
-      _ <- WithNumber.checkNumber(with1, number.getOrElse(with1.length), "span")
-      spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(with1), span, chapters)
-      _ <- Effects.check(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
-    yield Torah(spans.map(inBook(bookSpan.book, _)))
+    WithNumber.requireNumber(with1, number.getOrElse(with1.length), "span")
+    val spans: Seq[Span] = SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(with1), span, chapters)
+    require(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
+    Torah(spans.map(inBook(bookSpan.book, _)))
 
   def decode[E: XmlAst](element: E): Torah =
     XmlDecode.requireName(element, "torah")
@@ -67,7 +66,7 @@ object Torah extends WithBookSpans[Chumash]:
     val spans: Seq[Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(el =>
       WithNumber.decode(el, e => SpanParsed.decode(e).defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
     )
-    Effects.unsafeRun(parseAliyot(bookSpan, spans, number = None))
+    parseAliyot(bookSpan, spans, number = None)
 
   def decodeMaftir[E: XmlAst](element: E): Maftir =
     XmlDecode.requireName(element, "maftir")
@@ -80,15 +79,13 @@ object Torah extends WithBookSpans[Chumash]:
     book: Chumash,
     days: Custom.Sets[Seq[Numbered]],
     span: Span
-  ): Effects.IO[Torah.Customs] =
+  ): Torah.Customs =
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
-
-    val result: Effects.IO[Custom.Sets[Torah]] = Effects.mapValues(days)((spans: Seq[Numbered]) =>
-      parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
+    Custom.Of(
+      Collections.mapValues(days)(spans => parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))),
+      full = true
     )
-
-    result.map(Custom.Of(_, full = true)) // TODO why does Scala 3 require 'full' being supplied?!
 
   private def addImplied1(
     spans: Seq[Numbered],

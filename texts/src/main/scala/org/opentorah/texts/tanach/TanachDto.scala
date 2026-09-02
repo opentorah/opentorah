@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{Name, Names}
+import org.opentorah.util.Collections
 import org.podval.xml.XmlCodec
 import zio.blocks.schema.{Modifier, Schema}
 
@@ -16,7 +17,7 @@ private[tanach] final case class BookDto(
 ) derives CanEqual:
   def bookNames: Names = Names.fromDefaultName(n, names.map(Name.fromData))
   def chapterLengths: Chapters =
-    require(chapters.map(_.n) == (1 to chapters.length), s"Wrong chapter numbers: $chapters")
+    Collections.requireConsecutive(chapters, _.n, "chapter")
     Chapters(chapters.map(_.length))
 
 private[tanach] object BookDto:

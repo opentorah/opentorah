@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.XmlAst
+import org.podval.xml.{XmlAst, XmlDecode}
 
 final class VerseParsed(val chapter: Option[Int], val verse: Option[Int]):
   def inheritFrom(ancestor: VerseParsed): VerseParsed =

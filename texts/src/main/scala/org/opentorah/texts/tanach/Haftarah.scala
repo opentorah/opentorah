@@ -226,7 +226,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     WithNumber(dto.n, dto.span.inheritFrom(ancestorSpan).resolve)
 
   private def partsHaftarah(parts: Seq[WithNumber[BookSpan]]): Haftarah =
-    require(parts.map(_.n) == (1 to parts.length), s"Wrong part numbers: $parts")
+    WithNumber.requireConsecutive(parts, "part")
     require(parts.length > 1, "too short")
     Haftarah(WithNumber.dropNumbers(parts))
 

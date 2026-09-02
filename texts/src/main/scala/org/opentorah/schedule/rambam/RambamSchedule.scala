@@ -4,6 +4,7 @@ import org.opentorah.calendar.Calendar
 import org.opentorah.calendar.jewish.Jewish.{Day, Month, Year}
 import org.opentorah.calendar.roman.Gregorian
 import org.opentorah.texts.rambam.{MishnehTorah, SeferHamitzvosLessons}
+import org.opentorah.util.Collections
 
 /**
  * Rambam study schedule for MishnehTorah and Sefer HaMitzvos
@@ -31,7 +32,7 @@ object RambamSchedule:
   )
 
   final val numberOfLessons: Int = 339
-  require(SeferHamitzvosLessons.lessons.map(_.number) == (1 to numberOfLessons))
+  Collections.requireConsecutive(SeferHamitzvosLessons.lessons, _.number, "lesson", count = Some(numberOfLessons))
 
   private val chapters: Seq[MishnehTorah.Chapter] = MishnehTorah.books.flatMap(_.parts.flatMap(_.chapters))
   private val numberOfChapters: Int = chapters.length
