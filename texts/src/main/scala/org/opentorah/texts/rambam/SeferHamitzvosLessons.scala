@@ -1,8 +1,9 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{Named, Names}
+import org.opentorah.metadata.{Name, Named, Names}
 import org.opentorah.store.Selector
-import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlError, XmlParser}
+import org.podval.xml.{XmlCodec, XmlParser}
+import zio.blocks.schema.{Modifier, Schema}
 
 object SeferHamitzvosLessons:
 
@@ -11,37 +12,7 @@ object SeferHamitzvosLessons:
     val parts: Seq[Part]
   )
 
-  object Lesson:
-    val codec: XmlCodec[Lesson] = new XmlCodec[Lesson]:
-      override def elementName: String = "lesson"
-      override def isRecordLike: Boolean = true
-
-      override def unsafeDecode[E: XmlAst](element: E): Lesson =
-        Lesson(
-          number = XmlDecode.positiveInt(element, "n"),
-          parts = element.getChildren.flatMap(_.asElement).map(Part.codec.unsafeDecode(_))
-        )
-
-      override def encodeNamed[E: XmlAst](elName: String, value: Lesson): E =
-        throw XmlError("Lesson is decode-only")
-
   sealed trait Part extends Named derives CanEqual
-
-  object Part:
-    val codec: XmlCodec[Part] = new XmlCodec[Part]:
-      override def elementName: String = "part"
-      override def isRecordLike: Boolean = true
-      override def caseNames: Seq[String] = Seq("positive", "negative", "named")
-
-      override def unsafeDecode[E: XmlAst](element: E): Part =
-        element.localName match
-          case "positive" => Positive(XmlDecode.positiveInt(element, "n"))
-          case "negative" => Negative(XmlDecode.positiveInt(element, "n"))
-          case "named" => NamedPart(Names.codec.unsafeDecode(element))
-          case other => throw XmlError(s"Unknown lesson part: $other")
-
-      override def encodeNamed[E: XmlAst](elName: String, value: Part): E =
-        throw XmlError("Part is decode-only")
 
   final case class NamedPart(override val names: Names) extends Part
 
@@ -55,5 +26,43 @@ object SeferHamitzvosLessons:
   final case class Negative(override val number: Int) extends Commandment(number):
     override def selector: Selector = Selector.getForName("negative")
 
+  @Modifier.config(XmlCodec.Element, "lesson")
+  private final case class LessonDto(
+    @Modifier.config(XmlCodec.Attribute, "n") n: Int,
+    parts: Seq[PartDto]
+  ) derives CanEqual
+
+  private object LessonDto:
+    given schema: Schema[LessonDto] = Schema.derived
+    val codec: XmlCodec[LessonDto] = schema.deriving(XmlCodec.deriver)
+      .instance(zio.blocks.typeid.TypeId.of[PartDto], PartDto.codec)
+      .derive
+    def toLesson(dto: LessonDto): Lesson = Lesson(dto.n, dto.parts.map(PartDto.toPart))
+
+  private sealed trait PartDto derives CanEqual
+
+  @Modifier.config(XmlCodec.Element, "positive")
+  private final case class PositiveDto(
+    @Modifier.config(XmlCodec.Attribute, "n") n: Int
+  ) extends PartDto derives CanEqual
+
+  @Modifier.config(XmlCodec.Element, "negative")
+  private final case class NegativeDto(
+    @Modifier.config(XmlCodec.Attribute, "n") n: Int
+  ) extends PartDto derives CanEqual
+
+  @Modifier.config(XmlCodec.Element, "named")
+  private final case class NamedDto(
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty
+  ) extends PartDto derives CanEqual
+
+  private object PartDto:
+    given schema: Schema[PartDto] = Schema.derived
+    val codec: XmlCodec[PartDto] = XmlCodec.derived
+    def toPart(dto: PartDto): Part = dto match
+      case PositiveDto(n) => Positive(n)
+      case NegativeDto(n) => Negative(n)
+      case NamedDto(names) => NamedPart(Names(names.map(Name.fromData)))
+
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = XmlParser.loadCatalog(this, Lesson.codec)
+  lazy val lessons: Seq[Lesson] = XmlParser.loadCatalog(this, LessonDto.codec).map(LessonDto.toLesson)
