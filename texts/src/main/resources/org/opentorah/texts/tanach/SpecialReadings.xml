@@ -473,6 +473,12 @@
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/> <!-- = Vayeilech Sefard -->
         </custom>
+        <annotation n="Algiers" sources="michlol, asulin"
+                    comment="The reading above is hamichlol's, which gives the city of
+                             Algiers Dirshu on these fasts. R. Avraham Asulin has it as
+                             'Dirshu or Shuva with Micah', so the city may keep either.
+                             The two sources agree on the Fast of Gedalia and on Tisha
+                             BeAv."/>
       </haftarah>
     </reading>
   </day>
