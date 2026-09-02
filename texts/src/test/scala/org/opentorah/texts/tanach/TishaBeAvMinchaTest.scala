@@ -33,11 +33,15 @@ final class TishaBeAvMinchaTest extends AnyFlatSpec, Matchers:
   "Sefard and everything under it" should "read Shuva with the Micah ending" in:
     for
       custom <- Custom.all.filter(_.isUnder(Custom.Sefard))
+      // Agadir reads Shuva without the Micah ending; Teiman likewise, and
+      // Chabad reads Dirshu with Ashkenaz
       if !custom.isUnder(Custom.Teiman) && !custom.isUnder(Custom.Chabad)
+         && !custom.isUnder(Custom.Agadir)
     do withClue(s"$custom: ")(haftarahOf(custom) shouldBe ShuvaWithMicah)
 
-  "Italki and Teiman" should "read Shuva alone" in:
-    for custom <- Custom.all.filter(c => c.isUnder(Custom.Italki) || c.isUnder(Custom.Teiman)) do
+  "Italki, Teiman and Agadir" should "read Shuva alone" in:
+    for custom <- Custom.all.filter(c =>
+      c.isUnder(Custom.Italki) || c.isUnder(Custom.Teiman) || c.isUnder(Custom.Agadir)) do
       withClue(s"$custom: ")(haftarahOf(custom) shouldBe Shuva)
 
   "every custom" should "read something, unlike on the other public fasts" in:
