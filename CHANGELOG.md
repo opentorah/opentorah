@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- cleanup: deleted `org.opentorah.xml`; store walks and catalog bind use `Effects.IO`; `Caching` is in `org.opentorah.util`
+- cleanup: `loadCatalog(this, codec)` for catalogs; dropped unused `Caching` / Caffeine
+- cleanup: deleted `org.opentorah.xml`; store walks and catalog bind use `Effects.IO`
 - cleanup: texts catalogs via codecs: Mishneh Torah, Sefer HaMitzvos lessons, CustomTree, ReadingSources
 - cleanup: `Selector` / `Alias` codecs; selector catalog via `parseCatalog`
 - cleanup: `Name` / `Names` / `Language.Spec` codecs; `Names.Loader` reads catalogs via `org.podval.xml` (`parseCatalog`)

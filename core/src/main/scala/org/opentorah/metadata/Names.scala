@@ -1,6 +1,6 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{ClassName, Collections, Effects}
+import org.opentorah.util.{Collections, Effects}
 import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 final case class Names(names: Seq[Name]) extends Language.ToString:
@@ -80,13 +80,8 @@ object Names:
     // This is lazy to allow correct initialization:
     // Language metadata file references Language instances by name :)
     final lazy val toNames: Map[Key, Names] =
-      val resourceName: String = resourceNameOverride.getOrElse(ClassName.get(this))
-      val nameses: Seq[Names] = XmlParser.parseCatalog(
-        getClass,
-        s"$resourceName.xml",
-        resourceName,
-        Names.codec
-      ).fold(error => throw error, identity)
+      val nameses: Seq[Names] = resourceNameOverride.fold(XmlParser.loadCatalog(this, Names.codec)):
+        XmlParser.loadCatalog(this, _, Names.codec)
       Effects.unsafeRun(HasName.mapByName(
         keys = valuesSeq,
         metadatas = nameses,

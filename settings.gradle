@@ -50,12 +50,6 @@ dependencyResolutionManagement {
     library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:$catsVersion")
     library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.3.0")
 
-    // Caching
-    // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
-    // and since I am not at the point of using anything other than Caffeine,
-    // I'll use it directly - albeit not Scala-idiomatically ;)
-    library('caffeine'     , 'com.github.ben-manes.caffeine:caffeine:3.2.4')
-
     // Logging
     library('slf4j'   , 'org.slf4j:slf4j-api:2.0.18')
     library('logback' , 'ch.qos.logback:logback-classic:1.6.3')

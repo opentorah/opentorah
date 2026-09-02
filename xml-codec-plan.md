@@ -4,9 +4,9 @@ Plan to retire the handmade XML parsers and unparsers in this repository
 (`ElementTo`, `Parsable`, `Parser` / `ParserState`, `Unparser`) and bind the
 same documents with `org.podval.xml.XmlCodec` derived from ZIO Schema.
 
-This is a plan, not an implementation. Gradle wiring so `core` can see the
-library is already in place (composite `includeBuild` of site-publisher when
-that checkout exists).
+PRs 1–9 are done: `org.opentorah.xml` is gone; catalogs use `org.podval.xml`.
+Gradle wiring is a composite `includeBuild` of site-publisher when that
+checkout exists.
 
 Codec mapping rules and modifier names live in the Site Publisher design note
 (section **XML codec**). This file is the OpenTorah-side migration.
@@ -14,7 +14,8 @@ Codec mapping rules and modifier names live in the Site Publisher design note
 ## Current state
 
 **PR 9 deleted `org.opentorah.xml`.** Catalogs bind with `org.podval.xml`.
-Store walks are `Effects.IO`. `Caching` is in `org.opentorah.util`.
+Store walks are `Effects.IO`. `loadCatalog(this, codec)` derives the file and
+wrapper name from the caller.
 
 Previously, `org.opentorah.xml` was a ZIO state-monad XML layer over `scala.xml.Elem`:
 
