@@ -1,10 +1,11 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.{ClassName, Collections, Effects}
-import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
+import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlParser}
 import zio.ZIO
 
-final class Names(val names: Seq[Name]) extends Language.ToString:
+final case class Names(names: Seq[Name]) extends Language.ToString:
   Collections.checkNoDuplicates(names.map(_.name), "names")
   // There may be multiple names for the same language (for an example, see Language),
   // so this check is disabled:
@@ -36,7 +37,18 @@ final class Names(val names: Seq[Name]) extends Language.ToString:
 
 object Names:
   // TODO create a mix-in for Named that overrides names as a val with this as a value?
-  def apply(name: String): Names = new Names(Seq(Name(name, Language.Spec.empty)))
+  def apply(name: String): Names = Names(Seq(Name(name, Language.Spec.empty)))
+
+  val codec: XmlCodec[Names] = new XmlCodec[Names]:
+    override def elementName: String = "names"
+    override def isRecordLike: Boolean = true
+
+    override def unsafeDecode[E: XmlAst](element: E): Names =
+      Names(Name.codec.decodeChildren(element).fold(error => throw error, identity))
+
+    override def encodeNamed[E: XmlAst](elName: String, value: Names): E =
+      val ast: XmlAst[E] = summon[XmlAst[E]]
+      ast.element(elName, Seq.empty, value.names.map(name => Name.codec.encode(name)))
 
   def checkDisjoint(nameses: Seq[Names]): Unit =
     for
@@ -84,9 +96,16 @@ object Names:
   abstract class Loader[Key <: HasName](resourceNameOverride: Option[String] = None) extends HasValues[Key]:
     // This is lazy to allow correct initialization:
     // Language metadata file references Language instances by name :)
-    final lazy val toNames: Map[Key, Names] = Parser.unsafeRun(HasName.load[Key, Names](
-      from = From.resourceNamed(this, resourceNameOverride.getOrElse(ClassName.get(this))),
-      content = Names.NamesMetadata,
-      keys = valuesSeq,
-      hasName = (metadata: Names, name: String) => metadata.hasName(name)
-    ))
+    final lazy val toNames: Map[Key, Names] =
+      val resourceName: String = resourceNameOverride.getOrElse(ClassName.get(this))
+      val nameses: Seq[Names] = XmlParser.parseCatalog(
+        getClass,
+        s"$resourceName.xml",
+        resourceName,
+        Names.codec
+      ).fold(error => throw error, identity)
+      Parser.unsafeRun(HasName.mapByName(
+        keys = valuesSeq,
+        metadatas = nameses,
+        hasName = (metadata: Names, name: String) => metadata.hasName(name)
+      ))

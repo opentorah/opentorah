@@ -6,7 +6,7 @@ enum Language(code: String) extends
   Named.ByLoader[Language](loader = Language, nameOverride = Some(code)),
   HasName.Enum derives CanEqual:
 
-  final def toSpec: Language.Spec = new Language.Spec(language = Some(this), isTransliterated = None, flavour = None)
+  final def toSpec: Language.Spec = Language.Spec(language = Some(this), isTransliterated = None, flavour = None)
 
   def numberToString(number: Int): String = number.toString
 
@@ -25,22 +25,12 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
     final override def toString: String = toLanguageString(using Language.Spec.empty)
     def toLanguageString(using spec: Language.Spec): String
 
-  final class Spec(
-    val language: Option[Language],
-    val isTransliterated: Option[Boolean],
-    val flavour: Option[String]
-  ):
+  final case class Spec(
+    language: Option[Language],
+    isTransliterated: Option[Boolean],
+    flavour: Option[String]
+  ) derives CanEqual:
     def isEmpty: Boolean = language.isEmpty && isTransliterated.isEmpty && flavour.isEmpty
-
-    def copy(
-      language: Option[Language] = language,
-      isTransliterated: Option[Boolean] = isTransliterated,
-      flavour: Option[String] = flavour
-    ): Spec = new Spec(
-      language,
-      isTransliterated,
-      flavour
-    )
 
     def languageName: String = language.get.toLanguageString(using this)
 
@@ -53,7 +43,7 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
     def dropLanguage: Spec = copy(language = None)
 
   object Spec extends Parsable[Spec]:
-    val empty: Spec = new Spec(None, None, None)
+    val empty: Spec = Spec(None, None, None)
 
     private val langAttribute: Attribute.Optional[String] = Attribute("lang").optional
     private val transliteratedAttribute: Attribute.Optional[Boolean] = Attribute.BooleanAttribute("transliterated").optional
@@ -63,7 +53,7 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
       lang: Option[String] <- langAttribute()
       isTransliterated: Option[Boolean] <- transliteratedAttribute()
       flavour: Option[String] <- flavourAttribute()
-    yield new Spec(
+    yield Spec(
       language = lang.map(Language.getForDefaultName),
       isTransliterated = isTransliterated,
       flavour = flavour

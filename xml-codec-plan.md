@@ -179,15 +179,17 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   (today’s `ElementTo.wrappedSeq(from.name).parse(from)`). Key bind
   (`HasName.load` to enum keys) stays in OpenTorah for PR 3+.
 
-### PR 3 — `core` metadata: `Name`, `Names`, `Language.Spec`
+### PR 3 — `core` metadata: `Name`, `Names`, `Language.Spec` (done)
 
 - **Repo:** opentorah.org `core`
-- **Depends on:** PR 1 (resource load)
+- **Depends on:** PR 1–2
 - **Files:** `metadata/Name.scala`, `Names.scala`, `Language.scala`;
-  `Language.xml`; `MetadataTest`
-- **Work:** case-class-friendly records, `Schema` + `XmlCodec`, custom `Name`
-  codec for `n` vs text. `Names.Loader` reads via decode + bind instead of
-  `ElementTo`. Keep `Parser.unsafeRun` only if other parsers remain.
+  `Language.xml`; `MetadataTest`; `HasName.mapByName`; CI checks out
+  site-publisher
+- **Work:** case classes; custom `Name` codec (`n` xor text); `Names.codec`
+  via `decodeChildren`. `Names.Loader` uses `parseCatalog` + `mapByName`
+  (calendar / astronomy / texts loaders get this for free). `ElementTo` /
+  `Parsable` remain for Selector / Alias / texts until later PRs.
 
 ### PR 4 — `core` store: `Selector`, `Alias`
 
@@ -199,13 +201,13 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   `HasValues.FindByName` (display-name rules stay here). `Alias` is a small
   record (`names` + `to`).
 
-### PR 5 — Calendar / astronomy catalogs
+### PR 5 — Calendar / astronomy catalogs (done with PR 3)
 
 - **Repo:** opentorah.org `core`
 - **Depends on:** PR 3
 - **Files:** `Names.Loader` users under `calendar/` and `astronomy/` and their
   `*.xml` resources
-- **Work:** no new combinators if PR 3’s loader is generic.
+- **Work:** none beyond PR 3’s generic loader.
 
 ### PR 6 — `texts` Rambam and simple catalogs
 

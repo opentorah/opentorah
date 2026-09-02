@@ -93,9 +93,9 @@ project(':texts'    ).name = 'opentorah-texts'
 include ':docs'
 
 // Composite: substitute org.podval:org.podval.xml from the local site-publisher
-// checkout. GitHub Actions has no Podval tree, so skip when the directory is
-// missing and omit the core dependency (see core/build.gradle). Override with
-// -PsitePublisherDir=/path/to/site-publisher.
+// checkout. Override with -PsitePublisherDir=/path/to/site-publisher (CI checks
+// out dubinsky/site-publisher and passes that). If the directory is missing,
+// Gradle resolves the artifact from Maven Central.
 final File sitePublisherDir = file(
   providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
 )
