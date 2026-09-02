@@ -20,12 +20,13 @@ object Schedule:
   final class DaySchedule(
     val day: Day,
     val dayNames: Seq[Named],
+    /** The Jewish day begins at night, so this comes first: read after maariv,
+      * on Simchas Torah only, and only by some customs, which the reading
+      * itself says by giving the rest None. */
+    val evening: Option[SpecialReadings.Evening],
     val morning: Option[Reading],
     val purimAlternativeMorning: Option[Reading],
     val afternoon: Option[Reading],
-    /** Read at night, after maariv: Simchas Torah only, and only by some
-      * customs, which the reading itself says by giving the rest None. */
-    val evening: Option[SpecialReadings.Evening],
     val chitas: Chitas
   )
 
@@ -75,6 +76,7 @@ object Schedule:
           (if day.next.isRoshChodesh then Seq(SpecialDay.ErevRoshChodesh) else Seq.empty) ++
           (if day.isRoshChodesh then Seq(SpecialDay.RoshChodesh) else Seq.empty) ++
           Omer.dayOf(day).toSeq,
+        evening = Readings.getEveningReading(specialDay = specialDay),
         morning = Readings.getMorningReading(
           day = day,
           specialDay = specialDay,
@@ -96,7 +98,6 @@ object Schedule:
           specialDay = specialDay,
           nextWeeklyReading = nextWeeklyReading
         ),
-        evening = Readings.getEveningReading(specialDay = specialDay),
         chitas = Chitas(day, currentWeeklyReadings.get(day), inHolyLand)
       )
 
