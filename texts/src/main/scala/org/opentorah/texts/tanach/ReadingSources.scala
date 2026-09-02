@@ -118,5 +118,22 @@ object ReadingSources:
   def variantsFor(parsha: Parsha, custom: Custom): Seq[Haftarah.Variant] =
     Haftarah.variantsByParsha.getOrElse(parsha, Map.empty).getOrElse(custom, Nil)
 
+  /** What is recorded for one of the special readings, which are keyed by the
+    * day and the reading name rather than by parsha. */
+  private def specialAnnotation(day: String, reading: String, custom: Custom): Haftarah.Annotation =
+    val byCustom: Map[Custom, Haftarah.Annotation] =
+      SpecialReadings.recorded.get((day, reading)).fold(Map.empty)(_.annotations)
+    byCustom.getOrElse(custom, Haftarah.Annotation()) ++
+      byCustom.getOrElse(Custom.Common, Haftarah.Annotation())
+
+  def forSpecialReading(day: String, reading: String, custom: Custom): Seq[Source] =
+    specialAnnotation(day, reading, custom).sources.map(byKey)
+
+  def commentForSpecialReading(day: String, reading: String, custom: Custom): Option[String] =
+    specialAnnotation(day, reading, custom).comment
+
+  def variantsForSpecialReading(day: String, reading: String, custom: Custom): Seq[Haftarah.Variant] =
+    SpecialReadings.recorded.get((day, reading)).fold(Nil)(_.variants.getOrElse(custom, Nil))
+
   /** Every parsha that names at least one source or carries a comment. */
   def annotatedParshiyos: Set[Parsha] = Haftarah.annotationsByParsha.keySet

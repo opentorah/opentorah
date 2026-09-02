@@ -138,10 +138,21 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   def precedenceWhenCombined(parsha: Parsha): Set[Custom] =
     loaded.get(parsha).fold(Set.empty)(_.precedenceWhenCombined)
 
+  /** What an entry says about itself, for readings not keyed by parsha. */
+  final case class Recorded(annotations: Annotations, variants: Variants):
+    def isEmpty: Boolean = annotations.isEmpty && variants.isEmpty
+
+  /** The annotations of one `<haftarah>`, for callers that key it themselves. */
+  def recordedIn(full: Boolean): ElementTo[Recorded] = new ElementTo[Recorded]("haftarah"):
+    override def contentParsable: Parsable[Recorded] = new Parsable[Recorded]:
+      override def parser: Parser[Recorded] =
+        Haftarah.parserWithAnnotations(full).map((_, annotations, variants, _) =>
+          Recorded(annotations, variants))
+
+      override def unparser: Unparser[Recorded] = ???
+
   def element(full: Boolean): ElementTo[Customs] = new ElementTo[Customs]("haftarah"):
     override def contentParsable: Parsable[Customs] = new Parsable[Customs]:
-      // SpecialReadings' inline readings have no parsha to key sources by, so
-      // they are parsed without them for now.
       override def parser: Parser[Customs] = Haftarah.parserWithAnnotations(full).map(parsed =>
         require(parsed._4.isEmpty, "<none> in a reading that is not optional")
         parsed._1
