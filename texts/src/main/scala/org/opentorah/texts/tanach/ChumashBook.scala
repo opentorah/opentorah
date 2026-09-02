@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.{Collections, Effects}
-import org.opentorah.xml.Parser
 import org.podval.xml.XmlAst
 
 trait ChumashBook extends TanachBook:
@@ -45,7 +44,7 @@ object ChumashBook:
     weeks: Seq[Parsha.Parsed]
   ) extends TanachBook.Parsed(book, names, chapters):
 
-    def resolve: Parser[Metadata] = for
+    def resolve: Effects.IO[Metadata] = for
       parsha2metadataParsed <- HasName.bind[Parsha, Parsha.Parsed](
         keys = book.parshiot,
         metadatas = weeks,
@@ -88,7 +87,7 @@ object ChumashBook:
           )
 
           val book: Tanach.Chumash = parsha.book
-          Some(Parser.unsafeRun(Torah.processDays(
+          Some(Effects.unsafeRun(Torah.processDays(
             book,
             combined,
             book.chapters.merge(

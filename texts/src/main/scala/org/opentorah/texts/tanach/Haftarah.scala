@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, Language}
 import org.opentorah.util.Collections
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
@@ -79,7 +79,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       "Haftarah",
       codec
     ).fold(error => throw error, identity)
-    Parser.unsafeRun(HasName.mapByName(
+    Effects.unsafeRun(HasName.mapByName(
       keys = Parsha.valuesSeq,
       metadatas = parsed,
       hasName = (metadata: WeekMetadata, name: String) => metadata.name == name

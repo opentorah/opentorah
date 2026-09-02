@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, HasValues, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import org.podval.xml.{XmlAst, XmlError}
 import Tanach.Chumash
 
@@ -135,7 +135,7 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
     def resolve(
       parshaSpan: Span,
       daysCombined: Option[Torah.Customs]
-    ): Parser[ParshaMetadata] =
+    ): Effects.IO[ParshaMetadata] =
       for
         days: Torah.Customs <- daysResolved(parshaSpan)
         aliyot: Torah <- aliyotResolved(parshaSpan, days)
@@ -150,10 +150,10 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
         maftir
       )
 
-    private def daysResolved(parshaSpan: Span): Parser[Torah.Customs] =
+    private def daysResolved(parshaSpan: Span): Effects.IO[Torah.Customs] =
       Torah.processDays(parsha.book, days, parshaSpan)
 
-    private def aliyotResolved(parshaSpan: Span, days: Torah.Customs): Parser[Torah] =
+    private def aliyotResolved(parshaSpan: Span, days: Torah.Customs): Effects.IO[Torah] =
       val bookSpan = Torah.inBook(parsha.book,
         Span(
           parshaSpan.from,

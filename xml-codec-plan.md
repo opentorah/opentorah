@@ -13,7 +13,10 @@ Codec mapping rules and modifier names live in the Site Publisher design note
 
 ## Current state
 
-`org.opentorah.xml` is a ZIO state-monad XML layer over `scala.xml.Elem`:
+**PR 9 deleted `org.opentorah.xml`.** Catalogs bind with `org.podval.xml`.
+Store walks are `Effects.IO`. `Caching` is in `org.opentorah.util`.
+
+Previously, `org.opentorah.xml` was a ZIO state-monad XML layer over `scala.xml.Elem`:
 
 - `From` loads a document (URL, classpath resource, in-memory element). Load
   uses Xerces SAX with XInclude. Nested `xml:base` is then rewritten because of
@@ -248,22 +251,20 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   decode for SpecialReadings.xml. `HasName.mapByName` still binds weeks
   to parshiyos.
 
-### PR 9 — Delete `org.opentorah.xml`
+### PR 9 — Delete `org.opentorah.xml` (done)
 
 - **Repo:** opentorah.org `core` (and leftover `texts` imports)
 - **Depends on:** PRs 3–8
-- **Files:** everything under `core/src/main/scala/org/opentorah/xml/`;
-  `XmlTest.scala`; `core/build.gradle` (`xerces` if unused);
-  `store/*.scala` and `TestBase` still using `Parser`
+- **Files:** deleted `core/src/main/scala/org/opentorah/xml/` and `XmlTest`;
+  `Caching` in `org.opentorah.util`; store / `HasName` / texts `resolve` use
+  `Effects.IO`; `core/build.gradle` dropped `xerces` and `scala-xml`
 - **Work:**
-  - `Stores.resolve` / `getPaths` / `findByName` return ZIO (with `Caching`
-    in `org.opentorah.util` or as a method argument).
-  - Move XInclude tests to site-publisher (if expansion exists) or delete
-    collector-style fixtures.
-  - Drop `scala-xml` as a direct `core` `api` if all AST use goes through
-    `org.podval.xml` (it may remain transitive).
-  - After xml is on Central, make the `core` dependency unconditional and
-    teach CI to resolve it (or keep `includeBuild` for local substitution).
+  - `Stores.resolve` / `getPaths` / `findByName` return `Effects.IO`
+    (`Caching` lives in `org.opentorah.util`; store walks do not need it).
+  - XInclude coverage stays in site-publisher `XmlParserSpec`; collector-style
+    fixtures under `core` tests are gone.
+  - `scala-xml` is no longer a direct `core` `api`.
+  - Composite `includeBuild` of site-publisher stays until xml is on Central.
 
 ## What not to do in the same PRs
 

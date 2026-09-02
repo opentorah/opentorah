@@ -32,14 +32,8 @@ dependencyResolutionManagement {
   // - it doesn't allow me to interpolate 'scalaVersionMajor';
   // - this way both plugin and dependency versions are in the same file.
   versionCatalogs {libs {
-    // Scala
-    library('scala-xml'    , "org.scala-lang.modules:scala-xml_$scalaVersionMajor:2.4.0")
-
-    // XML
-    library('xerces'       , 'xerces:xercesImpl:2.12.2')
     // Substituted from the site-publisher composite build when that checkout is present.
     library('podval-xml'   , 'org.podval:org.podval.xml:0.0.1')
-    // tagsoup     = "1.2.1" TODO use org.jsoup?
 
     // Google Cloud
     library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.71.0')

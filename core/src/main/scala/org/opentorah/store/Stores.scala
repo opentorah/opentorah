@@ -2,13 +2,12 @@ package org.opentorah.store
 
 import org.opentorah.metadata.HasValues
 import org.opentorah.util.{Effects, Files}
-import org.opentorah.xml.Parser
 import zio.ZIO
 
 trait Stores[+T <: Store] extends Store:
-  def stores: Parser[Seq[T]]
+  def stores: Effects.IO[Seq[T]]
 
-  def findByName(name: String): Parser[Option[T]] = stores.map(HasValues.find(_, name))
+  def findByName(name: String): Effects.IO[Option[T]] = stores.map(HasValues.find(_, name))
 
   // TODO add indexOf() and friends
 
@@ -19,16 +18,16 @@ trait Stores[+T <: Store] extends Store:
 
   Store.Path returned is nonEmpty ;)
  */
-  final def resolve(path: String): Parser[Path] = resolve(Files.splitAndDecodeUrl(path))
+  final def resolve(path: String): Effects.IO[Path] = resolve(Files.splitAndDecodeUrl(path))
 
   // TODO does this work with an alias "/" - and should such alias be legal?
-  final def resolve(path: Seq[String]): Parser[Path] =
+  final def resolve(path: Seq[String]): Effects.IO[Path] =
     if path.nonEmpty then this.resolve(path, Seq.empty) else ZIO.succeed(Seq(this))
 
   private def resolve(
     path: Seq[String],
     acc: Path
-  ): Parser[Path] = if path.isEmpty then ZIO.succeed(acc.reverse) else
+  ): Effects.IO[Path] = if path.isEmpty then ZIO.succeed(acc.reverse) else
     val head: String = path.head
     val tail: Seq[String] = path.tail
     for

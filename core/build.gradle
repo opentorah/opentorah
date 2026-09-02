@@ -11,12 +11,9 @@ description = 'Open Torah Core'
 apply from: '../configure.gradle'
 
 dependencies {
-  api libs.scala.xml
   api libs.zio.core
   api libs.zio.streams // TODO ?
   api libs.podval.xml
-
-  implementation libs.xerces
 
   implementation libs.zmanim
 

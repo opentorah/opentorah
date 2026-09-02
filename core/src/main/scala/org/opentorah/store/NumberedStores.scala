@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.{Language, Name, Names}
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import zio.ZIO
 
 // TODO override indexOf()
@@ -25,5 +25,5 @@ trait NumberedStores[+T <: NumberedStore] extends Pure[T]:
 
   protected def createNumberedStore(number: Int): T
 
-  final override def findByName(name: String): Parser[Option[T]] =
+  final override def findByName(name: String): Effects.IO[Option[T]] =
     ZIO.succeed(name2number(name).filter(contains).map(createNumberedStore))

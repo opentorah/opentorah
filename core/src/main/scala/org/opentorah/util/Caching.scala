@@ -1,4 +1,4 @@
-package org.opentorah.xml
+package org.opentorah.util
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine, RemovalCause}
 import org.slf4j.{Logger, LoggerFactory}
@@ -7,15 +7,16 @@ import java.net.URL
 import java.time.Duration
 
 trait Caching:
-  final def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Parser[T]): Parser[T] = getCached[T](url, load(url))
+  final def getCachedByUrl[T <: AnyRef](url: URL, load: URL => Effects.IO[T]): Effects.IO[T] =
+    getCached[T](url, load(url))
 
-  def getCached[T <: AnyRef](key: AnyRef, load: => Parser[T]): Parser[T]
+  def getCached[T <: AnyRef](key: AnyRef, load: => Effects.IO[T]): Effects.IO[T]
 
 object Caching:
   private val log: Logger = LoggerFactory.getLogger(classOf[Caching.type])
 
   object Zero extends Caching:
-    def getCached[T <: AnyRef](key: AnyRef, load: => Parser[T]): Parser[T] = load
+    def getCached[T <: AnyRef](key: AnyRef, load: => Effects.IO[T]): Effects.IO[T] = load
 
   final class Simple extends Caching:
     private val cache: Cache[AnyRef, AnyRef] = Caffeine.newBuilder
@@ -26,7 +27,7 @@ object Caching:
 
     var logEnabled: Boolean = true
 
-    def getCached[T <: AnyRef](key: AnyRef, load: => Parser[T]): Parser[T] = Option[AnyRef](cache.getIfPresent(key))
+    def getCached[T <: AnyRef](key: AnyRef, load: => Effects.IO[T]): Effects.IO[T] = Option[AnyRef](cache.getIfPresent(key))
       .map(_.asInstanceOf[T])
       .map(ZIO.succeed)
       .getOrElse(
