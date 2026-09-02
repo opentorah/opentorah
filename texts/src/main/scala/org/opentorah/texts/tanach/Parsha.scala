@@ -4,7 +4,7 @@ import org.opentorah.metadata.{HasName, HasValues, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
 import org.opentorah.util.Effects
-import org.podval.xml.{XmlAst, XmlError}
+import org.podval.xml.XmlError
 import Tanach.Chumash
 
 enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
@@ -173,15 +173,13 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
         ).head
       )
 
-  def decode[E: XmlAst](book: ChumashBook, element: E): Parsed =
-    XmlDecode.requireNoOther(element, Set("name", "aliyah", "day", "maftir"))
-    val names: Names = XmlDecode.namesOf(element, defaultN = false)
-    val span: SpanSemiResolved = SpanParsed.decode(element).semiResolve
-    val aliyot: Seq[Torah.Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(numberedSpan)
-    val daysParsed: Seq[DayParsed] = XmlDecode.childrenNamed(element, "day").map(decodeDay)
-    val maftirs: Seq[E] = XmlDecode.childrenNamed(element, "maftir")
-    if maftirs.length != 1 then throw XmlError(s"Required maftir, found ${maftirs.length}")
-    val maftir: SpanSemiResolved = SpanParsed.decode(maftirs.head).semiResolve
+  def decode(book: ChumashBook, dto: ParshaWeekDto): Parsed =
+    val names: Names = dto.weekNames
+    val span: SpanSemiResolved = dto.span
+    val aliyot: Seq[Torah.Numbered] = dto.aliyot.map(_.numberedSemi)
+    val daysParsed: Seq[DayParsed] = dto.days.map(decodeDay)
+    if dto.maftirs.length != 1 then throw XmlError(s"Required maftir, found ${dto.maftirs.length}")
+    val maftir: SpanSemiResolved = dto.maftirs.head.span.semiResolve
     val parsha: Parsha = HasName.findByNames(book.parshiot, names)
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     Parsed(
@@ -200,14 +198,11 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
     val isCombined: Boolean
   )
 
-  private def decodeDay[E: XmlAst](element: E): DayParsed = DayParsed(
-    span = numberedSpan(element),
-    custom = element.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
-    isCombined = XmlDecode.booleanOpt(element, "combined").getOrElse(false)
+  private def decodeDay(dto: DayDto): DayParsed = DayParsed(
+    span = dto.span,
+    custom = dto.custom.fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
+    isCombined = dto.combined.getOrElse(false)
   )
 
   private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
-
-  private def numberedSpan[E: XmlAst](element: E): Torah.Numbered =
-    WithNumber.decode(element, el => SpanParsed.decode(el).semiResolve)

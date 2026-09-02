@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.{Collections, Effects}
-import org.podval.xml.XmlAst
 
 trait ChumashBook extends TanachBook:
   lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
@@ -17,15 +16,15 @@ trait ChumashBook extends TanachBook:
   // Parsed names of the book are ignored - names of the first parsha are used instead.
   override def names: Names = parshiot.head.names
 
-  override def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): ChumashBook.Parsed =
-    ChumashBook.parse(this, names, chapters, element)
+  override def parse(names: Names, chapters: Chapters, dto: BookDto): ChumashBook.Parsed =
+    ChumashBook.parse(this, names, chapters, dto)
 
   def metadata: ChumashBook.Metadata = TanachBook.metadata(this).asInstanceOf[ChumashBook.Metadata]
 
 object ChumashBook:
-  def parse[E: XmlAst](book: ChumashBook, names: Names, chapters: Chapters, element: E): Parsed =
-    XmlDecode.requireNoOther(element, Set("name", "chapter", "week"))
-    val weeks: Seq[Parsha.Parsed] = XmlDecode.childrenNamed(element, "week").map(Parsha.decode(book, _))
+  def parse(book: ChumashBook, names: Names, chapters: Chapters, dto: BookDto): Parsed =
+    require(dto.days.isEmpty && dto.weekDays.isEmpty && dto.books.isEmpty)
+    val weeks: Seq[Parsha.Parsed] = dto.weeks.map(Parsha.decode(book, _))
     require(names.getDefaultName.isDefined, "Only default name is allowed for a Chumash book")
     require(weeks.head.names.hasName(names.getDefaultName.get),
       "Chumash book name must be a name of the book's first parsha")

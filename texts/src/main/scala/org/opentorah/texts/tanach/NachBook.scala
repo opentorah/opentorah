@@ -2,14 +2,13 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Names
 import org.opentorah.util.Effects
-import org.podval.xml.XmlAst
 import zio.ZIO
 
 trait NachBook extends TanachBook:
   final override def names: Names = TanachBook.names(this)
 
-  override def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): NachBook.Parsed =
-    XmlDecode.requireNoOther(element, Set("name", "chapter"))
+  override def parse(names: Names, chapters: Chapters, dto: BookDto): NachBook.Parsed =
+    require(dto.weeks.isEmpty && dto.days.isEmpty && dto.weekDays.isEmpty && dto.books.isEmpty)
     NachBook.Parsed(this, names, chapters)
 
 object NachBook:

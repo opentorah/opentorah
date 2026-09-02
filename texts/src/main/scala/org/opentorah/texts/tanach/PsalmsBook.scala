@@ -4,7 +4,6 @@ import org.opentorah.calendar.Week
 import org.opentorah.metadata.Names
 import org.opentorah.store.By
 import org.opentorah.util.Effects
-import org.podval.xml.XmlAst
 import zio.ZIO
 import Tanach.Psalms
 
@@ -28,8 +27,8 @@ trait PsalmsBook extends NachBook:
         .orElse(Week.Day.forDefaultName(name).map(_.ordinal + 1))
   )
 
-  override def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): PsalmsBook.Parsed =
-    PsalmsBook.parse(this, names, chapters, element)
+  override def parse(names: Names, chapters: Chapters, dto: BookDto): PsalmsBook.Parsed =
+    PsalmsBook.parse(this, names, chapters, dto)
 
 object PsalmsBook:
   final class Metadata(
@@ -52,19 +51,18 @@ object PsalmsBook:
       books
     ))
 
-  def parse[E: XmlAst](book: PsalmsBook, names: Names, chapters: Chapters, element: E): Parsed =
-    XmlDecode.requireNoOther(element, Set("name", "chapter", "day", "weekDay", "book"))
+  def parse(book: PsalmsBook, names: Names, chapters: Chapters, dto: BookDto): Parsed =
+    require(dto.weeks.isEmpty)
     Parsed(
       names,
       chapters,
-      days = spans(element, "day", 30, chapters),
-      weekDays = spans(element, "weekDay", 7, chapters),
-      books = spans(element, "book", 5, chapters)
+      days = spans(dto.days, "day", 30, chapters),
+      weekDays = spans(dto.weekDays, "weekDay", 7, chapters),
+      books = spans(dto.books, "book", 5, chapters)
     )
 
-  private def spans[E: XmlAst](element: E, name: String, number: Int, chapters: Chapters): Seq[Span] =
-    val numbered: Seq[WithNumber[SpanParsed]] =
-      XmlDecode.childrenNamed(element, name).map(el => WithNumber.decode(el, SpanParsed.decode))
+  private def spans(numberedDto: Seq[NumberedSpanDto], name: String, number: Int, chapters: Chapters): Seq[Span] =
+    val numbered: Seq[WithNumber[SpanParsed]] = numberedDto.map(_.numbered)
     require(numbered.map(_.n) == (1 to numbered.length), s"Wrong $name numbers: $numbered")
     require(numbered.length == number, s"Wrong number of ${name}s: ${numbered.length} != $number")
     SpanSemiResolved.setImpliedTo(WithNumber.dropNumbers(numbered).map(_.semiResolve), chapters.full, chapters)

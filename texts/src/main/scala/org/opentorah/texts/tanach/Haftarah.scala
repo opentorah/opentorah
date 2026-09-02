@@ -3,7 +3,8 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Language}
 import org.opentorah.util.Collections
 import org.opentorah.util.Effects
-import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlParser}
+import zio.blocks.schema.{Modifier, Schema}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
 final case class Haftarah(override val spans: Seq[Haftarah.BookSpan]) extends Haftarah.Spans(spans) derives CanEqual:
@@ -63,17 +64,8 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     precedenceWhenCombined: Set[Custom]
   )
 
-  private val codec: XmlCodec[WeekMetadata] = new XmlCodec[WeekMetadata]:
-    override def elementName: String = "week"
-    override def isRecordLike: Boolean = true
-
-    override def unsafeDecode[E: XmlAst](element: E): WeekMetadata = decodeWeek(element)
-
-    override def encodeNamed[E: XmlAst](elName: String, value: WeekMetadata): E =
-      throw XmlError("Haftarah week is decode-only")
-
   private lazy val loaded: Map[Parsha, WeekMetadata] =
-    val parsed: Seq[WeekMetadata] = XmlParser.loadCatalog(this, codec)
+    val parsed: Seq[WeekMetadata] = XmlParser.loadCatalog(this, WeekDto.codec).map(toWeekMetadata)
     Effects.unsafeRun(HasName.mapByName(
       keys = Parsha.valuesSeq,
       metadatas = parsed,
@@ -101,19 +93,19 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   def decode[E: XmlAst](element: E, full: Boolean): Customs =
     XmlDecode.requireName(element, "haftarah")
-    val parsed: Parsed = withAnnotations(element, full)
+    val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     require(parsed.nones.isEmpty, "<none> in a reading that is not optional")
     parsed.customs
 
   def decodeRecorded[E: XmlAst](element: E, full: Boolean): Recorded =
     XmlDecode.requireName(element, "haftarah")
-    val parsed: Parsed = withAnnotations(element, full)
+    val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     Recorded(parsed.annotations, parsed.variants)
 
   /** A reading in which a custom may read nothing; see `<none>`. */
   def decodeOptional[E: XmlAst](element: E, full: Boolean): OptionalCustoms =
     XmlDecode.requireName(element, "haftarah")
-    val parsed: Parsed = withAnnotations(element, full = false)
+    val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full = false)
     val reading: Map[Custom, Option[Haftarah]] =
       Collections.mapValues(parsed.customs.customs)(Some(_)) ++ parsed.nones.map(_ -> None)
     new Custom.Of[Option[Haftarah]](reading, full = full)
@@ -125,18 +117,16 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     nones: Set[Custom]
   )
 
-  private def decodeWeek[E: XmlAst](element: E): WeekMetadata =
-    XmlDecode.requireName(element, "week")
-    val name: String = XmlDecode.requireAttr(element, "n")
-    val forWeek: Annotation = annotationOf(element)
-    val keep: Set[Custom] = element.get("precedenceWhenCombined").map(_.trim).filter(_.nonEmpty)
+  private def toWeekMetadata(dto: WeekDto): WeekMetadata =
+    val forWeek: Annotation = annotation(dto.sources, dto.comment)
+    val keep: Set[Custom] = dto.precedenceWhenCombined.map(_.trim).filter(_.nonEmpty)
       .fold(Set.empty)(Custom.parse)
-    val result: Parsed = withAnnotations(element, full = true)
+    val result: Parsed = withAnnotations(dto.asHaftarah, full = true)
     // an annotation on the week itself stands for the entry as a whole
     val annotations: Annotations =
       if forWeek.isEmpty then result.annotations
       else result.annotations.updated(Custom.Common, result.annotations.getOrElse(Custom.Common, Annotation()) ++ forWeek)
-    WeekMetadata(name, result.customs, annotations, result.variants, keep)
+    WeekMetadata(dto.n, result.customs, annotations, result.variants, keep)
 
   /**
    * `sources="michlol, chitas"`: the sources an entry rests on, by name; see
@@ -160,14 +150,13 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
    * is there to be shown next to the primary reading and to keep what is known
    * from being thrown away. Numbered from 2, the primary being 1.
    */
-  private def withAnnotations[E: XmlAst](element: E, full: Boolean): Parsed =
-    XmlDecode.requireNoOther(element, Set("part", "custom", "annotation", "none"))
-    val bookSpanParsed: BookSpanParsed = decodeSpan(element)
-    val parts: Seq[WithNumber[BookSpan]] = XmlDecode.childrenNamed(element, "part").map(decodePart(bookSpanParsed, _))
+  private def withAnnotations(dto: HaftarahDto, full: Boolean): Parsed =
+    val bookSpanParsed: BookSpanParsed = dto.span
+    val parts: Seq[WithNumber[BookSpan]] = dto.parts.map(decodePart(bookSpanParsed, _))
     val partsOpt: Option[Haftarah] = if parts.isEmpty then None else Some(partsHaftarah(parts))
-    val parsed: Seq[CustomParsed] = XmlDecode.childrenNamed(element, "custom").map(decodeCustom(bookSpanParsed, _))
-    val standalone: Seq[(Set[Custom], Annotation)] = XmlDecode.childrenNamed(element, "annotation").map(decodeNamedAnnotation)
-    val noneEntries: Seq[(Set[Custom], Annotation)] = XmlDecode.childrenNamed(element, "none").map(decodeNamedAnnotation)
+    val parsed: Seq[CustomParsed] = dto.customs.map(decodeCustom(bookSpanParsed, _))
+    val standalone: Seq[(Set[Custom], Annotation)] = dto.annotations.map(decodeNamed)
+    val noneEntries: Seq[(Set[Custom], Annotation)] = dto.nones.map(decodeNamed)
     // a variant stands beside the reading rather than being one of them, so it
     // takes no part in building the map that customs resolve through
     val (variantsParsed: Seq[CustomParsed], parsedCustoms: Seq[CustomParsed]) =
@@ -210,13 +199,11 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     variant: Option[Int]
   )
 
-  private def decodeCustom[E: XmlAst](ancestorSpan: BookSpanParsed, element: E): CustomParsed =
-    XmlDecode.requireNoOther(element, Set("part"))
-    val n: String = XmlDecode.requireAttr(element, "n")
-    val bookSpanParsed: BookSpanParsed = decodeSpan(element).inheritFrom(ancestorSpan)
-    val parts: Seq[WithNumber[BookSpan]] = XmlDecode.childrenNamed(element, "part").map(decodePart(bookSpanParsed, _))
+  private def decodeCustom(ancestorSpan: BookSpanParsed, dto: CustomDto): CustomParsed =
+    val bookSpanParsed: BookSpanParsed = dto.span.inheritFrom(ancestorSpan)
+    val parts: Seq[WithNumber[BookSpan]] = dto.parts.map(decodePart(bookSpanParsed, _))
     val result: Haftarah = if parts.isEmpty then oneSpan(bookSpanParsed) else partsHaftarah(parts)
-    CustomParsed(Custom.parse(n), result, annotationOf(element), XmlDecode.intOpt(element, "variant"))
+    CustomParsed(Custom.parse(dto.n), result, annotation(dto.sources, dto.comment), dto.variant)
 
   /**
    * `<annotation n="Chabad" sources="chitas"/>`: what is known about a custom's
@@ -232,17 +219,96 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
    * be written down to exist. Only readings parsed as [[OptionalCustoms]] may
    * carry it -- the weekly readings are full, and everyone reads something.
    */
-  private def decodeNamedAnnotation[E: XmlAst](element: E): (Set[Custom], Annotation) =
-    XmlDecode.requireNoOther(element, Set.empty)
-    (Custom.parse(XmlDecode.requireAttr(element, "n")), annotationOf(element))
+  private def decodeNamed(dto: NamedDto): (Set[Custom], Annotation) =
+    (Custom.parse(dto.n), annotation(dto.sources, dto.comment))
 
-  private def decodePart[E: XmlAst](ancestorSpan: BookSpanParsed, element: E): WithNumber[BookSpan] =
-    WithNumber.decode(element, el => decodeSpan(el).inheritFrom(ancestorSpan).resolve)
+  private def decodePart(ancestorSpan: BookSpanParsed, dto: PartDto): WithNumber[BookSpan] =
+    WithNumber(dto.n, dto.span.inheritFrom(ancestorSpan).resolve)
 
   private def partsHaftarah(parts: Seq[WithNumber[BookSpan]]): Haftarah =
     require(parts.map(_.n) == (1 to parts.length), s"Wrong part numbers: $parts")
     require(parts.length > 1, "too short")
     Haftarah(WithNumber.dropNumbers(parts))
 
-  private def annotationOf[E: XmlAst](element: E): Annotation =
-    annotation(element.get("sources"), element.get("comment"))
+  private def spanOf(
+    book: Option[String],
+    fromChapter: Option[Int],
+    fromVerse: Option[Int],
+    toChapter: Option[Int],
+    toVerse: Option[Int]
+  ): BookSpanParsed = BookSpanParsed(
+    book = book.map(_.trim).filter(_.nonEmpty),
+    span = SpanParsed(VerseParsed(fromChapter, fromVerse), VerseParsed(toChapter, toVerse))
+  )
+
+  @Modifier.config(XmlCodec.Element, "haftarah")
+  private final case class HaftarahDto(
+    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "annotation") annotations: Seq[NamedDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty
+  ) derives CanEqual:
+    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
+
+  private object HaftarahDto:
+    given schema: Schema[HaftarahDto] = Schema.derived
+    val codec: XmlCodec[HaftarahDto] = XmlCodec.derived
+
+  @Modifier.config(XmlCodec.Element, "week")
+  private final case class WeekDto(
+    @Modifier.config(XmlCodec.Attribute, "") n: String,
+    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") precedenceWhenCombined: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "annotation") annotations: Seq[NamedDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty
+  ) derives CanEqual:
+    def asHaftarah: HaftarahDto = HaftarahDto(
+      book, fromChapter, fromVerse, toChapter, toVerse, parts, customs, annotations, nones
+    )
+
+  private object WeekDto:
+    given schema: Schema[WeekDto] = Schema.derived
+    val codec: XmlCodec[WeekDto] = XmlCodec.derived
+
+  private final case class CustomDto(
+    @Modifier.config(XmlCodec.Attribute, "") n: String,
+    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") variant: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty
+  ) derives CanEqual:
+    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
+
+  private final case class PartDto(
+    @Modifier.config(XmlCodec.Attribute, "") n: Int,
+    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None
+  ) derives CanEqual:
+    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
+
+  private final case class NamedDto(
+    @Modifier.config(XmlCodec.Attribute, "") n: String,
+    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None
+  ) derives CanEqual

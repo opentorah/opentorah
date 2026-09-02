@@ -12,7 +12,7 @@ trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are 
 
   override def storesPure: Seq[By[?]] = Seq(chapters.byChapter)
 
-  private[tanach] def parse[E: XmlAst](names: Names, chapters: Chapters, element: E): TanachBook.Parsed
+  private[tanach] def parse(names: Names, chapters: Chapters, dto: BookDto): TanachBook.Parsed
 
 private[tanach] object TanachBook:
   def valuesSeq: Seq[TanachBook] = Tanach.Book.valuesSeq
@@ -22,10 +22,11 @@ private[tanach] object TanachBook:
     override def isRecordLike: Boolean = true
 
     override def unsafeDecode[E: XmlAst](element: E): Parsed =
-      val names: Names = XmlDecode.namesOf(element)
-      val chapters: Chapters = Chapters.decode(element)
+      val dto: BookDto = BookDto.codec.unsafeDecode(element)
+      val names: Names = dto.bookNames
+      val chapters: Chapters = dto.chapterLengths
       val book: TanachBook = HasName.findByNames(valuesSeq, names)
-      book.parse(names, chapters, element)
+      book.parse(names, chapters, dto)
 
     override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =
       throw XmlError("Tanach book is decode-only")
