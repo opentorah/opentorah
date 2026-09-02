@@ -51,7 +51,7 @@ object Name extends ElementTo[Name]("name"):
 
     override def unsafeDecode[E: XmlAst](element: E): Name =
       val data: Data = Data.codec.unsafeDecode(element)
-      val fromN: Option[String] = data.n.map(_.trim).filter(_.nonEmpty)
+      val fromN: Option[String] = data.n.map(_.trim)
       val fromText: Option[String] = data.text.map(_.trim).filter(_.nonEmpty)
       if fromN.isEmpty && fromText.isEmpty then throw XmlError("Both 'n' attribute and text are absent.")
       if fromN.isDefined && fromText.isDefined then throw XmlError("Both 'n' attribute and text are present.")

@@ -2,7 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.{HasName, HasValues, Named, Names}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
+import org.podval.xml.{XmlCodec, XmlParser}
+import zio.blocks.schema.{Modifier, Schema}
 
 // The hierarchy lives in CustomTree.xml, not here. Assumptions: no cycles;
 // only Common has no parent.
@@ -56,19 +57,23 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
    * so that it can be edited as data. Lazy for the same reason the names are:
    * resolving an entry needs the names, which the loader reads on demand.
    */
-  private object TreeEntry extends ElementTo[(String, Option[String])]("custom"):
-    override def contentParsable: Parsable[(String, Option[String])] =
-      new Parsable[(String, Option[String])]:
-        override def parser: Parser[(String, Option[String])] = for
-          name: String <- Attribute("n").required()
-          parent: Option[String] <- Attribute("parent").optional()
-        yield (name, parent)
-        override def unparser: Unparser[(String, Option[String])] = ???
+  private final case class TreeEntry(
+    @Modifier.config(XmlCodec.Attribute, "") n: String,
+    @Modifier.config(XmlCodec.Attribute, "") parent: Option[String] = None
+  ) derives CanEqual
+
+  private object TreeEntry:
+    given schema: Schema[TreeEntry] = Schema.derived
+    val codec: XmlCodec[TreeEntry] = XmlCodec.derived
 
   private lazy val parents: Map[Custom, Option[Custom]] =
-    val from: From = From.resourceNamed(this, "CustomTree")
-    val entries: Seq[(String, Option[String])] =
-      Parser.unsafeRun(TreeEntry.wrappedSeq(from.name).parse(from))
+    val parsed: Seq[TreeEntry] = XmlParser.parseCatalog(
+      classOf[Custom],
+      "CustomTree.xml",
+      "CustomTree",
+      TreeEntry.codec
+    ).fold(error => throw error, identity)
+    val entries: Seq[(String, Option[String])] = parsed.map(entry => (entry.n, entry.parent))
     val byName: Map[String, Custom] = valuesSeq.map(custom => custom.name -> custom).toMap
     val missing: Seq[String] = valuesSeq.map(_.name).filterNot(entries.map(_._1).contains)
     require(missing.isEmpty, s"CustomTree.xml does not mention: ${missing.mkString(", ")}")

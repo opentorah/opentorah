@@ -1,7 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ElementTo, From, Parsable, Parser, Unparser}
+import org.podval.xml.{XmlCodec, XmlParser}
+import zio.blocks.schema.{Modifier, Schema}
 
 /**
  * Where a reading is attested. Readings differ between customs, and the
@@ -58,32 +59,38 @@ object ReadingSources:
       publication.fold("")(pub => s" ($pub)") +
       url.fold("")(u => s" <$u>")
 
-  private object SourceElement extends ElementTo[Source]("source"):
-    override def contentParsable: Parsable[Source] = new Parsable[Source]:
-      override def parser: Parser[Source] = for
-        key: String <- Attribute("n").required()
-        kind: String <- Attribute("kind").required()
-        name: String <- Attribute("name").required()
-        publication: Option[String] <- Attribute("publication").optional()
-        where: Option[String] <- Attribute("where").optional()
-        url: Option[String] <- Attribute("url").optional()
-        combines: Option[String] <- Attribute("combines").optional()
-      yield Source(
-        key = key,
-        kind = Kind.parse(kind),
-        name = name,
-        publication = publication,
-        where = where,
-        url = url,
-        combines = combines.fold(Seq.empty)(_.split(',').toSeq.map(_.trim).filter(_.nonEmpty))
-      )
+  private final case class ParsedSource(
+    @Modifier.config(XmlCodec.Attribute, "n") key: String,
+    @Modifier.config(XmlCodec.Attribute, "") kind: String,
+    @Modifier.config(XmlCodec.Attribute, "") name: String,
+    @Modifier.config(XmlCodec.Attribute, "") publication: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") where: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") url: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") combines: Option[String] = None
+  ) derives CanEqual
 
-      override def unparser: Unparser[Source] = ???
+  private object ParsedSource:
+    given schema: Schema[ParsedSource] = Schema.derived
+    val codec: XmlCodec[ParsedSource] = XmlCodec.derived
+
+    def toSource(parsed: ParsedSource): Source = Source(
+      key = parsed.key,
+      kind = Kind.parse(parsed.kind),
+      name = parsed.name,
+      publication = parsed.publication,
+      where = parsed.where,
+      url = parsed.url,
+      combines = parsed.combines.fold(Seq.empty)(_.split(',').toSeq.map(_.trim).filter(_.nonEmpty))
+    )
 
   /** The works themselves, read from ReadingSources.xml. */
   lazy val sources: Map[String, Source] =
-    val from: From = From.resourceNamed(this, "ReadingSources")
-    val parsed: Seq[Source] = Parser.unsafeRun(SourceElement.wrappedSeq(from.name).parse(from))
+    val parsed: Seq[Source] = XmlParser.parseCatalog(
+      getClass,
+      "ReadingSources.xml",
+      "ReadingSources",
+      ParsedSource.codec
+    ).fold(error => throw error, identity).map(ParsedSource.toSource)
     Collections.checkNoDuplicates(parsed.map(_.key), "sources")
     val byKey: Map[String, Source] = parsed.map(source => source.key -> source).toMap
     for

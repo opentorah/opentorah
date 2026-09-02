@@ -209,14 +209,16 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   `*.xml` resources
 - **Work:** none beyond PR 3’s generic loader.
 
-### PR 6 — `texts` Rambam and simple catalogs
+### PR 6 — `texts` Rambam and simple catalogs (done)
 
 - **Repo:** opentorah.org `texts`
 - **Depends on:** PRs 3–4
 - **Files:** `rambam/MishnehTorah.scala`, `SeferHamitzvosLessons.scala`;
   `tanach/Custom.scala`, `ReadingSources.scala`; matching XML
-- **Work:** sealed `Part` like `XmlCodecSpec.Lesson`. `HasName.load` via
-  codecs. Decode-only is fine (`unparser = ???` today).
+- **Work:** `parseCatalog` + codecs. Lesson `Part` is a tagged union
+  (`positive` / `negative` / `named`); `<negative>` now decodes as `Negative`
+  (the old `ElementTo[Positive]` for both numbered cases was wrong).
+  Decode-only.
 
 ### PR 7 — `texts` Tanach books, parsha, Torah spans
 
