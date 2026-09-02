@@ -26,12 +26,7 @@ object Selector extends HasValues.FindByName[Selector]:
 
   def valuesSeq: Seq[Selector] = values.toIndexedSeq
 
-  lazy val values: Seq[Selector] = XmlParser.parseCatalog(
-    classOf[Selector],
-    "Selector.xml",
-    "Selector",
-    codec
-  ).fold(error => throw error, identity)
+  lazy val values: Seq[Selector] = XmlParser.loadCatalog(this, codec)
 
 // TODO why so much stuff? org.podval.xml not powerful enough?
 private[store] object NameChildren:

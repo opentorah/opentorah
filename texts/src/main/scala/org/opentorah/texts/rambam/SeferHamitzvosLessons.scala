@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Named, Names}
 import org.opentorah.store.Selector
-import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlError, XmlParser}
 
 object SeferHamitzvosLessons:
 
@@ -18,7 +18,7 @@ object SeferHamitzvosLessons:
 
       override def unsafeDecode[E: XmlAst](element: E): Lesson =
         Lesson(
-          number = positiveInt(element, "n"),
+          number = XmlDecode.positiveInt(element, "n"),
           parts = element.getChildren.flatMap(_.asElement).map(Part.codec.unsafeDecode(_))
         )
 
@@ -35,8 +35,8 @@ object SeferHamitzvosLessons:
 
       override def unsafeDecode[E: XmlAst](element: E): Part =
         element.localName match
-          case "positive" => Positive(positiveInt(element, "n"))
-          case "negative" => Negative(positiveInt(element, "n"))
+          case "positive" => Positive(XmlDecode.positiveInt(element, "n"))
+          case "negative" => Negative(XmlDecode.positiveInt(element, "n"))
           case "named" => NamedPart(Names.codec.unsafeDecode(element))
           case other => throw XmlError(s"Unknown lesson part: $other")
 
@@ -56,17 +56,4 @@ object SeferHamitzvosLessons:
     override def selector: Selector = Selector.getForName("negative")
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = XmlParser.parseCatalog(
-    getClass,
-    "SeferHamitzvosLessons.xml",
-    "SeferHamitzvosLessons",
-    Lesson.codec
-  ).fold(error => throw error, identity)
-
-  private def positiveInt[E: XmlAst](element: E, name: String): Int =
-    val raw: String = element.get(name).map(_.trim).filter(_.nonEmpty).getOrElse:
-      // TODO isn't it required by the class?
-      throw XmlError(s"Missing attribute '$name'")
-    val n: Int = raw.toIntOption.getOrElse(throw XmlError(s"Invalid integer for $name: $raw"))
-    if n <= 0 then throw XmlError(s"Non-positive integer: $n")
-    n
+  lazy val lessons: Seq[Lesson] = XmlParser.loadCatalog(this, Lesson.codec)

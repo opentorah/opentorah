@@ -73,12 +73,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       throw XmlError("Haftarah week is decode-only")
 
   private lazy val loaded: Map[Parsha, WeekMetadata] =
-    val parsed: Seq[WeekMetadata] = XmlParser.parseCatalog(
-      getClass,
-      "Haftarah.xml",
-      "Haftarah",
-      codec
-    ).fold(error => throw error, identity)
+    val parsed: Seq[WeekMetadata] = XmlParser.loadCatalog(this, codec)
     Effects.unsafeRun(HasName.mapByName(
       keys = Parsha.valuesSeq,
       metadatas = parsed,

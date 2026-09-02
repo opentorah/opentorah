@@ -1,7 +1,7 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Names
-import org.podval.xml.{XmlAst, XmlCodec, XmlError}
+import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlError}
 
 // TODO remove
 final case class Alias(override val names: Names, to: String) extends Terminal derives CanEqual
@@ -12,8 +12,7 @@ object Alias:
     override def isRecordLike: Boolean = true
 
     override def unsafeDecode[E: XmlAst](element: E): Alias =
-      val to: String = element.get("to").map(_.trim).filter(_.nonEmpty).getOrElse:
-        throw XmlError("Missing attribute 'to'")
+      val to: String = XmlDecode.requireAttr(element, "to")
       Alias(
         names = Names.fromDefaultName(element.get("n"), NameChildren.decode(element)),
         to = to

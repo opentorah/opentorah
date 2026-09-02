@@ -17,12 +17,6 @@ dependencies {
 
   implementation libs.zmanim
 
-  // Optional dependencies:
-  // - are declared here as 'compileOnly';
-  // - need to be supplied as 'runtimeOnly' ('implementation'?) where needed.
-
-  compileOnly libs.caffeine
-
   testImplementation libs.zio.test
   testImplementation libs.cats.core
   testImplementation libs.cats.laws

@@ -33,13 +33,7 @@ private[tanach] object TanachBook:
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   // ... but it started manifesting only with the switch to ZIO 2.0!
   private lazy val book2parsed: Map[TanachBook, Parsed] =
-    val parsed: Seq[Parsed] = XmlParser.parseCatalog(
-      Tanach.getClass,
-      "Tanach.xml",
-      "Tanach",
-      codec,
-      xinclude = true
-    ).fold(error => throw error, identity)
+    val parsed: Seq[Parsed] = XmlParser.loadCatalog(Tanach, codec, xinclude = true)
     val result: Map[TanachBook, Parsed] = parsed.map(metadata => metadata.book -> metadata).toMap
     val unmatched: Set[TanachBook] = valuesSeq.toSet -- result.keySet
     require(unmatched.isEmpty, s"Unmatched keys: $unmatched")

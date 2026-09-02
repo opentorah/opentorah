@@ -85,12 +85,7 @@ object ReadingSources:
 
   /** The works themselves, read from ReadingSources.xml. */
   lazy val sources: Map[String, Source] =
-    val parsed: Seq[Source] = XmlParser.parseCatalog(
-      getClass,
-      "ReadingSources.xml",
-      "ReadingSources",
-      ParsedSource.codec
-    ).fold(error => throw error, identity).map(ParsedSource.toSource)
+    val parsed: Seq[Source] = XmlParser.loadCatalog(this, ParsedSource.codec).map(ParsedSource.toSource)
     Collections.checkNoDuplicates(parsed.map(_.key), "sources")
     val byKey: Map[String, Source] = parsed.map(source => source.key -> source).toMap
     for

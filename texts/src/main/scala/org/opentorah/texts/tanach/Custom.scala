@@ -67,12 +67,7 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
     val codec: XmlCodec[TreeEntry] = XmlCodec.derived
 
   private lazy val parents: Map[Custom, Option[Custom]] =
-    val parsed: Seq[TreeEntry] = XmlParser.parseCatalog(
-      classOf[Custom],
-      "CustomTree.xml",
-      "CustomTree",
-      TreeEntry.codec
-    ).fold(error => throw error, identity)
+    val parsed: Seq[TreeEntry] = XmlParser.loadCatalog(this, "CustomTree", TreeEntry.codec)
     val entries: Seq[(String, Option[String])] = parsed.map(entry => (entry.n, entry.parent))
     val byName: Map[String, Custom] = valuesSeq.map(custom => custom.name -> custom).toMap
     val missing: Seq[String] = valuesSeq.map(_.name).filterNot(entries.map(_._1).contains)

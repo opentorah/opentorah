@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Name, Named, Names}
 import org.opentorah.store.Selector
-import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlError, XmlParser}
 
 // TODO parse the names of the book itself! (and probably do the same for Tanach?)
 object MishnehTorah:
@@ -21,12 +21,12 @@ object MishnehTorah:
 
       override def unsafeDecode[E: XmlAst](element: E): Book =
         val names: Names = namesOf(element)
-        val parts: Seq[Part] = childrenNamed(element, "part").map(Part.codec.unsafeDecode(_))
-        requireNoOther(element, Set("name", "part"))
+        val parts: Seq[Part] = XmlDecode.childrenNamed(element, "part").map(Part.codec.unsafeDecode(_))
+        XmlDecode.requireNoOther(element, Set("name", "part"))
         require(parts.map(_.number) == (1 to parts.length),
           s"Wrong part numbers: ${parts.map(_.number)} != ${1 to parts.length}")
         val result: Book = Book(
-          number = intAttr(element, "n"),
+          number = XmlDecode.intAttr(element, "n"),
           names = names,
           parts = parts
         )
@@ -54,8 +54,8 @@ object MishnehTorah:
       override def isRecordLike: Boolean = true
 
       override def unsafeDecode[E: XmlAst](element: E): Part =
-        val number: Int = positiveInt(element, "n")
-        val numChapters: Int = positiveInt(element, "chapters")
+        val number: Int = XmlDecode.positiveInt(element, "n")
+        val numChapters: Int = XmlDecode.positiveInt(element, "chapters")
         val names: Names =
           try namesOf(element)
           catch case e: XmlError =>
@@ -63,8 +63,8 @@ object MishnehTorah:
               s"${el.getName} attrs=${el.getAttributes} text=[${el.getText}]"
             .mkString(" || ")
             throw XmlError(s"${e.getMessage}; part children: $kids")
-        val chapterElements: Seq[E] = childrenNamed(element, "chapter")
-        requireNoOther(element, Set("name", "chapter"))
+        val chapterElements: Seq[E] = XmlDecode.childrenNamed(element, "chapter")
+        XmlDecode.requireNoOther(element, Set("name", "chapter"))
         if chapterElements.isEmpty then PartWithNumberedChapters(number, numChapters, names) else
           val chapters: Seq[NamedChapter] = chapterElements.map(el => NamedChapter(namesOf(el)))
           val result: PartWithNamedChapters = PartWithNamedChapters(number, numChapters, names, chapters)
@@ -102,32 +102,9 @@ object MishnehTorah:
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] =
-    // TODO can we derive all those names from the class of this?
-    val result: Seq[Book] = XmlParser.parseCatalog(
-      getClass,
-      "MishnehTorah.xml",
-      "MishnehTorah",
-      Book.codec
-    ).fold(error => throw error, identity)
+    val result: Seq[Book] = XmlParser.loadCatalog(this, Book.codec)
     require(result.map(_.number) == (0 to 14))
     result
 
   private def namesOf[E: XmlAst](element: E): Names =
-    Names(childrenNamed(element, "name").map(Name.codec.unsafeDecode(_)))
-
-  private def childrenNamed[E: XmlAst](element: E, name: String): Seq[E] =
-    element.getChildren.flatMap(_.asElement).filter(_.localName == name)
-
-  private def requireNoOther[E: XmlAst](element: E, allowed: Set[String]): Unit =
-    val extra: Seq[String] = element.getChildren.flatMap(_.asElement).map(_.localName).filterNot(allowed.contains)
-    if extra.nonEmpty then throw XmlError(s"Unparsed elements: $extra")
-
-  private def intAttr[E: XmlAst](element: E, name: String): Int =
-    val raw: String = element.get(name).map(_.trim).filter(_.nonEmpty).getOrElse:
-      throw XmlError(s"Missing attribute '$name'")
-    raw.toIntOption.getOrElse(throw XmlError(s"Invalid integer for $name: $raw"))
-
-  private def positiveInt[E: XmlAst](element: E, name: String): Int =
-    val n: Int = intAttr(element, name)
-    if n <= 0 then throw XmlError(s"Non-positive integer: $n")
-    n
+    Names(XmlDecode.childrenNamed(element, "name").map(Name.codec.unsafeDecode(_)))
