@@ -125,4 +125,14 @@
     <name n="Румыния (нусах романия)" lang="ru"/>
     <name n="רומניא" lang="he"/>
   </names>
+  <names>
+    <name n="Marrakesh" lang="en" transliterated="true"/>
+    <name n="Марракеш" lang="ru"/>
+    <name n="מראכש" lang="he"/>
+  </names>
+  <names>
+    <name n="Agadir" lang="en" transliterated="true"/>
+    <name n="Агадир" lang="ru"/>
+    <name n="אגדיר" lang="he"/>
+  </names>
 </Custom>

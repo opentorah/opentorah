@@ -467,9 +467,12 @@
                          Ashkenaz and Italki on Dirshu, against the rest of the Maghreb
                          below: 'א, איט, קהילת העיר אלג'יר, רומ''. The Fast of Gedalia
                          is the exception -- see there."/> <!-- = Vayeilech Italki -->
-        <custom n="Morocco, Algeria" sources="michlol"
-                comment="Morocco and Algeria apart from the city of Algiers, on these
-                         fasts but not on the Fast of Gedalia.">
+        <custom n="Algeria, Marrakesh" sources="michlol, asulin"
+                comment="Algeria apart from the city of Algiers, and Marrakesh with
+                         Bogmaz, on these fasts but not on the Fast of Gedalia. Morocco
+                         at large is not here: Asulin has Sefrou, Fes, Meknes and the
+                         rest of Morocco reading no haftarah on these fasts at all, so
+                         Morocco falls back to Magreb and Sefard, which read none.">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/> <!-- = Vayeilech Sefard -->
         </custom>
@@ -485,8 +488,13 @@
   <day n="FastOfGedalia">
     <reading n="afternoonHaftarahExceptions" full="false">
       <haftarah>
+        <custom n="Marrakesh" book="Hosea" fromChapter="14" fromVerse="2"
+                toVerse="10" sources="asulin"
+                comment="Asulin, reporting R. Meir Asulin and R. D. Tzabach: Marrakesh
+                         and Bogmaz read Shuva on the Fast of Gedalia, where the rest
+                         of Morocco reads Dirshu."/>
         <custom n="Morocco, Algeria" book="Isaiah" fromChapter="55" fromVerse="6"
-                toChapter="56" toVerse="8" sources="michlol"
+                toChapter="56" toVerse="8" sources="michlol, asulin"
                 comment="hamichlol gives the Fast of Gedalia its own entry, in which
                          Morocco and Algeria read Dirshu with Ashkenaz and Italki --
                          'א, איט, חלק מסמג (בעיקר מרוקו ואלג'יריה)' -- rather than the
@@ -533,8 +541,8 @@
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
-        <custom n="Italki, Teiman" book="Hosea" fromChapter="14" fromVerse="2"
-                toVerse="10" sources="michlol"
+        <custom n="Italki, Teiman, Agadir" book="Hosea" fromChapter="14" fromVerse="2"
+                toVerse="10" sources="michlol, asulin"
                 comment="hamichlol cites its own sources for both. For Italki, Machzor
                          Shadal vol. 1, 189b. For Teiman it notes that the old Yemenite
                          siddurim record no Mincha haftarah here at all; the practice
@@ -542,6 +550,11 @@
                          Daim excepted, and R. Yosef Kapach held in Siach Yerushalayim
                          that those who do read it should not say the brachos, which
                          was not accepted in practice."/>
+        <annotation n="Agadir" sources="asulin"
+                    comment="Agadir and southern Morocco read Shuva here without the
+                             Micah ending that the rest of Sefard adds. On the other
+                             fasts they read nothing at all, which is why Agadir hangs
+                             off Magreb rather than Morocco."/>
       </haftarah>
     </reading>
   </day>
