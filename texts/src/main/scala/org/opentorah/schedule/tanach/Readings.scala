@@ -230,13 +230,13 @@ object Readings:
         else if sheniAndChamishi.contains(day.name) then Some(nextWeeklyReading.getAfternoonReading) else None
       )
 
-  // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
   /** Only Simchas Torah is read at night, and only by some customs; the rest
     * are given None by the reading itself rather than by this returning None. */
   def getEveningReading(specialDay: Option[SpecialDay]): Option[SpecialReadings.Evening] =
     specialDay collect:
       case SimchasTorah => SpecialReadings.SimchasTorah.evening(SimchasTorah)
 
+  // On Festival that falls on Shabbos, afternoon reading is that of the Shabbos - except on Yom Kippur.
   def getAfternoonReading(
     day: Day,
     specialDay: Option[SpecialDay],
