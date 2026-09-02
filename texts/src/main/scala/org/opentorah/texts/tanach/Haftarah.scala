@@ -75,6 +75,13 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   type Annotations = Map[Custom, Annotation]
 
+  /**
+   * A reading in which a custom may read nothing at all: `None` is a value
+   * here, not a missing entry, so a custom can read nothing where its parent
+   * reads something. See [[NoneElement]].
+   */
+  type OptionalCustoms = Custom.Of[Option[Haftarah]]
+
   /** An alternative reading for a custom, with whatever is known about it. */
   final case class Variant(number: Int, haftarah: Haftarah, annotation: Annotation) derives CanEqual
 
@@ -98,7 +105,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
         weekSources: Option[String] <- sourcesAttribute.optional()
         weekComment: Option[String] <- commentAttribute.optional()
         keep: Option[String] <- precedenceWhenCombinedAttribute.optional()
-        result: (Customs, Annotations, Variants) <- elementParser
+        result: (Customs, Annotations, Variants, Set[Custom]) <- elementParser
       yield
         val forWeek: Annotation = annotation(weekSources, weekComment)
         // an annotation on the week itself stands for the entry as a whole
@@ -135,16 +142,33 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     override def contentParsable: Parsable[Customs] = new Parsable[Customs]:
       // SpecialReadings' inline readings have no parsha to key sources by, so
       // they are parsed without them for now.
-      override def parser: Parser[Customs] = Haftarah.parserWithAnnotations(full).map(_._1)
+      override def parser: Parser[Customs] = Haftarah.parserWithAnnotations(full).map(parsed =>
+        require(parsed._4.isEmpty, "<none> in a reading that is not optional")
+        parsed._1
+      )
 
       override def unparser: Unparser[Haftarah.Customs] = ???
 
-  private def parserWithAnnotations(full: Boolean): Parser[(Customs, Annotations, Variants)] = for
+  /** A reading in which a custom may read nothing; see [[NoneElement]]. */
+  def optionalElement(full: Boolean): ElementTo[OptionalCustoms] =
+    new ElementTo[OptionalCustoms]("haftarah"):
+      override def contentParsable: Parsable[OptionalCustoms] = new Parsable[OptionalCustoms]:
+        override def parser: Parser[OptionalCustoms] =
+          Haftarah.parserWithAnnotations(full = false).map((customs, _, _, nones) =>
+            val reading: Map[Custom, Option[Haftarah]] =
+              Collections.mapValues(customs.customs)(Some(_)) ++ nones.map(_ -> None)
+            new Custom.Of[Option[Haftarah]](reading, full = full)
+          )
+
+        override def unparser: Unparser[OptionalCustoms] = ???
+
+  private def parserWithAnnotations(full: Boolean): Parser[(Customs, Annotations, Variants, Set[Custom])] = for
     bookSpanParsed: BookSpanParsed <- spanParser
     parts: Seq[WithNumber[BookSpan]] <- PartElement(bookSpanParsed).seq()
     partsOpt: Option[Haftarah] <- if parts.isEmpty then ZIO.none else partsParser(parts).map(Some(_))
     parsed: Seq[CustomParsed] <- CustomElement(bookSpanParsed).seq()
     standalone: Seq[(Set[Custom], Annotation)] <- AnnotationElement.seq()
+    nones: Seq[(Set[Custom], Annotation)] <- NoneElement.seq()
   yield
     // a variant stands beside the reading rather than being one of them, so it
     // takes no part in building the map that customs resolve through
@@ -163,6 +187,9 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
         .filterNot(_.annotation.isEmpty)
         .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation)) ++
       standalone
+        .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation)) ++
+      nones
+        .filterNot((_, annotation) => annotation.isEmpty)
         .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation))
     ).groupMapReduce((custom, _) => custom)((_, annotation) => annotation)(_ ++ _)
 
@@ -174,7 +201,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       customs.customs.updated(Custom.Common, common)
     )
 
-    (new Custom.Of(result, full = full), annotations, variants)
+    (new Custom.Of(result, full = full), annotations, variants, nones.flatMap(_._1).toSet)
 
   private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
 
@@ -209,6 +236,24 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
    * two entries cannot hold the same reading. This attaches the source to the
    * custom without touching what it reads.
    */
+  /**
+   * A custom that reads no haftarah at all: `<none n="Agadir"/>`. Absence
+   * expressed by leaving a custom out of the map means "inherit from the
+   * parent", so it cannot say this; and a hole is silent, where a value has to
+   * be written down to exist. Only readings parsed as [[OptionalCustoms]] may
+   * carry it -- the weekly readings are full, and everyone reads something.
+   */
+  private object NoneElement extends ElementTo[(Set[Custom], Annotation)]("none"):
+    override def contentParsable: Parsable[(Set[Custom], Annotation)] =
+      new Parsable[(Set[Custom], Annotation)]:
+        override def parser: Parser[(Set[Custom], Annotation)] = for
+          n: String <- Attribute("n").required()
+          sources: Option[String] <- sourcesAttribute.optional()
+          comment: Option[String] <- commentAttribute.optional()
+        yield (Custom.parse(n), annotation(sources, comment))
+
+        override def unparser: Unparser[(Set[Custom], Annotation)] = ???
+
   private object AnnotationElement extends ElementTo[(Set[Custom], Annotation)]("annotation"):
     override def contentParsable: Parsable[(Set[Custom], Annotation)] =
       new Parsable[(Set[Custom], Annotation)]:
