@@ -63,7 +63,7 @@ object ChumashBook:
         f = combineDays(parsha2span, _)
       )
 
-      parsha2metadata <- Effects.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
+      parsha2metadata = Collections.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
@@ -86,13 +86,13 @@ object ChumashBook:
           )
 
           val book: Tanach.Chumash = parsha.book
-          Some(Effects.unsafeRun(Torah.processDays(
+          Some(Torah.processDays(
             book,
             combined,
             book.chapters.merge(
               parsha2span(parsha),
               parsha2span(parshaNext)
             )
-          )))
+          ))
 
         result +: combineDays(parsha2span, (parshaNext, daysNext) +: weeks.tail.tail)

@@ -1,6 +1,7 @@
 package org.opentorah.metadata
 
-import org.opentorah.util.{ClassName, Effects}
+import org.opentorah.util.Effects
+import org.podval.xml.XmlParser
 
 trait HasName(nameOverride: Option[String]):
   final def name: String = nameOverride.getOrElse(defaultName)
@@ -15,7 +16,7 @@ object HasName:
 
   trait NonEnum extends HasName:
     self: HasName =>
-    final override protected def defaultName: String = ClassName.get(this)
+    final override protected def defaultName: String = XmlParser.className(this.getClass)
 
   def mapByName[K <: HasName, M](
     keys: Seq[K],

@@ -10,8 +10,6 @@ import java.nio.file.Paths
 object Files:
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def nameAndExtension(fullName: String): (String, Option[String]) = Strings.split(fullName, '.')
-
   def write(file: File, replace: Boolean, content: String): Unit =
     if !replace && file.exists then logger.debug(s"Already exists: $file")
     else write(file, content)

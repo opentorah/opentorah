@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.util.Effects
-import org.podval.xml.XmlAst
+import org.opentorah.util.Collections
+import org.podval.xml.{XmlAst, XmlDecode}
 
 final class WithNumber[T](val n: Int, val what: T)
 
@@ -10,13 +10,11 @@ object WithNumber:
   def decode[T, E: XmlAst](element: E, what: E => T): WithNumber[T] =
     WithNumber(XmlDecode.positiveInt(element, "n"), what(element))
 
-  def checkConsecutive[T](result: Seq[WithNumber[T]], what: String): Effects.IO[Unit] =
-    Effects.check(result.map(_.n) == (1 to result.length), s"Wrong $what numbers: $result")
+  def requireConsecutive[T](result: Seq[WithNumber[T]], what: String): Unit =
+    Collections.requireConsecutive(result, _.n, what)
 
-  def checkNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Effects.IO[Unit] = for
-    _ <- checkConsecutive(result, what)
-    _ <- Effects.check(result.length == number, s"Wrong number of ${what}s: ${result.length} != $number")
-  yield ()
+  def requireNumber[T](result: Seq[WithNumber[T]], number: Int, what: String): Unit =
+    Collections.requireConsecutive(result, _.n, what, count = Some(number))
 
   def overlay[T](base: Seq[WithNumber[T]], differences: Seq[WithNumber[T]]): Seq[WithNumber[T]] =
     val result = scala.collection.mutable.ArrayBuffer.empty[WithNumber[T]] ++= base

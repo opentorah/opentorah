@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlAst, XmlDecode, XmlParser, Xml as ZioXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

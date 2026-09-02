@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
 import org.opentorah.util.Collections
-import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlAst, XmlDecode, XmlParser, Xml as ZioXml}
 import Torah.{Fragment, Maftir}
 
 /* All the special readings and their rules are here.

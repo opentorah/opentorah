@@ -31,6 +31,18 @@ object Collections:
   def checkNoDuplicates[T](seq: Seq[T], what: String): Unit =
     val result = duplicates(seq)
     require(result.isEmpty, s"Duplicate $what: $result")
+
+  /** `n` values are `from, from+1, …` (and, if `count` is set, there are that many). */
+  def requireConsecutive[T](
+    items: Seq[T],
+    n: T => Int,
+    what: String,
+    from: Int = 1,
+    count: Option[Int] = None
+  ): Unit =
+    require(items.map(n) == (from until from + items.length), s"Wrong $what numbers: ${items.map(n)}")
+    count.foreach: expected =>
+      require(items.length == expected, s"Wrong number of ${what}s: ${items.length} != $expected")
   
   def inSequence[K, V, R](keys: Seq[K], map: Map[K, V], f: Seq[(K, V)] => Seq[R]): Map[K, R] =
     keys.zip(f(keys.map(key => key -> map(key)))).toMap

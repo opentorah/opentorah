@@ -3,7 +3,7 @@ package org.opentorah.numbers
 import cats.Eq
 import cats.kernel.CommutativeGroup
 import cats.kernel.laws.discipline.CommutativeGroupTests
-import org.opentorah.util.ClassName
+import org.podval.xml.XmlParser
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatestplus.scalacheck.Checkers
@@ -28,4 +28,4 @@ abstract class NumbersLawsTest(val numbers: Numbers) extends AnyFunSuite, FunSui
     override def combine(x: numbers.Vector, y: numbers.Vector): numbers.Vector = x + y
     override def inverse(a: numbers.Vector): numbers.Vector = -a
 
-  checkAll(ClassName.get(numbers), CommutativeGroupTests[numbers.Vector].commutativeGroup)
+  checkAll(XmlParser.className(numbers.getClass), CommutativeGroupTests[numbers.Vector].commutativeGroup)

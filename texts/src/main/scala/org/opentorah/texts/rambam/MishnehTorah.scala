@@ -1,6 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.metadata.{Name, Named, Names}
+import org.opentorah.util.Collections
 import org.opentorah.store.Selector
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
@@ -55,8 +56,7 @@ object MishnehTorah:
     val codec: XmlCodec[BookDto] = XmlCodec.derived
     def toBook(dto: BookDto): Book =
       val parts: Seq[Part] = dto.parts.map(PartDto.toPart)
-      require(parts.map(_.number) == (1 to parts.length),
-        s"Wrong part numbers: ${parts.map(_.number)} != ${1 to parts.length}")
+      Collections.requireConsecutive(parts, _.number, "part")
       Book(dto.n, Names(dto.names.map(Name.fromData)), parts)
 
   private final case class PartDto(
@@ -81,5 +81,5 @@ object MishnehTorah:
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] =
     val result: Seq[Book] = XmlParser.loadCatalog(this, BookDto.codec).map(BookDto.toBook)
-    require(result.map(_.number) == (0 to 14))
+    Collections.requireConsecutive(result, _.number, "book", from = 0, count = Some(15))
     result
