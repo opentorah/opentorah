@@ -54,9 +54,6 @@ dependencyResolutionManagement {
     library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:$catsVersion")
     library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.3.0")
 
-    // Paiges
-    library('paiges'       , "org.typelevel:paiges-core_$scalaVersionMajor:0.4.4")
-
     // Caching
     // I didn't find [ScalaCache](https://cb372.github.io/scalacache/) documentation,
     // and since I am not at the point of using anything other than Caffeine,

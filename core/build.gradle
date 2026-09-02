@@ -16,7 +16,6 @@ dependencies {
   api libs.zio.streams // TODO ?
 
   implementation libs.xerces
-  implementation libs.paiges
 
   implementation libs.zmanim
 
@@ -27,11 +26,6 @@ dependencies {
   compileOnly libs.caffeine
 
   testImplementation libs.zio.test
-  //testImplementation libs.zio.prelude
   testImplementation libs.cats.core
   testImplementation libs.cats.laws
 }
-
-//test {
-//  maxParallelForks = 1
-//}
