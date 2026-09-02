@@ -1,7 +1,5 @@
 package org.opentorah.metadata
 
-import org.opentorah.xml.{Attribute, Parsable, Parser, Unparser}
-
 enum Language(code: String) extends
   Named.ByLoader[Language](loader = Language, nameOverride = Some(code)),
   HasName.Enum derives CanEqual:
@@ -42,28 +40,8 @@ object Language extends Names.Loader[Language], HasValues.FindByDefaultName[Lang
 
     def dropLanguage: Spec = copy(language = None)
 
-  object Spec extends Parsable[Spec]:
+  object Spec:
     val empty: Spec = Spec(None, None, None)
-
-    private val langAttribute: Attribute.Optional[String] = Attribute("lang").optional
-    private val transliteratedAttribute: Attribute.Optional[Boolean] = Attribute.BooleanAttribute("transliterated").optional
-    private val flavourAttribute: Attribute.Optional[String] = Attribute("flavour").optional
-
-    override protected val parser: Parser[Spec] = for
-      lang: Option[String] <- langAttribute()
-      isTransliterated: Option[Boolean] <- transliteratedAttribute()
-      flavour: Option[String] <- flavourAttribute()
-    yield Spec(
-      language = lang.map(Language.getForDefaultName),
-      isTransliterated = isTransliterated,
-      flavour = flavour
-    )
-
-    override val unparser: Unparser[Spec] = Unparser.concat(
-      langAttribute(_.language.map(_.name)),
-      transliteratedAttribute(_.isTransliterated),
-      flavourAttribute(_.flavour)
-    )
 
   trait Hebrew:
     self: Language =>

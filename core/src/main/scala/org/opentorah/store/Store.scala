@@ -1,20 +1,19 @@
 package org.opentorah.store
 
 import org.opentorah.metadata.Named
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import zio.ZIO
 
 /*
   Not all `Stores` are read from XML - some are constructed -
-  so `Store` does *not* extend `FromUrl.With`.
-*/
+  so `Store` does *not* extend `FromUrl.With`.*/
 trait Store extends Named:
 
   final def getPaths(
     path: Path = Seq.empty,
     include: Store => Boolean,
     stop: Store => Boolean
-  ): Parser[Seq[Path]] =
+  ): Effects.IO[Seq[Path]] =
     val selfPath: Path = path :+ this
     val self: Seq[Path] = if include(this) then Seq(selfPath) else Seq.empty
     this match

@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.calendar.Week
 import org.opentorah.metadata.Names
 import org.opentorah.store.By
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import org.podval.xml.XmlAst
 import zio.ZIO
 import Tanach.Psalms
@@ -46,7 +46,7 @@ object PsalmsBook:
     val books: Seq[Span]
   ) extends NachBook.Parsed(Psalms, names, chapters):
 
-    override def resolve: Parser[Metadata] = ZIO.succeed(Metadata(
+    override def resolve: Effects.IO[Metadata] = ZIO.succeed(Metadata(
       days,
       weekDays,
       books

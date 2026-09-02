@@ -2,7 +2,6 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.metadata.Named
 import org.opentorah.util.Effects
-import org.opentorah.xml.Parser
 import org.podval.xml.XmlAst
 import Tanach.Chumash
 
@@ -51,7 +50,7 @@ object Torah extends WithBookSpans[Chumash]:
     bookSpan: BookSpan,
     aliyot: Seq[Numbered],
     number: Option[Int]
-  ): Parser[Torah] =
+  ): Effects.IO[Torah] =
     val span: Span = bookSpan.span
     val chapters: Chapters = bookSpan.book.chapters
     val with1: Seq[Numbered] = addImplied1(aliyot, span, chapters)
@@ -68,7 +67,7 @@ object Torah extends WithBookSpans[Chumash]:
     val spans: Seq[Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(el =>
       WithNumber.decode(el, e => SpanParsed.decode(e).defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
     )
-    Parser.unsafeRun(parseAliyot(bookSpan, spans, number = None))
+    Effects.unsafeRun(parseAliyot(bookSpan, spans, number = None))
 
   def decodeMaftir[E: XmlAst](element: E): Maftir =
     XmlDecode.requireName(element, "maftir")
@@ -81,11 +80,11 @@ object Torah extends WithBookSpans[Chumash]:
     book: Chumash,
     days: Custom.Sets[Seq[Numbered]],
     span: Span
-  ): Parser[Torah.Customs] =
+  ): Effects.IO[Torah.Customs] =
     val bookSpan = inBook(book, span)
     val with1 = addImplied1(Custom.common(days), span, book.chapters)
 
-    val result: Parser[Custom.Sets[Torah]] = Effects.mapValues(days)((spans: Seq[Numbered]) =>
+    val result: Effects.IO[Custom.Sets[Torah]] = Effects.mapValues(days)((spans: Seq[Numbered]) =>
       parseAliyot(bookSpan, WithNumber.overlay(with1, spans), Some(7))
     )
 

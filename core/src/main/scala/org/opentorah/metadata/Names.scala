@@ -1,9 +1,7 @@
 package org.opentorah.metadata
 
 import org.opentorah.util.{ClassName, Collections, Effects}
-import org.opentorah.xml.{Attribute, ElementTo, Parsable, Parser, Unparser}
 import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
-import zio.ZIO
 
 final case class Names(names: Seq[Name]) extends Language.ToString:
   Collections.checkNoDuplicates(names.map(_.name), "names")
@@ -78,28 +76,6 @@ object Names:
       Name(combiner(spec, one.doFind(spec).name, other.doFind(spec).name), spec))
     new Names(result.toSeq)
 
-  final val defaultNameAttribute: Attribute[String] = Attribute("n")
-
-  def parser(isDefaultNameAllowed: Boolean): Parser[Names] = for
-    n <- if !isDefaultNameAllowed then ZIO.none else defaultNameAttribute.optional()
-    nonDefaultNames <- Name.seq()
-    _ <- Effects.check(nonDefaultNames.nonEmpty || n.isDefined, s"No names and no default name")
-  yield Names(mergeDefaultName(n, nonDefaultNames))
-
-  val withDefaultNameParsable: Parsable[Names] = new Parsable[Names]:
-    override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = true)
-    override def unparser: Unparser[Names] = Unparser(
-      attributes = value => Seq(defaultNameAttribute.optional.withValue(value.getDefaultName)),
-      content = value => if value.getDefaultName.isDefined then Seq.empty else Name.seq[Names](_.names).content(value) // TODO ???
-    )
-
-  val withoutDefaultNameParsable: Parsable[Names] = new Parsable[Names]:
-    override protected def parser: Parser[Names] = Names.this.parser(isDefaultNameAllowed = false)
-    override def unparser: Unparser[Names] = Name.seq[Names](_.names)
-
-  object NamesMetadata extends ElementTo[Names]("names"):
-    override def contentParsable: Parsable[Names] = withoutDefaultNameParsable
-
   abstract class Loader[Key <: HasName](resourceNameOverride: Option[String] = None) extends HasValues[Key]:
     // This is lazy to allow correct initialization:
     // Language metadata file references Language instances by name :)
@@ -111,7 +87,7 @@ object Names:
         resourceName,
         Names.codec
       ).fold(error => throw error, identity)
-      Parser.unsafeRun(HasName.mapByName(
+      Effects.unsafeRun(HasName.mapByName(
         keys = valuesSeq,
         metadatas = nameses,
         hasName = (metadata: Names, name: String) => metadata.hasName(name)

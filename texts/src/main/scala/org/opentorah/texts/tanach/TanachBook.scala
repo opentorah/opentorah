@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, Names}
 import org.opentorah.store.{By, Pure}
 import org.opentorah.util.Collections
-import org.opentorah.xml.Parser
+import org.opentorah.util.Effects
 import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
@@ -52,7 +52,7 @@ private[tanach] object TanachBook:
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   // ... but it started manifesting only with the switch to ZIO 2.0!
-  private lazy val book2metadata: Map[TanachBook, Metadata] = Collections.mapValues(book2parsed)(metadata => Parser.unsafeRun(metadata.resolve))
+  private lazy val book2metadata: Map[TanachBook, Metadata] = Collections.mapValues(book2parsed)(metadata => Effects.unsafeRun(metadata.resolve))
 
   def metadata(book: TanachBook): Metadata = book2metadata(book)
 
@@ -65,4 +65,4 @@ private[tanach] object TanachBook:
     val names: Names,
     val chapters: Chapters
   ):
-    def resolve: Parser[Metadata]
+    def resolve: Effects.IO[Metadata]
