@@ -22,6 +22,10 @@ object SpecialReadings:
   private def parseHaftarah(element: Element, full: Boolean = true): Haftarah.Customs =
     parse(Haftarah.element(full), "Haftarah", element)
 
+  /** A reading in which a custom may read nothing at all; see Haftarah.NoneElement. */
+  private def parseHaftarahOptional(element: Element): Haftarah.OptionalCustoms =
+    parse(Haftarah.optionalElement(full = false), "Haftarah", element)
+
   private def parse[R](fromXml: ElementsTo[R], what: String, element: Element): R =
     Parser.unsafeRun(fromXml.parse(From.xml(what, element)))
 
@@ -55,12 +59,18 @@ object SpecialReadings:
     val (element: Element, full: Boolean) = readingFor(day, name)
     parseHaftarah(element, full)
 
+  private def haftarahOptionalFor(day: String, name: String): Haftarah.OptionalCustoms =
+    parseHaftarahOptional(readingFor(day, name)._1)
+
   private def fromDay(named: Named, torah: Torah): Torah = torah.fromWithNumbers(named)
 
   private def fromDay(named: Named, maftir: Maftir): Maftir = maftir.from(named)
 
   private def fromDay(named: Named, haftarah: Haftarah.Customs): Haftarah.Customs =
     haftarah.map(_.from(named), full = false)
+
+  private def fromDayOptional(named: Named, haftarah: Haftarah.OptionalCustoms): Haftarah.OptionalCustoms =
+    haftarah.map(_.map(_.from(named)), full = false)
 
   sealed trait WeekdayReading:
     def weekday(day: Named): Reading
@@ -611,15 +621,17 @@ object SpecialReadings:
       IntermediateShabbos.torah.spans(4)   // Exodus 34:4-10
     )
 
-    val defaultAfternoonHaftarah: Haftarah.Customs = haftarahFor("Fast", "defaultAfternoonHaftarah")
+    val defaultAfternoonHaftarah: Haftarah.OptionalCustoms =
+      haftarahOptionalFor("Fast", "defaultAfternoonHaftarah")
 
   sealed trait Fast extends WeekdayReading, AfternoonReading:
     override def afternoon(day: Named): Reading =
       val torah: Torah = fromDay(day, Fast.torah)
-      val haftarah: Haftarah.Customs = fromDay(day, afternoonHaftarah)
+      val haftarah: Haftarah.OptionalCustoms = fromDayOptional(day, afternoonHaftarah)
       new Reading(
-        customs = haftarah.lift[Reading.ReadingCustom]((_: Custom, haftarah: Option[Haftarah]) =>
-          haftarah.fold(Reading.ReadingCustom(torah, None))((haftarah: Haftarah) =>
+        customs = haftarah.lift[Reading.ReadingCustom]((_: Custom, found: Option[Option[Haftarah]]) =>
+          // Some(None) is a custom that reads nothing; None is one with no entry
+          found.flatten.fold(Reading.ReadingCustom(torah, None))((haftarah: Haftarah) =>
             Reading.ReadingCustom(
               torah = Torah(torah.spans),
               maftirAndHaftarah = Some(Reading.MaftirAndHaftarah(None, haftarah))
@@ -636,17 +648,18 @@ object SpecialReadings:
      * replace but not take away, and the customs that read nothing on an
      * ordinary fast do read on Tisha BeAv.
      */
-    protected def afternoonHaftarah: Haftarah.Customs =
+    protected def afternoonHaftarah: Haftarah.OptionalCustoms =
       afternoonHaftarahExceptions.fold(Fast.defaultAfternoonHaftarah)(afternoonHaftarahExceptions =>
         Fast.defaultAfternoonHaftarah ++ afternoonHaftarahExceptions)
 
-    protected def afternoonHaftarahExceptions: Option[Haftarah.Customs] = None
+    protected def afternoonHaftarahExceptions: Option[Haftarah.OptionalCustoms] = None
 
   sealed trait NonTishaBeAvFast extends Fast:
     final override def weekday(day: Named): Reading = Reading(fromDay(day, Fast.torah))
 
   object FastOfGedalia extends NonTishaBeAvFast:
-    override protected val afternoonHaftarahExceptions: Option[Haftarah.Customs] = Some(haftarahFor("FastOfGedalia", "afternoonHaftarahExceptions"))
+    override protected val afternoonHaftarahExceptions: Option[Haftarah.OptionalCustoms] =
+      Some(haftarahOptionalFor("FastOfGedalia", "afternoonHaftarahExceptions"))
 
   object FastOfTeves extends NonTishaBeAvFast
 
@@ -665,8 +678,8 @@ object SpecialReadings:
 
     private val haftarah: Haftarah.Customs = haftarahFor("TishaBeAv", "haftarah")
 
-    override protected val afternoonHaftarah: Haftarah.Customs =
-      haftarahFor("TishaBeAv", "afternoonHaftarah")
+    override protected val afternoonHaftarah: Haftarah.OptionalCustoms =
+      haftarahOptionalFor("TishaBeAv", "afternoonHaftarah")
 
   /**
    * Shabbos Shuvah -- the Shabbos between Rosh Hashanah and Yom Kippur -- has
