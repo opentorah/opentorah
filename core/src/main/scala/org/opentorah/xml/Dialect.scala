@@ -4,9 +4,7 @@ trait Dialect:
   def namespace: Namespace
 
   def mimeType: String
-
-  def prettyPrinter: PrettyPrinter
-
+  
   def rootElementName: String
   
   def dtdId: Option[String] = None
