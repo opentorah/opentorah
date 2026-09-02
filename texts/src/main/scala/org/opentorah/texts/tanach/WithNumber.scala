@@ -2,12 +2,16 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Effects
 import org.opentorah.xml.{Attribute, Parser}
+import org.podval.xml.XmlAst
 
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber:
 
   val nAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("n").required
+
+  def decode[T, E: XmlAst](element: E, what: E => T): WithNumber[T] =
+    WithNumber(XmlDecode.positiveInt(element, "n"), what(element))
 
   def parse[T](parser: Parser[T]): Parser[WithNumber[T]] = for
     n: Int <- nAttribute()

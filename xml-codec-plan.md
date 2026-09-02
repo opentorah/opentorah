@@ -66,12 +66,13 @@ codecs. It is not a drop-in `From` + `Parser`.
 ### Load
 
 - Parse is string-in (`XmlParser.parseXml`). No classpath-resource or URL
-  helper analogous to `From.resource` / `From.url`.
-- XInclude is **off** on purpose: publisher `store`/`collection` treats
-  `xi:include/@href` as a page reference, not an inlined document. OpenTorah
-  production catalogs do not use XInclude. The only remaining expander is
-  `From` plus `XmlTest` fixtures that mimic collector stores.
-- Xerces is a `core` implementation dependency solely for that load path.
+  helper analogous to `From.resource` / `From.url`. *(PR 1 added URL/file/resource.)*
+- XInclude is **off** by default: publisher `store`/`collection` treats
+  `xi:include/@href` as a page reference, not an inlined document.
+  `Tanach.xml` includes the chumash books (`parseCatalog(..., xinclude = true)`).
+  `XmlTest` fixtures still go through `From` + Xerces until PR 9.
+- Xerces is a `core` implementation dependency solely for that remaining
+  `From` path.
 
 ### Mapping
 
@@ -220,17 +221,19 @@ the xml module must grow; OpenTorah PRs then use the new APIs.
   (the old `ElementTo[Positive]` for both numbered cases was wrong).
   Decode-only.
 
-### PR 7 — `texts` Tanach books, parsha, Torah spans
+### PR 7 — `texts` Tanach books, parsha, Torah spans (done)
 
-- **Repo:** opentorah.org `texts`
+- **Repo:** opentorah.org `texts`; site-publisher `parseCatalog(..., xinclude)`
 - **Depends on:** PR 6
 - **Files:** `TanachBook.scala`, `Chapters.scala`, `Chapter.scala`,
-  `Parsha.scala`, `Torah.scala`, `PsalmsBook.scala`, `SpanParsed.scala`,
-  `VerseParsed.scala`, `WithNumber.scala`, `WithBookSpans.scala`
-- **Work:** DTO decode + existing `resolve` pass. Keep lazy vals that avoid
-  ZIO initialization deadlocks ([zio#1841](https://github.com/zio/zio/issues/1841));
-  codecs are synchronous, so some `Parser.unsafeRun` inside `lazy val` can
-  become a straight `decode` + `getOrElse(throw)`.
+  `Parsha.scala`, `PsalmsBook.scala`, `SpanParsed.scala`,
+  `VerseParsed.scala`, `WithNumber.scala`, `XmlDecode.scala`;
+  `HasName.findByNames`
+- **Work:** DTO decode + existing `resolve` pass. `Tanach.xml` loads with
+  `parseCatalog(..., xinclude = true)` so chumash `xi:include`s inline.
+  Keep lazy vals that avoid ZIO initialization deadlocks
+  ([zio#1841](https://github.com/zio/zio/issues/1841)). `Torah.torahParsable` /
+  `spanParser` stay `ElementTo` for PR 8 (Haftarah / SpecialReadings).
 
 ### PR 8 — Haftarah and special readings
 

@@ -3,7 +3,8 @@ package org.opentorah.texts.tanach
 import org.opentorah.metadata.{HasName, HasValues, Names}
 import org.opentorah.store.{By, Pure, Store}
 import org.opentorah.util.Collections
-import org.opentorah.xml.{Attribute, ContentType, ElementTo, Parsable, Parser, Unparser}
+import org.opentorah.xml.Parser
+import org.podval.xml.{XmlAst, XmlError}
 import Tanach.Chumash
 
 enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
@@ -172,19 +173,16 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
         ).head
       )
 
-  final class WeekParsable(book: ChumashBook) extends ElementTo[Parsed]("week"):
-    override def contentParsable: Parsable[Parsed] = new Parsable[Parsed]:
-      override def parser: Parser[Parsed] = Parsha.parser(book)
-      override def unparser: Unparser[Parsed] = ???
-
-  private def parser(book: ChumashBook): Parser[Parsed] = for
-    names: Names <- Names.withoutDefaultNameParsable()
-    span: SpanSemiResolved <- semiResolvedParser
-    aliyot: Seq[Torah.Numbered] <- Aliyah.seq()
-    daysParsed: Seq[DayParsed] <- DayParsed.seq()
-    maftir: SpanSemiResolved <- Maftir.required()
-    parsha: Parsha <- HasName.find[Parsha](book.parshiot, names)
-  yield
+  def decode[E: XmlAst](book: ChumashBook, element: E): Parsed =
+    XmlDecode.requireNoOther(element, Set("name", "aliyah", "day", "maftir"))
+    val names: Names = XmlDecode.namesOf(element, defaultN = false)
+    val span: SpanSemiResolved = SpanParsed.decode(element).semiResolve
+    val aliyot: Seq[Torah.Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(numberedSpan)
+    val daysParsed: Seq[DayParsed] = XmlDecode.childrenNamed(element, "day").map(decodeDay)
+    val maftirs: Seq[E] = XmlDecode.childrenNamed(element, "maftir")
+    if maftirs.length != 1 then throw XmlError(s"Required maftir, found ${maftirs.length}")
+    val maftir: SpanSemiResolved = SpanParsed.decode(maftirs.head).semiResolve
+    val parsha: Parsha = HasName.findByNames(book.parshiot, names)
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     Parsed(
       parsha,
@@ -202,35 +200,14 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
     val isCombined: Boolean
   )
 
-  private object DayParsed extends ElementTo[DayParsed]("day"):
-    override def contentParsable: Parsable[DayParsed] = new Parsable[DayParsed]:
-      override def parser: Parser[DayParsed] = for
-        span: Torah.Numbered <- numberedParser
-        custom: Set[Custom] <- Attribute("custom").optional().map(_.fold[Set[Custom]](Set(Custom.Common))(Custom.parse))
-        isCombined: Boolean <- Attribute.BooleanAttribute("combined").optional().map(_.getOrElse(false))
-      yield DayParsed(
-        span,
-        custom,
-        isCombined
-      )
-
-      override def unparser: Unparser[DayParsed] = ???
+  private def decodeDay[E: XmlAst](element: E): DayParsed = DayParsed(
+    span = numberedSpan(element),
+    custom = element.get("custom").fold[Set[Custom]](Set(Custom.Common))(Custom.parse),
+    isCombined = XmlDecode.booleanOpt(element, "combined").getOrElse(false)
+  )
 
   private def byCustom(days: Seq[DayParsed]): Custom.Sets[Seq[Torah.Numbered]] =
     Collections.mapValues(days.groupBy(_.custom))(days => days.map(_.span))
 
-  object Aliyah extends ElementTo[Torah.Numbered]("aliyah"):
-    override def contentType: ContentType = ContentType.Empty
-
-    override def contentParsable: Parsable[Torah.Numbered] = new Parsable[Torah.Numbered]:
-      override def parser: Parser[Torah.Numbered] = numberedParser
-      override def unparser: Unparser[Torah.Numbered] = ???
-
-  object Maftir extends ElementTo[SpanSemiResolved]("maftir"):
-    override def contentParsable: Parsable[SpanSemiResolved] = new Parsable[SpanSemiResolved]:
-      override def parser: Parser[SpanSemiResolved] = semiResolvedParser
-      override def unparser: Unparser[SpanSemiResolved] = ???
-
-  private def numberedParser: Parser[Torah.Numbered] = WithNumber.parse(semiResolvedParser)
-
-  private def semiResolvedParser: Parser[SpanSemiResolved] = SpanParsed.parser.map(_.semiResolve)
+  private def numberedSpan[E: XmlAst](element: E): Torah.Numbered =
+    WithNumber.decode(element, el => SpanParsed.decode(el).semiResolve)
