@@ -33,6 +33,16 @@ final class VariantTest extends AnyFlatSpec, Matchers:
       custom <- Custom.all
     do withClue(s"$parsha/$custom: ")(parsha.haftarah.find(custom) should not be empty)
 
+  "every source a special reading names" should "be one ReadingSources knows" in:
+    // this is the check that could not see SpecialReadings.xml: three numeric
+    // sources="1" survived there, in the form replaced everywhere else, and
+    // the suite stayed green
+    for
+      ((day, reading), recorded) <- SpecialReadings.recorded
+      (custom, annotation) <- recorded.annotations
+      key <- annotation.sources
+    do withClue(s"$day/$reading/$custom: ")(ReadingSources.sources.keySet should contain (key))
+
   "every source an entry names" should "be one ReadingSources knows" in:
     // entries refer to sources by name now, so a typo is a runtime error
     // rather than a compile one; this is what catches it

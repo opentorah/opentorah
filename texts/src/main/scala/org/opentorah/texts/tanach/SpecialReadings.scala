@@ -46,6 +46,19 @@ object SpecialReadings:
     Collections.checkNoDuplicates(parsed.map(_._1), "special readings")
     parsed.toMap
 
+  /**
+   * What the special readings say about themselves: sources, comments and
+   * variants, keyed by the day and the reading name, which is what identifies
+   * one uniquely. They cannot be keyed by SpecialDay: five of the readings are
+   * shared -- Chanukah by its eight days, the intermediate days of Succos and
+   * Pesach by theirs, one table by all the fasts.
+   */
+  lazy val recorded: Map[(String, String), Haftarah.Recorded] = readings
+    .collect { case (key, (element: Element, full: Boolean)) if element.label == "haftarah" =>
+      key -> parse(Haftarah.recordedIn(full), "Haftarah", element)
+    }
+    .filterNot((_, recorded) => recorded.isEmpty)
+
   private def readingFor(day: String, name: String): (Element, Boolean) = readings.getOrElse(
     (day, name),
     throw IllegalArgumentException(s"SpecialReadings.xml has no '$name' for '$day'")
