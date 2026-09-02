@@ -25,6 +25,7 @@ final class MetadataTest extends AnyFlatSpec, Matchers:
 
     decode("""<name n="x">y</name>""").isLeft shouldBe true
     decode("""<name lang="en"/>""").isLeft shouldBe true
+    decode("""<name lang="en" n="" transliterated="yes"/>""").toOption.get.name shouldBe ""
 
     val encoded = Name.codec.encode(fromN)(using ZioXml)
     encoded.get("n") shouldBe Some("English")

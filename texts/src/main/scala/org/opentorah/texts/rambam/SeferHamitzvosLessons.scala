@@ -1,67 +1,72 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{HasName, Language, Name, Named, Names}
+import org.opentorah.metadata.{Named, Names}
 import org.opentorah.store.Selector
-import org.opentorah.xml.{Attribute, ElementTo, ElementsTo, From, Parsable, Parser, Unparser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 object SeferHamitzvosLessons:
-
-  private val nAttribute: Attribute.Required[Int] = Attribute.PositiveIntAttribute("n").required
 
   final class Lesson(
     val number: Int,
     val parts: Seq[Part]
   )
 
-  object Lesson extends ElementTo[Lesson]("lesson"):
-    override def contentParsable: Parsable[Lesson] = new Parsable[Lesson]:
-      override def parser: Parser[Lesson] = for
-        number: Int <- nAttribute()
-        parts: Seq[Part] <- Part.seq()
-      yield Lesson(
-        number,
-        parts
-      )
+  object Lesson:
+    val codec: XmlCodec[Lesson] = new XmlCodec[Lesson]:
+      override def elementName: String = "lesson"
+      override def isRecordLike: Boolean = true
 
-      override def unparser: Unparser[Lesson] = ???
+      override def unsafeDecode[E: XmlAst](element: E): Lesson =
+        Lesson(
+          number = positiveInt(element, "n"),
+          parts = element.getChildren.flatMap(_.asElement).map(Part.codec.unsafeDecode(_))
+        )
 
-  sealed trait Part extends Named
+      override def encodeNamed[E: XmlAst](elName: String, value: Lesson): E =
+        throw XmlError("Lesson is decode-only")
 
-  private object Part extends ElementsTo.Union[Part]:
-    override protected val elements: Seq[ElementTo[? <: Part]] = Seq(Positive, Negative, NamedPart)
+  sealed trait Part extends Named derives CanEqual
 
-    override protected def elementByValue(value: Part): ElementTo[? <: Part] = value match
-      case _: Positive  => Positive
-      case _: Negative  => Negative
-      case _: NamedPart => NamedPart
+  object Part:
+    val codec: XmlCodec[Part] = new XmlCodec[Part]:
+      override def elementName: String = "part"
+      override def isRecordLike: Boolean = true
+      override def caseNames: Seq[String] = Seq("positive", "negative", "named")
+
+      override def unsafeDecode[E: XmlAst](element: E): Part =
+        element.localName match
+          case "positive" => Positive(positiveInt(element, "n"))
+          case "negative" => Negative(positiveInt(element, "n"))
+          case "named" => NamedPart(Names.codec.unsafeDecode(element))
+          case other => throw XmlError(s"Unknown lesson part: $other")
+
+      override def encodeNamed[E: XmlAst](elName: String, value: Part): E =
+        throw XmlError("Part is decode-only")
 
   final case class NamedPart(override val names: Names) extends Part
-
-  object NamedPart extends ElementTo[NamedPart]("named"):
-    override def contentParsable: Parsable[NamedPart] = new Parsable[NamedPart]:
-      override def parser: Parser[NamedPart] = Names.withoutDefaultNameParsable().map(NamedPart.apply)
-      override def unparser: Unparser[NamedPart] = Names.withoutDefaultNameParsable(_.names)
-
-  private class Numbered(elementName: String) extends ElementTo[Positive](elementName):
-    def selector: Selector = Selector.getForName(elementName)
-
-    override def contentParsable: Parsable[Positive] = new Parsable[Positive]:
-      override def parser: Parser[Positive] = nAttribute().map(Positive.apply)
-      override def unparser: Unparser[Positive] = nAttribute(_.number)
 
   sealed abstract class Commandment(val number: Int) extends Part:
     final override def names: Names = selector.andNumber(number).names
     def selector: Selector
 
   final case class Positive(override val number: Int) extends Commandment(number):
-    override def selector: Selector = Positive.selector
-
-  private object Positive extends Numbered("positive")
+    override def selector: Selector = Selector.getForName("positive")
 
   final case class Negative(override val number: Int) extends Commandment(number):
-    override def selector: Selector = Negative.selector
-
-  private object Negative extends Numbered("negative")
+    override def selector: Selector = Selector.getForName("negative")
 
   // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  lazy val lessons: Seq[Lesson] = Parser.unsafeRun(HasName.load(From.resource(this), Lesson))
+  lazy val lessons: Seq[Lesson] = XmlParser.parseCatalog(
+    getClass,
+    "SeferHamitzvosLessons.xml",
+    "SeferHamitzvosLessons",
+    Lesson.codec
+  ).fold(error => throw error, identity)
+
+  private def positiveInt[E: XmlAst](element: E, name: String): Int =
+    val raw: String = element.get(name).map(_.trim).filter(_.nonEmpty).getOrElse:
+      // TODO isn't it required by the class?
+      throw XmlError(s"Missing attribute '$name'")
+    val n: Int = raw.toIntOption.getOrElse(throw XmlError(s"Invalid integer for $name: $raw"))
+    if n <= 0 then throw XmlError(s"Non-positive integer: $n")
+    n
