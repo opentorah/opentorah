@@ -82,6 +82,16 @@ final class NewRitesTest extends AnyFlatSpec, Matchers:
     haftarahOn(SpecialReadings.FastOfTeves, Custom.Algiers) shouldBe Some("Isaiah 55:6-56:8")
     haftarahOn(SpecialReadings.FastOfGedalia, Custom.Algiers) shouldBe Some("Isaiah 55:6-56:8")
 
+  "Agadir" should "read nothing on the fasts, though Morocco reads Dirshu on one" in:
+    def onFast(fast: SpecialReadings.Fast, custom: Custom): Option[String] =
+      fast.afternoon(Parsha.Bereishis).doFind(custom).maftirAndHaftarah.map(mh => spans(mh.haftarah))
+    onFast(SpecialReadings.FastOfGedalia, Custom.Morocco) shouldBe Some("Isaiah 55:6-56:8")
+    onFast(SpecialReadings.FastOfGedalia, Custom.Agadir) shouldBe None
+    onFast(SpecialReadings.FastOfTeves, Custom.Agadir) shouldBe None
+    // it is under Morocco, where it belongs, and says what it reads rather
+    // than being placed elsewhere to inherit the right answer
+    Custom.Agadir.parent shouldBe Some(Custom.Morocco)
+
   "the new rites" should "cite hamichlol" in:
     ReadingSources.forParsha(Parsha.Chukas, Custom.Poznan).map(_.key) should contain ("michlol")
     ReadingSources.forParsha(Parsha.Shemos, Custom.Persia).map(_.key) should contain ("michlol")

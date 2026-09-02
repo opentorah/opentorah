@@ -31,16 +31,7 @@
   <!-- Marrakesh stands for Bogmaz too: Asulin never separates them, and no
        reading we have tells them apart. -->
   <custom n="Marrakesh"      parent="Morocco"/>
-
-  <!--
-    Agadir hangs off Magreb rather than Morocco, though it is in Morocco.
-    Placement here is about which readings a custom falls back on, not about
-    geography: on the fasts Agadir reads nothing, as Sefard and Magreb do,
-    where Morocco reads Dirshu on the Fast of Gedalia. Parenting it to Morocco
-    would give it that Dirshu, and there is no way to take a reading away
-    again: a custom with no entry inherits its parent's.
-  -->
-  <custom n="Agadir"         parent="Magreb"/>
+  <custom n="Agadir"         parent="Morocco"/>
   <custom n="Bavlim"         parent="Sefard"/>
   <custom n="Teiman"         parent="Sefard"/>
   <custom n="Baladi"         parent="Teiman"/>
