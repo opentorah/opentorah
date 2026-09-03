@@ -1,7 +1,7 @@
 package org.opentorah.calendar.paper
 
 import org.opentorah.astronomy.{Angles, Days2Rotation, MoonAnomalyMean, MoonHeadMean, MoonLongitudeMean, SunApogee, SunLongitudeMean}
-import org.opentorah.metadata.Language
+import org.podval.metadata.Language
 import org.opentorah.numbers.BigRational
 import Angles.Rotation
 import Rotation.Interval

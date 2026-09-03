@@ -1,6 +1,6 @@
 package org.opentorah.calendar
 
-import org.opentorah.metadata.{HasName, HasValues, Named, Names}
+import org.podval.metadata.{HasName, HasValues, Named, Names}
 
 object Week:
 

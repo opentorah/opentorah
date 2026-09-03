@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure}
+import org.podval.store.{By, NumberedStore, NumberedStores, Pure}
 
 abstract class Chapter(override val number: Int, from: Int, to: Int) extends NumberedStore, Pure[?]:
   def length: Int = to - from + 1

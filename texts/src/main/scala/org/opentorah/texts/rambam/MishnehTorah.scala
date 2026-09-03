@@ -1,8 +1,8 @@
 package org.opentorah.texts.rambam
 
-import org.opentorah.metadata.{Name, Named, Names}
 import org.opentorah.util.Collections
-import org.opentorah.store.Selector
+import org.podval.metadata.{Name, Named, Names}
+import org.podval.store.Selector
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 

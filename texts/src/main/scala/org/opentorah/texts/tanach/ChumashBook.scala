@@ -1,8 +1,8 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Names}
-import org.opentorah.store.{By, Pure, Store}
-import org.opentorah.util.{Collections, Effects}
+import org.opentorah.util.Collections
+import org.podval.metadata.{HasName, Names}
+import org.podval.store.{By, Pure, Store}
 
 trait ChumashBook extends TanachBook:
   lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
@@ -43,31 +43,31 @@ object ChumashBook:
     weeks: Seq[Parsha.Parsed]
   ) extends TanachBook.Parsed(book, names, chapters):
 
-    def resolve: Effects.IO[Metadata] = for
-      parsha2metadataParsed <- HasName.bind[Parsha, Parsha.Parsed](
+    def resolve: Metadata =
+      val parsha2metadataParsed: Map[Parsha, Parsha.Parsed] = HasName.bind[Parsha, Parsha.Parsed](
         keys = book.parshiot,
         metadatas = weeks,
         getKey = _.parsha
       )
 
-      parsha2span: Map[Parsha, Span] = Collections.inSequence(
+      val parsha2span: Map[Parsha, Span] = Collections.inSequence(
         keys = book.parshiot,
         map = Collections.mapValues(parsha2metadataParsed)(_.span),
         f = (pairs: Seq[(Parsha, SpanSemiResolved)]) =>
           SpanSemiResolved.setImpliedTo(pairs.map(_._2), chapters.full, chapters)
       )
 
-      parsha2daysCombined: Map[Parsha, Option[Torah.Customs]] = Collections.inSequence(
+      val parsha2daysCombined: Map[Parsha, Option[Torah.Customs]] = Collections.inSequence(
         keys = book.parshiot,
         map = Collections.mapValues(parsha2metadataParsed)(_.daysCombined),
         f = combineDays(parsha2span, _)
       )
 
-      parsha2metadata = Collections.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
+      val parsha2metadata = Collections.mapValues(parsha2metadataParsed)(metadata => metadata.resolve(
         parshaSpan = parsha2span(metadata.parsha),
         daysCombined = parsha2daysCombined(metadata.parsha)
       ))
-    yield Metadata(book, parsha2metadata)
+      Metadata(book, parsha2metadata)
 
     private def combineDays(
       parsha2span: Map[Parsha, Span],

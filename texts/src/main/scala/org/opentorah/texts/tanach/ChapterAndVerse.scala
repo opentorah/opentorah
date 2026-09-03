@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.Language
+import org.podval.metadata.Language
 
 final class ChapterAndVerse(val chapter: Int, val verse: Int) extends Ordered[ChapterAndVerse], Language.ToString derives CanEqual:
   require(chapter > 0)

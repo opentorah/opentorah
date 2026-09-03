@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.Named
 import org.opentorah.util.Collections
+import org.podval.metadata.Named
 import org.podval.xml.{XmlAst, XmlDecode, XmlParser, Xml as ZioXml}
 import Torah.{Fragment, Maftir}
 

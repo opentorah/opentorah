@@ -1,8 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, HasValues, Names}
-import org.opentorah.store.{By, Pure, Store}
+
 import org.opentorah.util.Collections
+import org.podval.metadata.{HasName, HasValues, Names}
+import org.podval.store.{By, Pure, Store}
 import org.podval.xml.XmlError
 import Tanach.Chumash
 

@@ -1,7 +1,7 @@
 package org.opentorah.calendar.roman
 
 import org.opentorah.calendar.Calendar
-import org.opentorah.metadata.{Language, Named, Names}
+import org.podval.metadata.{Language, Named, Names}
 
 trait Roman extends Calendar:
 

@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{Named, Names}
+import org.podval.metadata.{Named, Names}
 
 final class WeeklyReading(val parsha: Parsha, val secondParsha: Option[Parsha]) extends Named derives CanEqual:
   override def equals(other: Any): Boolean = other match

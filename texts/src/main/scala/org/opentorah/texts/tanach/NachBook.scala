@@ -1,8 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.Names
-import org.opentorah.util.Effects
-import zio.ZIO
+import org.podval.metadata.Names
 
 trait NachBook extends TanachBook:
   final override def names: Names = TanachBook.names(this)
@@ -22,6 +20,6 @@ object NachBook:
     names: Names,
     chapters: Chapters
   ) extends TanachBook.Parsed(book, names, chapters):
-    override def resolve: Effects.IO[Metadata] = ZIO.succeed(Metadata(
+    override def resolve: Metadata = Metadata(
       book
-    ))
+    )

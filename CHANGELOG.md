@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- cleanup: `org.opentorah.store` / `org.opentorah.metadata` moved to site-publisher `org.podval.xml` (`org.podval.store`, `org.podval.metadata`); store walks and `HasName.bind` are synchronous
 - cleanup: odd catalogs are derived DTOs then bind (Selector, Alias, Mishneh Torah, Sefer HaMitzvos, Haftarah, Tanach books); `Name` stays `n` xor text
 - cleanup: `loadCatalog(this, codec)` for catalogs; dropped unused `Caching` / Caffeine
 - cleanup: deleted `org.opentorah.xml`; store walks and catalog bind use `Effects.IO`
