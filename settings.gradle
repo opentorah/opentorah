@@ -34,28 +34,14 @@ dependencyResolutionManagement {
     // Substituted from the site-publisher composite build when that checkout is present.
     library('podval-xml'   , 'org.podval:org.podval.xml:0.0.1')
 
-    // Google Cloud
-    library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.71.0')
+    // Zmanim
+    library('zmanim', 'com.kosherjava:zmanim:2.5.0')
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
     library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion")
     library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:$catsVersion")
     library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.3.0")
-
-    // Logging
-    library('slf4j'   , 'org.slf4j:slf4j-api:2.0.18')
-    library('logback' , 'ch.qos.logback:logback-classic:1.6.3')
-    library('logstash', 'net.logstash.logback:logstash-logback-encoder:9.0')
-
-    // Flexmark
-    library('flexmark-core'           , "com.vladsch.flexmark:flexmark:$flexmarkVersion")
-//    library('flexmark-profile-pegdown', "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion")
-    library('flexmark-ext-toc'        , "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion")
-    bundle('markdown', ['flexmark-core', 'flexmark-ext-toc'])
-
-    // Zmanim
-    library('zmanim', 'com.kosherjava:zmanim:2.5.0')
 
     // Testing
     library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.20")

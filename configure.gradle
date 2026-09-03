@@ -4,10 +4,6 @@ project.group = 'org.opentorah'
 scala.scalaVersion = '3.9.0'
 
 dependencies {
-  compileOnly     libs.slf4j
-  testRuntimeOnly libs.logback
-
-  testImplementation libs.slf4j
   testImplementation libs.scalatest
   testImplementation libs.scalacheck
   testImplementation libs.discipline.scalatest
