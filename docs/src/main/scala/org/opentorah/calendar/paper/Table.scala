@@ -1,7 +1,6 @@
 package org.opentorah.calendar.paper
 
-import org.opentorah.util.Files
-import java.io.File
+import java.io.{BufferedWriter, File, FileWriter}
 
 object Table:
   final class Column[T](val heading: String, val f: T => Any)
@@ -26,7 +25,12 @@ object Table:
         "|===\n"
       )
 
-    Files.write(file = File(directory, name + ".adoc"), content = strings.mkString)
+    write(file = File(directory, name + ".adoc"), content = strings.mkString)
+
+  private def write(file: File, content: String): Unit =
+    file.getParentFile.mkdirs()
+    val writer: BufferedWriter = BufferedWriter(new FileWriter(file))
+    try writer.write(content) finally writer.close()
 
 final class Table[T](rows: Seq[T])(columns: Table.Column[T]*):
 
