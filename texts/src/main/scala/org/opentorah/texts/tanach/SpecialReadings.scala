@@ -216,6 +216,13 @@ object SpecialReadings:
       // the maftir, in which case Rosh Chodesh is read as the seventh aliyah
       // instead: on a special Shabbos the four parshiyos take it, and in Teves
       // -- where Rosh Chodesh always falls in Chanukah -- the korbanot do.
+      //
+      // chabad.org on the Rosh Chodesh Torah reading (ReadingSources
+      // chabad-rosh-chodesh-torah) states it without qualification: the weekly
+      // portion in seven aliyot as usual, and Numbers 28:9-15 after it for
+      // maftir. It names no month it does not hold in, and it treats Rosh
+      // Chodesh Teves as the case where a second scroll is taken -- which is
+      // the shape of the exception this line makes.
       val allowReplaceMaftir: Boolean = !isSpecialShabbos && !isMonthTeves
 
       // The haftarah yields more often than the maftir does. In Av the rebuke
@@ -223,6 +230,15 @@ object SpecialReadings:
       // around them, and neither gives way to Rosh Chodesh; Chabad is the
       // exception in Elul. Where the Rosh Chodesh haftarah is not read, its
       // closing verses may still be added to the one that is.
+      //
+      // chabad.org's list of haftarot where customs vary (ReadingSources
+      // chabad-haftarot) attests both halves for Chabad. For Av it gives
+      // Shim'u, and its footnote records the Rebbe Rashab reading Hashamayim
+      // Kis'i one such year and Shim'u when the year came round again,
+      // regretting the first choice. For Elul it says that when Re'eh falls on
+      // Shabbos Rosh Chodesh the Rosh Chodesh haftarah is read, and that Ki
+      // Seitzei then takes Aniya So'ara after its own -- which is what
+      // correctKiSeitzei does, two weeks being the distance between them.
       val allowReplaceHaftarah: Boolean = allowReplaceMaftir && !isMonthAv
 
       def transformer(
