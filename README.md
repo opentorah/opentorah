@@ -8,13 +8,6 @@ TODO convert READMEs to AsciiDoc and move them into /docs
 
 ## XML processing ##
 
-### XML parsing ###
-
-Catalogs bind with derived
-[`org.podval.xml.XmlCodec`](https://github.com/dubinsky/site-publisher) codecs
-(see [xml-codec-plan.md](xml-codec-plan.md)). Store path resolution is ZIO
-(`Effects.IO`), not a document combinator.
-
 ### XML generation ###
 
 In web-apps, I need to generate XML. I tried using [ScalaTags](https://com-lihaoyi.github.io/scalatags/) for that,

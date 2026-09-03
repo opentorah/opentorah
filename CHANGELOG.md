@@ -4,18 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-- cleanup: `org.opentorah.store` / `org.opentorah.metadata` moved to site-publisher `org.podval.xml` (`org.podval.store`, `org.podval.metadata`); store walks and `HasName.bind` are synchronous
-- cleanup: odd catalogs are derived DTOs then bind (Selector, Alias, Mishneh Torah, Sefer HaMitzvos, Haftarah, Tanach books); `Name` stays `n` xor text
-- cleanup: `loadCatalog(this, codec)` for catalogs; dropped unused `Caching` / Caffeine
-- cleanup: deleted `org.opentorah.xml`; store walks and catalog bind use `Effects.IO`
-- cleanup: texts catalogs via codecs: Mishneh Torah, Sefer HaMitzvos lessons, CustomTree, ReadingSources
-- cleanup: `Selector` / `Alias` codecs; selector catalog via `parseCatalog`
-- cleanup: `Name` / `Names` / `Language.Spec` codecs; `Names.Loader` reads catalogs via `org.podval.xml` (`parseCatalog`)
-- chore: `core` depends on `org.podval:org.podval.xml`; CI checks out site-publisher for the composite build
-- chore: include site-publisher as a Gradle composite build when the checkout is present; `core` then depends on `org.podval:org.podval.xml`
-- docs: plan to replace `org.opentorah.xml` parsers/unparsers with `org.podval.xml` codecs (`xml-codec-plan.md`)
-
 ## [0.10.17] - 2026-
 - chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin;
 - chore: dependency updates;
@@ -25,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - cleanup: removed CalendarServer;
 - cleanup: merged 'util' into 'core';
 - cleanup: removed some dead code;
-
+- feat: use XML codec derivers from org.podval.xml;
+- feat: `store` and `metadata` moved to org.podval.xml;
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook
