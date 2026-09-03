@@ -2,14 +2,14 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Names}
-import org.podval.store.{By, Pure}
+import org.podval.store.{By, Stores}
 import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
-trait TanachBook extends HasName, Pure[?] derives CanEqual: // all deriveds are objects; using eq
+trait TanachBook extends HasName, Stores[?] derives CanEqual: // all deriveds are objects; using eq
 
   private[tanach] final def chapters: Chapters = TanachBook.chapters(this)
 
-  override def storesPure: Seq[By[?]] = Seq(chapters.byChapter)
+  override def stores: Seq[By[?]] = Seq(chapters.byChapter)
 
   private[tanach] def parse(names: Names, chapters: Chapters, dto: BookDto): TanachBook.Parsed
 
@@ -30,8 +30,6 @@ private[tanach] object TanachBook:
     override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =
       throw XmlError("Tanach book is decode-only")
 
-  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  // ... but it started manifesting only with the switch to ZIO 2.0!
   private lazy val book2parsed: Map[TanachBook, Parsed] =
     val parsed: Seq[Parsed] = XmlParser.loadCatalog(Tanach, codec, xinclude = true)
     val result: Map[TanachBook, Parsed] = parsed.map(metadata => metadata.book -> metadata).toMap
@@ -44,8 +42,6 @@ private[tanach] object TanachBook:
 
   private def chapters(book: TanachBook): Chapters = book2parsed(book).chapters
 
-  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
-  // ... but it started manifesting only with the switch to ZIO 2.0!
   private lazy val book2metadata: Map[TanachBook, Metadata] = Collections.mapValues(book2parsed)(_.resolve)
 
   def metadata(book: TanachBook): Metadata = book2metadata(book)

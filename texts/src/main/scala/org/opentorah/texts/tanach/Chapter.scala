@@ -1,10 +1,10 @@
 package org.opentorah.texts.tanach
 
-import org.podval.store.{By, NumberedStore, NumberedStores, Pure}
+import org.podval.store.{By, NumberedStore, NumberedStores, Stores}
 
-abstract class Chapter(override val number: Int, from: Int, to: Int) extends NumberedStore, Pure[?]:
+abstract class Chapter(override val number: Int, from: Int, to: Int) extends NumberedStore, Stores[?]:
   def length: Int = to - from + 1
-  override def storesPure: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
+  override def stores: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
 
 object Chapter:
 

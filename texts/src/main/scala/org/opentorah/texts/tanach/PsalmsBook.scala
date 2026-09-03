@@ -14,7 +14,7 @@ trait PsalmsBook extends NachBook:
 
   private def metadata: PsalmsBook.Metadata = TanachBook.metadata(Psalms).asInstanceOf[PsalmsBook.Metadata]
 
-  override def storesPure: Seq[By[?]] = Seq(
+  override def stores: Seq[By[?]] = Seq(
     chapters.byChapter,
     // TODO override to/from name(s)/number
     Chapters.BySpan("book", books, chapters),

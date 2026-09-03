@@ -3,14 +3,14 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, HasValues, Names}
-import org.podval.store.{By, Pure, Store}
+import org.podval.store.{By, Stores}
 import org.podval.xml.XmlError
 import Tanach.Chumash
 
 enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
   HasName(nameOverride),
   HasName.Enum,
-  Pure[?] derives CanEqual:
+  Stores[?] derives CanEqual:
 
   case Bereishis       extends Parsha(Chumash.Genesis)
   case Noach           extends Parsha(Chumash.Genesis)
@@ -93,7 +93,7 @@ enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
 
   final def haftarah: Haftarah.Customs = Haftarah.haftarah(this).map(_.from(this))
 
-  override def storesPure: Seq[By[?]] = Seq(
+  override def stores: Seq[By[?]] = Seq(
     Chapters.ByChapter(span, book.chapters)
   )
 

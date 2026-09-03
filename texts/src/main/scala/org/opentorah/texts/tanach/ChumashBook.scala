@@ -2,15 +2,15 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Names}
-import org.podval.store.{By, Pure, Store}
+import org.podval.store.{By, Stores}
 
 trait ChumashBook extends TanachBook:
   lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
 
-  override def storesPure: Seq[By[?]] = Seq(
+  override def stores: Seq[By[?]] = Seq(
     chapters.byChapter,
     new By.WithSelector[Parsha](selectorName = "parsha")
-      with Pure.With[Parsha](storesPure = parshiot)
+      with Stores.With[Parsha](stores = parshiot)
   )
 
   // Parsed names of the book are ignored - names of the first parsha are used instead.

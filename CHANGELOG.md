@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - cleanup: removed some dead code;
 - feat: use XML codec derivers from org.podval.xml;
 - feat: `store` and `metadata` moved to org.podval.xml;
+- cleanup: dropped ZIO runtime (`Effects`, zio-http `serveCalendar`);
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook

@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
+import org.podval.store.{By, NumberedStore, NumberedStores, Stores}
 
 final class Chapters(chapters: Seq[Int]):
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -79,6 +79,6 @@ object Chapters:
 
     private class ForSpan(override val number: Int) extends
       NumberedStore,
-      Pure[?]:
+      Stores[?]:
       override def oneOf: NumberedStores[NumberedStore] = BySpan.this
-      override def storesPure: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
+      override def stores: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
