@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
 import org.podval.metadata.{HasName, HasValues, Named, Names}
-import org.podval.store.{By, Pure, Store}
+import org.podval.store.{By, Store, Stores}
 
-object Tanach extends Pure[?]:
+object Tanach extends Stores[?]:
   override def names: Names = All.names
 
   // Part markers
@@ -69,12 +69,12 @@ object Tanach extends Pure[?]:
   sealed class Part[T <: TanachBook](
     clazz: Class[T],
     nameOverride: Option[String] = None,
-  ) extends Named.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Pure[?]:
+  ) extends Named.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Stores[?]:
     protected def byBook: By[TanachBook] =
       new By.WithSelector[TanachBook](selectorName = "book")
-        with Pure.With[TanachBook](storesPure = Book.valuesSeq.filter(clazz.isInstance))
+        with Stores.With[TanachBook](stores = Book.valuesSeq.filter(clazz.isInstance))
 
-    override def storesPure: Seq[Store] = Seq(byBook)
+    override def stores: Seq[Store] = Seq(byBook)
 
     final def forName(name: String): T = Book.getForName(name).asInstanceOf[T]
 
@@ -90,10 +90,10 @@ object Tanach extends Pure[?]:
   object Nach extends Part(classOf[Nach])
 
   object Prophets extends Part(classOf[Prophets]):
-    override def storesPure: Seq[Store] = Seq(
+    override def stores: Seq[Store] = Seq(
       byBook,
       new By.WithSelector[Part[?]](selectorName = "part")
-        with Pure.With[Part[?]](storesPure = Seq(EarlyProphets, LateProphets,TreiAsar))
+        with Stores.With[Part[?]](stores = Seq(EarlyProphets, LateProphets,TreiAsar))
     )
 
   object EarlyProphets extends Part(classOf[EarlyProphets], nameOverride = Some("Early Prophets"))
@@ -108,9 +108,9 @@ object Tanach extends Pure[?]:
 
   // Stores
   // TODO when I have aliases, install them for Chumash and Psalm here (and higher?)
-  override def storesPure: Seq[Store] = Seq(
+  override def stores: Seq[Store] = Seq(
     new By.WithSelector[TanachBook](selectorName = "book")
-      with Pure.With[TanachBook](storesPure = Book.valuesSeq),
+      with Stores.With[TanachBook](stores = Book.valuesSeq),
     new By.WithSelector[Part[?]](selectorName = "part")
-      with Pure.With[Part[?]](storesPure = Seq(Chumash, Prophets, Writings))
+      with Stores.With[Part[?]](stores = Seq(Chumash, Prophets, Writings))
   )

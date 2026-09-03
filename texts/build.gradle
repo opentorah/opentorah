@@ -10,17 +10,9 @@ description = 'Jewish Texts, Readings and Learning Schedules'
 
 apply from: '../configure.gradle'
 
-tasks.register('serveCalendar', JavaExec) {
-  group = 'publishing'
-  mainClass.set('org.opentorah.calendar.service.CalendarService')
-  args = []
-  classpath = sourceSets.main.runtimeClasspath
-}
-
 dependencies {
   implementation project(':opentorah-core')
 
-  implementation libs.zio.http
 //  implementation libs.logback
 //  implementation libs.logstash
 }

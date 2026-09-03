@@ -15,7 +15,6 @@ pluginManagement {
 
 final String scalaVersionMajor = '3'
 
-final String zioVersion        = '2.1.26'
 final String flexmarkVersion   = '0.64.8'
 final String catsVersion       = '2.13.0'
 
@@ -37,12 +36,6 @@ dependencyResolutionManagement {
 
     // Google Cloud
     library('google.cloud.storage', 'com.google.cloud:google-cloud-storage:2.71.0')
-
-    // ZIO
-    library('zio-core'     , "dev.zio:zio_$scalaVersionMajor:$zioVersion")
-    library('zio-streams'  , "dev.zio:zio-streams_$scalaVersionMajor:$zioVersion")
-    library('zio-test'     , "dev.zio:zio-test_$scalaVersionMajor:$zioVersion")
-    library('zio-http'     , "dev.zio:zio-http_$scalaVersionMajor:3.11.4")
 
     // Algebra
     library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")

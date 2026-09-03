@@ -78,7 +78,6 @@ object MishnehTorah:
     @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty
   ) derives CanEqual
 
-  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val books: Seq[Book] =
     val result: Seq[Book] = XmlParser.loadCatalog(this, BookDto.codec).map(BookDto.toBook)
     Collections.requireConsecutive(result, _.number, "book", from = 0, count = Some(15))

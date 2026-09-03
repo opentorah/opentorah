@@ -32,13 +32,6 @@ tasks.withType(ScalaCompile).configureEach {
   }
 }
 
-// with switch to ZIO2.0 (?) the tests started hanging if run in parallel...
-// TODO this is not the end of the story; am I going to run into ZIO's
-// blocking thread-pool size in production?!
-test {
-  maxParallelForks = 1
-}
-
 // library: all projects are configured as a library (except for the docs one);
 // with the latest Gradle plugin publishing plugin, uploading of it as a library started failing, so I disabled it...
 if (project.name != 'docs') {

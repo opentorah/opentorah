@@ -64,5 +64,4 @@ object SeferHamitzvosLessons:
       case NegativeDto(n) => Negative(n)
       case NamedDto(names) => NamedPart(Names(names.map(Name.fromData)))
 
-  // unless this is lazy, ZIO deadlocks; see https://github.com/zio/zio/issues/1841
   lazy val lessons: Seq[Lesson] = XmlParser.loadCatalog(this, LessonDto.codec).map(LessonDto.toLesson)
