@@ -31,7 +31,7 @@ dependencyResolutionManagement {
   // - it doesn't allow me to interpolate 'scalaVersionMajor';
   // - this way both plugin and dependency versions are in the same file.
   versionCatalogs {libs {
-    // Substituted from the site-publisher composite build when that checkout is present.
+    // Substituted from the xml composite build when that checkout is present.
     library('podval-xml'   , 'org.podval:org.podval.xml:0.0.1')
 
     // Zmanim
@@ -59,16 +59,12 @@ project(':texts'    ).name = 'opentorah-texts'
 
 include ':docs'
 
-// Composite: substitute org.podval:org.podval.xml from the local site-publisher
-// checkout. Override with -PsitePublisherDir=/path/to/site-publisher (CI checks
-// out dubinsky/site-publisher and passes that). If the directory is missing,
-// Gradle resolves the artifact from Maven Central.
-final File sitePublisherDir = file(
-  providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
+// Composite: substitute org.podval:org.podval.xml from a local xml checkout.
+// Override with -PxmlDir=/path/to/xml. If the directory is missing, Gradle
+// resolves the artifact from Maven Central. GitHub CI does not check out xml.
+final File xmlDir = file(
+  providers.gradleProperty('xmlDir').getOrElse('../../Podval/xml')
 )
-final boolean includeSitePublisher =
-  sitePublisherDir.isDirectory() && new File(sitePublisherDir, 'settings.gradle').isFile()
-gradle.ext.includeSitePublisher = includeSitePublisher
-if (includeSitePublisher) {
-  includeBuild(sitePublisherDir)
+if (xmlDir.isDirectory() && new File(xmlDir, 'settings.gradle').isFile()) {
+  includeBuild(xmlDir)
 }

@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - cleanup: removed some dead code;
 - feat: use XML codec derivers from org.podval.xml;
 - feat: `store` and `metadata` moved to org.podval.xml;
+- chore: depend on published `org.podval:org.podval.xml` (optional local `includeBuild` of `dubinsky/xml`); CI does not check out site-publisher;
 - cleanup: dropped ZIO runtime (`Effects`, zio-http `serveCalendar`);
 - dropped unused dependencies;
 
