@@ -13,49 +13,19 @@ pluginManagement {
   }
 }
 
-final String scalaVersionMajor = '3'
-
-final String flexmarkVersion   = '0.64.8'
-final String catsVersion       = '2.13.0'
-
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
-//    maven {
-//      url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-//    }
   }
-
-  // Yes, I know about 'libs.versions.toml', but:
-  // - I do not want to use yet another configuration language;
-  // - it doesn't allow me to interpolate 'scalaVersionMajor';
-  // - this way both plugin and dependency versions are in the same file.
-  versionCatalogs {libs {
-    // Substituted from the xml composite build when that checkout is present.
-    library('podval-xml'   , 'org.podval:org.podval.xml:0.0.1')
-
-    // Zmanim
-    library('zmanim', 'com.kosherjava:zmanim:2.5.0')
-
-    // Algebra
-    library('cats-core'    , "org.typelevel:cats-core_$scalaVersionMajor:$catsVersion")
-    library('cats-laws'    , "org.typelevel:cats-laws_$scalaVersionMajor:$catsVersion")
-    library('algebraLaws'  , "org.typelevel:algebra-laws_$scalaVersionMajor:$catsVersion")
-    library('discipline-scalatest', "org.typelevel:discipline-scalatest_$scalaVersionMajor:2.3.0")
-
-    // Testing
-    library('scalatest' , "org.scalatest:scalatest_$scalaVersionMajor:3.2.20")
-    library('scalacheck', "org.scalacheck:scalacheck_$scalaVersionMajor:1.20.0")
-  }}
 }
 
 rootProject.name = 'opentorah'
 
 include ':core'
-project(':core'     ).name = 'opentorah-core'
+project(':core').name = 'opentorah-core'
 
 include ':texts'
-project(':texts'    ).name = 'opentorah-texts'
+project(':texts').name = 'opentorah-texts'
 
 include ':docs'
 

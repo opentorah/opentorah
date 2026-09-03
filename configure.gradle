@@ -3,11 +3,13 @@ project.group = 'org.opentorah'
 
 scala.scalaVersion = '3.9.0'
 
+final String catsVersion = '2.13.0'
+
 dependencies {
-  testImplementation libs.scalatest
-  testImplementation libs.scalacheck
-  testImplementation libs.discipline.scalatest
-  testImplementation libs.algebraLaws
+  testImplementation 'org.scalatest:scalatest_3:3.2.20'
+  testImplementation 'org.scalacheck:scalacheck_3:1.20.0'
+  testImplementation 'org.typelevel:discipline-scalatest_3:2.3.0'
+  testImplementation "org.typelevel:algebra-laws_3:$catsVersion"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)

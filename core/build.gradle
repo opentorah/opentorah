@@ -10,11 +10,14 @@ description = 'Open Torah Core'
 
 apply from: '../configure.gradle'
 
+final String catsVersion = '2.13.0'
+
 dependencies {
-  api libs.podval.xml
+  // Substituted from the xml composite build when that checkout is present.
+  api 'org.podval:org.podval.xml:0.0.2' // TODO api?!
 
-  implementation libs.zmanim
+  implementation 'com.kosherjava:zmanim:2.5.0'
 
-  testImplementation libs.cats.core
-  testImplementation libs.cats.laws
+  testImplementation "org.typelevel:cats-core_3:$catsVersion"
+  testImplementation "org.typelevel:cats-laws_3:$catsVersion"
 }
