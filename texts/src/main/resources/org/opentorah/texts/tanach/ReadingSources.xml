@@ -18,6 +18,14 @@
   <source n="chabad-org" kind="website" name="chabad.org"
           url="https://www.chabad.org"/>
 
+  <source n="chabad-rosh-chodesh-torah" kind="website" name="chabad.org"
+          where="What Do We Read From the Torah on Rosh Chodesh?"
+          url="https://www.chabad.org/parshah/article_cdo/aid/1235854/jewish/What-Do-We-Read-From-the-Torah-on-Rosh-Chodesh.htm"/>
+
+  <source n="chabad-haftarot" kind="website" name="chabad.org"
+          where="List of Haftorah Readings where Customs Vary, drawn from the Rebbe's records; its own footnotes cite Shulchan Aruch, Orach Chayim 425"
+          url="https://www.chabad.org/library/article_cdo/aid/4158333/jewish/List-of-Haftorah-Readings-where-Customs-Vary.htm"/>
+
   <source n="finkelstein" kind="study" name="Louis Finkelstein"
           where="The Prophetic Readings According to the Palestinian, Byzantine, and Karaite Rites, HUCA vol. 17 (1942-1943) p. 423"
           url="https://www.jstor.org/stable/23506442"/>

@@ -14,7 +14,16 @@
     </reading>
     <reading n="shabbosAdditionalHaftarah" full="false">
       <haftarah>
-        <custom n="Chabad, Fes" book="I Samuel" fromChapter="20">
+        <custom n="Chabad" book="I Samuel" fromChapter="20" sources="chabad-haftarot"
+                comment="chabad.org states the rule directly: on a Shabbos that is
+                         Rosh Chodesh and also the eve of Rosh Chodesh, the first and
+                         last verse of Machar Chodesh follow the haftarah that was
+                         read. Fes reads the same two verses, on the older evidence
+                         these two customs were recorded together on.">
+          <part n="1" fromVerse="18" toVerse="18"/>
+          <part n="2" fromVerse="42" toVerse="42"/>
+        </custom>
+        <custom n="Fes" book="I Samuel" fromChapter="20">
           <part n="1" fromVerse="18" toVerse="18"/>
           <part n="2" fromVerse="42" toVerse="42"/>
         </custom>
@@ -39,7 +48,13 @@
     </reading>
     <reading n="shabbosAdditionalHaftarah" full="false">
       <haftarah>
-        <custom n="Chabad" book="Isaiah" fromChapter="66">
+        <custom n="Chabad" book="Isaiah" fromChapter="66"
+                comment="Read after whichever haftarah displaced the Rosh Chodesh one.
+                         chabad.org states the pattern for Parshas HaChodesh falling on
+                         Rosh Chodesh or its eve, so it is not in doubt as a practice;
+                         what is not settled is whether it reaches Rosh Chodesh Av,
+                         where that page gives Shim'u and says nothing of an addition.
+                         Recorded without a source rather than narrowed on a guess.">
           <part n="1" fromVerse="1" toVerse="1"/> <!-- first verse of the common haftarah -->
           <part n="2" fromVerse="23" toVerse="24"/> <!-- last verse of the common haftarah -->
           <part n="3" fromVerse="23" toVerse="23"/>
