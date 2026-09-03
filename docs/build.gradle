@@ -12,7 +12,6 @@ repositories {
 
 dependencies {
   implementation project(':opentorah-core')
-  implementation libs.logback
 }
 
 final File buildDirectory = layout.buildDirectory.asFile.get()
