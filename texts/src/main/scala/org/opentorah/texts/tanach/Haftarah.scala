@@ -1,8 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, Language}
 import org.opentorah.util.Collections
-import org.opentorah.util.Effects
+import org.podval.metadata.{HasName, Language}
 import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
@@ -66,11 +65,11 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private lazy val loaded: Map[Parsha, WeekMetadata] =
     val parsed: Seq[WeekMetadata] = XmlParser.loadCatalog(this, WeekDto.codec).map(toWeekMetadata)
-    Effects.unsafeRun(HasName.mapByName(
+    HasName.mapByName(
       keys = Parsha.valuesSeq,
       metadatas = parsed,
       hasName = (metadata: WeekMetadata, name: String) => metadata.name == name
-    ))
+    )
 
   lazy val haftarah: Map[Parsha, Customs] = Collections.mapValues(loaded)(_.customs)
 

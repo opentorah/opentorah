@@ -1,10 +1,8 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.calendar.Week
-import org.opentorah.metadata.Names
-import org.opentorah.store.By
-import org.opentorah.util.Effects
-import zio.ZIO
+import org.podval.metadata.Names
+import org.podval.store.By
 import Tanach.Psalms
 
 trait PsalmsBook extends NachBook:
@@ -45,11 +43,11 @@ object PsalmsBook:
     val books: Seq[Span]
   ) extends NachBook.Parsed(Psalms, names, chapters):
 
-    override def resolve: Effects.IO[Metadata] = ZIO.succeed(Metadata(
+    override def resolve: Metadata = Metadata(
       days,
       weekDays,
       books
-    ))
+    )
 
   def parse(book: PsalmsBook, names: Names, chapters: Chapters, dto: BookDto): Parsed =
     require(dto.weeks.isEmpty)

@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, HasValues, Named, Names}
 import org.opentorah.util.Collections
+import org.podval.metadata.{HasName, HasValues, Named, Names}
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 

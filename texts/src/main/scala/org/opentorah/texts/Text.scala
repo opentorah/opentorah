@@ -1,7 +1,7 @@
 package org.opentorah.texts
 
-import org.opentorah.metadata.Names
-import org.opentorah.store.{Pure, Store}
+import org.podval.metadata.Names
+import org.podval.store.{Pure, Store}
 
 // TODO expose Rambam here too!
 object Text extends Pure[?]:

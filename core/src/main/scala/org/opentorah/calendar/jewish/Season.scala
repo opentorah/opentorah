@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.astronomy.Zodiac
-import org.opentorah.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, Named, Names}
 
 enum Season(name: String, val sunEnters: Zodiac)
   extends Named.ByLoader[Season](loader = Season, nameOverride = Some(name)), HasName.Enum derives CanEqual:

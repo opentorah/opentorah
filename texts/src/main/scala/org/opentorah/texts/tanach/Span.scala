@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.Language
+import org.podval.metadata.Language
 
 final class Span(val from: ChapterAndVerse, val to: ChapterAndVerse) extends Language.ToString derives CanEqual:
   require(from <= to, s"Empty span: $from..$to")

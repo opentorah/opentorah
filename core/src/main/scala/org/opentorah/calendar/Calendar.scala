@@ -1,7 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.opentorah.metadata.{HasName, HasValues, Language, Named, Names}
+import org.podval.metadata.{HasName, HasValues, Language, Named, Names}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 

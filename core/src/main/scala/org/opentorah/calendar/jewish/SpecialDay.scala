@@ -1,6 +1,6 @@
 package org.opentorah.calendar.jewish
 
-import org.opentorah.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, Named, Names}
 import Jewish.{Day, Year}
 import Jewish.Month.*
 

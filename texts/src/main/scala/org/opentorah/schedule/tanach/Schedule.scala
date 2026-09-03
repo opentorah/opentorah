@@ -3,9 +3,9 @@ package org.opentorah.schedule.tanach
 import org.opentorah.calendar.Week
 import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.calendar.jewish.SpecialDay
-import org.opentorah.metadata.Named
 import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
 import org.opentorah.util.{Cache, Collections}
+import org.podval.metadata.Named
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
 final class Schedule(

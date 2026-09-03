@@ -1,6 +1,6 @@
 package org.opentorah.astronomy
 
-import org.opentorah.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, Named, Names}
 import Angles.{Position, Rotation}
 
 // KH 11:9

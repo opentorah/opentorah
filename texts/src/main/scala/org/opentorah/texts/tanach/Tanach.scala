@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.metadata.{HasName, HasValues, Named, Names}
-import org.opentorah.store.{By, Pure, Store}
+import org.podval.metadata.{HasName, HasValues, Named, Names}
+import org.podval.store.{By, Pure, Store}
 
 object Tanach extends Pure[?]:
   override def names: Names = All.names

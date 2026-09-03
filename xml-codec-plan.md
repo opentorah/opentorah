@@ -59,8 +59,8 @@ Decode-only is enough for catalogs that are never written back.
   are AST-polymorphic. New code can pin ZIO Blocks XML where convenient.
 - `org.opentorah.xml` is deleted when nothing in `core` or `texts` imports it.
 
-`org.podval.xml` does **not** replace store *path* resolution. That stays ZIO
-(or a smaller effect) in `org.opentorah.store`.
+Store path resolution lives in `org.podval.store` (same `org.podval.xml` artifact)
+and is synchronous. `org.opentorah.store` / `org.opentorah.metadata` were deleted.
 
 ## Gaps in `org.podval.xml` today
 
@@ -111,10 +111,10 @@ classes with `@Modifier.config`. Known mismatches:
 `org.podval.xml` has no ZIO *runtime* (it uses zio-blocks Schema, not `dev.zio:zio`).
 Putting `Caching` into the xml module would add ZIO and Caffeine there.
 
-`Parser` as the store-walk effect is a historical accident. After codecs are
-synchronous, `Stores.resolve` should be `ZIO[Caching, Effects.Error, A]` (or
-plain `Task` if caching moves to an explicit argument). `Caching` itself
-belongs in `org.opentorah.util` (there is already a non-Caffeine `Cache`).
+`Parser` as the store-walk effect was a historical accident. `Stores.resolve` /
+`getPaths` / `HasName.bind` are now synchronous in `org.podval.store` /
+`org.podval.metadata`. `Caching` belongs in `org.opentorah.util` (there is
+already a non-Caffeine `Cache`) if something else still needs it.
 
 ## Key decisions
 
@@ -131,8 +131,8 @@ belongs in `org.opentorah.util` (there is already a non-Caffeine `Cache`).
 3. **Do not put `Caching` in `org.podval.xml`.** It is an effect environment,
    not an XML binding. Move it to `org.opentorah.util` when `Parser` dies.
 4. **Stop using `Parser` for non-XML work** in the same change that deletes
-   `ParserState`. Store path resolution is ZIO (plus optional cache), not a
-   document combinator.
+   `ParserState`. Store path resolution is synchronous in `org.podval.store`,
+   not a document combinator.
 5. **Decode then bind.** Catalog load is: parse root → decode children →
    `HasName.bind` / per-book `resolve`. No `HasName.find` inside a codec.
 6. **`Name` / default `n` get a small custom codec**, not a deriver extension,

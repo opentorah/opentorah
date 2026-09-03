@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.opentorah.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
+import org.podval.store.{By, NumberedStore, NumberedStores, Pure, Selector, Store}
 
 final class Chapters(chapters: Seq[Int]):
   def length(chapter: Int): Int = chapters(chapter-1)

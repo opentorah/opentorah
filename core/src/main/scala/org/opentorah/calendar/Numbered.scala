@@ -1,6 +1,6 @@
 package org.opentorah.calendar
 
-trait Numbered[T] extends org.opentorah.metadata.Numbered[T]:
+trait Numbered[T] extends org.podval.metadata.Numbered[T]:
   def companion: Numbered.Companion[T]
 
   @scala.annotation.targetName("add")

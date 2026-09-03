@@ -5,8 +5,8 @@ import org.opentorah.calendar.jewish.Jewish.{Day, Month}
 import org.opentorah.calendar.jewish.Jewish.Month.*
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay.*
-import org.opentorah.metadata.Named
 import org.opentorah.texts.tanach.{Custom, Parsha, Reading, SpecialReadings, Torah, WeeklyReading}
+import org.podval.metadata.Named
 
 object Readings:
   final def getMorningReading(
