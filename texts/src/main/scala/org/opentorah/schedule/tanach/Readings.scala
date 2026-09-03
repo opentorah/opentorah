@@ -99,7 +99,8 @@ object Readings:
       .fold(result)(month => SpecialReadings.RoshChodesh.correct(
         day = RoshChodesh,
         isSpecialShabbos,
-        isMonthTevesAv = (month == Teves) || (month == Av),
+        isMonthTeves = month == Teves,
+        isMonthAv = month == Av,
         isMonthElul = month == Elul,
         isMonthTishrei = month == Tishrei,
         result
