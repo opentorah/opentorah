@@ -204,13 +204,26 @@ object SpecialReadings:
     def correct(
       day: Named,
       isSpecialShabbos: Boolean,
-      isMonthTevesAv: Boolean,
+      isMonthTeves: Boolean,
+      isMonthAv: Boolean,
       isMonthElul: Boolean,
       isMonthTishrei: Boolean,
       reading: Reading
     ): Reading = if isMonthTishrei then reading else
       // We do not mention Rosh Chodesh on Rosh Hashanah
-      val allowReplace: Boolean = !isSpecialShabbos && !isMonthTevesAv
+
+      // The Rosh Chodesh maftir is read unless something else has already taken
+      // the maftir, in which case Rosh Chodesh is read as the seventh aliyah
+      // instead: on a special Shabbos the four parshiyos take it, and in Teves
+      // -- where Rosh Chodesh always falls in Chanukah -- the korbanot do.
+      val allowReplaceMaftir: Boolean = !isSpecialShabbos && !isMonthTeves
+
+      // The haftarah yields more often than the maftir does. In Av the rebuke
+      // is read and in Elul the consolation, both in sequence with the weeks
+      // around them, and neither gives way to Rosh Chodesh; Chabad is the
+      // exception in Elul. Where the Rosh Chodesh haftarah is not read, its
+      // closing verses may still be added to the one that is.
+      val allowReplaceHaftarah: Boolean = allowReplaceMaftir && !isMonthAv
 
       def transformer(
         custom: Custom,
@@ -218,9 +231,12 @@ object SpecialReadings:
         haftarah: Haftarah,
         addition: Option[Haftarah]
       ): Reading.ReadingCustom =
-        if allowReplace && (!isMonthElul || (custom == Custom.Chabad))
+        if allowReplaceHaftarah && (!isMonthElul || (custom == Custom.Chabad))
         then reading.replaceMaftirAndHaftarah(fromDay(day, shabbosMaftir), haftarah)
-        else reading.addHaftarah(addition)
+        else
+          val withMaftir: Reading.ReadingCustom =
+            if allowReplaceMaftir then reading.replaceMaftir(fromDay(day, shabbosMaftir)) else reading
+          withMaftir.addHaftarah(addition)
 
       transformMaftirAndHaftarah(
         day,

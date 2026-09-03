@@ -60,6 +60,9 @@ object Reading:
     def replaceHaftarah(haftarah: Haftarah): ReadingCustom =
       setHaftarah(haftarah)
 
+    def replaceMaftir(maftir: Maftir): ReadingCustom =
+      setMaftirAndHaftarah(MaftirAndHaftarah(Some(maftir), maftirAndHaftarah.get.haftarah))
+
     def replaceMaftirAndHaftarah(maftir: Maftir, haftarah: Haftarah): ReadingCustom =
       setMaftirAndHaftarah(MaftirAndHaftarah(Some(maftir), haftarah))
 
