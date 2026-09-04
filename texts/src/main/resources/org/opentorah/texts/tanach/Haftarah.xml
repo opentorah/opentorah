@@ -148,10 +148,14 @@
         <custom n="Romania" book="Isaiah" fromChapter="43" fromVerse="7"
                 toChapter="44" toVerse="2" sources="michlol"/>
         <custom n="Ashkenaz" book="I Kings" fromChapter="18" fromVerse="1" toVerse="39"/>
-        <custom n="Sefard, Italki, Chabad, Poznan" sources="chabad-org, chitas"
+        <custom n="Sefard, Italki, Chabad, Poznan" sources="michlol"
                 book="I Kings" fromChapter="18" fromVerse="20" toVerse="39"/>
         <custom n="Teiman" book="I Kings" fromChapter="18" fromVerse="1" toVerse="45"/>
-      <annotation n="Sefard, Italki, Chabad, Poznan" comment="chabad.org and Chitas are cited for Chabad; hamichlol gives the same reading to Sefard, Italki and Poznan. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Chabad" sources="chabad-org, chitas"
+                  comment="chabad.org and Chitas are cited for Chabad."/>
+        <annotation n="Poznan"
+                  comment="hamichlol documents the Poznan readings from the community
+                           pinkas (poznan-pinkas)."/>
     </week>
     <week n="Vayakhel" book="I Kings">
         <custom n="Romania" fromChapter="8" fromVerse="1" toVerse="10" sources="michlol"/>
