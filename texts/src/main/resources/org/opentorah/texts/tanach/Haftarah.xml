@@ -35,7 +35,7 @@
         <custom n="Sefard, Frankfurt, Poznan" fromChapter="42" fromVerse="5" toChapter="42" toVerse="21"/>
         <custom n="Teiman" fromChapter="42" fromVerse="1" toChapter="42" toVerse="16"/>
         <custom n="Italki" fromChapter="42" fromVerse="1" toChapter="42" toVerse="21"/>
-      <annotation n="Sefard, Frankfurt, Poznan" comment="Poznan reads with Frankfurt here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Poznan" comment="Poznan reads with Frankfurt here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Noach" book="Isaiah" fromChapter="54">
         <custom n="Romania" fromVerse="9" toChapter="55" toVerse="12" sources="michlol"/>
@@ -52,7 +52,7 @@
                 toChapter="34" toVerse="13" sources="michlol"/>
         <custom n="Ashkenaz, Chabad, Algeria" book="II Kings" fromChapter="4" fromVerse="1" toVerse="37"/>
         <custom n="Sefard, Poznan" book="II Kings" fromChapter="4" fromVerse="1" toVerse="23"/>
-      <annotation n="Sefard, Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Chayei Sarah" book="I Kings" fromChapter="1" fromVerse="1">
         <custom n="Common" toVerse="31"/>
@@ -101,7 +101,7 @@
         <custom n="Italki" book="Jeremiah" fromChapter="1" fromVerse="1" toVerse="19"/>
         <custom n="Teiman, Bavlim, Magreb, Persia, Libya, Pure Sephardim"
                 book="Ezekiel" fromChapter="16" fromVerse="1" toVerse="14" sources="michlol"/>
-      <annotation n="Teiman, Bavlim, Magreb, Persia, Libya, Pure Sephardim" comment="hamichlol lists Algeria here too; it already reads this by way of Magreb, so it is not named again. Its rite code סאל is Algerian Jewry as a whole; the city of Algiers is named only in prose, and only for the fast Mincha readings."/>
+      <annotation n="Magreb" comment="hamichlol lists Algeria here too; it already reads this by way of Magreb, so it is not named again. Its rite code סאל is Algerian Jewry as a whole; the city of Algiers is named only in prose, and only for the fast Mincha readings."/>
     </week>
     <week n="Va'eira" book="Ezekiel">
         <custom n="Common" fromChapter="28" fromVerse="25" toChapter="29" toVerse="21"/>
@@ -132,7 +132,7 @@
             <part n="1" fromChapter="6" fromVerse="1" toVerse="13"/>
             <part n="2" fromChapter="9" fromVerse="5" toVerse="6"/>
         </custom>
-      <annotation n="Sefard, Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Mishpatim" book="Jeremiah">
         <custom n="Common">
@@ -200,7 +200,7 @@
                              hamichlol names no Chabad practice at this week, and its
                              rite key nests Chabad under Ashkenaz, so it would imply
                              the Ashkenaz reading above; Chitas is against that."/>
-      <annotation n="Sefard, Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Poznan" comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Tazria" book="II Kings" fromChapter="4" fromVerse="42" toChapter="5" toVerse="19"/>
     <week n="Metzora" book="II Kings">
@@ -246,7 +246,7 @@
         <custom n="Common" book="Jeremiah" fromChapter="16" fromVerse="19" toChapter="17" toVerse="14"/>
         <custom n="Teiman" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="27"/>
         <custom n="Italki, Poznan" book="Ezekiel" fromChapter="34" fromVerse="1" toVerse="15"/>
-      <annotation n="Italki, Poznan" comment="Poznan per hamichlol, but unsettled: the Poznan minhagim book says they end at 'ne'um Hashem', which could be verse 15, 30 or 31, and the kuntres contradicts itself about whether they read this haftarah at all or the ordinary Ashkenaz one. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Poznan" comment="Poznan per hamichlol, but unsettled: the Poznan minhagim book says they end at 'ne'um Hashem', which could be verse 15, 30 or 31, and the kuntres contradicts itself about whether they read this haftarah at all or the ordinary Ashkenaz one. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Bemidbar" book="Hosea" fromChapter="2" fromVerse="1" toVerse="22"/>
     <week n="Nasso" book="Judges" fromChapter="13" fromVerse="2">
@@ -288,7 +288,7 @@
                              hamichlol names no Chabad practice at this week, and its
                              rite key nests Chabad under Ashkenaz, so it would imply
                              the Ashkenaz reading above; Chitas is against that."/>
-      <annotation n="Sefard, Shami, Romania" comment="hamichlol gives Romania the same reading as Sefard here."/>
+      <annotation n="Romania" comment="hamichlol gives Romania the same reading as Sefard here."/>
     </week>
 
     <week n="Devarim" book="Isaiah" fromChapter="1">
@@ -356,8 +356,8 @@
                              hamichlol names no Chabad practice at this week, and its
                              rite key nests Chabad under Ashkenaz, so it would imply
                              the Ashkenaz reading above; Chitas is against that."/>
-      <annotation n="Sefard, Romania" comment="hamichlol gives Romania the same reading as Sefard here."/>
-      <annotation n="Italki, Poznan" comment="Poznan per the first practice in kuntres Poznan, which reads Dirshu on Shabbos Shuvah; its second practice reads Shuva like the rest of Ashkenaz. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+      <annotation n="Romania" comment="hamichlol gives Romania the same reading as Sefard here."/>
+      <annotation n="Poznan" comment="Poznan per the first practice in kuntres Poznan, which reads Dirshu on Shabbos Shuvah; its second practice reads Shuva like the rest of Ashkenaz. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
     </week>
     <week n="Haazinu">
           <custom n="Common" book="II Samuel" fromChapter="22" fromVerse="1" toVerse="51"/>
