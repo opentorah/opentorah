@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Tanach xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xi:include href="Genesis.xml"/>
-    <xi:include href="Exodus.xml"/>
-    <xi:include href="Leviticus.xml"/>
-    <xi:include href="Numbers.xml"/>
-    <xi:include href="Deuteronomy.xml"/>
-
+<Tanach>
     <book>
         <name lang="en" n="Joshua"/>
         <name lang="ru" n="Ехошуа" transliterated="true"/>
@@ -493,8 +487,6 @@
         <chapter n="2" length="17"/>
         <chapter n="3" length="24"/>
     </book>
-
-    <xi:include href="Psalms.xml"/>
 
     <book>
       <name lang="en" n="Proverbs"/>
