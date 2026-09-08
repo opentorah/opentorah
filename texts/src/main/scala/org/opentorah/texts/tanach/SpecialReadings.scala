@@ -54,7 +54,7 @@ object SpecialReadings:
    * Pesach by theirs, one table by all the fasts.
    */
   lazy val recorded: Map[(String, String), Haftarah.Recorded] = readings
-    .collect { case (key, (element, full)) if element.localName == "haftarah" =>
+    .collect { case (key, (element, full)) if element.isNamed("haftarah") =>
       key -> Haftarah.decodeRecorded(element, full)
     }
     .filterNot((_, recorded) => recorded.isEmpty)

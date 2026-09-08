@@ -36,9 +36,9 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
   it should "wrap exactly one torah, maftir or haftarah in each reading" in:
     for (day, name, reading) <- readings do
       val elements = reading.getChildren.flatMap(_.asElement)
-      withClue(s"$day/$name: ")(elements.map(_.localName) should have size 1)
+      withClue(s"$day/$name: ")(elements.map(_.getName.localName) should have size 1)
       withClue(s"$day/$name: ")
-        (Seq("torah", "maftir", "haftarah") should contain (elements.head.localName))
+        (Seq("torah", "maftir", "haftarah") should contain (elements.head.getName.localName))
 
   "the readings" should "all still parse and resolve" in:
     // forcing SpecialReadings parses every one of them; before the move, a
