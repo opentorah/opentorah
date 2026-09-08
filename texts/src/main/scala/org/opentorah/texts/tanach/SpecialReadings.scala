@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.Named
-import org.podval.xml.{XmlAst, XmlDecode, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
 import Torah.{Fragment, Maftir}
 
 /* All the special readings and their rules are here.
@@ -38,10 +38,10 @@ object SpecialReadings:
     val root: ZioXml.Element = XmlParser.parseResource(getClass, "SpecialReadings.xml")
       .fold(error => throw error, identity)
     val parsed: Seq[((String, String), (ZioXml.Element, Boolean))] = for
-      day <- XmlDecode.childrenNamed(root, "day")
-      reading <- XmlDecode.childrenNamed(day, "reading")
+      day <- root.childrenNamed("day")
+      reading <- day.childrenNamed("reading")
       element <- reading.getChildren.flatMap(_.asElement)
-    yield (XmlDecode.requireAttr(day, "n"), XmlDecode.requireAttr(reading, "n")) ->
+    yield (day.requireAttr("n"), reading.requireAttr("n")) ->
       (element, !reading.get("full").contains("false"))
     Collections.checkNoDuplicates(parsed.map(_._1), "special readings")
     parsed.toMap

@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Language}
-import org.podval.xml.{XmlAst, XmlCodec, XmlDecode, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
@@ -91,19 +91,19 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     def isEmpty: Boolean = annotations.isEmpty && variants.isEmpty
 
   def decode[E: XmlAst](element: E, full: Boolean): Customs =
-    XmlDecode.requireName(element, "haftarah")
+    element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     require(parsed.nones.isEmpty, "<none> in a reading that is not optional")
     parsed.customs
 
   def decodeRecorded[E: XmlAst](element: E, full: Boolean): Recorded =
-    XmlDecode.requireName(element, "haftarah")
+    element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     Recorded(parsed.annotations, parsed.variants)
 
   /** A reading in which a custom may read nothing; see `<none>`. */
   def decodeOptional[E: XmlAst](element: E, full: Boolean): OptionalCustoms =
-    XmlDecode.requireName(element, "haftarah")
+    element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full = false)
     val reading: Map[Custom, Option[Haftarah]] =
       Collections.mapValues(parsed.customs.customs)(Some(_)) ++ parsed.nones.map(_ -> None)

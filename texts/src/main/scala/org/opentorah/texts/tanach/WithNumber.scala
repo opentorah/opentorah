@@ -1,14 +1,14 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.podval.xml.{XmlAst, XmlDecode}
+import org.podval.xml.XmlAst
 
 final class WithNumber[T](val n: Int, val what: T)
 
 object WithNumber:
 
   def decode[T, E: XmlAst](element: E, what: E => T): WithNumber[T] =
-    WithNumber(XmlDecode.positiveInt(element, "n"), what(element))
+    WithNumber(element.positiveInt("n"), what(element))
 
   def requireConsecutive[T](result: Seq[WithNumber[T]], what: String): Unit =
     Collections.requireConsecutive(result, _.n, what)

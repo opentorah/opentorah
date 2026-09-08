@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.{XmlAst, XmlDecode, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -17,12 +17,12 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
     "SpecialReadings.xml"
   ).fold(error => throw error, identity)
 
-  private val days: Seq[ZioXml.Element] = XmlDecode.childrenNamed(root, "day")
+  private val days: Seq[ZioXml.Element] = root.childrenNamed("day")
 
   private val readings: Seq[(String, String, ZioXml.Element)] = for
     day <- days
-    reading <- XmlDecode.childrenNamed(day, "reading")
-  yield (XmlDecode.requireAttr(day, "n"), XmlDecode.requireAttr(reading, "n"), reading)
+    reading <- day.childrenNamed("reading")
+  yield (day.requireAttr("n"), reading.requireAttr("n"), reading)
 
   "SpecialReadings.xml" should "hold every reading, and each of them once" in:
     val keys: Seq[(String, String)] = readings.map((day, name, _) => (day, name))

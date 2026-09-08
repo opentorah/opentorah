@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.Named
-import org.podval.xml.{XmlAst, XmlDecode}
+import org.podval.xml.XmlAst
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -60,17 +60,17 @@ object Torah extends WithBookSpans[Chumash]:
     Torah(spans.map(inBook(bookSpan.book, _)))
 
   def decode[E: XmlAst](element: E): Torah =
-    XmlDecode.requireName(element, "torah")
-    XmlDecode.requireNoOther(element, Set("aliyah"))
+    element.requireName("torah")
+    element.requireNoOther(Set("aliyah"))
     val bookSpan: BookSpan = decodeSpan(element).resolve
-    val spans: Seq[Numbered] = XmlDecode.childrenNamed(element, "aliyah").map(el =>
+    val spans: Seq[Numbered] = element.childrenNamed("aliyah").map(el =>
       WithNumber.decode(el, e => SpanParsed.decode(e).defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
     )
     parseAliyot(bookSpan, spans, number = None)
 
   def decodeMaftir[E: XmlAst](element: E): Maftir =
-    XmlDecode.requireName(element, "maftir")
-    XmlDecode.requireNoOther(element, Set.empty)
+    element.requireName("maftir")
+    element.requireNoOther(Set.empty)
     decodeSpan(element).resolve
 
   def inBook(book: Chumash, span: Span): BookSpan = BookSpan(book, span)
