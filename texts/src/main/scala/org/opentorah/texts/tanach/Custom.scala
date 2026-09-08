@@ -1,12 +1,12 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.podval.metadata.{HasName, HasValues, Named, Names}
+import org.podval.metadata.{HasName, HasValues, Name, Named, Names}
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
-// The hierarchy lives in CustomTree.xml, not here. Assumptions: no cycles;
-// only Common has no parent.
+// The hierarchy is the nesting in Custom.xml, not declared on the enum.
+// Assumptions: a single root; no custom appears twice.
 enum Custom(nameOverride: Option[String] = None)
   extends Named.ByLoader[Custom](loader = Custom, nameOverride), HasName.Enum derives CanEqual:
   // lazy: resolving a parent needs the names, which the loader reads lazily.
@@ -53,31 +53,37 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
   override val valuesSeq: Seq[Custom] = values.toIndexedSeq
 
   /**
-   * The hierarchy, read from CustomTree.xml rather than declared in the enum,
-   * so that it can be edited as data. Lazy for the same reason the names are:
-   * resolving an entry needs the names, which the loader reads on demand.
+   * One catalog item per custom: names as `<name>` children, hierarchy as nested
+   * `<custom>`. Lazy for the same reason the names are: resolving an entry needs
+   * the names, which the loader reads on demand.
    */
-  private final case class TreeEntry(
-    @Modifier.config(XmlCodec.Attribute, "") n: String,
-    @Modifier.config(XmlCodec.Attribute, "") parent: Option[String] = None
+  @Modifier.config(XmlCodec.Element, "custom")
+  private final case class Entry(
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data],
+    @Modifier.config(XmlCodec.Element, "custom") children: Seq[Entry] = Seq.empty
   ) derives CanEqual
 
-  private object TreeEntry:
-    given schema: Schema[TreeEntry] = Schema.derived
-    val codec: XmlCodec[TreeEntry] = XmlCodec.derived
+  private object Entry:
+    given schema: Schema[Entry] = Schema.derived
+    val codec: XmlCodec[Entry] = XmlCodec.derived
 
-  private lazy val parents: Map[Custom, Option[Custom]] =
-    val parsed: Seq[TreeEntry] = XmlParser.loadCatalog(this, "CustomTree", TreeEntry.codec)
-    val entries: Seq[(String, Option[String])] = parsed.map(entry => (entry.n, entry.parent))
-    val byName: Map[String, Custom] = valuesSeq.map(custom => custom.name -> custom).toMap
-    val missing: Seq[String] = valuesSeq.map(_.name).filterNot(entries.map(_._1).contains)
-    require(missing.isEmpty, s"CustomTree.xml does not mention: ${missing.mkString(", ")}")
-    entries.map((name, parent) =>
-      val custom: Custom = byName.getOrElse(name, throw IllegalArgumentException(s"Unknown custom: $name"))
-      custom -> parent.map(p => byName.getOrElse(p, throw IllegalArgumentException(s"Unknown parent: $p")))
-    ).toMap
+  private lazy val loaded: (Seq[Names], Map[Custom, Option[Custom]]) =
+    def walk(entries: Seq[Entry], parent: Option[Custom]): Seq[(Custom, Names, Option[Custom])] =
+      entries.flatMap: entry =>
+        val names: Names = Names.fromDefaultName(None, entry.names.map(Name.fromData))
+        val custom: Custom = HasName.find(valuesSeq, names)
+        (custom, names, parent) +: walk(entry.children, Some(custom))
+    val walked: Seq[(Custom, Names, Option[Custom])] =
+      walk(XmlParser.loadCatalog(this, Entry.codec), None)
+    Collections.checkNoDuplicates(walked.map(_._1), "customs")
+    val parents: Map[Custom, Option[Custom]] = walked.map(node => node._1 -> node._3).toMap
+    val missing: Seq[Custom] = valuesSeq.filterNot(parents.contains)
+    require(missing.isEmpty, s"Custom.xml does not mention: ${missing.map(_.name).mkString(", ")}")
+    (walked.map(_._2), parents)
 
-  private[tanach] def parentOf(custom: Custom): Option[Custom] = parents(custom)
+  override protected def loadNames: Seq[Names] = loaded._1
+
+  private[tanach] def parentOf(custom: Custom): Option[Custom] = loaded._2(custom)
 
   val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 

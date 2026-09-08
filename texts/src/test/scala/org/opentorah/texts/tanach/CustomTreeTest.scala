@@ -4,8 +4,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 /**
- * The hierarchy is data now (CustomTree.xml), so the properties the code
- * relies on have to be asserted rather than guaranteed by the enum's shape.
+ * The hierarchy is data now (the nesting in Custom.xml), so the properties
+ * the code relies on have to be asserted rather than guaranteed by the enum.
  */
 final class CustomTreeTest extends AnyFlatSpec, Matchers:
 
@@ -24,9 +24,7 @@ final class CustomTreeTest extends AnyFlatSpec, Matchers:
         at = c.parent
       withClue(s"$custom does not reach Common: ")(seen should contain (Custom.Common))
 
-  it should "be named in Custom.xml too" in:
-    // Named.ByLoader resolves names through the loader; a custom missing from
-    // Custom.xml fails there, not here, so check both files list the same set.
+  it should "have names" in:
     for custom <- Custom.valuesSeq do
       withClue(s"$custom has no name: ")(custom.name should not be empty)
 

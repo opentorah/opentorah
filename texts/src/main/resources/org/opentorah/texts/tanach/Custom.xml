@@ -1,138 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Customs and their names. Nesting is the hierarchy: a custom with no
+  enclosing custom is a root; every other custom inherits a reading from
+  its parent when it states none of its own (see Custom.Of.find).
+  Custom.scala checks this file covers every enum value.
+-->
 <Custom>
-  <names>
+  <custom>
     <name n="Common" lang="en"/>
     <name n="Общий" lang="ru"/>
     <name n="כללי" lang="he"/>
-  </names>
-  <names>
-    <name n="Ashkenaz" lang="en" transliterated="true"/>
-    <name n="Ашкеназский " lang="ru"/>
-    <name n="אשכנז" lang="he"/>
-  </names>
-  <names>
-    <name n="Italki" lang="en" transliterated="true"/>
-    <name n="Итальянский" lang="ru"/>
-    <name n="יטלקי" lang="he"/>
-  </names>
-  <names>
-    <name n="Frankfurt" lang="en" transliterated="true"/>
-    <name n="Франкфуртский" lang="ru"/>
-    <name n="פרנקפורט" lang="he"/>
-  </names>
-  <names>
-    <name n="Lita" lang="en" transliterated="true"/>
-    <name n="Литовский" lang="ru"/>
-    <name n="ליטה" lang="he"/>
-  </names>
-  <names>
-    <name n="Chayey Odom" lang="en" transliterated="true"/>
-    <name n="Хаей адам" lang="ru"/>
-    <name n="חיי אדם" lang="he"/>
-  </names>
-  <names>
-    <name n="Hagra" lang="en" transliterated="true"/>
-    <name n="Агро" lang="ru"/>
-    <name n="הגרא" lang="he"/>
-  </names>
-  <names>
-    <name n="Sefard" lang="en" transliterated="true"/>
-    <name n="Сефардский" lang="ru"/>
-    <name n="ספרד" lang="he"/>
-  </names>
-  <names>
-    <name n="Chabad" lang="en" transliterated="true"/>
-    <name n="Хабад" lang="ru"/>
-    <name n="חבד" lang="he"/>
-  </names>
-  <names>
-    <name n="Magreb" lang="en" transliterated="true"/>
-    <name n="Магреб" lang="ru"/>
-    <name n="מגרב" lang="he"/>
-  </names>
-  <names>
-    <name n="Algeria" lang="en" transliterated="true"/>
-    <name n="Алжирский" lang="ru"/>
-    <name n="אלגיר" lang="he"/>
-  </names>
-  <names>
-    <name n="Morocco" lang="en" transliterated="true"/>
-    <name n="Марокко" lang="ru"/>
-    <name n="מרוקו" lang="he"/>
-  </names>
-  <names>
-    <name n="Fes" lang="en" transliterated="true"/>
-    <name n="Фес" lang="ru"/>
-    <name n="פאס" lang="he"/>
-  </names>
-  <names>
-    <name n="Toshbim" lang="en" transliterated="true"/>
-    <name n="Тошбим" lang="ru"/>
-    <name n="תושבים" lang="he"/>
-  </names>
-  <names>
-    <name n="Djerba" lang="en" transliterated="true"/>
-    <name n="Джерба" lang="ru"/>
-    <name n="דגרבה" lang="he"/>
-  </names>
-  <names>
-    <name n="Bavlim" lang="en" transliterated="true"/>
-    <name n="Вавилонский" lang="ru"/>
-    <name n="בבלים" lang="he"/>
-  </names>
-  <names>
-    <name n="Teiman" lang="en" transliterated="true"/>
-    <name n="Йеменский" lang="ru"/>
-    <name n="תימן" lang="he"/>
-  </names>
-  <names>
-    <name n="Baladi" lang="en" transliterated="true"/>
-    <name n="Балади" lang="ru"/>
-    <name n="בלדי" lang="he"/>
-  </names>
-  <names>
-    <name n="Shami" lang="en" transliterated="true"/>
-    <name n="Шами" lang="ru"/>
-    <name n="שאמי" lang="he"/>
-  </names>
-  <names>
-    <name n="Poznan" lang="en" transliterated="true"/>
-    <name n="Познанский" lang="ru"/>
-    <name n="פוזנא" lang="he"/>
-  </names>
-  <names>
-    <name n="Pure Sephardim" lang="en" transliterated="true"/>
-    <name n="Чистые сефарды" lang="ru"/>
-    <name n="ספרדים טהורים" lang="he"/>
-  </names>
-  <names>
-    <name n="Persia" lang="en" transliterated="true"/>
-    <name n="Персия и Бухара" lang="ru"/>
-    <name n="פרס ובוכרה" lang="he"/>
-  </names>
-  <names>
-    <name n="Libya" lang="en" transliterated="true"/>
-    <name n="Ливийский" lang="ru"/>
-    <name n="לוב" lang="he"/>
-  </names>
-  <names>
-    <name n="Algiers" lang="en" transliterated="true"/>
-    <name n="Алжир" lang="ru"/>
-    <name n="אלג׳יר" lang="he"/>
-  </names>
-  <names>
-    <name n="Romania" lang="en" transliterated="true"/>
-    <name n="Румыния (нусах романия)" lang="ru"/>
-    <name n="רומניא" lang="he"/>
-  </names>
-  <names>
-    <name n="Marrakesh" lang="en" transliterated="true"/>
-    <name n="Марракеш" lang="ru"/>
-    <name n="מראכש" lang="he"/>
-  </names>
-  <names>
-    <name n="Agadir" lang="en" transliterated="true"/>
-    <name n="Агадир" lang="ru"/>
-    <name n="אגדיר" lang="he"/>
-  </names>
+
+    <custom>
+      <name n="Ashkenaz" lang="en" transliterated="true"/>
+      <name n="Ашкеназский " lang="ru"/>
+      <name n="אשכנז" lang="he"/>
+
+      <custom>
+        <name n="Italki" lang="en" transliterated="true"/>
+        <name n="Итальянский" lang="ru"/>
+        <name n="יטלקי" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Frankfurt" lang="en" transliterated="true"/>
+        <name n="Франкфуртский" lang="ru"/>
+        <name n="פרנקפורט" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Poznan" lang="en" transliterated="true"/>
+        <name n="Познанский" lang="ru"/>
+        <name n="פוזנא" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Lita" lang="en" transliterated="true"/>
+        <name n="Литовский" lang="ru"/>
+        <name n="ליטה" lang="he"/>
+        <custom>
+          <name n="Chayey Odom" lang="en" transliterated="true"/>
+          <name n="Хаей адам" lang="ru"/>
+          <name n="חיי אדם" lang="he"/>
+        </custom>
+      </custom>
+      <custom>
+        <name n="Hagra" lang="en" transliterated="true"/>
+        <name n="Агро" lang="ru"/>
+        <name n="הגרא" lang="he"/>
+      </custom>
+    </custom>
+
+    <custom>
+      <name n="Sefard" lang="en" transliterated="true"/>
+      <name n="Сефардский" lang="ru"/>
+      <name n="ספרד" lang="he"/>
+
+      <custom>
+        <name n="Chabad" lang="en" transliterated="true"/>
+        <name n="Хабад" lang="ru"/>
+        <name n="חבד" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Pure Sephardim" lang="en" transliterated="true"/>
+        <name n="Чистые сефарды" lang="ru"/>
+        <name n="ספרדים טהורים" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Persia" lang="en" transliterated="true"/>
+        <name n="Персия и Бухара" lang="ru"/>
+        <name n="פרס ובוכרה" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Libya" lang="en" transliterated="true"/>
+        <name n="Ливийский" lang="ru"/>
+        <name n="לוב" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Magreb" lang="en" transliterated="true"/>
+        <name n="Магреб" lang="ru"/>
+        <name n="מגרב" lang="he"/>
+        <custom>
+          <name n="Algeria" lang="en" transliterated="true"/>
+          <name n="Алжирский" lang="ru"/>
+          <name n="אלגיר" lang="he"/>
+          <custom>
+            <name n="Algiers" lang="en" transliterated="true"/>
+            <name n="Алжир" lang="ru"/>
+            <name n="אלג׳יר" lang="he"/>
+          </custom>
+        </custom>
+        <custom>
+          <name n="Toshbim" lang="en" transliterated="true"/>
+          <name n="Тошбим" lang="ru"/>
+          <name n="תושבים" lang="he"/>
+        </custom>
+        <custom>
+          <name n="Djerba" lang="en" transliterated="true"/>
+          <name n="Джерба" lang="ru"/>
+          <name n="דגרבה" lang="he"/>
+        </custom>
+        <custom>
+          <name n="Morocco" lang="en" transliterated="true"/>
+          <name n="Марокко" lang="ru"/>
+          <name n="מרוקו" lang="he"/>
+          <custom>
+            <name n="Fes" lang="en" transliterated="true"/>
+            <name n="Фес" lang="ru"/>
+            <name n="פאס" lang="he"/>
+          </custom>
+          <!-- Marrakesh stands for Bogmaz too: Asulin never separates them, and no
+               reading we have tells them apart. -->
+          <custom>
+            <name n="Marrakesh" lang="en" transliterated="true"/>
+            <name n="Марракеш" lang="ru"/>
+            <name n="מראכש" lang="he"/>
+          </custom>
+          <custom>
+            <name n="Agadir" lang="en" transliterated="true"/>
+            <name n="Агадир" lang="ru"/>
+            <name n="אגדיר" lang="he"/>
+          </custom>
+        </custom>
+      </custom>
+      <custom>
+        <name n="Bavlim" lang="en" transliterated="true"/>
+        <name n="Вавилонский" lang="ru"/>
+        <name n="בבלים" lang="he"/>
+      </custom>
+      <custom>
+        <name n="Teiman" lang="en" transliterated="true"/>
+        <name n="Йеменский" lang="ru"/>
+        <name n="תימן" lang="he"/>
+        <custom>
+          <name n="Baladi" lang="en" transliterated="true"/>
+          <name n="Балади" lang="ru"/>
+          <name n="בלדי" lang="he"/>
+        </custom>
+        <custom>
+          <name n="Shami" lang="en" transliterated="true"/>
+          <name n="Шами" lang="ru"/>
+          <name n="שאמי" lang="he"/>
+        </custom>
+      </custom>
+    </custom>
+
+    <!--
+      Romania is neither Ashkenaz nor Sefard. hamichlol notes that its readings
+      follow the old Erets Yisrael rite, "לעומת מנהגי שאר העדות שמבוססים על המנהג
+      הבבלי": as against the other rites, which follow the Babylonian custom.
+      Parenting it to either would make its fallback claim the wrong tradition, so
+      it hangs off Common and states its own readings.
+
+      It says the same again of a particular reading: "ונראה שמנהג זה מבוסס על
+      מסורה ארצישראלית, כמו רוב ההפטרות של רומניא": it appears this practice
+      rests on an Erets Yisrael tradition, as do most of the Romania haftarot.
+    -->
+    <custom>
+      <name n="Romania" lang="en" transliterated="true"/>
+      <name n="Румыния (нусах романия)" lang="ru"/>
+      <name n="רומניא" lang="he"/>
+    </custom>
+  </custom>
 </Custom>
