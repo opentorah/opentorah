@@ -103,7 +103,7 @@ object Tanach extends Stores[?]:
   private object Part extends Names.Loader[Part[?]]:
     override def valuesSeq: Seq[Part[?]] = Seq(All, Chumash, Nach, Prophets, EarlyProphets, LateProphets, TreiAsar, Writings)
 
-  override def stores: Seq[Store] = Seq(
+  override lazy val stores: Seq[Store] = Seq(
     By("book", Book.valuesSeq),
     By("part", Seq(Chumash, Prophets, Writings)),
     Alias(Chumash.names, "/part/Chumash"),

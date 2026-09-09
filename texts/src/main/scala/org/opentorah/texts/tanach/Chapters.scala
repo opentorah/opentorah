@@ -51,22 +51,20 @@ final class Chapters(chapters: Seq[Int]):
     require(contains(span))
     consecutive(spans) && (spans.head.from == span.from) && (spans.last.to == span.to)
 
-  def byChapter: By[Chapter] = byChapter(full)
+  lazy val byChapter: By[Chapter] = axis(full)
 
-  def byChapter(span: Span): By[Chapter] = Chapters.ByChapter(span, this)
+  def byChapter(span: Span): By[Chapter] = if span == full then byChapter else axis(span)
+
+  private def axis(span: Span): By[Chapter] = By.numbered("chapter", span.from.chapter, span.to.chapter):
+    (number, parent) =>
+      new Chapter(
+        number,
+        from = if number == span.from.chapter then span.from.verse else 1,
+        to = if number == span.to.chapter then span.to.verse else this.length(number)
+      ):
+        override def oneOf: NumberedStores[Chapter] = parent
 
 object Chapters:
-  final class ByChapter(span: Span, chapters: Chapters) extends By.Numbered[Chapter]("chapter"):
-    override def minNumber: Int = span.from.chapter
-    override def maxNumber: Int = span.to.chapter
-
-    override protected def createNumberedStore(number: Int): Chapter = new Chapter(
-      number,
-      from = if number == minNumber then span.from.verse else 1,
-      to =   if number == maxNumber then span.to.verse   else chapters.length(number)
-    ):
-      override def oneOf: NumberedStores[Chapter] = ByChapter.this
-
   class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends By.Numbered[NumberedStore](selectorName):
     override def minNumber: Int = 1
     override def length: Int = spans.length
@@ -74,4 +72,5 @@ object Chapters:
 
     private class ForSpan(override val number: Int) extends NumberedStore with Stores[?]:
       override def oneOf: NumberedStores[NumberedStore] = BySpan.this
-      override def stores: Seq[By[?]] = Seq(chapters.byChapter(spans(number-1)))
+      private lazy val byChapter: By[Chapter] = chapters.byChapter(spans(number - 1))
+      override def stores: Seq[By[?]] = Seq(byChapter)

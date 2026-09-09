@@ -7,7 +7,7 @@ import org.podval.store.By
 trait ChumashBook extends TanachBook:
   lazy val parshiot: Seq[Parsha] = Parsha.forChumash(this)
 
-  override def stores: Seq[By[?]] = Seq(
+  override lazy val stores: Seq[By[?]] = Seq(
     chapters.byChapter,
     By("parsha", parshiot)
   )

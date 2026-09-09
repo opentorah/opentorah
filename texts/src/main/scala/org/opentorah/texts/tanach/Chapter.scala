@@ -4,9 +4,9 @@ import org.podval.store.{By, NumberedStore, NumberedStores, Stores}
 
 abstract class Chapter(override val number: Int, from: Int, to: Int) extends NumberedStore, Stores[?]:
   def length: Int = to - from + 1
-  override def stores: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
 
-object Chapter:
-  final class ByVerse(override val minNumber: Int, override val maxNumber: Int) extends By.Numbered[Verse]("verse"):
-    override protected def createNumberedStore(number: Int): Verse = new Verse(number):
-      override def oneOf: NumberedStores[Verse] = ByVerse.this
+  private lazy val verses: By[Verse] = By.numbered("verse", from, to): (number, parent) =>
+    new Verse(number):
+      override def oneOf: NumberedStores[Verse] = parent
+
+  override def stores: Seq[By[?]] = Seq(verses)

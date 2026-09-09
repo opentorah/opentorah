@@ -9,7 +9,7 @@ trait TanachBook extends HasName, Stores[?] derives CanEqual: // all deriveds ar
 
   private[tanach] final def chapters: Chapters = TanachBook.chapters(this)
 
-  override def stores: Seq[By[?]] = Seq(chapters.byChapter)
+  override lazy val stores: Seq[By[?]] = Seq(chapters.byChapter)
 
   private[tanach] def parse(names: Names, chapters: Chapters, dto: BookDto): TanachBook.Parsed
 

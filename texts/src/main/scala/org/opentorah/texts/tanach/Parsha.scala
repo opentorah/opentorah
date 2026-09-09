@@ -93,9 +93,9 @@ enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
 
   final def haftarah: Haftarah.Customs = Haftarah.haftarah(this).map(_.from(this))
 
-  override def stores: Seq[By[?]] = Seq(
-    Chapters.ByChapter(span, book.chapters)
-  )
+  private lazy val byChapter: By[Chapter] = book.chapters.byChapter(span)
+
+  override def stores: Seq[By[?]] = Seq(byChapter)
 
 object Parsha extends HasValues.Distance[Parsha]:
   override val valuesSeq: Seq[Parsha] = values.toIndexedSeq

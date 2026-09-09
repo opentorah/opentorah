@@ -88,3 +88,10 @@ final class TanachTest extends TestBase(Tanach):
     )
 //    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
 
+  it should "return the same numbered store on a second resolve" in:
+    resolveLast("/book/Genesis/chapter/1/verse/1") should be theSameInstanceAs
+      resolveLast("/book/Genesis/chapter/1/verse/1")
+
+  it should "not equate chapters of different books" in:
+    resolveLast("/book/Genesis/chapter/1") should not equal resolveLast("/book/Exodus/chapter/1")
+
