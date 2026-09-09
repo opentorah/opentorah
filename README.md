@@ -6,35 +6,6 @@ TODO convert READMEs to AsciiDoc and move them into /docs
 
 [Writings](http://www.opentorah.org) on the subject.
 
-## XML processing ##
-
-### XML generation ###
-
-In web-apps, I need to generate XML. I tried using [ScalaTags](https://com-lihaoyi.github.io/scalatags/) for that,
-and they work, but there is no clean [interoperability](https://github.com/lihaoyi/scalatags/issues/102) with Scala XML,
-so generating - say - HTML wrappers for XML parsed from files is not pleasant, and since ScalaTags does not (in my
-opinion) have obvious advantages over Scala XML, I decided not to bother with it.
-
-### XML pretty-printing ###      
-
-Scala XML does provide a pretty-printer, but it doesn't do what I need it to do, especially when formatting
-TEI documents. For instance, it inserts a break between `</e1>` and `<e2>` in `<e1>...</e1><e2>...</e2>` and
-between `</e1>` and `text` in `<e1>...</e1>text`, thus separating notes from what they are notes on and
-punctuation from its content by spaces. Attempts to modify the behavior of the Scala XML pretty-printer
-(or at least to fix what looks like an obvious bug in its `Print.merge`) were not successful,
-so I started looking for alternatives.
-
-[Compact, Streaming Pretty-Printing of Hierarchical Data](https://www.lihaoyi.com/post/CompactStreamingPrettyPrintingofHierarchicalData.html)
-looked promising, but it looks like to fine-tune behavior of the pretty-printer, I'd have to rework the code each time:
-as with ScalaTags, [Li Haoyi's](https://www.lihaoyi.com) focus seems to be performance, but I need flexibility to get
-the format I want without rewriting the whole algorithm for each experiment...
-
-I remembered a paper by [Phil Wadler](http://homepages.inf.ed.ac.uk/wadler/) on  pretty-printing:
-[A prettier printer](https://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf),
-and almost started implementing it in Scala, but it turns out that there is an implementation already:
-[Typelevel Paiges](https://github.com/typelevel/paiges). With its declarative approach, I was able to
-tweak the output to my liking :)
-
 
 ## Code Structure ##
 
@@ -87,6 +58,6 @@ The first reason is not that compelling either: Gradle doesn't block cyclical in
 Besides, relying on Gradle in this respect means putting every cohesive package in a separate module, which seems excessive.
 
 As a result, I currently use the fewest number of modules approach: code is separated in a module only if it needs
-to be deployed separately, as a website (docs), or a service (collector, texts).
+to be deployed separately, as a website (docs), or a service (texts).
 
 If users that need just the calendar code appear, I'll think about splitting that ;)

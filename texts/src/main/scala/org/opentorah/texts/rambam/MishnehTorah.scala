@@ -3,12 +3,11 @@ package org.opentorah.texts.rambam
 import org.opentorah.util.Collections
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Selector, Store, Stores}
-import org.podval.xml.{XmlCodec, XmlParser}
+import org.podval.xml.{Xml, XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
-// TODO parse the names of the book itself! (and probably do the same for Tanach?)
 object MishnehTorah extends Stores[?]:
-  override val names: Names = Names("Mishneh Torah")
+  override lazy val names: Names = Names(work.names.map(Name.fromData))
 
   final class Book(
     val number: Int,
@@ -88,8 +87,22 @@ object MishnehTorah extends Stores[?]:
     @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty
   ) derives CanEqual
 
+  private final case class WorkDto(
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "book") books: Seq[BookDto] = Seq.empty
+  ) derives CanEqual
+
+  private object WorkDto:
+    given schema: Schema[WorkDto] = Schema.derived
+    val codec: XmlCodec[WorkDto] = XmlCodec.derived
+
+  private lazy val work: WorkDto =
+    XmlParser.parseResource[Xml.Element](getClass, "MishnehTorah.xml")
+      .flatMap(WorkDto.codec.decode)
+      .fold(error => throw error, identity)
+
   lazy val books: Seq[Book] =
-    val result: Seq[Book] = XmlParser.loadCatalog(this, BookDto.codec).map(BookDto.toBook)
+    val result: Seq[Book] = work.books.map(BookDto.toBook)
     Collections.requireConsecutive(result, _.number, "book", from = 0, count = Some(15))
     result
 

@@ -16,13 +16,14 @@ trait PsalmsBook extends NachBook:
 
   override lazy val stores: Seq[By[?]] = Seq(
     chapters.byChapter,
-    // TODO override to/from name(s)/number
     Chapters.BySpan("book", books, chapters),
     Chapters.BySpan("day", days, chapters),
     new Chapters.BySpan("day of the week", weekDays, chapters):
-      // Recognize names of the days of the week:
-      override def name2number(name: String): Option[Int] = super.name2number(name)
-        .orElse(Week.Day.forDefaultName(name).map(_.ordinal + 1))
+      override def name2number(name: String): Option[Int] =
+        super.name2number(name).orElse:
+          Week.Day.valuesSeq.find(_.names.hasName(name)).map(_.ordinal + 1)
+      override def number2names(number: Int): Names =
+        Names(super.number2names(number).names ++ Week.Day.forNumber(number).names.names)
   )
 
   override def parse(names: Names, chapters: Chapters, dto: BookDto): PsalmsBook.Parsed =

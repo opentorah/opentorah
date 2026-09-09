@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Structure of Yad HaChazoko -->
 <MishnehTorah>
+  <name lang="en">Mishneh Torah</name>
   <book n="0">
     <name lang="he" n=".. הקדמת הרמב״ם"/>
     <name lang="ru">Предисловие автора</name>

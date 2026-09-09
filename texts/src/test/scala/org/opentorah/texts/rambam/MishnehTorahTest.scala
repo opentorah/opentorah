@@ -8,6 +8,9 @@ final class MishnehTorahTest extends TestBase(MishnehTorah):
   "Mishneh Torah" should "load books" in:
     MishnehTorah.books.length shouldBe 15
 
+  it should "load names of the work from XML" in:
+    MishnehTorah.names.hasName("Mishneh Torah") shouldBe true
+
   it should "contain named books and parts" in:
     checkName("/book/The Book of Knowledge", "Sefer Madda")
     checkName("/book/Sefer Madda/part/Yesodei haTorah", "foundations of Torah")

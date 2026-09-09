@@ -80,6 +80,10 @@ final class TanachTest extends TestBase(Tanach):
 
   it should "contain /book/Psalms/day of the week/Friday/chapter/119/verse/150" in:
     checkName("/book/Psalms/day of the week/Friday/chapter/119/verse/150", "150")
+    val friday = resolve("/book/Psalms/day of the week/Friday/chapter/119/verse/150")
+    val numbered = resolve("/book/Psalms/day of the week/6/chapter/119/verse/150")
+    friday.structureNames should contain("Friday")
+    numbered.toUrl shouldBe friday.toUrl
 
   it should "be walkable" in:
     val paths: Seq[Path] = Tanach.getPaths(
