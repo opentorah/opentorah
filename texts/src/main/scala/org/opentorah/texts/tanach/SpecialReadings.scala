@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.podval.metadata.Named
+import org.podval.metadata.HasNames
 import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
 import Torah.{Fragment, Maftir}
 
@@ -75,24 +75,24 @@ object SpecialReadings:
   private def haftarahOptionalFor(day: String, name: String): Haftarah.OptionalCustoms =
     parseHaftarahOptional(readingFor(day, name)._1)
 
-  private def fromDay(named: Named, torah: Torah): Torah = torah.fromWithNumbers(named)
+  private def fromDay(named: HasNames, torah: Torah): Torah = torah.fromWithNumbers(named)
 
-  private def fromDay(named: Named, maftir: Maftir): Maftir = maftir.from(named)
+  private def fromDay(named: HasNames, maftir: Maftir): Maftir = maftir.from(named)
 
-  private def fromDay(named: Named, haftarah: Haftarah.Customs): Haftarah.Customs =
+  private def fromDay(named: HasNames, haftarah: Haftarah.Customs): Haftarah.Customs =
     haftarah.map(_.from(named), full = false)
 
-  private def fromDayOptional(named: Named, haftarah: Haftarah.OptionalCustoms): Haftarah.OptionalCustoms =
+  private def fromDayOptional(named: HasNames, haftarah: Haftarah.OptionalCustoms): Haftarah.OptionalCustoms =
     haftarah.map(_.map(_.from(named)), full = false)
 
   sealed trait WeekdayReading:
-    def weekday(day: Named): Reading
+    def weekday(day: HasNames): Reading
 
   sealed trait ShabbosReading:
-    def shabbos(day: Named): Reading
+    def shabbos(day: HasNames): Reading
 
   sealed trait AfternoonReading:
-    def afternoon(day: Named): Reading
+    def afternoon(day: HasNames): Reading
 
   /**
    * Read at night, after maariv. Only Simchas Torah has one, and only some
@@ -103,7 +103,7 @@ object SpecialReadings:
    * haftarah at night anyway.
    */
   sealed trait EveningReading:
-    def evening(day: Named): Evening
+    def evening(day: HasNames): Evening
 
   /**
    * A night reading. The practices are nested rather than alternative, so the
@@ -119,11 +119,11 @@ object SpecialReadings:
   )
 
   sealed trait ShabbosAndWeekdayReading extends ShabbosReading, WeekdayReading:
-    final override def weekday(day: Named): Reading = getReading(weekdayTorah, day)
+    final override def weekday(day: HasNames): Reading = getReading(weekdayTorah, day)
 
-    final override def shabbos(day: Named): Reading = getReading(shabbosTorah, day)
+    final override def shabbos(day: HasNames): Reading = getReading(shabbosTorah, day)
 
-    private def getReading(torah: Torah, day: Named): Reading =
+    private def getReading(torah: Torah, day: HasNames): Reading =
       simpleReading(day, torah, maftir, haftarah)
 
     protected def shabbosTorah: Torah
@@ -136,7 +136,7 @@ object SpecialReadings:
 
   object ErevRoshChodesh:
     def correct(
-      day: Named,
+      day: HasNames,
       isSpecialShabbos: Boolean,
       isRoshChodesh: Boolean,
       isMonthTevesAvElul: Boolean,
@@ -173,7 +173,7 @@ object SpecialReadings:
     // Ashkenaz and Sefard divide these aliyot the same way, so the division is
     // stated once for Common: naming the two of them instead would leave any
     // custom that hangs off Common directly -- Romania -- without a reading.
-    def weekday(day: Named): Reading = readingByCutom(day,
+    def weekday(day: HasNames): Reading = readingByCutom(day,
       Custom.Common -> ashkenazSefard,
       Custom.Hagra  -> hagra
     )
@@ -190,7 +190,7 @@ object SpecialReadings:
       val hagra = Torah.aliyot(aliya1, aliya2Hagra, aliya3, aliya4)
       (ashkenazSefard, hagra)
 
-    def in3aliyot(day: Named): Torah = Torah.aliyot(
+    def in3aliyot(day: HasNames): Torah = Torah.aliyot(
       (torah.head+torah(1)+torah(2)).from(day.andNumbers(1, 2)     ), // 1-5
       (torah(3)+torah(4)           ).from(day.andNumber (3)), // 6-10
       torah(5)                      .from(day.andNumber (4))  // 11-15
@@ -198,11 +198,11 @@ object SpecialReadings:
 
     private val shabbosMaftir: Maftir = torah(4)+torah(5) // 9-15
 
-    def addShabbosMaftirAs7thAliyah(reading: Reading, day: Named): Reading =
+    def addShabbosMaftirAs7thAliyah(reading: Reading, day: HasNames): Reading =
       reading.transformTorah(torah => to6withLast(torah, fromDay(day, shabbosMaftir)))
 
     def correct(
-      day: Named,
+      day: HasNames,
       isSpecialShabbos: Boolean,
       isMonthTeves: Boolean,
       isMonthAv: Boolean,
@@ -284,7 +284,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = haftarahFor("RoshHashanah1", "haftarah")
 
   object RoshHashanah2 extends WeekdayReading:
-    final override def weekday(day: Named): Reading = simpleReading(
+    final override def weekday(day: HasNames): Reading = simpleReading(
       day,
       torah = torah,
       maftir = maftir,
@@ -306,7 +306,7 @@ object SpecialReadings:
 
     override protected val maftir: Maftir = maftirFor("YomKippur", "maftir")
 
-    override def afternoon(day: Named): Reading = Reading(
+    override def afternoon(day: HasNames): Reading = Reading(
       torah = fromDay(day, afternoonTorah),
       maftir = None,
       haftarah = fromDay(day, afternoonHaftarah)
@@ -340,7 +340,7 @@ object SpecialReadings:
 
   object SuccosIntermediate:
 
-    def weekday(day: Named, intermediateDayNumber: Int, inHolyLand: Boolean): Reading =
+    def weekday(day: HasNames, intermediateDayNumber: Int, inHolyLand: Boolean): Reading =
       if intermediateDayNumber == 6 then require(inHolyLand)
 
       // Do not go beyond 6th fragment of korbanot.
@@ -359,7 +359,7 @@ object SpecialReadings:
         Custom.Sefard -> sefard
       )
 
-    def shabbos(day: Named, intermediateDayNumber: Int, inHolyLand: Boolean): Reading = simpleReading(
+    def shabbos(day: HasNames, intermediateDayNumber: Int, inHolyLand: Boolean): Reading = simpleReading(
       day,
       torah = IntermediateShabbos.torah,
       maftir = korbanotToday(intermediateDayNumber, inHolyLand),
@@ -387,7 +387,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = haftarahFor("SheminiAtzeres", "haftarah")
 
   object SimchasTorah extends WeekdayReading, EveningReading:
-    final override def weekday(day: Named): Reading = Reading(
+    final override def weekday(day: HasNames): Reading = Reading(
       torah(day),
       Some(fromDay(day, maftir)),
       fromDay(day, haftarah)
@@ -395,7 +395,7 @@ object SpecialReadings:
 
     private val chassanBereishis: Fragment = torahFor("SimchasTorah", "chassanBereishis").spans.head
 
-    private def torah(day: Named): Torah =
+    private def torah(day: HasNames): Torah =
       to6withLast(fromDay(day, Parsha.VezosHaberachah.days.common), fromDay(day, chassanBereishis))
 
     private def maftir: Maftir = SheminiAtzeres.maftir
@@ -410,28 +410,28 @@ object SpecialReadings:
      * Sukkos. Not a Custom.Of variant: the two belong to the same custom, and
      * the Torah readings carry no variant of their own the way haftarot do.
      */
-    override def evening(day: Named): Evening = Evening(
+    override def evening(day: HasNames): Evening = Evening(
       torah = eveningAliyot(day, 5),
       note = "Read by Ashkenaz, and not by all of them. Some read only the " +
              "first three of these aliyot. The split does not follow rite " +
              "lines. Nitei Gavriel, Hilchos Sukkos."
     )
 
-    private def eveningAliyot(day: Named, count: Int): Custom.Of[Option[Torah]] =
+    private def eveningAliyot(day: HasNames, count: Int): Custom.Of[Option[Torah]] =
       val ashkenaz: Torah = Parsha.VezosHaberachah.days.doFind(Custom.Ashkenaz)
       val torah: Torah = fromDay(day, Torah(ashkenaz.spans.take(count)))
       Custom.Of(Map(Custom.Common -> None, Custom.Ashkenaz -> Some(torah)))
 
 
   object SheminiAtzeresAndSimchasTorahInHolyLand extends WeekdayReading, ShabbosReading:
-    final override def weekday(day: Named): Reading = SimchasTorah.weekday(day)
+    final override def weekday(day: HasNames): Reading = SimchasTorah.weekday(day)
 
-    override def shabbos(day: Named): Reading = weekday(day)
+    override def shabbos(day: HasNames): Reading = weekday(day)
 
   object Chanukah:
     final def shabbos(
-      day: Named,
-      roshChodeshDay: Option[Named],
+      day: HasNames,
+      roshChodeshDay: Option[HasNames],
       dayNumber: Int,
       weeklyReading: WeeklyReading
     ): Reading =
@@ -442,8 +442,8 @@ object SpecialReadings:
       roshChodeshDay.fold(result)(roshChodeshDay => RoshChodesh.addShabbosMaftirAs7thAliyah(result, roshChodeshDay))
 
     final def weekday(
-      day: Named,
-      roshChodeshDay: Option[Named],
+      day: HasNames,
+      roshChodeshDay: Option[HasNames],
       dayNumber: Int,
     ): Reading =
       val (
@@ -490,8 +490,8 @@ object SpecialReadings:
   sealed trait SpecialParsha:
     final def transform(
       reading: Reading,
-      day: Named,
-      roshChodeshDay: Option[Named]
+      day: HasNames,
+      roshChodeshDay: Option[HasNames]
     ): Reading =
       val result = replaceMaftirAndHaftarah(
         reading,
@@ -515,14 +515,14 @@ object SpecialReadings:
     override val haftarah: Haftarah.Customs = haftarahFor("ParshasZachor", "haftarah")
 
   object Purim extends WeekdayReading:
-    override def weekday(day: Named): Reading = Reading(fromDay(day, torah))
+    override def weekday(day: HasNames): Reading = Reading(fromDay(day, torah))
 
     val torah: Torah = torahFor("Purim", "torah")
 
   object ShushanPurim extends WeekdayReading:
-    override def weekday(day: Named): Reading = Reading(fromDay(day, Purim.torah))
+    override def weekday(day: HasNames): Reading = Reading(fromDay(day, Purim.torah))
 
-    def shabbos(day: Named, weeklyReading: WeeklyReading): Reading = replaceMaftirAndHaftarah(
+    def shabbos(day: HasNames, weeklyReading: WeeklyReading): Reading = replaceMaftirAndHaftarah(
       weeklyReading.getMorningReading,
       maftir = fromDay(day, shabbosMaftir),
       haftarah = ParshasZachor.haftarah
@@ -541,7 +541,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = haftarahFor("ParshasHachodesh", "haftarah")
 
   object ShabbosHagodol:
-    def transform(day: Named, isErevPesach: Boolean, reading: Reading): Reading =
+    def transform(day: HasNames, isErevPesach: Boolean, reading: Reading): Reading =
       reading.transform[Haftarah](fromDay(day, haftarah),
         (custom: Custom, readingCustom: Reading.ReadingCustom, haftarah: Haftarah) =>
           if (custom == Custom.Chabad) && !isErevPesach then readingCustom
@@ -551,12 +551,12 @@ object SpecialReadings:
     private val haftarah: Haftarah.Customs = haftarahFor("ShabbosHagodol", "haftarah")
 
   object PesachIntermediate extends ShabbosReading:
-    final def weekday(day: Named, isPesachOnChamishi: Boolean, dayNumber: Int): Reading =
+    final def weekday(day: HasNames, isPesachOnChamishi: Boolean, dayNumber: Int): Reading =
       val realDayNumber: Int =
         if isPesachOnChamishi && ((dayNumber == 4) || (dayNumber == 5)) then dayNumber-1 else dayNumber
       Reading(fromDay(day, first5(realDayNumber) :+ shabbosMaftir))
 
-    final override def shabbos(day: Named): Reading = simpleReading(
+    final override def shabbos(day: HasNames): Reading = simpleReading(
       day,
       torah = IntermediateShabbos.torah,
       maftir = shabbosMaftir,
@@ -603,7 +603,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = haftarahFor("Pesach1", "haftarah")
 
   object Pesach2 extends WeekdayReading:
-    final override def weekday(day: Named): Reading = simpleReading(
+    final override def weekday(day: HasNames): Reading = simpleReading(
       day,
       torah = torah,
       maftir = maftir,
@@ -635,7 +635,7 @@ object SpecialReadings:
     override protected val haftarah: Haftarah.Customs = haftarahFor("Pesach8", "haftarah")
 
   object Shavuos1 extends WeekdayReading:
-    final override def weekday(day: Named): Reading = simpleReading(
+    final override def weekday(day: HasNames): Reading = simpleReading(
       day,
       torah = torah,
       maftir = maftir,
@@ -670,7 +670,7 @@ object SpecialReadings:
       haftarahOptionalFor("Fast", "defaultAfternoonHaftarah")
 
   sealed trait Fast extends WeekdayReading, AfternoonReading:
-    override def afternoon(day: Named): Reading =
+    override def afternoon(day: HasNames): Reading =
       val torah: Torah = fromDay(day, Fast.torah)
       val haftarah: Haftarah.OptionalCustoms = fromDayOptional(day, afternoonHaftarah)
       new Reading(
@@ -700,7 +700,7 @@ object SpecialReadings:
     protected def afternoonHaftarahExceptions: Option[Haftarah.OptionalCustoms] = None
 
   sealed trait NonTishaBeAvFast extends Fast:
-    final override def weekday(day: Named): Reading = Reading(fromDay(day, Fast.torah))
+    final override def weekday(day: HasNames): Reading = Reading(fromDay(day, Fast.torah))
 
   object FastOfGedalia extends NonTishaBeAvFast:
     override protected val afternoonHaftarahExceptions: Option[Haftarah.OptionalCustoms] =
@@ -713,7 +713,7 @@ object SpecialReadings:
   object FastOfTammuz extends NonTishaBeAvFast
 
   object TishaBeAv extends Fast:
-    final override def weekday(day: Named): Reading = Reading(
+    final override def weekday(day: HasNames): Reading = Reading(
       torah = fromDay(day, torah),
       maftir = None,
       haftarah = fromDay(day, haftarah)
@@ -775,11 +775,11 @@ object SpecialReadings:
 
   private def to6withLast(torah: Torah, last: Torah.Aliyah): Torah = torah.drop(Set(7)) :+ last
 
-  private def readingByCutom(day: Named, customs: (Custom, Torah)*): Reading =
+  private def readingByCutom(day: HasNames, customs: (Custom, Torah)*): Reading =
     Reading(Custom.Of(customs.map((custom, torah) => (custom, fromDay(day, torah))).toMap))
 
   private def simpleReading(
-    day: Named,
+    day: HasNames,
     torah: Torah,
     maftir: Maftir,
     haftarah: Haftarah.Customs
@@ -799,7 +799,7 @@ object SpecialReadings:
   )
 
   private def transformMaftirAndHaftarah(
-    day: Named,
+    day: HasNames,
     transformer: (
       Custom,
       Reading.ReadingCustom,

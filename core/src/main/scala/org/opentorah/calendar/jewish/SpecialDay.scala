@@ -1,16 +1,16 @@
 package org.opentorah.calendar.jewish
 
-import org.podval.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, HasNames, Names}
 import Jewish.{Day, Year}
 import Jewish.Month.*
 
-sealed trait SpecialDay extends Named derives CanEqual: // all deriveds are objects; using eq
+sealed trait SpecialDay extends HasNames derives CanEqual: // all deriveds are objects; using eq
   def date(year: Year): Day
   final def correctedDate(year: Year): Day = correctDate(date(year))
   protected def correctDate(date: Day): Day = date
 
 private sealed class LoadNames(name: String)
-  extends Named.ByLoader[LoadNames](loader = SpecialDay, nameOverride = Some(name)), HasName.NonEnum
+  extends HasNames.ByLoader[LoadNames](loader = SpecialDay, nameOverride = Some(name)), HasName.NonEnum
 
 object SpecialDay extends Names.Loader[LoadNames]:
   sealed trait PostponeOnShabbos extends SpecialDay:
@@ -108,7 +108,7 @@ object SpecialDay extends Names.Loader[LoadNames]:
 
   private object Chanukah extends LoadNames("Chanukah")
 
-  sealed class Chanukah(override val dayNumber: Int) extends Named, DayOf, RabbinicFestival:
+  sealed class Chanukah(override val dayNumber: Int) extends HasNames, DayOf, RabbinicFestival:
     final override lazy val names: Names = namesWithNumber(Chanukah, dayNumber)
     final override def firstDay: SpecialDay = Chanukah1
     final override def date(year: Year): Day = year.month(Kislev).day(25)+(dayNumber-1)
@@ -197,7 +197,7 @@ object SpecialDay extends Names.Loader[LoadNames]:
     override def firstDay: SpecialDay = Pesach1
     override def dayNumber: Int = 8
 
-  case class Omer(number: Int) extends Named:
+  case class Omer(number: Int) extends HasNames:
     override def names: Names = namesWithNumber(Omer, number)
 
   object Omer extends LoadNames("Omer"):
@@ -232,7 +232,7 @@ object SpecialDay extends Names.Loader[LoadNames]:
 
   def numDaysSelichos(year: Year): Int = RoshHashanah1.date(year) - SpecialDay.ShabbosSelichos.date(year-1) - 1
 
-  private def namesWithNumber(named: Named, number: Int): Names = named.andNumber(number).names
+  private def namesWithNumber(named: HasNames, number: Int): Names = named.andNumber(number).names
 
   val festivals: Set[FestivalOrIntermediate] = Set(
     RoshHashanah1, RoshHashanah2,

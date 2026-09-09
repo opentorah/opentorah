@@ -1,10 +1,10 @@
 package org.opentorah.astronomy
 
-import org.podval.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, HasNames, Names}
 import Angles.{Position, Rotation}
 
 // KH 11:9
-enum Zodiac extends Named.ByLoader[Zodiac](loader = Zodiac, nameOverride = None), HasName.Enum, Ordered[Zodiac] derives CanEqual:
+enum Zodiac extends HasNames.ByLoader[Zodiac](loader = Zodiac, nameOverride = None), HasName.Enum, Ordered[Zodiac] derives CanEqual:
   final override def compare(that: Zodiac): Int = this.ordinal - that.ordinal // TODO should be derived...
 
   lazy val start: Position = Position(0) + Zodiac.size*ordinal

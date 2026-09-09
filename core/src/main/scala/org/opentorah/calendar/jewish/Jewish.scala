@@ -1,7 +1,7 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.calendar.{Calendar, Week}
-import org.podval.metadata.{Language, Named, Names}
+import org.podval.metadata.Language
 
 object Jewish extends Calendar:
 

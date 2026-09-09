@@ -5,7 +5,7 @@ import org.opentorah.calendar.jewish.Jewish.{Day, Year}
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.texts.tanach.{Reading, SpecialReadings, WeeklyReading}
 import org.opentorah.util.{Cache, Collections}
-import org.podval.metadata.Named
+import org.podval.metadata.HasNames
 import SpecialDay.{FestivalOrIntermediate, Omer, ShabbosBereishis}
 
 final class Schedule(
@@ -19,7 +19,7 @@ object Schedule:
 
   final class DaySchedule(
     val day: Day,
-    val dayNames: Seq[Named],
+    val dayNames: Seq[HasNames],
     /** The Jewish day begins at night, so this comes first: read after maariv,
       * on Simchas Torah only, and only by some customs, which the reading
       * itself says by giving the rest None. */

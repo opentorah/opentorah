@@ -97,7 +97,7 @@ enum Parsha(val book: Chumash, nameOverride: Option[String] = None) extends
     Chapters.ByChapter(span, book.chapters)
   )
 
-object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
+object Parsha extends HasValues.Distance[Parsha]:
   override val valuesSeq: Seq[Parsha] = values.toIndexedSeq
 
   def forChumash(book: ChumashBook): Seq[Parsha] = valuesSeq.filter(_.book == book)
@@ -178,7 +178,7 @@ object Parsha extends Names.Loader[Parsha], HasValues.Distance[Parsha]:
     val daysParsed: Seq[DayParsed] = dto.days.map(decodeDay)
     if dto.maftirs.length != 1 then throw XmlError(s"Required maftir, found ${dto.maftirs.length}")
     val maftir: SpanSemiResolved = dto.maftirs.head.span.semiResolve
-    val parsha: Parsha = HasName.findByNames(book.parshiot, names)
+    val parsha: Parsha = HasName.find(book.parshiot, names)
     val (days: Seq[DayParsed], daysCombined: Seq[DayParsed]) = daysParsed.partition(!_.isCombined)
     Parsed(
       parsha,

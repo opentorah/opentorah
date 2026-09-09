@@ -1,10 +1,10 @@
 package org.opentorah.calendar
 
-import org.podval.metadata.{HasName, HasValues, Named, Names}
+import org.podval.metadata.{HasName, HasNames, HasValues, Names}
 
 object Week:
 
-  enum Day extends Named.ByLoader[Day](loader = Day, nameOverride = None), HasName.Enum derives CanEqual:
+  enum Day extends HasNames.ByLoader[Day](loader = Day, nameOverride = None), HasName.Enum derives CanEqual:
     case Sunday    extends Day
     case Monday    extends Day
     case Tuesday   extends Day

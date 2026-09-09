@@ -24,7 +24,7 @@ private[tanach] object TanachBook:
       val dto: BookDto = BookDto.codec.unsafeDecode(element)
       val names: Names = dto.bookNames
       val chapters: Chapters = dto.chapterLengths
-      val book: TanachBook = HasName.findByNames(valuesSeq, names)
+      val book: TanachBook = HasName.find(valuesSeq, names)
       book.parse(names, chapters, dto)
 
     override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =

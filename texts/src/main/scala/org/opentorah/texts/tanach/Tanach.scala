@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.metadata.{HasName, HasValues, Named, Names}
+import org.podval.metadata.{HasName, HasNames, HasValues, Names}
 import org.podval.store.{By, Store, Stores}
 
 object Tanach extends Stores[?]:
@@ -69,7 +69,7 @@ object Tanach extends Stores[?]:
   sealed class Part[T <: TanachBook](
     clazz: Class[T],
     nameOverride: Option[String] = None,
-  ) extends Named.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Stores[?]:
+  ) extends HasNames.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Stores[?]:
     protected def byBook: By[TanachBook] =
       new By.WithSelector[TanachBook](selectorName = "book")
         with Stores.With[TanachBook](stores = Book.valuesSeq.filter(clazz.isInstance))

@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.metadata.{Language, Named}
+import org.podval.metadata.{Language, HasNames}
 import org.podval.xml.XmlAst
 
 trait WithBookSpans[Book <: TanachBook]:
@@ -14,7 +14,7 @@ trait WithBookSpans[Book <: TanachBook]:
     @scala.annotation.targetName("append")
     final def :+(that: BookSpan): Many = apply(spans :+ that)
 
-    def from(source: Named): Many = apply(spans.map(_.from(source)))
+    def from(source: HasNames): Many = apply(spans.map(_.from(source)))
 
   protected type Many <: Spans
 
@@ -22,7 +22,7 @@ trait WithBookSpans[Book <: TanachBook]:
 
   final type Customs = Custom.Of[Many]
 
-  final class BookSpan(val book: Book, val span: Span, val source: Option[Named] = None)
+  final class BookSpan(val book: Book, val span: Span, val source: Option[HasNames] = None)
     extends Language.ToString derives CanEqual:
     require(book.chapters.contains(span), s"Book $book doesn't contain span $span")
 
@@ -39,7 +39,7 @@ trait WithBookSpans[Book <: TanachBook]:
     @scala.annotation.targetName("add")
     def +(next: BookSpan): BookSpan = merge(Seq(this, next))
 
-    def from(source: Named): BookSpan = BookSpan(book, span, Some(source))
+    def from(source: HasNames): BookSpan = BookSpan(book, span, Some(source))
 
   final class BookSpanParsed(val book: Option[String], val span: SpanParsed):
     def inheritFrom(ancestor: BookSpanParsed): BookSpanParsed =
@@ -64,7 +64,7 @@ trait WithBookSpans[Book <: TanachBook]:
     require(spans.forall(_.book == book))
     require(book.chapters.consecutive(spans.map(_.span)))
 
-    val source: Option[Named] = spans.map(_.source).reduce[Option[Named]]((source1, source2) =>
+    val source: Option[HasNames] = spans.map(_.source).reduce[Option[HasNames]]((source1, source2) =>
       if source1.isEmpty && source2.isEmpty then None else
         require(source1.isDefined)
         require(source2.isDefined)

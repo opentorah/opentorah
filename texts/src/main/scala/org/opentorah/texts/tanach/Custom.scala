@@ -1,14 +1,14 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.podval.metadata.{HasName, HasValues, Name, Named, Names}
+import org.podval.metadata.{HasName, HasNames, HasValues, Name, Names}
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
 // The hierarchy is the nesting in Custom.xml, not declared on the enum.
 // Assumptions: a single root; no custom appears twice.
 enum Custom(nameOverride: Option[String] = None)
-  extends Named.ByLoader[Custom](loader = Custom, nameOverride), HasName.Enum derives CanEqual:
+  extends HasNames.ByLoader[Custom](loader = Custom, nameOverride), HasName.Enum derives CanEqual:
   // lazy: resolving a parent needs the names, which the loader reads lazily.
   lazy val parent: Option[Custom] = Custom.parentOf(this)
 

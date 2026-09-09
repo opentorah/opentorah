@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.util.Collections
-import org.podval.metadata.{Name, Named, Names}
+import org.podval.metadata.{HasNames, Name, Names}
 import org.podval.store.Selector
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
@@ -13,13 +13,13 @@ object MishnehTorah:
     val number: Int,
     override val names: Names,
     val parts: Seq[Part]
-  ) extends Named
+  ) extends HasNames
 
   sealed abstract class Part(
     val number: Int,
     val numChapters: Int,
     override val names: Names
-  ) extends Named:
+  ) extends HasNames:
     def chapters: Seq[Chapter]
 
   final class PartWithNumberedChapters(
@@ -37,7 +37,7 @@ object MishnehTorah:
   ) extends Part(number, numChapters, names):
     require(numChapters == chapters.length)
 
-  sealed abstract class Chapter extends Named
+  sealed abstract class Chapter extends HasNames
 
   final class NumberedChapter(number: Int) extends Chapter:
     override def names: Names = Selector.getForName("chapter").andNumber(number).names

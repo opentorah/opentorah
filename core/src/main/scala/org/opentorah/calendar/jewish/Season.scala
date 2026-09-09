@@ -1,10 +1,10 @@
 package org.opentorah.calendar.jewish
 
 import org.opentorah.astronomy.Zodiac
-import org.podval.metadata.{HasName, Named, Names}
+import org.podval.metadata.{HasName, HasNames, Names}
 
 enum Season(name: String, val sunEnters: Zodiac)
-  extends Named.ByLoader[Season](loader = Season, nameOverride = Some(name)), HasName.Enum derives CanEqual:
+  extends HasNames.ByLoader[Season](loader = Season, nameOverride = Some(name)), HasName.Enum derives CanEqual:
   lazy val numberInYear: Int = ordinal + 1
 
   // tkufos KH 9:3, 10:3

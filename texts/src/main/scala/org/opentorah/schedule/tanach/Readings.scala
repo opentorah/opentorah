@@ -6,7 +6,7 @@ import org.opentorah.calendar.jewish.Jewish.Month.*
 import org.opentorah.calendar.jewish.SpecialDay
 import org.opentorah.calendar.jewish.SpecialDay.*
 import org.opentorah.texts.tanach.{Custom, Parsha, Reading, SpecialReadings, Torah, WeeklyReading}
-import org.podval.metadata.Named
+import org.podval.metadata.HasNames
 
 object Readings:
   final def getMorningReading(
@@ -119,7 +119,7 @@ object Readings:
   private def getShabbosMorningReading(
     specialDay: SpecialDay,
     weeklyReading: Option[WeeklyReading],
-    roshChodeshDay: Option[Named]
+    roshChodeshDay: Option[HasNames]
   ): Reading = specialDay match
     case day: Chanukah =>
       require(weeklyReading.isDefined)
@@ -159,7 +159,7 @@ object Readings:
     specialShabbos: SpecialShabbos,
     weekly: Reading,
     day: Day,
-    roshChodeshDay: Option[Named]
+    roshChodeshDay: Option[HasNames]
   ): Reading = specialShabbos match
     case ShabbosHagodol =>
       SpecialReadings.ShabbosHagodol.transform(
@@ -185,7 +185,7 @@ object Readings:
     isPesachOnChamishi: Boolean
   ): Option[Reading] =
     val isRoshChodesh: Boolean = day.isRoshChodesh
-    val roshChodeshDay: Option[Named] = if isRoshChodesh then Some(RoshChodesh) else None
+    val roshChodeshDay: Option[HasNames] = if isRoshChodesh then Some(RoshChodesh) else None
 
     specialDay.map {
       case day: SuccosIntermediate =>

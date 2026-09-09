@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
-import org.podval.metadata.Named
+import org.podval.metadata.HasNames
 import org.podval.xml.XmlAst
 import Tanach.Chumash
 
@@ -25,7 +25,7 @@ final case class Torah(override val spans: Seq[Torah.BookSpan]) extends Torah.Sp
     require(!withDrop.head._2)
     Torah(drop(withDrop))
 
-  def fromWithNumbers(source: Named): Torah = Torah(
+  def fromWithNumbers(source: HasNames): Torah = Torah(
     spans.zipWithIndex.map((aliyah, index) =>
       aliyah.from(source.andNumber(number = index + 1))
     )

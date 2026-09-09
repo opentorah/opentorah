@@ -1,6 +1,6 @@
 package org.opentorah.texts.rambam
 
-import org.podval.metadata.{Name, Named, Names}
+import org.podval.metadata.{HasNames, Name, Names}
 import org.podval.store.Selector
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
@@ -12,7 +12,7 @@ object SeferHamitzvosLessons:
     val parts: Seq[Part]
   )
 
-  sealed trait Part extends Named derives CanEqual
+  sealed trait Part extends HasNames derives CanEqual
 
   final case class NamedPart(override val names: Names) extends Part
 

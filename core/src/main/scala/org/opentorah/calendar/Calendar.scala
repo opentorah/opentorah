@@ -1,7 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.podval.metadata.{HasName, HasValues, Language, Named, Names}
+import org.podval.metadata.{HasName, HasNames, HasValues, Language, Names}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
@@ -154,7 +154,7 @@ trait Calendar extends Times, Epoch:
 
   // TODO toString once all deriveds are enums - but making them such breaks Scala 3 compiler!!!
   open class MonthNameBase(nameOverride: Option[String]) extends
-    Named.ByLoader[MonthName](loader = Month, nameOverride),
+    HasNames.ByLoader[MonthName](loader = Month, nameOverride),
     HasName.NonEnum
 
   type MonthName <: MonthNameBase
