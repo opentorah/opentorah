@@ -36,8 +36,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     )
 
   private def annotation(sources: Option[String], comment: Option[String]): Annotation =
-    // XML turns the newlines of a wrapped attribute value into spaces but does
-    // not collapse the indentation that follows them.
+    // Wrapped <comment> text keeps its newlines and the indentation that follows them.
     Annotation(parseSources(sources), comment.map(_.replaceAll("\\s+", " ").trim).filter(_.nonEmpty))
 
   type Annotations = Map[Custom, Annotation]
@@ -133,10 +132,11 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
    * `week` and on `custom`, not on `part`: the parts of one reading are
    * attested together.
    *
-   * `comment="..."`: what the sources do not settle, said in words. For where
-   * they disagree, or agree only with a qualification -- a chumash that prints
+   * `<comment>`: what the sources do not settle, said in words. For where they
+   * disagree, or agree only with a qualification -- a chumash that prints
    * verses as "some add" is not the same as one that prints them plainly.
-   * Allowed alongside `sources`, on `week` and on `custom`.
+   * Last child, alongside `sources`, on `week`, `custom`, `annotation` and
+   * `none`.
    *
    * `precedenceWhenCombined="Chabad"`: customs for which this parsha's
    * haftarah takes precedence when it is combined with the next, instead of
@@ -262,7 +262,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   private final case class WeekDto(
     @Modifier.config(XmlCodec.Attribute, "") n: String,
     @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") precedenceWhenCombined: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
@@ -272,7 +271,8 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "annotation") annotations: Seq[NamedDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty
+    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual:
     def asHaftarah: HaftarahDto = HaftarahDto(
       book, fromChapter, fromVerse, toChapter, toVerse, parts, customs, annotations, nones
@@ -285,14 +285,14 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   private final case class CustomDto(
     @Modifier.config(XmlCodec.Attribute, "") n: String,
     @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") variant: Option[Int] = None,
     @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
     @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
     @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
     @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty
+    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual:
     def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
 
@@ -309,5 +309,5 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   private final case class NamedDto(
     @Modifier.config(XmlCodec.Attribute, "") n: String,
     @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") comment: Option[String] = None
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual

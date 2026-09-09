@@ -14,14 +14,13 @@
     </reading>
     <reading n="shabbosAdditionalHaftarah" full="false">
       <haftarah>
-        <custom n="Chabad" book="I Samuel" fromChapter="20" sources="chabad-haftarot"
-                comment="chabad.org states the rule directly: on a Shabbos that is
-                         Rosh Chodesh and also the eve of Rosh Chodesh, the first and
-                         last verse of Machar Chodesh follow the haftarah that was
-                         read. Fes reads the same two verses, on the older evidence
-                         these two customs were recorded together on.">
+        <custom n="Chabad" book="I Samuel" fromChapter="20" sources="chabad-haftarot">
           <part n="1" fromVerse="18" toVerse="18"/>
           <part n="2" fromVerse="42" toVerse="42"/>
+          <comment>chabad.org states the rule directly: on a Shabbos that is Rosh Chodesh
+            and also the eve of Rosh Chodesh, the first and last verse of Machar Chodesh
+            follow the haftarah that was read. Fes reads the same two verses, on the older
+            evidence these two customs were recorded together on.</comment>
         </custom>
         <custom n="Fes" book="I Samuel" fromChapter="20">
           <part n="1" fromVerse="18" toVerse="18"/>
@@ -48,16 +47,15 @@
     </reading>
     <reading n="shabbosAdditionalHaftarah" full="false">
       <haftarah>
-        <custom n="Chabad" book="Isaiah" fromChapter="66"
-                comment="Read after whichever haftarah displaced the Rosh Chodesh one.
-                         chabad.org states the pattern for Parshas HaChodesh falling on
-                         Rosh Chodesh or its eve, so it is not in doubt as a practice;
-                         what is not settled is whether it reaches Rosh Chodesh Av,
-                         where that page gives Shim'u and says nothing of an addition.
-                         Recorded without a source rather than narrowed on a guess.">
+        <custom n="Chabad" book="Isaiah" fromChapter="66">
           <part n="1" fromVerse="1" toVerse="1"/> <!-- first verse of the common haftarah -->
           <part n="2" fromVerse="23" toVerse="24"/> <!-- last verse of the common haftarah -->
           <part n="3" fromVerse="23" toVerse="23"/>
+          <comment>Read after whichever haftarah displaced the Rosh Chodesh one.
+            chabad.org states the pattern for Parshas HaChodesh falling on Rosh Chodesh or its eve,
+            so it is not in doubt as a practice; what is not settled is whether it reaches Rosh Chodesh Av,
+            where that page gives Shim'u and says nothing of an addition.
+            Recorded without a source rather than narrowed on a guess.</comment>
         </custom>
       </haftarah>
     </reading>
@@ -315,8 +313,10 @@
       <haftarah book="Ezekiel" fromChapter="45" toChapter="46">
         <custom n="Ashkenaz" fromVerse="16" toVerse="18"/>
         <custom n="Italki" fromVerse="18" toVerse="11"/>
-        <custom n="Sefard, Poznan" fromVerse="18" toVerse="15"
-                comment="Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas)."/>
+        <custom n="Sefard, Poznan" fromVerse="18" toVerse="15">
+          <comment>Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from
+            the community pinkas (poznan-pinkas).</comment>
+        </custom>
         <custom n="Teiman" fromVerse="9" toVerse="11"/>
         <custom n="Romania" fromVerse="21" toVerse="13" sources="michlol"/>
       </haftarah>
@@ -378,18 +378,18 @@
           <part n="3" fromChapter="6" fromVerse="27"/> <!-- piece 2 -->
         </custom>
         <custom n="Ashkenaz" variant="2" sources="michlol" fromChapter="5" fromVerse="2"
-                toChapter="6" toVerse="1"
-                comment="hamichlol gives Ashkenaz the bare piece 1, without 3:5-7 or
-                         6:27; it gives the same to Romania. Same text as the
-                         Frankfurt and Hagra reading below."/>
+                toChapter="6" toVerse="1">
+          <comment>hamichlol gives Ashkenaz the bare piece 1, without 3:5-7 or 6:27; it gives the same to Romania.
+            Same text as the Frankfurt and Hagra reading below.</comment>
+        </custom>
         <custom n="Sefard">
           <part n="1" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"/> <!-- piece 1 -->
           <part n="2" fromChapter="6" fromVerse="27"/> <!-- piece 2 -->
         </custom>
         <custom n="Frankfurt, Hagra, Romania" fromChapter="5" fromVerse="2" toChapter="6" toVerse="1"
-                sources="michlol"
-                comment="hamichlol gives Romania the bare piece 1, the same as Frankfurt
-                         and Hagra read."/> <!-- piece 1 -->
+                sources="michlol">
+          <comment>hamichlol gives Romania the bare piece 1, the same as Frankfurt and Hagra read.</comment>
+        </custom> <!-- piece 1 -->
       </haftarah>
     </reading>
   </day>
@@ -401,11 +401,11 @@
           <part n="2" fromChapter="23" fromVerse="21" toVerse="25"/>
         </custom>
         <custom n="Italki" fromChapter="23" fromVerse="21" toVerse="30"/>
-        <custom n="Poznan" sources="michlol, poznan-pinkas"
-                comment="kuntres Poznan says they finish at 'vayamlichu tachtav'; which
-                         verses are skipped in the middle, if any, is not stated.">
+        <custom n="Poznan" sources="michlol, poznan-pinkas">
           <part n="1" fromChapter="23" fromVerse="4" toVerse="9"/>
           <part n="2" fromChapter="23" fromVerse="21" toVerse="30"/>
+          <comment>kuntres Poznan says they finish at 'vayamlichu tachtav';
+            which verses are skipped in the middle, if any, is not stated.</comment>
         </custom>
         <custom n="Teiman">
           <part n="1" fromChapter="22" fromVerse="1" toVerse="7"/>
@@ -462,8 +462,9 @@
   <day n="Shavuos2">
     <reading n="haftarah">
       <haftarah book="Habakkuk">
-        <custom n="Ashkenaz, Romania" fromChapter="3" fromVerse="1" toVerse="19" sources="michlol"
-                comment="hamichlol groups Romania with Ashkenaz here."/>
+        <custom n="Ashkenaz, Romania" fromChapter="3" fromVerse="1" toVerse="19" sources="michlol">
+          <comment>hamichlol groups Romania with Ashkenaz here.</comment>
+        </custom>
         <custom n="Sefard, Italki" fromChapter="2" fromVerse="20" toChapter="3" toVerse="19"/>
       </haftarah>
     </reading>
@@ -477,26 +478,24 @@
     <reading n="defaultAfternoonHaftarah" full="false">
       <haftarah>
         <custom n="Ashkenaz, Chabad, Algiers, Romania" book="Isaiah" fromChapter="55"
-                fromVerse="6" toChapter="56" toVerse="8" sources="michlol"
-                comment="On these fasts hamichlol keeps only the city of Algiers with
-                         Ashkenaz and Italki on Dirshu, against the rest of the Maghreb
-                         below: 'א, איט, קהילת העיר אלג'יר, רומ''. The Fast of Gedalia
-                         is the exception -- see there."/> <!-- = Vayeilech Italki -->
-        <custom n="Algeria, Marrakesh" sources="michlol, asulin"
-                comment="Algeria apart from the city of Algiers, and Marrakesh with
-                         Bogmaz, on these fasts but not on the Fast of Gedalia. Morocco
-                         at large is not here: Asulin has Sefrou, Fes, Meknes and the
-                         rest of Morocco reading no haftarah on these fasts at all, so
-                         Morocco falls back to Magreb and Sefard, which read none.">
+                fromVerse="6" toChapter="56" toVerse="8" sources="michlol">
+          <comment>On these fasts hamichlol keeps only the city of Algiers with Ashkenaz and Italki on Dirshu,
+            against the rest of the Maghreb below: 'א, איט, קהילת העיר אלג'יר, רומ''.
+            The Fast of Gedalia is the exception -- see there.</comment>
+        </custom> <!-- = Vayeilech Italki -->
+        <custom n="Algeria, Marrakesh" sources="michlol, asulin">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/> <!-- = Vayeilech Sefard -->
+          <comment>Algeria apart from the city of Algiers, and Marrakesh with Bogmaz,
+            on these fasts but not on the Fast of Gedalia. Morocco at large is not here:
+            Asulin has Sefrou, Fes, Meknes and the rest of Morocco reading no haftarah on these fasts at all,
+            so Morocco falls back to Magreb and Sefard, which read none.</comment>
         </custom>
-        <annotation n="Algiers" sources="michlol, asulin"
-                    comment="The reading above is hamichlol's, which gives the city of
-                             Algiers Dirshu on these fasts. R. Avraham Asulin has it as
-                             'Dirshu or Shuva with Micah', so the city may keep either.
-                             The two sources agree on the Fast of Gedalia and on Tisha
-                             BeAv."/>
+        <annotation n="Algiers" sources="michlol, asulin">
+          <comment>The reading above is hamichlol's, which gives the city of Algiers Dirshu on these fasts.
+            R. Avraham Asulin has it as 'Dirshu or Shuva with Micah', so the city may keep either.
+            The two sources agree on the Fast of Gedalia and on Tisha BeAv.</comment>
+        </annotation>
       </haftarah>
     </reading>
   </day>
@@ -504,19 +503,21 @@
     <reading n="afternoonHaftarahExceptions" full="false">
       <haftarah>
         <custom n="Marrakesh" book="Hosea" fromChapter="14" fromVerse="2"
-                toVerse="10" sources="asulin"
-                comment="Asulin, reporting R. Meir Asulin and R. D. Tzabach: Marrakesh
-                         and Bogmaz read Shuva on the Fast of Gedalia, where the rest
-                         of Morocco reads Dirshu."/>
+                toVerse="10" sources="asulin">
+          <comment>Asulin, reporting R. Meir Asulin and R. D. Tzabach: Marrakesh and Bogmaz read Shuva
+            on the Fast of Gedalia, where the rest of Morocco reads Dirshu.</comment>
+        </custom>
         <custom n="Morocco, Algeria" book="Isaiah" fromChapter="55" fromVerse="6"
-                toChapter="56" toVerse="8" sources="michlol, asulin"
-                comment="hamichlol gives the Fast of Gedalia its own entry, in which
-                         Morocco and Algeria read Dirshu with Ashkenaz and Italki --
-                         'א, איט, חלק מסמג (בעיקר מרוקו ואלג'יריה)' -- rather than the
-                         Hosea reading they have on the other public fasts."/>
-        <none n="Agadir" sources="asulin"
-              comment="Agadir and southern Morocco read no haftarah on the fasts,
-                       where the rest of Morocco reads Dirshu on this one."/>
+                toChapter="56" toVerse="8" sources="michlol, asulin">
+          <comment>hamichlol gives the Fast of Gedalia its own entry, in which Morocco and Algeria read Dirshu
+            with Ashkenaz and Italki --
+            'א, איט, חלק מסמג (בעיקר מרוקו ואלג'יריה)' -- rather than the
+            Hosea reading they have on the other public fasts.</comment>
+        </custom>
+        <none n="Agadir" sources="asulin">
+          <comment>Agadir and southern Morocco read no haftarah on the fasts, where the rest of Morocco reads Dirshu
+            on this one.</comment>
+        </none>
       </haftarah>
     </reading>
   </day>
@@ -545,32 +546,35 @@
       -->
       <haftarah>
         <custom n="Ashkenaz, Chabad, Romania" book="Isaiah" fromChapter="55" fromVerse="6"
-                toChapter="56" toVerse="8" sources="michlol, chabad-org"
-                comment="hamichlol for Ashkenaz; chabad.org for Chabad, which reads
-                         Dirshu here rather than following Sefard. hamichlol names no
-                         Chabad practice at this occasion, but its rite key nests
-                         Chabad under Ashkenaz, so it implies the same. For Romania it
-                         says only 'קצת רומ'', some of Romania, on the strength of the
-                         Machzor of Romania (Venice 5283): 'יש קהלות שמפטירין דרשו,
-                         ורבינו האיי כת' שמפטירין' -- there are communities that read
-                         Dirshu, and Rabbeinu Hai wrote that they read. What the rest
-                         of Romania reads is not stated."/>
+                toChapter="56" toVerse="8" sources="michlol, chabad-org">
+          <comment>hamichlol for Ashkenaz; chabad.org for Chabad, which reads
+            Dirshu here rather than following Sefard. hamichlol names no
+            Chabad practice at this occasion, but its rite key nests
+            Chabad under Ashkenaz, so it implies the same. For Romania it
+            says only 'קצת רומ'', some of Romania, on the strength of the
+            Machzor of Romania (Venice 5283): 'יש קהלות שמפטירין דרשו,
+            ורבינו האיי כת' שמפטירין' -- there are communities that read
+            Dirshu, and Rabbeinu Hai wrote that they read. What the rest
+            of Romania reads is not stated.</comment>
+        </custom>
         <custom n="Sefard" sources="michlol">
           <part n="1" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
           <part n="2" book="Micah" fromChapter="7" fromVerse="18" toVerse="20"/>
         </custom>
         <custom n="Italki, Teiman, Agadir" book="Hosea" fromChapter="14" fromVerse="2"
-                toVerse="10" sources="michlol, asulin"
-                comment="hamichlol cites its own sources for both. For Italki, Machzor
-                         Shadal vol. 1, 189b. For Teiman it notes that the old Yemenite
-                         siddurim record no Mincha haftarah here at all; the practice
-                         was taken up in most communities in recent centuries, the Dor
-                         Daim excepted, and R. Yosef Kapach held in Siach Yerushalayim
-                         that those who do read it should not say the brachos, which
-                         was not accepted in practice."/>
-        <annotation n="Agadir" sources="asulin"
-                    comment="Agadir and southern Morocco read Shuva here without the
-                             Micah ending that the rest of Sefard adds."/>
+                toVerse="10" sources="michlol, asulin">
+          <comment>hamichlol cites its own sources for both. For Italki, Machzor
+            Shadal vol. 1, 189b. For Teiman it notes that the old Yemenite
+            siddurim record no Mincha haftarah here at all; the practice
+            was taken up in most communities in recent centuries, the Dor
+            Daim excepted, and R. Yosef Kapach held in Siach Yerushalayim
+            that those who do read it should not say the brachos, which
+            was not accepted in practice.</comment>
+        </custom>
+        <annotation n="Agadir" sources="asulin">
+          <comment>Agadir and southern Morocco read Shuva here without the
+            Micah ending that the rest of Sefard adds.</comment>
+        </annotation>
       </haftarah>
     </reading>
   </day>

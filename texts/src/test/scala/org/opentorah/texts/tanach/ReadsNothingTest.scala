@@ -16,7 +16,9 @@ final class ReadsNothingTest extends AnyFlatSpec, Matchers:
     val xml = XmlParser.parseXml(
       """<haftarah>
         |  <custom n="Magreb" book="Hosea" fromChapter="14" fromVerse="2" toVerse="10"/>
-        |  <none n="Morocco" comment="reads nothing, though Magreb above it reads Hosea"/>
+        |  <none n="Morocco">
+        |    <comment>reads nothing, though Magreb above it reads Hosea</comment>
+        |  </none>
         |</haftarah>""".stripMargin
     ).fold(error => throw error, identity)
     Haftarah.decodeOptional(xml, full = false)(using ZioXml)
