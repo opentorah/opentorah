@@ -1,25 +1,27 @@
 package org.opentorah.texts.rambam
 
 import org.opentorah.util.Collections
-import org.podval.metadata.{HasNames, Name, Names}
-import org.podval.store.Selector
+import org.podval.metadata.{Name, Names}
+import org.podval.store.{By, NumberedStore, NumberedStores, Selector, Store, Stores}
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
 // TODO parse the names of the book itself! (and probably do the same for Tanach?)
-object MishnehTorah:
+object MishnehTorah extends Stores[?]:
+  override val names: Names = Names("Mishneh Torah")
 
   final class Book(
     val number: Int,
     override val names: Names,
     val parts: Seq[Part]
-  ) extends HasNames
+  ) extends Stores[?]:
+    override lazy val stores: Seq[By[?]] = Seq(By("part", parts))
 
   sealed abstract class Part(
     val number: Int,
     val numChapters: Int,
     override val names: Names
-  ) extends HasNames:
+  ) extends Stores[?]:
     def chapters: Seq[Chapter]
 
   final class PartWithNumberedChapters(
@@ -27,7 +29,12 @@ object MishnehTorah:
     numChapters: Int,
     names: Names
   ) extends Part(number, numChapters, names):
-    override def chapters: Seq[NumberedChapter] = (1 to numChapters).map(NumberedChapter(_))
+    override def chapters: Seq[NumberedChapter] = byChapter.stores
+    override lazy val stores: Seq[By[?]] = Seq(byChapter)
+    private lazy val byChapter: By.Numbered[NumberedChapter] = new By.Numbered[NumberedChapter]("chapter"):
+      override def length: Int = numChapters
+      override def number2names(number: Int): Names = Selector.getForName("chapter").andNumber(number).names
+      override protected def createNumberedStore(number: Int): NumberedChapter = NumberedChapter(number, this)
 
   final class PartWithNamedChapters(
     number: Int,
@@ -36,11 +43,14 @@ object MishnehTorah:
     override val chapters: Seq[NamedChapter]
   ) extends Part(number, numChapters, names):
     require(numChapters == chapters.length)
+    override lazy val stores: Seq[By[?]] = Seq(By("chapter", chapters))
 
-  sealed abstract class Chapter extends HasNames
+  sealed abstract class Chapter extends Store
 
-  final class NumberedChapter(number: Int) extends Chapter:
-    override def names: Names = Selector.getForName("chapter").andNumber(number).names
+  final class NumberedChapter(
+    override val number: Int,
+    override val oneOf: NumberedStores[NumberedChapter]
+  ) extends Chapter, NumberedStore
 
   final class NamedChapter(override val names: Names) extends Chapter
 
@@ -82,3 +92,5 @@ object MishnehTorah:
     val result: Seq[Book] = XmlParser.loadCatalog(this, BookDto.codec).map(BookDto.toBook)
     Collections.requireConsecutive(result, _.number, "book", from = 0, count = Some(15))
     result
+
+  override lazy val stores: Seq[Store] = Seq(By("book", books))
