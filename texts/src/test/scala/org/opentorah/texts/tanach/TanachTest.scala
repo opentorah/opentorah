@@ -6,9 +6,9 @@ import org.podval.store.Path
 final class TanachTest extends TestBase(Tanach):
   // TODO put into common base class in tanach package if I am going to make - say - separate PsalmsTest:
   def checkChapterLength(path: String, length: Int): Unit =
-    resolveLast(path).asInstanceOf[Chapter].length shouldBe length
+    resolve(path).lastAs[Chapter].length shouldBe length
   def checkVerseNumber(path: String, number: Int): Unit =
-    resolveLast(path).asInstanceOf[Verse].number shouldBe number
+    resolve(path).lastAs[Verse].number shouldBe number
 
   "Tanach" should "load" in:
     Tanach.Chumash.Genesis.chapters.length(17) shouldBe 27
@@ -94,4 +94,17 @@ final class TanachTest extends TestBase(Tanach):
 
   it should "not equate chapters of different books" in:
     resolveLast("/book/Genesis/chapter/1") should not equal resolveLast("/book/Exodus/chapter/1")
+
+  it should "skip a unique By hop" in:
+    resolve("/Genesis").toUrl shouldBe resolve("/book/Genesis").toUrl
+    resolve("/Genesis").last should be theSameInstanceAs resolve("/book/Genesis").last
+    resolve("/book/Genesis/1/1").toUrl shouldBe resolve("/book/Genesis/chapter/1/verse/1").toUrl
+    resolve("/book/Genesis/1/1").last should be theSameInstanceAs
+      resolve("/book/Genesis/chapter/1/verse/1").last
+    resolve("/Бытие/1/1").last should be theSameInstanceAs
+      resolve("/book/Genesis/chapter/1/verse/1").last
+
+  it should "require the hop when several By axes match" in:
+    intercept[IllegalArgumentException] { resolve("/book/Psalms/1") }
+    checkVerseNumber("/book/Psalms/chapter/1/verse/1", 1)
 

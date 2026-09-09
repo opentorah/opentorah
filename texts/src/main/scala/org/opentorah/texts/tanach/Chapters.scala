@@ -55,22 +55,24 @@ final class Chapters(chapters: Seq[Int]):
 
   def byChapter(span: Span): By[Chapter] = if span == full then byChapter else axis(span)
 
-  private def axis(span: Span): By[Chapter] = By.numbered("chapter", span.from.chapter, span.to.chapter):
+  private def axis(span: Span): By[Chapter] = By.Numbered("chapter", span.from.chapter, span.to.chapter):
     (number, parent) =>
-      new Chapter(
+      Chapter(
         number,
         from = if number == span.from.chapter then span.from.verse else 1,
-        to = if number == span.to.chapter then span.to.verse else this.length(number)
-      ):
-        override def oneOf: NumberedStores[Chapter] = parent
+        to = if number == span.to.chapter then span.to.verse else this.length(number),
+        parent
+      )
 
 object Chapters:
   class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends By.Numbered[NumberedStore](selectorName):
     override def minNumber: Int = 1
     override def length: Int = spans.length
-    override protected def createNumberedStore(number: Int): NumberedStore = ForSpan(number)
+    override protected def createNumberedStore(number: Int): NumberedStore = ForSpan(number, this)
 
-    private class ForSpan(override val number: Int) extends NumberedStore with Stores[?]:
-      override def oneOf: NumberedStores[NumberedStore] = BySpan.this
+    private class ForSpan(
+      override val number: Int,
+      override val oneOf: NumberedStores[NumberedStore]
+    ) extends NumberedStore with Stores[?]:
       private lazy val byChapter: By[Chapter] = chapters.byChapter(spans(number - 1))
       override def stores: Seq[By[?]] = Seq(byChapter)

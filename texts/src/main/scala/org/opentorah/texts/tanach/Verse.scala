@@ -1,5 +1,8 @@
 package org.opentorah.texts.tanach
 
-import org.podval.store.NumberedStore
+import org.podval.store.{NumberedStore, NumberedStores}
 
-abstract class Verse(override val number: Int) extends NumberedStore
+final class Verse(
+  override val number: Int,
+  override val oneOf: NumberedStores[Verse]
+) extends NumberedStore
