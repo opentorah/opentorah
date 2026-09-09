@@ -2,6 +2,12 @@ package org.opentorah.texts.tanach
 
 import org.podval.xml.XmlAst
 
+object SpanParsed:
+  def decode[E: XmlAst](element: E): SpanParsed = SpanParsed(
+    from = VerseParsed.decodeFrom(element),
+    to = VerseParsed.decodeTo(element)
+  )
+
 final class SpanParsed(val from: VerseParsed, val to: VerseParsed):
 
   def inheritFrom(ancestor: SpanParsed): SpanParsed = SpanParsed(
@@ -35,10 +41,3 @@ final class SpanParsed(val from: VerseParsed, val to: VerseParsed):
 
   private def resolveToChapter(fromResolved: ChapterAndVerse): Int =
     to.chapter.getOrElse(fromResolved.chapter)
-
-object SpanParsed:
-
-  def decode[E: XmlAst](element: E): SpanParsed = SpanParsed(
-    from = VerseParsed.decodeFrom(element),
-    to = VerseParsed.decodeTo(element)
-  )

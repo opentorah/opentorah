@@ -10,7 +10,6 @@ trait NachBook extends TanachBook:
     NachBook.Parsed(this, names, chapters)
 
 object NachBook:
-
   open class Metadata(
     book: NachBook
   ) extends TanachBook.Metadata(book)

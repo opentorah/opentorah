@@ -7,8 +7,6 @@ abstract class Chapter(override val number: Int, from: Int, to: Int) extends Num
   override def stores: Seq[By[?]] = Seq(Chapter.ByVerse(from, to))
 
 object Chapter:
-
-  final class ByVerse(override val minNumber: Int, override val maxNumber: Int) extends
-    By.Numbered[Verse]("verse"):
+  final class ByVerse(override val minNumber: Int, override val maxNumber: Int) extends By.Numbered[Verse]("verse"):
     override protected def createNumberedStore(number: Int): Verse = new Verse(number):
       override def oneOf: NumberedStores[Verse] = ByVerse.this
