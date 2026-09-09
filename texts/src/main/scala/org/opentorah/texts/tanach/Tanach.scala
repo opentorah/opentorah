@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.podval.metadata.{HasName, HasNames, HasValues, Names}
-import org.podval.store.{By, Store, Stores}
+import org.podval.store.{Alias, By, Store, Stores}
 
 object Tanach extends Stores[?]:
   override def names: Names = All.names
@@ -70,9 +70,7 @@ object Tanach extends Stores[?]:
     clazz: Class[T],
     nameOverride: Option[String] = None,
   ) extends HasNames.ByLoader[Part[?]](loader = Part, nameOverride), HasName.NonEnum, Stores[?]:
-    protected def byBook: By[TanachBook] =
-      new By.WithSelector[TanachBook](selectorName = "book")
-        with Stores.With[TanachBook](stores = Book.valuesSeq.filter(clazz.isInstance))
+    protected def byBook: By[TanachBook] = By("book", Book.valuesSeq.filter(clazz.isInstance))
 
     override def stores: Seq[Store] = Seq(byBook)
 
@@ -92,8 +90,7 @@ object Tanach extends Stores[?]:
   object Prophets extends Part(classOf[Prophets]):
     override def stores: Seq[Store] = Seq(
       byBook,
-      new By.WithSelector[Part[?]](selectorName = "part")
-        with Stores.With[Part[?]](stores = Seq(EarlyProphets, LateProphets,TreiAsar))
+      By("part", Seq(EarlyProphets, LateProphets, TreiAsar))
     )
 
   object EarlyProphets extends Part(classOf[EarlyProphets], nameOverride = Some("Early Prophets"))
@@ -106,11 +103,9 @@ object Tanach extends Stores[?]:
   private object Part extends Names.Loader[Part[?]]:
     override def valuesSeq: Seq[Part[?]] = Seq(All, Chumash, Nach, Prophets, EarlyProphets, LateProphets, TreiAsar, Writings)
 
-  // Stores
-  // TODO when I have aliases, install them for Chumash and Psalm here (and higher?)
   override def stores: Seq[Store] = Seq(
-    new By.WithSelector[TanachBook](selectorName = "book")
-      with Stores.With[TanachBook](stores = Book.valuesSeq),
-    new By.WithSelector[Part[?]](selectorName = "part")
-      with Stores.With[Part[?]](stores = Seq(Chumash, Prophets, Writings))
+    By("book", Book.valuesSeq),
+    By("part", Seq(Chumash, Prophets, Writings)),
+    Alias(Chumash.names, "/part/Chumash"),
+    Alias(Psalms.names, "/book/Psalms")
   )

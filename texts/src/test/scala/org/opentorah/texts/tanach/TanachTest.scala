@@ -50,6 +50,22 @@ final class TanachTest extends TestBase(Tanach):
   it should "contain /part/Prophets/part/Early Prophets/book/Joshua" in:
     checkName("/part/Prophets/part/Early Prophets/book/Joshua", "Ехошуа")
 
+  it should "contain /Chumash/book/Genesis" in:
+    checkName("/Chumash/book/Genesis", "Бытие")
+
+  it should "contain /Хумаш/book/Genesis" in:
+    checkName("/Хумаш/book/Genesis", "Бытие")
+
+  it should "contain /Psalms/chapter/119/verse/150" in:
+    checkName("/Psalms/chapter/119/verse/150", "150")
+
+  it should "contain /Псалмы/chapter/119/verse/150" in:
+    checkName("/Псалмы/chapter/119/verse/150", "150")
+
+  it should "expand aliases to the canonical English URL" in:
+    resolve("/Chumash").toUrl shouldBe "/part/Chumash"
+    resolve("/Psalms").toUrl shouldBe "/book/Psalms"
+
   it should "contain /book/Psalms/chapter/119/verse/150" in:
     checkName("/book/Psalms/chapter/119/verse/150", "150")
 

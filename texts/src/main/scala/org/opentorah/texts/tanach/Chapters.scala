@@ -58,8 +58,7 @@ final class Chapters(chapters: Seq[Int]):
 object Chapters:
 
   final class ByChapter(span: Span, chapters: Chapters) extends
-    By.WithSelector[Chapter]("chapter"),
-    NumberedStores[Chapter]:
+    By.Numbered[Chapter]("chapter"):
     override def minNumber: Int = span.from.chapter
     override def maxNumber: Int = span.to.chapter
 
@@ -71,8 +70,7 @@ object Chapters:
       override def oneOf: NumberedStores[Chapter] = ByChapter.this
 
   class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends
-    By.WithSelector[NumberedStore](selectorName),
-    NumberedStores[NumberedStore]:
+    By.Numbered[NumberedStore](selectorName):
     override def minNumber: Int = 1
     override def length: Int = spans.length
     override protected def createNumberedStore(number: Int): NumberedStore = ForSpan(number)
