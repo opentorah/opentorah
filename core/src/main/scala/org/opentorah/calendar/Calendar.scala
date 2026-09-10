@@ -1,7 +1,7 @@
 package org.opentorah.calendar
 
 import org.opentorah.calendar.jewish.Jewish
-import org.podval.metadata.{HasName, HasNames, HasValues, Language, Names}
+import org.podval.metadata.{HasName, HasNames, HasValues, Language, Names, Numbered}
 import org.opentorah.numbers.Digits
 import org.opentorah.util.Cache
 
@@ -216,9 +216,6 @@ trait Calendar extends Times, Epoch:
       }
 
       monthOpt.get
-
-    @scala.annotation.targetName("subtract")
-    final def -(that: Day): Int = this.number - that.number
 
     final def year: Year = month.year
 
