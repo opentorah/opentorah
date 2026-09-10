@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.10.17] - 2026-
+- chore: org.podval.xml 0.1.0;
 - calendar: weekday names in German, French, Polish, and Lithuanian.
 - astronomy: Zodiac names distinguish Latin (`la`) from English.
 - xml: `Path` is a class (`toUrl` / `structureNames`); drop `Terminal`; `By(selector, stores)` / `By.Numbered`.
