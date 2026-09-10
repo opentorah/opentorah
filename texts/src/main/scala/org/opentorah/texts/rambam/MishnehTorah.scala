@@ -2,7 +2,7 @@ package org.opentorah.texts.rambam
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{Name, Names}
-import org.podval.store.{By, NumberedStore, NumberedStores, Selector, Store, Stores}
+import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{Xml, XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
@@ -30,10 +30,7 @@ object MishnehTorah extends Stores[?]:
   ) extends Part(number, numChapters, names):
     override def chapters: Seq[NumberedChapter] = byChapter.stores
     override lazy val stores: Seq[By[?]] = Seq(byChapter)
-    private lazy val byChapter: By.Numbered[NumberedChapter] = new By.Numbered[NumberedChapter]("chapter"):
-      override def length: Int = numChapters
-      override def number2names(number: Int): Names = Selector.getForName("chapter").andNumber(number).names
-      override protected def createNumberedStore(number: Int): NumberedChapter = NumberedChapter(number, this)
+    private lazy val byChapter: By.Numbered[NumberedChapter] = By.Numbered("chapter", 1, numChapters)(NumberedChapter(_, _))
 
   final class PartWithNamedChapters(
     number: Int,

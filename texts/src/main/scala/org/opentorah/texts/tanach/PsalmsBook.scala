@@ -2,7 +2,7 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.calendar.Week
 import org.podval.metadata.Names
-import org.podval.store.By
+import org.podval.store.{By, NumberedStores}
 import Tanach.Psalms
 
 trait PsalmsBook extends NachBook:
@@ -18,12 +18,16 @@ trait PsalmsBook extends NachBook:
     chapters.byChapter,
     Chapters.BySpan("book", books, chapters),
     Chapters.BySpan("day", days, chapters),
-    new Chapters.BySpan("day of the week", weekDays, chapters):
-      override def name2number(name: String): Option[Int] =
-        super.name2number(name).orElse:
-          Week.Day.valuesSeq.find(_.names.hasName(name)).map(_.ordinal + 1)
-      override def number2names(number: Int): Names =
-        Names(super.number2names(number).names ++ Week.Day.forNumber(number).names.names)
+    Chapters.BySpan(
+      "day of the week",
+      weekDays,
+      chapters,
+      fromName = name =>
+        NumberedStores.parseNumber(name).orElse:
+          Week.Day.valuesSeq.find(_.names.hasName(name)).map(_.ordinal + 1),
+      toNames = number =>
+        Names(NumberedStores.namesForNumber(number).names ++ Week.Day.forNumber(number).names.names)
+    )
   )
 
   override def parse(names: Names, chapters: Chapters, dto: BookDto): PsalmsBook.Parsed =

@@ -1,5 +1,6 @@
 package org.opentorah.texts.tanach
 
+import org.podval.metadata.Names
 import org.podval.store.{By, NumberedStore, NumberedStores, Stores}
 
 final class Chapters(chapters: Seq[Int]):
@@ -65,7 +66,13 @@ final class Chapters(chapters: Seq[Int]):
       )
 
 object Chapters:
-  class BySpan(selectorName: String, spans: Seq[Span], chapters: Chapters) extends By.Numbered[NumberedStore](selectorName):
+  class BySpan(
+    selectorName: String,
+    spans: Seq[Span],
+    chapters: Chapters,
+    fromName: String => Option[Int] = NumberedStores.parseNumber,
+    toNames: Int => Names = NumberedStores.namesForNumber
+  ) extends By.Numbered[NumberedStore](selectorName, fromName, toNames):
     override def minNumber: Int = 1
     override def length: Int = spans.length
     override protected def createNumberedStore(number: Int): NumberedStore = ForSpan(number, this)

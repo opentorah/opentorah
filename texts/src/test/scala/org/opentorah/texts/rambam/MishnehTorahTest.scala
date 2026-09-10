@@ -16,7 +16,10 @@ final class MishnehTorahTest extends TestBase(MishnehTorah):
     checkName("/book/Sefer Madda/part/Yesodei haTorah", "foundations of Torah")
 
   it should "resolve a numbered chapter" in:
-    resolve("/book/Sefer Madda/part/Yesodei haTorah/chapter/1").lastAs[MishnehTorah.NumberedChapter].number shouldBe 1
+    val path: Path = resolve("/book/Sefer Madda/part/Yesodei haTorah/chapter/1")
+    path.lastAs[MishnehTorah.NumberedChapter].number shouldBe 1
+    path.toUrl should endWith("/chapter/1")
+    resolve(path.toUrl).last should be theSameInstanceAs path.last
 
   it should "skip unique By hops" in:
     val typed: Path = resolve("/book/Sefer Madda/part/Yesodei haTorah/chapter/1")
