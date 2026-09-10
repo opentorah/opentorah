@@ -1,7 +1,7 @@
 package org.opentorah.texts.rambam
 
-import org.podval.metadata.{Language, Name, Names}
-import org.podval.store.{By, NumberedStore, NumberedStores, Selector, Store, Stores}
+import org.podval.metadata.{Name, Names}
+import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
@@ -27,16 +27,11 @@ object SeferHamitzvosLessons extends Stores[?]:
   final case class NamedPart(override val names: Names) extends Part
 
   sealed abstract class Commandment(val number: Int) extends Part:
-    final override def names: Names = Names(
-      selector.andNumber(number).names.names :+ Name(number.toString, Language.Spec.empty)
-    )
-    def selector: Selector
+    final override def names: Names = NumberedStores.namesForNumber(number)
 
-  final case class Positive(override val number: Int) extends Commandment(number):
-    override def selector: Selector = Selector.getForName("positive")
+  final case class Positive(override val number: Int) extends Commandment(number)
 
-  final case class Negative(override val number: Int) extends Commandment(number):
-    override def selector: Selector = Selector.getForName("negative")
+  final case class Negative(override val number: Int) extends Commandment(number)
 
   @Modifier.config(XmlCodec.Element, "lesson")
   private final case class LessonDto(

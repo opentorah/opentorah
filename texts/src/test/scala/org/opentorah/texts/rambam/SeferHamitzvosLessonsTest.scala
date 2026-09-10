@@ -13,7 +13,10 @@ final class SeferHamitzvosLessonsTest extends TestBase(SeferHamitzvosLessons):
   it should "resolve a commandment through the lesson and from the root" in:
     val viaLesson = resolve("/lesson/5/positive/1").lastAs[SeferHamitzvosLessons.Positive]
     viaLesson.number shouldBe 1
-    resolve("/positive/1").lastAs[SeferHamitzvosLessons.Positive] shouldBe viaLesson
+    val fromRoot = resolve("/positive/1")
+    fromRoot.lastAs[SeferHamitzvosLessons.Positive] shouldBe viaLesson
+    fromRoot.toUrl should endWith("/positive/1")
+    resolve(fromRoot.toUrl).last should be theSameInstanceAs fromRoot.last
 
   it should "resolve a named lesson part" in:
     checkName("/lesson/2", "2")

@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.podval.metadata.{HasName, HasNames, HasValues, Names}
-import org.podval.store.{Alias, By, Store, Stores}
+import org.podval.store.{Alias, By, Path, Store, Stores}
 
 object Tanach extends Stores[?]:
   override def names: Names = All.names
@@ -103,9 +103,12 @@ object Tanach extends Stores[?]:
   private object Part extends Names.Loader[Part[?]]:
     override def valuesSeq: Seq[Part[?]] = Seq(All, Chumash, Nach, Prophets, EarlyProphets, LateProphets, TreiAsar, Writings)
 
-  override lazy val stores: Seq[Store] = Seq(
-    By("book", Book.valuesSeq),
-    By("part", Seq(Chumash, Prophets, Writings)),
-    Alias(Chumash.names, "/part/Chumash"),
-    Alias(Psalms.names, "/book/Psalms")
-  )
+  override lazy val stores: Seq[Store] =
+    val byBook: By[TanachBook] = By("book", Book.valuesSeq)
+    val byPart: By[Part[?]] = By("part", Seq(Chumash, Prophets, Writings))
+    Seq(
+      byBook,
+      byPart,
+      Alias(Chumash.names, Path(Seq(byPart, Chumash))),
+      Alias(Psalms.names, Path(Seq(byBook, Psalms)))
+    )
