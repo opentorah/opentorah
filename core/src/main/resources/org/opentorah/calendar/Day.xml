@@ -1,41 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- TODO add other languages -->
 <Day>
     <names>
         <name lang="en" n="Sunday"/>
         <name lang="he" n="ראשון"/>
         <name lang="en" transliterated="yes" n="Rishon"/>
         <name lang="ru" n="воскресенье"/>
+        <name lang="lt" n="sekmadienis"/>
+        <name lang="pl" n="niedziela"/>
+        <name lang="fr" n="dimanche"/>
+        <name lang="de" n="Sonntag"/>
     </names>
     <names>
         <name lang="en" n="Monday"/>
         <name lang="he" n="שני"/>
         <name lang="en" transliterated="yes" n="Sheni"/>
         <name lang="ru" n="понедельник"/>
+        <name lang="lt" n="pirmadienis"/>
+        <name lang="pl" n="poniedziałek"/>
+        <name lang="fr" n="lundi"/>
+        <name lang="de" n="Montag"/>
     </names>
     <names>
         <name lang="en" n="Tuesday"/>
         <name lang="he" n="שלישי"/>
         <name lang="en" transliterated="yes" n="Shlishi"/>
         <name lang="ru" n="вторник"/>
+        <name lang="lt" n="antradienis"/>
+        <name lang="pl" n="wtorek"/>
+        <name lang="fr" n="mardi"/>
+        <name lang="de" n="Dienstag"/>
     </names>
     <names>
         <name lang="en" n="Wednesday"/>
         <name lang="he" n="רביעי"/>
         <name lang="en" transliterated="yes" n="Rvii"/>
         <name lang="ru" n="среда"/>
+        <name lang="lt" n="trečiadienis"/>
+        <name lang="pl" n="środa"/>
+        <name lang="fr" n="mercredi"/>
+        <name lang="de" n="Mittwoch"/>
     </names>
     <names>
         <name lang="en" n="Thursday"/>
         <name lang="he" n="חמישי"/>
         <name lang="en" transliterated="yes" n="Chamishi"/>
         <name lang="ru" n="четверг"/>
+        <name lang="lt" n="ketvirtadienis"/>
+        <name lang="pl" n="czwartek"/>
+        <name lang="fr" n="jeudi"/>
+        <name lang="de" n="Donnerstag"/>
     </names>
     <names>
         <name lang="en" n="Friday"/>
         <name lang="he" n="ששי"/>
         <name lang="en" transliterated="yes" n="Shishi"/>
         <name lang="ru" n="пятница"/>
+        <name lang="lt" n="penktadienis"/>
+        <name lang="pl" n="piątek"/>
+        <name lang="fr" n="vendredi"/>
+        <name lang="de" n="Freitag"/>
     </names>
     <names>
         <name lang="en" n="Saturday"/>
@@ -44,5 +67,9 @@
         <name lang="en" transliterated="yes" n="Shabbos"/>
         <name lang="en" transliterated="no" n="Sabbath"/>
         <name lang="ru" n="суббота"/>
+        <name lang="lt" n="šeštadienis"/>
+        <name lang="pl" n="sobota"/>
+        <name lang="fr" n="samedi"/>
+        <name lang="de" n="Samstag"/>
     </names>
 </Day>

@@ -15,6 +15,15 @@ final class DatesTest extends AnyFlatSpec, Matchers:
 
   "Days of the Week" should "load correctly" in:
     Week.Day.Rishon.names.hasName("воскресенье") shouldBe true
+    Week.Day.Rishon.names.hasName("sekmadienis") shouldBe true
+    Week.Day.Rishon.names.hasName("niedziela") shouldBe true
+    Week.Day.Rishon.names.hasName("dimanche") shouldBe true
+    Week.Day.Rishon.names.hasName("Sonntag") shouldBe true
+    Week.Day.Shabbos.names.hasName("šeštadienis") shouldBe true
+    Week.Day.Shabbos.names.hasName("sobota") shouldBe true
+    Week.Day.Rvii.names.hasName("trečiadienis") shouldBe true
+    Week.Day.Rvii.names.hasName("środa") shouldBe true
+    Week.Day.Shishi.names.hasName("piątek") shouldBe true
 
   "Known dates" should "have correct day of the week" in:
     Year(5772).month(Marheshvan).day(24).name shouldBe Sheni
