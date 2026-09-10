@@ -49,7 +49,8 @@
   <source n="steinsaltz" kind="chumash" name="Chumash Steinsaltz"
           publication="Koren Publishers, Jerusalem 2023"/>
 
-  <!-- hamichlol's own source for the Poznan readings, named in the footnote on
+  <!-- TODO put it where it belongs, and probably not XML comment:
+   hamichlol's own source for the Poznan readings, named in the footnote on
        its rite code rather than on any one reading, so it stands behind them all. -->
   <source n="nitei-gavriel" kind="halachah" name="Nitei Gavriel"
           where="Hilchot Sukkot"

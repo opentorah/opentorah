@@ -242,7 +242,7 @@
     <day n="5" from="33:22"/>
     <day n="6" from="33:27"/>
     <day n="7" from="34:1"/>
-    <!-- Maftir SimchasTorah is NOT what it says here :) -->
+    <!-- TODO address the problem: Maftir SimchasTorah is NOT what it says here :) -->
     <maftir from="34:1"/>
   </week>
 </book>

@@ -497,6 +497,7 @@
       </custom>
     </haftarah>
     <!--
+    TODO put it where it belongs, and probably as comment element, not XML comment:
       hamichlol gives Tisha BeAv Mincha its own section, not the one shared by
       the other public fasts: there Teiman and most of Sefard read nothing at
       all, here everyone reads. So this is a table of its own, not a set of

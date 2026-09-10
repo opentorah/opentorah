@@ -106,8 +106,8 @@
             <name n="Фес" lang="ru"/>
             <name n="פאס" lang="he"/>
           </custom>
-          <!-- Marrakesh stands for Bogmaz too: Asulin never separates them, and no
-               reading we have tells them apart. -->
+          <!-- TODO put it where it belongs, and probably as comment element, not XML comment:
+           Marrakesh stands for Bogmaz too: Asulin never separates them, and no reading we have tells them apart. -->
           <custom>
             <name n="Marrakesh" lang="en" transliterated="true"/>
             <name n="Марракеш" lang="ru"/>
@@ -142,7 +142,7 @@
       </custom>
     </custom>
 
-    <!--
+    <!-- TODO put it where it belongs, and probably as comment element, not XML comment:
       Romania is neither Ashkenaz nor Sefard. hamichlol notes that its readings
       follow the old Erets Yisrael rite, "לעומת מנהגי שאר העדות שמבוססים על המנהג
       הבבלי": as against the other rites, which follow the Babylonian custom.
