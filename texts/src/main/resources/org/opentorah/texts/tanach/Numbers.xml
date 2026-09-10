@@ -37,7 +37,7 @@
   <chapter n="35" length="34"/>
   <chapter n="36" length="13"/>
 
-  <week fromChapter="1" fromVerse="1">
+  <week from="1:1">
     <name lang="he">במדבר</name>
     <name lang="en">Numbers</name>
     <name lang="en" transliterated="yes">Bemidbar</name>
@@ -45,196 +45,196 @@
     <name n="Числа" lang="ru"/>
     <name lang="ru" transliterated="true">Бэмидбар</name>
 
-    <aliyah n="2" fromChapter="1" fromVerse="5"/>
-    <aliyah n="3" fromChapter="1" fromVerse="17"/>
+    <aliyah n="2" from="1:5"/>
+    <aliyah n="3" from="1:17"/>
 
-    <day n="1" fromChapter="1" fromVerse="1"/>
-    <day n="2" fromChapter="1" fromVerse="20"/>
-    <day n="3" fromChapter="2" fromVerse="1"/>
-    <day n="4" fromChapter="3" fromVerse="1"/>
-    <day n="5" fromChapter="3" fromVerse="14"/>
-    <day n="6" fromChapter="3" fromVerse="40"/>
-    <day n="7" fromChapter="4" fromVerse="1"/>
-    <maftir fromChapter="4" fromVerse="17"/>
+    <day n="1" from="1:1"/>
+    <day n="2" from="1:20"/>
+    <day n="3" from="2:1"/>
+    <day n="4" from="3:1"/>
+    <day n="5" from="3:14"/>
+    <day n="6" from="3:40"/>
+    <day n="7" from="4:1"/>
+    <maftir from="4:17"/>
   </week>
 
-  <week fromChapter="4" fromVerse="21">
+  <week from="4:21">
     <name lang="he">נשא</name>
     <name lang="en" transliterated="yes">Nasso</name>
     <name lang="en" transliterated="yes">Naso</name>
     <name lang="ru" transliterated="true">Насо</name>
 
-    <aliyah n="2" fromChapter="4" fromVerse="25"/>
-    <aliyah n="3" fromChapter="4" fromVerse="29"/>
+    <aliyah n="2" from="4:25"/>
+    <aliyah n="3" from="4:29"/>
 
-    <day n="1" fromChapter="4" fromVerse="21"/>
-    <day n="2" fromChapter="4" fromVerse="38"/>
-    <day n="3" fromChapter="5" fromVerse="1"/>
-    <day n="4" fromChapter="5" fromVerse="11"/>
-    <day n="5" fromChapter="7" fromVerse="1"/>
-    <day n="6" fromChapter="7" fromVerse="42"/>
-    <day n="7" fromChapter="7" fromVerse="72"/>
-    <day n="7" fromChapter="7" fromVerse="84" custom="Chabad"/>
-    <maftir fromChapter="7" fromVerse="87"/>
+    <day n="1" from="4:21"/>
+    <day n="2" from="4:38"/>
+    <day n="3" from="5:1"/>
+    <day n="4" from="5:11"/>
+    <day n="5" from="7:1"/>
+    <day n="6" from="7:42"/>
+    <day n="7" from="7:72"/>
+    <day n="7" from="7:84" custom="Chabad"/>
+    <maftir from="7:87"/>
   </week>
 
-  <week fromChapter="8" fromVerse="1">
+  <week from="8:1">
     <name lang="he">בהעלותך</name>
     <name lang="en" transliterated="yes">Beha'aloscha</name>
     <name lang="ru" transliterated="true">Бэѓаалотха</name>
 
-    <aliyah n="2" fromChapter="8" fromVerse="5"/>
-    <aliyah n="3" fromChapter="8" fromVerse="10"/>
+    <aliyah n="2" from="8:5"/>
+    <aliyah n="3" from="8:10"/>
 
-    <day n="1" fromChapter="8" fromVerse="1"/>
-    <day n="2" fromChapter="8" fromVerse="15"/>
-    <day n="3" fromChapter="9" fromVerse="1"/>
-    <day n="4" fromChapter="9" fromVerse="15"/>
-    <day n="5" fromChapter="10" fromVerse="11"/>
-    <day n="6" fromChapter="10" fromVerse="35"/>
-    <day n="7" fromChapter="11" fromVerse="30"/>
-    <maftir fromChapter="12" fromVerse="14"/>
+    <day n="1" from="8:1"/>
+    <day n="2" from="8:15"/>
+    <day n="3" from="9:1"/>
+    <day n="4" from="9:15"/>
+    <day n="5" from="10:11"/>
+    <day n="6" from="10:35"/>
+    <day n="7" from="11:30"/>
+    <maftir from="12:14"/>
   </week>
 
-  <week fromChapter="13" fromVerse="1">
+  <week from="13:1">
     <name lang="he">שלח</name>
     <name lang="en" transliterated="yes">Shelach</name>
     <name lang="ru" transliterated="true">Шлах</name>
 
-    <aliyah n="2" fromChapter="13" fromVerse="4"/>
-    <aliyah n="3" fromChapter="13" fromVerse="17"/>
+    <aliyah n="2" from="13:4"/>
+    <aliyah n="3" from="13:17"/>
 
-    <day n="1" fromChapter="13" fromVerse="1"/>
-    <day n="2" fromChapter="13" fromVerse="21"/>
-    <day n="3" fromChapter="14" fromVerse="8"/>
-    <day n="4" fromChapter="14" fromVerse="26"/>
-    <day n="5" fromChapter="15" fromVerse="8"/>
-    <day n="6" fromChapter="15" fromVerse="17"/>
-    <day n="7" fromChapter="15" fromVerse="27"/>
-    <maftir fromChapter="15" fromVerse="37"/>
+    <day n="1" from="13:1"/>
+    <day n="2" from="13:21"/>
+    <day n="3" from="14:8"/>
+    <day n="4" from="14:26"/>
+    <day n="5" from="15:8"/>
+    <day n="6" from="15:17"/>
+    <day n="7" from="15:27"/>
+    <maftir from="15:37"/>
   </week>
 
-  <week fromChapter="16" fromVerse="1">
+  <week from="16:1">
     <name lang="he">קרח</name>
     <name lang="en" transliterated="yes">Korach</name>
     <name lang="ru" transliterated="true">Корах</name>
 
-    <aliyah n="2" fromChapter="16" fromVerse="4"/>
-    <aliyah n="3" fromChapter="16" fromVerse="8"/>
+    <aliyah n="2" from="16:4"/>
+    <aliyah n="3" from="16:8"/>
 
-    <day n="1" fromChapter="16" fromVerse="1"/>
-    <day n="2" fromChapter="16" fromVerse="14"/>
-    <day n="3" fromChapter="16" fromVerse="20"/>
-    <day n="4" fromChapter="17" fromVerse="9"/>
-    <day n="5" fromChapter="17" fromVerse="16"/>
-    <day n="6" fromChapter="17" fromVerse="25"/>
-    <day n="7" fromChapter="18" fromVerse="21"/>
-    <maftir fromChapter="18" fromVerse="30"/>
+    <day n="1" from="16:1"/>
+    <day n="2" from="16:14"/>
+    <day n="3" from="16:20"/>
+    <day n="4" from="17:9"/>
+    <day n="5" from="17:16"/>
+    <day n="6" from="17:25"/>
+    <day n="7" from="18:21"/>
+    <maftir from="18:30"/>
   </week>
 
-  <week fromChapter="19" fromVerse="1">
+  <week from="19:1">
     <name lang="he">חקת</name>
     <name lang="en" transliterated="yes">Chukas</name>
     <name lang="ru" transliterated="true">Хукат</name>
 
-    <aliyah n="2" fromChapter="19" fromVerse="7"/>
-    <aliyah n="3" fromChapter="19" fromVerse="10"/>
+    <aliyah n="2" from="19:7"/>
+    <aliyah n="3" from="19:10"/>
 
-    <day n="1" fromChapter="19" fromVerse="1"/>
-    <day n="2" fromChapter="19" fromVerse="18"/>
-    <day n="3" fromChapter="20" fromVerse="7"/>
-    <day n="2" fromChapter="20" fromVerse="7" combined="true"/>
-    <day n="4" fromChapter="20" fromVerse="14"/>
-    <day n="5" fromChapter="20" fromVerse="22"/>
-    <day n="3" fromChapter="20" fromVerse="22" combined="true"/>
-    <day n="6" fromChapter="21" fromVerse="10"/>
-    <day n="7" fromChapter="21" fromVerse="21"/>
-    <day n="4" fromChapter="21" fromVerse="21" combined="true"/>
-    <maftir fromChapter="21" fromVerse="34"/>
+    <day n="1" from="19:1"/>
+    <day n="2" from="19:18"/>
+    <day n="3" from="20:7"/>
+    <day n="2" from="20:7" combined="true"/>
+    <day n="4" from="20:14"/>
+    <day n="5" from="20:22"/>
+    <day n="3" from="20:22" combined="true"/>
+    <day n="6" from="21:10"/>
+    <day n="7" from="21:21"/>
+    <day n="4" from="21:21" combined="true"/>
+    <maftir from="21:34"/>
   </week>
 
-  <week fromChapter="22" fromVerse="2">
+  <week from="22:2">
     <name lang="he">בלק</name>
     <name lang="en" transliterated="yes">Balak</name>
     <name lang="ru" transliterated="true">Балак</name>
 
-    <aliyah n="2" fromChapter="22" fromVerse="5"/>
-    <aliyah n="3" fromChapter="22" fromVerse="8"/>
+    <aliyah n="2" from="22:5"/>
+    <aliyah n="3" from="22:8"/>
 
-    <day n="1" fromChapter="22" fromVerse="2"/>
-    <day n="2" fromChapter="22" fromVerse="13"/>
-    <day n="5" fromChapter="22" fromVerse="13" combined="true"/>
-    <day n="3" fromChapter="22" fromVerse="21"/>
-    <day n="4" fromChapter="22" fromVerse="39"/>
-    <day n="6" fromChapter="22" fromVerse="39" combined="true"/>
-    <day n="5" fromChapter="23" fromVerse="13"/>
-    <day n="6" fromChapter="23" fromVerse="27"/>
-    <day n="7" fromChapter="23" fromVerse="27" combined="true"/>
-    <day n="7" fromChapter="24" fromVerse="14"/>
-    <maftir fromChapter="25" fromVerse="7"/>
+    <day n="1" from="22:2"/>
+    <day n="2" from="22:13"/>
+    <day n="5" from="22:13" combined="true"/>
+    <day n="3" from="22:21"/>
+    <day n="4" from="22:39"/>
+    <day n="6" from="22:39" combined="true"/>
+    <day n="5" from="23:13"/>
+    <day n="6" from="23:27"/>
+    <day n="7" from="23:27" combined="true"/>
+    <day n="7" from="24:14"/>
+    <maftir from="25:7"/>
   </week>
 
-  <week fromChapter="25" fromVerse="10">
+  <week from="25:10">
     <name lang="he">פנחס</name>
     <name lang="en" transliterated="yes">Pinchas</name>
     <name lang="ru" transliterated="true">Пинхас</name>
 
-    <aliyah n="2" fromChapter="25" fromVerse="13"/>
-    <aliyah n="3" fromChapter="25" fromVerse="16"/>
+    <aliyah n="2" from="25:13"/>
+    <aliyah n="3" from="25:16"/>
 
-    <day n="1" fromChapter="25" fromVerse="10"/>
-    <day n="2" fromChapter="26" fromVerse="5"/>
-    <day n="3" fromChapter="26" fromVerse="52"/>
-    <day n="4" fromChapter="27" fromVerse="6"/>
-    <day n="5" fromChapter="28" fromVerse="1"/>
-    <day n="6" fromChapter="28" fromVerse="16"/>
-    <day n="7" fromChapter="29" fromVerse="12"/>
-    <maftir fromChapter="29" fromVerse="35"/>
+    <day n="1" from="25:10"/>
+    <day n="2" from="26:5"/>
+    <day n="3" from="26:52"/>
+    <day n="4" from="27:6"/>
+    <day n="5" from="28:1"/>
+    <day n="6" from="28:16"/>
+    <day n="7" from="29:12"/>
+    <maftir from="29:35"/>
   </week>
 
-  <week fromChapter="30" fromVerse="2">
+  <week from="30:2">
     <name lang="he">מטות</name>
     <name lang="en" transliterated="yes">Mattos</name>
     <name lang="en" transliterated="yes">Matos</name>
     <name lang="ru" transliterated="true">Матот</name>
 
-    <aliyah n="2" fromChapter="30" fromVerse="10"/>
-    <aliyah n="3" fromChapter="30" fromVerse="14"/>
+    <aliyah n="2" from="30:10"/>
+    <aliyah n="3" from="30:14"/>
 
-    <day n="1" fromChapter="30" fromVerse="2"/>
-    <day n="2" fromChapter="31" fromVerse="1"/>
-    <day n="3" fromChapter="31" fromVerse="13"/>
-    <day n="2" fromChapter="31" fromVerse="13" combined="true"/>
-    <day n="4" fromChapter="31" fromVerse="25"/>
-    <day n="5" fromChapter="31" fromVerse="42"/>
-    <day n="6" fromChapter="32" fromVerse="1"/>
-    <day n="3" fromChapter="32" fromVerse="1" combined="true"/>
-    <day n="7" fromChapter="32" fromVerse="20"/>
-    <day n="4" fromChapter="32" fromVerse="20" combined="true"/>
-    <maftir fromChapter="32" fromVerse="39"/>
+    <day n="1" from="30:2"/>
+    <day n="2" from="31:1"/>
+    <day n="3" from="31:13"/>
+    <day n="2" from="31:13" combined="true"/>
+    <day n="4" from="31:25"/>
+    <day n="5" from="31:42"/>
+    <day n="6" from="32:1"/>
+    <day n="3" from="32:1" combined="true"/>
+    <day n="7" from="32:20"/>
+    <day n="4" from="32:20" combined="true"/>
+    <maftir from="32:39"/>
   </week>
 
-  <week fromChapter="33" fromVerse="1">
+  <week from="33:1">
     <name lang="he">מסעי</name>
     <name lang="en" transliterated="yes">Masei</name>
     <name lang="ru" transliterated="true">Масъэй</name>
 
-    <aliyah n="2" fromChapter="33" fromVerse="4"/>
-    <aliyah n="3" fromChapter="33" fromVerse="50" toVerse="53"/>
+    <aliyah n="2" from="33:4"/>
+    <aliyah n="3" from="33:50" to="33:53"/>
 
-    <day n="1" fromChapter="33" fromVerse="1"/>
-    <day n="2" fromChapter="33" fromVerse="11" custom="Ashkenaz"/>
-    <day n="5" fromChapter="33" fromVerse="11" combined="true" custom="Ashkenaz"/>
-    <day n="2" fromChapter="33" fromVerse="50"/>
-    <day n="5" fromChapter="33" fromVerse="50" combined="true"/>
-    <day n="3" fromChapter="33" fromVerse="54"/>
-    <day n="3" fromChapter="33" fromVerse="50" custom="Ashkenaz"/>
-    <day n="4" fromChapter="34" fromVerse="16"/>
-    <day n="6" fromChapter="34" fromVerse="16" combined="true"/>
-    <day n="5" fromChapter="35" fromVerse="1"/>
-    <day n="6" fromChapter="35" fromVerse="9"/>
-    <day n="7" fromChapter="35" fromVerse="9" combined="true"/>
-    <day n="7" fromChapter="36" fromVerse="1"/>
-    <maftir fromChapter="36" fromVerse="11"/>
+    <day n="1" from="33:1"/>
+    <day n="2" from="33:11" custom="Ashkenaz"/>
+    <day n="5" from="33:11" combined="true" custom="Ashkenaz"/>
+    <day n="2" from="33:50"/>
+    <day n="5" from="33:50" combined="true"/>
+    <day n="3" from="33:54"/>
+    <day n="3" from="33:50" custom="Ashkenaz"/>
+    <day n="4" from="34:16"/>
+    <day n="6" from="34:16" combined="true"/>
+    <day n="5" from="35:1"/>
+    <day n="6" from="35:9"/>
+    <day n="7" from="35:9" combined="true"/>
+    <day n="7" from="36:1"/>
+    <maftir from="36:11"/>
   </week>
 </book>

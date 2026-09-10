@@ -44,7 +44,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   /**
    * A reading in which a custom may read nothing at all: `None` is a value
    * here, not a missing entry, so a custom can read nothing where its parent
-   * reads something. See `<none>`.
+   * reads something. See `reads="none"`.
    */
   type OptionalCustoms = Custom.Of[Option[Haftarah]]
 
@@ -92,7 +92,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   def decode[E: XmlAst](element: E, full: Boolean): Customs =
     element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
-    require(parsed.nones.isEmpty, "<none> in a reading that is not optional")
+    require(parsed.nones.isEmpty, """reads="none" in a reading that is not optional""")
     parsed.customs
 
   def decodeRecorded[E: XmlAst](element: E, full: Boolean): Recorded =
@@ -100,7 +100,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     Recorded(parsed.annotations, parsed.variants)
 
-  /** A reading in which a custom may read nothing; see `<none>`. */
+  /** A reading in which a custom may read nothing; see `reads="none"`. */
   def decodeOptional[E: XmlAst](element: E, full: Boolean): OptionalCustoms =
     element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full = false)
@@ -129,130 +129,125 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   /**
    * `sources="michlol, chitas"`: the sources an entry rests on, by name; see
    * [[ReadingSources]]. Comma-separated, as `n` lists customs. Allowed on
-   * `week` and on `custom`, not on `part`: the parts of one reading are
-   * attested together.
+   * `week`, `custom` and `variant`, not on `span`: the spans of one reading
+   * are attested together.
    *
-   * `<comment>`: what the sources do not settle, said in words. For where they
-   * disagree, or agree only with a qualification -- a chumash that prints
-   * verses as "some add" is not the same as one that prints them plainly.
-   * Last child, alongside `sources`, on `week`, `custom`, `annotation` and
-   * `none`.
+   * `<comment>`: what the sources do not settle, said in words. Last child,
+   * alongside `sources`, on `week`, `custom` and `variant`.
    *
    * `precedenceWhenCombined="Chabad"`: customs for which this parsha's
    * haftarah takes precedence when it is combined with the next, instead of
    * the second parsha's as combined weeks otherwise do. Names a custom and
    * everything under it, so `Common` means the whole tree.
    *
-   * `variant="2"`: a reading recorded beside the custom's own, not instead of
-   * it. For where the sources report a practice without settling who follows
-   * it -- a variant is never resolved to, so nothing reads it by accident; it
-   * is there to be shown next to the primary reading and to keep what is known
-   * from being thrown away. Numbered from 2, the primary being 1.
+   * `reads="inherit"`: what is known about a custom's reading where the custom
+   * has no reading of its own. A custom that follows its parent has nowhere to
+   * carry a source, and giving it a span would assert a distinction that is
+   * not being made -- and be rejected, since two entries cannot hold the same
+   * reading.
+   *
+   * `reads="none"`: a custom that reads no haftarah at all. Absence expressed
+   * by leaving a custom out of the map means "inherit from the parent", so it
+   * cannot say this. Only readings parsed as [[OptionalCustoms]] may carry it
+   * -- the weekly readings are full, and everyone reads something.
+   *
+   * Nested `<variant>`: a reading recorded beside the custom's own, not
+   * instead of it. Never resolved to. Numbered from 2 in document order, the
+   * primary being 1. `n` on variant names a subset of the parent custom;
+   * omitted, the variant belongs to every custom on the parent.
    */
   private def withAnnotations(dto: HaftarahDto, full: Boolean): Parsed =
-    val bookSpanParsed: BookSpanParsed = dto.span
-    val parts: Seq[WithNumber[BookSpan]] = dto.parts.map(decodePart(bookSpanParsed, _))
-    val partsOpt: Option[Haftarah] = if parts.isEmpty then None else Some(partsHaftarah(parts))
-    val parsed: Seq[CustomParsed] = dto.customs.map(decodeCustom(bookSpanParsed, _))
-    val standalone: Seq[(Set[Custom], Annotation)] = dto.annotations.map(decodeNamed)
-    val noneEntries: Seq[(Set[Custom], Annotation)] = dto.nones.map(decodeNamed)
-    // a variant stands beside the reading rather than being one of them, so it
-    // takes no part in building the map that customs resolve through
-    val (variantsParsed: Seq[CustomParsed], parsedCustoms: Seq[CustomParsed]) =
-      parsed.partition(_.variant.isDefined)
+    val ancestor: BookSpanParsed = bookOnly(dto.book)
+    val parsed: Seq[CustomParsed] = dto.customs.map(decodeCustom(ancestor, _))
+    val readings: Seq[CustomParsed] = parsed.filter(_.reads.isEmpty)
+    val inherit: Seq[CustomParsed] = parsed.filter(_.reads.contains("inherit"))
+    val noneEntries: Seq[CustomParsed] = parsed.filter(_.reads.contains("none"))
 
-    val variants: Variants = variantsParsed
-      .flatMap(parsed => parsed.customs.toSeq.map(_ -> Variant(parsed.variant.get, parsed.haftarah, parsed.annotation)))
+    val variants: Variants = readings
+      .flatMap(_.variants)
       .groupMap((custom, _) => custom)((_, variant) => variant)
       .view.mapValues(_.sortBy(_.number)).toMap
 
-    val customsElements: Seq[(Set[Custom], Haftarah)] = parsedCustoms.map(p => (p.customs, p.haftarah))
-    // one annotation may cover several customs: `<custom n="Sefard, Italki" sources="1"/>`
+    val customsElements: Seq[(Set[Custom], Haftarah)] = readings.map(p => (p.customs, p.haftarah.get))
     val annotations: Annotations = (
-      parsedCustoms
+      (readings ++ inherit ++ noneEntries)
         .filterNot(_.annotation.isEmpty)
-        .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation)) ++
-      standalone
-        .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation)) ++
-      noneEntries
-        .filterNot((_, annotation) => annotation.isEmpty)
-        .flatMap((customs, annotation) => customs.toSeq.map(_ -> annotation))
+        .flatMap(parsed => parsed.customs.toSeq.map(_ -> parsed.annotation))
     ).groupMapReduce((custom, _) => custom)((_, annotation) => annotation)(_ ++ _)
 
     val customs: Custom.Of[Haftarah] = Custom.Of(customsElements, full = false)
-    val common: Option[Haftarah] = if parts.isEmpty && customsElements.isEmpty then Some(oneSpan(bookSpanParsed)) else partsOpt
+    Parsed(new Custom.Of(customs.customs, full = full), annotations, variants, noneEntries.flatMap(_.customs).toSet)
 
-    val result: Map[Custom, Haftarah] = common.fold(customs.customs)(common =>
-      require(customs.find(Custom.Common).isEmpty)
-      customs.customs.updated(Custom.Common, common)
-    )
-
-    Parsed(new Custom.Of(result, full = full), annotations, variants, noneEntries.flatMap(_._1).toSet)
-
-  private def oneSpan(span: BookSpanParsed): Haftarah = Haftarah(Seq(span.resolve))
+  private def bookOnly(book: Option[String]): BookSpanParsed = BookSpanParsed(
+    book = book.map(_.trim).filter(_.nonEmpty),
+    span = SpanParsed(VerseParsed(None, None), VerseParsed(None, None))
+  )
 
   private final case class CustomParsed(
     customs: Set[Custom],
-    haftarah: Haftarah,
+    haftarah: Option[Haftarah],
     annotation: Annotation,
-    variant: Option[Int]
+    variants: Seq[(Custom, Variant)],
+    reads: Option[String]
   )
 
-  private def decodeCustom(ancestorSpan: BookSpanParsed, dto: CustomDto): CustomParsed =
-    val bookSpanParsed: BookSpanParsed = dto.span.inheritFrom(ancestorSpan)
-    val parts: Seq[WithNumber[BookSpan]] = dto.parts.map(decodePart(bookSpanParsed, _))
-    val result: Haftarah = if parts.isEmpty then oneSpan(bookSpanParsed) else partsHaftarah(parts)
-    CustomParsed(Custom.parse(dto.n), result, annotation(dto.sources, dto.comment), dto.variant)
+  private def decodeCustom(ancestor: BookSpanParsed, dto: CustomDto): CustomParsed =
+    val reads: Option[String] = parseReads(dto.reads)
+    val here: BookSpanParsed = bookOnly(dto.book).inheritFrom(ancestor)
+    val note: Annotation = annotation(dto.sources, dto.comment)
+    val names: Set[Custom] = Custom.parse(dto.n)
+    reads match
+      case Some(_) =>
+        require(dto.spans.isEmpty, s"custom '${dto.n}' with reads= cannot have span")
+        require(dto.variants.isEmpty, s"custom '${dto.n}' with reads= cannot have variant")
+        CustomParsed(names, None, note, Nil, reads)
+      case None =>
+        require(dto.spans.nonEmpty, s"custom '${dto.n}' needs a span")
+        CustomParsed(
+          names,
+          Some(spansHaftarah(dto.spans.map(decodeSpan(here, _)))),
+          note,
+          dto.variants.zipWithIndex.flatMap((variant, index) =>
+            decodeVariant(here, names, variant, index + 2)),
+          None
+        )
 
-  /**
-   * `<annotation n="Chabad" sources="chitas"/>`: what is known about a custom's
-   * reading, where the custom has no reading of its own. A custom that follows
-   * its parent has nowhere to carry a source, and giving it an entry to hold one
-   * would assert a distinction that is not being made -- and be rejected, since
-   * two entries cannot hold the same reading. This attaches the source to the
-   * custom without touching what it reads.
-   *
-   * `<none n="Agadir"/>`: a custom that reads no haftarah at all. Absence
-   * expressed by leaving a custom out of the map means "inherit from the
-   * parent", so it cannot say this; and a hole is silent, where a value has to
-   * be written down to exist. Only readings parsed as [[OptionalCustoms]] may
-   * carry it -- the weekly readings are full, and everyone reads something.
-   */
-  private def decodeNamed(dto: NamedDto): (Set[Custom], Annotation) =
-    (Custom.parse(dto.n), annotation(dto.sources, dto.comment))
+  private def parseReads(value: Option[String]): Option[String] =
+    value.map(_.trim).filter(_.nonEmpty).map: v =>
+      require(v == "inherit" || v == "none", s"reads must be inherit or none, got '$v'")
+      v
 
-  private def decodePart(ancestorSpan: BookSpanParsed, dto: PartDto): WithNumber[BookSpan] =
-    WithNumber(dto.n, dto.span.inheritFrom(ancestorSpan).resolve)
+  private def decodeVariant(
+    ancestor: BookSpanParsed,
+    parent: Set[Custom],
+    dto: VariantDto,
+    number: Int
+  ): Seq[(Custom, Variant)] =
+    require(dto.spans.nonEmpty, "variant needs a span")
+    val customs: Set[Custom] = dto.n.fold(parent): n =>
+      val subset: Set[Custom] = Custom.parse(n)
+      require(subset.subsetOf(parent), s"variant n='$n' is not under '${parent.map(_.name).mkString(", ")}'")
+      subset
+    val variant: Variant =
+      Variant(number, spansHaftarah(dto.spans.map(decodeSpan(ancestor, _))), annotation(dto.sources, dto.comment))
+    customs.toSeq.map(_ -> variant)
 
-  private def partsHaftarah(parts: Seq[WithNumber[BookSpan]]): Haftarah =
-    WithNumber.requireConsecutive(parts, "part")
-    require(parts.length > 1, "too short")
-    Haftarah(WithNumber.dropNumbers(parts))
+  private def decodeSpan(ancestor: BookSpanParsed, dto: SpanDto): BookSpan =
+    dto.parsed.inheritFrom(ancestor).resolve
 
-  private def spanOf(
-    book: Option[String],
-    fromChapter: Option[Int],
-    fromVerse: Option[Int],
-    toChapter: Option[Int],
-    toVerse: Option[Int]
-  ): BookSpanParsed = BookSpanParsed(
-    book = book.map(_.trim).filter(_.nonEmpty),
-    span = SpanParsed(VerseParsed(fromChapter, fromVerse), VerseParsed(toChapter, toVerse))
-  )
+  private def spansHaftarah(spans: Seq[BookSpan]): Haftarah =
+    require(spans.nonEmpty, "empty reading")
+    Haftarah(spans)
 
   @Modifier.config(XmlCodec.Element, "haftarah")
   private final case class HaftarahDto(
     @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "annotation") annotations: Seq[NamedDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty
-  ) derives CanEqual:
-    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
+    @Modifier.config(XmlCodec.Attribute, "") when: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") role: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") n: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") partial: Option[Boolean] = None,
+    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty
+  ) derives CanEqual
 
   private object HaftarahDto:
     given schema: Schema[HaftarahDto] = Schema.derived
@@ -264,19 +259,10 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") precedenceWhenCombined: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "annotation") annotations: Seq[NamedDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "none") nones: Seq[NamedDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual:
-    def asHaftarah: HaftarahDto = HaftarahDto(
-      book, fromChapter, fromVerse, toChapter, toVerse, parts, customs, annotations, nones
-    )
+    def asHaftarah: HaftarahDto = HaftarahDto(book = book, customs = customs)
 
   private object WeekDto:
     given schema: Schema[WeekDto] = Schema.derived
@@ -285,29 +271,27 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   private final case class CustomDto(
     @Modifier.config(XmlCodec.Attribute, "") n: String,
     @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") variant: Option[Int] = None,
+    @Modifier.config(XmlCodec.Attribute, "") reads: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
-  ) derives CanEqual:
-    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
-
-  private final case class PartDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: Int,
-    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") fromVerse: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toChapter: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") toVerse: Option[Int] = None
-  ) derives CanEqual:
-    def span: BookSpanParsed = spanOf(book, fromChapter, fromVerse, toChapter, toVerse)
-
-  private final case class NamedDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: String,
-    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "variant") variants: Seq[VariantDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
+
+  private final case class VariantDto(
+    @Modifier.config(XmlCodec.Attribute, "") n: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
+  ) derives CanEqual
+
+  private final case class SpanDto(
+    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
+    @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None
+  ) derives CanEqual:
+    def parsed: BookSpanParsed = BookSpanParsed(
+      book = book.map(_.trim).filter(_.nonEmpty),
+      span = SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to))
+    )
+

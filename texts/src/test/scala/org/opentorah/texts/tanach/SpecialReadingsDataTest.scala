@@ -19,26 +19,35 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
 
   private val days: Seq[ZioXml.Element] = root.childrenNamed("day")
 
-  private val readings: Seq[(String, String, ZioXml.Element)] = for
+  private val readings: Seq[(String, SpecialReadings.Slot, ZioXml.Element)] = for
     day <- days
-    reading <- day.childrenNamed("reading")
-  yield (day.requireAttr("n"), reading.requireAttr("n"), reading)
+    element <- day.getChildren.flatMap(_.asElement)
+    tag = element.getName.localName
+    if Seq("torah", "maftir", "haftarah").contains(tag)
+  yield (
+    day.requireAttr("n"),
+    SpecialReadings.Slot(
+      tag,
+      when = element.get("when").map(_.trim).filter(_.nonEmpty),
+      role = element.get("role").map(_.trim).filter(_.nonEmpty),
+      n = element.get("n").map(_.trim).filter(_.nonEmpty).map(_.toInt)
+    ),
+    element
+  )
 
   "SpecialReadings.xml" should "hold every reading, and each of them once" in:
-    val keys: Seq[(String, String)] = readings.map((day, name, _) => (day, name))
+    val keys: Seq[(String, SpecialReadings.Slot)] = readings.map((day, slot, _) => (day, slot))
     keys.size shouldBe 60
     keys.distinct shouldBe keys
 
-  it should "give every reading a day and a name" in:
-    for (day, name, _) <- readings do
-      withClue(s"'$day'/'$name': ")((day.nonEmpty && name.nonEmpty) shouldBe true)
+  it should "give every reading a day" in:
+    for (day, slot, _) <- readings do
+      withClue(s"'$day'/$slot: ")(day.nonEmpty shouldBe true)
 
-  it should "wrap exactly one torah, maftir or haftarah in each reading" in:
-    for (day, name, reading) <- readings do
-      val elements = reading.getChildren.flatMap(_.asElement)
-      withClue(s"$day/$name: ")(elements.map(_.getName.localName) should have size 1)
-      withClue(s"$day/$name: ")
-        (Seq("torah", "maftir", "haftarah") should contain (elements.head.getName.localName))
+  it should "use only torah, maftir or haftarah as children of day" in:
+    for (day, slot, _) <- readings do
+      withClue(s"$day/$slot: ")
+        (Seq("torah", "maftir", "haftarah") should contain (slot.tag))
 
   "the readings" should "all still parse and resolve" in:
     // forcing SpecialReadings parses every one of them; before the move, a

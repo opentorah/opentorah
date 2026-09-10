@@ -59,7 +59,7 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
    */
   @Modifier.config(XmlCodec.Element, "custom")
   private final case class Entry(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data],
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name],
     @Modifier.config(XmlCodec.Element, "custom") children: Seq[Entry] = Seq.empty
   ) derives CanEqual
 
@@ -70,7 +70,7 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
   private lazy val loaded: (Seq[Names], Map[Custom, Option[Custom]]) =
     def walk(entries: Seq[Entry], parent: Option[Custom]): Seq[(Custom, Names, Option[Custom])] =
       entries.flatMap: entry =>
-        val names: Names = Names.fromDefaultName(None, entry.names.map(Name.fromData))
+        val names: Names = Names.fromDefaultName(None, entry.names)
         val custom: Custom = HasName.find(valuesSeq, names)
         (custom, names, parent) +: walk(entry.children, Some(custom))
     val walked: Seq[(Custom, Names, Option[Custom])] =

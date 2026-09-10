@@ -38,10 +38,10 @@ final class VariantTest extends AnyFlatSpec, Matchers:
     // sources="1" survived there, in the form replaced everywhere else, and
     // the suite stayed green
     for
-      ((day, reading), recorded) <- SpecialReadings.recorded
+      ((day, slot), recorded) <- SpecialReadings.recorded
       (custom, annotation) <- recorded.annotations
       key <- annotation.sources
-    do withClue(s"$day/$reading/$custom: ")(ReadingSources.sources.keySet should contain (key))
+    do withClue(s"$day/$slot/$custom: ")(ReadingSources.sources.keySet should contain (key))
 
   "every source an entry names" should "be one ReadingSources knows" in:
     // entries refer to sources by name now, so a typo is a runtime error

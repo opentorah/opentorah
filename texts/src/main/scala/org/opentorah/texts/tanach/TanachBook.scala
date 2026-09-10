@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Names}
 import org.podval.store.{By, Stores}
-import org.podval.xml.{Xml, XmlAst, XmlCodec, XmlError, XmlParser}
+import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
 
 trait TanachBook extends HasName, Stores[?] derives CanEqual: // all deriveds are objects; using eq
 
@@ -30,16 +30,15 @@ private[tanach] object TanachBook:
     override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =
       throw XmlError("Tanach book is decode-only")
 
-  private def loadBook(name: String): Parsed =
-    XmlParser.parseResource[Xml.Element](Tanach.getClass, s"$name.xml")
-      .flatMap(codec.decode)
-      .fold(error => throw error, identity)
-
   private lazy val book2parsed: Map[TanachBook, Parsed] =
-    val fromFiles: Seq[Parsed] =
-      Seq("Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Psalms").map(loadBook)
     val parsed: Seq[Parsed] =
-      (fromFiles ++ XmlParser.loadCatalog(Tanach, codec))
+      (
+        XmlParser.loadResources(
+          Tanach,
+          codec,
+          "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Psalms"
+        ) ++ XmlParser.loadCatalog(Tanach, codec)
+      )
         .sortBy(p => valuesSeq.indexOf(p.book))
     val result: Map[TanachBook, Parsed] = parsed.map(metadata => metadata.book -> metadata).toMap
     val unmatched: Set[TanachBook] = valuesSeq.toSet -- result.keySet

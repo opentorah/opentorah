@@ -42,12 +42,11 @@ trait WithBookSpans[Book <: TanachBook]:
     def from(source: HasNames): BookSpan = BookSpan(book, span, Some(source))
 
   final class BookSpanParsed(val book: Option[String], val span: SpanParsed):
+    /** `book` may be restated; `from`/`to` are not inherited. */
     def inheritFrom(ancestor: BookSpanParsed): BookSpanParsed =
-      require(this.book.isEmpty || ancestor.book.isEmpty)
-
       BookSpanParsed(
         book = this.book.orElse(ancestor.book),
-        span = this.span.inheritFrom(ancestor.span)
+        span = this.span
       )
 
     def resolve: BookSpan = BookSpan(getBook(book.get), span.resolve)

@@ -4,9 +4,6 @@ import org.podval.xml.XmlAst
 
 final class VerseParsed(val chapter: Option[Int], val verse: Option[Int]):
   def inheritFrom(ancestor: VerseParsed): VerseParsed =
-    require(this.chapter.isEmpty || ancestor.chapter.isEmpty)
-    require(this.verse.isEmpty || ancestor.verse.isEmpty)
-
     VerseParsed(
       chapter = this.chapter.orElse(ancestor.chapter),
       verse = this.verse.orElse(ancestor.verse),
@@ -20,11 +17,25 @@ final class VerseParsed(val chapter: Option[Int], val verse: Option[Int]):
 
 object VerseParsed:
 
-  def decodeFrom[E: XmlAst](element: E): VerseParsed = decode(element, "from")
+  def parse(value: String): VerseParsed =
+    val trimmed: String = value.trim
+    trimmed.split(':').toSeq.map(_.trim) match
+      case Seq(chapter) =>
+        VerseParsed(Some(positive(chapter, trimmed)), None)
+      case Seq(chapter, verse) =>
+        VerseParsed(Some(positive(chapter, trimmed)), Some(positive(verse, trimmed)))
+      case _ =>
+        throw IllegalArgumentException(s"Citation must be chapter or chapter:verse, got '$value'")
 
-  def decodeTo[E: XmlAst](element: E): VerseParsed = decode(element, "to")
+  def parseOpt(value: Option[String]): VerseParsed =
+    value.map(_.trim).filter(_.nonEmpty).fold(VerseParsed(None, None))(parse)
 
-  private def decode[E: XmlAst](element: E, prefix: String): VerseParsed = VerseParsed(
-    chapter = element.positiveIntOpt(prefix + "Chapter"),
-    verse = element.positiveIntOpt(prefix + "Verse")
-  )
+  def decodeFrom[E: XmlAst](element: E): VerseParsed = parseOpt(element.get("from"))
+
+  def decodeTo[E: XmlAst](element: E): VerseParsed = parseOpt(element.get("to"))
+
+  private def positive(raw: String, whole: String): Int =
+    val n: Int = raw.toIntOption.getOrElse(throw IllegalArgumentException(
+      s"Citation must be chapter or chapter:verse, got '$whole'"))
+    require(n > 0, s"Citation '$whole' must be positive")
+    n

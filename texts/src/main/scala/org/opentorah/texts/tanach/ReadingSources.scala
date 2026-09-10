@@ -9,8 +9,8 @@ import zio.blocks.schema.{Modifier, Schema}
  * differences are the part most likely to be questioned, so an entry in
  * Haftarah.xml can name the sources it rests on:
  *
- *   <week n="Vayeilech" sources="michlol chitas">
- *     <custom n="Ashkenaz" sources="2"> ... </custom>
+ *   <week n="Vayeilech">
+ *     <custom n="Ashkenaz" sources="michlol, chitas"> ... </custom>
  *   </week>
  *
  * A `sources` on a
@@ -121,21 +121,40 @@ object ReadingSources:
     Haftarah.variantsByParsha.getOrElse(parsha, Map.empty).getOrElse(custom, Nil)
 
   /** What is recorded for one of the special readings, which are keyed by the
-    * day and the reading name rather than by parsha. */
-  private def specialAnnotation(day: String, reading: String, custom: Custom): Haftarah.Annotation =
+    * day and [[SpecialReadings.Slot]] rather than by parsha. */
+  private def specialAnnotation(day: String, slot: SpecialReadings.Slot, custom: Custom): Haftarah.Annotation =
     val byCustom: Map[Custom, Haftarah.Annotation] =
-      SpecialReadings.recorded.get((day, reading)).fold(Map.empty)(_.annotations)
+      SpecialReadings.recorded.get((day, slot)).fold(Map.empty)(_.annotations)
     byCustom.getOrElse(custom, Haftarah.Annotation()) ++
       byCustom.getOrElse(Custom.Common, Haftarah.Annotation())
 
-  def forSpecialReading(day: String, reading: String, custom: Custom): Seq[Source] =
-    specialAnnotation(day, reading, custom).sources.map(byKey)
+  def forSpecialReading(
+    day: String,
+    custom: Custom,
+    when: Option[String] = None,
+    role: Option[String] = None,
+    n: Option[Int] = None
+  ): Seq[Source] =
+    specialAnnotation(day, SpecialReadings.Slot("haftarah", when, role, n), custom).sources.map(byKey)
 
-  def commentForSpecialReading(day: String, reading: String, custom: Custom): Option[String] =
-    specialAnnotation(day, reading, custom).comment
+  def commentForSpecialReading(
+    day: String,
+    custom: Custom,
+    when: Option[String] = None,
+    role: Option[String] = None,
+    n: Option[Int] = None
+  ): Option[String] =
+    specialAnnotation(day, SpecialReadings.Slot("haftarah", when, role, n), custom).comment
 
-  def variantsForSpecialReading(day: String, reading: String, custom: Custom): Seq[Haftarah.Variant] =
-    SpecialReadings.recorded.get((day, reading)).fold(Nil)(_.variants.getOrElse(custom, Nil))
+  def variantsForSpecialReading(
+    day: String,
+    custom: Custom,
+    when: Option[String] = None,
+    role: Option[String] = None,
+    n: Option[Int] = None
+  ): Seq[Haftarah.Variant] =
+    SpecialReadings.recorded.get((day, SpecialReadings.Slot("haftarah", when, role, n)))
+      .fold(Nil)(_.variants.getOrElse(custom, Nil))
 
   /** Every parsha that names at least one source or carries a comment. */
   def annotatedParshiyos: Set[Parsha] = Haftarah.annotationsByParsha.keySet

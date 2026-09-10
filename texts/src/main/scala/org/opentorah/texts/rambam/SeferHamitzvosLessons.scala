@@ -60,7 +60,7 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   @Modifier.config(XmlCodec.Element, "named")
   private final case class NamedDto(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty
   ) extends PartDto derives CanEqual
 
   private object PartDto:
@@ -69,7 +69,7 @@ object SeferHamitzvosLessons extends Stores[?]:
     def toPart(dto: PartDto): Part = dto match
       case PositiveDto(n) => Positive(n)
       case NegativeDto(n) => Negative(n)
-      case NamedDto(names) => NamedPart(Names(names.map(Name.fromData)))
+      case NamedDto(names) => NamedPart(Names(names))
 
   private lazy val lessonDtos: Seq[LessonDto] = XmlParser.loadCatalog(this, LessonDto.codec)
 

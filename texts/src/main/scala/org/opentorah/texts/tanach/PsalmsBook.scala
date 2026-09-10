@@ -22,10 +22,10 @@ trait PsalmsBook extends NachBook:
       "day of the week",
       weekDays,
       chapters,
-      fromName = name =>
+      name2number = name =>
         NumberedStores.parseNumber(name).orElse:
           Week.Day.valuesSeq.find(_.names.hasName(name)).map(_.ordinal + 1),
-      toNames = number =>
+      number2names = number =>
         Names(NumberedStores.namesForNumber(number).names ++ Week.Day.forNumber(number).names.names)
     )
   )

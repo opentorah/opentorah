@@ -7,7 +7,7 @@ import org.podval.xml.{Xml, XmlCodec, XmlParser}
 import zio.blocks.schema.{Modifier, Schema}
 
 object MishnehTorah extends Stores[?]:
-  override lazy val names: Names = Names(work.names.map(Name.fromData))
+  override lazy val names: Names = Names(work.names)
 
   final class Book(
     val number: Int,
@@ -53,7 +53,7 @@ object MishnehTorah extends Stores[?]:
   @Modifier.config(XmlCodec.Element, "book")
   private final case class BookDto(
     @Modifier.config(XmlCodec.Attribute, "") n: Int,
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty
   ) derives CanEqual
 
@@ -63,29 +63,29 @@ object MishnehTorah extends Stores[?]:
     def toBook(dto: BookDto): Book =
       val parts: Seq[Part] = dto.parts.map(PartDto.toPart)
       Collections.requireConsecutive(parts, _.number, "part")
-      Book(dto.n, Names(dto.names.map(Name.fromData)), parts)
+      Book(dto.n, Names(dto.names), parts)
 
   private final case class PartDto(
     @Modifier.config(XmlCodec.Attribute, "") n: Int,
     @Modifier.config(XmlCodec.Attribute, "") chapters: Int,
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "chapter") chapterElems: Seq[ChapterDto] = Seq.empty
   ) derives CanEqual
 
   private object PartDto:
     def toPart(dto: PartDto): Part =
-      val names: Names = Names(dto.names.map(Name.fromData))
+      val names: Names = Names(dto.names)
       if dto.chapterElems.isEmpty then PartWithNumberedChapters(dto.n, dto.chapters, names)
       else
-        val chapters: Seq[NamedChapter] = dto.chapterElems.map(c => NamedChapter(Names(c.names.map(Name.fromData))))
+        val chapters: Seq[NamedChapter] = dto.chapterElems.map(c => NamedChapter(Names(c.names)))
         PartWithNamedChapters(dto.n, dto.chapters, names, chapters)
 
   private final case class ChapterDto(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty
   ) derives CanEqual
 
   private final case class WorkDto(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name.Data] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "book") books: Seq[BookDto] = Seq.empty
   ) derives CanEqual
 

@@ -70,12 +70,12 @@ object Chapters:
     selectorName: String,
     spans: Seq[Span],
     chapters: Chapters,
-    fromName: String => Option[Int] = NumberedStores.parseNumber,
-    toNames: Int => Names = NumberedStores.namesForNumber
+    name2number: String => Option[Int] = NumberedStores.parseNumber,
+    number2names: Int => Names = NumberedStores.namesForNumber
   )(using Selectors) extends By.Numbered[NumberedStore](
     summon[Selectors].getForName(selectorName),
-    fromName,
-    toNames
+    name2number,
+    number2names
   ):
     override def minNumber: Int = 1
     override def length: Int = spans.length

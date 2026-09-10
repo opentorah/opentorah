@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 /**
- * An `<annotation>` records what is known about a custom's reading without
+ * `reads="inherit"` records what is known about a custom's reading without
  * giving it one. The point is that it must not change what is read: these are
  * the three weeks where Chabad follows Sefard and hamichlol, whose rite key
  * nests Chabad under Ashkenaz, would imply otherwise.
