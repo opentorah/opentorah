@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
 import org.opentorah.texts.TestBase
+import org.podval.metadata.Language
 import org.podval.store.Path
 
 final class TanachTest extends TestBase(Tanach):
@@ -91,12 +92,33 @@ final class TanachTest extends TestBase(Tanach):
     friday.structureNames should contain("Friday")
     numbered.toUrl shouldBe friday.toUrl
 
-  it should "be walkable" in:
+  it should "walk each book on every axis and skip aliases" in:
     val paths: Seq[Path] = Tanach.getPaths(
       include = _.isInstanceOf[TanachBook],
       stop = _.isInstanceOf[TanachBook]
     )
-//    println(paths.map(Path.structureNames(_).mkString("/")).mkString("\n"))
+    val names: Seq[Seq[String]] = paths.map(_.structureNames)
+    def bookName(book: TanachBook): String = book.names.doFind(Language.English.toSpec).name
+
+    names should contain(Seq("book", bookName(Tanach.Book.Genesis)))
+    names should contain(Seq("part", "Chumash", "book", bookName(Tanach.Book.Genesis)))
+    resolve("/book/Genesis").last should be theSameInstanceAs resolve("/part/Chumash/book/Genesis").last
+
+    names should contain(Seq("book", bookName(Tanach.Book.Joshua)))
+    names should contain(Seq("part", "Prophets", "book", bookName(Tanach.Book.Joshua)))
+    names should contain(Seq("part", "Prophets", "part", "Early Prophets", "book", bookName(Tanach.Book.Joshua)))
+
+    names should contain(Seq("book", bookName(Tanach.Psalms)))
+    names should contain(Seq("part", "Writings", "book", bookName(Tanach.Psalms)))
+    names should not contain Seq("Psalms")
+    names should not contain Seq("Chumash")
+
+    Tanach.Book.valuesSeq.foreach: book =>
+      names should contain(Seq("book", bookName(book)))
+    paths.length should be > Tanach.Book.valuesSeq.length
+    paths.foreach: path =>
+      path.last shouldBe a[TanachBook]
+      Tanach.resolve(path.toUrl).last should be theSameInstanceAs path.last
 
   it should "return the same numbered store on a second resolve" in:
     resolveLast("/book/Genesis/chapter/1/verse/1") should be theSameInstanceAs
