@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+- `:docs:generateSite` / `:docs:serveSite`; Pages CI uses `./gradlew :docs:generateSite`; `includeBuild` of a local site-publisher checkout.
+
 ## [0.11.0] - 2026-09-10
 - numbers: Vector Euclidean `/` and `%`; number-system laws and angle `toString` tests.
 - calendar: weekday names in German, French, Polish, and Lithuanian.

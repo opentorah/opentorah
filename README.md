@@ -9,7 +9,14 @@ Libraries `org.opentorah:opentorah-core` and `org.opentorah:opentorah-texts` pub
 
 ```shell
 ./gradlew build
+./gradlew :docs:generateSite
+./gradlew :docs:serveSite
 ```
+
+`:docs:generateSite` runs `generateTables` first and writes `docs/_site` (GitHub Pages).
+A local site-publisher checkout at `../../Podval/site-publisher` is used when present
+(`-PsitePublisherDir=`); CI resolves `org.podval.tools:org.podval.tools.publisher`
+from Maven Central.
 
 
 ## What's here ##

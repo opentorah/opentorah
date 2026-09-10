@@ -56,3 +56,13 @@ final File xmlDir = file(
 if (xmlDir.isDirectory() && new File(xmlDir, 'settings.gradle').isFile()) {
   includeBuild(xmlDir)
 }
+
+// Composite: substitute org.podval.tools:org.podval.tools.publisher from a local
+// checkout. Override with -PsitePublisherDir=. If the directory is missing,
+// Gradle resolves the artifact from Maven Central (CI).
+final File publisherDir = file(
+  providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
+)
+if (publisherDir.isDirectory() && new File(publisherDir, 'settings.gradle').isFile()) {
+  includeBuild(publisherDir)
+}

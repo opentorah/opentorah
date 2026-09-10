@@ -21,26 +21,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Check Out
         uses: actions/checkout@v6
 
-      - name: Generate Site
-        uses: dubinsky/site-publisher/.github/actions/generate@master
-        id: site
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
         with:
-          source: 'docs'
-          treat-errors-as-warnings: true
+          distribution: temurin
+          java-version: '25'
 
-      - name: Upload GitHub Pages from './_site' as an Artifact
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/ms-playwright
+          key: playwright-${{ runner.os }}-ms-playwright
+
+      - name: Generate Site
+        run: ./gradlew --no-daemon :docs:generateSite
+
+      - name: Upload GitHub Pages from './docs/_site' as an Artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ${{ steps.site.outputs.site-path }}
+          path: docs/_site
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages

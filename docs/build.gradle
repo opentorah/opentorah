@@ -10,6 +10,22 @@ dependencies {
   implementation project(':opentorah-core')
 }
 
+configurations {
+  sitePublisher
+}
+
+dependencies {
+  sitePublisher "org.podval.tools:org.podval.tools.publisher:${providers.gradleProperty('sitePublisherVersion').get()}"
+}
+
+// JDK 22+ compatibility flags for transitive / ecosystem native & Unsafe use:
+// - AsciidoctorJ → JRuby → jffi calls System.load (restricted native access)
+// - scala.runtime.LazyVals$ (old lazy-val bytecode on the classpath) uses sun.misc.Unsafe
+ext.jdkCompatJvmArgs = [
+  '--enable-native-access=ALL-UNNAMED',
+  '--sun-misc-unsafe-memory-access=allow',
+]
+
 final File buildDirectory = layout.buildDirectory.asFile.get()
 final File tablesDir = file("$buildDirectory/tables")
 tasks.register('generateTables', JavaExec) {
@@ -18,6 +34,40 @@ tasks.register('generateTables', JavaExec) {
   mainClass.set('org.opentorah.calendar.paper.Tables')
   args = [tablesDir]
   classpath = sourceSets.main.runtimeClasspath
+  jvmArgs jdkCompatJvmArgs
+}
+
+def siteArgs(boolean serve) {
+  def args = [
+    layout.projectDirectory.asFile.absolutePath,
+    '--treat-errors-as-warnings',
+  ]
+  if (serve) args.add('--serve')
+  args
+}
+
+tasks.register('generateSite', JavaExec) {
+  group = 'documentation'
+  description = 'Generate the static site into docs/_site'
+  dependsOn generateTables
+  classpath = configurations.sitePublisher
+  mainClass = 'org.podval.tools.publish.site.Site'
+  args = siteArgs(false)
+  jvmArgs jdkCompatJvmArgs
+  environment 'PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS', '1'
+  environment 'PLAYWRIGHT_BROWSERS_PATH', "${gradle.gradleUserHomeDir}/ms-playwright"
+}
+
+tasks.register('serveSite', JavaExec) {
+  group = 'documentation'
+  description = 'Generate the static site and serve it locally'
+  dependsOn generateTables
+  classpath = configurations.sitePublisher
+  mainClass = 'org.podval.tools.publish.site.Site'
+  args = siteArgs(true)
+  jvmArgs jdkCompatJvmArgs
+  environment 'PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS', '1'
+  environment 'PLAYWRIGHT_BROWSERS_PATH', "${gradle.gradleUserHomeDir}/ms-playwright"
 }
 
 tasks.named('build') {
