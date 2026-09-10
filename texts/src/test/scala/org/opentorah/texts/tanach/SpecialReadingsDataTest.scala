@@ -37,7 +37,7 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
 
   "SpecialReadings.xml" should "hold every reading, and each of them once" in:
     val keys: Seq[(String, SpecialReadings.Slot)] = readings.map((day, slot, _) => (day, slot))
-    keys.size shouldBe 60
+    keys.size shouldBe 61
     keys.distinct shouldBe keys
 
   it should "give every reading a day" in:
@@ -53,3 +53,13 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
     // forcing SpecialReadings parses every one of them; before the move, a
     // reading that failed to parse took the whole object's initialiser with it
     SpecialReadings.YomKippur.shabbos(Parsha.Bereishis).customs should not be empty
+
+  "Simchas Torah maftir" should "be the last Succos korban, same as Shemini Atzeres" in:
+    val simchas = SpecialReadings.SimchasTorah.weekday(Parsha.VezosHaberachah)
+      .maftir.doFind(Custom.Common).get
+    val shemini = SpecialReadings.SheminiAtzeres.weekday(Parsha.VezosHaberachah)
+      .maftir.doFind(Custom.Common).get
+    simchas.book shouldBe Tanach.Chumash.Numbers
+    simchas.span.from shouldBe ChapterAndVerse(29, 35)
+    simchas.span.to shouldBe ChapterAndVerse(30, 1)
+    simchas shouldBe shemini

@@ -21,7 +21,8 @@ import zio.blocks.schema.{Modifier, Schema}
  * only what can be said about where it comes from. Ask via [[forParsha]].
  *
  * Entries are added as readings are checked; an unannotated reading means
- * "not yet traced", not "unsourced".
+ * "not yet traced", not "unsourced". A `<comment>` on a source in
+ * ReadingSources.xml is what the catalog itself has to say about that work.
  */
 object ReadingSources:
 
@@ -51,7 +52,10 @@ object ReadingSources:
     where: Option[String] = None,
     url: Option[String] = None,
     /** For Kind.Reconstruction: the sources it is built from. */
-    combines: Seq[String] = Nil
+    combines: Seq[String] = Nil,
+    /** What the catalog itself has to say about this work, when that is not
+      * a `where` or a `publication`. */
+    comment: Option[String] = None
   ):
     override def toString: String =
       name +
@@ -66,7 +70,8 @@ object ReadingSources:
     @Modifier.config(XmlCodec.Attribute, "") publication: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") where: Option[String] = None,
     @Modifier.config(XmlCodec.Attribute, "") url: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") combines: Option[String] = None
+    @Modifier.config(XmlCodec.Attribute, "") combines: Option[String] = None,
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 
   private object ParsedSource:
@@ -80,7 +85,8 @@ object ReadingSources:
       publication = parsed.publication,
       where = parsed.where,
       url = parsed.url,
-      combines = parsed.combines.fold(Seq.empty)(_.split(',').toSeq.map(_.trim).filter(_.nonEmpty))
+      combines = parsed.combines.fold(Seq.empty)(_.split(',').toSeq.map(_.trim).filter(_.nonEmpty)),
+      comment = parsed.comment.map(_.replaceAll("\\s+", " ").trim).filter(_.nonEmpty)
     )
 
   /** The works themselves, read from ReadingSources.xml. */

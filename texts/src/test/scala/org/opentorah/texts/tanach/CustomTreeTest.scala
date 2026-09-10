@@ -34,5 +34,11 @@ final class CustomTreeTest extends AnyFlatSpec, Matchers:
     Custom.Algiers.parent shouldBe Some(Custom.Algeria)
     Custom.Fes.parent shouldBe Some(Custom.Morocco)
     Custom.ChayeyOdom.parent shouldBe Some(Custom.Lita)
+    Custom.Romania.parent shouldBe Some(Custom.Common)
     Custom.Common.level shouldBe 0
     Custom.Fes.level shouldBe 4
+
+  it should "say why Romania hangs off Common, and that Marrakesh is Bogmaz too" in:
+    Custom.Romania.comment.get should include ("Erets Yisrael")
+    Custom.Marrakesh.comment.get should include ("Bogmaz")
+    Custom.Ashkenaz.comment shouldBe None

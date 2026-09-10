@@ -40,7 +40,7 @@
       <span from="42:1" to="42:21"/>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan reads with Frankfurt here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan reads with Frankfurt here, per hamichlol.</comment>
     </custom>
   </week>
   <week n="Noach" book="Isaiah">
@@ -76,7 +76,7 @@
       <span from="4:1" to="4:23"/>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan reads with Sefard here, per hamichlol.</comment>
     </custom>
   </week>
   <week n="Chayei Sarah" book="I Kings">
@@ -133,13 +133,13 @@
       <span from="2:6" to="3:8"/>
     </custom>
   </week>
-  <!-- On Chanuka - Chanukah I -->
+  <!-- On Chanukah this is replaced by Chanukah I (= Beha'aloscha Common) -->
   <week n="Mikeitz" book="I Kings">
     <custom n="Common">
       <span from="3:15" to="4:1"/>
     </custom>
   </week>
-  <!-- On Chanuka - Chanukah I or II -->
+  <!-- On Chanukah this is replaced by Chanukah I or II, depending on which Shabbos -->
   <week n="Vayigash" book="Ezekiel">
     <custom n="Common">
       <span from="37:15" to="37:28"/>
@@ -229,7 +229,7 @@
       <span from="9:5" to="9:6"/>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan reads with Sefard here, per hamichlol.</comment>
     </custom>
   </week>
   <week n="Mishpatim" book="Jeremiah">
@@ -269,9 +269,6 @@
     </custom>
     <custom n="Chabad" reads="inherit" sources="chabad-org, chitas">
       <comment>chabad.org and Chitas are cited for Chabad.</comment>
-    </custom>
-    <custom n="Poznan" reads="inherit">
-      <comment>hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
     </custom>
   </week>
   <week n="Vayakhel" book="I Kings">
@@ -348,7 +345,7 @@
       <comment>Chabad reads with Sefard here, verified in Chitas. hamichlol names no Chabad practice at this week, and its rite key nests Chabad under Ashkenaz, so it would imply the Ashkenaz reading above; Chitas is against that.</comment>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan reads with Sefard here, per hamichlol.</comment>
     </custom>
   </week>
   <week n="Tazria" book="II Kings">
@@ -414,7 +411,7 @@
       <span from="16:19" to="17:14"/>
     </custom>
     <custom n="Chabad, Poznan" reads="inherit">
-      <comment>hamichlol gives Poznan the same ending as Chabad; the two are unrelated, they simply stop at the same verse. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>hamichlol gives Poznan the same ending as Chabad; the two are unrelated, they simply stop at the same verse.</comment>
     </custom>
   </week>
   <week n="Bechukosai">
@@ -428,7 +425,7 @@
       <span from="34:1" to="34:15"/>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan per hamichlol, but unsettled: the Poznan minhagim book says they end at 'ne'um Hashem', which could be verse 15, 30 or 31, and the kuntres contradicts itself about whether they read this haftarah at all or the ordinary Ashkenaz one. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan per hamichlol, but unsettled: the Poznan minhagim book says they end at 'ne'um Hashem', which could be verse 15, 30 or 31, and the kuntres contradicts itself about whether they read this haftarah at all or the ordinary Ashkenaz one.</comment>
     </custom>
   </week>
   <week n="Bemidbar" book="Hosea">
@@ -481,12 +478,12 @@
       <span from="5:6" to="6:8"/>
     </custom>
   </week>
+  <!-- In the three weeks this is replaced by Mattos -->
   <week n="Pinchas" book="I Kings">
     <custom n="Common">
       <span from="18:46" to="19:21"/>
     </custom>
   </week>
-  <!-- In 3 weeks - Mattos -->
   <week n="Mattos">
     <custom n="Italki" book="Joshua">
       <span from="13:15" to="13:33"/>
@@ -586,6 +583,7 @@
     </custom>
     <comment>Nitzavim-Vayeilech is the one combined week where the first parsha's haftarah takes precedence for every custom.</comment>
   </week>
+  <!-- = Shabbos Shuvah; Haazinu when Nitzavim-Vayeilech combine -->
   <week n="Vayeilech">
     <custom n="Ashkenaz" sources="michlol, torat-chaim, steinsaltz">
       <span book="Hosea" from="14:2" to="14:10"/>
@@ -614,7 +612,7 @@
       <comment>hamichlol gives Romania the same reading as Sefard here.</comment>
     </custom>
     <custom n="Poznan" reads="inherit">
-      <comment>Poznan per the first practice in kuntres Poznan, which reads Dirshu on Shabbos Shuvah; its second practice reads Shuva like the rest of Ashkenaz. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+      <comment>Poznan per the first practice in kuntres Poznan, which reads Dirshu on Shabbos Shuvah; its second practice reads Shuva like the rest of Ashkenaz.</comment>
     </custom>
   </week>
   <week n="Haazinu">

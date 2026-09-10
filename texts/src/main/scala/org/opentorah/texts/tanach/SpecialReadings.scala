@@ -453,7 +453,7 @@ object SpecialReadings:
     private def torah(day: HasNames): Torah =
       to6withLast(fromDay(day, Parsha.VezosHaberachah.days.common), fromDay(day, chassanBereishis))
 
-    private def maftir: Maftir = SheminiAtzeres.maftir
+    private def maftir: Maftir = maftirFor("SimchasTorah")
 
     private def haftarah: Haftarah.Customs = Parsha.VezosHaberachah.haftarah
 
@@ -788,7 +788,7 @@ object SpecialReadings:
   /**
    * Shabbos Shuvah -- the Shabbos between Rosh Hashanah and Yom Kippur -- has
    * its own haftarah, which Haftarah.xml stores on Vayeilech:
-   *   <week n="Vayeilech"> <!-- = Shabbos Shuvah -->
+   *   <week n="Vayeilech"> <!-- = Shabbos Shuvah; Haazinu when Nitzavim-Vayeilech combine -->
    * That identification holds only in the years when Vayeilech is the parsha
    * of that week. When Nitzavim and Vayeilech are combined they are read
    * *before* Rosh Hashanah, Haazinu falls on Shabbos Shuvah, and it keeps its
@@ -810,7 +810,7 @@ object SpecialReadings:
    * sequence shifts a week earlier: Pinchas -- which then falls after the
    * 17th of Tammuz -- reads Mattos's haftarah, and the combined week reads
    * Masei's, as noted in Haftarah.xml:
-   *   <week n="Pinchas" ...> <!-- In 3 weeks - Mattos -->
+   *   <week n="Pinchas"> <!-- In the three weeks this is replaced by Mattos -->
    * Pinchas's own haftarah is read only in the years when it falls before the
    * fast. The shift is stated in terms of the parshiyos rather than of the
    * rebukes, so it holds for the customs that do not follow that scheme.

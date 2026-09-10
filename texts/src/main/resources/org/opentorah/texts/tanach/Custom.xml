@@ -3,7 +3,9 @@
   Customs and their names. Nesting is the hierarchy: a custom with no
   enclosing custom is a root; every other custom inherits a reading from
   its parent when it states none of its own (see Custom.Of.find).
-  Custom.scala checks this file covers every enum value.
+  Custom.scala checks this file covers every enum value. Optional
+  `<comment>`: what the tree itself has to say about a rite (identity, why
+  it hangs where it does).
 -->
 <Custom>
   <custom>
@@ -106,12 +108,11 @@
             <name n="Фес" lang="ru"/>
             <name n="פאס" lang="he"/>
           </custom>
-          <!-- TODO put it where it belongs, and probably as comment element, not XML comment:
-           Marrakesh stands for Bogmaz too: Asulin never separates them, and no reading we have tells them apart. -->
           <custom>
             <name n="Marrakesh" lang="en" transliterated="true"/>
             <name n="Марракеш" lang="ru"/>
             <name n="מראכש" lang="he"/>
+            <comment>Marrakesh stands for Bogmaz too: Asulin never separates them, and no reading we have tells them apart.</comment>
           </custom>
           <custom>
             <name n="Agadir" lang="en" transliterated="true"/>
@@ -142,21 +143,19 @@
       </custom>
     </custom>
 
-    <!-- TODO put it where it belongs, and probably as comment element, not XML comment:
-      Romania is neither Ashkenaz nor Sefard. hamichlol notes that its readings
-      follow the old Erets Yisrael rite, "לעומת מנהגי שאר העדות שמבוססים על המנהג
-      הבבלי": as against the other rites, which follow the Babylonian custom.
-      Parenting it to either would make its fallback claim the wrong tradition, so
-      it hangs off Common and states its own readings.
-
-      It says the same again of a particular reading: "ונראה שמנהג זה מבוסס על
-      מסורה ארצישראלית, כמו רוב ההפטרות של רומניא": it appears this practice
-      rests on an Erets Yisrael tradition, as do most of the Romania haftarot.
-    -->
     <custom>
       <name n="Romania" lang="en" transliterated="true"/>
       <name n="Румыния (нусах романия)" lang="ru"/>
       <name n="רומניא" lang="he"/>
+      <comment>Romania is neither Ashkenaz nor Sefard. hamichlol notes that its readings
+        follow the old Erets Yisrael rite, "לעומת מנהגי שאר העדות שמבוססים על המנהג
+        הבבלי": as against the other rites, which follow the Babylonian custom.
+        Parenting it to either would make its fallback claim the wrong tradition, so
+        it hangs off Common and states its own readings.
+
+        It says the same again of a particular reading: "ונראה שמנהג זה מבוסס על
+        מסורה ארצישראלית, כמו רוב ההפטרות של רומניא": it appears this practice
+        rests on an Erets Yisrael tradition, as do most of the Romania haftarot.</comment>
     </custom>
   </custom>
 </Custom>

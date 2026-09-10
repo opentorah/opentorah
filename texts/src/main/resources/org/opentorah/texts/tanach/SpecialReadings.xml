@@ -203,6 +203,7 @@
     <torah role="chassanBereishis" book="Genesis" from="1:1" to="2:3">
       <aliyah n="1" from="1:1"/>
     </torah>
+    <maftir book="Numbers" from="29:35" to="30:1"/>
   </day>
   <day n="Chanukah">
     <torah role="day1Cohen" book="Numbers" from="6:22" to="7:11">
@@ -306,7 +307,7 @@
       </custom>
       <custom n="Sefard, Poznan">
         <span from="45:18" to="46:15"/>
-        <comment>Poznan reads with Sefard here, per hamichlol. hamichlol documents the Poznan readings from the community pinkas (poznan-pinkas).</comment>
+        <comment>Poznan reads with Sefard here, per hamichlol.</comment>
       </custom>
       <custom n="Teiman">
         <span from="45:9" to="46:11"/>
@@ -496,8 +497,7 @@
         <span from="8:13" to="9:23"/>
       </custom>
     </haftarah>
-    <!--
-    TODO put it where it belongs, and probably as comment element, not XML comment:
+    <!-- TODO should this be a comment visible to the consumers?
       hamichlol gives Tisha BeAv Mincha its own section, not the one shared by
       the other public fasts: there Teiman and most of Sefard read nothing at
       all, here everyone reads. So this is a table of its own, not a set of

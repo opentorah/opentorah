@@ -21,6 +21,8 @@ final class DatesTest extends AnyFlatSpec, Matchers:
     Week.Day.Rishon.names.hasName("Sonntag") shouldBe true
     Week.Day.Shabbos.names.hasName("šeštadienis") shouldBe true
     Week.Day.Shabbos.names.hasName("sobota") shouldBe true
+    Week.Day.Shabbos.names.hasName("שבת") shouldBe true
+    Week.Day.Shabbos.names.hasName("שביעי") shouldBe true
     Week.Day.Rvii.names.hasName("trečiadienis") shouldBe true
     Week.Day.Rvii.names.hasName("środa") shouldBe true
     Week.Day.Shishi.names.hasName("piątek") shouldBe true

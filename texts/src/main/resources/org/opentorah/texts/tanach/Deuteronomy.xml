@@ -242,7 +242,9 @@
     <day n="5" from="33:22"/>
     <day n="6" from="33:27"/>
     <day n="7" from="34:1"/>
-    <!-- TODO address the problem: Maftir SimchasTorah is NOT what it says here :) -->
+    <!-- Last verses of the parsha, as every week records. Vezos Haberachah is
+         never a weekly reading; Simchas Torah's maftir is Shemini Atzeres's
+         (Succos korbanot last), in SpecialReadings.xml. -->
     <maftir from="34:1"/>
   </week>
 </book>

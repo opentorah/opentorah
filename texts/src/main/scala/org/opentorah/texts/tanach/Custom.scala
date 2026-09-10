@@ -14,6 +14,9 @@ enum Custom(nameOverride: Option[String] = None)
 
   lazy val children: Set[Custom] = Custom.valuesSeq.filter(_.parent.contains(this)).toSet
 
+  /** What Custom.xml says about this rite besides names and parent. */
+  lazy val comment: Option[String] = Custom.commentOf(this)
+
   /** Is this the given custom, or one that inherits from it? */
   def isUnder(ancestor: Custom): Boolean =
     (this == ancestor) || parent.exists(_.isUnder(ancestor))
@@ -54,36 +57,42 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
 
   /**
    * One catalog item per custom: names as `<name>` children, hierarchy as nested
-   * `<custom>`. Lazy for the same reason the names are: resolving an entry needs
-   * the names, which the loader reads on demand.
+   * `<custom>`, optional `<comment>` for what the tree itself has to say.
+   * Lazy for the same reason the names are: resolving an entry needs the names,
+   * which the loader reads on demand.
    */
   @Modifier.config(XmlCodec.Element, "custom")
   private final case class Entry(
     @Modifier.config(XmlCodec.Element, "name") names: Seq[Name],
-    @Modifier.config(XmlCodec.Element, "custom") children: Seq[Entry] = Seq.empty
+    @Modifier.config(XmlCodec.Element, "custom") children: Seq[Entry] = Seq.empty,
+    @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 
   private object Entry:
     given schema: Schema[Entry] = Schema.derived
     val codec: XmlCodec[Entry] = XmlCodec.derived
 
-  private lazy val loaded: (Seq[Names], Map[Custom, Option[Custom]]) =
-    def walk(entries: Seq[Entry], parent: Option[Custom]): Seq[(Custom, Names, Option[Custom])] =
+  private lazy val loaded: (Seq[Names], Map[Custom, Option[Custom]], Map[Custom, Option[String]]) =
+    def walk(entries: Seq[Entry], parent: Option[Custom]): Seq[(Custom, Names, Option[Custom], Option[String])] =
       entries.flatMap: entry =>
         val names: Names = Names.fromDefaultName(None, entry.names)
         val custom: Custom = HasName.find(valuesSeq, names)
-        (custom, names, parent) +: walk(entry.children, Some(custom))
-    val walked: Seq[(Custom, Names, Option[Custom])] =
+        val comment: Option[String] = entry.comment.map(_.replaceAll("\\s+", " ").trim).filter(_.nonEmpty)
+        (custom, names, parent, comment) +: walk(entry.children, Some(custom))
+    val walked: Seq[(Custom, Names, Option[Custom], Option[String])] =
       walk(XmlParser.loadCatalog(this, Entry.codec), None)
     Collections.checkNoDuplicates(walked.map(_._1), "customs")
     val parents: Map[Custom, Option[Custom]] = walked.map(node => node._1 -> node._3).toMap
+    val comments: Map[Custom, Option[String]] = walked.map(node => node._1 -> node._4).toMap
     val missing: Seq[Custom] = valuesSeq.filterNot(parents.contains)
     require(missing.isEmpty, s"Custom.xml does not mention: ${missing.map(_.name).mkString(", ")}")
-    (walked.map(_._2), parents)
+    (walked.map(_._2), parents, comments)
 
   override protected def loadNames: Seq[Names] = loaded._1
 
   private[tanach] def parentOf(custom: Custom): Option[Custom] = loaded._2(custom)
+
+  private def commentOf(custom: Custom): Option[String] = loaded._3(custom)
 
   val all: Set[Custom] = values.toSet.filter(_.parent.isDefined)
 

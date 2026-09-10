@@ -95,3 +95,6 @@ final class NewRitesTest extends AnyFlatSpec, Matchers:
   "the new rites" should "cite hamichlol" in:
     ReadingSources.forParsha(Parsha.Chukas, Custom.Poznan).map(_.key) should contain ("michlol")
     ReadingSources.forParsha(Parsha.Shemos, Custom.Persia).map(_.key) should contain ("michlol")
+
+  "poznan-pinkas" should "say it stands behind all Poznan readings" in:
+    ReadingSources.byKey("poznan-pinkas").comment.get should include ("rite code")

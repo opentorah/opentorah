@@ -5,7 +5,9 @@
 
   kind: chumash, siddur, halachah, study, website, or reconstruction.
   A reconstruction is not a work of its own: it is a reading established by
-  combining others, which it names in `combines`.
+  combining others, which it names in `combines`. Optional `<comment>`: what
+  the catalog itself has to say about the work (not a `where` or a
+  `publication`).
 -->
 <ReadingSources>
   <source n="michlol" kind="website" name="hamichlol"
@@ -49,15 +51,15 @@
   <source n="steinsaltz" kind="chumash" name="Chumash Steinsaltz"
           publication="Koren Publishers, Jerusalem 2023"/>
 
-  <!-- TODO put it where it belongs, and probably not XML comment:
-   hamichlol's own source for the Poznan readings, named in the footnote on
-       its rite code rather than on any one reading, so it stands behind them all. -->
   <source n="nitei-gavriel" kind="halachah" name="Nitei Gavriel"
           where="Hilchot Sukkot"
           publication="Hotzaat Shemesh, Jerusalem 2002"/>
 
   <source n="poznan-pinkas" kind="study" name="Pinkas Beis HaKnesses de-Kehilas Pozna"
-          publication="in Berakhah le-Menachem, St. Louis 1955, p. 262"/>
+          publication="in Berakhah le-Menachem, St. Louis 1955, p. 262">
+    <comment>hamichlol's own source for the Poznan readings, named in the footnote on
+      its rite code rather than on any one reading, so it stands behind them all.</comment>
+  </source>
   <source n="asulin" kind="website" name="R. Avraham Asulin"
           where="Moroccan customs, on moreshet-morocco.com"
           url="https://moreshet-morocco.com/2015/07/12/הלכות-ט-באב-הרב-אברה-אסולין/"/>
