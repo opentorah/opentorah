@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Collections
 import org.podval.metadata.HasNames
 import org.podval.xml.{XmlCodec, XmlParser, Xml as ZioXml}
-import org.podval.xml.given
+import XmlCodec.given
 import Torah.{Fragment, Maftir}
 import zio.blocks.schema.{Modifier, Schema}
 
