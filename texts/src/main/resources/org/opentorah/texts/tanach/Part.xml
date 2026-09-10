@@ -3,28 +3,35 @@
     <names>
         <name lang="en" n="Tanach" transliterated="true"/>
         <name lang="ru" n="Танах" transliterated="true"/>
+        <name lang="he" n="תנ״ך"/>
     </names>
     <names>
         <name lang="en" n="Nach" transliterated="true"/>
         <name lang="ru" n="Нах" transliterated="true"/>
+        <name lang="he" n="נ״ך"/>
     </names>
     <names>
         <name lang="en" n="Chumash" transliterated="true"/>
         <name lang="ru" n="Хумаш" transliterated="true"/>
+        <name lang="he" n="חומש"/>
         <name lang="en" n="Pentateuch"/>
         <name lang="ru" n="Пятикнижие"/>
+        <name lang="he" n="חמישה חומשי תורה"/>
     </names>
     <names>
         <name lang="en" n="Prophets"/>
         <name lang="ru" n="Пророки"/>
+        <name lang="he" n="נביאים"/>
     </names>
     <names>
         <name lang="en" n="Early Prophets"/>
         <name lang="ru" n="Ранние Пророки"/>
+        <name lang="he" n="נביאים ראשונים"/>
     </names>
     <names>
         <name lang="en" n="Late Prophets"/>
         <name lang="ru" n="Поздние Пророки"/>
+        <name lang="he" n="נביאים אחרונים"/>
     </names>
     <names>
         <name lang="en" n="Trei Asar" transliterated="true"/>
@@ -34,5 +41,6 @@
     <names>
         <name lang="en" n="Writings"/>
         <name lang="ru" n="Писания"/>
+        <name lang="he" n="כתובים"/>
     </names>
 </Part>

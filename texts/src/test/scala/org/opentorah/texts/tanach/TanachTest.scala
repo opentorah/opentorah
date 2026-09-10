@@ -47,6 +47,12 @@ final class TanachTest extends TestBase(Tanach):
   it should "contain /part/Prophets/book/Joshua" in:
     checkName("/part/Prophets/book/Joshua", "Ехошуа")
 
+  it should "contain /part/Prophets/book/Judges" in:
+    checkName("/part/Prophets/book/Judges", "Шофтим")
+
+  it should "contain /part/Writings" in:
+    checkName("/part/Writings", "כתובים")
+
   it should "contain /part/Prophets/part/Early Prophets/book/Joshua" in:
     checkName("/part/Prophets/part/Early Prophets/book/Joshua", "Ехошуа")
 

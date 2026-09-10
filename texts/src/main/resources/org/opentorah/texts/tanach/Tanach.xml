@@ -32,6 +32,7 @@
     </book>
     <book>
         <name lang="en" n="Judges"/>
+        <name lang="ru" n="Шофтим" transliterated="true"/>
         <name lang="he" n="שופטים"/>
 
         <chapter n="1" length="36"/>
@@ -58,6 +59,7 @@
     </book>
     <book>
         <name lang="en" n="I Samuel"/>
+        <name lang="ru" n="Шмуэль I" transliterated="true"/>
         <name lang="he" n="שמואל א"/>
 
         <chapter n="1" length="28"/>
@@ -94,6 +96,7 @@
     </book>
     <book>
         <name lang="en" n="II Samuel"/>
+        <name lang="ru" n="Шмуэль II" transliterated="true"/>
         <name lang="he" n="שמואל ב"/>
 
         <chapter n="1" length="27"/>
@@ -123,6 +126,7 @@
     </book>
     <book>
         <name lang="en" n="I Kings"/>
+        <name lang="ru" n="Мелахим I" transliterated="true"/>
         <name lang="he" n="מלכים א"/>
 
         <chapter n="1" length="53"/>
@@ -150,6 +154,7 @@
     </book>
     <book>
         <name lang="en" n="II Kings"/>
+        <name lang="ru" n="Мелахим II" transliterated="true"/>
         <name lang="he" n="מלכים ב"/>
 
         <chapter n="1" length="18"/>
@@ -180,6 +185,8 @@
     </book>
     <book>
         <name lang="en" n="Isaiah"/>
+        <name lang="ru" n="Ешая" transliterated="true"/>
+        <name lang="ru" n="Ешаяу" transliterated="true"/>
         <name lang="he" n="ישעיה"/>
         <name lang="he" n="ישעיהו"/>
 
@@ -252,6 +259,8 @@
     </book>
     <book>
         <name lang="en" n="Jeremiah"/>
+        <name lang="ru" n="Ирмея" transliterated="true"/>
+        <name lang="ru" n="Ирмеяу" transliterated="true"/>
         <name lang="he" n="ירמיה"/>
         <name lang="he" n="ירמיהו"/>
 
@@ -310,6 +319,7 @@
     </book>
     <book>
         <name lang="en" n="Ezekiel"/>
+        <name lang="ru" n="Ехезкель" transliterated="true"/>
         <name lang="he" n="יחזקאל"/>
 
         <chapter n="1" length="28"/>
@@ -365,6 +375,7 @@
     <!-- תרי עשר -->
     <book>
         <name lang="en" n="Hosea"/>
+        <name lang="ru" n="Ошеа" transliterated="true"/>
         <name lang="he" n="הושע"/>
 
         <chapter n="1" length="9"/>
@@ -384,6 +395,7 @@
     </book>
     <book>
         <name lang="en" n="Joel"/>
+        <name lang="ru" n="Йоэль" transliterated="true"/>
         <name lang="he" n="יואל"/>
 
         <chapter n="1" length="20"/>
@@ -393,6 +405,7 @@
     </book>
     <book>
         <name lang="en" n="Amos"/>
+        <name lang="ru" n="Амос" transliterated="true"/>
         <name lang="he" n="עמוס"/>
 
         <chapter n="1" length="15"/>
@@ -407,12 +420,14 @@
     </book>
     <book>
         <name lang="en" n="Obadiah"/>
+        <name lang="ru" n="Овадья" transliterated="true"/>
         <name lang="he" n="עובדיה"/>
 
         <chapter n="1" length="21"/>
     </book>
     <book>
         <name lang="en" n="Jonah"/>
+        <name lang="ru" n="Йона" transliterated="true"/>
         <name lang="he" n="יונה"/>
 
         <chapter n="1" length="16"/>
@@ -422,6 +437,7 @@
     </book>
     <book>
         <name lang="en" n="Micah"/>
+        <name lang="ru" n="Миха" transliterated="true"/>
         <name lang="he" n="מיכה"/>
 
         <chapter n="1" length="16"/>
@@ -434,6 +450,7 @@
     </book>
     <book>
         <name lang="en" n="Nahum"/>
+        <name lang="ru" n="Нахум" transliterated="true"/>
         <name lang="he" n="נחום"/>
 
         <chapter n="1" length="14"/>
@@ -442,6 +459,7 @@
     </book>
     <book>
         <name lang="en" n="Habakkuk"/>
+        <name lang="ru" n="Хавакук" transliterated="true"/>
         <name lang="he" n="חבקוק"/>
 
         <chapter n="1" length="17"/>
@@ -450,6 +468,7 @@
     </book>
     <book>
         <name lang="en" n="Zephaniah"/>
+        <name lang="ru" n="Цфанья" transliterated="true"/>
         <name lang="he" n="צפניה"/>
 
         <chapter n="1" length="18"/>
@@ -458,10 +477,12 @@
     </book>
     <book>
         <name lang="en" n="Haggai"/>
+        <name lang="ru" n="Хагай" transliterated="true"/>
         <name lang="he" n="חגי"/>
     </book>
     <book>
         <name lang="en" n="Zechariah"/>
+        <name lang="ru" n="Зхарья" transliterated="true"/>
         <name lang="he" n="זכריה"/>
 
         <chapter n="1" length="17"/>
@@ -481,6 +502,7 @@
     </book>
     <book>
         <name lang="en" n="Malachi"/>
+        <name lang="ru" n="Малахи" transliterated="true"/>
         <name lang="he" n="מלאכי"/>
 
         <chapter n="1" length="14"/>
@@ -490,6 +512,7 @@
 
     <book>
       <name lang="en" n="Proverbs"/>
+      <name lang="ru" n="Мишлей" transliterated="true"/>
       <name lang="he" n="משלי"/>
 
       <chapter n="1" length="33"/>
@@ -526,6 +549,7 @@
     </book>
     <book>
       <name lang="en" n="Job"/>
+      <name lang="ru" n="Ийов" transliterated="true"/>
       <name lang="he" n="איוב"/>
 
       <chapter n="1" length="22"/>
@@ -573,6 +597,7 @@
     </book>
     <book>
       <name lang="en" n="Song of Songs"/>
+      <name lang="ru" n="Шир а-ширим" transliterated="true"/>
       <name lang="he" n="שיר השירים"/>
 
       <chapter n="1" length="17"/>
@@ -586,6 +611,7 @@
     </book>
     <book>
         <name lang="en" n="Ruth"/>
+        <name lang="ru" n="Рут" transliterated="true"/>
         <name lang="he" n="רות"/>
 
       <chapter n="1" length="22"/>
@@ -595,6 +621,7 @@
     </book>
     <book>
       <name lang="en" n="Lamentations"/>
+      <name lang="ru" n="Эйха" transliterated="true"/>
       <name lang="he" n="איכה"/>
 
       <chapter n="1" length="22"/>
@@ -605,6 +632,7 @@
     </book>
     <book>
       <name lang="en" n="Ecclesiastes"/>
+      <name lang="ru" n="Коэлет" transliterated="true"/>
       <name lang="he" n="קהלת"/>
 
       <chapter n="1" length="18"/>
@@ -622,6 +650,7 @@
     </book>
     <book>
       <name lang="en" n="Esther"/>
+      <name lang="ru" n="Эстер" transliterated="true"/>
       <name lang="he" n="אסתר"/>
 
       <chapter n="1" length="22"/>
@@ -637,6 +666,7 @@
     </book>
     <book>
       <name lang="en" n="Daniel"/>
+      <name lang="ru" n="Даниэль" transliterated="true"/>
       <name lang="he" n="דניאל"/>
 
       <chapter n="1" length="21"/>
@@ -654,6 +684,7 @@
     </book>
     <book>
       <name lang="en" n="Ezra"/>
+      <name lang="ru" n="Эзра" transliterated="true"/>
       <name lang="he" n="עזרא"/>
 
       <chapter n="1" length="11"/>
@@ -669,6 +700,7 @@
     </book>
     <book>
       <name lang="en" n="Nehemiah"/>
+      <name lang="ru" n="Нехемья" transliterated="true"/>
       <name lang="he" n="נחמיה"/>
 
       <chapter n="1" length="11"/>
@@ -687,6 +719,7 @@
     </book>
     <book>
       <name lang="en" n="I Chronicles"/>
+      <name lang="ru" n="Диврей а-ямим I" transliterated="true"/>
       <name lang="he" n="דברי הימים א"/>
 
       <chapter n="1" length="54"/>
@@ -721,6 +754,7 @@
     </book>
     <book>
       <name lang="en" n="II Chronicles"/>
+      <name lang="ru" n="Диврей а-ямим II" transliterated="true"/>
       <name lang="he" n="דברי הימים ב"/>
 
       <chapter n="1" length="18"/>

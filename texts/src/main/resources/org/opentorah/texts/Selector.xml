@@ -3,9 +3,12 @@
   <selector>
     <name n="книга" lang="ru"/>
     <name n="book" lang="en"/>
+    <name n="ספר" lang="he"/>
   </selector>
   <selector>
     <name n="parsha" lang="en" transliterated="true"/>
+    <name n="парша" lang="ru" transliterated="true"/>
+    <name n="פרשה" lang="he"/>
   </selector>
   <selector>
     <name n="глава" lang="ru"/>
@@ -35,13 +38,16 @@
   <selector>
     <name n="day" lang="en"/>
     <name n="день" lang="ru"/>
+    <name n="יום" lang="he"/>
   </selector>
   <selector>
     <name n="day of the week" lang="en"/>
     <name n="день недели" lang="ru"/>
+    <name n="יום בשבוע" lang="he"/>
   </selector>
   <selector>
     <name n="part" lang="en"/>
     <name n="часть" lang="ru"/>
+    <name n="חלק" lang="he"/>
   </selector>
 </Selector>
