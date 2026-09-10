@@ -9,7 +9,7 @@ Corrections, additions and suggestions are welcome at dub@opentorah.org.
 The paper is hosted by
 https://pages.github.com/[GitHub Pages] at
 http://www.opentorah.org in multiple formats:
-link:/paper/calendar/calendar/calendar.html[chunked HTML],
+link:/paper/calendar/calendar/index.html[chunked HTML],
 link:/paper/calendar/calendar.html[one HTML file],
 link:/paper/calendar/calendar.pdf[PDF].
 

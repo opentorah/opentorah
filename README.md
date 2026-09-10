@@ -1,63 +1,58 @@
 # Digital Judaica Done Right :)
 
-TODO convert READMEs to AsciiDoc and move them into /docs
-
 ![](https://github.com/opentorah/opentorah/workflows/CI/badge.svg)
 
 [Writings](http://www.opentorah.org) on the subject.
 
-
-## Code Structure ##
-
-### Monorepo ###
-
-Inspired by [Advantages of monorepos](https://danluu.com/monorepo/) and
-[Unorthodocs: Abandon your DVCS and Return to Sanity](https://www.bitquabit.com/post/unorthodocs-abandon-your-dvcs-and-return-to-sanity/)
-(what a gem!), I switched to using monorepo for the opentorah.org projects
-(with the number and sizes of projects, I think I am safe from the issues that
-Google and FaceBook experienced ;)).
-
-One never knows when there will arise a need to split or merge repositories,
-so this is how I did it:
-
-To extract directories from a repository into a separate one:
+Scala 3.9, Java 25, Gradle 9. Version **0.11.0**.
+Libraries `org.opentorah:opentorah-core` and `org.opentorah:opentorah-texts` publish to Maven Central.
 
 ```shell
-  $ git filter-repo --path <path1> --path <path2> ...
+./gradlew build
 ```
 
-Since `filter-repo` does not try to preserve history for the files that were
-[renamed](https://github.com/newren/git-filter-repo/issues/25), before
-extracting the directories, one should figure out what other directories
-files in them previously resided in. Looking through the output of
-`$ git log` is one way; another is to look at the renames report that
-`$ git filter-repo --analyze` generates.
 
-To merge repository `old` into repository `new` preserving history (one hopes!):
+## What's here ##
 
-```shell
-  $ cd <new>
-  $ git remote add -f old <old>
-  $ git merge ald/master --allow-unrelated-histories
-```
+Three Gradle modules:
 
-Since it is impossible to have a file in Git where only the last revision is kept
-but revision history is automatically discarded, and for the generated files
-(like HTML, PDF and EPUB of the papers) to be visible on the site they need to be checked in,
-I might end up pruning their history periodically using `$ git filter-repo`...
+- **core** (`opentorah-core`) — Rambam's arithmetic and astronomical calendar, mixed-radix numbers, angles.
+  See [README-calendar.md](README-calendar.md).
+- **texts** (`opentorah-texts`) — Tanach structure, rites (`Custom`), Torah and haftarah readings,
+  Rambam learning schedules. Tanach, Mishneh Torah and Sefer HaMitzvos are Stores.
+- **docs** — papers (calendar, dream, typesetting) and the [www.opentorah.org](http://www.opentorah.org) site,
+  built with [Podval Site Publisher](https://github.com/dubinsky/site-publisher) and deployed by GitHub Actions.
 
-### Modules ###
+XML, names/metadata and Store live in [`org.podval.xml`](https://github.com/dubinsky/xml)
+(`org.podval:org.podval.xml`). A local checkout at `../../Podval/xml` (or `-PxmlDir=…`) is picked up
+as a Gradle composite build when present; otherwise the published artifact is used.
 
-Historically, thematically cohesive packages were relegated to separate Gradle modules, since they originated in
-separate repositories. This approach helps enforce layered architecture: no imports of the higher layer types in the
-lower layers. It also helps to trim down unneeded dependencies when using specific subset of the functionality.
+Related sites, not built from this repository:
 
-Since I am just about the only user of the code, the latter reason is not compelling.
+- [www.chumashquestions.org](https://www.chumashquestions.org) — Rabbi Wichnin's Chumash Questions;
+- [www.alter-rebbe.org](https://www.alter-rebbe.org) — archive of early Chabad documents.
 
-The first reason is not that compelling either: Gradle doesn't block cyclical inter-module dependencies completely.
-Besides, relying on Gradle in this respect means putting every cohesive package in a separate module, which seems excessive.
 
-As a result, I currently use the fewest number of modules approach: code is separated in a module only if it needs
-to be deployed separately, as a website (docs), or a service (texts).
+## No longer here ##
 
-If users that need just the calendar code appear, I'll think about splitting that ;)
+Removed in 0.11.0 (August 2026):
+
+- **Collector** — used to generate and serve www.alter-rebbe.org.
+  Old notes: [README-collector.md](README-collector.md).
+- **Calendar web application** — use [hebrewcalendar.net](https://hebrewcalendar.net).
+- In-repo XML stack, ZIO runtime, DocBook plugin, Jekyll.
+
+Historical toolchain notes: [README-docbook.md](README-docbook.md),
+[README-asciidoctor.adoc](README-asciidoctor.adoc).
+
+See [CHANGELOG.md](CHANGELOG.md) for the rest.
+
+
+## Modules ##
+
+Historically, thematically cohesive packages were separate Gradle modules — they started as separate
+repositories. That helps enforce layering and trims unused dependencies, but I am just about the only
+user of the code, Gradle does not fully block cycles anyway, and a module per package is excessive.
+
+A module is split out only when it has to ship on its own: `docs` as the website; `core` and `texts`
+as published libraries. Calendar stays in `core` until someone needs it without the rest.

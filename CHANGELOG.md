@@ -6,25 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.11.0] - 2026-09-10
 - numbers: Vector Euclidean `/` and `%`; number-system laws and angle `toString` tests.
-- chore: org.podval.xml 0.1.0;
 - calendar: weekday names in German, French, Polish, and Lithuanian.
 - astronomy: Zodiac names distinguish Latin (`la`) from English.
+- texts: "customs" DSL; custom hierarchy lives in `Custom.xml` (`CustomTree` folded into `Custom`); special readings live in `SpecialReadings.xml`.
+- texts: Tanach, Mishneh Torah and Sefer HaMitzvos are Stores; Chumash and Psalms aliases on `Tanach` (`/Chumash`, `/Psalms`).
 - xml: `Path` is a class (`toUrl` / `structureNames`); drop `Terminal`; `By(selector, stores)` / `By.Numbered`.
-- texts: Chumash and Psalms aliases on `Tanach` (`/Chumash`, `/Psalms`).
 - xml: `Named` is `HasNames`; drop `HasName.findByNames` (use `find`); `Parsha` is `HasValues.Distance` only.
-- chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin;
-- chore: dependency updates;
-- chore: switch from Jekyll to Podval Site Publisher;
-- chore: Java 25;
-- cleanup: removed Collector;
-- cleanup: removed CalendarServer;
-- cleanup: merged 'util' into 'core';
-- cleanup: removed some dead code;
-- feat: use XML codec derivers from org.podval.xml;
-- feat: `store` and `metadata` moved to org.podval.xml;
-- chore: depend on published `org.podval:org.podval.xml` (optional local `includeBuild` of `dubinsky/xml`); CI does not check out site-publisher;
-- cleanup: dropped ZIO runtime (`Effects`, zio-http `serveCalendar`);
-- dropped unused dependencies;
+- chore: Scala 3.9.0; Gradle 9.7.1.
+- texts: notes recorded against the customs they speak about, not against a reading entry.
+- texts: Ki Sisa — cite Chabad's sources against Chabad.
+- texts: Rosh Chodesh maftir in Av and Elul; cite chabad.org for the maftir and haftarah rules.
+- feat: `store` and `metadata` moved to `org.podval.xml`; XML codec derivers; depend on published `org.podval:org.podval.xml` 0.1.0 (optional local `includeBuild` of `dubinsky/xml`; CI does not check out site-publisher).
+- fix: negative commandments in Sefer HaMitzvos.
+- cleanup: dropped ZIO runtime (`Effects`, zio-http `serveCalendar`) and unused dependencies.
+- texts: a custom may read nothing where its parent reads something, and may carry a source without carrying a reading.
+- texts: evening first (the day begins at night); read the night of Simchas Torah.
+- texts: Maghreb, Morocco, Algeria, Algiers and Agadir fast-day haftarot against Asulin and hamichlol; rites added from hamichlol given their readings.
+- texts: Romania custom (hamichlol); Tisha BeAv Mincha has its own haftarah table; record what is known about a reading beside the reading (sources, comments, variants).
+- texts: Italki reads the second day of Shavuos with Sefard.
+- texts: public fasts have their weekday morning reading; Yom Kippur on Shabbos is read with seven aliyot; Shabbos Shuvah haftarah on Shabbos Shuvah; shift the haftarot of rebuke when Mattos and Masei are combined.
+- fix: `equals` checks the type before casting (unguarded casts threw `ClassCastException`).
+- cleanup: removed Collector; removed CalendarServer; merged `util` into `core`; removed some dead code.
+- chore: switch from Jekyll to Podval Site Publisher (GitHub Action deploys `docs/` to GitHub Pages).
+- chore: Java 25.
+- chore: moved `build`, `node` and `platform` packages back to the Scala.js Gradle plugin.
+- chore: dependency updates.
 
 ## [0.10.16] - 2025-01-17
 - cleanup: remove more mentions of DocBook
@@ -47,6 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - chore: dependency updates
 - chore: Scala 3.6.2
 - no more `com.github.maiflai.scalatest` plugin;
+- fix: ZIO HTTP Body from Array[Byte] and InputStream
+- fix: quotes and `persName`s in collection titles
 - cleanup: switching from Asciidoctor Gradle plugin to calling external Asciidoctor
 - cleanup: switching bibliography to asciidoctor-bibtex
 - cleanup: ZIO-ified XML Attributes a bit more
@@ -694,7 +702,7 @@ site:
 - added LICENSE.md
 - Linearizer
 
-- ## [] - 2018-04-05 - 04-12
+## [] - 2018-04-05 - 04-12
 - calendar: merged the paper repository back into the monorepo
 - found a version of Saxon that can handle DocBook XSLT
 - docbook: started on a Gradle DocBook plugin based on Gradle scripts floating around

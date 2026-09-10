@@ -1,3 +1,6 @@
+> Collector was removed on 2026-08-31 (0.11.0). This file is kept as notes for the
+> [www.alter-rebbe.org](https://www.alter-rebbe.org) setup; the code is not in this repository.
+
 ## Static / Dynamic ##
 
 We are moving towards making the site dynamic, so that we can add:  

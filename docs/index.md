@@ -22,6 +22,8 @@ In addition to the main website www.opentorah.org, the project maintains:
 - companion [paper](/paper/typesetting/typesetting.html) on typesetting Jewish texts.
 
 ## Code ##
-- [code](https://github.com/opentorah/opentorah/tree/master/collector) that generates and serves the www.alter-rebbe.org website;
-- [code](https://github.com/opentorah/opentorah/tree/master/texts) for working with specific Jewish texts and for calculating Torah reading/learning schedules;
-- [code](https://github.com/opentorah/opentorah/tree/master/core/src/main/scala/org/opentorah/calendar) implementing Rambam's calculations with dates, time intervals and angles and related algorithms.
+- [core](https://github.com/opentorah/opentorah/tree/master/core) — Rambam's calculations with dates, time intervals and angles (`org.opentorah:opentorah-core`);
+- [texts](https://github.com/opentorah/opentorah/tree/master/texts) — Jewish texts and learning schedules (`org.opentorah:opentorah-texts`).
+
+The www.alter-rebbe.org generator (Collector) and the calendar web application were removed in 0.11.0;
+for a calendar UI see [hebrewcalendar.net](https://hebrewcalendar.net).

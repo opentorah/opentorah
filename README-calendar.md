@@ -2,14 +2,17 @@
 
 Understanding the ignored for fun and schar.
 
-Paper on Rambam's Laws of the Sanctification of the available at opentorah.org.
+This code lives in the `core` module (`org.opentorah:opentorah-core`).
+Torah reading and Rambam learning schedules live in `texts` (`org.opentorah:opentorah-texts`).
+
+Paper on Rambam's Laws of the Sanctification of the Moon: [opentorah.org](http://www.opentorah.org/paper/calendar/calendar.html).
 
 Code for working with Jewish calendar, both arithmetic and astronomical.
 Makes possible calculations with dates, time intervals and angles exactly as they are
 described by Rambam.
 
-The code is written in Scala and uses extendable family polymorphism encoding with family members in
-separate files inspired by a Stackoverflow
+The code is written in Scala and uses family polymorphism (all family members in one trait since
+Scala 2.13) inspired by a Stackoverflow
 [post](https://stackoverflow.com/questions/1154571/scala-abstract-types-vs-generics/10891994#10891994)
 by [ayvango](https://stackoverflow.com/users/837133/ayvango).
 
@@ -23,21 +26,22 @@ Note:
 - I was not able to figure out how to do split-file family polymorphism without it;
 - so in January 2021 I gave up and went back to the "one trait to scope them all" approach...
 
-The code:
+The `core` calendar:
 - implements Rambam's calculations for arithmetic calendar (chapters 6-10);
 - implements Rambam's calculations for astronomical calendar (chapters 11-19);
 - has Rambam's numerical examples as unit tests;
-- provides conversions between Jewish and secular (Gregorian) dates;
+- provides conversions between Jewish and secular (Gregorian and Julian) dates,
+  `java.time.LocalDateTime` and Julian Day;
 - supports [sanctification of the Sun](http://dub.podval.org/2019/07/18/sanctification-of-the-sun.html)
- calculations;
+  calculations;
+- uses [KosherJava zmanim](https://github.com/KosherJava/zmanim) for modern sun-position calculations.
+
+The `texts` module:
 - generates Torah and Haftorah reading schedule for a number of customs;
-- generates schedule of learning Rambam;
+- generates schedule of learning Rambam.
 
 Enhancements being considered are:
-- calculation of halachic times (zmanim)
-  - raw data for the hazot calculations is obtainable from the [Naval Oceanography Portal](http://www.usno.navy.mil/USNO/astronomical-applications/data-services/rs-one-year-us);
-    it is produced in accordance with the algorithm described in the Meese's book, I think...
-  - there is [another source of data](http://www.timeanddate.com/worldclock/sunrise.html)
+- fuller calculation of halachic times (zmanim); some NOAA/KosherJava work is already in `core`;
 - integration with Google Calendar:
   - [iCalendar](http://en.wikipedia.org/wiki/ICalendar)
   - [iCalendar RFC](http://tools.ietf.org/html/rfc2445)

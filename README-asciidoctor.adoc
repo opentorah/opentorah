@@ -1,6 +1,10 @@
 = Asciidoctor
 :toc:
 
+The papers in `docs/paper` are processed by
+https://github.com/dubinsky/site-publisher[Podval Site Publisher], not by a Gradle Asciidoctor task.
+This file is the history of that switch (Gradle plugin, then calling Asciidoctor from the build).
+
 TODO consolidate with the DocBook -> AsciiDoc move remark
 
 TODO if AsciiDoc conversion could be handled without a Gradle plugin,
