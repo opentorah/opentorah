@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.10.17] - 2026-
+- astronomy: Zodiac names distinguish Latin (`la`) from English.
 - xml: `Path` is a class (`toUrl` / `structureNames`); drop `Terminal`; `By(selector, stores)` / `By.Numbered`.
 - texts: Chumash and Psalms aliases on `Tanach` (`/Chumash`, `/Psalms`).
 - xml: `Named` is `HasNames`; drop `HasName.findByNames` (use `find`); `Parsha` is `HasValues.Distance` only.

@@ -3,6 +3,7 @@ package org.opentorah.astronomy
 import org.opentorah.calendar.{Week, YearsCycle}
 import org.opentorah.calendar.jewish.{Jewish, LeapYearsCycle, Sun}
 import org.opentorah.numbers.BigRational
+import org.podval.metadata.Language
 import Angles.{Digit, Position, Rotation, headRange, range}
 import Jewish.{Day, Month, Year}
 import org.scalatest.funspec.AnyFunSpec
@@ -12,6 +13,10 @@ class TextTest extends AnyFunSpec, Matchers:
   describe("Metadata") {
     it("Zodiacs should load correctly") {
       Zodiac.Aries.names.hasName("Овен") shouldBe true
+      Zodiac.Aries.names.hasName("Aries") shouldBe true
+      Zodiac.Aries.names.hasName("Ram") shouldBe true
+      Zodiac.Aries.names.doFind(Language.Latin.toSpec).name shouldBe "Aries"
+      Zodiac.Aries.names.doFind(Language.English.toSpec).name shouldBe "Ram"
     }
   }
   describe("Chapter 9") {

@@ -7,10 +7,17 @@ pluginManagement {
   plugins {
     id 'io.github.ben-manes.versions' version '0.61.0'
     id 'org.podval.tools.scalajs'      version '1.0.4'
-    id 'com.google.cloud.tools.jib'    version '3.5.4'
-    id 'org.podval.tools.cloudrun'     version '0.4.3'
-    id 'com.gradle.plugin-publish'     version '1.2.1'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+    id 'com.gradleup.nmcp.settings'   version '1.6.2'
   }
+}
+
+plugins {
+  // Auto-provision JDKs for the Java toolchain (e.g. 25 when only 21 is installed).
+  id 'org.gradle.toolchains.foojay-resolver-convention'
+  // Applies com.gradleup.nmcp to maven-publish projects and aggregation on the root.
+  // https://gradleup.com/nmcp/
+  id 'com.gradleup.nmcp.settings'
 }
 
 dependencyResolutionManagement {
@@ -28,6 +35,17 @@ include ':texts'
 project(':texts').name = 'opentorah-texts'
 
 include ':docs'
+
+// ./gradlew nmcpZipAggregation — inspect the zip
+// ./gradlew publishAggregationToCentralPortal — upload (USER_MANAGED)
+// https://central.sonatype.com/publishing/deployments — release
+nmcpSettings {
+  centralPortal {
+    publishingType = 'USER_MANAGED'
+    username = providers.gradleProperty('mavenCentralUsername')
+    password = providers.gradleProperty('mavenCentralPassword')
+  }
+}
 
 // Composite: substitute org.podval:org.podval.xml from a local xml checkout.
 // Override with -PxmlDir=/path/to/xml. If the directory is missing, Gradle

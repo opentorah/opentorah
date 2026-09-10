@@ -1,47 +1,22 @@
 plugins {
   id 'io.github.ben-manes.versions'
-  id 'idea'
   id 'base'
-  id 'com.gradleup.nmcp.aggregation' version '1.6.2'
-}
-
-idea {
-  module {
-    excludeDirs += [
-      file('.idea'),
-      file('gradle')
-    ]
-  }
-}
-
-// There is no Java in the project :)
-project.gradle.startParameter.excludedTaskNames.add('compileJava')
-
-// https://gradleup.com/nmcp/
-// ./gradlew nmcpZipAggregation - to see what will be published
-// ./gradlew publishAggregationToCentralPortal - to publish
-// https://central.sonatype.com/publishing/deployments - to release
-// TODO move to settings.gradle
-nmcpAggregation {
-  // Publish all projects that apply the 'maven-publish' plugin
-  publishAllProjectsProbablyBreakingProjectIsolation()
-
-  centralPortal {
-    publishingType = "USER_MANAGED"
-    username = findProperty('mavenCentralUsername') as String
-    password = findProperty('mavenCentralPassword') as String
-  }
 }
 
 def isNonStable = { String version ->
-    boolean stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
-    String regex = /^[0-9,.v-]+(-r)?$/
-    return !stableKeyword && !(version ==~ regex)
+  boolean stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+  String regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
 }
 
-// dependencyUpdates.revision = 'release'
+// Maven has zio-blocks-schema_3:0.017 (a padded 0.0.17), which both Maven and Gradle
+// rank above 0.0.x because the second component is 17.
+def hasPaddedNumericComponent = { String version ->
+  version.tokenize('.-').any { it.length() > 1 && it ==~ /0\d+/ }
+}
+
 tasks.named("dependencyUpdates").configure {
   rejectVersionIf {
-    isNonStable(it.candidate.version)
+    isNonStable(it.candidate.version) || hasPaddedNumericComponent(it.candidate.version)
   }
 }

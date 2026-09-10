@@ -1,7 +1,4 @@
-project.version = '0.10.17'
-project.group = 'org.opentorah'
-
-scala.scalaVersion = '3.9.0'
+scala.scalaVersion = providers.gradleProperty('scalaVersion').get()
 
 final String catsVersion = '2.13.0'
 
@@ -17,6 +14,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 tasks.withType(ScalaCompile).configureEach {
   scalaCompileOptions.with {
     additionalParameters = [
+      // Scala 3.9 requires JDK 17+; emit 25 to match the Java toolchain.
+      '-release:25',
       '-new-syntax',
       '-feature',
       '-language:strictEquality',
@@ -33,88 +32,85 @@ tasks.withType(ScalaCompile).configureEach {
 // library: all projects are configured as a library (except for the docs one);
 // with the latest Gradle plugin publishing plugin, uploading of it as a library started failing, so I disabled it...
 if (project.name != 'docs') {
-  final String gitHubRepository = "opentorah/opentorah"
+  final String gitHubRepository = 'opentorah/opentorah'
   final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
   final String orgName = 'Open Torah Project'
   final String orgUrl = 'https://www.opentorah.org'
 
-  jar {
+  // Register before `withJavadocJar()` so that call reuses this task (it will not
+  // overwrite `from`). Maven Central requires a -javadoc jar; this project is
+  // Scala-only, so the classifier carries ScalaDoc.
+  tasks.register('javadocJar', Jar) {
+    group = 'build'
+    description = 'Assembles a jar archive containing the ScalaDoc (Maven Central -javadoc classifier).'
+    from scaladoc
+    archiveClassifier = 'javadoc'
+  }
+
+  java {
+    withSourcesJar()
+    withJavadocJar()
+  }
+
+  tasks.named('jar', Jar) {
+    // `jar` packs both compileScala output (`build/classes/scala/main`) and
+    // processResources output (`build/resources/main`). Catalog XML belongs only
+    // in resources; compileScala does not emit it. IntelliJ's compiler copies
+    // those same files into the classes dir, and Gradle does not delete unknown
+    // files there, so both copies survive until `clean`. Gradle 7+ then fails
+    // the jar (`duplicatesStrategy` FAIL). Exclude the second copy; they are identical.
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
       attributes(
-        'Implementation-Title': project.description,
-        'Implementation-Version': project.version
+        'Implementation-Title'  : project.name,
+        'Implementation-Version': archiveVersion,
+        'Implementation-Vendor' : orgName
       )
     }
   }
 
-  tasks.register('sourcesJar', Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier.set('sources')
-  }
-
-  // there is no Java in the project, but Maven Central requires javadoc JAR...
-  tasks.register('javadocJar', Jar) {
-    from javadoc.destinationDir
-    archiveClassifier.set('javadoc')
-  }
-  javadocJar.dependsOn(javadoc)
-
-  tasks.register('scaladocJar', Jar) {
-    from scaladoc.destinationDir
-    archiveClassifier.set('scaladoc')
-  }
-  scaladocJar.dependsOn(scaladoc)
-
   publishing {
-    repositories {
-      maven {
-        name = 'mavenCentral'
-        url = version.endsWith('SNAPSHOT') ?
-          'https://oss.sonatype.org/content/repositories/snapshots' :
-          'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+    publications {
+      library(MavenPublication) {
+        from components.java
 
-        // Note: this will use mavenCentralUsername and mavenCentralPassword properties - if they are available
-        credentials(PasswordCredentials)
-      }
-
-      publications {
-        library(MavenPublication) {
-          from components.java
-          artifact sourcesJar
-          // TODO something is still not quite right with the ScalaDoc support for Scala 3 in Gradle; disabling for now
-          //artifact scaladocJar
-          artifact javadocJar
-
-          pom {
-            name = project.name
-            description = project.description
-            url = "$gitHubRepositoryUrl/tree/master/$project.name"
-            scm {
-              url = "$gitHubRepositoryUrl"
-              connection = "scm:git:git://github.com/${gitHubRepository}.git"
-              developerConnection = "scm:git:ssh://github.com/${gitHubRepository}.git"
+        pom {
+          name = project.name
+          description = project.description
+          url = gitHubRepositoryUrl
+          inceptionYear = '2009'
+          scm {
+            url = gitHubRepositoryUrl
+            connection = "scm:git:https://github.com/${gitHubRepository}.git"
+            developerConnection = "scm:git:ssh://git@github.com/${gitHubRepository}.git"
+          }
+          issueManagement {
+            system = 'GitHub'
+            url = "$gitHubRepositoryUrl/issues"
+          }
+          ciManagement {
+            system = 'GitHub Actions'
+            url = "$gitHubRepositoryUrl/actions"
+          }
+          licenses {
+            license {
+              name = 'Apache-2.0'
+              url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
             }
-            licenses {
-              license {
-                name = 'The Apache Software License, Version 2.0'
-                url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution = 'repo'
-                comments = 'A business-friendly OSS license'
-              }
-            }
-            organization {
-              name = orgName
-              url = orgUrl
-            }
-            developers {
-              developer {
-                id = 'dub'
-                name = 'Leonid Dubinsky'
-                email = 'dub@opentorah.org'
-                organization = orgName
-                organizationUrl = orgUrl
-                timezone = '-5'
-              }
+          }
+          organization {
+            name = orgName
+            url = orgUrl
+          }
+          developers {
+            developer {
+              id = 'dub'
+              name = 'Leonid Dubinsky'
+              email = 'dub@opentorah.org'
+              url = 'https://dub.podval.org'
+              organization = orgName
+              organizationUrl = orgUrl
+              timezone = '-5'
             }
           }
         }
@@ -123,22 +119,10 @@ if (project.name != 'docs') {
   }
 
   signing {
-    useInMemoryPgpKeys(
-      findProperty('signingKey').toString(),
-      findProperty('signingPassword').toString()
-    )
+    def key = providers.gradleProperty('signingKey')
+    def password = providers.gradleProperty('signingPassword')
+    required = key.isPresent()
+    useInMemoryPgpKeys(key.getOrNull(), password.getOrNull())
     sign publishing.publications.library
   }
-
-  tasks.register('uploadLibrary') {
-    group = 'publishing'
-    description = 'Upload artifacts'
-  }
-  uploadLibrary.dependsOn(publishLibraryPublicationToMavenCentralRepository)
-
-  tasks.register('upload') {
-    description = 'Upload artifacts and plugins'
-    group = 'publishing'
-  }
-  upload.dependsOn(uploadLibrary)
 }

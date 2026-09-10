@@ -6,10 +6,6 @@ description = 'OpenTorah Documentation'
 
 apply from: '../configure.gradle'
 
-repositories {
-  mavenCentral()
-}
-
 dependencies {
   implementation project(':opentorah-core')
 }
