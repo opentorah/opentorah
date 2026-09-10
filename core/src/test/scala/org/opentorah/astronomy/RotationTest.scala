@@ -101,3 +101,14 @@ class RotationTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks, Matchers
     check("90°", 3, "270°")
     check("90°", 4, "360°")
     check("90°", 5, "450°")
+
+  it should "convert to string correctly" in:
+    Rotation(3).toString shouldBe "3°"
+    Rotation(3, 5).toString shouldBe "3°5′"
+    Rotation(3, 5).toString(2) shouldBe "3°5′0″"
+    Rotation(3, 5, 4).toString shouldBe "3°5′4″"
+    Rotation(-3).toString shouldBe "-3°"
+    Rotation(-3, 5).toString shouldBe "-2°55′"
+    (-Rotation(0, 5)).toString shouldBe "-0°5′"
+    Rotation("-15°").toString shouldBe "-15°"
+    Rotation("-15°").canonical.toString shouldBe "345°"

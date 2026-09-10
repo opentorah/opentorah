@@ -229,4 +229,4 @@ class TextTest extends AnyFunSpec, Matchers:
   private val week: TimeVector = TimeVector().days(Week.length) // TODO merge into Week?
 
   private def remainderForWeek(ofWhat: TimeVector): TimeVector =
-    ofWhat - (week * (ofWhat.toRational / week.toRational).whole)
+    ofWhat % week

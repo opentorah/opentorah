@@ -216,6 +216,29 @@ trait Numbers extends NumbersBase:
     @scala.annotation.targetName("divide")
     final def /(that: BigRational, length: Int): Vector = this.*(that.invert, length)
 
+    /** Whole quotient `this / that`.
+     *
+     * The quotient must fit in `Int` (`BigRational.whole` uses `intValueExact`).
+     * Not equivalent to reconstructing the fractional part of the rational quotient:
+     * remainder is `that` times that fraction, not the fraction itself.
+     */
+    @scala.annotation.targetName("quotient")
+    final def /(that: Vector): Int =
+      require(!that.isZero)
+      (this.toRational / that.toRational).whole
+
+    /** Remainder `this - that * (this / that)`. */
+    @scala.annotation.targetName("remainder")
+    final def %(that: Vector): Vector =
+      this - that * (this / that)
+
+    /** Remainder after dividing by `n` with up to `length` digits after the point:
+     * `this - (this / (n, length)) * n`. */
+    @scala.annotation.targetName("remainder")
+    final def %(n: Int, length: Int): Vector =
+      require(n != 0)
+      this - (this / (n, length)) * n
+
     /** Returns canonical representation of this Vector;
      * Vectors are not canonicalized by default even in the periodic number systems. */
     final def canonical: Vector = Vector.fromDigits(digits, isCanonical = true)

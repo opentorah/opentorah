@@ -83,11 +83,13 @@ trait NumbersBase:
     forDigit: (Int, Int, Int) => (Int, Int),
     forHead: Int => Int
   ): Digits =
-    val (headCarry: Int, newTail: Digits) = digits.tail.zipWithIndex.foldRight(0, Seq.empty[Int]) {
-      case ((digit: Int, position: Int), (carry: Int, result: Digits)) =>
-        val (resultCarry: Int, resultDigit: Int) = forDigit(digit + carry, position, range(position))
-        (resultCarry, resultDigit +: result)
-    }
+    require(digits.nonEmpty)
+    require(digits.tail.length <= ranges.length)
+    val (headCarry: Int, newTail: Digits) =
+      digits.tail.zip(ranges).zipWithIndex.foldRight((0, Seq.empty[Int])):
+        case (((digit: Int, digitRange: Int), position: Int), (carry: Int, result: Digits)) =>
+          val (resultCarry: Int, resultDigit: Int) = forDigit(digit + carry, position, digitRange)
+          (resultCarry, resultDigit +: result)
 
     forHead(digits.head + headCarry) +: newTail
 
@@ -123,7 +125,7 @@ trait NumbersBase:
       forDigit: ( /* digit: */ Int, /* digitRange: */ Int) => (Int, Int)
     ): Digits = transform(
       digits,
-      (digit: Int, _ /* TODO position - unused! */ : Int, digitRange: Int) => forDigit(digit, digitRange),
+      (digit: Int, _: Int, digitRange: Int) => forDigit(digit, digitRange),
       (headDigit: Int) =>
         if !isCanonical then headDigit
         else headRangeOpt.fold(headDigit)((headRange: Int) => forDigit(headDigit, headRange)._2)

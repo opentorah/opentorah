@@ -149,8 +149,33 @@ final class SimpleTimesTest extends AnyFlatSpec, ScalaCheckDrivenPropertyChecks,
     Vector(3, 5).toString(3) shouldBe "3ᵈ5ʰ0ᵖ0ᵐ"
     Vector(3, 5).toString(4) shouldBe "3ᵈ5ʰ0ᵖ0ᵐ0"
     Vector(3, 5, 4).toString shouldBe "3ᵈ5ʰ4ᵖ"
+    Vector(-3).toString shouldBe "-3ᵈ"
     Vector(-3, 5, 4).toString shouldBe "-2ᵈ18ʰ1076ᵖ"
     Vector(3, 5, 4, 1).toString shouldBe "3ᵈ5ʰ4ᵖ1ᵐ"
     Vector(-3, 5, 4, 1).toString shouldBe "-2ᵈ18ʰ1075ᵖ75ᵐ"
     (-Vector(0, 5, 4, 1)).toString shouldBe "-0ᵈ5ʰ4ᵖ1ᵐ"
+  }
+
+  "/" should "return the whole quotient" in {
+    Vector(10) / Vector(3) shouldBe 3
+    Vector(0, 5) / Vector(0, 2) shouldBe 2
+    Vector(1) / Vector(0, 12) shouldBe 2
+    Vector(3, 5) / Vector(1) shouldBe 3
+  }
+
+  "%" should "satisfy x = (x/y)*y + (x%y)" in {
+    def check(x: Vector, y: Vector): Unit =
+      x shouldBe y * (x / y) + (x % y)
+
+    check(Vector(10), Vector(3))
+    check(Vector(0, 5), Vector(0, 2))
+    check(Vector(1), Vector(0, 12))
+    check(Vector(3, 5, 4), Vector(1, 2))
+    check(-Vector(3, 5), Vector(1))
+    check(Vector(3, 5), -Vector(1))
+
+    val n: Int = 2
+    val length: Int = SimpleTimes.maxLength
+    val x: Vector = Vector(3, 5, 4)
+    x shouldBe (x / (n, length)) * n + (x % (n, length))
   }
