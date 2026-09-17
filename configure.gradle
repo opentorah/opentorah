@@ -1,4 +1,14 @@
-scala.scalaVersion = providers.gradleProperty('scalaVersion').get()
+pluginManager.apply 'org.podval.conventions'
+
+// Conventions set `-source:future`; this tree is not ready (given `with` syntax).
+tasks.withType(ScalaCompile).configureEach {
+  scalaCompileOptions.additionalParameters = [
+    '-release:25',
+    '-new-syntax',
+    '-feature',
+    '-language:strictEquality',
+  ]
+}
 
 final String catsVersion = '2.13.0'
 
@@ -9,120 +19,13 @@ dependencies {
   testImplementation "org.typelevel:algebra-laws_3:$catsVersion"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
-
-tasks.withType(ScalaCompile).configureEach {
-  scalaCompileOptions.with {
-    additionalParameters = [
-      // Scala 3.9 requires JDK 17+; emit 25 to match the Java toolchain.
-      '-release:25',
-      '-new-syntax',
-      '-feature',
-      '-language:strictEquality',
-      //'-source:future', /// TODO!!!
-      //'-deprecation',
-      //'-unchecked',
-      //'-Xsemanticdb',
-      //'-Ysafe-init',
-      //'-explain',
-    ]
-  }
-}
-
-// library: all projects are configured as a library (except for the docs one);
-// with the latest Gradle plugin publishing plugin, uploading of it as a library started failing, so I disabled it...
-if (project.name != 'docs') {
-  final String gitHubRepository = 'opentorah/opentorah'
-  final String gitHubRepositoryUrl = "https://github.com/$gitHubRepository"
-  final String orgName = 'Open Torah Project'
-  final String orgUrl = 'https://www.opentorah.org'
-
-  // Register before `withJavadocJar()` so that call reuses this task (it will not
-  // overwrite `from`). Maven Central requires a -javadoc jar; this project is
-  // Scala-only, so the classifier carries ScalaDoc.
-  tasks.register('javadocJar', Jar) {
-    group = 'build'
-    description = 'Assembles a jar archive containing the ScalaDoc (Maven Central -javadoc classifier).'
-    from scaladoc
-    archiveClassifier = 'javadoc'
-  }
-
-  java {
-    withSourcesJar()
-    withJavadocJar()
-  }
-
-  tasks.named('jar', Jar) {
-    // `jar` packs both compileScala output (`build/classes/scala/main`) and
-    // processResources output (`build/resources/main`). Catalog XML belongs only
-    // in resources; compileScala does not emit it. IntelliJ's compiler copies
-    // those same files into the classes dir, and Gradle does not delete unknown
-    // files there, so both copies survive until `clean`. Gradle 7+ then fails
-    // the jar (`duplicatesStrategy` FAIL). Exclude the second copy; they are identical.
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest {
-      attributes(
-        'Implementation-Title'  : project.name,
-        'Implementation-Version': archiveVersion,
-        'Implementation-Vendor' : orgName
-      )
-    }
-  }
-
-  publishing {
-    publications {
-      library(MavenPublication) {
-        from components.java
-
-        pom {
-          name = project.name
-          description = project.description
-          url = gitHubRepositoryUrl
-          inceptionYear = '2009'
-          scm {
-            url = gitHubRepositoryUrl
-            connection = "scm:git:https://github.com/${gitHubRepository}.git"
-            developerConnection = "scm:git:ssh://git@github.com/${gitHubRepository}.git"
-          }
-          issueManagement {
-            system = 'GitHub'
-            url = "$gitHubRepositoryUrl/issues"
-          }
-          ciManagement {
-            system = 'GitHub Actions'
-            url = "$gitHubRepositoryUrl/actions"
-          }
-          licenses {
-            license {
-              name = 'Apache-2.0'
-              url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-            }
-          }
-          organization {
-            name = orgName
-            url = orgUrl
-          }
-          developers {
-            developer {
-              id = 'dub'
-              name = 'Leonid Dubinsky'
-              email = 'dub@opentorah.org'
-              url = 'https://dub.podval.org'
-              organization = orgName
-              organizationUrl = orgUrl
-              timezone = '-5'
-            }
-          }
-        }
-      }
-    }
-  }
-
-  signing {
-    def key = providers.gradleProperty('signingKey')
-    def password = providers.gradleProperty('signingPassword')
-    required = key.isPresent()
-    useInMemoryPgpKeys(key.getOrNull(), password.getOrNull())
-    sign publishing.publications.library
+if (pluginManager.hasPlugin('maven-publish')) {
+  pluginManager.apply 'org.podval.conventions.publish'
+  podvalPublish {
+    gitHubRepository = 'opentorah/opentorah'
+    inceptionYear = '2009'
+    orgName = 'Open Torah Project'
+    orgUrl = 'https://www.opentorah.org'
+    developerEmail = 'dub@opentorah.org'
   }
 }

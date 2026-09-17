@@ -14,9 +14,10 @@ Libraries `org.opentorah:opentorah-core` and `org.opentorah:opentorah-texts` pub
 ```
 
 `:docs:generateSite` runs `generateTables` first and writes `docs/_site` (GitHub Pages).
-A local site-publisher checkout at `../../Podval/site-publisher` is used when present
-(`-PsitePublisherDir=`); CI resolves `org.podval.tools:org.podval.tools.publisher`
-from Maven Central.
+Plugin id `org.podval.tools.site-publisher`. A local site-publisher checkout at
+`../../Podval/site-publisher` is used when present (`pluginManagement { includeBuild }` plus
+settings-body `includeBuild`, `-PsitePublisherDir=`); CI resolves the plugin and
+`org.podval.tools:org.podval.tools.publisher` from Maven Central.
 
 
 ## What's here ##

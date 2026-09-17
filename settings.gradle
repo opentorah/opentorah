@@ -5,25 +5,30 @@ pluginManagement {
   }
 
   plugins {
-    id 'io.github.ben-manes.versions' version '0.61.0'
     id 'org.podval.tools.scalajs'      version '1.0.4'
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
     id 'com.gradleup.nmcp.settings'   version '1.6.2'
+  }
+
+  // String path: a File would call Settings.includeBuild (not a plugin build).
+  final String conventionsDir =
+    providers.gradleProperty('podvalGradleDir').getOrElse('../../Podval/podval-gradle')
+  if (file(conventionsDir).isDirectory() && file("${conventionsDir}/settings.gradle").isFile()) {
+    includeBuild conventionsDir
+  }
+  // Composite: plugin id. Library substitution is the settings-body includeBuild below.
+  // Override with -PsitePublisherDir=. Missing directory (CI): resolve both from Maven Central.
+  final String publisherPluginDir =
+    providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
+  if (file(publisherPluginDir).isDirectory() && file("${publisherPluginDir}/settings.gradle").isFile()) {
+    includeBuild publisherPluginDir
   }
 }
 
 plugins {
-  // Auto-provision JDKs for the Java toolchain (e.g. 25 when only 21 is installed).
-  id 'org.gradle.toolchains.foojay-resolver-convention'
+  id 'org.podval.conventions.settings' version '0.1.0'
   // Applies com.gradleup.nmcp to maven-publish projects and aggregation on the root.
   // https://gradleup.com/nmcp/
   id 'com.gradleup.nmcp.settings'
-}
-
-dependencyResolutionManagement {
-  repositories {
-    mavenCentral()
-  }
 }
 
 rootProject.name = 'opentorah'
@@ -57,9 +62,8 @@ if (xmlDir.isDirectory() && new File(xmlDir, 'settings.gradle').isFile()) {
   includeBuild(xmlDir)
 }
 
-// Composite: substitute org.podval.tools:org.podval.tools.publisher from a local
-// checkout. Override with -PsitePublisherDir=. If the directory is missing,
-// Gradle resolves the artifact from Maven Central (CI).
+// Composite: substitute org.podval.tools:org.podval.tools.publisher (library child).
+// Same directory as pluginManagement includeBuild; required now that the library is not the root.
 final File publisherDir = file(
   providers.gradleProperty('sitePublisherDir').getOrElse('../../Podval/site-publisher')
 )
