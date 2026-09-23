@@ -2,7 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.HasNames
-import org.podval.xml.XmlAst
+import org.podval.xml.Xml
+import Xml.given
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.
@@ -59,7 +60,7 @@ object Torah extends WithBookSpans[Chumash]:
     require(bookSpan.book.chapters.consecutive(spans), s"Non-consecutive: $spans")
     Torah(spans.map(inBook(bookSpan.book, _)))
 
-  def decode[E: XmlAst](element: E): Torah =
+  def decode(element: Xml.Element): Torah =
     element.requireName("torah")
     element.requireNoOther(Set("aliyah"))
     val bookSpan: BookSpan = decodeSpan(element).resolve
@@ -68,7 +69,7 @@ object Torah extends WithBookSpans[Chumash]:
     )
     parseAliyot(bookSpan, spans, number = None)
 
-  def decodeMaftir[E: XmlAst](element: E): Maftir =
+  def decodeMaftir(element: Xml.Element): Maftir =
     element.requireName("maftir")
     element.requireNoOther(Set.empty)
     decodeSpan(element).resolve

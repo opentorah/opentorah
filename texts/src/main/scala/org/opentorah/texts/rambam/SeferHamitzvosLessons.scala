@@ -35,7 +35,7 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   @Modifier.config(XmlCodec.Element, "lesson")
   private final case class LessonDto(
-    @Modifier.config(XmlCodec.Attribute, "n") n: Int,
+    n: Int,
     parts: Seq[PartDto]
   ) derives CanEqual
 
@@ -50,12 +50,12 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   @Modifier.config(XmlCodec.Element, "positive")
   private final case class PositiveDto(
-    @Modifier.config(XmlCodec.Attribute, "n") n: Int
+    n: Int
   ) extends PartDto derives CanEqual
 
   @Modifier.config(XmlCodec.Element, "negative")
   private final case class NegativeDto(
-    @Modifier.config(XmlCodec.Attribute, "n") n: Int
+    n: Int
   ) extends PartDto derives CanEqual
 
   @Modifier.config(XmlCodec.Element, "named")

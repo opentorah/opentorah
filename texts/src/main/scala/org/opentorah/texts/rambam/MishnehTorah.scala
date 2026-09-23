@@ -53,7 +53,7 @@ object MishnehTorah extends Stores[?]:
 
   @Modifier.config(XmlCodec.Element, "book")
   private final case class BookDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: Int,
+    n: Int,
     @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "part") parts: Seq[PartDto] = Seq.empty
   ) derives CanEqual
@@ -67,8 +67,8 @@ object MishnehTorah extends Stores[?]:
       Book(dto.n, Names(dto.names), parts)
 
   private final case class PartDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: Int,
-    @Modifier.config(XmlCodec.Attribute, "") chapters: Int,
+    n: Int,
+    chapters: Int,
     @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "chapter") chapterElems: Seq[ChapterDto] = Seq.empty
   ) derives CanEqual

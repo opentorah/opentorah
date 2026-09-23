@@ -1,9 +1,9 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.XmlAst
+import org.podval.xml.Xml
 
 object SpanParsed:
-  def decode[E: XmlAst](element: E): SpanParsed = SpanParsed(
+  def decode(element: Xml.Element): SpanParsed = SpanParsed(
     from = VerseParsed.decodeFrom(element),
     to = VerseParsed.decodeTo(element)
   )

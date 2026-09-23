@@ -47,7 +47,7 @@ object SpecialReadings:
    */
   @Modifier.config(XmlCodec.IgnoreUnknown, "")
   private final case class DayDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: String,
+    n: String,
     torah: Seq[Xml.Element] = Seq.empty,
     maftir: Seq[Xml.Element] = Seq.empty,
     haftarah: Seq[Xml.Element] = Seq.empty

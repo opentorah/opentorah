@@ -24,7 +24,7 @@ final class ReadsNothingTest extends AnyFlatSpec, Matchers:
         |  </custom>
         |</haftarah>""".stripMargin
     ).fold(error => throw error, identity)
-    Haftarah.decodeOptional(xml, full = false)(using Xml)
+    Haftarah.decodeOptional(xml, full = false)
 
   "a custom with reads=none" should "read nothing rather than its parent's reading" in:
     table.find(Custom.Morocco) shouldBe Some(None)

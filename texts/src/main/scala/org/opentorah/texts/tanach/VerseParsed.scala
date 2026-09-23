@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.XmlAst
+import org.podval.xml.Xml
+import Xml.given
 
 final class VerseParsed(val chapter: Option[Int], val verse: Option[Int]):
   def inheritFrom(ancestor: VerseParsed): VerseParsed =
@@ -30,9 +31,9 @@ object VerseParsed:
   def parseOpt(value: Option[String]): VerseParsed =
     value.map(_.trim).filter(_.nonEmpty).fold(VerseParsed(None, None))(parse)
 
-  def decodeFrom[E: XmlAst](element: E): VerseParsed = parseOpt(element.get("from"))
+  def decodeFrom(element: Xml.Element): VerseParsed = parseOpt(element.get("from"))
 
-  def decodeTo[E: XmlAst](element: E): VerseParsed = parseOpt(element.get("to"))
+  def decodeTo(element: Xml.Element): VerseParsed = parseOpt(element.get("to"))
 
   private def positive(raw: String, whole: String): Int =
     val n: Int = raw.toIntOption.getOrElse(throw IllegalArgumentException(

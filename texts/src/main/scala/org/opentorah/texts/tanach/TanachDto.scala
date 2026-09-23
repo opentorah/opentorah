@@ -7,7 +7,7 @@ import zio.blocks.schema.{Modifier, Schema}
 
 /** Derived XML shape of a Tanach `<book>` (and its weeks / psalm spans). */
 private[tanach] final case class BookDto(
-  @Modifier.config(XmlCodec.Attribute, "") n: Option[String] = None,
+  n: Option[String] = None,
   @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
   @Modifier.config(XmlCodec.Element, "chapter") chapters: Seq[ChapterDto] = Seq.empty,
   @Modifier.config(XmlCodec.Element, "week") weeks: Seq[ParshaWeekDto] = Seq.empty,
@@ -25,20 +25,20 @@ private[tanach] object BookDto:
   val codec: XmlCodec[BookDto] = XmlCodec.derived
 
 private[tanach] final case class ChapterDto(
-  @Modifier.config(XmlCodec.Attribute, "") n: Int,
-  @Modifier.config(XmlCodec.Attribute, "") length: Int
+  n: Int,
+  length: Int
 ) derives CanEqual
 
 private[tanach] final case class SpanDto(
-  @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
-  @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None
+  from: Option[String] = None,
+  to: Option[String] = None
 ) derives CanEqual:
   def span: SpanParsed = SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to))
 
 private[tanach] final case class NumberedSpanDto(
-  @Modifier.config(XmlCodec.Attribute, "") n: Int,
-  @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
-  @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None
+  n: Int,
+  from: Option[String] = None,
+  to: Option[String] = None
 ) derives CanEqual:
   def numbered: WithNumber[SpanParsed] =
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)))
@@ -46,18 +46,18 @@ private[tanach] final case class NumberedSpanDto(
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve)
 
 private[tanach] final case class DayDto(
-  @Modifier.config(XmlCodec.Attribute, "") n: Int,
-  @Modifier.config(XmlCodec.Attribute, "") custom: Option[String] = None,
-  @Modifier.config(XmlCodec.Attribute, "") combined: Option[Boolean] = None,
-  @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
-  @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None
+  n: Int,
+  custom: Option[String] = None,
+  combined: Option[Boolean] = None,
+  from: Option[String] = None,
+  to: Option[String] = None
 ) derives CanEqual:
   def span: Torah.Numbered =
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve)
 
 private[tanach] final case class ParshaWeekDto(
-  @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
-  @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None,
+  from: Option[String] = None,
+  to: Option[String] = None,
   @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
   @Modifier.config(XmlCodec.Element, "aliyah") aliyot: Seq[NumberedSpanDto] = Seq.empty,
   @Modifier.config(XmlCodec.Element, "day") days: Seq[DayDto] = Seq.empty,

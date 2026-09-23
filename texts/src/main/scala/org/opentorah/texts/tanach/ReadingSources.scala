@@ -65,12 +65,12 @@ object ReadingSources:
 
   private final case class ParsedSource(
     @Modifier.config(XmlCodec.Attribute, "n") key: String,
-    @Modifier.config(XmlCodec.Attribute, "") kind: String,
-    @Modifier.config(XmlCodec.Attribute, "") name: String,
-    @Modifier.config(XmlCodec.Attribute, "") publication: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") where: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") url: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") combines: Option[String] = None,
+    kind: String,
+    name: String,
+    publication: Option[String] = None,
+    where: Option[String] = None,
+    url: Option[String] = None,
+    combines: Option[String] = None,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 

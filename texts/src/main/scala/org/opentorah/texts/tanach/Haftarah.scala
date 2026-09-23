@@ -2,7 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Language}
-import org.podval.xml.{XmlAst, XmlCodec, XmlParser}
+import org.podval.xml.{Xml, XmlCodec, XmlParser}
+import Xml.given
 import zio.blocks.schema.{Modifier, Schema}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
@@ -89,19 +90,19 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
   final case class Recorded(annotations: Annotations, variants: Variants):
     def isEmpty: Boolean = annotations.isEmpty && variants.isEmpty
 
-  def decode[E: XmlAst](element: E, full: Boolean): Customs =
+  def decode(element: Xml.Element, full: Boolean): Customs =
     element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     require(parsed.nones.isEmpty, """reads="none" in a reading that is not optional""")
     parsed.customs
 
-  def decodeRecorded[E: XmlAst](element: E, full: Boolean): Recorded =
+  def decodeRecorded(element: Xml.Element, full: Boolean): Recorded =
     element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     Recorded(parsed.annotations, parsed.variants)
 
   /** A reading in which a custom may read nothing; see `reads="none"`. */
-  def decodeOptional[E: XmlAst](element: E, full: Boolean): OptionalCustoms =
+  def decodeOptional(element: Xml.Element, full: Boolean): OptionalCustoms =
     element.requireName("haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full = false)
     val reading: Map[Custom, Option[Haftarah]] =
@@ -241,11 +242,11 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   @Modifier.config(XmlCodec.Element, "haftarah")
   private final case class HaftarahDto(
-    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") when: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") role: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") n: Option[Int] = None,
-    @Modifier.config(XmlCodec.Attribute, "") partial: Option[Boolean] = None,
+    book: Option[String] = None,
+    when: Option[String] = None,
+    role: Option[String] = None,
+    n: Option[Int] = None,
+    partial: Option[Boolean] = None,
     @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty
   ) derives CanEqual
 
@@ -255,10 +256,10 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   @Modifier.config(XmlCodec.Element, "week")
   private final case class WeekDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: String,
-    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") precedenceWhenCombined: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    n: String,
+    sources: Option[String] = None,
+    precedenceWhenCombined: Option[String] = None,
+    book: Option[String] = None,
     @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual:
@@ -269,26 +270,26 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     val codec: XmlCodec[WeekDto] = XmlCodec.derived
 
   private final case class CustomDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: String,
-    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") reads: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
+    n: String,
+    sources: Option[String] = None,
+    reads: Option[String] = None,
+    book: Option[String] = None,
     @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "variant") variants: Seq[VariantDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 
   private final case class VariantDto(
-    @Modifier.config(XmlCodec.Attribute, "") n: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") sources: Option[String] = None,
+    n: Option[String] = None,
+    sources: Option[String] = None,
     @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 
   private final case class SpanDto(
-    @Modifier.config(XmlCodec.Attribute, "") book: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") from: Option[String] = None,
-    @Modifier.config(XmlCodec.Attribute, "") to: Option[String] = None
+    book: Option[String] = None,
+    from: Option[String] = None,
+    to: Option[String] = None
   ) derives CanEqual:
     def parsed: BookSpanParsed = BookSpanParsed(
       book = book.map(_.trim).filter(_.nonEmpty),
