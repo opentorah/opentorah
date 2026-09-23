@@ -2,7 +2,8 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.metadata.HasNames
-import org.podval.xml.{XmlCodec, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlCodec, XmlParser, Xml}
+import Xml.given
 import XmlCodec.given
 import Torah.{Fragment, Maftir}
 import zio.blocks.schema.{Modifier, Schema}
@@ -16,15 +17,15 @@ import zio.blocks.schema.{Modifier, Schema}
  I am not sure that coding all those relationships will increase clarity, so they are left in the comments.
  */
 object SpecialReadings:
-  private def parseTorah(element: ZioXml.Element): Torah = Torah.decode(element)
+  private def parseTorah(element: Xml.Element): Torah = Torah.decode(element)
 
-  private def parseMaftir(element: ZioXml.Element): Maftir = Torah.decodeMaftir(element)
+  private def parseMaftir(element: Xml.Element): Maftir = Torah.decodeMaftir(element)
 
-  private def parseHaftarah(element: ZioXml.Element, full: Boolean = true): Haftarah.Customs =
+  private def parseHaftarah(element: Xml.Element, full: Boolean = true): Haftarah.Customs =
     Haftarah.decode(element, full)
 
   /** A reading in which a custom may read nothing at all; see `reads="none"`. */
-  private def parseHaftarahOptional(element: ZioXml.Element): Haftarah.OptionalCustoms =
+  private def parseHaftarahOptional(element: Xml.Element): Haftarah.OptionalCustoms =
     Haftarah.decodeOptional(element, full = false)
 
   /**
@@ -47,19 +48,19 @@ object SpecialReadings:
   @Modifier.config(XmlCodec.IgnoreUnknown, "")
   private final case class DayDto(
     @Modifier.config(XmlCodec.Attribute, "") n: String,
-    torah: Seq[ZioXml.Element] = Seq.empty,
-    maftir: Seq[ZioXml.Element] = Seq.empty,
-    haftarah: Seq[ZioXml.Element] = Seq.empty
+    torah: Seq[Xml.Element] = Seq.empty,
+    maftir: Seq[Xml.Element] = Seq.empty,
+    haftarah: Seq[Xml.Element] = Seq.empty
   ) derives CanEqual
 
   private object DayDto:
     given schema: Schema[DayDto] = Schema.derived
     val codec: XmlCodec[DayDto] = XmlCodec.derived
 
-  private lazy val readings: Map[(String, Slot), (ZioXml.Element, Boolean)] =
+  private lazy val readings: Map[(String, Slot), (Xml.Element, Boolean)] =
     val days: Seq[DayDto] =
       XmlParser.loadCatalog(this, "SpecialReadings", DayDto.codec, "specialReadings")
-    val parsed: Seq[((String, Slot), (ZioXml.Element, Boolean))] = days.flatMap: day =>
+    val parsed: Seq[((String, Slot), (Xml.Element, Boolean))] = days.flatMap: day =>
       (day.torah ++ day.maftir ++ day.haftarah).map: element =>
         (day.n, slotOf(element)) -> (element, !element.get("partial").contains("true"))
     Collections.checkNoDuplicates(parsed.map(_._1), "special readings")
@@ -78,7 +79,7 @@ object SpecialReadings:
     }
     .filterNot((_, recorded) => recorded.isEmpty)
 
-  private def slotOf(element: ZioXml.Element): Slot = Slot(
+  private def slotOf(element: Xml.Element): Slot = Slot(
     tag = element.getName.localName,
     when = element.get("when").map(_.trim).filter(_.nonEmpty),
     role = element.get("role").map(_.trim).filter(_.nonEmpty),
@@ -91,7 +92,7 @@ object SpecialReadings:
     when: Option[String] = None,
     role: Option[String] = None,
     n: Option[Int] = None
-  ): (ZioXml.Element, Boolean) =
+  ): (Xml.Element, Boolean) =
     val slot: Slot = Slot(tag, when, role, n)
     readings.getOrElse(
       (day, slot),
@@ -114,7 +115,7 @@ object SpecialReadings:
     role: Option[String] = None,
     n: Option[Int] = None
   ): Haftarah.Customs =
-    val (element: ZioXml.Element, full: Boolean) = readingFor(day, "haftarah", when, role, n)
+    val (element: Xml.Element, full: Boolean) = readingFor(day, "haftarah", when, role, n)
     parseHaftarah(element, full)
 
   private def haftarahOptionalFor(

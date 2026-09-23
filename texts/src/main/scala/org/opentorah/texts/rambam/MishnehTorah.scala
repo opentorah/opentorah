@@ -4,6 +4,7 @@ import org.opentorah.util.Collections
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{Xml, XmlCodec, XmlParser}
+import Xml.given
 import zio.blocks.schema.{Modifier, Schema}
 
 object MishnehTorah extends Stores[?]:

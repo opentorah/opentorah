@@ -1,6 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.{XmlAst, XmlParser, Xml as ZioXml}
+import org.podval.xml.{XmlAst, XmlParser, Xml}
+import Xml.given
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -10,16 +11,16 @@ import org.scalatest.matchers.should.Matchers
  * that exists -- now has to be checked.
  */
 final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
-  private given xmlAst: XmlAst[ZioXml.Element] = ZioXml
+  private given xmlAst: XmlAst[Xml.Element] = Xml
 
-  private val root: ZioXml.Element = XmlParser.parseResource(
+  private val root: Xml.Element = XmlParser.parseResource(
     SpecialReadings.getClass,
     "SpecialReadings.xml"
   ).fold(error => throw error, identity)
 
-  private val days: Seq[ZioXml.Element] = root.childrenNamed("day")
+  private val days: Seq[Xml.Element] = root.childrenNamed("day")
 
-  private val readings: Seq[(String, SpecialReadings.Slot, ZioXml.Element)] = for
+  private val readings: Seq[(String, SpecialReadings.Slot, Xml.Element)] = for
     day <- days
     element <- day.getChildren.flatMap(_.asElement)
     tag = element.getName.localName
