@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Collections
 import org.podval.metadata.HasNames
 import org.podval.xml.Xml
-import Xml.given
 import Tanach.Chumash
 
 // Other than on Simchas Torah, aliyot are from the same book.

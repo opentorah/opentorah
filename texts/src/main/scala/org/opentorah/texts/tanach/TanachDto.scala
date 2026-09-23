@@ -8,12 +8,12 @@ import zio.blocks.schema.{Modifier, Schema}
 /** Derived XML shape of a Tanach `<book>` (and its weeks / psalm spans). */
 private[tanach] final case class BookDto(
   n: Option[String] = None,
-  @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "chapter") chapters: Seq[ChapterDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "week") weeks: Seq[ParshaWeekDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "day") days: Seq[NumberedSpanDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "weekDay") weekDays: Seq[NumberedSpanDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "book") books: Seq[NumberedSpanDto] = Seq.empty
+  names: Seq[Name] = Seq.empty,
+  chapters: Seq[ChapterDto] = Seq.empty,
+  weeks: Seq[ParshaWeekDto] = Seq.empty,
+  @Modifier.rename("day") days: Seq[NumberedSpanDto] = Seq.empty,
+  @Modifier.rename("weekDay") weekDays: Seq[NumberedSpanDto] = Seq.empty,
+  @Modifier.rename("book") books: Seq[NumberedSpanDto] = Seq.empty
 ) derives CanEqual:
   def bookNames: Names = Names.fromDefaultName(n, names)
   def chapterLengths: Chapters =
@@ -22,18 +22,26 @@ private[tanach] final case class BookDto(
 
 private[tanach] object BookDto:
   given schema: Schema[BookDto] = Schema.derived
-  val codec: XmlCodec[BookDto] = XmlCodec.derived
+  val codec: XmlCodec[BookDto] = XmlCodec.derived(ChapterDto.codec, ParshaWeekDto.codec)
 
 private[tanach] final case class ChapterDto(
   n: Int,
   length: Int
 ) derives CanEqual
 
+private[tanach] object ChapterDto:
+  given schema: Schema[ChapterDto] = Schema.derived
+  val codec: XmlCodec[ChapterDto] = XmlCodec.derived(element = "chapter")
+
 private[tanach] final case class SpanDto(
   from: Option[String] = None,
   to: Option[String] = None
 ) derives CanEqual:
   def span: SpanParsed = SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to))
+
+private[tanach] object SpanDto:
+  given schema: Schema[SpanDto] = Schema.derived
+  val codec: XmlCodec[SpanDto] = XmlCodec.derived(element = "maftir")
 
 private[tanach] final case class NumberedSpanDto(
   n: Int,
@@ -55,14 +63,22 @@ private[tanach] final case class DayDto(
   def span: Torah.Numbered =
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve)
 
+private[tanach] object DayDto:
+  given schema: Schema[DayDto] = Schema.derived
+  val codec: XmlCodec[DayDto] = XmlCodec.derived(element = "day")
+
 private[tanach] final case class ParshaWeekDto(
   from: Option[String] = None,
   to: Option[String] = None,
-  @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "aliyah") aliyot: Seq[NumberedSpanDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "day") days: Seq[DayDto] = Seq.empty,
-  @Modifier.config(XmlCodec.Element, "maftir") maftirs: Seq[SpanDto] = Seq.empty
+  names: Seq[Name] = Seq.empty,
+  @Modifier.rename("aliyah") aliyot: Seq[NumberedSpanDto] = Seq.empty,
+  days: Seq[DayDto] = Seq.empty,
+  maftirs: Seq[SpanDto] = Seq.empty
 ) derives CanEqual:
   def weekNames: Names = Names.fromDefaultName(None, names)
   def span: SpanSemiResolved =
     SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve
+
+private[tanach] object ParshaWeekDto:
+  given schema: Schema[ParshaWeekDto] = Schema.derived
+  val codec: XmlCodec[ParshaWeekDto] = XmlCodec.derived(element = "week", DayDto.codec, SpanDto.codec)

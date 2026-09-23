@@ -1,7 +1,6 @@
 package org.opentorah.texts.tanach
 
 import org.podval.xml.{XmlAst, XmlParser, Xml}
-import Xml.given
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -22,7 +21,7 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
 
   private val readings: Seq[(String, SpecialReadings.Slot, Xml.Element)] = for
     day <- days
-    element <- day.getChildren.flatMap(_.asElement)
+    element <- day.childElements
     tag = element.getName.localName
     if Seq("torah", "maftir", "haftarah").contains(tag)
   yield (

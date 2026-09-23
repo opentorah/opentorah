@@ -2,7 +2,6 @@ package org.opentorah.texts.tanach
 
 import org.podval.metadata.{Language, HasNames}
 import org.podval.xml.Xml
-import Xml.given
 
 trait WithBookSpans[Book <: TanachBook]:
 

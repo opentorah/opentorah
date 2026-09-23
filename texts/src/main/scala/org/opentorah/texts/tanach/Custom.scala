@@ -61,16 +61,15 @@ object Custom extends Names.Loader[Custom], HasValues.FindByName[Custom]:
    * Lazy for the same reason the names are: resolving an entry needs the names,
    * which the loader reads on demand.
    */
-  @Modifier.config(XmlCodec.Element, "custom")
   private final case class Entry(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name],
-    @Modifier.config(XmlCodec.Element, "custom") children: Seq[Entry] = Seq.empty,
+    names: Seq[Name],
+    children: Seq[Entry] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
 
   private object Entry:
     given schema: Schema[Entry] = Schema.derived
-    val codec: XmlCodec[Entry] = XmlCodec.derived
+    val codec: XmlCodec[Entry] = XmlCodec.derived(element = "custom")
 
   private lazy val loaded: (Seq[Names], Map[Custom, Option[Custom]], Map[Custom, Option[String]]) =
     def walk(entries: Seq[Entry], parent: Option[Custom]): Seq[(Custom, Names, Option[Custom], Option[String])] =

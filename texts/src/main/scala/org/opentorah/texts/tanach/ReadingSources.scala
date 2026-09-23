@@ -64,7 +64,7 @@ object ReadingSources:
       url.fold("")(u => s" <$u>")
 
   private final case class ParsedSource(
-    @Modifier.config(XmlCodec.Attribute, "n") key: String,
+    @Modifier.rename("n") key: String,
     kind: String,
     name: String,
     publication: Option[String] = None,

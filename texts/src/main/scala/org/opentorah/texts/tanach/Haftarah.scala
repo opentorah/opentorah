@@ -240,51 +240,57 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     require(spans.nonEmpty, "empty reading")
     Haftarah(spans)
 
-  @Modifier.config(XmlCodec.Element, "haftarah")
   private final case class HaftarahDto(
     book: Option[String] = None,
     when: Option[String] = None,
     role: Option[String] = None,
     n: Option[Int] = None,
     partial: Option[Boolean] = None,
-    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty
+    customs: Seq[CustomDto] = Seq.empty
   ) derives CanEqual
 
   private object HaftarahDto:
     given schema: Schema[HaftarahDto] = Schema.derived
-    val codec: XmlCodec[HaftarahDto] = XmlCodec.derived
+    val codec: XmlCodec[HaftarahDto] = XmlCodec.derived(element = "haftarah", CustomDto.codec)
 
-  @Modifier.config(XmlCodec.Element, "week")
   private final case class WeekDto(
     n: String,
     sources: Option[String] = None,
     precedenceWhenCombined: Option[String] = None,
     book: Option[String] = None,
-    @Modifier.config(XmlCodec.Element, "custom") customs: Seq[CustomDto] = Seq.empty,
+    customs: Seq[CustomDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual:
     def asHaftarah: HaftarahDto = HaftarahDto(book = book, customs = customs)
 
   private object WeekDto:
     given schema: Schema[WeekDto] = Schema.derived
-    val codec: XmlCodec[WeekDto] = XmlCodec.derived
+    val codec: XmlCodec[WeekDto] = XmlCodec.derived(element = "week", CustomDto.codec)
 
   private final case class CustomDto(
     n: String,
     sources: Option[String] = None,
     reads: Option[String] = None,
     book: Option[String] = None,
-    @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
-    @Modifier.config(XmlCodec.Element, "variant") variants: Seq[VariantDto] = Seq.empty,
+    spans: Seq[SpanDto] = Seq.empty,
+    variants: Seq[VariantDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
+
+  private object CustomDto:
+    given schema: Schema[CustomDto] = Schema.derived
+    val codec: XmlCodec[CustomDto] = XmlCodec.derived(element = "custom", SpanDto.codec, VariantDto.codec)
 
   private final case class VariantDto(
     n: Option[String] = None,
     sources: Option[String] = None,
-    @Modifier.config(XmlCodec.Element, "span") spans: Seq[SpanDto] = Seq.empty,
+    spans: Seq[SpanDto] = Seq.empty,
     @Modifier.config(XmlCodec.Element, "comment") comment: Option[String] = None
   ) derives CanEqual
+
+  private object VariantDto:
+    given schema: Schema[VariantDto] = Schema.derived
+    val codec: XmlCodec[VariantDto] = XmlCodec.derived(element = "variant", SpanDto.codec)
 
   private final case class SpanDto(
     book: Option[String] = None,
@@ -295,4 +301,8 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
       book = book.map(_.trim).filter(_.nonEmpty),
       span = SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to))
     )
+
+  private object SpanDto:
+    given schema: Schema[SpanDto] = Schema.derived
+    val codec: XmlCodec[SpanDto] = XmlCodec.derived(element = "span")
 

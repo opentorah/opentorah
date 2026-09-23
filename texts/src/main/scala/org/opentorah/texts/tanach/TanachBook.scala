@@ -3,7 +3,7 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Names}
 import org.podval.store.{By, Stores}
-import org.podval.xml.{XmlAst, XmlCodec, XmlError, XmlParser}
+import org.podval.xml.{Xml, XmlCodec, XmlError, XmlParser}
 
 trait TanachBook extends HasName, Stores[?] derives CanEqual: // all deriveds are objects; using eq
 
@@ -20,14 +20,16 @@ private[tanach] object TanachBook:
     override def elementName: String = "book"
     override def isRecordLike: Boolean = true
 
-    override def unsafeDecode[E: XmlAst](element: E): Parsed =
+    override def unsafeDecode(element: Xml.Element): Parsed = read(element)
+
+    private def read(element: Xml.Element): Parsed =
       val dto: BookDto = BookDto.codec.unsafeDecode(element)
       val names: Names = dto.bookNames
       val chapters: Chapters = dto.chapterLengths
       val book: TanachBook = HasName.find(valuesSeq, names)
       book.parse(names, chapters, dto)
 
-    override def encodeNamed[E: XmlAst](elName: String, value: Parsed): E =
+    override def encodeNamed(elName: String, value: Parsed): Xml.Element =
       throw XmlError("Tanach book is decode-only")
 
   private lazy val book2parsed: Map[TanachBook, Parsed] =

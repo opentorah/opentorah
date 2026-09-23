@@ -2,7 +2,6 @@ package org.opentorah.texts.tanach
 
 import org.opentorah.util.Collections
 import org.podval.xml.Xml
-import Xml.given
 
 final class WithNumber[T](val n: Int, val what: T)
 

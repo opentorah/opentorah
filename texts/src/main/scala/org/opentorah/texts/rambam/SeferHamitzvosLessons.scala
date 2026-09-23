@@ -3,7 +3,7 @@ package org.opentorah.texts.rambam
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{XmlCodec, XmlParser}
-import zio.blocks.schema.{Modifier, Schema}
+import zio.blocks.schema.Schema
 
 object SeferHamitzvosLessons extends Stores[?]:
   override val names: Names = Names("Sefer Hamitzvos")
@@ -33,7 +33,6 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   final case class Negative(override val number: Int) extends Commandment(number)
 
-  @Modifier.config(XmlCodec.Element, "lesson")
   private final case class LessonDto(
     n: Int,
     parts: Seq[PartDto]
@@ -41,31 +40,38 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   private object LessonDto:
     given schema: Schema[LessonDto] = Schema.derived
-    val codec: XmlCodec[LessonDto] = schema.deriving(XmlCodec.deriver)
-      .instance(zio.blocks.typeid.TypeId.of[PartDto], PartDto.codec)
-      .derive
+    val codec: XmlCodec[LessonDto] = XmlCodec.derived(element = "lesson", PartDto.codec)
     def toParts(dto: LessonDto): Seq[Part] = dto.parts.map(PartDto.toPart)
 
   private sealed trait PartDto derives CanEqual
 
-  @Modifier.config(XmlCodec.Element, "positive")
   private final case class PositiveDto(
     n: Int
   ) extends PartDto derives CanEqual
 
-  @Modifier.config(XmlCodec.Element, "negative")
+  private object PositiveDto:
+    given schema: Schema[PositiveDto] = Schema.derived
+    val codec: XmlCodec[PositiveDto] = XmlCodec.derived(element = "positive")
+
   private final case class NegativeDto(
     n: Int
   ) extends PartDto derives CanEqual
 
-  @Modifier.config(XmlCodec.Element, "named")
+  private object NegativeDto:
+    given schema: Schema[NegativeDto] = Schema.derived
+    val codec: XmlCodec[NegativeDto] = XmlCodec.derived(element = "negative")
+
   private final case class NamedDto(
-    @Modifier.config(XmlCodec.Element, "name") names: Seq[Name] = Seq.empty
+    names: Seq[Name] = Seq.empty
   ) extends PartDto derives CanEqual
+
+  private object NamedDto:
+    given schema: Schema[NamedDto] = Schema.derived
+    val codec: XmlCodec[NamedDto] = XmlCodec.derived(element = "named")
 
   private object PartDto:
     given schema: Schema[PartDto] = Schema.derived
-    val codec: XmlCodec[PartDto] = XmlCodec.derived
+    val codec: XmlCodec[PartDto] = XmlCodec.derived(PositiveDto.codec, NegativeDto.codec, NamedDto.codec)
     def toPart(dto: PartDto): Part = dto match
       case PositiveDto(n) => Positive(n)
       case NegativeDto(n) => Negative(n)
