@@ -14,7 +14,7 @@ final String catsVersion = '2.13.0'
 
 dependencies {
   // Substituted from the xml composite build when that checkout is present.
-  api 'org.podval:org.podval.xml:0.1.0' // TODO api?!
+  api 'org.podval:org.podval.xml:0.4.0' // TODO api?!
 
   implementation 'com.kosherjava:zmanim:2.5.0'
 
