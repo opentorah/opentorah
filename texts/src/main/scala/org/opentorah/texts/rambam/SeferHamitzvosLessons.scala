@@ -3,7 +3,7 @@ package org.opentorah.texts.rambam
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{XmlCodec, XmlParser}
-import zio.blocks.schema.{Modifier, Schema}
+import zio.blocks.schema.Schema
 
 object SeferHamitzvosLessons extends Stores[?]:
   override val names: Names = Names("Sefer Hamitzvos")
@@ -33,7 +33,6 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   final case class Negative(override val number: Int) extends Commandment(number)
 
-  @Modifier.config(XmlCodec.Element, "lesson")
   private final case class LessonDto(
     n: Int,
     parts: Seq[PartDto]
@@ -46,7 +45,6 @@ object SeferHamitzvosLessons extends Stores[?]:
 
   private sealed trait PartDto derives CanEqual
 
-  @Modifier.config(XmlCodec.Element, "positive")
   private final case class PositiveDto(
     n: Int
   ) extends PartDto derives CanEqual
@@ -55,7 +53,6 @@ object SeferHamitzvosLessons extends Stores[?]:
     given schema: Schema[PositiveDto] = Schema.derived
     val codec: XmlCodec[PositiveDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "negative")
   private final case class NegativeDto(
     n: Int
   ) extends PartDto derives CanEqual
@@ -64,7 +61,6 @@ object SeferHamitzvosLessons extends Stores[?]:
     given schema: Schema[NegativeDto] = Schema.derived
     val codec: XmlCodec[NegativeDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "named")
   private final case class NamedDto(
     names: Seq[Name] = Seq.empty
   ) extends PartDto derives CanEqual

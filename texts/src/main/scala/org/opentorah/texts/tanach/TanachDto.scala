@@ -24,7 +24,6 @@ private[tanach] object BookDto:
   given schema: Schema[BookDto] = Schema.derived
   val codec: XmlCodec[BookDto] = XmlCodec.derived
 
-@Modifier.config(XmlCodec.Element, "chapter")
 private[tanach] final case class ChapterDto(
   n: Int,
   length: Int
@@ -55,7 +54,6 @@ private[tanach] final case class NumberedSpanDto(
   def numberedSemi: Torah.Numbered =
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve)
 
-@Modifier.config(XmlCodec.Element, "day")
 private[tanach] final case class DayDto(
   n: Int,
   custom: Option[String] = None,

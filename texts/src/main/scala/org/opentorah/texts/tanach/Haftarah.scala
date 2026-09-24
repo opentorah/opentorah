@@ -239,7 +239,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     require(spans.nonEmpty, "empty reading")
     Haftarah(spans)
 
-  @Modifier.config(XmlCodec.Element, "haftarah")
   private final case class HaftarahDto(
     book: Option[String] = None,
     when: Option[String] = None,
@@ -253,7 +252,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     given schema: Schema[HaftarahDto] = Schema.derived
     val codec: XmlCodec[HaftarahDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "week")
   private final case class WeekDto(
     n: String,
     sources: Option[String] = None,
@@ -268,7 +266,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     given schema: Schema[WeekDto] = Schema.derived
     val codec: XmlCodec[WeekDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "custom")
   private final case class CustomDto(
     n: String,
     sources: Option[String] = None,
@@ -283,7 +280,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     given schema: Schema[CustomDto] = Schema.derived
     val codec: XmlCodec[CustomDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "variant")
   private final case class VariantDto(
     n: Option[String] = None,
     sources: Option[String] = None,
@@ -295,7 +291,6 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     given schema: Schema[VariantDto] = Schema.derived
     val codec: XmlCodec[VariantDto] = XmlCodec.derived
 
-  @Modifier.config(XmlCodec.Element, "span")
   private final case class SpanDto(
     book: Option[String] = None,
     from: Option[String] = None,

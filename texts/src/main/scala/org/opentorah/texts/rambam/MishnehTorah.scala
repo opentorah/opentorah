@@ -4,7 +4,7 @@ import org.opentorah.util.Collections
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
 import org.podval.xml.{XmlCodec, XmlParser}
-import zio.blocks.schema.{Modifier, Schema}
+import zio.blocks.schema.Schema
 
 object MishnehTorah extends Stores[?]:
   override lazy val names: Names = Names(work.names)
@@ -50,7 +50,6 @@ object MishnehTorah extends Stores[?]:
 
   final class NamedChapter(override val names: Names) extends Chapter
 
-  @Modifier.config(XmlCodec.Element, "book")
   private final case class BookDto(
     n: Int,
     names: Seq[Name] = Seq.empty,
@@ -65,7 +64,6 @@ object MishnehTorah extends Stores[?]:
       Collections.requireConsecutive(parts, _.number, "part")
       Book(dto.n, Names(dto.names), parts)
 
-  @Modifier.config(XmlCodec.Element, "part")
   private final case class PartDto(
     n: Int,
     chapters: Int,
@@ -83,7 +81,6 @@ object MishnehTorah extends Stores[?]:
         val chapters: Seq[NamedChapter] = dto.chapterElems.map(c => NamedChapter(Names(c.names)))
         PartWithNamedChapters(dto.n, dto.chapters, names, chapters)
 
-  @Modifier.config(XmlCodec.Element, "chapter")
   private final case class ChapterDto(
     names: Seq[Name] = Seq.empty
   ) derives CanEqual
