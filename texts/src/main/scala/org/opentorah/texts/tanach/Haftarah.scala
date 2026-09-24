@@ -3,7 +3,6 @@ package org.opentorah.texts.tanach
 import org.opentorah.util.Collections
 import org.podval.metadata.{HasName, Language}
 import org.podval.xml.{Xml, XmlCodec, XmlParser}
-import Xml.given
 import zio.blocks.schema.{Modifier, Schema}
 
 // TODO de-case - and figure out why object Haftarah's creation becomes impossible if 'case' is removed here...
@@ -91,19 +90,19 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     def isEmpty: Boolean = annotations.isEmpty && variants.isEmpty
 
   def decode(element: Xml.Element, full: Boolean): Customs =
-    element.requireName("haftarah")
+    XmlChecks.requireName(element, "haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     require(parsed.nones.isEmpty, """reads="none" in a reading that is not optional""")
     parsed.customs
 
   def decodeRecorded(element: Xml.Element, full: Boolean): Recorded =
-    element.requireName("haftarah")
+    XmlChecks.requireName(element, "haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full)
     Recorded(parsed.annotations, parsed.variants)
 
   /** A reading in which a custom may read nothing; see `reads="none"`. */
   def decodeOptional(element: Xml.Element, full: Boolean): OptionalCustoms =
-    element.requireName("haftarah")
+    XmlChecks.requireName(element, "haftarah")
     val parsed: Parsed = withAnnotations(HaftarahDto.codec.unsafeDecode(element), full = false)
     val reading: Map[Custom, Option[Haftarah]] =
       Collections.mapValues(parsed.customs.customs)(Some(_)) ++ parsed.nones.map(_ -> None)
@@ -240,6 +239,7 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
     require(spans.nonEmpty, "empty reading")
     Haftarah(spans)
 
+  @Modifier.config(XmlCodec.Element, "haftarah")
   private final case class HaftarahDto(
     book: Option[String] = None,
     when: Option[String] = None,
@@ -251,8 +251,9 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private object HaftarahDto:
     given schema: Schema[HaftarahDto] = Schema.derived
-    val codec: XmlCodec[HaftarahDto] = XmlCodec.derived(element = "haftarah", CustomDto.codec)
+    val codec: XmlCodec[HaftarahDto] = XmlCodec.derived
 
+  @Modifier.config(XmlCodec.Element, "week")
   private final case class WeekDto(
     n: String,
     sources: Option[String] = None,
@@ -265,8 +266,9 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private object WeekDto:
     given schema: Schema[WeekDto] = Schema.derived
-    val codec: XmlCodec[WeekDto] = XmlCodec.derived(element = "week", CustomDto.codec)
+    val codec: XmlCodec[WeekDto] = XmlCodec.derived
 
+  @Modifier.config(XmlCodec.Element, "custom")
   private final case class CustomDto(
     n: String,
     sources: Option[String] = None,
@@ -279,8 +281,9 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private object CustomDto:
     given schema: Schema[CustomDto] = Schema.derived
-    val codec: XmlCodec[CustomDto] = XmlCodec.derived(element = "custom", SpanDto.codec, VariantDto.codec)
+    val codec: XmlCodec[CustomDto] = XmlCodec.derived
 
+  @Modifier.config(XmlCodec.Element, "variant")
   private final case class VariantDto(
     n: Option[String] = None,
     sources: Option[String] = None,
@@ -290,8 +293,9 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private object VariantDto:
     given schema: Schema[VariantDto] = Schema.derived
-    val codec: XmlCodec[VariantDto] = XmlCodec.derived(element = "variant", SpanDto.codec)
+    val codec: XmlCodec[VariantDto] = XmlCodec.derived
 
+  @Modifier.config(XmlCodec.Element, "span")
   private final case class SpanDto(
     book: Option[String] = None,
     from: Option[String] = None,
@@ -304,5 +308,5 @@ object Haftarah extends WithBookSpans[Tanach.Prophets]:
 
   private object SpanDto:
     given schema: Schema[SpanDto] = Schema.derived
-    val codec: XmlCodec[SpanDto] = XmlCodec.derived(element = "span")
+    val codec: XmlCodec[SpanDto] = XmlCodec.derived
 

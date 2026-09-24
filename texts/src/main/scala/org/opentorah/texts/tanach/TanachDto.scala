@@ -22,8 +22,9 @@ private[tanach] final case class BookDto(
 
 private[tanach] object BookDto:
   given schema: Schema[BookDto] = Schema.derived
-  val codec: XmlCodec[BookDto] = XmlCodec.derived(ChapterDto.codec, ParshaWeekDto.codec)
+  val codec: XmlCodec[BookDto] = XmlCodec.derived
 
+@Modifier.config(XmlCodec.Element, "chapter")
 private[tanach] final case class ChapterDto(
   n: Int,
   length: Int
@@ -31,8 +32,9 @@ private[tanach] final case class ChapterDto(
 
 private[tanach] object ChapterDto:
   given schema: Schema[ChapterDto] = Schema.derived
-  val codec: XmlCodec[ChapterDto] = XmlCodec.derived(element = "chapter")
+  val codec: XmlCodec[ChapterDto] = XmlCodec.derived
 
+@Modifier.config(XmlCodec.Element, "maftir")
 private[tanach] final case class SpanDto(
   from: Option[String] = None,
   to: Option[String] = None
@@ -41,7 +43,7 @@ private[tanach] final case class SpanDto(
 
 private[tanach] object SpanDto:
   given schema: Schema[SpanDto] = Schema.derived
-  val codec: XmlCodec[SpanDto] = XmlCodec.derived(element = "maftir")
+  val codec: XmlCodec[SpanDto] = XmlCodec.derived
 
 private[tanach] final case class NumberedSpanDto(
   n: Int,
@@ -53,6 +55,7 @@ private[tanach] final case class NumberedSpanDto(
   def numberedSemi: Torah.Numbered =
     WithNumber(n, SpanParsed(VerseParsed.parseOpt(from), VerseParsed.parseOpt(to)).semiResolve)
 
+@Modifier.config(XmlCodec.Element, "day")
 private[tanach] final case class DayDto(
   n: Int,
   custom: Option[String] = None,
@@ -65,8 +68,9 @@ private[tanach] final case class DayDto(
 
 private[tanach] object DayDto:
   given schema: Schema[DayDto] = Schema.derived
-  val codec: XmlCodec[DayDto] = XmlCodec.derived(element = "day")
+  val codec: XmlCodec[DayDto] = XmlCodec.derived
 
+@Modifier.config(XmlCodec.Element, "week")
 private[tanach] final case class ParshaWeekDto(
   from: Option[String] = None,
   to: Option[String] = None,
@@ -81,4 +85,4 @@ private[tanach] final case class ParshaWeekDto(
 
 private[tanach] object ParshaWeekDto:
   given schema: Schema[ParshaWeekDto] = Schema.derived
-  val codec: XmlCodec[ParshaWeekDto] = XmlCodec.derived(element = "week", DayDto.codec, SpanDto.codec)
+  val codec: XmlCodec[ParshaWeekDto] = XmlCodec.derived

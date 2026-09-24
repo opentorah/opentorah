@@ -8,7 +8,7 @@ final class WithNumber[T](val n: Int, val what: T)
 object WithNumber:
 
   def decode[T](element: Xml.Element, what: Xml.Element => T): WithNumber[T] =
-    WithNumber(element.positiveInt("n"), what(element))
+    WithNumber(XmlChecks.positiveInt(element, "n"), what(element))
 
   def requireConsecutive[T](result: Seq[WithNumber[T]], what: String): Unit =
     Collections.requireConsecutive(result, _.n, what)

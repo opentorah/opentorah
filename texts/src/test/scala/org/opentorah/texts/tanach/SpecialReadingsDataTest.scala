@@ -1,6 +1,6 @@
 package org.opentorah.texts.tanach
 
-import org.podval.xml.{XmlAst, XmlParser, Xml}
+import org.podval.xml.{XmlParser, Xml}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -10,8 +10,6 @@ import org.scalatest.matchers.should.Matchers
  * that exists -- now has to be checked.
  */
 final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
-  private given xmlAst: XmlAst[Xml.Element] = Xml
-
   private val root: Xml.Element = XmlParser.parseResource(
     SpecialReadings.getClass,
     "SpecialReadings.xml"
@@ -25,7 +23,7 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
     tag = element.getName.localName
     if Seq("torah", "maftir", "haftarah").contains(tag)
   yield (
-    day.requireAttr("n"),
+    XmlChecks.requireAttr(day, "n"),
     SpecialReadings.Slot(
       tag,
       when = element.get("when").map(_.trim).filter(_.nonEmpty),

@@ -3,9 +3,8 @@ package org.opentorah.texts.rambam
 import org.opentorah.util.Collections
 import org.podval.metadata.{Name, Names}
 import org.podval.store.{By, NumberedStore, NumberedStores, Store, Stores}
-import org.podval.xml.{Xml, XmlCodec, XmlParser}
-import Xml.given
-import zio.blocks.schema.Schema
+import org.podval.xml.{XmlCodec, XmlParser}
+import zio.blocks.schema.{Modifier, Schema}
 
 object MishnehTorah extends Stores[?]:
   override lazy val names: Names = Names(work.names)
@@ -51,6 +50,7 @@ object MishnehTorah extends Stores[?]:
 
   final class NamedChapter(override val names: Names) extends Chapter
 
+  @Modifier.config(XmlCodec.Element, "book")
   private final case class BookDto(
     n: Int,
     names: Seq[Name] = Seq.empty,
@@ -59,12 +59,13 @@ object MishnehTorah extends Stores[?]:
 
   private object BookDto:
     given schema: Schema[BookDto] = Schema.derived
-    val codec: XmlCodec[BookDto] = XmlCodec.derived(element = "book", PartDto.codec)
+    val codec: XmlCodec[BookDto] = XmlCodec.derived
     def toBook(dto: BookDto): Book =
       val parts: Seq[Part] = dto.parts.map(PartDto.toPart)
       Collections.requireConsecutive(parts, _.number, "part")
       Book(dto.n, Names(dto.names), parts)
 
+  @Modifier.config(XmlCodec.Element, "part")
   private final case class PartDto(
     n: Int,
     chapters: Int,
@@ -74,7 +75,7 @@ object MishnehTorah extends Stores[?]:
 
   private object PartDto:
     given schema: Schema[PartDto] = Schema.derived
-    val codec: XmlCodec[PartDto] = XmlCodec.derived(element = "part", ChapterDto.codec)
+    val codec: XmlCodec[PartDto] = XmlCodec.derived
     def toPart(dto: PartDto): Part =
       val names: Names = Names(dto.names)
       if dto.chapterElems.isEmpty then PartWithNumberedChapters(dto.n, dto.chapters, names)
@@ -82,13 +83,14 @@ object MishnehTorah extends Stores[?]:
         val chapters: Seq[NamedChapter] = dto.chapterElems.map(c => NamedChapter(Names(c.names)))
         PartWithNamedChapters(dto.n, dto.chapters, names, chapters)
 
+  @Modifier.config(XmlCodec.Element, "chapter")
   private final case class ChapterDto(
     names: Seq[Name] = Seq.empty
   ) derives CanEqual
 
   private object ChapterDto:
     given schema: Schema[ChapterDto] = Schema.derived
-    val codec: XmlCodec[ChapterDto] = XmlCodec.derived(element = "chapter")
+    val codec: XmlCodec[ChapterDto] = XmlCodec.derived
 
   private final case class WorkDto(
     names: Seq[Name] = Seq.empty,
@@ -97,10 +99,10 @@ object MishnehTorah extends Stores[?]:
 
   private object WorkDto:
     given schema: Schema[WorkDto] = Schema.derived
-    val codec: XmlCodec[WorkDto] = XmlCodec.derived(BookDto.codec)
+    val codec: XmlCodec[WorkDto] = XmlCodec.derived
 
   private lazy val work: WorkDto =
-    XmlParser.parseResource[Xml.Element](getClass, "MishnehTorah.xml")
+    XmlParser.parseResource(getClass, "MishnehTorah.xml")
       .flatMap(WorkDto.codec.decode)
       .fold(error => throw error, identity)
 

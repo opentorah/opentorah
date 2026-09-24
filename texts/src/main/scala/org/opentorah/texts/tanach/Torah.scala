@@ -60,8 +60,8 @@ object Torah extends WithBookSpans[Chumash]:
     Torah(spans.map(inBook(bookSpan.book, _)))
 
   def decode(element: Xml.Element): Torah =
-    element.requireName("torah")
-    element.requireNoOther(Set("aliyah"))
+    XmlChecks.requireName(element, "torah")
+    XmlChecks.requireNoOther(element, Set("aliyah"))
     val bookSpan: BookSpan = decodeSpan(element).resolve
     val spans: Seq[Numbered] = element.childrenNamed("aliyah").map(el =>
       WithNumber.decode(el, e => SpanParsed.decode(e).defaultFromChapter(bookSpan.span.from.chapter).semiResolve)
@@ -69,8 +69,8 @@ object Torah extends WithBookSpans[Chumash]:
     parseAliyot(bookSpan, spans, number = None)
 
   def decodeMaftir(element: Xml.Element): Maftir =
-    element.requireName("maftir")
-    element.requireNoOther(Set.empty)
+    XmlChecks.requireName(element, "maftir")
+    XmlChecks.requireNoOther(element, Set.empty)
     decodeSpan(element).resolve
 
   def inBook(book: Chumash, span: Span): BookSpan = BookSpan(book, span)
