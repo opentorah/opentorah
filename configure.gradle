@@ -10,6 +10,13 @@ tasks.withType(ScalaCompile).configureEach {
   ]
 }
 
+// Published artifactIds stay opentorah-core and opentorah-texts.
+if (pluginManager.hasPlugin('org.podval.tools.scalajs')) {
+  scalaBackend {
+    useArtifactSuffix = false
+  }
+}
+
 final String catsVersion = '2.13.0'
 
 dependencies {
