@@ -6,6 +6,9 @@ import org.podval.store.{Alias, By, Path, Store, Stores}
 object Tanach extends Stores[?]:
   override def names: Names = All.names
 
+  // Scala 3.10 does not summon the `derives CanEqual` instance from TanachBook.
+  given CanEqual[TanachBook, TanachBook] = CanEqual.derived
+
   // Part markers
   trait Chumash extends ChumashBook {}
   trait Nach extends NachBook {}

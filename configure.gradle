@@ -1,3 +1,6 @@
+// Gradle 9.8.1 still defaults Zinc to 1.12.0.
+scala.zincVersion = '1.12.1'
+
 pluginManager.apply 'org.podval.conventions'
 
 // Conventions set `-source:future`; this tree is not ready (given `with` syntax).
@@ -26,8 +29,7 @@ dependencies {
   testImplementation "org.typelevel:algebra-laws_3:$catsVersion"
 }
 
-if (pluginManager.hasPlugin('maven-publish')) {
-  pluginManager.apply 'org.podval.conventions.publish'
+if (pluginManager.hasPlugin('org.podval.conventions.publish')) {
   podvalPublish {
     gitHubRepository = 'opentorah/opentorah'
     inceptionYear = '2009'

@@ -1,0 +1,12 @@
+name: Dependency updates
+on:
+  schedule:
+    # Monday 12:00 UTC
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  dependency-updates:
+    uses: dubinsky/podval-gradle/.github/workflows/dependency-updates.yml@0.2.0

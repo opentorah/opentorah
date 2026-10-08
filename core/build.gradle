@@ -1,9 +1,8 @@
 plugins {
   id 'java-library'
   id 'scala'
-  id 'maven-publish'
-  id 'signing'
-  id 'org.podval.tools.scalajs'
+  id 'org.podval.conventions.publish'
+  id 'org.podval.tools.scala'
 }
 
 description = 'Open Torah Core'

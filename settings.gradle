@@ -5,8 +5,7 @@ pluginManagement {
   }
 
   plugins {
-    id 'org.podval.tools.scalajs'      version '2.2.0'
-    id 'com.gradleup.nmcp.settings'   version '1.6.2'
+    id 'org.podval.tools.scala' version '2.2.0'
   }
 
   // String path: a File would call Settings.includeBuild (not a plugin build).
@@ -25,10 +24,7 @@ pluginManagement {
 }
 
 plugins {
-  id 'org.podval.conventions.settings' version '0.1.0'
-  // Applies com.gradleup.nmcp to maven-publish projects and aggregation on the root.
-  // https://gradleup.com/nmcp/
-  id 'com.gradleup.nmcp.settings'
+  id 'org.podval.conventions.settings' version '0.2.0'
 }
 
 rootProject.name = 'opentorah'
@@ -40,17 +36,6 @@ include ':texts'
 project(':texts').name = 'opentorah-texts'
 
 include ':docs'
-
-// ./gradlew nmcpZipAggregation — inspect the zip
-// ./gradlew publishAggregationToCentralPortal — upload (USER_MANAGED)
-// https://central.sonatype.com/publishing/deployments — release
-nmcpSettings {
-  centralPortal {
-    publishingType = 'USER_MANAGED'
-    username = providers.gradleProperty('mavenCentralUsername')
-    password = providers.gradleProperty('mavenCentralPassword')
-  }
-}
 
 // Composite: substitute org.podval:org.podval.xml from a local xml checkout.
 // Override with -PxmlDir=/path/to/xml. If the directory is missing, Gradle
