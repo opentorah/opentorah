@@ -132,8 +132,8 @@ final class EpochTest extends AnyFlatSpec, Matchers:
     Gregorian.Year( 1600).month(Gregorian.Month.December).day( 31).toMoment                 .toJulianDay shouldBe 2305812.5
     Gregorian.Year( 1600).month(Gregorian.Month.January ).day(  1).toMoment                 .toJulianDay shouldBe 2305447.5
     Julian.Year(  837).month(Julian.Month.April   ).day(10).toMoment          .toJulianDay shouldBe 2026871.5
-    Julian.Year(- 122).month(Julian.Month.January ).day( 1).toMoment          .toJulianDay shouldBe 1676497.5
-    Julian.Year(- 123).month(Julian.Month.December).day(31).toMoment          .toJulianDay shouldBe 1676496.5
+    Julian.Year( -122).month(Julian.Month.January ).day( 1).toMoment          .toJulianDay shouldBe 1676497.5
+    Julian.Year( -123).month(Julian.Month.December).day(31).toMoment          .toJulianDay shouldBe 1676496.5
     Julian.Year(-1000).month(Julian.Month.July    ).day(12).toMoment.hours(12).toJulianDay shouldBe 1356001.0
     Julian.Year(-1000).month(Julian.Month.February).day(29).toMoment          .toJulianDay shouldBe 1355866.5
     Julian.Year(-1001).month(Julian.Month.August  ).day(17).toMoment          .toJulianDay shouldBe 1355670.5
