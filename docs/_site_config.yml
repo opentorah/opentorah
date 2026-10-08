@@ -5,6 +5,7 @@ author: "Leonid Dubinsky"
 email: dub@opentorah.org
 timezone: "America/New_York"
 favicon: favicon.ico
+apparatus: true
 
 social:
   github:  dubinsky
