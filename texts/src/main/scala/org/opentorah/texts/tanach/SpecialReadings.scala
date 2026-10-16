@@ -5,7 +5,7 @@ import org.podval.metadata.HasNames
 import org.podval.xml.{XmlCodec, XmlParser, Xml}
 import XmlCodec.given
 import Torah.{Fragment, Maftir}
-import zio.blocks.schema.{Modifier, Schema}
+import zio.blocks.schema.Schema
 
 /* All the special readings and their rules are here.
  Readings are annotated with their reason.
@@ -44,7 +44,6 @@ object SpecialReadings:
    * so that loading happens on first use rather than during the initialisation
    * of the objects below.
    */
-  @Modifier.config(XmlCodec.IgnoreUnknown, "")
   private final case class DayDto(
     n: String,
     torah: Seq[Xml.Element] = Seq.empty,

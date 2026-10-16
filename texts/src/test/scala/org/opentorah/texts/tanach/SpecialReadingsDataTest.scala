@@ -43,9 +43,9 @@ final class SpecialReadingsDataTest extends AnyFlatSpec, Matchers:
       withClue(s"'$day'/$slot: ")(day.nonEmpty shouldBe true)
 
   it should "use only torah, maftir or haftarah as children of day" in:
-    for (day, slot, _) <- readings do
-      withClue(s"$day/$slot: ")
-        (Seq("torah", "maftir", "haftarah") should contain (slot.tag))
+    for day <- days do
+      val names: Seq[String] = day.childElements.map(_.getName.localName)
+      names.foreach(name => Seq("torah", "maftir", "haftarah") should contain (name))
 
   "the readings" should "all still parse and resolve" in:
     // forcing SpecialReadings parses every one of them; before the move, a
