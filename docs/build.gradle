@@ -7,6 +7,9 @@ description = 'OpenTorah Documentation'
 
 apply from: '../configure.gradle'
 
+// scala.runtime.LazyVals$ uses sun.misc.Unsafe
+podval.allowJdk25RestrictedAccess()
+
 dependencies {
   implementation project(':opentorah-core')
 }
@@ -14,13 +17,6 @@ dependencies {
 site {
   treatErrorsAsWarnings = true
 }
-
-// JDK 22+ compatibility flags for generateTables (not site-publisher):
-// scala.runtime.LazyVals$ (old lazy-val bytecode on the classpath) uses sun.misc.Unsafe
-ext.jdkCompatJvmArgs = [
-  '--enable-native-access=ALL-UNNAMED',
-  '--sun-misc-unsafe-memory-access=allow',
-]
 
 final File buildDirectory = layout.buildDirectory.asFile.get()
 final File tablesDir = file("$buildDirectory/tables")
@@ -30,7 +26,6 @@ tasks.register('generateTables', JavaExec) {
   mainClass.set('org.opentorah.calendar.paper.Tables')
   args = [tablesDir]
   classpath = sourceSets.main.runtimeClasspath
-  jvmArgs jdkCompatJvmArgs
 }
 
 tasks.named('generateSite') { dependsOn generateTables }

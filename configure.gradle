@@ -1,17 +1,7 @@
-// Gradle 9.8.1 still defaults Zinc to 1.12.0.
-scala.zincVersion = '1.12.1'
-
 pluginManager.apply 'org.podval.conventions'
 
-// Conventions set `-source:future`; this tree is not ready (given `with` syntax).
-tasks.withType(ScalaCompile).configureEach {
-  scalaCompileOptions.additionalParameters = [
-    '-release:25',
-    '-new-syntax',
-    '-feature',
-    '-language:strictEquality',
-  ]
-}
+// given `with` syntax is not ready
+podval.scalaCompilerParameters.remove('-source:future')
 
 // Published artifactIds stay opentorah-core and opentorah-texts.
 if (pluginManager.hasPlugin('org.podval.tools.scalajs')) {
