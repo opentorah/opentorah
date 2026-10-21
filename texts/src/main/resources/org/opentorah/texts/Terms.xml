@@ -1,53 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Selector>
-  <selector>
+<Terms>
+  <term id="book" selector="yes">
     <name n="книга" lang="ru"/>
     <name n="book" lang="en"/>
     <name n="ספר" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="parsha" selector="yes">
     <name n="parsha" lang="en" transliterated="true"/>
     <name n="парша" lang="ru" transliterated="true"/>
     <name n="פרשה" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="chapter" selector="yes">
     <name n="глава" lang="ru"/>
     <name n="chapter" lang="en"/>
     <name n="פרק" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="positive" selector="yes">
     <name n="positive" lang="en"/>
     <name n="повелевающая" lang="ru"/>
     <name n="עשה" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="negative" selector="yes">
     <name n="negative" lang="en"/>
     <name n="запрещающая" lang="ru"/>
     <name n="לא תעשה" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="verse" selector="yes">
     <name n="стих" lang="ru"/>
     <name n="verse" lang="en"/>
     <name n="פסוק" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="lesson" selector="yes">
     <name n="lesson" lang="en"/>
     <name n="урок" lang="ru"/>
     <name n="שיעור" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="day" selector="yes">
     <name n="day" lang="en"/>
     <name n="день" lang="ru"/>
     <name n="יום" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="day of the week" selector="yes">
     <name n="day of the week" lang="en"/>
     <name n="день недели" lang="ru"/>
     <name n="יום בשבוע" lang="he"/>
-  </selector>
-  <selector>
+  </term>
+  <term id="part" selector="yes">
     <name n="part" lang="en"/>
     <name n="часть" lang="ru"/>
     <name n="חלק" lang="he"/>
-  </selector>
-</Selector>
+  </term>
+</Terms>

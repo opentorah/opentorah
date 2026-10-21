@@ -1,33 +1,41 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 - Plugin id `org.podval.tools.site-publisher` on `:docs` (`generateSite` / `serveSite`, still `dependsOn generateTables`).
+- texts: axis catalog is `Terms.xml` (`<term id selector="yes">`); pin `org.podval:org.podval.xml` 0.7.0.
 
 ## [0.11.0] - 2026-09-10
 - numbers: Vector Euclidean `/` and `%`; number-system laws and angle `toString` tests.
 - calendar: weekday names in German, French, Polish, and Lithuanian.
 - astronomy: Zodiac names distinguish Latin (`la`) from English.
-- texts: "customs" DSL; custom hierarchy lives in `Custom.xml` (`CustomTree` folded into `Custom`); special readings live in `SpecialReadings.xml`.
-- texts: Tanach, Mishneh Torah and Sefer HaMitzvos are Stores; Chumash and Psalms aliases on `Tanach` (`/Chumash`, `/Psalms`).
+- texts: "customs" DSL; custom hierarchy lives in `Custom.xml` (`CustomTree` folded into `Custom`); special readings
+  live in `SpecialReadings.xml`.
+- texts: Tanach, Mishneh Torah and Sefer HaMitzvos are Stores; Chumash and Psalms aliases on `Tanach` (`/Chumash`,
+  `/Psalms`).
 - xml: `Path` is a class (`toUrl` / `structureNames`); drop `Terminal`; `By(selector, stores)` / `By.Numbered`.
 - xml: `Named` is `HasNames`; drop `HasName.findByNames` (use `find`); `Parsha` is `HasValues.Distance` only.
 - chore: Scala 3.9.0; Gradle 9.7.1.
 - texts: notes recorded against the customs they speak about, not against a reading entry.
 - texts: Ki Sisa — cite Chabad's sources against Chabad.
 - texts: Rosh Chodesh maftir in Av and Elul; cite chabad.org for the maftir and haftarah rules.
-- feat: `store` and `metadata` moved to `org.podval.xml`; XML codec derivers; depend on published `org.podval:org.podval.xml` 0.1.0 (optional local `includeBuild` of `dubinsky/xml`; CI does not check out site-publisher).
+- feat: `store` and `metadata` moved to `org.podval.xml`; XML codec derivers; depend on published
+  `org.podval:org.podval.xml` 0.1.0 (optional local `includeBuild` of `dubinsky/xml`; CI does not check out
+  site-publisher).
 - fix: negative commandments in Sefer HaMitzvos.
 - cleanup: dropped ZIO runtime (`Effects`, zio-http `serveCalendar`) and unused dependencies.
 - texts: a custom may read nothing where its parent reads something, and may carry a source without carrying a reading.
 - texts: evening first (the day begins at night); read the night of Simchas Torah.
-- texts: Maghreb, Morocco, Algeria, Algiers and Agadir fast-day haftarot against Asulin and hamichlol; rites added from hamichlol given their readings.
-- texts: Romania custom (hamichlol); Tisha BeAv Mincha has its own haftarah table; record what is known about a reading beside the reading (sources, comments, variants).
+- texts: Maghreb, Morocco, Algeria, Algiers and Agadir fast-day haftarot against Asulin and hamichlol; rites added from
+  hamichlol given their readings.
+- texts: Romania custom (hamichlol); Tisha BeAv Mincha has its own haftarah table; record what is known about a reading
+  beside the reading (sources, comments, variants).
 - texts: Italki reads the second day of Shavuos with Sefard.
-- texts: public fasts have their weekday morning reading; Yom Kippur on Shabbos is read with seven aliyot; Shabbos Shuvah haftarah on Shabbos Shuvah; shift the haftarot of rebuke when Mattos and Masei are combined.
+- texts: public fasts have their weekday morning reading; Yom Kippur on Shabbos is read with seven aliyot; Shabbos
+  Shuvah haftarah on Shabbos Shuvah; shift the haftarot of rebuke when Mattos and Masei are combined.
 - fix: `equals` checks the type before casting (unguarded casts threw `ClassCastException`).
 - cleanup: removed Collector; removed CalendarServer; merged `util` into `core`; removed some dead code.
 - chore: switch from Jekyll to Podval Site Publisher (GitHub Action deploys `docs/` to GitHub Pages).
@@ -95,7 +103,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs: minor calendar paper changes
 - docs: solar theory
 - docs: cleanup of the exact value calculations
-- docs: using [custom styles](https://docs.asciidoctor.org/asciidoc/latest/text/custom-inline-styles/) for the critical apparatus (add/correct/source)
+- docs: using [custom styles](https://docs.asciidoctor.org/asciidoc/latest/text/custom-inline-styles/) for the critical
+  apparatus (add/correct/source)
 
 ## [0.10.10] - 2023-05-31
 - cleanup: Node
@@ -135,7 +144,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - removed ToHtml and direct (non-XSLT) processing functionality and Playwright
   - moved docbook, fop, math and pdf packages from the core module into the docbook module
   - cleanup
-- html: moved Html and A into the xml package, and merged the rest of the package into the site package in the collector module
+- html: moved Html and A into the xml package, and merged the rest of the package into the site package in the collector
+  module
 - xml:
   - use XML includes instead of redirects
   - worked around a terrible Xerces XInclude bug
@@ -195,12 +205,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saxon 11;
 - dependencies update;
 - using scala-xml with my enhancements;
-- make XML includes leave xml:base traces;
-calendar: modern sun position calculations using com.kosherjava:zmanim;
-calendar: conversions to java.time.LocalDateTime and Julian Day;
-docbook: installDocBookDependencies task;
-site: list DocBook files to pretty-print;
-site: use per-entity reference lists instead of the monolithic one to avoid OOM;
+- make XML includes leave xml:base traces; calendar: modern sun position calculations using com.kosherjava:zmanim;
+  calendar: conversions to java.time.LocalDateTime and Julian Day; docbook: installDocBookDependencies task; site: list
+  DocBook files to pretty-print; site: use per-entity reference lists instead of the monolithic one to avoid OOM;
 
 ## [0.10.0] - 2022-01-20
 - from now on, version applies to DocBook plugin too;
@@ -212,8 +219,8 @@ site: use per-entity reference lists instead of the monolithic one to avoid OOM;
 - consolidated all papers (and data generators) and mdoc in the "docs" module;
 - ScalaTest 3.2.10 uses current FlexMark and there is no longer a conflict with mdoc; removed build classpath trickery;
 - ToHtml cleanup: levels of notes;
-- hand-coded replacement for Gradle/Ant Zip and Copy (with filtering);
-docbook: *breaking changes from the previous release*
+- hand-coded replacement for Gradle/Ant Zip and Copy (with filtering); docbook: *breaking changes from the previous
+  release*
 - moved DocBook stuff that is not the plugin itself into core;
 - reworked plugin's the Gradle DSL;
 - introduce configuration by XML files;
@@ -221,7 +228,8 @@ docbook: *breaking changes from the previous release*
 - ProcessDocBookTask self-configures from the extension - no other instances can be used;
 - output and temporary directories are per document even if there is only one document configured;
 - per-document configuration;
-- to support per-variant configuration of the versions, math etc., generate main stylesheet and XML catalog for each variant;
+- to support per-variant configuration of the versions, math etc., generate main stylesheet and XML catalog for each
+  variant;
 - variant name is used for the output only if there are more than one variant of the same format for the document;
 - generate under `build`, not `src`: stylesheets, substitutions DTD, XML catalog, FOP configuration file;
 - generate default customization stylesheets (under `build`) only if they are used *and* non-empty;
@@ -251,11 +259,11 @@ docbook: *breaking changes from the previous release*
 
 ## [0.2.6; 0.3.7 calendar] - 2021-08-17
 - consolidated 'util', 'xml' and 'metadata' modules into 'base';
-- moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the
-    'store' package of the 'base' module;
+- moved Store, By, Selector, Directory, WithSource and some Site/HtmlContent methods into the 'store' package of the
+  'base' module;
 - consolidated 'calendar-paper' into 'calendar';
 - consolidated 'fop' into 'docbook';
-- consolidated 'calendar-service' into 'schedule';  
+- consolidated 'calendar-service' into 'schedule';
 - consolidated 'dream' and 'typesetting' papers into 'texts';
 - added 'site' module with Site/HtmlTheme/HtmlContent/Viewer and Markdown support;
 - added 'docs' module;
@@ -279,8 +287,8 @@ docbook: *breaking changes from the previous release*
 - correct `jib.from.image`;
 - centralized dependency versions using Gradle 7 features;
 - dependency updates;
-- code adjusted to compile with Scala 3 (using 
-  [patched Gradle](https://github.com/gradle/gradle/pull/18001) and Scala 3.0.3 nightlies);
+- code adjusted to compile with Scala 3 (using [patched Gradle](https://github.com/gradle/gradle/pull/18001) and Scala
+  3.0.3 nightlies);
 
 ## [0.8.3 docbook] - 2021-08-17
 - **note:** `mathJax.isEnabled` renamed `mathJax.enabled`;
@@ -312,8 +320,8 @@ docbook: *breaking changes from the previous release*
 - use the latest Cloud Run Gradle plugin to run in the local Docker;
 
 ## [0.2.0] - 2021-01-27
-My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed:
-it was not general enough, and too inflexible to be used even in its original context.
+My attempt at re-using Store and friends for texts other than the alter-rebbe archive failed: it was not general enough,
+and too inflexible to be used even in its original context.
 Code in the 'collector' module was re-written, and 'store' module emptied out.
 - Service class enhanced to serve dynamic content;
 - Main and Cutter moved into the alter-rebbe.org repository;
@@ -325,8 +333,8 @@ Code in the 'collector' module was re-written, and 'store' module emptied out.
 
 ## [0.3.4 calendar] - 2021-01-15
 - preparing for the switch to Scala 2.13/3;
-- reworked family polymorphism to not use general type projections
-  (they go away in Scala 3), so we are back to all family members being in one file :(
+- reworked family polymorphism to not use general type projections (they go away in Scala 3), so we are back to all
+  family members being in one file :(
 
 ## [0.1.66] - 2021-01-14
 - Scala 2.13+
@@ -511,10 +519,9 @@ Code in the 'collector' module was re-written, and 'store' module emptied out.
 - force use of Xerces by Saxon
 
 ## [0.7.11 docbook] - 2019-11-25
-- update Gradle to 6.0.1; call metadataSources.artifact() explicitly to handle NodeJS
-  repository (was done automatically in Gradle <6)
-- update FOP to 2.4; exclude new JAI dependencies that rely on JBoss repository
-  add equivalent dependencies from JCenter
+- update Gradle to 6.0.1; call metadataSources.artifact() explicitly to handle NodeJS repository (was done automatically
+  in Gradle <6)
+- update FOP to 2.4; exclude new JAI dependencies that rely on JBoss repository add equivalent dependencies from JCenter
 
 ## [] - 2019-11-13
 - addressee
@@ -590,8 +597,8 @@ collector:
 - namespace-aware DocBook XSLT 1.0 stylesheets
 
 ## [0.6.6 docbook] - 2019-02-20
-- merged XSL customizations, temporary directory, output directory and
-  output formats configuration for XSLT 1.0 and 2.0 stylesheets
+- merged XSL customizations, temporary directory, output directory and output formats configuration for XSLT 1.0 and 2.0
+  stylesheets
 - versions of the XSLT stylesheets are now configurable
 
 ## [0.6.5 docbook] - 2019-02-19
@@ -739,13 +746,13 @@ calendar:
 - more tests
 - cleanup
 
-NOTE: Scala compiler crashed (!!!) with the typing on Number/TimeNumber.
-When family members are inside the family trait, it gets in the way (Family.this.T...);
-To work around it, I tried using [T <: NumberSystem[T], N <: T#Number[T, N]].
-It did the trick - I think - on the NumberSystem, but once I modified TimeNumberSystem in this way,
-I got compiler crash!
-Splitting the NumberSystem and TimeNumberSystem *helped* the knot-tying:
-everything compiles and works!
+NOTE: Scala compiler crashed (!!!)
+with the typing on Number/TimeNumber.
+When family members are inside the family trait, it gets in the way (Family.this.T...); To work around it, I tried using
+[T <: NumberSystem[T], N <: T#Number[T, N]].
+It did the trick - I think - on the NumberSystem, but once I modified TimeNumberSystem in this way, I got compiler
+crash!
+Splitting the NumberSystem and TimeNumberSystem *helped* the knot-tying: everything compiles and works!
 
 ## [] - 2016-05-08
 - Rambam schedule generator
