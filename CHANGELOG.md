@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 - Plugin id `org.podval.tools.site-publisher` on `:docs` (`generateSite` / `serveSite`, still `dependsOn generateTables`).
 - texts: axis catalog is `Terms.xml` (`<term id selector="yes">`); pin `org.podval:org.podval.xml` 0.7.0.
+- `object Terms` holds the `TermCatalog`, the given is exported from `tanach` and `rambam`, `Chapters.BySpan` uses
+  `forName`, and the pin is `org.podval:org.podval.xml` 0.8.0.
 
 ## [0.11.0] - 2026-09-10
 - numbers: Vector Euclidean `/` and `%`; number-system laws and angle `toString` tests.

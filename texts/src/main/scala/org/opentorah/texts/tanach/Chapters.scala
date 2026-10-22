@@ -1,7 +1,7 @@
 package org.opentorah.texts.tanach
 
-import org.podval.metadata.Names
-import org.podval.store.{By, NumberedStore, NumberedStores, Selectors, Stores}
+import org.podval.metadata.{Names, Term, TermCatalog}
+import org.podval.store.{By, NumberedStore, NumberedStores, Selector, Stores, selector}
 
 final class Chapters(chapters: Seq[Int]):
   def length(chapter: Int): Int = chapters(chapter-1)
@@ -66,14 +66,19 @@ final class Chapters(chapters: Seq[Int]):
       )
 
 object Chapters:
+  private def selectorForName(name: String)(using catalog: TermCatalog): Selector =
+    val found: Option[Term] = catalog.forName(name)
+    require(found.isDefined, s"Unknown term: $name")
+    catalog.selector(found.get.id)
+
   class BySpan(
     selectorName: String,
     spans: Seq[Span],
     chapters: Chapters,
     name2number: String => Option[Int] = NumberedStores.parseNumber,
     number2names: Int => Names = NumberedStores.namesForNumber
-  )(using Selectors) extends By.Numbered[NumberedStore](
-    summon[Selectors].getForName(selectorName),
+  )(using catalog: TermCatalog) extends By.Numbered[NumberedStore](
+    selectorForName(selectorName),
     name2number,
     number2names
   ):
