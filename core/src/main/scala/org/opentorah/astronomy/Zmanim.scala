@@ -2,8 +2,7 @@ package org.opentorah.astronomy
 
 import com.kosherjava.zmanim.ZmanimCalendar
 import com.kosherjava.zmanim.util.{GeoLocation, NOAACalculator, SunTimesCalculator}
-import java.time.{OffsetDateTime, ZoneOffset}
-import java.util.{Calendar, Date, SimpleTimeZone}
+import java.time.{Instant, LocalDate, OffsetDateTime, ZoneOffset}
 
 /*
   Some calculations on the Kiddush between 6 and 7
@@ -28,7 +27,10 @@ object Zmanim:
     longitude: Double,
     rawOffset: Int
   ):
-    def noSaving(date: Date): OffsetDateTime = date.toInstant.atOffset(ZoneOffset.ofHours(rawOffset))
+    // Fixed offset, no daylight saving: the same offset `noSaving` uses to read the clock.
+    private val zoneOffset: ZoneOffset = ZoneOffset.ofHours(rawOffset)
+
+    def noSaving(instant: Instant): OffsetDateTime = instant.atOffset(zoneOffset)
 
     def minute(date: OffsetDateTime): Int = date.getHour*60 + date.getMinute
 
@@ -37,20 +39,18 @@ object Zmanim:
       latitude,
       longitude,
       0,
-      SimpleTimeZone(rawOffset, name)
+      zoneOffset
     )
 
     def zmanim(year: Int): Seq[ZmanimCalendar] = for day <- 1 to 365 yield
       val zmanim: ZmanimCalendar = ZmanimCalendar(geoLocation)
       zmanim.setAstronomicalCalculator(calculator)
-      val calendar = zmanim.getCalendar
-      calendar.set(Calendar.YEAR, year)
-      calendar.set(Calendar.DAY_OF_YEAR, day)
+      zmanim.setLocalDate(LocalDate.ofYearDay(year, day))
       zmanim
 
     def averageNoonOffset(year: Int): Int =
       val noonOffsets: Seq[Int] = for zmanim <- zmanim(year) yield
-        val noon: OffsetDateTime = noSaving(zmanim.getChatzos)
+        val noon: OffsetDateTime = noSaving(zmanim.getChatzosHayom)
         (noon.getHour-12)*60 + noon.getMinute
 
       (noonOffsets.sum.toFloat/noonOffsets.length).toInt
@@ -60,9 +60,9 @@ object Zmanim:
       println(s"noon offset: $noonOffset")
 
       for zmanim <- zmanim(year) do
-        val plagHamincha = noSaving(zmanim.getPlagHamincha)
+        val plagHamincha = noSaving(zmanim.getPlagHaminchaGRA)
         val plagHaminchaMinute: Int = minute(plagHamincha)
-        val seventhHourReal = noSaving(zmanim.getChatzos).plusHours(6)
+        val seventhHourReal = noSaving(zmanim.getChatzosHayom).plusHours(6)
 
         val minutesBeforeSeventhHourReal: Int = minute(seventhHourReal)-plagHaminchaMinute
         val minutesBeforeSeventhHourMean: Int = 18*60+noonOffset-plagHaminchaMinute

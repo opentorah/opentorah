@@ -15,7 +15,7 @@ dependencies {
   // Substituted from the xml composite build when that checkout is present.
   api 'org.podval:org.podval.xml:0.7.0'
 
-  implementation 'com.kosherjava:zmanim:2.5.0'
+  implementation 'com.kosherjava:zmanim:3.0.0'
 
   testImplementation "org.typelevel:cats-core_3:$catsVersion"
   testImplementation "org.typelevel:cats-laws_3:$catsVersion"
