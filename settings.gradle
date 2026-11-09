@@ -8,11 +8,14 @@ pluginManagement {
     id 'org.podval.tools.scala' version '2.3.0'
   }
 
-  // String path: a File would call Settings.includeBuild (not a plugin build).
-  final String conventionsDir =
-    providers.gradleProperty('podvalGradleDir').getOrElse('../../Podval/podval-gradle')
-  if (file(conventionsDir).isDirectory() && file("${conventionsDir}/settings.gradle").isFile()) {
-    includeBuild conventionsDir
+  // A parent build has already included this directory; Gradle rejects a second include.
+  if (gradle.parent == null) {
+    // String path: a File would call Settings.includeBuild (not a plugin build).
+    final String conventionsDir =
+      providers.gradleProperty('podvalGradleDir').getOrElse('../../Podval/podval-gradle')
+    if (file(conventionsDir).isDirectory() && file("${conventionsDir}/settings.gradle").isFile()) {
+      includeBuild conventionsDir
+    }
   }
   // Composite: plugin id. Library substitution is the settings-body includeBuild below.
   // Override with -PsitePublisherDir=. Missing directory (CI): resolve both from Maven Central.
