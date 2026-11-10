@@ -8,7 +8,7 @@ description = 'OpenTorah Documentation'
 apply from: '../configure.gradle'
 
 // scala.runtime.LazyVals$ uses sun.misc.Unsafe
-podval.allowJdk25RestrictedAccess()
+podval.allowJdkRestrictedAccess()
 
 dependencies {
   implementation project(':opentorah-core')
